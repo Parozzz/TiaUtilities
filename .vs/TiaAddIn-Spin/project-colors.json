@@ -5,6 +5,11 @@
       "ProjectGuid": "00c536d1-31ed-4430-937f-336672a3b4c6",
       "DisplayName": "TiaAddIn-Spin",
       "ColorIndex": 0
+    },
+    "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3": {
+      "ProjectGuid": "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3",
+      "DisplayName": "File esterni",
+      "ColorIndex": -1
     }
   },
   "NextColorIndex": 1

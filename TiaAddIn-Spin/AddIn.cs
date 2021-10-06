@@ -22,11 +22,11 @@ namespace FCFBConverter
 
         private readonly string _traceFilePath;
 
-        public AddIn(TiaPortal tiaPortal) : base("FC-FB Converter")
+        public AddIn(TiaPortal tiaPortal) : base("TiaAddIn-Spin")
         {
             _tiaPortal = tiaPortal;
             _settings = Settings.Load();
-            
+
             var assemblyName = Assembly.GetCallingAssembly().GetName();
             var logDirectoryPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "TIA Add-Ins", assemblyName.Name, assemblyName.Version.ToString(), "Logs");
             var logDirectory = Directory.CreateDirectory(logDirectoryPath);
@@ -38,7 +38,6 @@ namespace FCFBConverter
             menuRoot.Items.AddActionItem<PlcTagTable>("Controlla Tabella tag", CheckTagTableClick);
             menuRoot.Items.AddActionItem<PlcBlock>("Controlla Blocchi", CheckBlocksClick);
             
-
             menuRoot.Items.AddActionItem<FC>("Convert to FB", AddInClick);
             menuRoot.Items.AddActionItem<FB>("Convert to FC", AddInClick);
             menuRoot.Items.AddActionItem<IEngineeringObject>("Please select only FBs or FCs", menuSelectionProvider => { }, InfoTextStatus);
