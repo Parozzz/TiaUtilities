@@ -1,0 +1,5 @@
+C:\Users\Paronetto g\Documents\GitHub\TiaSpinAddin\FCFBConverter\bin\Debug\FCFBConverter.dll
+C:\Users\Paronetto g\Documents\GitHub\TiaSpinAddin\FCFBConverter\bin\Debug\FCFBConverter.pdb
+C:\Users\Paronetto g\Documents\GitHub\TiaSpinAddin\FCFBConverter\obj\Debug\TiaAddIn-Spin.csproj.CoreCompileInputs.cache
+C:\Users\Paronetto g\Documents\GitHub\TiaSpinAddin\FCFBConverter\obj\Debug\FCFBConverter.dll
+C:\Users\Paronetto g\Documents\GitHub\TiaSpinAddin\FCFBConverter\obj\Debug\FCFBConverter.pdb

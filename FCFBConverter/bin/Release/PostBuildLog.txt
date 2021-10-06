@@ -1,7 +1,7 @@
-C:\Program Files\Siemens\Automation\Portal V16\PublicAPI\V16.AddIn\Siemens.Engineering.AddIn.Publisher.exe --> 05/10/2021 13:38:03 UTC
+C:\Program Files\Siemens\Automation\Portal V16\PublicAPI\V16.AddIn\Siemens.Engineering.AddIn.Publisher.exe --> 06/10/2021 09:04:24 UTC
 
 Calling Arguments:
---configuration              :C:\Users\Paronetto g\Desktop\TIA16-AddIn\Project\FCFBConverter\Config.xml
+--configuration              :C:\Users\Paronetto g\Documents\GitHub\TiaSpinAddin\FCFBConverter\Config.xml
 --logfile                    :PostBuildLog.txt
 --outfile                    :
 --verbose                    :False
@@ -9,8 +9,8 @@ Calling Arguments:
 --pause                      :False
 
 Packaging engineering version.
-Packaging main assembly 'fcfbconverter, version=1.0.2.0, culture=neutral, publickeytoken=null, processorarchitecture=msil'.
-Packaging reference assembly 'fcfbconverter.xmlserializers, version=1.0.2.0, culture=neutral, publickeytoken=null, processorarchitecture=msil'.
+Packaging main assembly 'spinaddin, version=1.0.2.0, culture=neutral, publickeytoken=null, processorarchitecture=msil'.
+Packaging reference assembly 'spinaddin.xmlserializers, version=1.0.2.0, culture=neutral, publickeytoken=null, processorarchitecture=msil'.
 Packaging Id.
 Packaging ProductName.
 Packaging multiuser settings information.
@@ -20,4 +20,4 @@ Packaging Permission 'System.Security.Permissions.UIPermission'.
 Packaging Permission 'System.Security.Permissions.SecurityPermission.UnmanagedCode'.
 Packaging Permission 'TIA.ReadWrite'.
 
- --> S U C C E E D E D <-- (0,138s)
+ --> S U C C E E D E D <-- (0,135s)

@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "00c536d1-31ed-4430-937f-336672a3b4c6": {
+      "ProjectGuid": "00c536d1-31ed-4430-937f-336672a3b4c6",
+      "DisplayName": "TiaAddIn-Spin",
+      "ColorIndex": 0
+    }
+  },
+  "NextColorIndex": 1
+}
