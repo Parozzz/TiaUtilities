@@ -1,4 +1,4 @@
-﻿using FCFBConverter.Utility;
+﻿using SpinAddin.Utility;
 using Siemens.Engineering;
 using Siemens.Engineering.AddIn.Menu;
 using Siemens.Engineering.SW.Blocks;
@@ -11,7 +11,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 
-namespace FCFBConverter
+namespace SpinAddin
 {
     public class AddIn : ContextMenuAddIn
     {

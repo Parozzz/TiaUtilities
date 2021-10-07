@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Siemens.Engineering.SW.Tags;
 
-namespace FCFBConverter
+namespace SpinAddin
 {
-    class TagsDatabase
+    public class TagsDatabase
     {
 
         private readonly Dictionary<string, Tag> tagNameDictionary;
@@ -23,14 +23,8 @@ namespace FCFBConverter
         {
             foreach(PlcTag plcTag in table.Tags)
             {
-                string comment = plcTag.Comment.Items.Count != 0 ? plcTag.Comment.Items[0].Text : null;
-                var tag = new Tag()
-                {
-                    Name = plcTag.Name,
-                    Comment = comment,
-                    DataTypeName = plcTag.DataTypeName,
-                    LogicalAddress = plcTag.LogicalAddress,
-                };
+                var tag = new Tag();
+                tag.ParseTag(plcTag);
 
                 if(!tagNameDictionary.ContainsKey(tag.Name))
                 {
@@ -45,7 +39,26 @@ namespace FCFBConverter
         }
     }
 
-    class Tag
+    public enum TagType
+    {
+        MERKER,
+        OUTPUT,
+        INPUT
+    }
+
+    public class TagAddress
+    {
+        public ushort Number { get; private set; }
+        public byte Bit { get; private set; }
+
+        public TagAddress(ushort number, byte bit)
+        {
+            this.Number = number;
+            this.Bit = bit;
+        }
+    }
+
+    public class Tag
     {
         public string Name {  get; set; }
 
@@ -54,5 +67,53 @@ namespace FCFBConverter
         public string DataTypeName {  get; set; }
 
         public string LogicalAddress { get; set;  }
+
+        public TagType Type { get; private set; }
+
+        public TagAddress Address { get; private set; }
+
+        internal void ParseTag(PlcTag plcTag)
+        {
+            this.Name = plcTag.Name;
+            this.Comment = plcTag.Comment.Items.Count != 0 ? plcTag.Comment.Items[0].Text : null; ;
+            this.DataTypeName = plcTag.DataTypeName;
+            this.LogicalAddress = plcTag.LogicalAddress;
+
+            if (LogicalAddress.StartsWith("%"))
+            {
+                switch(LogicalAddress.ToUpper()[1])
+                {
+                    case 'Q':
+                        this.Type = TagType.OUTPUT;
+                        break;
+                    case 'I':
+                        this.Type = TagType.INPUT;
+                        break;
+                    case 'M':
+                        this.Type = TagType.MERKER;
+                        break;
+                }
+
+                ushort addressNumber;
+                byte addressBit = 0;
+                if (DataTypeName.ToUpper().Equals("BOOL"))
+                {
+                    var pointIndex = LogicalAddress.IndexOf('.');
+                    ushort.TryParse("" + LogicalAddress.Substring(2, pointIndex), out addressNumber);
+                    byte.TryParse("" + LogicalAddress[pointIndex + 1], out addressBit);
+                }
+                else
+                {
+                    ushort.TryParse("" + LogicalAddress.Substring(2), out addressNumber);
+                }
+
+                Address = new TagAddress(addressNumber, addressBit);
+            }
+        }
+
+        string CreateExcelString()
+        {
+            return "";
+        }
     }
 }

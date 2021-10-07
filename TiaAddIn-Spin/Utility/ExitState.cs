@@ -1,4 +1,4 @@
-﻿namespace FCFBConverter.Utility
+﻿namespace SpinAddin.Utility
 {
     public enum ExitState
     {

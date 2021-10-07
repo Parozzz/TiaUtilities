@@ -6,7 +6,7 @@ using Siemens.Engineering.SW.Blocks;
 using System.Windows.Forms;
 using Siemens.Engineering.SW.Tags;
 
-namespace FCFBConverter.Utility
+namespace SpinAddin.Utility
 {
     public static class Util
     {

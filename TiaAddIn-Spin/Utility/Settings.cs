@@ -5,7 +5,7 @@ using System.Xml.Serialization;
 using Siemens.Engineering;
 using Siemens.Engineering.AddIn.Menu;
 
-namespace FCFBConverter.Utility
+namespace SpinAddin.Utility
 {
     [XmlRoot]
     [XmlType]

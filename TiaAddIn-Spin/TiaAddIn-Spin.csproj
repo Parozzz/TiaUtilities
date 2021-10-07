@@ -68,6 +68,7 @@
   <ItemGroup>
     <Compile Include="AddIn.cs" />
     <Compile Include="AddInProvider.cs" />
+    <Compile Include="FC.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TagsDatabase.cs" />
     <Compile Include="Utility\Block.cs" />

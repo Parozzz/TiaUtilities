@@ -9,7 +9,7 @@ using Siemens.Engineering.Library.Types;
 using Siemens.Engineering.SW;
 using Siemens.Engineering.SW.Blocks;
 
-namespace FCFBConverter.Utility
+namespace SpinAddin.Utility
 {
     public class Block
     {

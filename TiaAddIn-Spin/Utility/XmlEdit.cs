@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Xml;
 
-namespace FCFBConverter.Utility
+namespace SpinAddin.Utility
 {
     public static class XmlEdit
     {
