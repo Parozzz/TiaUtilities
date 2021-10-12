@@ -75,7 +75,7 @@ namespace SpinAddin.Utility
             string message = "Message: " + ex.Message + " \r\n StackTrace: " + ex.StackTrace;
             string caption = "An exception occoured while executing Spin Addin!";
 
-            MessageBox.Show(new Form() { TopMost = true }, message, caption);
+            MessageBox.Show(message, caption);
         }
     }
 
@@ -101,7 +101,9 @@ namespace SpinAddin.Utility
             }
             catch (Exception ex)
             {
-                Trace.TraceError("Exception during export:" + Environment.NewLine + ex);
+                Util.ShowExceptionMessage(ex);
+
+                //Trace.TraceError("Exception during export:" + Environment.NewLine + ex);
                 return false;
             }
             return true;

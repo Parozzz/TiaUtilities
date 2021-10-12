@@ -37,7 +37,7 @@ namespace SpinAddin
         {
             menuRoot.Items.AddActionItem<PlcTagTable>("Controlla Tabella tag", CheckTagTableClick);
             menuRoot.Items.AddActionItem<PlcBlock>("Controlla Blocchi", CheckBlocksClick);
-            
+
             menuRoot.Items.AddActionItem<FC>("Convert to FB", AddInClick);
             menuRoot.Items.AddActionItem<FB>("Convert to FC", AddInClick);
             menuRoot.Items.AddActionItem<IEngineeringObject>("Please select only FBs or FCs", menuSelectionProvider => { }, InfoTextStatus);
@@ -58,48 +58,33 @@ namespace SpinAddin
 
         private void CheckTagTableClick(MenuSelectionProvider selectionProvider)
         {
-            try
+            foreach (PlcTagTable tagTable in selectionProvider.GetSelection())
             {
-                foreach (PlcTagTable tagTable in selectionProvider.GetSelection())
+                ExportUtil.Export(tagTable.Export, Util.DesktopFolder() + "\\TagTableExport.xml");
+                foreach (PlcTag tag in tagTable.Tags)
                 {
-                    ExportUtil.Export(tagTable.Export, Util.DesktopFolder() + "\\TagTableExport.xml");
-                    foreach (PlcTag tag in tagTable.Tags)
-                    {
-                        ExportUtil.Export(tag.Export, Util.DesktopFolder() + "\\TagExport.xml");
-                        break;
-                    }
-
+                    ExportUtil.Export(tag.Export, Util.DesktopFolder() + "\\TagExport.xml");
                     break;
                 }
-            }
-            catch (Exception ex)
-            {
-                Util.ShowExceptionMessage(ex);
+
+                break;
             }
         }
 
         private void CheckBlocksClick(MenuSelectionProvider selectionProvider)
         {
-            try
+            foreach (PlcBlock block in selectionProvider.GetSelection())
             {
-                foreach (PlcBlock block in selectionProvider.GetSelection())
+                if (block is FC fc)
                 {
-                    if (block is FC fc)
-                    {
-                        ExportUtil.Export(fc.Export, Util.DesktopFolder() + "\\FCExport.xml");
-                    }
-                    else if (block is FB fb)
-                    {
-                        ExportUtil.Export(fb.Export, Util.DesktopFolder() + "\\FBExport.xml");
-                    }
+                    ExportUtil.Export(fc.Export, Util.DesktopFolder() + "\\FCExport.xml");
+                }
+                else if (block is FB fb)
+                {
+                    ExportUtil.Export(fb.Export, Util.DesktopFolder() + "\\FBExport.xml");
                 }
             }
-            catch (Exception ex)
-            {
-                Util.ShowExceptionMessage(ex);
-            }
         }
-
 
         private void AddInClick(MenuSelectionProvider menuSelectionProvider)
         {

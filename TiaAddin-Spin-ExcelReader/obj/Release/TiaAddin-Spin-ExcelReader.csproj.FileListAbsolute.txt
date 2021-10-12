@@ -1,0 +1,10 @@
+C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\Release\TiaAddin-Spin-ExcelReader.csproj.SuggestedBindingRedirects.cache
+C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\Release\TiaAddin_Spin_ExcelReader.Properties.Resources.resources
+C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\Release\TiaAddin-Spin-ExcelReader.csproj.GenerateResource.cache
+C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\Release\TiaAddin-Spin-ExcelReader.csproj.CoreCompileInputs.cache
+C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\bin\Release\TiaAddin-Spin-ExcelReader.exe.config
+C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\bin\Release\TiaAddin-Spin-ExcelReader.exe
+C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\bin\Release\TiaAddin-Spin-ExcelReader.pdb
+C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\Release\TiaAddin-Spin-ExcelReader.exe
+C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\Release\TiaAddin-Spin-ExcelReader.pdb
+C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\Release\TiaAddin_Spin_ExcelReader.Form1.resources
