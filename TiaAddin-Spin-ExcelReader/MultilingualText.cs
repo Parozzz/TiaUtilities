@@ -63,12 +63,16 @@ namespace SpinAddIn
 
             internal Item ParseXMLNode(XmlNode node)
             {
-                var cultureNode = node.SelectSingleNode("./AttributeList/Culture");
-
-                var value = cultureNode?.Value;
-                Locale = cultureNode == null ? CultureInfo.InvariantCulture : CultureInfo.GetCultureInfo(value);
-
-                Text = node.SelectSingleNode("./AttributeList/Text")?.Value;
+                try
+                {
+                    var cultureNodeValue = node.SelectSingleNode("./AttributeList/Culture")?.FirstChild?.Value;
+                    Locale = CultureInfo.GetCultureInfo(cultureNodeValue ?? "{}");
+                } catch (CultureNotFoundException)
+                {
+                    Locale = CultureInfo.InvariantCulture;
+                }
+                
+                Text = node.SelectSingleNode("./AttributeList/Text")?.FirstChild?.Value ?? "";
 
                 return this;
             }

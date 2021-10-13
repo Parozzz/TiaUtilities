@@ -21,9 +21,7 @@ namespace SpinAddIn.BlockData
 
         internal CompileUnit ParseXmlNode(XmlNode node)
         {
-            var attributeListNode = node.SelectSingleNode(".//AttributeList");
-
-            var networkSourceNode = attributeListNode?.SelectSingleNode(".//NetworkSource");
+            var networkSourceNode = node.SelectSingleNode("./AttributeList/NetworkSource");
             if (networkSourceNode != null)
             {
                 foreach (XmlNode networkSourceChildNode in networkSourceNode.ChildNodes)
@@ -39,34 +37,18 @@ namespace SpinAddIn.BlockData
                 }
             }
 
-            var programmingLanguangeNode = attributeListNode?.SelectSingleNode(".//ProgrammingLanguage");
-            if (programmingLanguangeNode != null)
-            {
-                ProgrammingLanguage = programmingLanguangeNode.Value;
-            }
+            ProgrammingLanguage = node.SelectSingleNode("./AttributeList/ProgrammingLanguage")?.InnerText ?? "";
             /*
             if (programmingLanguangeNode != null && Enum.TryParse(programmingLanguangeNode.Value, true, out ProgrammingLanguage language))
             {
                 ProgrammingLanguage = language;
             }*/
 
-            var multilingualTextList = node?.SelectNodes("./ObjectList/MultilingualText");
-            if (multilingualTextList != null)
-            {
-                foreach (XmlNode multilingualTextNode in multilingualTextList)
-                {
-                    var multilingualText = new MultilingualText().ParseXMLNode(multilingualTextNode);
-                    switch (multilingualText.CompositionName)
-                    {
-                        case "Comment":
-                            Comment = multilingualText;
-                            break;
-                        case "Title":
-                            Title = multilingualText;
-                            break;
-                    }
-                }
-            }
+            var titleNode = node?.SelectSingleNode("./ObjectList/MultilingualText[@CompositionName = Title]");
+            Title = new MultilingualText().ParseXMLNode(titleNode);
+
+            var commentNode = node?.SelectSingleNode("./ObjectList/MultilingualText[@CompositionName = Comment]");
+            Comment = new MultilingualText().ParseXMLNode(commentNode);
 
             return this;
         }

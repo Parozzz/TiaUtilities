@@ -21,8 +21,10 @@ namespace TiaAddin_Spin_ExcelReader
 
         private void FilePathTextBox_MouseClick(object sender, MouseEventArgs e)
         {
-            var fileDialog = new OpenFileDialog();
-            fileDialog.Filter = "XML Files (*.xml)|*.xml";
+            var fileDialog = new OpenFileDialog
+            {
+                Filter = "XML Files (*.xml)|*.xml"
+            };
 
             var result = fileDialog.ShowDialog();
             if(result == DialogResult.OK || result == DialogResult.Yes)
