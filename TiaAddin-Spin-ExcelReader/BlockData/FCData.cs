@@ -23,51 +23,22 @@ namespace SpinAddIn.BlockData
 
         public void ParseXMLDocument()
         {
-            var mainNode = xmlDocument.SelectSingleNode(".//SW.Blocks.FC");
-            if (mainNode != null)
+            // Here i search for the whole document for the first FC Block AttributeList Interface (Because .//)
+            var interfaceNode = xmlDocument.SelectSingleNode(".//SW.Blocks.FC/AttributeList/Interface");
+            if (interfaceNode != null)
             {
+                blockInterface.ParseXmlNode(interfaceNode);
+            }
+            // Here i search for the whole document for the first FC Block ObjectList (Because .//)
+            var objectListNode = xmlDocument.SelectSingleNode(".//SW.Blocks.FC/ObjectList"); 
+            Title = new MultilingualText()
+                .ParseXMLNode(objectListNode.SelectSingleNode("./MultilingualText[@CompositionName = \"Title\"]"));
+            Comment = new MultilingualText()
+                .ParseXMLNode(objectListNode.SelectSingleNode("./MultilingualText[@CompositionName = \"Comment\"]"));
 
-                foreach (XmlNode mainChildNode in mainNode.ChildNodes)
-                {
-                    if (mainChildNode.Name == "AttributeList")
-                    {
-                        var attributeListNode = mainChildNode;
-                        foreach (XmlNode attributeNode in attributeListNode.ChildNodes)
-                        {
-                            if (attributeNode.Name == "Interface")
-                            {
-                                blockInterface.ParseXmlNode(mainChildNode);
-                                break;
-                            }
-                        }
-
-                    }
-                    else if (mainChildNode.Name == "ObjectList")
-                    {
-                        var objectListNode = mainChildNode;
-                        foreach (XmlNode objectNode in objectListNode.ChildNodes)
-                        {
-                            if (objectNode.Name == "SW.Blocks.CompileUnit")
-                            {
-                                compileUnitList.Add(new CompileUnit().ParseXmlNode(objectNode));
-                            }
-                            else if (objectNode.Name == "MultilingualText")
-                            {
-                                var multilingualText = new MultilingualText().ParseXMLNode(objectNode);
-                                switch (objectNode.Attributes["CompositionName"].Value)
-                                {
-                                    case "Comment":
-                                        Comment = multilingualText;
-                                        break;
-                                    case "Title":
-                                        Title = multilingualText;
-                                        break;
-                                }
-                            }
-                        }
-                    }
-                }
-
+            foreach(XmlNode compileUnitNode in objectListNode.SelectNodes("./SW.Blocks.CompileUnit"))
+            {
+                compileUnitList.Add(new CompileUnit().ParseXmlNode(compileUnitNode));
             }
         }
 

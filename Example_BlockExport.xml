@@ -59,7 +59,6 @@
 							<Member Name="Hot3" Datatype="Array[0..9] of Char"/>
 						</Member>
 					</Section>
-					
 					<Section Name="InOut">
 						<Member Name="ColdInOut" Datatype="IEC_TIMER" Version="1.0"/>
 						<Member Name="HotInOut" Datatype="IEC_COUNTER" Version="1.0"/>

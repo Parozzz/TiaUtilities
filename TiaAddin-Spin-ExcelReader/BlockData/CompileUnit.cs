@@ -38,16 +38,11 @@ namespace SpinAddIn.BlockData
             }
 
             ProgrammingLanguage = node.SelectSingleNode("./AttributeList/ProgrammingLanguage")?.InnerText ?? "";
-            /*
-            if (programmingLanguangeNode != null && Enum.TryParse(programmingLanguangeNode.Value, true, out ProgrammingLanguage language))
-            {
-                ProgrammingLanguage = language;
-            }*/
 
-            var titleNode = node?.SelectSingleNode("./ObjectList/MultilingualText[@CompositionName = Title]");
+            var titleNode = node?.SelectSingleNode("./ObjectList/MultilingualText[@CompositionName = \"Title\"]");
             Title = new MultilingualText().ParseXMLNode(titleNode);
 
-            var commentNode = node?.SelectSingleNode("./ObjectList/MultilingualText[@CompositionName = Comment]");
+            var commentNode = node?.SelectSingleNode("./ObjectList/MultilingualText[@CompositionName = \"Comment\"]");
             Comment = new MultilingualText().ParseXMLNode(commentNode);
 
             return this;
