@@ -22,7 +22,7 @@ namespace SpinAddIn.BlockData
         internal void ParseXmlNode(XmlNode node)
         {
             var sectionNodeList = node.SelectNodes("./Sections/Section");
-            if(sectionNodeList != null)
+            if(sectionNodeList.Count > 0)
             {
                 foreach (XmlNode sectionNode in sectionNodeList)
                 {

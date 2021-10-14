@@ -29,6 +29,7 @@ namespace SpinAddIn.BlockData
             {
                 blockInterface.ParseXmlNode(interfaceNode);
             }
+
             // Here i search for the whole document for the first FC Block ObjectList (Because .//)
             var objectListNode = xmlDocument.SelectSingleNode(".//SW.Blocks.FC/ObjectList"); 
             Title = new MultilingualText()
