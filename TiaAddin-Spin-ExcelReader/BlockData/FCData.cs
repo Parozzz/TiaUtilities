@@ -16,7 +16,7 @@ namespace SpinAddIn.BlockData
         public FCData(XmlDocument xmlDocument)
         {
             this.xmlDocument = xmlDocument;
-            this.blockInterface = new BlockInterface();
+            this.blockInterface = new BlockInterface(this);
 
             this.compileUnitList = new List<CompileUnit>();
         }
@@ -43,6 +43,10 @@ namespace SpinAddIn.BlockData
             }
         }
 
+        public XmlDocument GetXmlDocument()
+        {
+            return xmlDocument;
+        }
     }
 
 }

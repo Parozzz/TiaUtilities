@@ -7,13 +7,15 @@ namespace SpinAddIn.BlockData
 {
     public class BlockInterface
     {
+        private readonly FCData fcData;
         private readonly Dictionary<SectionTypeEnum, Section> sectionDictionary;
         private readonly List<Section> sectionList;
 
-        internal BlockInterface()
+        internal BlockInterface(FCData fcData)
         {
-            sectionDictionary = new Dictionary<SectionTypeEnum, Section>();
-            sectionList = new List<Section>();
+            this.fcData = fcData;
+            this.sectionDictionary = new Dictionary<SectionTypeEnum, Section>();
+            this.sectionList = new List<Section>();
         }
         public Section GetByType(SectionTypeEnum type)
         {
@@ -22,8 +24,11 @@ namespace SpinAddIn.BlockData
 
         internal void ParseXmlNode(XmlNode node)
         {
-            var sectionNodeList = node.SelectNodes("*/*");
-            if(sectionNodeList.Count > 0)
+            var nsmgr = new XmlNamespaceManager(fcData.GetXmlDocument().NameTable);
+            nsmgr.AddNamespace("irfcv4", "http://www.siemens.com/automation/Openness/SW/Interface/v4");
+
+            var sectionNodeList = node.SelectNodes("irfcv4:Sections/irfcv4:Section", nsmgr);
+            if(sectionNodeList != null && sectionNodeList.Count > 0)
             {
                 foreach (XmlNode sectionNode in sectionNodeList)
                 {
