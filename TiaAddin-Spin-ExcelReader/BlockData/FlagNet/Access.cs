@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace SpinAddIn.BlockData.Access
+namespace SpinAddIn.BlockData
 {
     public enum AccessScopeEnum
     {
@@ -69,8 +69,6 @@ namespace SpinAddIn.BlockData.Access
         }
 
     }
-
-
 
     public class Access : UIdObject
     {

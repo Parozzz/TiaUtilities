@@ -47,13 +47,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BlockData\Access\Access.cs" />
-    <Compile Include="BlockData\Access\LocalVariableAccess.cs" />
-    <Compile Include="BlockData\Access\TypesConstantAccess.cs" />
+    <Compile Include="BlockData\FlagNet\Access.cs" />
+    <Compile Include="BlockData\FlagNet\Access\LocalVariableAccess.cs" />
+    <Compile Include="BlockData\FlagNet\Access\TypesConstantAccess.cs" />
     <Compile Include="BlockData\BlockInterface.cs" />
     <Compile Include="BlockData\CompileUnit.cs" />
     <Compile Include="BlockData\FCData.cs" />
-    <Compile Include="BlockData\FlagNet.cs" />
+    <Compile Include="BlockData\FlagNet\FlagNet.cs" />
+    <Compile Include="BlockData\FlagNet\Part.cs" />
     <Compile Include="BlockData\UIdObject.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -89,6 +90,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TiaAddIn-Spin\TiaAddIn-Spin.csproj">
+      <Project>{00C536D1-31ED-4430-937F-336672A3B4C6}</Project>
+      <Name>TiaAddIn-Spin</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

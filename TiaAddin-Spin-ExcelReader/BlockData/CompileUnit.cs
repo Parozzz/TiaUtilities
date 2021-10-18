@@ -31,7 +31,7 @@ namespace SpinAddIn.BlockData
                         case "StructuredText":
                             break;
                         case "FlgNet":
-                            Net = new FlagNet();
+                            Net = new FlagNet().ParseXMLNode(networkSourceChildNode);
                             break;
                     }
                 }

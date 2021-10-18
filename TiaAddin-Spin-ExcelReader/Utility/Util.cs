@@ -18,4 +18,23 @@ namespace SpinAddin.Utility
             MessageBox.Show(message, caption);
         }
     }
+
+    public static class Validate
+    {
+        public static void NotNull(Object obj)
+        {
+            if(obj == null)
+            {
+                throw new NullReferenceException();
+            }
+        }
+    
+        public static void IsTrue(bool condition)
+        {
+            if (!condition)
+            {
+                throw new ArgumentException();
+            }
+        }
+    }
 }

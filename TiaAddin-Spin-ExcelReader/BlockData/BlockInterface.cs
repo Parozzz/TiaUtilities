@@ -12,6 +12,7 @@ namespace SpinAddIn.BlockData
 
         internal BlockInterface()
         {
+            sectionDictionary = new Dictionary<SectionTypeEnum, Section>();
             sectionList = new List<Section>();
         }
         public Section GetByType(SectionTypeEnum type)
@@ -21,7 +22,7 @@ namespace SpinAddIn.BlockData
 
         internal void ParseXmlNode(XmlNode node)
         {
-            var sectionNodeList = node.SelectNodes("./Sections/Section");
+            var sectionNodeList = node.SelectNodes("*/*");
             if(sectionNodeList.Count > 0)
             {
                 foreach (XmlNode sectionNode in sectionNodeList)
