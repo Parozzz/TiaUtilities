@@ -48,8 +48,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BlockData\FlagNet\Access.cs" />
-    <Compile Include="BlockData\FlagNet\Access\LocalVariableAccess.cs" />
-    <Compile Include="BlockData\FlagNet\Access\TypesConstantAccess.cs" />
+    <Compile Include="BlockData\FlagNet\Access\LiteralConstantAccess.cs" />
+    <Compile Include="BlockData\FlagNet\Access\VariableAccess.cs" />
+    <Compile Include="BlockData\FlagNet\Access\TypedConstantAccess.cs" />
     <Compile Include="BlockData\BlockInterface.cs" />
     <Compile Include="BlockData\CompileUnit.cs" />
     <Compile Include="BlockData\FCData.cs" />

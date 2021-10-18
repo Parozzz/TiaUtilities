@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace SpinAddIn.BlockData
+namespace TiaAddin_Spin_ExcelReader.BlockData
 {
     public static class PartParser
     {

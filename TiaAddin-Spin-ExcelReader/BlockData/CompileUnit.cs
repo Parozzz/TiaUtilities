@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace SpinAddIn.BlockData
+namespace TiaAddin_Spin_ExcelReader.BlockData
 {
     public class CompileUnit
     {
@@ -14,9 +14,11 @@ namespace SpinAddIn.BlockData
         public string ProgrammingLanguage { get; private set; }
         public FlagNet Net { get; private set; }
 
-        internal CompileUnit()
-        {
+        private readonly FCData fcData;
 
+        internal CompileUnit(FCData fcData)
+        {
+            this.fcData = fcData;
         }
 
         internal CompileUnit ParseXmlNode(XmlNode node)
@@ -31,7 +33,7 @@ namespace SpinAddIn.BlockData
                         case "StructuredText":
                             break;
                         case "FlgNet":
-                            Net = new FlagNet().ParseXMLNode(networkSourceChildNode);
+                            Net = new FlagNet(fcData).ParseXMLNode(networkSourceChildNode);
                             break;
                     }
                 }

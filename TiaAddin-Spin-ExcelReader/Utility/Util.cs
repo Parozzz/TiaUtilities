@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Windows.Forms;
+using System.Xml;
 
-namespace SpinAddin.Utility
+namespace TiaAddin_Spin_ExcelReader.Utility
 {
     public static class Util
     {
@@ -21,20 +22,40 @@ namespace SpinAddin.Utility
 
     public static class Validate
     {
-        public static void NotNull(Object obj)
+        public static void NotNull(Object obj, string exceptionMsg)
         {
-            if(obj == null)
+            if (obj == null)
             {
-                throw new NullReferenceException();
+                throw new NullReferenceException(exceptionMsg);
             }
         }
-    
-        public static void IsTrue(bool condition)
+
+        public static void NotNull(Object obj)
+        {
+            NotNull(obj, "An object is null when shouldn't");
+        }
+
+        public static void IsTrue(bool condition, string exceptionMsg)
         {
             if (!condition)
             {
-                throw new ArgumentException();
+                throw new ArgumentException(exceptionMsg);
             }
+        }
+
+        public static void IsTrue(bool condition)
+        {
+            IsTrue(condition, "A condition is false when should be true");
+        }
+    }
+
+    public static class XmlUtil
+    {
+        public static XmlNamespaceManager GetNamespace(XmlDocument document, string id, string namespaceURI)
+        {
+            var nsmgr = new XmlNamespaceManager(document.NameTable);
+            nsmgr.AddNamespace("net", namespaceURI); //The section has different workspace.
+            return nsmgr;
         }
     }
 }

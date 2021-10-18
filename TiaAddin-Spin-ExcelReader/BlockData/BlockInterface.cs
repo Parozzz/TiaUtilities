@@ -1,9 +1,11 @@
-﻿using System;
+﻿using SpinAddin.Utility;
+using System;
 using System.Collections.Generic;
 using System.Xml;
-using static SpinAddIn.BlockData.BlockInterface.Section;
+using TiaAddin_Spin_ExcelReader.Utility;
+using static TiaAddin_Spin_ExcelReader.BlockData.BlockInterface.Section;
 
-namespace SpinAddIn.BlockData
+namespace TiaAddin_Spin_ExcelReader.BlockData
 {
     public class BlockInterface
     {
@@ -22,14 +24,19 @@ namespace SpinAddIn.BlockData
             return sectionDictionary[type];
         }
 
+        XmlNodeList te;
         internal void ParseXmlNode(XmlNode node)
         {
-            var nsmgr = new XmlNamespaceManager(fcData.GetXmlDocument().NameTable);
-            nsmgr.AddNamespace("irfcv4", "http://www.siemens.com/automation/Openness/SW/Interface/v4");
+            Validate.NotNull(node);
+            Validate.IsTrue(node.Name.Equals("Interface"), "BlockInterface node name is not valid.");
 
-            var sectionNodeList = node.SelectNodes("irfcv4:Sections/irfcv4:Section", nsmgr);
-            if(sectionNodeList != null && sectionNodeList.Count > 0)
+            var sectionsNode = node["Sections"];
+            if (sectionsNode != null)
             {
+                var nsmgr = new XmlNamespaceManager(fcData.GetXmlDocument().NameTable);
+                nsmgr.AddNamespace("irfc", sectionsNode.NamespaceURI); //The section has different workspace.
+
+                var sectionNodeList = sectionsNode.SelectNodes("irfc:Section", nsmgr);
                 foreach (XmlNode sectionNode in sectionNodeList)
                 {
                     var section = new Section().ParseXmlNode(sectionNode);

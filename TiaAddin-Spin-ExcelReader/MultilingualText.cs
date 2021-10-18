@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace SpinAddIn
+namespace TiaAddin_Spin_ExcelReader
 {
     public class MultilingualText
     {

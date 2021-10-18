@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SpinAddIn.BlockData
+namespace TiaAddin_Spin_ExcelReader.BlockData
 {
     public class LocalVariableAccess : Access
     {

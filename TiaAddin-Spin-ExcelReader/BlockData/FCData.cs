@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Xml;
 
-namespace SpinAddIn.BlockData
+namespace TiaAddin_Spin_ExcelReader.BlockData
 {
     public class FCData
     {
@@ -39,7 +39,7 @@ namespace SpinAddIn.BlockData
 
             foreach(XmlNode compileUnitNode in objectListNode.SelectNodes("./SW.Blocks.CompileUnit"))
             {
-                compileUnitList.Add(new CompileUnit().ParseXmlNode(compileUnitNode));
+                compileUnitList.Add(new CompileUnit(this).ParseXmlNode(compileUnitNode));
             }
         }
 
