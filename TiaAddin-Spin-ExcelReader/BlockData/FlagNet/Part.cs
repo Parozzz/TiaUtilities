@@ -8,30 +8,20 @@ using System.Xml;
 
 namespace TiaAddin_Spin_ExcelReader.BlockData
 {
-    public static class PartParser
-    {
-        public static Part ParseXMLNode(XmlNode node)
-        {
-            bool parseOK = true;
-            parseOK &= uint.TryParse(node.Attributes["UId"].Value, out var parseUID);
-
-            var name = node.Attributes["Name"].Value;
-
-            return new Part()
-            {
-                UId = parseUID,
-                Name = name
-            };
-        }
-    }
-
     public class Part : UIdObject
     {
         public string Name { get; internal protected set; }
 
-        internal Part()
-        {
+        private readonly Dictionary<uint, string> connectionDictionary;
 
+        public Part()
+        {
+            connectionDictionary = new Dictionary<uint, string>();
+        }
+
+        public void AddConnection(uint uid, string name)
+        {
+            connectionDictionary.Add(uid, name);
         }
     }
 }
