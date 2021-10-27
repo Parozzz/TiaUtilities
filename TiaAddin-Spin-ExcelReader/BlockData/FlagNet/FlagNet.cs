@@ -14,12 +14,15 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
         private readonly Dictionary<uint, UIdObject> completeUIdDictionary;
         private readonly Dictionary<uint, Part> partUIdDictionary;
         private readonly Dictionary<uint, Access> accessUIdDictionary;
+        private readonly Dictionary<uint, Wire> wireUIdDictionary;
+
         internal FlagNet(FCData fcData)
         {
             this.fcData = fcData;
             completeUIdDictionary = new Dictionary<uint, UIdObject>();
             partUIdDictionary = new Dictionary<uint, Part>();
             accessUIdDictionary = new Dictionary<uint, Access>();
+            wireUIdDictionary = new Dictionary<uint, Wire>();
         }
 
 
@@ -51,37 +54,20 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
                 }
             }
 
+            //Call is used when calling FCs or FBs
+            foreach (XmlNode callNode in node.SelectNodes("net:Parts/net:Call", netNamespace))
+            {
+            }
+
+
             foreach (XmlNode wireNode in node.SelectNodes("net:Wires/net:Wire", netNamespace))
             {
-
-                uint indentationConnectionUid = 0;
-                uint nameConnectionUid = 0;
-                uint openConnectionUid = 0;
-
-                bool powerrail = false;
-                foreach(XmlNode childWireNode in node)
+                var wire = parser.ParseWireNode(wireNode);
+                if(wire != null)
                 {
-                    switch(childWireNode.Name)
-                    {
-                        case "Powerrail":
-                            powerrail = true;
-                            break;
-                        case "IdentCon":
-                            uint.TryParse(childWireNode.Attributes["UId"].Value, out indentationConnectionUid);
-                            break;
-                        case "NameCon":
-                            uint.TryParse(childWireNode.Attributes["UId"].Value, out nameConnectionUid);
-                            break;
-                        case "OpenCon":
-                            uint.TryParse(childWireNode.Attributes["UId"].Value, out openConnectionUid);
-                            break;
-                        default:
-                            MessageBox.Show("Unknown Wire ChildNode name: " + childWireNode.Name);
-                            break;
-                    }
+                    completeUIdDictionary[wire.UId] = wire;
+                    wireUIdDictionary[wire.UId] = wire;
                 }
-
-                var wire = new Wire(powerrail);
             }
 
             return this;

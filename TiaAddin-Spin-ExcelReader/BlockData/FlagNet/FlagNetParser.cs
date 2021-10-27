@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Xml;
 
 namespace TiaAddin_Spin_ExcelReader.BlockData
@@ -20,8 +21,8 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
         public Access ParseAccessNode(XmlNode node)
         {
             bool parseOK = true;
-            parseOK &= uint.TryParse(node.Attributes["UId"].Value, out var parseUID);
-            parseOK &= Enum.TryParse(node.Attributes["Scope"].Value, true, out AccessScopeEnum parseScope);
+            parseOK &= uint.TryParse(node.Attributes["UId"]?.Value, out var parseUID);
+            parseOK &= Enum.TryParse(node.Attributes["Scope"]?.Value, true, out AccessScopeEnum parseScope);
             if (!parseOK)
             {
                 return null;
@@ -72,7 +73,7 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
         public Part ParsePartNode(XmlNode node)
         {
             bool parseOK = true;
-            parseOK &= uint.TryParse(node.Attributes["UId"].Value, out var parseUID);
+            parseOK &= uint.TryParse(node.Attributes["UId"]?.Value, out var parsedUID);
             if (!parseOK)
             {
                 return null;
@@ -82,8 +83,58 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
 
             return new Part()
             {
-                UId = parseUID,
+                UId = parsedUID,
                 Name = name
+            };
+        }
+
+        public Wire ParseWireNode(XmlNode node)
+        {
+            var wire = new Wire();
+            foreach (XmlNode childWireNode in node)
+            {
+                var wirePart = ParseWirePartNode(childWireNode);
+                if(wirePart != null)
+                {
+                    wire.AddWirePart(wirePart);
+                }
+            }
+            return wire;
+        }
+
+        private WirePart ParseWirePartNode(XmlNode node)
+        {
+            if(!Enum.TryParse(node.Name, out WirePartType type))
+            {
+                MessageBox.Show("Unknown WirePart node named " + node.Name);
+                return null;
+            }
+
+            if(type == WirePartType.POWERRAIL)
+            {
+                return new WirePart()
+                {
+                    UId = 0,
+                    Name = "Powerrail",
+                    Type = WirePartType.POWERRAIL
+                };
+            }
+
+            bool parsedOK = true;
+            parsedOK &= uint.TryParse(node.Attributes["UId"]?.Value, out uint parsedUId);
+            if (!parsedOK)
+            {
+                return null;
+            }
+
+            var nameAttribute = node.Attributes["Name"];
+            string name = nameAttribute == null ? "" : nameAttribute.Value;
+
+            return new WirePart()
+            {
+                UId = parsedUId,
+                Name = name,
+                Type = type
             };
         }
     }

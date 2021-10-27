@@ -24,3 +24,4 @@ C:\Users\Paronetto g\Documents\GitHub\TiaSpinAddin\TiaAddin-Spin-ExcelReader\bin
 C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\Release\TiaAddin-Spin-ExcelReader.csproj.AssemblyReference.cache
 C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\bin\Release\SpinAddIn.dll
 C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\bin\Release\SpinAddIn.XmlSerializers.dll
+C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\Release\TiaAddin-Spin-ExcelReader.csproj.CopyComplete

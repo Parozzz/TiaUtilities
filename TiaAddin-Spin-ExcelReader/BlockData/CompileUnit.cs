@@ -23,7 +23,19 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
 
         internal CompileUnit ParseXmlNode(XmlNode node)
         {
-            var networkSourceNode = node.SelectSingleNode("./AttributeList/NetworkSource");
+            var attributeListNode = node.SelectSingleNode("AttributeList");
+            var objectListNode = node.SelectSingleNode("ObjectList");
+            if(attributeListNode == null || objectListNode == null)
+            {
+                return null;
+            }
+
+            Title = new MultilingualText().ParseXMLNode(objectListNode.SelectSingleNode("MultilingualText[@CompositionName = \"Title\"]"));
+            Comment = new MultilingualText().ParseXMLNode(objectListNode.SelectSingleNode("MultilingualText[@CompositionName = \"Comment\"]"));
+
+            ProgrammingLanguage = attributeListNode.SelectSingleNode("ProgrammingLanguage")?.InnerText ?? "";
+
+            var networkSourceNode = attributeListNode.SelectSingleNode("NetworkSource");
             if (networkSourceNode != null)
             {
                 foreach (XmlNode networkSourceChildNode in networkSourceNode.ChildNodes)
@@ -38,14 +50,6 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
                     }
                 }
             }
-
-            ProgrammingLanguage = node.SelectSingleNode("./AttributeList/ProgrammingLanguage")?.InnerText ?? "";
-
-            var titleNode = node?.SelectSingleNode("./ObjectList/MultilingualText[@CompositionName = \"Title\"]");
-            Title = new MultilingualText().ParseXMLNode(titleNode);
-
-            var commentNode = node?.SelectSingleNode("./ObjectList/MultilingualText[@CompositionName = \"Comment\"]");
-            Comment = new MultilingualText().ParseXMLNode(commentNode);
 
             return this;
         }

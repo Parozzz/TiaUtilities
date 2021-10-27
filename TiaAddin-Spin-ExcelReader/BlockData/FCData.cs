@@ -23,21 +23,29 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
 
         public void ParseXMLDocument()
         {
-            // Here i search for the whole document for the first FC Block AttributeList Interface (Because .//)
-            var interfaceNode = xmlDocument.SelectSingleNode(".//SW.Blocks.FC/AttributeList/Interface");
-            if (interfaceNode != null)
+            var interfaceNode = xmlDocument.SelectSingleNode(".//SW.Blocks.FC/AttributeList/Interface"); //search the whole document for the first FC Block AttributeList Interface (Because .//)
+            var objectListNode = xmlDocument.SelectSingleNode(".//SW.Blocks.FC/ObjectList");  //search the whole document for the first FC Block ObjectList (Because .//)
+            if (interfaceNode == null || objectListNode == null)
             {
-                blockInterface.ParseXmlNode(interfaceNode);
+                return;
             }
 
-            // Here i search for the whole document for the first FC Block ObjectList (Because .//)
-            var objectListNode = xmlDocument.SelectSingleNode(".//SW.Blocks.FC/ObjectList"); 
+            // ==============================
+            // BLOCK INTERFACE
+            //==============================
+
+            blockInterface.ParseXmlNode(interfaceNode);
+
+            // ==============================
+            // OBJECT LIST
+            //==============================
+
             Title = new MultilingualText()
                 .ParseXMLNode(objectListNode.SelectSingleNode("./MultilingualText[@CompositionName = \"Title\"]"));
             Comment = new MultilingualText()
                 .ParseXMLNode(objectListNode.SelectSingleNode("./MultilingualText[@CompositionName = \"Comment\"]"));
 
-            foreach(XmlNode compileUnitNode in objectListNode.SelectNodes("./SW.Blocks.CompileUnit"))
+            foreach (XmlNode compileUnitNode in objectListNode.SelectNodes("./SW.Blocks.CompileUnit"))
             {
                 compileUnitList.Add(new CompileUnit(this).ParseXmlNode(compileUnitNode));
             }
