@@ -7,7 +7,7 @@ using System.Xml;
 
 namespace TiaAddin_Spin_ExcelReader.BlockData
 {
-    public class UIdObject
+    public abstract class UIdObject
     {
         public uint UId { get; protected internal set;  }
     }

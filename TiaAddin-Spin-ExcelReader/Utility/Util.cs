@@ -48,14 +48,4 @@ namespace TiaAddin_Spin_ExcelReader.Utility
             IsTrue(condition, "A condition is false when should be true");
         }
     }
-
-    public static class XmlUtil
-    {
-        public static XmlNamespaceManager GetNamespace(XmlDocument document, string id, string namespaceURI)
-        {
-            var nsmgr = new XmlNamespaceManager(document.NameTable);
-            nsmgr.AddNamespace("net", namespaceURI); //The section has different workspace.
-            return nsmgr;
-        }
-    }
 }

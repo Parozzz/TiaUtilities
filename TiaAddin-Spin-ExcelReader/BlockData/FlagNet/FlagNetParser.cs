@@ -22,7 +22,7 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
         {
             bool parseOK = true;
             parseOK &= uint.TryParse(node.Attributes["UId"]?.Value, out var parseUID);
-            parseOK &= Enum.TryParse(node.Attributes["Scope"]?.Value, true, out AccessScopeEnum parseScope);
+            parseOK &= Enum.TryParse(node.Attributes["Scope"]?.Value, true, out ScopeEnum parseScope);
             if (!parseOK)
             {
                 return null;
@@ -31,8 +31,8 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
             Access access = null;
             switch (parseScope)
             {
-                case AccessScopeEnum.LOCALVARIABLE:
-                case AccessScopeEnum.GLOBALVARIABLE:
+                case ScopeEnum.LOCALVARIABLE:
+                case ScopeEnum.GLOBALVARIABLE:
                     access = new LocalVariableAccess();
 
                     StringBuilder symbolBuilder = new StringBuilder();
@@ -45,14 +45,14 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
                     ((LocalVariableAccess)access).Symbol = symbolBuilder.ToString();
 
                     break;
-                case AccessScopeEnum.TYPEDCONSTANT:
+                case ScopeEnum.TYPEDCONSTANT:
                     access = new TypedConstantAccess();
 
                     var constantValueNode = node.SelectSingleNode("net:Constant/net:ConstantValue", netNamespace);
                     ((TypedConstantAccess)access).ConstantValue = constantValueNode?.InnerText;
 
                     break;
-                case AccessScopeEnum.LITERALCONSTANT:
+                case ScopeEnum.LITERALCONSTANT:
                     access = new LiteralConstantAccess();
 
                     ((LiteralConstantAccess)access).ConstantType = node.SelectSingleNode("net:Constant/net:ConstantType", netNamespace)?.InnerText ?? "";
@@ -88,54 +88,78 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
             };
         }
 
-        public Wire ParseWireNode(XmlNode node)
+        public Wire ParseWireNode(FlagNet flagNet, XmlNode node)
         {
-            var wire = new Wire();
-            foreach (XmlNode childWireNode in node)
+            var parsedOk = true;
+            parsedOk &= uint.TryParse(node.Attributes["UId"]?.Value, out uint parsedUID);
+            if(!parsedOk)
             {
-                var wirePart = ParseWirePartNode(childWireNode);
-                if(wirePart != null)
-                {
-                    wire.AddWirePart(wirePart);
-                }
+                return null;
             }
-            return wire;
+
+            var firstWirePart = ParseWirePartNode(flagNet, node.ChildNodes[0]);
+            if (firstWirePart == null)
+            {
+                return null;
+            }
+
+            if (firstWirePart.GetWirePart() == WirePartType.POWERRAIL)
+            {
+                var powerrrailWire = new PowerrailWire()
+                {
+                    UId = parsedUID
+                };
+
+                for (int x = 1; x < node.ChildNodes.Count; x++)
+                {
+                    var partNode = ParseWirePartNode(flagNet, node.ChildNodes[x]);
+                    if (partNode != null)
+                    {
+                        powerrrailWire.AddWirePart(partNode);
+                    }
+                }
+                return powerrrailWire;
+            }
+            else
+            {
+                var secondWirePart = ParseWirePartNode(flagNet, node.ChildNodes[1]);
+                if (secondWirePart == null)
+                {
+                    return null;
+                }
+
+                return new NormalWire(firstWirePart, secondWirePart)
+                {
+                    UId = parsedUID
+                };
+            }
         }
 
-        private WirePart ParseWirePartNode(XmlNode node)
+        private WirePart ParseWirePartNode(FlagNet flagNet, XmlNode node)
         {
-            if(!Enum.TryParse(node.Name, out WirePartType type))
+            if (!Enum.TryParse(node.Name.ToUpper(), out WirePartType type))
             {
                 MessageBox.Show("Unknown WirePart node named " + node.Name);
                 return null;
             }
 
-            if(type == WirePartType.POWERRAIL)
+            if (type == WirePartType.POWERRAIL)
             {
-                return new WirePart()
-                {
-                    UId = 0,
-                    Name = "Powerrail",
-                    Type = WirePartType.POWERRAIL
-                };
+                return new WirePart(WirePartType.POWERRAIL, null, "Powerrail");
             }
 
             bool parsedOK = true;
             parsedOK &= uint.TryParse(node.Attributes["UId"]?.Value, out uint parsedUId);
+
+            var uidObject = flagNet.GetUIdObject(parsedUId);
+            parsedOK &= uidObject != null;
             if (!parsedOK)
             {
                 return null;
             }
 
-            var nameAttribute = node.Attributes["Name"];
-            string name = nameAttribute == null ? "" : nameAttribute.Value;
-
-            return new WirePart()
-            {
-                UId = parsedUId,
-                Name = name,
-                Type = type
-            };
+            var name = node.Attributes["Name"]?.Value ?? "";
+            return new WirePart(type, uidObject, name);
         }
     }
 }

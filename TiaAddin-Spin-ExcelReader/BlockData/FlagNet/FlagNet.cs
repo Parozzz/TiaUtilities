@@ -25,6 +25,11 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
             wireUIdDictionary = new Dictionary<uint, Wire>();
         }
 
+        public UIdObject GetUIdObject(uint uid)
+        {
+            return completeUIdDictionary.TryGetValue(uid, out UIdObject value) ? value : null;
+        }
+
 
         public FlagNet ParseXMLNode(XmlNode node)
         {
@@ -62,7 +67,7 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
 
             foreach (XmlNode wireNode in node.SelectNodes("net:Wires/net:Wire", netNamespace))
             {
-                var wire = parser.ParseWireNode(wireNode);
+                var wire = parser.ParseWireNode(this, wireNode);
                 if(wire != null)
                 {
                     completeUIdDictionary[wire.UId] = wire;

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Xml;
+using TiaAddin_Spin_ExcelReader.Utility;
 
 namespace TiaAddin_Spin_ExcelReader.BlockData
 {
@@ -23,8 +24,10 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
 
         public void ParseXMLDocument()
         {
-            var interfaceNode = xmlDocument.SelectSingleNode(".//SW.Blocks.FC/AttributeList/Interface"); //search the whole document for the first FC Block AttributeList Interface (Because .//)
-            var objectListNode = xmlDocument.SelectSingleNode(".//SW.Blocks.FC/ObjectList");  //search the whole document for the first FC Block ObjectList (Because .//)
+            var documentElement = xmlDocument.DocumentElement;
+
+            var interfaceNode = XmlSearchEngine.Of(documentElement).AddMultipleSearch("SW.Blocks.FC/AttributeList/Interface").Search(); //search the whole document for the first FC Block AttributeList Interface (Because .//)
+            var objectListNode = XmlSearchEngine.Of(documentElement).AddMultipleSearch("SW.Blocks.FC/ObjectList").Search(); //search the whole document for the first FC Block ObjectList (Because .//)
             if (interfaceNode == null || objectListNode == null)
             {
                 return;
@@ -39,13 +42,13 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
             // ==============================
             // OBJECT LIST
             //==============================
-
             Title = new MultilingualText()
-                .ParseXMLNode(objectListNode.SelectSingleNode("./MultilingualText[@CompositionName = \"Title\"]"));
+                .ParseXMLNode(XmlSearchEngine.Of(objectListNode).AddSearch("MultilingualText").AttributeRequired("CompositionName", "Title").Search());
             Comment = new MultilingualText()
-                .ParseXMLNode(objectListNode.SelectSingleNode("./MultilingualText[@CompositionName = \"Comment\"]"));
+                .ParseXMLNode(XmlSearchEngine.Of(objectListNode).AddSearch("MultilingualText").AttributeRequired("CompositionName", "Comment").Search());
 
-            foreach (XmlNode compileUnitNode in objectListNode.SelectNodes("./SW.Blocks.CompileUnit"))
+       
+            foreach (XmlNode compileUnitNode in XmlUtil.GetAllChild(objectListNode, "SW.Blocks.CompileUnit"))
             {
                 compileUnitList.Add(new CompileUnit(this).ParseXmlNode(compileUnitNode));
             }

@@ -24,7 +24,6 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
             return sectionDictionary[type];
         }
 
-        XmlNodeList te;
         internal void ParseXmlNode(XmlNode node)
         {
             Validate.NotNull(node);
@@ -33,15 +32,14 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
             var sectionsNode = node["Sections"];
             if (sectionsNode != null)
             {
-                var nsmgr = new XmlNamespaceManager(fcData.GetXmlDocument().NameTable);
-                nsmgr.AddNamespace("irfc", sectionsNode.NamespaceURI); //The section has different workspace.
-
-                var sectionNodeList = sectionsNode.SelectNodes("irfc:Section", nsmgr);
-                foreach (XmlNode sectionNode in sectionNodeList)
+                foreach (XmlNode sectionNode in XmlUtil.GetAllChild(sectionsNode, "Section"))
                 {
                     var section = new Section().ParseXmlNode(sectionNode);
-                    sectionList.Add(section);
-                    sectionDictionary.Add(section.Type, section);
+                    if(section != null)
+                    {
+                        sectionList.Add(section);
+                        sectionDictionary.Add(section.Type, section);
+                    }
                 }
             }
         }
@@ -75,12 +73,16 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
 
             internal Section ParseXmlNode(XmlNode node)
             {
-                var name = node.Attributes["Name"].Value;
-                if (Enum.TryParse(name, true, out SectionTypeEnum sectionType))
+                var name = node.Attributes["Name"]?.Value;
+
+                bool conversionOK = true;
+                conversionOK &= Enum.TryParse(name, true, out SectionTypeEnum sectionType);
+                if(!conversionOK)
                 {
-                    Type = sectionType;
+                    return null; 
                 }
 
+                Type = sectionType;
                 foreach (XmlNode memberNode in node.ChildNodes)
                 {
                     MemberList.Add(new Member().ParseXmlNode(memberNode));
@@ -95,6 +97,8 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
 
                 public string Datatype { get; private set; }
 
+                public string StartValue { get; private set; }
+
                 public readonly List<Member> SubMemberList;
                 internal Member()
                 {
@@ -108,7 +112,15 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
 
                     foreach (XmlNode childNode in node.ChildNodes)
                     {
-                        SubMemberList.Add(new Member().ParseXmlNode(childNode));
+                        if(childNode.Name == "StartValue")
+                        {
+                            StartValue = childNode.InnerText;
+                        }
+                        else if(childNode.Name == "Member")
+                        {
+                            SubMemberList.Add(new Member().ParseXmlNode(childNode));
+                        }
+                        
                     }
 
                     return this;

@@ -8,20 +8,50 @@ using System.Xml;
 
 namespace TiaAddin_Spin_ExcelReader.BlockData
 {
-    public class Wire : UIdObject
+    public abstract class Wire : UIdObject
     {
-        public bool HasPowerrail { get; internal set; }
+    }
 
-        private List<WirePart> wirePartList;
+    public class PowerrailWire : Wire
+    {
+        private readonly List<WirePart> wireParts;
 
-        public Wire()
+        public PowerrailWire()
         {
-            wirePartList = new List<WirePart>();
+            wireParts = new List<WirePart>();
         }
 
-        public void AddWirePart(WirePart wirePart)
+        public void AddWirePart(WirePart part)
         {
-            wirePartList.Add(wirePart);
+            wireParts.Add(part);
+        }
+
+        public ICollection<WirePart> GetWireParts()
+        {
+            return wireParts;
+        }
+    }
+
+    public class NormalWire : Wire
+    {
+
+        private readonly WirePart leftWirePart;
+        private readonly WirePart rightWirePart;
+
+        public NormalWire(WirePart leftWirePart, WirePart rightWirePart)
+        {
+            this.leftWirePart = leftWirePart;
+            this.rightWirePart = rightWirePart;
+        }
+
+        public WirePart GetLeftWirePart()
+        {
+            return leftWirePart;
+        }
+
+        public WirePart GetRightWirePart()
+        {
+            return rightWirePart;
         }
     }
 
@@ -33,15 +63,29 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
         OPENCON
     }
 
-    public class WirePart : UIdObject
+    public class WirePart
     {
         public string Name { get; protected internal set; }
 
-        public WirePartType Type { get; protected internal set; }
+        private readonly WirePartType type;
+        private readonly UIdObject partUIdObject;
+        private readonly string name;
 
-        public WirePart()
+        public WirePart(WirePartType type, UIdObject partUIdObject, string name)
         {
+            this.type = type;
+            this.partUIdObject = partUIdObject;
+            this.name = name;
+        }
 
+        public WirePartType GetWirePart()
+        {
+            return type;
+        }
+
+        public UIdObject GetPartUIdObject()
+        {
+            return partUIdObject;
         }
 
         public bool HasName()
@@ -49,18 +93,9 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
             return Name != null && Name.Length > 0;
         }
 
-        public void ParseXMLNode(XmlNode node)
+        public string GetName()
         {
-            if(uint.TryParse(node.Attributes["UId"].Value, out uint parsedUId))
-            {
-                this.UId = parsedUId;
-            }
-
-            var nameAttribute = node.Attributes["Name"];
-            if (nameAttribute != null)
-            {
-                Name = nameAttribute.Value;
-            }
+            return name;
         }
     }
 }
