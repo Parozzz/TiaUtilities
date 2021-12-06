@@ -68,23 +68,8 @@
   <ItemGroup>
     <Compile Include="AddIn.cs" />
     <Compile Include="AddInProvider.cs" />
-    <Compile Include="BlockData\Access\Access.cs" />
-    <Compile Include="BlockData\Access\LocalVariableAccess.cs" />
-    <Compile Include="BlockData\Access\TypesConstantAccess.cs" />
-    <Compile Include="BlockData\BlockInterface.cs" />
-    <Compile Include="BlockData\CompileUnit.cs" />
-    <Compile Include="BlockData\FCData.cs" />
-    <Compile Include="BlockData\FlagNet.cs" />
-    <Compile Include="BlockData\UIdObject.cs" />
-    <Compile Include="MultilingualText.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TagsDatabase.cs" />
-    <Compile Include="Utility\Block.cs" />
-    <Compile Include="Utility\ExitState.cs" />
-    <Compile Include="Utility\MoveStaticVariables.cs" />
-    <Compile Include="Utility\Settings.cs" />
-    <Compile Include="Utility\Util.cs" />
-    <Compile Include="Utility\XmlEdit.cs" />
+    <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Config.xml">

@@ -3,3 +3,8 @@ C:\Users\Paronetto g\Documents\GitHub\TiaSpinAddin\FCFBConverter\bin\Debug\FCFBC
 C:\Users\Paronetto g\Documents\GitHub\TiaSpinAddin\FCFBConverter\obj\Debug\TiaAddIn-Spin.csproj.CoreCompileInputs.cache
 C:\Users\Paronetto g\Documents\GitHub\TiaSpinAddin\FCFBConverter\obj\Debug\FCFBConverter.dll
 C:\Users\Paronetto g\Documents\GitHub\TiaSpinAddin\FCFBConverter\obj\Debug\FCFBConverter.pdb
+C:\Users\Paronetto g\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\bin\Debug\SpinAddIn.dll
+C:\Users\Paronetto g\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\bin\Debug\SpinAddIn.pdb
+C:\Users\Paronetto g\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\obj\Debug\TiaAddIn-Spin.csproj.CoreCompileInputs.cache
+C:\Users\Paronetto g\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\obj\Debug\SpinAddIn.dll
+C:\Users\Paronetto g\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\obj\Debug\SpinAddIn.pdb

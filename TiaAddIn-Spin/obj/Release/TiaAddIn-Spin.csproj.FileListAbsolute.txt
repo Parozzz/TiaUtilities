@@ -8,3 +8,6 @@ C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\bin\Release\SpinAddIn
 C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\obj\Release\TiaAddIn-Spin.csproj.CoreCompileInputs.cache
 C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\obj\Release\SpinAddIn.dll
 C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\obj\Release\TiaAddIn-Spin.csproj.AssemblyReference.cache
+C:\Users\Paronetto g\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\bin\Release\SpinAddIn.dll
+C:\Users\Paronetto g\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\obj\Release\TiaAddIn-Spin.csproj.CoreCompileInputs.cache
+C:\Users\Paronetto g\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\obj\Release\SpinAddIn.dll
