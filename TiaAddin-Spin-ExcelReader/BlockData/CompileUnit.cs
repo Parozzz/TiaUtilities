@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Siemens.Engineering.SW.Blocks;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +12,7 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
     {
         public MultilingualText Title { get; private set; }
         public MultilingualText Comment { get; private set; }
-        public string ProgrammingLanguage { get; private set; }
+        public ProgrammingLanguage ProgrammingLanguage { get; private set; }
         public FlagNet Net { get; private set; }
 
         private readonly FCData fcData;
@@ -30,10 +31,16 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
                 return null;
             }
 
-            Title = new MultilingualText().ParseXMLNode(objectListNode.SelectSingleNode("MultilingualText[@CompositionName = \"Title\"]"));
-            Comment = new MultilingualText().ParseXMLNode(objectListNode.SelectSingleNode("MultilingualText[@CompositionName = \"Comment\"]"));
+            var convOK = true;
+            convOK &= Enum.TryParse(attributeListNode["ProgrammingLanguage"]?.InnerText, true, out ProgrammingLanguage language);
+            if(!convOK)
+            {
+                return null;
+            }
 
-            ProgrammingLanguage = attributeListNode.SelectSingleNode("ProgrammingLanguage")?.InnerText ?? "";
+            ProgrammingLanguage = language;
+            Title = new MultilingualText().ParseFromParent(objectListNode, "Title");
+            Comment = new MultilingualText().ParseFromParent(objectListNode, "Comment");
 
             var networkSourceNode = attributeListNode.SelectSingleNode("NetworkSource");
             if (networkSourceNode != null)

@@ -5,17 +5,17 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
+using TiaAddin_Spin_ExcelReader.Utility;
 
 namespace TiaAddin_Spin_ExcelReader.BlockData
 {
     internal class FlagNetParser
     {
         private readonly FlagNet flagNet;
-        private readonly XmlNamespaceManager netNamespace;
-        public FlagNetParser(FlagNet flagNet, XmlNamespaceManager netNamespace)
+
+        public FlagNetParser(FlagNet flagNet)
         {
             this.flagNet = flagNet;
-            this.netNamespace = netNamespace;
         }
 
         public Access ParseAccessNode(XmlNode node)
@@ -36,7 +36,7 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
                     access = new LocalVariableAccess();
 
                     StringBuilder symbolBuilder = new StringBuilder();
-                    foreach (XmlNode componentNode in node.SelectNodes("net:Symbol/net:Component", netNamespace))
+                    foreach (XmlNode componentNode in XmlSearchEngine.Of(node).AddSearch("Symbol/Component").GetAllNodes())
                     {
                         symbolBuilder.Append('.').Append(componentNode.Attributes["Name"].Value).Append('.');
                     }
@@ -48,15 +48,16 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
                 case ScopeEnum.TYPEDCONSTANT:
                     access = new TypedConstantAccess();
 
-                    var constantValueNode = node.SelectSingleNode("net:Constant/net:ConstantValue", netNamespace);
+
+                    var constantValueNode = XmlSearchEngine.Of(node).AddSearch("Constant/ConstantValue").GetLastNode();
                     ((TypedConstantAccess)access).ConstantValue = constantValueNode?.InnerText;
 
                     break;
                 case ScopeEnum.LITERALCONSTANT:
                     access = new LiteralConstantAccess();
-
-                    ((LiteralConstantAccess)access).ConstantType = node.SelectSingleNode("net:Constant/net:ConstantType", netNamespace)?.InnerText ?? "";
-                    ((LiteralConstantAccess)access).ConstantValue = node.SelectSingleNode("net:Constant/net:ConstantValue", netNamespace)?.InnerText ?? "";
+                    
+                    ((LiteralConstantAccess)access).ConstantType = XmlSearchEngine.Of(node).AddSearch("Constant/ConstantType").GetLastNode()?.InnerText ?? "";
+                    ((LiteralConstantAccess)access).ConstantValue = XmlSearchEngine.Of(node).AddSearch("Constant/ConstantValue").GetLastNode()?.InnerText ?? "";
 
                     break;
             }

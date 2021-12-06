@@ -26,8 +26,8 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
         {
             var documentElement = xmlDocument.DocumentElement;
 
-            var interfaceNode = XmlSearchEngine.Of(documentElement).AddMultipleSearch("SW.Blocks.FC/AttributeList/Interface").Search(); //search the whole document for the first FC Block AttributeList Interface (Because .//)
-            var objectListNode = XmlSearchEngine.Of(documentElement).AddMultipleSearch("SW.Blocks.FC/ObjectList").Search(); //search the whole document for the first FC Block ObjectList (Because .//)
+            var interfaceNode = XmlSearchEngine.Of(documentElement).AddSearch("SW.Blocks.FC/AttributeList/Interface").GetLastNode(); //search the whole document for the first FC Block AttributeList Interface (Because .//)
+            var objectListNode = XmlSearchEngine.Of(documentElement).AddSearch("SW.Blocks.FC/ObjectList").GetLastNode(); //search the whole document for the first FC Block ObjectList (Because .//)
             if (interfaceNode == null || objectListNode == null)
             {
                 return;
@@ -42,13 +42,10 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
             // ==============================
             // OBJECT LIST
             //==============================
-            Title = new MultilingualText()
-                .ParseXMLNode(XmlSearchEngine.Of(objectListNode).AddSearch("MultilingualText").AttributeRequired("CompositionName", "Title").Search());
-            Comment = new MultilingualText()
-                .ParseXMLNode(XmlSearchEngine.Of(objectListNode).AddSearch("MultilingualText").AttributeRequired("CompositionName", "Comment").Search());
+            Title = new MultilingualText().ParseFromParent(objectListNode, "Title");
+            Comment = new MultilingualText().ParseFromParent(objectListNode, "Comment");
 
-       
-            foreach (XmlNode compileUnitNode in XmlUtil.GetAllChild(objectListNode, "SW.Blocks.CompileUnit"))
+            foreach (XmlNode compileUnitNode in XmlSearchEngine.Of(objectListNode).AddSearch("SW.Blocks.CompileUnit").GetAllNodes())
             {
                 compileUnitList.Add(new CompileUnit(this).ParseXmlNode(compileUnitNode));
             }

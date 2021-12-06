@@ -1,5 +1,4 @@
-﻿using SpinAddin.Utility;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
@@ -36,10 +35,8 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
             Validate.NotNull(node);
             Validate.IsTrue(node.Name.Equals("FlgNet"), "FlagNet XmlNode has wrong name.");
 
-            var netNamespace = XmlUtil.GetNamespace(fcData.GetXmlDocument(), "net", node.NamespaceURI); //The section has different namespace.nsmgr
-
             var parser = new FlagNetParser(this, netNamespace);
-            foreach (XmlNode partNode in node.SelectNodes("net:Parts/net:Part", netNamespace))
+            foreach (XmlNode partNode in XmlSearchEngine.Of(node).AddSearch("Parts/Part").GetAllNodes())
             {
                 var part = parser.ParsePartNode(partNode);
                 if (part != null)
@@ -48,8 +45,8 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
                     partUIdDictionary.Add(part.UId, part);
                 }
             }
-
-            foreach (XmlNode accessNode in node.SelectNodes("net:Parts/net:Access", netNamespace))
+            
+            foreach (XmlNode accessNode in XmlSearchEngine.Of(node).AddSearch("Parts/Access").GetAllNodes())
             {
                 var access = parser.ParseAccessNode(accessNode);
                 if (access != null)
@@ -58,14 +55,14 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
                     accessUIdDictionary.Add(access.UId, access);
                 }
             }
-
+            
             //Call is used when calling FCs or FBs
-            foreach (XmlNode callNode in node.SelectNodes("net:Parts/net:Call", netNamespace))
+            foreach (XmlNode callNode in XmlSearchEngine.Of(node).AddSearch("Parts/Call").GetAllNodes())
             {
             }
 
-
-            foreach (XmlNode wireNode in node.SelectNodes("net:Wires/net:Wire", netNamespace))
+            
+            foreach (XmlNode wireNode in XmlSearchEngine.Of(node).AddSearch("Wires/Wire").GetAllNodes())
             {
                 var wire = parser.ParseWireNode(this, wireNode);
                 if(wire != null)

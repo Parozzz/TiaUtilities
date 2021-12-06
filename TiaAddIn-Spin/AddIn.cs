@@ -31,10 +31,10 @@ namespace SpinAddin
         {
             menuRoot.Items.AddActionItem<PlcTagTable>("Esporta Tabella tag", ExportTagTableClick);
 
-            menuRoot.Items.AddActionItem<PlcBlock>("Esporta Blocchi", ExportBlockClick);
+            menuRoot.Items.AddActionItem<PlcBlock>("Esporta Blocco selezionato", ExportBlockClick);
             menuRoot.Items.AddActionItem<PlcBlock>("Importa Blocco", ImportBlockClick);
 
-            menuRoot.Items.AddActionItem<DataBlock>("Esporta DB", ExportDBClick);
+            menuRoot.Items.AddActionItem<DataBlock>("Esporta DB selezionata", ExportDBClick);
             menuRoot.Items.AddActionItem<DataBlock>("Importa DB", ImportDBClick);
         }
 
@@ -58,19 +58,7 @@ namespace SpinAddin
             foreach (PlcBlock block in selectionProvider.GetSelection())
             {
                 ExportUtil.Export(block.Export, Util.DesktopFolder() + "\\FCFBExport.xml");
-                /*
-                if (block is FC fc)
-                {
-                    
-                    ExportUtil.Export(fc.Export, Util.DesktopFolder() + "\\FCFBExport.xml");
-                }
-                else if (block is FB fb)
-                {
-                    ExportUtil.Export(fb.Export, Util.DesktopFolder() + "\\FCFBExport.xml");
-                }*/
             }
-
-            
         }
 
         private void ImportBlockClick(MenuSelectionProvider selectionProvider)

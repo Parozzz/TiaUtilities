@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using TiaAddin_Spin_ExcelReader.Utility;
 
 namespace TiaAddin_Spin_ExcelReader
 {
@@ -28,6 +29,12 @@ namespace TiaAddin_Spin_ExcelReader
         public Item GetByLocale(CultureInfo culture)
         {
             return itemDictionary[culture];
+        }
+
+        internal MultilingualText ParseFromParent(XmlNode parent, string compositionName)
+        {
+            var node = XmlSearchEngine.Of(parent).AddSearch("MultilingualText").AttributeRequired("CompositionName", compositionName).GetLastNode();
+            return node == null ? null : ParseXMLNode(node);
         }
 
         internal MultilingualText ParseXMLNode(XmlNode node)

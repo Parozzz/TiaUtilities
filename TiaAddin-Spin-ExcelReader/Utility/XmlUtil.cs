@@ -84,25 +84,18 @@ namespace TiaAddin_Spin_ExcelReader.Utility
             this.searchNodeList = new List<XmlSearchNode>();
         }
 
-        public XmlSearchNode AddSearch(string childNodeName)
-        {
-            var searchNode = new XmlSearchNode(this, childNodeName);
-            searchNodeList.Add(searchNode);
-            return searchNode;
-        }
-
-        public XmlSearchEngine AddMultipleSearch(string multipleNodeName)
+        public XmlSearchNode AddSearch(string multipleNodeName)
         {
             var childNodeNameArray = multipleNodeName.Split('/');
             foreach (string childNodeName in childNodeNameArray)
             {
-                AddSearch(childNodeName);
+                searchNodeList.Add(new XmlSearchNode(this, childNodeName));
             }
 
-            return this;
+            return searchNodeList[searchNodeList.Count - 1];
         }
 
-        public XmlNode Search()
+        public XmlNode GetLastNode()
         {
             if (searchNodeList.Count == 0 || mainNode == null)
             {
@@ -112,7 +105,7 @@ namespace TiaAddin_Spin_ExcelReader.Utility
             var loopNode = mainNode;
             foreach(var searchNode in searchNodeList)
             {
-                loopNode = searchNode.SearchChilds(loopNode);
+                loopNode = searchNode.FindFirstValidChild(loopNode);
                 if(loopNode == null)
                 {
                     return null;
@@ -120,6 +113,44 @@ namespace TiaAddin_Spin_ExcelReader.Utility
             }
 
             return loopNode;
+        }
+
+        public List<XmlNode> GetAllNodes()
+        {
+            XmlNode searchChildNode;
+            if (searchNodeList.Count == 0 || mainNode == null)
+            {
+                return new List<XmlNode>();
+            }
+            else if(searchNodeList.Count == 1)
+            {
+                searchChildNode = mainNode;
+            }
+            else
+            {
+                var loopNode = mainNode;
+                for(int x = 0; x < (searchNodeList.Count - 1); x++)
+                {
+                    loopNode = searchNodeList[x].FindFirstValidChild(loopNode);
+                    if (loopNode == null)
+                    {
+                        return new List<XmlNode>();
+                    }
+                }
+                searchChildNode = loopNode;
+            }
+
+            var lastSearchNode = searchNodeList[searchNodeList.Count - 1];
+
+            var nodeList = new List<XmlNode>();
+            foreach (XmlNode child in searchChildNode.ChildNodes)
+            {
+                if (lastSearchNode.IsValid(child))
+                {
+                    nodeList.Add(child);
+                }
+            }
+            return nodeList;
         }
     }
 
@@ -147,31 +178,40 @@ namespace TiaAddin_Spin_ExcelReader.Utility
             return engine.AddSearch(childNodeName);
         }
 
-        public XmlSearchEngine NextMultipleSearch(string multipleNodeName)
+        public XmlNode GetLastNode()
         {
-            return engine.AddMultipleSearch(multipleNodeName);
+            return engine.GetLastNode();
         }
 
-        public XmlNode Search()
+        public List<XmlNode> GetAllNodes()
         {
-            return engine.Search();
+            return engine.GetAllNodes();
         }
 
-        internal XmlNode SearchChilds(XmlNode node)
+        internal bool IsValid(XmlNode node)
         {
-            foreach (XmlNode childNode in XmlUtil.GetAllChild(node, nodeName))
+            if(node.Name != nodeName)
             {
-                bool allAttributesOK = true;
-                foreach (KeyValuePair<string, string> requiredAttributes in attributeRequiredList)
-                {
-                    var attribute = childNode.Attributes[requiredAttributes.Key];
-                    if (attribute == null || attribute.Value != requiredAttributes.Value)
-                    {
-                        allAttributesOK = false;
-                    }
-                }
+                return false;
+            }
 
-                if (allAttributesOK)
+            bool allAttributesOK = true;
+            foreach (KeyValuePair<string, string> requiredAttributes in attributeRequiredList)
+            {
+                var attribute = node.Attributes[requiredAttributes.Key];
+                if (attribute == null || attribute.Value != requiredAttributes.Value)
+                {
+                    allAttributesOK = false;
+                }
+            }
+            return allAttributesOK;
+        }
+
+        internal XmlNode FindFirstValidChild(XmlNode node)
+        {
+            foreach (XmlNode childNode in node.ChildNodes)
+            {
+                if (IsValid(childNode))
                 {
                     return childNode;
                 }

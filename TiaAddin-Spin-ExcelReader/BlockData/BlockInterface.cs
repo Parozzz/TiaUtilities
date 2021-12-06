@@ -1,5 +1,4 @@
-﻿using SpinAddin.Utility;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Xml;
 using TiaAddin_Spin_ExcelReader.Utility;
@@ -29,17 +28,13 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
             Validate.NotNull(node);
             Validate.IsTrue(node.Name.Equals("Interface"), "BlockInterface node name is not valid.");
 
-            var sectionsNode = node["Sections"];
-            if (sectionsNode != null)
+            foreach (XmlNode sectionNode in XmlSearchEngine.Of(node).AddSearch("Sections/Section").GetAllNodes())
             {
-                foreach (XmlNode sectionNode in XmlUtil.GetAllChild(sectionsNode, "Section"))
+                var section = new Section().ParseXmlNode(sectionNode);
+                if (section != null)
                 {
-                    var section = new Section().ParseXmlNode(sectionNode);
-                    if(section != null)
-                    {
-                        sectionList.Add(section);
-                        sectionDictionary.Add(section.Type, section);
-                    }
+                    sectionList.Add(section);
+                    sectionDictionary.Add(section.Type, section);
                 }
             }
         }
@@ -77,9 +72,9 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
 
                 bool conversionOK = true;
                 conversionOK &= Enum.TryParse(name, true, out SectionTypeEnum sectionType);
-                if(!conversionOK)
+                if (!conversionOK)
                 {
-                    return null; 
+                    return null;
                 }
 
                 Type = sectionType;
@@ -112,15 +107,15 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
 
                     foreach (XmlNode childNode in node.ChildNodes)
                     {
-                        if(childNode.Name == "StartValue")
+                        if (childNode.Name == "StartValue")
                         {
                             StartValue = childNode.InnerText;
                         }
-                        else if(childNode.Name == "Member")
+                        else if (childNode.Name == "Member")
                         {
                             SubMemberList.Add(new Member().ParseXmlNode(childNode));
                         }
-                        
+
                     }
 
                     return this;

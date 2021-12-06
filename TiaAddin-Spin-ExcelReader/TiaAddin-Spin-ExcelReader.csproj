@@ -34,6 +34,9 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Siemens.Engineering.AddIn">
+      <HintPath>..\..\..\..\Desktop\TIA - PublicAPI\V16.AddIn\Siemens.Engineering.AddIn.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -95,12 +98,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\TiaAddIn-Spin\TiaAddIn-Spin.csproj">
-      <Project>{00C536D1-31ED-4430-937F-336672A3B4C6}</Project>
-      <Name>TiaAddIn-Spin</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
