@@ -9,87 +9,62 @@ using TiaAddin_Spin_ExcelReader.Utility;
 
 namespace TiaAddin_Spin_ExcelReader.BlockData
 {
-    internal class FlagNetParser
+    internal static class FlagNetParser
     {
-        private readonly FlagNet flagNet;
-
-        public FlagNetParser(FlagNet flagNet)
-        {
-            this.flagNet = flagNet;
-        }
-
-        public Access ParseAccessNode(XmlNode node)
+        public static Access ParseAccessNode(XmlNode node)
         {
             bool parseOK = true;
-            parseOK &= uint.TryParse(node.Attributes["UId"]?.Value, out var parseUID);
-            parseOK &= Enum.TryParse(node.Attributes["Scope"]?.Value, true, out ScopeEnum parseScope);
+            parseOK &= uint.TryParse(node.Attributes["UId"]?.Value, out var uid);
+            parseOK &= Enum.TryParse(node.Attributes["Scope"]?.Value, true, out ScopeEnum scope);
             if (!parseOK)
             {
                 return null;
             }
 
             Access access = null;
-            switch (parseScope)
+            switch (scope)
             {
                 case ScopeEnum.LOCALVARIABLE:
                 case ScopeEnum.GLOBALVARIABLE:
-                    access = new LocalVariableAccess();
-
-                    StringBuilder symbolBuilder = new StringBuilder();
-                    foreach (XmlNode componentNode in XmlSearchEngine.Of(node).AddSearch("Symbol/Component").GetAllNodes())
-                    {
-                        symbolBuilder.Append('.').Append(componentNode.Attributes["Name"].Value).Append('.');
-                    }
-                    symbolBuilder.Remove(0, 1).Remove(symbolBuilder.Length - 1, 1); //Remove the initial and final dot
-
-                    ((LocalVariableAccess)access).Symbol = symbolBuilder.ToString();
-
+                    access = VariableAccess.Parse(node);
                     break;
                 case ScopeEnum.TYPEDCONSTANT:
-                    access = new TypedConstantAccess();
-
-
-                    var constantValueNode = XmlSearchEngine.Of(node).AddSearch("Constant/ConstantValue").GetLastNode();
-                    ((TypedConstantAccess)access).ConstantValue = constantValueNode?.InnerText;
-
+                    access = TypedConstantAccess.Parse(node);
                     break;
                 case ScopeEnum.LITERALCONSTANT:
-                    access = new LiteralConstantAccess();
-                    
-                    ((LiteralConstantAccess)access).ConstantType = XmlSearchEngine.Of(node).AddSearch("Constant/ConstantType").GetLastNode()?.InnerText ?? "";
-                    ((LiteralConstantAccess)access).ConstantValue = XmlSearchEngine.Of(node).AddSearch("Constant/ConstantValue").GetLastNode()?.InnerText ?? "";
-
+                    access = LiteralConstantAccess.Parse(node);
                     break;
             }
 
             if (access != null)
             {
-                access.UId = parseUID;
-                access.Scope = parseScope;
+                access.UId = uid;
+                access.Scope = scope;
             }
 
             return access;
         }
 
-        public Part ParsePartNode(XmlNode node)
+        public static Part ParsePartNode(XmlNode node)
         {
             bool parseOK = true;
-            parseOK &= uint.TryParse(node.Attributes["UId"]?.Value, out var parsedUID);
+            parseOK &= uint.TryParse(node.Attributes["UId"]?.Value, out var uid);
             if (!parseOK)
             {
                 return null;
             }
 
-            var name = node.Attributes["Name"].Value;
-
-            return new Part()
+            var part = Part.Parse(node);
+            if(part == null)
             {
-                UId = parsedUID,
-                Name = name
-            };
+                return null;
+            }
+
+            part.UId = uid;
+            return part;
         }
 
-        public Wire ParseWireNode(FlagNet flagNet, XmlNode node)
+        public static Wire ParseWireNode(FlagNet flagNet, XmlNode node)
         {
             var parsedOk = true;
             parsedOk &= uint.TryParse(node.Attributes["UId"]?.Value, out uint parsedUID);
@@ -136,11 +111,13 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
             }
         }
 
-        private WirePart ParseWirePartNode(FlagNet flagNet, XmlNode node)
+        private static WirePart ParseWirePartNode(FlagNet flagNet, XmlNode node)
         {
-            if (!Enum.TryParse(node.Name.ToUpper(), out WirePartType type))
+            bool parseOK = Enum.TryParse(node.Name, true, out WirePartType type);
+            parseOK &= uint.TryParse(node.Attributes["UId"]?.Value, out uint uid);
+            parseOK &= Util.TryNotNull(node.Attributes["Name"]?.Value, out string name);
+            if (!parseOK)
             {
-                MessageBox.Show("Unknown WirePart node named " + node.Name);
                 return null;
             }
 
@@ -149,17 +126,12 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
                 return new WirePart(WirePartType.POWERRAIL, null, "Powerrail");
             }
 
-            bool parsedOK = true;
-            parsedOK &= uint.TryParse(node.Attributes["UId"]?.Value, out uint parsedUId);
-
-            var uidObject = flagNet.GetUIdObject(parsedUId);
-            parsedOK &= uidObject != null;
-            if (!parsedOK)
+            var uidObject = flagNet.GetUIdObject(uid);
+            if (uidObject == null)
             {
                 return null;
             }
 
-            var name = node.Attributes["Name"]?.Value ?? "";
             return new WirePart(type, uidObject, name);
         }
     }

@@ -35,10 +35,9 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
             Validate.NotNull(node);
             Validate.IsTrue(node.Name.Equals("FlgNet"), "FlagNet XmlNode has wrong name.");
 
-            var parser = new FlagNetParser(this, netNamespace);
             foreach (XmlNode partNode in XmlSearchEngine.Of(node).AddSearch("Parts/Part").GetAllNodes())
             {
-                var part = parser.ParsePartNode(partNode);
+                var part = FlagNetParser.ParsePartNode(partNode);
                 if (part != null)
                 {
                     completeUIdDictionary.Add(part.UId, part);
@@ -48,7 +47,7 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
             
             foreach (XmlNode accessNode in XmlSearchEngine.Of(node).AddSearch("Parts/Access").GetAllNodes())
             {
-                var access = parser.ParseAccessNode(accessNode);
+                var access = FlagNetParser.ParseAccessNode(accessNode);
                 if (access != null)
                 {
                     completeUIdDictionary.Add(access.UId, access);
@@ -64,7 +63,7 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
             
             foreach (XmlNode wireNode in XmlSearchEngine.Of(node).AddSearch("Wires/Wire").GetAllNodes())
             {
-                var wire = parser.ParseWireNode(this, wireNode);
+                var wire = FlagNetParser.ParseWireNode(this, wireNode);
                 if(wire != null)
                 {
                     completeUIdDictionary[wire.UId] = wire;

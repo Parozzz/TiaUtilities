@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Xml;
 using TiaAddin_Spin_ExcelReader.Utility;
 using static TiaAddin_Spin_ExcelReader.BlockData.BlockInterface.Section;
@@ -30,7 +31,7 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
 
             foreach (XmlNode sectionNode in XmlSearchEngine.Of(node).AddSearch("Sections/Section").GetAllNodes())
             {
-                var section = new Section().ParseXmlNode(sectionNode);
+                var section = Section.Parse(sectionNode);
                 if (section != null)
                 {
                     sectionList.Add(section);
@@ -52,6 +53,31 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
                 RETURN
             }
 
+            public static Section Parse(XmlNode node)
+            {
+                bool parseOK = Enum.TryParse(node.Attributes["Name"]?.Value, true, out SectionTypeEnum sectionType);
+                if (!parseOK)
+                {
+                    return null;
+                }
+
+                var section = new Section()
+                {
+                    Type = sectionType
+                };
+
+                foreach (XmlNode memberNode in XmlSearchEngine.Of(node).AddSearch("Member").GetAllNodes())
+                {
+                    var member = Member.Parse(memberNode);
+                    if(member != null)
+                    {
+                        section.MemberList.Add(member);
+                    }
+                }
+
+                return section;
+            }
+
             public SectionTypeEnum Type { get; internal set; }
 
             public readonly List<Member> MemberList;
@@ -66,59 +92,115 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
                 return MemberList;
             }
 
-            internal Section ParseXmlNode(XmlNode node)
-            {
-                var name = node.Attributes["Name"]?.Value;
-
-                bool conversionOK = true;
-                conversionOK &= Enum.TryParse(name, true, out SectionTypeEnum sectionType);
-                if (!conversionOK)
-                {
-                    return null;
-                }
-
-                Type = sectionType;
-                foreach (XmlNode memberNode in node.ChildNodes)
-                {
-                    MemberList.Add(new Member().ParseXmlNode(memberNode));
-                }
-
-                return this;
-            }
-
             public class Member
             {
+
+                public static Member Parse(XmlNode node)
+                {
+                    var parseOK = Util.TryNotNull(node.Attributes["Name"].Value, out string name);
+                    parseOK &= Util.TryNotNull(node.Attributes["Datatype"].Value, out string datatype);
+                    if (!parseOK)
+                    {
+                        return null;
+                    }
+
+                    var member = new Member()
+                    {
+                        Name = name,
+                        Datatype = datatype
+                    };
+
+                    foreach (XmlNode childNode in node.ChildNodes)
+                    {
+                        if (childNode.Name == "StartValue")
+                        {
+                            member.StartValue = childNode.InnerText;
+                        }
+                        else if (childNode.Name == "Member")
+                        {
+                            var childMember = Member.Parse(childNode);
+                            if(childMember != null)
+                            {
+                                member.subMemberList.Add(childMember);
+                            }
+                        }
+                        else if (childNode.Name == "AttributeList")
+                        {
+                            foreach (XmlNode attributeNode in childNode)
+                            {
+                                var memberAttribute = MemberAttribute.Parse(attributeNode);
+                                if (memberAttribute != null)
+                                {
+                                    member.attributeList.Add(memberAttribute);
+                                }
+                            }
+                        }
+                        else if (childNode.Name == "Comment")
+                        {
+                            foreach (XmlNode languangeTextNode in XmlSearchEngine.Of(childNode).AddSearch("MultiLanguageText").GetAllNodes())
+                            {
+                                var lang = languangeTextNode.Attributes["Lang"]?.Value;
+                                if (lang == null)
+                                {
+                                    continue;
+                                }
+
+                                var cultureInfo = CultureInfo.GetCultureInfoByIetfLanguageTag(lang);
+                                if (cultureInfo != null)
+                                {
+                                    member.commentDictionary.Add(cultureInfo, languangeTextNode.InnerText);
+                                }
+                            }
+                        }
+                    }
+
+                    return member;
+                }
+
                 public string Name { get; private set; }
 
                 public string Datatype { get; private set; }
 
                 public string StartValue { get; private set; }
 
-                public readonly List<Member> SubMemberList;
+                private readonly List<MemberAttribute> attributeList;
+                private readonly Dictionary<CultureInfo, string> commentDictionary;
+                private readonly List<Member> subMemberList;
+
                 internal Member()
                 {
-                    SubMemberList = new List<Member>();
+                    attributeList = new List<MemberAttribute>();
+                    commentDictionary = new Dictionary<CultureInfo, string>();
+                    subMemberList = new List<Member>();
                 }
 
-                internal Member ParseXmlNode(XmlNode node)
+                public class MemberAttribute
                 {
-                    Name = node.Attributes["Name"].Value;
-                    Datatype = node.Attributes["Datatype"].Value;
-
-                    foreach (XmlNode childNode in node.ChildNodes)
+                    public static MemberAttribute Parse(XmlNode node)
                     {
-                        if (childNode.Name == "StartValue")
+                        if (node.Name != "StringAttribute")
                         {
-                            StartValue = childNode.InnerText;
-                        }
-                        else if (childNode.Name == "Member")
-                        {
-                            SubMemberList.Add(new Member().ParseXmlNode(childNode));
+                            return null;
                         }
 
+                        var parseOK = Util.TryNotNull(node.Attributes["Name"]?.Value, out string name);
+                        parseOK = bool.TryParse(node.Attributes["SystemDefined"]?.Value, out bool systemDefined);
+                        if (!parseOK)
+                        {
+                            return null;
+                        }
+
+                        return new MemberAttribute()
+                        {
+                            Name = name,
+                            SystemDefined = systemDefined,
+                            Value = node.InnerText
+                        };
                     }
 
-                    return this;
+                    public string Name { get; private set; }
+                    public bool SystemDefined { get; private set; }
+                    public string Value { get; private set; }
                 }
             }
         }

@@ -18,6 +18,18 @@ namespace TiaAddin_Spin_ExcelReader.Utility
 
             MessageBox.Show(message, caption);
         }
+
+        public static bool TryNotNull<OBJ>(OBJ obj, out OBJ outObj)
+        {
+            if(obj == null)
+            {
+                outObj = default(OBJ);
+                return false;
+            }
+
+            outObj = obj;
+            return true;
+        }
     }
 
     public static class Validate
