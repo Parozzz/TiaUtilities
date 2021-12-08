@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 using System.Xml;
 using TiaAddin_Spin_ExcelReader.Utility;
 
-namespace TiaAddin_Spin_ExcelReader.BlockData
+namespace TiaAddin_Spin_ExcelReader
 {
     public class TypedConstantAccess : Access
     {
 
         public static TypedConstantAccess Parse(XmlNode node)
         {
-            var constantValue = XmlSearchEngine.Of(node).AddSearch("Constant/ConstantValue").GetLastNode()?.InnerText;
+            var constantValue = XmlSearchEngine.Of(node).AddSearch("Constant/ConstantValue").GetFirstNode()?.InnerText;
             if(constantValue == null)
             {
                 return null;

@@ -59,7 +59,10 @@
     <Compile Include="BlockData\FCData.cs" />
     <Compile Include="BlockData\FlagNet\FlagNet.cs" />
     <Compile Include="BlockData\FlagNet\FlagNetParser.cs" />
-    <Compile Include="BlockData\FlagNet\Part.cs" />
+    <Compile Include="BlockData\FlagNet\Part\CoilPart.cs" />
+    <Compile Include="BlockData\FlagNet\Part\Part.cs" />
+    <Compile Include="BlockData\FlagNet\Part\ContactPart.cs" />
+    <Compile Include="BlockData\FlagNet\Part\PartParser.cs" />
     <Compile Include="BlockData\FlagNet\Wire.cs" />
     <Compile Include="BlockData\UIdObject.cs" />
     <Compile Include="Form1.cs">

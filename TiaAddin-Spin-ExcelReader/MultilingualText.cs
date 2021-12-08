@@ -33,7 +33,7 @@ namespace TiaAddin_Spin_ExcelReader
 
         internal MultilingualText ParseFromParent(XmlNode parent, string compositionName)
         {
-            var node = XmlSearchEngine.Of(parent).AddSearch("MultilingualText").AttributeRequired("CompositionName", compositionName).GetLastNode();
+            var node = XmlSearchEngine.Of(parent).AddSearch("MultilingualText").AttributeRequired("CompositionName", compositionName).GetFirstNode();
             return node == null ? null : ParseXMLNode(node);
         }
 

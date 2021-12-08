@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Xml;
 using TiaAddin_Spin_ExcelReader.Utility;
-using static TiaAddin_Spin_ExcelReader.BlockData.BlockInterface.Section;
+using static TiaAddin_Spin_ExcelReader.BlockInterface.Section;
 
-namespace TiaAddin_Spin_ExcelReader.BlockData
+namespace TiaAddin_Spin_ExcelReader
 {
     public class BlockInterface
     {
         private readonly FCData fcData;
         private readonly Dictionary<SectionTypeEnum, Section> sectionDictionary;
         private readonly List<Section> sectionList;
+
+        public XmlNode Node { get; private set; }
 
         internal BlockInterface(FCData fcData)
         {
@@ -24,11 +26,12 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
             return sectionDictionary[type];
         }
 
-        internal void ParseXmlNode(XmlNode node)
+        internal void SetXmlNode(XmlNode node)
         {
             Validate.NotNull(node);
             Validate.IsTrue(node.Name.Equals("Interface"), "BlockInterface node name is not valid.");
 
+            Node = node;
             foreach (XmlNode sectionNode in XmlSearchEngine.Of(node).AddSearch("Sections/Section").GetAllNodes())
             {
                 var section = Section.Parse(sectionNode);

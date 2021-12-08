@@ -95,7 +95,7 @@ namespace TiaAddin_Spin_ExcelReader.Utility
             return searchNodeList[searchNodeList.Count - 1];
         }
 
-        public XmlNode GetLastNode()
+        public XmlNode GetFirstNode()
         {
             if (searchNodeList.Count == 0 || mainNode == null)
             {
@@ -113,6 +113,11 @@ namespace TiaAddin_Spin_ExcelReader.Utility
             }
 
             return loopNode;
+        }
+
+        public bool HasAnyNode()
+        {
+            return GetFirstNode() != null;
         }
 
         public List<XmlNode> GetAllNodes()
@@ -178,9 +183,14 @@ namespace TiaAddin_Spin_ExcelReader.Utility
             return engine.AddSearch(childNodeName);
         }
 
-        public XmlNode GetLastNode()
+        public XmlNode GetFirstNode()
         {
-            return engine.GetLastNode();
+            return engine.GetFirstNode();
+        }
+
+        public bool HasAnyNode()
+        {
+            return GetFirstNode() != null;
         }
 
         public List<XmlNode> GetAllNodes()

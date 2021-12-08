@@ -1,139 +1,129 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Document>
-	<Engineering version="V16"/>
-	<DocumentInfo>
-		<Created>2021-12-07T22:24:05.0101031Z</Created>
-		<ExportSetting>None</ExportSetting>
-		<InstalledProducts>
-			<Product>
-				<DisplayName>Totally Integrated Automation Portal</DisplayName>
-				<DisplayVersion>V16</DisplayVersion>
-			</Product>
-			<OptionPackage>
-				<DisplayName>TIA Portal Version Control Interface</DisplayName>
-				<DisplayVersion>V16</DisplayVersion>
-			</OptionPackage>
-			<OptionPackage>
-				<DisplayName>TIA Portal Openness</DisplayName>
-				<DisplayVersion>V16</DisplayVersion>
-			</OptionPackage>
-			<Product>
-				<DisplayName>STEP 7 Professional</DisplayName>
-				<DisplayVersion>V16</DisplayVersion>
-			</Product>
-			<OptionPackage>
-				<DisplayName>STEP 7 Safety</DisplayName>
-				<DisplayVersion>V16</DisplayVersion>
-			</OptionPackage>
-			<Product>
-				<DisplayName>WinCC Advanced</DisplayName>
-				<DisplayVersion>V16</DisplayVersion>
-			</Product>
-		</InstalledProducts>
-	</DocumentInfo>
-	<SW.Blocks.FB ID="0">
-		<AttributeList>
-			<Interface>
-				<Sections xmlns="http://www.siemens.com/automation/Openness/SW/Interface/v4">
-					<Section Name="Input">
-						<Member Name="Input1" Datatype="Bool">
-							<AttributeList>
-								<StringAttribute Name="S7_HiddenAssignment" SystemDefined="true">Hide</StringAttribute>
-								<StringAttribute Name="S7_PredefinedAssignment" SystemDefined="true">NULL</StringAttribute>
-							</AttributeList>
-							<Comment>
-								<MultiLanguageText Lang="it-IT">WOW! UN COMMENTO :D</MultiLanguageText>
-								<MultiLanguageText Lang="en-US">WOW! A COMMENT c:</MultiLanguageText>
-							</Comment>
-						</Member>
-					</Section>
-					<Section Name="Output"/>
-					<Section Name="InOut"/>
-					<Section Name="Static"/>
-					<Section Name="Temp"/>
-					<Section Name="Constant"/>
-				</Sections>
-			</Interface>
-			<MemoryLayout>Optimized</MemoryLayout>
-			<MemoryReserve>100</MemoryReserve>
-			<Name>CommentTest</Name>
-			<Number>2</Number>
-			<ProgrammingLanguage>LAD</ProgrammingLanguage>
-			<SetENOAutomatically>false</SetENOAutomatically>
-		</AttributeList>
-		<ObjectList>
-			<MultilingualText ID="1" CompositionName="Comment">
-				<ObjectList>
-					<MultilingualTextItem ID="2" CompositionName="Items">
-						<AttributeList>
-							<Culture>it-IT</Culture>
-							<Text/>
-						</AttributeList>
-					</MultilingualTextItem>
-					<MultilingualTextItem ID="3" CompositionName="Items">
-						<AttributeList>
-							<Culture>en-US</Culture>
-							<Text/>
-						</AttributeList>
-					</MultilingualTextItem>
-				</ObjectList>
-			</MultilingualText>
-			<SW.Blocks.CompileUnit ID="4" CompositionName="CompileUnits">
-				<AttributeList>
-					<NetworkSource/>
-					<ProgrammingLanguage>LAD</ProgrammingLanguage>
-				</AttributeList>
-				<ObjectList>
-					<MultilingualText ID="5" CompositionName="Comment">
-						<ObjectList>
-							<MultilingualTextItem ID="6" CompositionName="Items">
-								<AttributeList>
-									<Culture>it-IT</Culture>
-									<Text/>
-								</AttributeList>
-							</MultilingualTextItem>
-							<MultilingualTextItem ID="7" CompositionName="Items">
-								<AttributeList>
-									<Culture>en-US</Culture>
-									<Text/>
-								</AttributeList>
-							</MultilingualTextItem>
-						</ObjectList>
-					</MultilingualText>
-					<MultilingualText ID="8" CompositionName="Title">
-						<ObjectList>
-							<MultilingualTextItem ID="9" CompositionName="Items">
-								<AttributeList>
-									<Culture>it-IT</Culture>
-									<Text/>
-								</AttributeList>
-							</MultilingualTextItem>
-							<MultilingualTextItem ID="A" CompositionName="Items">
-								<AttributeList>
-									<Culture>en-US</Culture>
-									<Text/>
-								</AttributeList>
-							</MultilingualTextItem>
-						</ObjectList>
-					</MultilingualText>
-				</ObjectList>
-			</SW.Blocks.CompileUnit>
-			<MultilingualText ID="B" CompositionName="Title">
-				<ObjectList>
-					<MultilingualTextItem ID="C" CompositionName="Items">
-						<AttributeList>
-							<Culture>it-IT</Culture>
-							<Text/>
-						</AttributeList>
-					</MultilingualTextItem>
-					<MultilingualTextItem ID="D" CompositionName="Items">
-						<AttributeList>
-							<Culture>en-US</Culture>
-							<Text/>
-						</AttributeList>
-					</MultilingualTextItem>
-				</ObjectList>
-			</MultilingualText>
-		</ObjectList>
-	</SW.Blocks.FB>
+  <Engineering version="V16" />
+  <DocumentInfo>
+    <Created>2021-12-08T08:11:41.215464Z</Created>
+    <ExportSetting>None</ExportSetting>
+    <InstalledProducts>
+      <Product>
+        <DisplayName>Totally Integrated Automation Portal</DisplayName>
+        <DisplayVersion>V16</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>TIA Portal Version Control Interface</DisplayName>
+        <DisplayVersion>V16</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>TIA Portal Openness</DisplayName>
+        <DisplayVersion>V16</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>STEP 7 Professional</DisplayName>
+        <DisplayVersion>V16</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>STEP 7 Safety</DisplayName>
+        <DisplayVersion>V16</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>WinCC Advanced</DisplayName>
+        <DisplayVersion>V16</DisplayVersion>
+      </Product>
+    </InstalledProducts>
+  </DocumentInfo>
+  <SW.Blocks.FC ID="0">
+    <AttributeList>
+      <Interface><Sections xmlns="http://www.siemens.com/automation/Openness/SW/Interface/v4">
+  <Section Name="Input">
+    <Member Name="Input1" Datatype="Bool"><AttributeList><StringAttribute Name="S7_HiddenAssignment" SystemDefined="true">Hide</StringAttribute><StringAttribute Name="S7_PredefinedAssignment" SystemDefined="true">NULL</StringAttribute></AttributeList><Comment><MultiLanguageText Lang="it-IT">WOW! UN COMMENTO :D</MultiLanguageText><MultiLanguageText Lang="en-US">WOW! A COMMENT c:</MultiLanguageText></Comment></Member>
+  </Section>
+  <Section Name="Output" />
+  <Section Name="InOut" />
+  <Section Name="Temp" />
+  <Section Name="Constant" />
+  <Section Name="Return">
+    <Member Name="Ret_Val" Datatype="Void" />
+  </Section>
+</Sections></Interface>
+      <MemoryLayout>Optimized</MemoryLayout>
+      <Name>CommentTest</Name>
+      <Number>4</Number>
+      <ProgrammingLanguage>LAD</ProgrammingLanguage>
+      <SetENOAutomatically>false</SetENOAutomatically>
+    </AttributeList>
+    <ObjectList>
+      <MultilingualText ID="1" CompositionName="Comment">
+        <ObjectList>
+          <MultilingualTextItem ID="2" CompositionName="Items">
+            <AttributeList>
+              <Culture>it-IT</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+          <MultilingualTextItem ID="3" CompositionName="Items">
+            <AttributeList>
+              <Culture>en-US</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+      <SW.Blocks.CompileUnit ID="4" CompositionName="CompileUnits">
+        <AttributeList>
+          <NetworkSource />
+          <ProgrammingLanguage>LAD</ProgrammingLanguage>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="5" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="6" CompositionName="Items">
+                <AttributeList>
+                  <Culture>it-IT</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="7" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+          <MultilingualText ID="8" CompositionName="Title">
+            <ObjectList>
+              <MultilingualTextItem ID="9" CompositionName="Items">
+                <AttributeList>
+                  <Culture>it-IT</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="A" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.Blocks.CompileUnit>
+      <MultilingualText ID="B" CompositionName="Title">
+        <ObjectList>
+          <MultilingualTextItem ID="C" CompositionName="Items">
+            <AttributeList>
+              <Culture>it-IT</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+          <MultilingualTextItem ID="D" CompositionName="Items">
+            <AttributeList>
+              <Culture>en-US</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+    </ObjectList>
+  </SW.Blocks.FC>
 </Document>

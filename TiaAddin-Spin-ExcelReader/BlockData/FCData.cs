@@ -2,7 +2,7 @@
 using System.Xml;
 using TiaAddin_Spin_ExcelReader.Utility;
 
-namespace TiaAddin_Spin_ExcelReader.BlockData
+namespace TiaAddin_Spin_ExcelReader
 {
     public class FCData
     {
@@ -26,8 +26,8 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
         {
             var documentElement = xmlDocument.DocumentElement;
 
-            var interfaceNode = XmlSearchEngine.Of(documentElement).AddSearch("SW.Blocks.FC/AttributeList/Interface").GetLastNode(); //search the whole document for the first FC Block AttributeList Interface (Because .//)
-            var objectListNode = XmlSearchEngine.Of(documentElement).AddSearch("SW.Blocks.FC/ObjectList").GetLastNode(); //search the whole document for the first FC Block ObjectList (Because .//)
+            var interfaceNode = XmlSearchEngine.Of(documentElement).AddSearch("SW.Blocks.FC/AttributeList/Interface").GetFirstNode(); //search the whole document for the first FC Block AttributeList Interface (Because .//)
+            var objectListNode = XmlSearchEngine.Of(documentElement).AddSearch("SW.Blocks.FC/ObjectList").GetFirstNode(); //search the whole document for the first FC Block ObjectList (Because .//)
             if (interfaceNode == null || objectListNode == null)
             {
                 return;
@@ -37,7 +37,7 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
             // BLOCK INTERFACE
             //==============================
 
-            blockInterface.ParseXmlNode(interfaceNode);
+            blockInterface.SetXmlNode(interfaceNode);
 
             // ==============================
             // OBJECT LIST

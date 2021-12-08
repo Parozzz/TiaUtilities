@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Xml;
 
-namespace TiaAddin_Spin_ExcelReader.BlockData
+namespace TiaAddin_Spin_ExcelReader
 {
     public class Part : UIdObject
     {

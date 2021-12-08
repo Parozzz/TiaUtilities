@@ -1,15 +1,15 @@
 ﻿using System.Xml;
 using TiaAddin_Spin_ExcelReader.Utility;
 
-namespace TiaAddin_Spin_ExcelReader.BlockData
+namespace TiaAddin_Spin_ExcelReader
 {
     public class LiteralConstantAccess : Access
     {
 
         public static LiteralConstantAccess Parse(XmlNode node)
         {
-            var constantType = XmlSearchEngine.Of(node).AddSearch("Constant/ConstantType").GetLastNode()?.InnerText;
-            var constantValue = XmlSearchEngine.Of(node).AddSearch("Constant/ConstantValue").GetLastNode()?.InnerText;
+            var constantType = XmlSearchEngine.Of(node).AddSearch("Constant/ConstantType").GetFirstNode()?.InnerText;
+            var constantValue = XmlSearchEngine.Of(node).AddSearch("Constant/ConstantValue").GetFirstNode()?.InnerText;
             if(constantType == null || constantValue == null)
             {
                 return null;

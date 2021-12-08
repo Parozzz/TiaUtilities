@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using System.Xml;
 using TiaAddin_Spin_ExcelReader.Utility;
 
-namespace TiaAddin_Spin_ExcelReader.BlockData
+namespace TiaAddin_Spin_ExcelReader
 {
     internal static class FlagNetParser
     {
@@ -66,9 +66,8 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
 
         public static Wire ParseWireNode(FlagNet flagNet, XmlNode node)
         {
-            var parsedOk = true;
-            parsedOk &= uint.TryParse(node.Attributes["UId"]?.Value, out uint parsedUID);
-            if(!parsedOk)
+            var parseOK = uint.TryParse(node.Attributes["UId"]?.Value, out uint uid);
+            if(!parseOK)
             {
                 return null;
             }
@@ -83,7 +82,7 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
             {
                 var powerrrailWire = new PowerrailWire()
                 {
-                    UId = parsedUID
+                    UId = uid
                 };
 
                 for (int x = 1; x < node.ChildNodes.Count; x++)
@@ -106,7 +105,7 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
 
                 return new NormalWire(firstWirePart, secondWirePart)
                 {
-                    UId = parsedUID
+                    UId = uid
                 };
             }
         }

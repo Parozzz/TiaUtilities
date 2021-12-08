@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
 
 namespace TiaAddin_Spin_ExcelReader
 {
-    public abstract class UIdObject
+    public class ContactPart : Part
     {
-        public uint UId { get; protected internal set;  }
+        public bool OperandNegated { get; internal set; }
     }
 }

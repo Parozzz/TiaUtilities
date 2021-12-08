@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
 using System.Xml;
-using TiaAddin_Spin_ExcelReader.BlockData;
 
 namespace TiaAddin_Spin_ExcelReader
 {

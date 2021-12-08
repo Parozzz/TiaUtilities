@@ -1,4 +1,4 @@
-C:\Program Files\Siemens\Automation\Portal V16\PublicAPI\V16.AddIn\Siemens.Engineering.AddIn.Publisher.exe --> 06/12/2021 21:04:24 UTC
+C:\Program Files\Siemens\Automation\Portal V16\PublicAPI\V16.AddIn\Siemens.Engineering.AddIn.Publisher.exe --> 08/12/2021 17:32:06 UTC
 
 Calling Arguments:
 --configuration              :C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\Config.xml
@@ -20,4 +20,4 @@ Packaging Permission 'System.Security.Permissions.UIPermission'.
 Packaging Permission 'System.Security.Permissions.SecurityPermission.UnmanagedCode'.
 Packaging Permission 'TIA.ReadWrite'.
 
- --> S U C C E E D E D <-- (0,146s)
+ --> S U C C E E D E D <-- (0,372s)
