@@ -34,8 +34,6 @@ namespace TiaAddin_Spin_ExcelReader
 
                 var fcData = new FCData(xmlDocument);
                 fcData.ParseXMLDocument();
-
-                "".Equals("");
             }
             catch (Exception ex)
             {

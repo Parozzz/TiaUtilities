@@ -67,6 +67,13 @@ namespace TiaAddin_Spin_ExcelReader.Utility
             }
             return collection;
         }
+
+        public static XmlNode CreateElementNode(XmlDocument document, string name, object obj)
+        {
+            var xmlNode = document.CreateNode(XmlNodeType.Element, name, "");
+            xmlNode.InnerText = obj.ToString();
+            return xmlNode;
+        }
     }
 
     public class XmlSearchEngine
@@ -93,6 +100,11 @@ namespace TiaAddin_Spin_ExcelReader.Utility
             }
 
             return searchNodeList[searchNodeList.Count - 1];
+        }
+
+        public XmlNode GetFirstNode(string multipleNodeName)
+        {
+            return this.AddSearch(multipleNodeName).GetFirstNode();
         }
 
         public XmlNode GetFirstNode()

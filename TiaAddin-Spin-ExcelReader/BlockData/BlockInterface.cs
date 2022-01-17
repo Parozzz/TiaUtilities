@@ -9,29 +9,25 @@ namespace TiaAddin_Spin_ExcelReader
 {
     public class BlockInterface
     {
-        private readonly FCData fcData;
         private readonly Dictionary<SectionTypeEnum, Section> sectionDictionary;
         private readonly List<Section> sectionList;
 
-        public XmlNode Node { get; private set; }
-
-        internal BlockInterface(FCData fcData)
+        internal BlockInterface()
         {
-            this.fcData = fcData;
             this.sectionDictionary = new Dictionary<SectionTypeEnum, Section>();
             this.sectionList = new List<Section>();
         }
+
         public Section GetByType(SectionTypeEnum type)
         {
             return sectionDictionary[type];
         }
 
-        internal void SetXmlNode(XmlNode node)
+        internal void DoXmlNode(XmlNode node)
         {
             Validate.NotNull(node);
             Validate.IsTrue(node.Name.Equals("Interface"), "BlockInterface node name is not valid.");
 
-            Node = node;
             foreach (XmlNode sectionNode in XmlSearchEngine.Of(node).AddSearch("Sections/Section").GetAllNodes())
             {
                 var section = Section.Parse(sectionNode);
@@ -41,6 +37,12 @@ namespace TiaAddin_Spin_ExcelReader
                     sectionDictionary.Add(section.Type, section);
                 }
             }
+        }
+
+        internal XmlNode GenerateXmlNode(XmlDocument document)
+        {
+
+            return null;
         }
 
         public class Section

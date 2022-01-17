@@ -37,7 +37,7 @@ namespace TiaAddin_Spin_ExcelReader
             // BLOCK INTERFACE
             //==============================
 
-            blockInterface.SetXmlNode(interfaceNode);
+            blockInterface.DoXmlNode(interfaceNode);
 
             // ==============================
             // OBJECT LIST

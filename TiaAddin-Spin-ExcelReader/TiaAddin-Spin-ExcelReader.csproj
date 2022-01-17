@@ -50,6 +50,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BlockData\BlockAttributeList.cs" />
     <Compile Include="BlockData\FlagNet\Access.cs" />
     <Compile Include="BlockData\FlagNet\Access\LiteralConstantAccess.cs" />
     <Compile Include="BlockData\FlagNet\Access\VariableAccess.cs" />
