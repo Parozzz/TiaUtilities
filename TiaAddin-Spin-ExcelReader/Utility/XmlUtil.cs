@@ -132,6 +132,11 @@ namespace TiaAddin_Spin_ExcelReader.Utility
             return GetFirstNode() != null;
         }
 
+        public List<XmlNode> GetAllNodes(string multipleNodeName)
+        {
+            return this.AddSearch(multipleNodeName).GetAllNodes();
+        }
+
         public List<XmlNode> GetAllNodes()
         {
             XmlNode searchChildNode;

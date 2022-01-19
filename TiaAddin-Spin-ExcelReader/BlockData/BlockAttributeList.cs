@@ -13,19 +13,19 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
         private readonly BlockInterface blockInterface;
 
         private string memoryLayout;
-        public String MemoryLayout { get { return memoryLayout; } set { memoryLayout = value; } }
+        public string MemoryLayout { get => memoryLayout; set => memoryLayout = value; }
 
         private string name;
-        public String Name { get { return name; } set { name = value; } }
-        
+        public string Name { get => name; set => name = value; }
+
         private int number;
-        public int Number { get { return number; } set { number = value; } }
+        public int Number { get => number; set => number = value; }
 
         private string programmingLanguage;
-        public string ProgrammingLanguage { get { return programmingLanguage; } set { programmingLanguage = value; } }
+        public string ProgrammingLanguage { get => programmingLanguage; set => programmingLanguage = value; }
 
         private bool setENOAutomatically;
-        public bool SetENOAutomatically { get { return setENOAutomatically; } set { setENOAutomatically = value; } }
+        public bool SetENOAutomatically { get => setENOAutomatically; set => setENOAutomatically = value; }
 
 
         public BlockAttributeList()
@@ -45,28 +45,15 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
 
             blockInterface.DoXmlNode(XmlSearchEngine.Of(node).GetFirstNode("Interface"));
 
-            string memoryLayout = XmlSearchEngine.Of(node).GetFirstNode("MemoryLayout")?.InnerText;
-            string name = XmlSearchEngine.Of(node).GetFirstNode("Name")?.InnerText;
-            string number = XmlSearchEngine.Of(node).GetFirstNode("Number")?.InnerText;
-            string programmingLanguage = XmlSearchEngine.Of(node).GetFirstNode("ProgrammingLanguage")?.InnerText;
-            string setENOAutomatically = XmlSearchEngine.Of(node).GetFirstNode("SetENOAutomatically")?.InnerText;
-
-            if(memoryLayout == null || name == null || number == null || programmingLanguage == null || setENOAutomatically == null)
-            {
-                throw new InvalidOperationException("Something is null while parsing BlockAttributeList.");
-            }
-
-            bool parseValid = true;
-
-            this.memoryLayout = memoryLayout;
-            this.name = name;
-            parseValid &= int.TryParse(number, out this.number);
-            this.programmingLanguage = programmingLanguage;
-            parseValid &= bool.TryParse(setENOAutomatically, out this.setENOAutomatically);
+            bool parseValid = Util.TryNotNull(XmlSearchEngine.Of(node).GetFirstNode("MemoryLayout")?.InnerText, out this.memoryLayout);
+            parseValid &= Util.TryNotNull(XmlSearchEngine.Of(node).GetFirstNode("Name")?.InnerText, out this.name);
+            parseValid &= int.TryParse(XmlSearchEngine.Of(node).GetFirstNode("Number")?.InnerText, out this.number);
+            parseValid &= Util.TryNotNull(XmlSearchEngine.Of(node).GetFirstNode("ProgrammingLanguage")?.InnerText, out this.programmingLanguage);
+            parseValid &= bool.TryParse(XmlSearchEngine.Of(node).GetFirstNode("SetENOAutomatically")?.InnerText, out this.setENOAutomatically);
 
             if(!parseValid)
             {
-                throw new InvalidOperationException("Something is not been parsed correctly parsing BlockAttributeList.");
+                throw new InvalidOperationException("Something is not been parsed correctly while parsing BlockAttributeList.");
             }
         }
 
