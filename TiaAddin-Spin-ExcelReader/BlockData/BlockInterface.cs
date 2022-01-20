@@ -12,10 +12,29 @@ namespace TiaAddin_Spin_ExcelReader
         private readonly Dictionary<SectionTypeEnum, Section> sectionDictionary;
         private readonly List<Section> sectionList;
 
-        internal BlockInterface()
+        private BlockInterface()
         {
             this.sectionDictionary = new Dictionary<SectionTypeEnum, Section>();
             this.sectionList = new List<Section>();
+
+        }
+
+        internal BlockInterface(XmlNode node) : this()
+        {
+            DoXmlNode(node);
+        }
+
+        public BlockInterface(bool isFC) : this()
+        {
+            foreach(SectionTypeEnum type in Enum.GetValues(typeof(SectionTypeEnum)))
+            {
+                if(type == SectionTypeEnum.STATIC && !isFC)
+                {
+                    continue;
+                }
+
+                this.AddSection(new Section(type));
+            }
         }
 
         public Section GetByType(SectionTypeEnum type)
@@ -28,11 +47,11 @@ namespace TiaAddin_Spin_ExcelReader
             Validate.NotNull(node);
             Validate.IsTrue(node.Name.Equals("Interface"), "BlockInterface node name is not valid.");
 
+            sectionDictionary.Clear();
+            sectionList.Clear();
             foreach (XmlNode sectionNode in XmlSearchEngine.Of(node).GetAllNodes("Sections/Section"))
             {
-                var section = new Section(sectionNode);
-                sectionList.Add(section);
-                sectionDictionary.Add(section.Type, section);
+                this.AddSection(new Section(sectionNode));
             }
         }
 
@@ -40,6 +59,12 @@ namespace TiaAddin_Spin_ExcelReader
         {
 
             return null;
+        }
+
+        private void AddSection(Section section)
+        {
+            sectionList.Add(section);
+            sectionDictionary.Add(section.Type, section);
         }
 
         public class Section
@@ -73,6 +98,8 @@ namespace TiaAddin_Spin_ExcelReader
                         return "Constant";
                     case SectionTypeEnum.RETURN:
                         return "Return";
+                    default:
+                        return null;
                 }
             }
 
@@ -80,23 +107,43 @@ namespace TiaAddin_Spin_ExcelReader
             public SectionTypeEnum Type { get => type; }
 
 
-            public readonly List<Member> memberList;
+            private readonly List<Member> memberList;
             public List<Member> MemberList { get => memberList; }
 
-            public Section(XmlNode node)
+            private Section()
             {
                 memberList = new List<Member>();
+            }
+
+            public Section(XmlNode node) : this()
+            {
                 this.DoXmlNode(node);
             }
 
-            public Section(SectionTypeEnum type) => this.type = type;
+            public Section(SectionTypeEnum type) : this()
+            {
+                this.type = type;
+            }
 
-            public Member AddMember(string name, string dataType, string startValue) => new Member(name, dataType, startValue);
+            //
+            // Riepilogo:
+            //     Aggiungi un nuovo membro alla lista dei membri di questa sezione
+            //
+            // Valori restituiti:
+            //     Il nuovo membro creato
+            public Member AddMember(string name, string dataType, string startValue)
+            {
+                var newMember = new Member(name, dataType, startValue);
+                memberList.Add(newMember);
+                return newMember;
+            }
 
-            private void DoXmlNode(XmlNode node)
+            internal void DoXmlNode(XmlNode node)
             {
                 Validate.NotNull(node);
                 Validate.IsTrue(node.Name.Equals("Section"), "Section node name is not valid.");
+
+                this.memberList.Clear();
 
                 bool parseOK = Enum.TryParse(node.Attributes["Name"]?.Value, true, out type);
                 if (!parseOK)
@@ -106,16 +153,17 @@ namespace TiaAddin_Spin_ExcelReader
 
                 foreach (XmlNode memberNode in XmlSearchEngine.Of(node).GetAllNodes("Member"))
                 {
-                    var member = new Member();
-                    member.DoXmlNode(memberNode);
-                    memberList.Add(member);
+                    memberList.Add(new Member(memberNode));
                 }
             }
 
             public XmlNode GenerateXmlNode(XmlDocument document)
             {
                 var mainNode = document.CreateNode(XmlNodeType.Element, "Section", "");
-                mainNode.Attributes.Append(document.CreateAttribute("Name", GetSectionTypeString(type)));
+
+                var appender = new XmlNodeAppender(document, mainNode)
+                    .AppendAttribute("Name", GetSectionTypeString(type));
+
             }
 
             public class Member
@@ -133,12 +181,18 @@ namespace TiaAddin_Spin_ExcelReader
                 private readonly Dictionary<CultureInfo, string> commentDictionary;
                 private readonly List<Member> subMemberList;
 
-                public Member()
+                private Member()
                 {
                     attributeList = new List<MemberAttribute>();
                     commentDictionary = new Dictionary<CultureInfo, string>();
                     subMemberList = new List<Member>();
                 }
+
+                public Member(XmlNode node) : this()
+                {
+                    this.DoXmlNode(node);
+                }
+
                 public Member(string name, string dataType, string startValue) : this()
                 {
                     this.name = name;
@@ -151,6 +205,10 @@ namespace TiaAddin_Spin_ExcelReader
                     Validate.NotNull(node);
                     Validate.IsTrue(node.Name.Equals("Member"), "Section/Member node name is not valid.");
 
+                    attributeList.Clear();
+                    commentDictionary.Clear();
+                    subMemberList.Clear();
+
                     var parseOK = Util.TryNotNull(node.Attributes["Name"].Value, out name);
                     parseOK &= Util.TryNotNull(node.Attributes["Datatype"].Value, out dataType);
                     if (!parseOK)
@@ -160,41 +218,65 @@ namespace TiaAddin_Spin_ExcelReader
 
                     foreach (XmlNode childNode in node.ChildNodes)
                     {
-                        if (childNode.Name == "StartValue")
+                        switch (childNode.Name)
                         {
-                            startValue = childNode.InnerText;
-                        }
-                        else if (childNode.Name == "Member")
-                        {
-                            var childMember = new Member();
-                            childMember.DoXmlNode(childNode);
-                            subMemberList.Add(childMember);
-                        }
-                        else if (childNode.Name == "AttributeList")
-                        {
-                            foreach (XmlNode attributeNode in childNode)
-                            {
-                                var memberAttribute = new MemberAttribute();
-                                memberAttribute.DoXmlNode(attributeNode);
-                                attributeList.Add(memberAttribute);
-                            }
-                        }
-                        else if (childNode.Name == "Comment")
-                        {
-                            foreach (XmlNode languangeTextNode in XmlSearchEngine.Of(childNode).AddSearch("MultiLanguageText").GetAllNodes())
-                            {
-                                var lang = languangeTextNode.Attributes["Lang"]?.Value;
-                                if (lang == null)
+                            case "StartValue":
+                                startValue = childNode.InnerText;
+                                break;
+                            case "Member":
+                                subMemberList.Add(new Member(childNode));
+                                break;
+                            case "AttributeList":
+                                foreach (XmlNode attributeNode in childNode)
                                 {
-                                    continue;
+                                    attributeList.Add(new MemberAttribute(attributeNode));
                                 }
+                                break;
+                            case "Comment":
+                                foreach (XmlNode languangeTextNode in XmlSearchEngine.Of(childNode).GetAllNodes("MultiLanguageText"))
+                                {
+                                    var lang = languangeTextNode.Attributes["Lang"]?.Value;
+                                    if (lang == null)
+                                    {
+                                        continue;
+                                    }
 
-                                var cultureInfo = CultureInfo.GetCultureInfoByIetfLanguageTag(lang);
-                                if (cultureInfo != null)
-                                {
-                                    commentDictionary.Add(cultureInfo, languangeTextNode.InnerText);
+                                    var cultureInfo = CultureInfo.GetCultureInfo(lang);
+                                    if (cultureInfo != null)
+                                    {
+                                        commentDictionary.Add(cultureInfo, languangeTextNode.InnerText);
+                                    }
                                 }
-                            }
+                                break;
+                        }
+                    }
+                }
+
+                public XmlNode GenerateXmlNode(XmlDocument document)
+                {
+                    var mainNode = document.CreateNode(XmlNodeType.Element, "Member", "");
+
+                    var appender = new XmlNodeAppender(document, mainNode)
+                        .AppendAttribute("Name", this.name).AppendAttribute("Datatype", this.dataType)
+                        .AppendChild("StartValue", this.startValue);
+
+                    if(attributeList.Count > 0)
+                    {
+                        var attributeListNode = document.CreateNode(XmlNodeType.Element, "AttributeList", "");
+                        foreach (MemberAttribute attribute in attributeList)
+                        {
+
+                        }
+                    }
+                    
+                    if(commentDictionary.Count > 0)
+                    {
+                        var commentNode = document.CreateNode(XmlNodeType.Element, "Comment", "");
+                        foreach (KeyValuePair<CultureInfo, string> commentPair in commentDictionary)
+                        {
+                            var textNode = document.CreateNode(XmlNodeType.Element, "MultiLanguageText", "");
+                            textNode.InnerText = commentPair.Value;
+                            XmlUtil.AppendAttribute(document, textNode, "Lang", commentPair.Key.IetfLanguageTag);
                         }
                     }
                 }
@@ -210,16 +292,16 @@ namespace TiaAddin_Spin_ExcelReader
                     private string value;
                     public string Value { get => value; }
 
+                    public MemberAttribute(XmlNode node)
+                    {
+                        this.DoXmlNode(node);
+                    }
+
                     public MemberAttribute(string name, bool systemDefined, string value)
                     {
                         this.name = name;
                         this.systemDefined = systemDefined;
                         this.value = value;
-                    }
-
-                    internal MemberAttribute()
-                    {
-
                     }
 
                     internal void DoXmlNode(XmlNode node)

@@ -68,11 +68,51 @@ namespace TiaAddin_Spin_ExcelReader.Utility
             return collection;
         }
 
-        public static XmlNode CreateElementNode(XmlDocument document, string name, object obj)
+        public static void AppendElement(XmlDocument document, XmlNode mainNode, string newNodeName, object newNodeInnerText)
         {
-            var xmlNode = document.CreateNode(XmlNodeType.Element, name, "");
-            xmlNode.InnerText = obj.ToString();
-            return xmlNode;
+            var newChildNode = document.CreateNode(XmlNodeType.Element, newNodeName, "");
+            newChildNode.InnerText = newNodeInnerText.ToString();
+            mainNode.AppendChild(newChildNode);
+        }
+
+        public static void AppendAttribute(XmlDocument document, XmlNode mainNode, string newAttributeName, object newAttributeValue)
+        {
+            var newAttribute = document.CreateAttribute(newAttributeName);
+            newAttribute.Value = newAttributeValue.ToString();
+            mainNode.Attributes.Append(newAttribute);
+        }
+    }
+
+    public class XmlNodeAppender
+    {
+        private readonly XmlDocument document;
+        private readonly XmlNode mainNode;
+        public XmlNodeAppender(XmlDocument document, XmlNode mainNode)
+        {
+            this.document = document;
+            this.mainNode = mainNode;
+        }
+
+        public XmlNodeAppender AppendChild(string newNodeName, object newNodeInnerText)
+        {
+            var newChildNode = document.CreateNode(XmlNodeType.Element, newNodeName, "");
+            newChildNode.InnerText = newNodeInnerText.ToString();
+            mainNode.AppendChild(newChildNode);
+            return this;
+        }
+
+        public XmlNodeAppender AppendChild(XmlNode childNode)
+        {
+            mainNode.AppendChild(childNode);
+            return this;
+        }
+
+        public XmlNodeAppender AppendAttribute(string newAttributeName, object newAttributeValue)
+        {
+            var newAttribute = document.CreateAttribute(newAttributeName);
+            newAttribute.Value = newAttributeValue.ToString();
+            mainNode.Attributes.Append(newAttribute);
+            return this;
         }
     }
 
