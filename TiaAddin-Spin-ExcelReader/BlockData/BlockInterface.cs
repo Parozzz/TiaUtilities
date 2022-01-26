@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SpinAddIn;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Xml;
@@ -7,7 +8,7 @@ using static TiaAddin_Spin_ExcelReader.BlockInterface.Section;
 
 namespace TiaAddin_Spin_ExcelReader
 {
-    public class BlockInterface
+    public class BlockInterface : XmlNodeSerializable
     {
         private readonly Dictionary<SectionTypeEnum, Section> sectionDictionary;
         private readonly List<Section> sectionList;
@@ -16,7 +17,6 @@ namespace TiaAddin_Spin_ExcelReader
         {
             this.sectionDictionary = new Dictionary<SectionTypeEnum, Section>();
             this.sectionList = new List<Section>();
-
         }
 
         internal BlockInterface(XmlNode node) : this()
@@ -26,9 +26,10 @@ namespace TiaAddin_Spin_ExcelReader
 
         public BlockInterface(bool isFC) : this()
         {
-            foreach(SectionTypeEnum type in Enum.GetValues(typeof(SectionTypeEnum)))
+            foreach (SectionTypeEnum type in Enum.GetValues(typeof(SectionTypeEnum)))
             {
-                if(type == SectionTypeEnum.STATIC && !isFC)
+                //Static exists only for FBs
+                if (type == SectionTypeEnum.STATIC && !isFC)
                 {
                     continue;
                 }
@@ -57,8 +58,9 @@ namespace TiaAddin_Spin_ExcelReader
 
         internal XmlNode GenerateXmlNode(XmlDocument document)
         {
-
-            return null;
+            return XmlNodeBuilder.CreateNewWithNamespace(document, "Sections", Properties.Resources.SECTIONS_NAMESPACE)
+                .AppendSerializableCollectionAsChild(sectionList)
+                .GetNode();
         }
 
         private void AddSection(Section section)
@@ -67,7 +69,7 @@ namespace TiaAddin_Spin_ExcelReader
             sectionDictionary.Add(section.Type, section);
         }
 
-        public class Section
+        public class Section : XmlNodeSerializable
         {
             public enum SectionTypeEnum
             {
@@ -80,7 +82,7 @@ namespace TiaAddin_Spin_ExcelReader
                 RETURN
             }
 
-            public static string GetSectionTypeString(SectionTypeEnum typeEnum)
+            public static string GetSectionNameFromType(SectionTypeEnum typeEnum)
             {
                 switch (typeEnum)
                 {
@@ -159,14 +161,13 @@ namespace TiaAddin_Spin_ExcelReader
 
             public XmlNode GenerateXmlNode(XmlDocument document)
             {
-                var mainNode = document.CreateNode(XmlNodeType.Element, "Section", "");
-
-                var appender = new XmlNodeAppender(document, mainNode)
-                    .AppendAttribute("Name", GetSectionTypeString(type));
-
+                return XmlNodeBuilder.CreateNew(document, "Section")
+                    .AppendAttribute("Name", GetSectionNameFromType(type))
+                    .AppendSerializableCollectionAsChild(memberList)
+                    .GetNode();
             }
 
-            public class Member
+            public class Member : XmlNodeSerializable
             {
                 private string name;
                 public String Name { get => name; }
@@ -177,13 +178,13 @@ namespace TiaAddin_Spin_ExcelReader
                 private string startValue;
                 public string StartValue { get => startValue; }
 
-                private readonly List<MemberAttribute> attributeList;
+                private readonly List<StringMemberAttribute> stringAttributeList;
                 private readonly Dictionary<CultureInfo, string> commentDictionary;
                 private readonly List<Member> subMemberList;
 
                 private Member()
                 {
-                    attributeList = new List<MemberAttribute>();
+                    stringAttributeList = new List<StringMemberAttribute>();
                     commentDictionary = new Dictionary<CultureInfo, string>();
                     subMemberList = new List<Member>();
                 }
@@ -205,7 +206,7 @@ namespace TiaAddin_Spin_ExcelReader
                     Validate.NotNull(node);
                     Validate.IsTrue(node.Name.Equals("Member"), "Section/Member node name is not valid.");
 
-                    attributeList.Clear();
+                    stringAttributeList.Clear();
                     commentDictionary.Clear();
                     subMemberList.Clear();
 
@@ -229,7 +230,10 @@ namespace TiaAddin_Spin_ExcelReader
                             case "AttributeList":
                                 foreach (XmlNode attributeNode in childNode)
                                 {
-                                    attributeList.Add(new MemberAttribute(attributeNode));
+                                    if (attributeNode.Name == "StringAttribute")
+                                    {
+                                        stringAttributeList.Add(new StringMemberAttribute(attributeNode));
+                                    }
                                 }
                                 break;
                             case "Comment":
@@ -254,34 +258,38 @@ namespace TiaAddin_Spin_ExcelReader
 
                 public XmlNode GenerateXmlNode(XmlDocument document)
                 {
-                    var mainNode = document.CreateNode(XmlNodeType.Element, "Member", "");
+                    var builder = XmlNodeBuilder.CreateNew(document, "Member")
+                        .AppendAttribute("Name", this.name).AppendAttribute("Datatype", this.dataType);
 
-                    var appender = new XmlNodeAppender(document, mainNode)
-                        .AppendAttribute("Name", this.name).AppendAttribute("Datatype", this.dataType)
-                        .AppendChild("StartValue", this.startValue);
-
-                    if(attributeList.Count > 0)
+                    if(this.startValue != null)
                     {
-                        var attributeListNode = document.CreateNode(XmlNodeType.Element, "AttributeList", "");
-                        foreach (MemberAttribute attribute in attributeList)
-                        {
-
-                        }
+                        builder.AppendChild("StartValue", this.startValue);
                     }
-                    
-                    if(commentDictionary.Count > 0)
+
+                    if (stringAttributeList.Count > 0)
+                    {
+                        XmlNodeBuilder.CreateNew(document, "AttributeList")
+                            .AppendSerializableCollectionAsChild(stringAttributeList)
+                            .ChildToBuilder(builder);
+                    }
+
+                    if (commentDictionary.Count > 0)
                     {
                         var commentNode = document.CreateNode(XmlNodeType.Element, "Comment", "");
                         foreach (KeyValuePair<CultureInfo, string> commentPair in commentDictionary)
                         {
-                            var textNode = document.CreateNode(XmlNodeType.Element, "MultiLanguageText", "");
-                            textNode.InnerText = commentPair.Value;
-                            XmlUtil.AppendAttribute(document, textNode, "Lang", commentPair.Key.IetfLanguageTag);
+                            XmlNodeBuilder.CreateNew(document, "MultiLanguageText")
+                                .InnerText(commentPair.Value)
+                                .AppendAttribute("Lang", commentPair.Key.IetfLanguageTag)
+                                .ChildTo(commentNode);
                         }
+                        builder.AppendChild(commentNode);
                     }
+
+                    return builder.GetNode();
                 }
 
-                public class MemberAttribute
+                public class StringMemberAttribute : XmlNodeSerializable
                 {
                     private string name;
                     public string Name { get => name; }
@@ -292,31 +300,40 @@ namespace TiaAddin_Spin_ExcelReader
                     private string value;
                     public string Value { get => value; }
 
-                    public MemberAttribute(XmlNode node)
+                    public StringMemberAttribute(XmlNode node)
                     {
-                        this.DoXmlNode(node);
+                        this.ParseXmlNode(node);
                     }
 
-                    public MemberAttribute(string name, bool systemDefined, string value)
+                    public StringMemberAttribute(string name, bool systemDefined, string value)
                     {
                         this.name = name;
                         this.systemDefined = systemDefined;
                         this.value = value;
                     }
 
-                    internal void DoXmlNode(XmlNode node)
+                    private void ParseXmlNode(XmlNode node)
                     {
                         Validate.NotNull(node);
                         Validate.IsTrue(node.Name == "StringAttribute", "Section/Member/Attribute node name is not valid.");
 
                         var parseOK = Util.TryNotNull(node.Attributes["Name"]?.Value, out string name);
-                        parseOK = bool.TryParse(node.Attributes["SystemDefined"]?.Value, out bool systemDefined);
-                        parseOK = Util.TryNotNull(node.InnerText, out value);
+                        parseOK &= bool.TryParse(node.Attributes["SystemDefined"]?.Value, out bool systemDefined);
+                        parseOK &= Util.TryNotNull(node.InnerText, out value);
                         if (!parseOK)
                         {
                             throw new InvalidOperationException("Some of the values inside a Section/Member/AttributeList has not been parsed correctly");
                         }
                     }
+                    public XmlNode GenerateXmlNode(XmlDocument document)
+                    {
+                        return XmlNodeBuilder.CreateNew(document, "StringAttribute")
+                            .InnerText(value)
+                            .AppendAttribute("Name", name)
+                            .AppendAttribute("SystemDefined", systemDefined)
+                            .GetNode();
+                    }
+
                 }
             }
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SpinAddIn;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -68,11 +69,12 @@ namespace TiaAddin_Spin_ExcelReader.Utility
             return collection;
         }
 
-        public static void AppendElement(XmlDocument document, XmlNode mainNode, string newNodeName, object newNodeInnerText)
+        public static XmlNode AppendElement(XmlDocument document, XmlNode mainNode, string newNodeName, object newNodeInnerText)
         {
             var newChildNode = document.CreateNode(XmlNodeType.Element, newNodeName, "");
             newChildNode.InnerText = newNodeInnerText.ToString();
             mainNode.AppendChild(newChildNode);
+            return newChildNode;
         }
 
         public static void AppendAttribute(XmlDocument document, XmlNode mainNode, string newAttributeName, object newAttributeValue)
@@ -83,36 +85,93 @@ namespace TiaAddin_Spin_ExcelReader.Utility
         }
     }
 
-    public class XmlNodeAppender
+    public class XmlNodeBuilder
     {
+        public static XmlNodeBuilder CreateNew(XmlDocument document, string nodeName)
+        {
+            var node = document.CreateNode(XmlNodeType.Element, nodeName, "");
+            return new XmlNodeBuilder(document, node);
+        }
+
+        public static XmlNodeBuilder CreateNewWithNamespace(XmlDocument document, string nodeName, string namespaceURI)
+        {
+            var node = document.CreateNode(XmlNodeType.Element, nodeName, namespaceURI);
+            return new XmlNodeBuilder(document, node);
+        }
+
         private readonly XmlDocument document;
-        private readonly XmlNode mainNode;
-        public XmlNodeAppender(XmlDocument document, XmlNode mainNode)
+        private readonly XmlNode node;
+        public XmlNodeBuilder(XmlDocument document, XmlNode node)
         {
             this.document = document;
-            this.mainNode = mainNode;
+            this.node = node;
         }
 
-        public XmlNodeAppender AppendChild(string newNodeName, object newNodeInnerText)
+        public XmlNodeBuilder InnerText(string innerText)
         {
-            var newChildNode = document.CreateNode(XmlNodeType.Element, newNodeName, "");
-            newChildNode.InnerText = newNodeInnerText.ToString();
-            mainNode.AppendChild(newChildNode);
+            node.InnerText = innerText;
             return this;
         }
 
-        public XmlNodeAppender AppendChild(XmlNode childNode)
+        public XmlNodeBuilder AppendChild(string newNodeName, object newNodeInnerText)
         {
-            mainNode.AppendChild(childNode);
+            XmlUtil.AppendElement(document, node, newNodeName, newNodeInnerText);
             return this;
         }
 
-        public XmlNodeAppender AppendAttribute(string newAttributeName, object newAttributeValue)
+        public XmlNodeBuilder AppendChild(string newNodeName, Action<XmlNodeBuilder> childNodeBuilderAction)
         {
-            var newAttribute = document.CreateAttribute(newAttributeName);
-            newAttribute.Value = newAttributeValue.ToString();
-            mainNode.Attributes.Append(newAttribute);
+            var childNode = document.CreateNode(XmlNodeType.Element, newNodeName, "");
+
+            var childNodeBuilder = new XmlNodeBuilder(document, childNode);
+            childNodeBuilderAction.Invoke(childNodeBuilder);
             return this;
+        }
+
+        public XmlNodeBuilder AppendChild(XmlNode childNode)
+        {
+            node.AppendChild(childNode);
+            return this;
+        }
+
+        public XmlNodeBuilder AppendSerializableAsChild(XmlNodeSerializable serializable)
+        {
+            var childNode = serializable.GenerateXmlNode(document);
+            return this.AppendChild(childNode);
+        }
+
+        public XmlNodeBuilder AppendSerializableCollectionAsChild<T>(ICollection<T> serializableColl) where T : XmlNodeSerializable
+        {
+            foreach(var serializable in serializableColl)
+            {
+                var childNode = serializable.GenerateXmlNode(document);
+                this.AppendChild(childNode);
+            }
+
+            return this;
+        }
+
+        public XmlNodeBuilder AppendAttribute(string newAttributeName, object newAttributeValue)
+        {
+            XmlUtil.AppendAttribute(document, node, newAttributeName, newAttributeValue);
+            return this;
+        }
+
+        /// <summary> Set the XmlNode inside this builder as a child to parentNode </summary>
+        public void ChildTo(XmlNode parentNode)
+        {
+            parentNode.AppendChild(node);
+        }
+
+        /// <summary> Set the XmlNode inside this builder as a child to the XmlNode inside parentBuilder </summary>
+        public void ChildToBuilder(XmlNodeBuilder parentBuilder)
+        {
+            parentBuilder.AppendChild(node);
+        }
+
+        public XmlNode GetNode()
+        {
+            return node;
         }
     }
 

@@ -28,9 +28,15 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
         public bool SetENOAutomatically { get => setENOAutomatically; set => setENOAutomatically = value; }
 
 
-        public BlockAttributeList()
+        public BlockAttributeList(XmlNode xmlNode)
         {
-            blockInterface = new BlockInterface();
+            blockInterface = new BlockInterface(xmlNode);
+            this.DoXmlNode(xmlNode);
+        }
+
+        public BlockAttributeList(bool isFC)
+        {
+            blockInterface = new BlockInterface(isFC);
         }
 
         public BlockInterface GetBlockInterface()
@@ -38,7 +44,7 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
             return blockInterface;
         }
 
-        public void DoXmlNode(XmlNode node)
+        private void DoXmlNode(XmlNode node)
         {
             Validate.NotNull(node);
             Validate.IsTrue(node.Name.Equals("AttributeList"), "BlockAttributeList node name is not valid.");
@@ -59,18 +65,14 @@ namespace TiaAddin_Spin_ExcelReader.BlockData
 
         public XmlNode GenerateXmlNode(XmlDocument document)
         {
-            var mainNode = document.CreateNode(XmlNodeType.Element, "AttributeList", "");
-
-            mainNode.AppendChild(XmlUtil.CreateElementNode(document, "Name", this.name));
-            mainNode.AppendChild(XmlUtil.CreateElementNode(document, "MemoryLayout", this.memoryLayout));
-            mainNode.AppendChild(XmlUtil.CreateElementNode(document, "Number", this.number));
-            mainNode.AppendChild(XmlUtil.CreateElementNode(document, "ProgrammingLanguage", this.programmingLanguage));
-            mainNode.AppendChild(XmlUtil.CreateElementNode(document, "SetENOAutomatically", this.setENOAutomatically));
-
-
-            mainNode.AppendChild(blockInterface.GenerateXmlNode(document));
-
-            return mainNode;
+            return XmlNodeBuilder.CreateNew(document, "AttributeList")
+                .AppendChild("Name", this.name)
+                .AppendChild("MemoryLayout", this.memoryLayout)
+                .AppendChild("Number", this.number)
+                .AppendChild("ProgrammingLanguage", this.programmingLanguage)
+                .AppendChild("SetENOAutomatically", this.setENOAutomatically)
+                .AppendSerializableAsChild(blockInterface)
+                .GetNode();
         }
 
     }

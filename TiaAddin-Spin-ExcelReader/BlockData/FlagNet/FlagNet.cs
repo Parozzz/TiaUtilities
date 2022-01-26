@@ -1,13 +1,15 @@
-﻿using System;
+﻿using SpinAddIn;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml;
+using TiaAddin_Spin_ExcelReader.BlockData;
 using TiaAddin_Spin_ExcelReader.Utility;
 
 namespace TiaAddin_Spin_ExcelReader
 {
-    public class FlagNet
+    public class FlagNet : XmlNodeSerializable, GlobalIDObject
     {
         private readonly FCData fcData;
         private readonly Dictionary<uint, UIdObject> completeUIdDictionary;
@@ -15,7 +17,7 @@ namespace TiaAddin_Spin_ExcelReader
         private readonly Dictionary<uint, Access> accessUIdDictionary;
         private readonly Dictionary<uint, Wire> wireUIdDictionary;
 
-        internal FlagNet(FCData fcData)
+        private FlagNet(FCData fcData)
         {
             this.fcData = fcData;
             completeUIdDictionary = new Dictionary<uint, UIdObject>();
@@ -24,13 +26,28 @@ namespace TiaAddin_Spin_ExcelReader
             wireUIdDictionary = new Dictionary<uint, Wire>();
         }
 
+        internal FlagNet(FCData fcData, XmlNode node) : this(fcData)
+        {
+            this.DoXMLNode(node);
+        }
+
+        public XmlNode GenerateXmlNode(XmlDocument document)
+        {
+            throw new NotImplementedException();
+        }
+
+        public uint GetID()
+        {
+            throw new NotImplementedException();
+        }
+
         public UIdObject GetUIdObject(uint uid)
         {
             return completeUIdDictionary.TryGetValue(uid, out UIdObject value) ? value : null;
         }
 
 
-        public FlagNet ParseXMLNode(XmlNode node)
+        internal FlagNet DoXMLNode(XmlNode node)
         {
             Validate.NotNull(node);
             Validate.IsTrue(node.Name.Equals("FlgNet"), "FlagNet XmlNode has wrong name.");

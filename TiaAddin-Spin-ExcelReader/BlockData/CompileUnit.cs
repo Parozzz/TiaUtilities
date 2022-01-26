@@ -1,14 +1,16 @@
 ﻿using Siemens.Engineering.SW.Blocks;
+using SpinAddIn;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using TiaAddin_Spin_ExcelReader.BlockData;
 
 namespace TiaAddin_Spin_ExcelReader
 {
-    public class CompileUnit
+    public class CompileUnit : XmlNodeSerializable, GlobalIDObject
     {
         public MultilingualText Title { get; private set; }
         public MultilingualText Comment { get; private set; }
@@ -59,6 +61,16 @@ namespace TiaAddin_Spin_ExcelReader
             }
 
             return this;
+        }
+
+        public uint GetID()
+        {
+            throw new NotImplementedException();
+        }
+
+        public XmlNode GenerateXmlNode(XmlDocument document)
+        {
+            throw new NotImplementedException();
         }
     }
 }

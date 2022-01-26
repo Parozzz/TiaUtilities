@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Xml;
+using TiaAddin_Spin_ExcelReader.BlockData;
 using TiaAddin_Spin_ExcelReader.Utility;
 
 namespace TiaAddin_Spin_ExcelReader
@@ -7,7 +8,8 @@ namespace TiaAddin_Spin_ExcelReader
     public class FCData
     {
         private readonly XmlDocument xmlDocument;
-        private readonly BlockInterface blockInterface;
+        public readonly GlobalIDGenerator GlobalIDGenerator;
+        private readonly BlockAttributeList blockAttributeList;
 
         public MultilingualText Comment { get; private set; }
         public MultilingualText Title { get; private set; }
@@ -17,7 +19,8 @@ namespace TiaAddin_Spin_ExcelReader
         public FCData(XmlDocument xmlDocument)
         {
             this.xmlDocument = xmlDocument;
-            this.blockInterface = new BlockInterface(this);
+            this.GlobalIDGenerator = new GlobalIDGenerator();
+            this.blockAttributeList = new BlockAttributeList(true);
 
             this.compileUnitList = new List<CompileUnit>();
         }
