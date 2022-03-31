@@ -26,10 +26,28 @@
       <TIA.ReadWrite/>
     </TIAPermissions>
     <SecurityPermissions>
-      <System.Security.Permissions.FileIOPermission/>
-      <System.Security.Permissions.EnvironmentPermission/>
-      <System.Security.Permissions.UIPermission/>
-      <System.Security.Permissions.SecurityPermission.UnmanagedCode/>
+	  <System.Security.Permissions.SecurityPermission.UnmanagedCode/>
+	  <System.Security.Permissions.FileDialogPermission/>
+	  <System.Security.Permissions.UIPermission/>
+   	  <System.Security.Permissions.MediaPermission/>
+	  <Siemens.Engineering.AddIn.Permissions.ProcessStartPermission/>
+	  <System.Net.WebPermission/>
+	  <System.Security.Permissions.KeyContainerPermission/>
+	  <System.Net.SocketPermission/>
+	  <System.Data.Odbc.OdbcPermission/>
+	  <System.Security.Permissions.WebBrowserPermission/>
+	  <System.Net.NetworkInformation.NetworkInformationPermission/>
+	  <System.Security.Permissions.StorePermission/>
+	  <System.Configuration.ConfigurationPermission/>
+	  <System.Security.Permissions.FileIOPermission/>
+	  <System.Diagnostics.EventLogPermission/>
+	  <System.Drawing.Printing.PrintingPermission/>
+	  <System.Security.Permissions.IsolatedStorageFilePermission/>
+	  <System.Data.OleDb.OleDbPermission/>
+	  <System.Security.Permissions.RegistryPermission/>
+	  <System.Data.SqlClient.SqlClientPermission/>
+	  <System.Security.Permissions.EnvironmentPermission/>
+	  <System.Net.Mail.SmtpPermission/>
     </SecurityPermissions>
   </RequiredPermissions>
 </PackageConfiguration>

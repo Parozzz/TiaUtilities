@@ -10,6 +10,17 @@ namespace SpinAddin.Utility
 {
     public static class Util
     {
+
+        public static Form CreateForm()
+        {
+            Form form = new Form { Opacity = 0, ShowIcon = false };
+            form.Show();
+            form.TopMost = true;
+            form.Activate();
+            form.TopMost = false;
+            return form;
+        }
+
         public static void RemoveIDBs(FC fc)
         {
             IEngineeringObject parent = fc;

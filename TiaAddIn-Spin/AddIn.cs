@@ -7,6 +7,7 @@ using System.IO;
 using System.Reflection;
 using Siemens.Engineering.SW;
 using SpinAddin.Utility;
+using System.Windows.Forms;
 
 namespace SpinAddin
 {
@@ -29,73 +30,208 @@ namespace SpinAddin
 
         protected override void BuildContextMenuItems(ContextMenuAddInRoot menuRoot)
         {
-            menuRoot.Items.AddActionItem<PlcTagTable>("Esporta Tabella tag", ExportTagTableClick);
+            menuRoot.Items.AddActionItem<PlcBlock>("Esporta Blocchi Singolarmente", ExportBlockClick);
+            menuRoot.Items.AddActionItem<PlcBlock>("Esporta Blocchi selez. su Cartella", ExportBlockFolderClick);
+            menuRoot.Items.AddActionItem<PlcBlock>("Importa Blocchi", ImportBlockClick);
+            menuRoot.Items.AddActionItem<PlcBlock>("Importa Cartella", ImportBlockFolderClick);
 
-            menuRoot.Items.AddActionItem<PlcBlock>("Esporta Blocco selezionato", ExportBlockClick);
-            menuRoot.Items.AddActionItem<PlcBlock>("Importa Blocco", ImportBlockClick);
+            //menuRoot.Items.AddActionItem<DataBlock>("Esporta DB", ExportDBClick);
+            //menuRoot.Items.AddActionItem<DataBlock>("Importa DB", ImportDBClick);
 
-            menuRoot.Items.AddActionItem<DataBlock>("Esporta DB selezionata", ExportDBClick);
-            menuRoot.Items.AddActionItem<DataBlock>("Importa DB", ImportDBClick);
-        }
-
-        private void ExportTagTableClick(MenuSelectionProvider selectionProvider)
-        {
-            foreach (PlcTagTable tagTable in selectionProvider.GetSelection())
-            {
-                ExportUtil.Export(tagTable.Export, Util.DesktopFolder() + "\\TagTableExport.xml");
-                foreach (PlcTag tag in tagTable.Tags)
-                {
-                    ExportUtil.Export(tag.Export, Util.DesktopFolder() + "\\TagExport.xml");
-                    break;
-                }
-
-                break;
-            }
+            menuRoot.Items.AddActionItem<PlcTagTable>("Esporta TagTable Singolarmente", ExportTagTableClick);
+            menuRoot.Items.AddActionItem<PlcTagTable>("Esporta TagTable selez. su Cartella", ExportTagTableFolderClick);
+            menuRoot.Items.AddActionItem<PlcTagTable>("Importa TagTable", ImportTagTableClick);
+            menuRoot.Items.AddActionItem<PlcTagTable>("Importa Cartella", ImportTagTableFolderClick);
         }
 
         private void ExportBlockClick(MenuSelectionProvider selectionProvider)
         {
             foreach (PlcBlock block in selectionProvider.GetSelection())
             {
-                ExportUtil.Export(block.Export, Util.DesktopFolder() + "\\FCFBExport.xml");
+                var fileDialog = new OpenFileDialog()
+                {
+                    Filter = "xml files (*.xml)|*.xml",
+                    CheckFileExists = false,
+                    Multiselect = false,
+                    Title = "Export BLOCK " + block.Name,
+                    ShowHelp = true,
+                    FileName = block.Name
+                };
+
+                if (fileDialog.ShowDialog(Util.CreateForm()) == DialogResult.OK)
+                {
+                    ExportUtil.Export(block.Export, fileDialog.FileName);
+                }
             }
         }
+
+        private void ExportBlockFolderClick(MenuSelectionProvider selectionProvider)
+        {
+            var folderDialog = new FolderBrowserDialog();
+            if (folderDialog.ShowDialog(Util.CreateForm()) == DialogResult.OK)
+            {
+                var directory = folderDialog.SelectedPath;
+                foreach (PlcBlock block in selectionProvider.GetSelection())
+                {
+                    ExportUtil.Export(block.Export, directory + "\\" + block.Name + ".xml");
+                }
+            }
+        }
+
 
         private void ImportBlockClick(MenuSelectionProvider selectionProvider)
         {
             foreach (PlcBlock block in selectionProvider.GetSelection())
             {
-                var filePath = Util.DesktopFolder() + "\\FCFBExport.xml";
-
-                var blockGroup = (PlcBlockGroup)block.Parent;
-                try
+                var fileDialog = new OpenFileDialog
                 {
-                    blockGroup.Blocks.Import(new FileInfo(filePath), ImportOptions.Override, SWImportOptions.IgnoreMissingReferencedObjects | SWImportOptions.IgnoreStructuralChanges | SWImportOptions.IgnoreUnitAttributes);
+                    Filter = "xml files (*.xml)|*.xml",
+                    CheckFileExists = false,
+                    Multiselect = true
+                };
+
+                if (fileDialog.ShowDialog(Util.CreateForm()) == DialogResult.OK)
+                {
+                    var files = fileDialog.FileNames;
+                    foreach (var fileName in files)
+                    {
+                        var blockGroup = (PlcBlockGroup)block.Parent;
+                        try
+                        {
+                            var fileInfo = new FileInfo(fileName);
+                            blockGroup.Blocks.Import(fileInfo, ImportOptions.Override,
+                                SWImportOptions.IgnoreMissingReferencedObjects |
+                                SWImportOptions.IgnoreStructuralChanges |
+                                SWImportOptions.IgnoreUnitAttributes);
+                        }
+                        catch { }
+                    }
                 }
-                catch (Exception) { }
+
+                break;
             }
         }
 
-        private void ExportDBClick(MenuSelectionProvider selectionProvider)
+        private void ImportBlockFolderClick(MenuSelectionProvider selectionProvider)
         {
-            foreach (DataBlock block in selectionProvider.GetSelection())
+            foreach (PlcBlock block in selectionProvider.GetSelection())
             {
-                ExportUtil.Export(block.Export, Util.DesktopFolder() + "\\DBExport.xml");
+                var folderDialog = new FolderBrowserDialog();
+
+                if (folderDialog.ShowDialog(Util.CreateForm()) == DialogResult.OK)
+                {
+                    string[] files = Directory.GetFiles(folderDialog.SelectedPath);
+
+                    foreach (var fileName in files)
+                    {
+                        if (fileName.EndsWith(".xml"))
+                        {
+                            var blockGroup = (PlcBlockGroup)block.Parent;
+                            try
+                            {
+                                var fileInfo = new FileInfo(fileName);
+                                blockGroup.Blocks.Import(fileInfo, ImportOptions.Override,
+                                    SWImportOptions.IgnoreMissingReferencedObjects |
+                                    SWImportOptions.IgnoreStructuralChanges |
+                                    SWImportOptions.IgnoreUnitAttributes);
+                            }
+                            catch { }
+                        }
+                    }
+                }
+
+                break;
             }
         }
 
-        private void ImportDBClick(MenuSelectionProvider selectionProvider)
+        private void ExportTagTableClick(MenuSelectionProvider selectionProvider)
         {
-            foreach (DataBlock block in selectionProvider.GetSelection())
+            foreach (PlcTagTable tagTable in selectionProvider.GetSelection())
             {
-                var filePath = Util.DesktopFolder() + "\\DBExport.xml";
-
-                var blockGroup = (PlcBlockGroup)block.Parent;
-                try
+                var fileDialog = new OpenFileDialog
                 {
-                    blockGroup.Blocks.Import(new FileInfo(filePath), ImportOptions.Override, SWImportOptions.IgnoreMissingReferencedObjects | SWImportOptions.IgnoreStructuralChanges | SWImportOptions.IgnoreUnitAttributes);
+                    Filter = "xml files (*.xml)|*.xml",
+                    CheckFileExists = false,
+                    Multiselect = false,
+                    Title = "Export tagtable " + tagTable.Name,
+                    ShowHelp = true,
+                    FileName = tagTable.Name
+                };
+
+                if (fileDialog.ShowDialog(Util.CreateForm()) == DialogResult.OK)
+                {
+                    ExportUtil.Export(tagTable.Export, fileDialog.FileName);
                 }
-                catch (Exception) { }
+            }
+        }
+
+        private void ExportTagTableFolderClick(MenuSelectionProvider selectionProvider)
+        {
+            var folderDialog = new FolderBrowserDialog();
+            if (folderDialog.ShowDialog(Util.CreateForm()) == DialogResult.OK)
+            {
+                var directory = folderDialog.SelectedPath;
+                foreach (PlcTagTable tagTable in selectionProvider.GetSelection())
+                {
+                    ExportUtil.Export(tagTable.Export, directory + "\\" + tagTable.Name + ".xml");
+                }
+            }
+        }
+
+        private void ImportTagTableClick(MenuSelectionProvider selectionProvider)
+        {
+            foreach (PlcTagTable tagTable in selectionProvider.GetSelection())
+            {
+                var fileDialog = new OpenFileDialog
+                {
+                    Filter = "xml files (*.xml)|*.xml",
+                    CheckFileExists = false,
+                    Multiselect = true
+                };
+
+                if (fileDialog.ShowDialog(Util.CreateForm()) == DialogResult.OK)
+                {
+                    var files = fileDialog.FileNames;
+                    foreach (var fileName in files)
+                    {
+                        var group = (PlcTagTableGroup)tagTable.Parent;
+                        try
+                        {
+                            var fileInfo = new FileInfo(fileName);
+                            group.TagTables.Import(fileInfo, ImportOptions.Override);
+                        }
+                        catch { }
+                    }
+                }
+            }
+        }
+
+        private void ImportTagTableFolderClick(MenuSelectionProvider selectionProvider)
+        {
+            foreach (PlcTagTable tagTable in selectionProvider.GetSelection())
+            {
+                var folderDialog = new FolderBrowserDialog();
+
+                if (folderDialog.ShowDialog(Util.CreateForm()) == DialogResult.OK)
+                {
+                    string[] files = Directory.GetFiles(folderDialog.SelectedPath);
+
+                    foreach (var fileName in files)
+                    {
+                        if (fileName.EndsWith(".xml"))
+                        {
+                            var group = (PlcTagTableGroup)tagTable.Parent;
+                            try
+                            {
+                                var fileInfo = new FileInfo(fileName);
+                                group.TagTables.Import(fileInfo, ImportOptions.Override);
+                            }
+                            catch { }
+                        }
+                    }
+                }
+
+                break;
             }
         }
     }
