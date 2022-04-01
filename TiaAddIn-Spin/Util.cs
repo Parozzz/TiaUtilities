@@ -83,10 +83,10 @@ namespace SpinAddin.Utility
 
         public static void ShowExceptionMessage(Exception ex)
         {
-            string message = "Message: " + ex.Message + " \r\n StackTrace: " + ex.StackTrace;
+            string message = "Message: " + ex.Message + "\r\nStackTrace: " + ex.StackTrace;
             string caption = "An exception occoured while executing Spin Addin!";
 
-            MessageBox.Show(message, caption);
+            MessageBox.Show(Util.CreateForm(), message, caption);
         }
     }
 
@@ -113,8 +113,6 @@ namespace SpinAddin.Utility
             catch (Exception ex)
             {
                 Util.ShowExceptionMessage(ex);
-
-                //Trace.TraceError("Exception during export:" + Environment.NewLine + ex);
                 return false;
             }
             return true;

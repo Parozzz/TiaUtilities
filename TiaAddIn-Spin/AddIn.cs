@@ -52,12 +52,12 @@ namespace SpinAddin
                 {
                     Filter = "xml files (*.xml)|*.xml",
                     CheckFileExists = false,
+                    CheckPathExists = false,
                     Multiselect = false,
                     Title = "Export BLOCK " + block.Name,
                     ShowHelp = true,
                     FileName = block.Name
                 };
-
                 if (fileDialog.ShowDialog(Util.CreateForm()) == DialogResult.OK)
                 {
                     ExportUtil.Export(block.Export, fileDialog.FileName);
@@ -83,28 +83,20 @@ namespace SpinAddin
         {
             foreach (PlcBlock block in selectionProvider.GetSelection())
             {
+                var group = (PlcBlockGroup)block.Parent;
+
                 var fileDialog = new OpenFileDialog
                 {
                     Filter = "xml files (*.xml)|*.xml",
-                    CheckFileExists = false,
+                    CheckFileExists = true,
+                    CheckPathExists = true,
                     Multiselect = true
                 };
-
                 if (fileDialog.ShowDialog(Util.CreateForm()) == DialogResult.OK)
                 {
-                    var files = fileDialog.FileNames;
-                    foreach (var fileName in files)
+                    foreach (var fileName in fileDialog.FileNames)
                     {
-                        var blockGroup = (PlcBlockGroup)block.Parent;
-                        try
-                        {
-                            var fileInfo = new FileInfo(fileName);
-                            blockGroup.Blocks.Import(fileInfo, ImportOptions.Override,
-                                SWImportOptions.IgnoreMissingReferencedObjects |
-                                SWImportOptions.IgnoreStructuralChanges |
-                                SWImportOptions.IgnoreUnitAttributes);
-                        }
-                        catch { }
+                        ImportBlock(group, fileName);
                     }
                 }
 
@@ -116,31 +108,37 @@ namespace SpinAddin
         {
             foreach (PlcBlock block in selectionProvider.GetSelection())
             {
-                var folderDialog = new FolderBrowserDialog();
+                var group = (PlcBlockGroup)block.Parent;
 
+                var folderDialog = new FolderBrowserDialog();
                 if (folderDialog.ShowDialog(Util.CreateForm()) == DialogResult.OK)
                 {
-                    string[] files = Directory.GetFiles(folderDialog.SelectedPath);
-
-                    foreach (var fileName in files)
+                    foreach (var fileName in Directory.GetFiles(folderDialog.SelectedPath))
                     {
-                        if (fileName.EndsWith(".xml"))
-                        {
-                            var blockGroup = (PlcBlockGroup)block.Parent;
-                            try
-                            {
-                                var fileInfo = new FileInfo(fileName);
-                                blockGroup.Blocks.Import(fileInfo, ImportOptions.Override,
-                                    SWImportOptions.IgnoreMissingReferencedObjects |
-                                    SWImportOptions.IgnoreStructuralChanges |
-                                    SWImportOptions.IgnoreUnitAttributes);
-                            }
-                            catch { }
-                        }
+                        ImportBlock(group, fileName);
                     }
                 }
 
                 break;
+            }
+        }
+
+        private void ImportBlock(PlcBlockGroup group, string fileName)
+        {
+            if (fileName.EndsWith(".xml"))
+            {
+                try
+                {
+                    var fileInfo = new FileInfo(fileName);
+                    group.Blocks.Import(fileInfo, ImportOptions.Override,
+                        SWImportOptions.IgnoreMissingReferencedObjects |
+                        SWImportOptions.IgnoreStructuralChanges |
+                        SWImportOptions.IgnoreUnitAttributes);
+                }
+                catch(Exception ex) 
+                { 
+                    Util.ShowExceptionMessage(ex);
+                }
             }
         }
 
@@ -152,12 +150,12 @@ namespace SpinAddin
                 {
                     Filter = "xml files (*.xml)|*.xml",
                     CheckFileExists = false,
+                    CheckPathExists = false,
                     Multiselect = false,
                     Title = "Export tagtable " + tagTable.Name,
                     ShowHelp = true,
                     FileName = tagTable.Name
                 };
-
                 if (fileDialog.ShowDialog(Util.CreateForm()) == DialogResult.OK)
                 {
                     ExportUtil.Export(tagTable.Export, fileDialog.FileName);
@@ -182,25 +180,20 @@ namespace SpinAddin
         {
             foreach (PlcTagTable tagTable in selectionProvider.GetSelection())
             {
+                var group = (PlcTagTableGroup)tagTable.Parent;
+
                 var fileDialog = new OpenFileDialog
                 {
                     Filter = "xml files (*.xml)|*.xml",
-                    CheckFileExists = false,
+                    CheckFileExists = true,
+                    CheckPathExists = true,
                     Multiselect = true
                 };
-
                 if (fileDialog.ShowDialog(Util.CreateForm()) == DialogResult.OK)
                 {
-                    var files = fileDialog.FileNames;
-                    foreach (var fileName in files)
+                    foreach (var fileName in fileDialog.FileNames)
                     {
-                        var group = (PlcTagTableGroup)tagTable.Parent;
-                        try
-                        {
-                            var fileInfo = new FileInfo(fileName);
-                            group.TagTables.Import(fileInfo, ImportOptions.Override);
-                        }
-                        catch { }
+                        ImportTagTable(group, fileName);
                     }
                 }
             }
@@ -210,29 +203,36 @@ namespace SpinAddin
         {
             foreach (PlcTagTable tagTable in selectionProvider.GetSelection())
             {
-                var folderDialog = new FolderBrowserDialog();
+                var group = (PlcTagTableGroup)tagTable.Parent;
 
+                var folderDialog = new FolderBrowserDialog();
                 if (folderDialog.ShowDialog(Util.CreateForm()) == DialogResult.OK)
                 {
-                    string[] files = Directory.GetFiles(folderDialog.SelectedPath);
-
-                    foreach (var fileName in files)
+                    foreach (var fileName in Directory.GetFiles(folderDialog.SelectedPath))
                     {
-                        if (fileName.EndsWith(".xml"))
-                        {
-                            var group = (PlcTagTableGroup)tagTable.Parent;
-                            try
-                            {
-                                var fileInfo = new FileInfo(fileName);
-                                group.TagTables.Import(fileInfo, ImportOptions.Override);
-                            }
-                            catch { }
-                        }
+                        ImportTagTable(group, fileName);
                     }
                 }
 
                 break;
             }
         }
+
+        private void ImportTagTable(PlcTagTableGroup group, string fileName)
+        {
+            if (fileName.EndsWith(".xml"))
+            {
+                try
+                {
+                    var fileInfo = new FileInfo(fileName);
+                    group.TagTables.Import(fileInfo, ImportOptions.Override);
+                }
+                catch (Exception ex)
+                {
+                    Util.ShowExceptionMessage(ex);
+                }
+            }
+        }
+
     }
 }
