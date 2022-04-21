@@ -1,4 +1,4 @@
-C:\Program Files\Siemens\Automation\Portal V16\PublicAPI\V16.AddIn\Siemens.Engineering.AddIn.Publisher.exe --> 01/04/2022 08:47:55 UTC
+C:\Program Files\Siemens\Automation\Portal V16\PublicAPI\V16.AddIn\Siemens.Engineering.AddIn.Publisher.exe --> 21/04/2022 08:25:30 UTC
 
 Calling Arguments:
 --configuration              :C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\Config.xml
@@ -38,4 +38,4 @@ Packaging Permission 'System.Security.Permissions.EnvironmentPermission'.
 Packaging Permission 'System.Net.Mail.SmtpPermission'.
 Packaging Permission 'TIA.ReadWrite'.
 
- --> S U C C E E D E D <-- (0,146s)
+ --> S U C C E E D E D <-- (0,137s)

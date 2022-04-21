@@ -68,6 +68,11 @@
   <ItemGroup>
     <Compile Include="AddIn.cs" />
     <Compile Include="AddInProvider.cs" />
+    <Compile Include="HMIPopupHandler.cs" />
+    <Compile Include="HMIScreenHandler.cs" />
+    <Compile Include="PlcBlockHandler.cs" />
+    <Compile Include="PlcTagTableHandler.cs" />
+    <Compile Include="SpinAddinMenuRegistrationService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util.cs" />
   </ItemGroup>

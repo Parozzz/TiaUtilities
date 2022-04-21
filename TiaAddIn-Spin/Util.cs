@@ -10,7 +10,6 @@ namespace SpinAddin.Utility
 {
     public static class Util
     {
-
         public static Form CreateForm()
         {
             Form form = new Form { Opacity = 0, ShowIcon = false };

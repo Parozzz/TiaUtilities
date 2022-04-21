@@ -3,7 +3,7 @@ using Siemens.Engineering;
 using Siemens.Engineering.AddIn;
 using Siemens.Engineering.AddIn.Menu;
 
-namespace SpinAddin
+namespace SpinAddIn
 {
     public sealed class AddInProvider : ProjectTreeAddInProvider
     {
