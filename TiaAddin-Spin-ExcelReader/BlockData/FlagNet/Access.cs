@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace TiaAddin_Spin_ExcelReader
+namespace SpinXmlReader.Block
 {
     public class Access : UIdObject
     {

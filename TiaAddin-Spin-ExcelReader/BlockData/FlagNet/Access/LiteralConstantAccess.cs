@@ -1,7 +1,7 @@
 ﻿using System.Xml;
 using TiaAddin_Spin_ExcelReader.Utility;
 
-namespace TiaAddin_Spin_ExcelReader
+namespace SpinXmlReader.Block
 {
     public class LiteralConstantAccess : Access
     {

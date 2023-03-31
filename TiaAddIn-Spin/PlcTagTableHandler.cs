@@ -9,15 +9,64 @@ using System.Windows.Forms;
 
 namespace SpinAddIn
 {
-    internal class PlcTagTableHandler : SpinAddinMenuRegistrationService
+    public class PlcTagTableHandler : SpinAddinMenuRegistrationService
     {
         public void Register(ContextMenuAddInRoot menuRoot)
         {
+            menuRoot.Items.AddActionItem<PlcTagTableGroup>("Esporta TagTables nella cartella", ExportOnlyMainFolder);
+            menuRoot.Items.AddActionItem<PlcTagTableGroup>("Esporta TagTables nella cartella (Comprese Sottocartelle)", ExportAllFolders);
             menuRoot.Items.AddActionItem<PlcTagTable>("Esporta TagTable Singolarmente", ExportDescrete);
             menuRoot.Items.AddActionItem<PlcTagTable>("Esporta TagTable selez. su Cartella", ExportAllToFolder);
             menuRoot.Items.AddActionItem<PlcTagTable>("Importa TagTable", ImportDescrete);
             menuRoot.Items.AddActionItem<PlcTagTable>("Importa Cartella", ImportAllFolder);
             menuRoot.Items.AddActionItem<PlcTagTable>("Importa Cartella (comprese sottocartelle)", ImportAllSubFolders);
+        }
+        private void ExportOnlyMainFolder(MenuSelectionProvider selectionProvider)
+        {
+            var folderDialog = new FolderBrowserDialog();
+            if (folderDialog.ShowDialog(Util.CreateForm()) != DialogResult.OK)
+            {
+                return;
+            }
+
+            var mainDirectory = folderDialog.SelectedPath;
+            foreach (PlcTagTableGroup group in selectionProvider.GetSelection())
+            {
+                ExportGroup(mainDirectory, group, false);
+            }
+        }
+
+        private void ExportAllFolders(MenuSelectionProvider selectionProvider)
+        {
+            var folderDialog = new FolderBrowserDialog();
+            if (folderDialog.ShowDialog(Util.CreateForm()) != DialogResult.OK)
+            {
+                return;
+            }
+
+            var mainDirectory = folderDialog.SelectedPath;
+            foreach (PlcTagTableGroup group in selectionProvider.GetSelection())
+            {
+                ExportGroup(mainDirectory, group, true);
+            }
+        }
+
+        public void ExportGroup(string mainDirectory, PlcTagTableGroup group, bool withSubfolders)
+        {
+            var directory = mainDirectory + "\\" + group.Name;
+            foreach (PlcTagTable tagTable in group.TagTables)
+            {
+                ExportUtil.Export(tagTable.Export, directory + "\\" + tagTable.Name + ".xml");
+            }
+
+            if (withSubfolders)
+            {
+                foreach (PlcTagTableGroup subGroup in group.Groups)
+                {
+                    ExportGroup(directory, subGroup, true);
+                }
+            }
+
         }
 
         private void ExportDescrete(MenuSelectionProvider selectionProvider)

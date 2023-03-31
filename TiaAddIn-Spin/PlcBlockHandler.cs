@@ -9,10 +9,12 @@ using System.Windows.Forms;
 
 namespace SpinAddIn
 {
-    internal class PlcBlockHandler : SpinAddinMenuRegistrationService
+    public class PlcBlockHandler : SpinAddinMenuRegistrationService
     {
         public void Register(ContextMenuAddInRoot menuRoot)
         {
+            menuRoot.Items.AddActionItem<PlcBlockGroup>("Esporta blocchi nella cartella", ExportOnlyMainFolder);
+            menuRoot.Items.AddActionItem<PlcBlockGroup>("Esporta blocchi nella cartella (Comprese Sottocartelle)", ExportAllFolders);
             menuRoot.Items.AddActionItem<PlcBlock>("Esporta Blocchi Singolarmente", ExportDescrete);
             menuRoot.Items.AddActionItem<PlcBlock>("Esporta Blocchi selez. su Cartella", ExportAllToFolder);
             menuRoot.Items.AddActionItem<PlcBlock>("Importa Blocchi", ImportDescrete);
@@ -20,6 +22,53 @@ namespace SpinAddIn
             menuRoot.Items.AddActionItem<PlcBlock>("Importa Cartella (comprese sottocartelle)", ImportAllSubFolders);
         }
 
+        private void ExportOnlyMainFolder(MenuSelectionProvider selectionProvider)
+        {
+            var folderDialog = new FolderBrowserDialog();
+            if (folderDialog.ShowDialog(Util.CreateForm()) != DialogResult.OK)
+            {
+                return;
+            }
+
+            var mainDirectory = folderDialog.SelectedPath;
+            foreach (PlcBlockGroup group in selectionProvider.GetSelection())
+            {
+                ExportGroup(mainDirectory, group, false);
+            }
+        }
+
+        private void ExportAllFolders(MenuSelectionProvider selectionProvider)
+        {
+            var folderDialog = new FolderBrowserDialog();
+            if (folderDialog.ShowDialog(Util.CreateForm()) != DialogResult.OK)
+            {
+                return;
+            }
+
+            var mainDirectory = folderDialog.SelectedPath;
+            foreach (PlcBlockGroup group in selectionProvider.GetSelection())
+            {
+                ExportGroup(mainDirectory, group, true);
+            }
+        }
+
+        public void ExportGroup(string mainDirectory, PlcBlockGroup group, bool withSubfolders)
+        {
+            var directory = mainDirectory + "\\" + group.Name;
+            foreach (PlcBlock block in group.Blocks)
+            {
+                ExportUtil.Export(block.Export, directory + "\\" + block.Name + ".xml");
+            }
+
+            if (withSubfolders)
+            {
+                foreach (PlcBlockGroup subGroup in group.Groups)
+                {
+                    ExportGroup(directory, subGroup, true);
+                }
+            }
+
+        }
 
         private void ExportDescrete(MenuSelectionProvider selectionProvider)
         {

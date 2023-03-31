@@ -1,16 +1,10 @@
 ﻿using Siemens.Engineering.SW.Blocks;
-using SpinAddIn;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
-using TiaAddin_Spin_ExcelReader.BlockData;
 
-namespace TiaAddin_Spin_ExcelReader
+namespace SpinXmlReader.Block
 {
-    public class CompileUnit : XmlNodeSerializable, GlobalIDObject
+    public class CompileUnit : IXMLNodeSerializable, IGlobalObject
     {
         public MultilingualText Title { get; private set; }
         public MultilingualText Comment { get; private set; }
@@ -41,8 +35,8 @@ namespace TiaAddin_Spin_ExcelReader
             }
 
             ProgrammingLanguage = language;
-            Title = new MultilingualText().ParseFromParent(objectListNode, "Title");
-            Comment = new MultilingualText().ParseFromParent(objectListNode, "Comment");
+            Title = MultilingualText.FindInParent(objectListNode, "Title");
+            Comment = MultilingualText.FindInParent(objectListNode, "Comment");
 
             var networkSourceNode = attributeListNode.SelectSingleNode("NetworkSource");
             if (networkSourceNode != null)
@@ -54,7 +48,7 @@ namespace TiaAddin_Spin_ExcelReader
                         case "StructuredText":
                             break;
                         case "FlgNet":
-                            Net = new FlagNet(fcData).ParseXMLNode(networkSourceChildNode);
+                            //Net = new FlagNet(fcData).ParseXMLNode(networkSourceChildNode);
                             break;
                     }
                 }

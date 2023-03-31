@@ -7,7 +7,7 @@ using Siemens.Engineering.AddIn.Menu;
 
 namespace SpinAddIn
 {
-    internal interface SpinAddinMenuRegistrationService
+    public interface SpinAddinMenuRegistrationService
     {
         void Register(ContextMenuAddInRoot menuRoot);
     }

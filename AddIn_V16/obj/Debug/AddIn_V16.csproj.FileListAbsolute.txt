@@ -1,0 +1,5 @@
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\AddIn_V16\obj\Debug\AddIn_V16.csproj.AssemblyReference.cache
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\AddIn_V16\obj\Debug\AddIn_V16.csproj.SuggestedBindingRedirects.cache
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\AddIn_V16\obj\Debug\AddIn_V16.Properties.Resources.resources
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\AddIn_V16\obj\Debug\AddIn_V16.csproj.GenerateResource.cache
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\AddIn_V16\obj\Debug\AddIn_V16.csproj.CoreCompileInputs.cache

@@ -7,9 +7,9 @@ using System.Xml;
 using TiaAddin_Spin_ExcelReader.BlockData;
 using TiaAddin_Spin_ExcelReader.Utility;
 
-namespace TiaAddin_Spin_ExcelReader
+namespace SpinXmlReader.Block
 {
-    public class FlagNet : XmlNodeSerializable, GlobalIDObject
+    public class FlagNet : IXMLNodeSerializable, IGlobalObject
     {
         private readonly FCData fcData;
         private readonly Dictionary<uint, UIdObject> completeUIdDictionary;

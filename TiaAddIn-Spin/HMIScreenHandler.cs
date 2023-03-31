@@ -13,7 +13,7 @@ using Siemens.Engineering.SW;
 
 namespace SpinAddIn
 {
-    internal class HMIScreenHandler : SpinAddinMenuRegistrationService
+    public class HMIScreenHandler : SpinAddinMenuRegistrationService
     {
         public void Register(ContextMenuAddInRoot menuRoot)
         {

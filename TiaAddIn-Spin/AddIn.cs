@@ -23,6 +23,7 @@ namespace SpinAddIn
         private readonly SpinAddinMenuRegistrationService plcTagTableHandler;
         private readonly SpinAddinMenuRegistrationService hmiScreenHandler;
         private readonly SpinAddinMenuRegistrationService hmiPopupHandler;
+        private readonly SpinAddinMenuRegistrationService plcUDTHandler;
 
         public AddIn(TiaPortal tiaPortal) : base("TiaAddIn-Spin")
         {
@@ -37,6 +38,7 @@ namespace SpinAddIn
             plcTagTableHandler = new PlcTagTableHandler();
             hmiScreenHandler = new HMIScreenHandler();
             hmiPopupHandler = new HMIPopupHandler();
+            plcUDTHandler = new PLCUDTHandler();
         }
 
         protected override void BuildContextMenuItems(ContextMenuAddInRoot menuRoot)
@@ -45,12 +47,7 @@ namespace SpinAddIn
             plcTagTableHandler.Register(menuRoot);
             hmiScreenHandler.Register(menuRoot);
             hmiPopupHandler.Register(menuRoot);
-
-            /*Siemens.Engineering.Hmi.Screen.Screen hmiScreen;
-            Siemens.Engineering.Hmi.Screen.ScreenPopup hmiPopup;
-            Siemens.Engineering.Hmi.Screen.ScreenSlidein hmiSlideIn;
-            Siemens.Engineering.Hmi.Screen.ScreenPopupComposition d;*/
-
+            plcUDTHandler.Register(menuRoot);
         }
 
 

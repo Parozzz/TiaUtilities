@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using System.Xml;
 using TiaAddin_Spin_ExcelReader.Utility;
 
-namespace TiaAddin_Spin_ExcelReader
+namespace SpinXmlReader.Block
 {
     internal static class FlagNetParser
     {

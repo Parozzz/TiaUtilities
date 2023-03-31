@@ -5,21 +5,43 @@ VisualStudioVersion = 17.0.31717.71
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TiaAddIn-Spin", "TiaAddIn-Spin\TiaAddIn-Spin.csproj", "{00C536D1-31ED-4430-937F-336672A3B4C6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TiaAddin-Spin-ExcelReader", "TiaAddin-Spin-ExcelReader\TiaAddin-Spin-ExcelReader.csproj", "{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TiaXmlReader", "TiaAddin-Spin-ExcelReader\TiaXmlReader.csproj", "{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddIn_V16", "AddIn_V16\AddIn_V16.csproj", "{8FE36490-894B-47CD-9EFB-313A4FEFDDFA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddIn_V17", "AddIn_V17\AddIn_V17.csproj", "{79FA89D6-1540-4A65-9000-0F7CE8EE3496}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		V16|Any CPU = V16|Any CPU
+		V17|Any CPU = V17|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{00C536D1-31ED-4430-937F-336672A3B4C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{00C536D1-31ED-4430-937F-336672A3B4C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{00C536D1-31ED-4430-937F-336672A3B4C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{00C536D1-31ED-4430-937F-336672A3B4C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00C536D1-31ED-4430-937F-336672A3B4C6}.V16|Any CPU.ActiveCfg = Release|Any CPU
+		{00C536D1-31ED-4430-937F-336672A3B4C6}.V17|Any CPU.ActiveCfg = Release|Any CPU
 		{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}.V16|Any CPU.ActiveCfg = Release|Any CPU
+		{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}.V17|Any CPU.ActiveCfg = Release|Any CPU
+		{8FE36490-894B-47CD-9EFB-313A4FEFDDFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8FE36490-894B-47CD-9EFB-313A4FEFDDFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8FE36490-894B-47CD-9EFB-313A4FEFDDFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8FE36490-894B-47CD-9EFB-313A4FEFDDFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8FE36490-894B-47CD-9EFB-313A4FEFDDFA}.V16|Any CPU.ActiveCfg = V16|Any CPU
+		{8FE36490-894B-47CD-9EFB-313A4FEFDDFA}.V16|Any CPU.Build.0 = V16|Any CPU
+		{8FE36490-894B-47CD-9EFB-313A4FEFDDFA}.V17|Any CPU.ActiveCfg = V16|Any CPU
+		{79FA89D6-1540-4A65-9000-0F7CE8EE3496}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79FA89D6-1540-4A65-9000-0F7CE8EE3496}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79FA89D6-1540-4A65-9000-0F7CE8EE3496}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79FA89D6-1540-4A65-9000-0F7CE8EE3496}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79FA89D6-1540-4A65-9000-0F7CE8EE3496}.V16|Any CPU.ActiveCfg = V17|Any CPU
+		{79FA89D6-1540-4A65-9000-0F7CE8EE3496}.V17|Any CPU.ActiveCfg = V17|Any CPU
+		{79FA89D6-1540-4A65-9000-0F7CE8EE3496}.V17|Any CPU.Build.0 = V17|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

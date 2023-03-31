@@ -13,9 +13,19 @@
     },
     "514d5d33-edfd-4048-9dc8-b8a6729f9cf5": {
       "ProjectGuid": "514d5d33-edfd-4048-9dc8-b8a6729f9cf5",
-      "DisplayName": "TiaAddin-Spin-ExcelReader",
+      "DisplayName": "TiaXmlReader",
       "ColorIndex": 1
+    },
+    "8fe36490-894b-47cd-9efb-313a4fefddfa": {
+      "ProjectGuid": "8fe36490-894b-47cd-9efb-313a4fefddfa",
+      "DisplayName": "AddIn_V16",
+      "ColorIndex": 2
+    },
+    "79fa89d6-1540-4a65-9000-0f7ce8ee3496": {
+      "ProjectGuid": "79fa89d6-1540-4a65-9000-0f7ce8ee3496",
+      "DisplayName": "AddIn_V17",
+      "ColorIndex": 3
     }
   },
-  "NextColorIndex": 2
+  "NextColorIndex": 4
 }

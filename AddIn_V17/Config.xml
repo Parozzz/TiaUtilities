@@ -1,0 +1,53 @@
+﻿<PackageConfiguration xmlns="http://www.siemens.com/automation/Openness/AddIn/Publisher/V17"> 
+  <Author>Giacomo P. Spin S.R.L.</Author>
+  <AddInVersion>V17</AddInVersion>
+  <Description>Usato per esportare i blocchi e pagine HMI come file .xml</Description>
+
+  <Product>
+    <Name>SpinAddIn</Name>
+    <Id>fspin-addin</Id>
+    <Version>0.0.2</Version>
+  </Product>
+
+  <FeatureAssembly>
+    <AssemblyInfo>
+      <Assembly>bin\V17\AddIn_V17.dll</Assembly>
+    </AssemblyInfo>
+  </FeatureAssembly>
+
+  <AdditionalAssemblies>
+    <AssemblyInfo>
+      <Assembly>bin\V17\AddIn_V17.XmlSerializers.dll</Assembly>
+    </AssemblyInfo>
+  </AdditionalAssemblies>
+
+  <RequiredPermissions>
+    <TIAPermissions>
+      <TIA.ReadWrite/>
+    </TIAPermissions>
+    <SecurityPermissions>
+	  <System.Security.Permissions.SecurityPermission.UnmanagedCode/>
+	  <System.Security.Permissions.FileDialogPermission/>
+	  <System.Security.Permissions.UIPermission/>
+   	  <System.Security.Permissions.MediaPermission/>
+	  <Siemens.Engineering.AddIn.Permissions.ProcessStartPermission/>
+	  <System.Net.WebPermission/>
+	  <System.Security.Permissions.KeyContainerPermission/>
+	  <System.Net.SocketPermission/>
+	  <System.Data.Odbc.OdbcPermission/>
+	  <System.Security.Permissions.WebBrowserPermission/>
+	  <System.Net.NetworkInformation.NetworkInformationPermission/>
+	  <System.Security.Permissions.StorePermission/>
+	  <System.Configuration.ConfigurationPermission/>
+	  <System.Security.Permissions.FileIOPermission/>
+	  <System.Diagnostics.EventLogPermission/>
+	  <System.Drawing.Printing.PrintingPermission/>
+	  <System.Security.Permissions.IsolatedStorageFilePermission/>
+	  <System.Data.OleDb.OleDbPermission/>
+	  <System.Security.Permissions.RegistryPermission/>
+	  <System.Data.SqlClient.SqlClientPermission/>
+	  <System.Security.Permissions.EnvironmentPermission/>
+	  <System.Net.Mail.SmtpPermission/>
+    </SecurityPermissions>
+  </RequiredPermissions>
+</PackageConfiguration>

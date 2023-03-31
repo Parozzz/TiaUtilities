@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Windows.Forms;
 using System.Xml;
+using TiaAddin_Spin_ExcelReader.TagTable;
 
-namespace TiaAddin_Spin_ExcelReader
+namespace SpinXmlReader
 {
     public partial class Form1 : Form
     {
@@ -32,8 +33,15 @@ namespace TiaAddin_Spin_ExcelReader
                 var xmlDocument = new XmlDocument();
                 xmlDocument.Load(FilePathTextBox.Text);
 
-                var fcData = new FCData(xmlDocument);
-                fcData.ParseXMLDocument();
+                var serializable = SiemensXMLParser.ParseXML(xmlDocument);
+                if (serializable is XMLTagTable tagTable)
+                {
+
+                }
+                else if (serializable is FCData fcData)
+                {
+
+                }
             }
             catch (Exception ex)
             {

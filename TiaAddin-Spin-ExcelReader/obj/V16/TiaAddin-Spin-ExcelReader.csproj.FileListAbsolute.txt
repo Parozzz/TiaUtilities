@@ -1,0 +1,14 @@
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\V16\TiaAddin-Spin-ExcelReader.csproj.AssemblyReference.cache
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\V16\TiaAddin-Spin-ExcelReader.csproj.SuggestedBindingRedirects.cache
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\V16\TiaAddin_Spin_ExcelReader.Form1.resources
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\V16\TiaAddin_Spin_ExcelReader.Properties.Resources.resources
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\V16\TiaAddin-Spin-ExcelReader.csproj.GenerateResource.cache
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\V16\TiaAddin-Spin-ExcelReader.csproj.CoreCompileInputs.cache
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\bin\V16\TiaAddin-Spin-ExcelReader.exe.config
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\bin\V16\TiaAddin-Spin-ExcelReader.exe
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\bin\V16\Siemens.Engineering.AddIn.dll
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\bin\V16\Siemens.Engineering.Hmi.dll
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\bin\V16\Siemens.Engineering.AddIn.xml
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\bin\V16\Siemens.Engineering.Hmi.xml
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\V16\TiaAddin-Spin-ExcelReader.csproj.CopyComplete
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\V16\TiaAddin-Spin-ExcelReader.exe

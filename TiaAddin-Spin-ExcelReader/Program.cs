@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace TiaAddin_Spin_ExcelReader
+namespace SpinXmlReader
 {
     internal static class Program
     {

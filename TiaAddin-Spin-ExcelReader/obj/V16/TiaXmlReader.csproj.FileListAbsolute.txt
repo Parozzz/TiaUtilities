@@ -1,0 +1,6 @@
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\V16\TiaXmlReader.csproj.AssemblyReference.cache
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\V16\TiaXmlReader.csproj.SuggestedBindingRedirects.cache
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\V16\SpinXmlReader.Form1.resources
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\V16\TiaXmlReader.Properties.Resources.resources
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\V16\TiaXmlReader.csproj.GenerateResource.cache
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\V16\TiaXmlReader.csproj.CoreCompileInputs.cache

@@ -13,7 +13,7 @@ using Siemens.Engineering.SW;
 
 namespace SpinAddIn
 {
-    internal class HMIPopupHandler : SpinAddinMenuRegistrationService
+    public class HMIPopupHandler : SpinAddinMenuRegistrationService
     {
         public void Register(ContextMenuAddInRoot menuRoot)
         {

@@ -1,4 +1,4 @@
-﻿namespace TiaAddin_Spin_ExcelReader
+﻿namespace SpinXmlReader
 {
     partial class Form1
     {
