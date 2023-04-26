@@ -40,7 +40,7 @@ namespace SpinXmlReader.Block
             return sectionDictionary[type];
         }
 
-        internal void DoXmlNode(XmlNode node)
+        public void ParseNode(XmlNode node)
         {
             Validate.NotNull(node);
             Validate.IsTrue(node.Name.Equals("Interface"), "BlockInterface node name is not valid.");
@@ -53,7 +53,7 @@ namespace SpinXmlReader.Block
             }
         }
 
-        internal XmlNode GenerateXmlNode(XmlDocument document)
+        public XmlNode GenerateNode(XmlDocument document)
         {
             return XmlNodeBuilder.CreateNewWithNamespace(document, "Sections", TiaXmlReader.Properties.Resources.SECTIONS_NAMESPACE)
                 .AppendSerializableCollectionAsChild(sectionList)
@@ -66,7 +66,7 @@ namespace SpinXmlReader.Block
             sectionDictionary.Add(section.Type, section);
         }
 
-        XmlNode IXMLNodeSerializable.GenerateXmlNode(XmlDocument document)
+        XmlNode IXMLNodeSerializable.GenerateNode(XmlDocument document)
         {
             throw new NotImplementedException();
         }

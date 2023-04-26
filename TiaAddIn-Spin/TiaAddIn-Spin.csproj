@@ -82,6 +82,7 @@
     <Compile Include="AddInProvider.cs" />
     <Compile Include="HMIPopupHandler.cs" />
     <Compile Include="HMIScreenHandler.cs" />
+    <Compile Include="GenericImportExportHandler.cs" />
     <Compile Include="PlcWatchTablesHandler.cs" />
     <Compile Include="PlcSoftwareHandler.cs" />
     <Compile Include="PLCUDTHandler.cs" />

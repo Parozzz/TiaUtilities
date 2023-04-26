@@ -4,8 +4,10 @@ using Siemens.Engineering.SW;
 using Siemens.Engineering.SW.Blocks;
 using SpinAddin.Utility;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
+using static SpinAddin.Utility.ExportUtil;
 
 namespace SpinAddIn
 {
@@ -55,10 +57,7 @@ namespace SpinAddIn
         public void ExportGroup(string mainDirectory, PlcBlockGroup group, bool withSubfolders)
         {
             var directory = mainDirectory + "\\" + group.Name;
-            foreach (PlcBlock block in group.Blocks)
-            {
-                ExportUtil.Export(block.Export, directory + "\\" + block.Name + ".xml");
-            }
+            ExportAll(group.Blocks, directory);
 
             if (withSubfolders)
             {
@@ -84,9 +83,14 @@ namespace SpinAddIn
                     ShowHelp = true,
                     FileName = block.Name
                 };
+
                 if (fileDialog.ShowDialog(Util.CreateForm()) == DialogResult.OK)
                 {
-                    ExportUtil.Export(block.Export, fileDialog.FileName);
+                    var exportSuccessful = ExportSingle(block, fileDialog.FileName);
+                    if(!exportSuccessful)
+                    {
+                        return;
+                    }
                 }
             }
         }
@@ -96,11 +100,7 @@ namespace SpinAddIn
             var folderDialog = new FolderBrowserDialog();
             if (folderDialog.ShowDialog(Util.CreateForm()) == DialogResult.OK)
             {
-                var directory = folderDialog.SelectedPath;
-                foreach (PlcBlock block in selectionProvider.GetSelection())
-                {
-                    ExportUtil.Export(block.Export, directory + "\\" + block.Name + ".xml");
-                }
+                ExportAll(selectionProvider.GetSelection(), folderDialog.SelectedPath);
             }
         }
 
@@ -122,7 +122,10 @@ namespace SpinAddIn
                 {
                     foreach (var fileName in fileDialog.FileNames)
                     {
-                        ImportBlock(group, fileName);
+                        if (!ImportBlock(group, fileName))
+                        {
+                            return;
+                        }
                     }
                 }
 
@@ -162,23 +165,48 @@ namespace SpinAddIn
             }
         }
 
-        private void ImportBlocksFromFolder(PlcBlockGroup group, string folderName, bool searchSubDirectories)
+        private bool ImportBlocksFromFolder(PlcBlockGroup group, string folderName, bool searchSubDirectories)
         {
             if (searchSubDirectories)
             {
                 foreach (var directoryName in Directory.GetDirectories(folderName))
                 {
-                    this.ImportBlocksFromFolder(group, directoryName, true);
+                    if(!this.ImportBlocksFromFolder(group, directoryName, true))
+                    {
+                        return false;
+                    }
                 }
             }
 
             foreach (var fileName in Directory.GetFiles(folderName))
             {
-                ImportBlock(group, fileName);
+                if(!ImportBlock(group, fileName))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private void ExportAll(IEnumerable<Object> selection, string directory)
+        {
+            foreach (PlcBlock plcBlock in selection)
+            {
+                var exportOK = ExportSingle(plcBlock, directory + "\\" + plcBlock.Name + ".xml");
+                if (!exportOK)
+                {
+                    return;
+                }
             }
         }
 
-        private void ImportBlock(PlcBlockGroup group, string fileName)
+        private bool ExportSingle(PlcBlock plcBlock, string fileName)
+        {
+            return ExportUtil.Export(plcBlock.Export, fileName);
+        }
+
+        private bool ImportBlock(PlcBlockGroup group, string fileName)
         {
             if (fileName.ToLower().EndsWith(".xml"))
             {
@@ -189,12 +217,15 @@ namespace SpinAddIn
                         SWImportOptions.IgnoreMissingReferencedObjects |
                         SWImportOptions.IgnoreStructuralChanges |
                         SWImportOptions.IgnoreUnitAttributes);
+                    return true;
                 }
                 catch (Exception ex)
                 {
                     Util.ShowExceptionMessage(ex);
                 }
             }
+
+            return false;
         }
 
     }

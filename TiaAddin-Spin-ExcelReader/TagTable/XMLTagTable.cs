@@ -34,9 +34,9 @@ namespace SpinXmlReader.TagTable
             return globalObjectData;
         }
 
-        public void ParseXMLNode(XmlNode tagTableNode)
+        public void ParseNode(XmlNode tagTableNode)
         {
-            globalObjectData.ParseXMLNode(tagTableNode);
+            globalObjectData.ParseNode(tagTableNode);
 
             var attributeList = XMLUtils.GetFirstChild(tagTableNode, "AttributeList");
             if (attributeList != null)
@@ -59,7 +59,7 @@ namespace SpinXmlReader.TagTable
             foreach (var tagNode in tagNodeList)
             {
                 var tag = new XMLTag();
-                tag.ParseXMLNode(tagNode);
+                tag.ParseNode(tagNode);
 
                 if (!tags.ContainsKey(tag.LogicalAddress))
                 {
@@ -69,12 +69,12 @@ namespace SpinXmlReader.TagTable
 
         }
 
-        public XmlNode GenerateXmlNode(XmlDocument document)
+        public XmlNode GenerateNode(XmlDocument document)
         {
             var xmlNode = document.CreateNode(XmlNodeType.Element, NAME, "");
 
             var globalObjectData = new GlobalObjectData();
-            globalObjectData.SetToXMLNode(xmlNode);
+            globalObjectData.SetToNode(xmlNode);
 
 
             // ========== ATTRIBUTE LIST ==========
@@ -86,7 +86,7 @@ namespace SpinXmlReader.TagTable
             var objectList = xmlNode.AppendChild(document.CreateElement(Constants.OBJECT_LIST_NAME));
             foreach (var tag in tags.Values)
             {
-                objectList.AppendChild(tag.GenerateXmlNode(document));
+                objectList.AppendChild(tag.GenerateNode(document));
             }
             // ========== OBJECT LIST ==========
 

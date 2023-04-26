@@ -163,23 +163,31 @@ namespace SpinAddIn
             }
         }
 
-        private void ImportBlocksFromFolder(PlcTypeGroup group, string folderName, bool searchSubDirectories)
+        private bool ImportBlocksFromFolder(PlcTypeGroup group, string folderName, bool searchSubDirectories)
         {
             if (searchSubDirectories)
             {
                 foreach (var directoryName in Directory.GetDirectories(folderName))
                 {
-                    this.ImportBlocksFromFolder(group, directoryName, true);
+                    if(!this.ImportBlocksFromFolder(group, directoryName, true))
+                    {
+                        return false;
+                    }
                 }
             }
 
             foreach (var fileName in Directory.GetFiles(folderName))
             {
-                ImportBlock(group, fileName);
+                if(!ImportBlock(group, fileName))
+                {
+                    return false;
+                }
             }
+
+            return true;
         }
 
-        private void ImportBlock(PlcTypeGroup group, string fileName)
+        private bool ImportBlock(PlcTypeGroup group, string fileName)
         {
             if (fileName.ToLower().EndsWith(".xml"))
             {
@@ -190,12 +198,15 @@ namespace SpinAddIn
                         SWImportOptions.IgnoreMissingReferencedObjects |
                         SWImportOptions.IgnoreStructuralChanges |
                         SWImportOptions.IgnoreUnitAttributes);
+                    return true;
                 }
                 catch (Exception ex)
                 {
                     Util.ShowExceptionMessage(ex);
                 }
             }
+
+            return false;
         }
 
     }

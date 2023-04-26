@@ -62,7 +62,7 @@ namespace SpinXmlReader.Block
             throw new NotImplementedException();
         }
 
-        public XmlNode GenerateXmlNode(XmlDocument document)
+        public XmlNode GenerateNode(XmlDocument document)
         {
             throw new NotImplementedException();
         }

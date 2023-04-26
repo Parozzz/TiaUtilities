@@ -71,8 +71,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\TiaAddIn-Spin\AddIn.cs">
-      <Link>AddIn.cs</Link>
+    <Compile Include="..\TiaAddIn-Spin\GenericImportExportHandler.cs">
+      <Link>GenericImportExportHandler.cs</Link>
     </Compile>
     <Compile Include="..\TiaAddIn-Spin\HMIPopupHandler.cs">
       <Link>HMIPopupHandler.cs</Link>
@@ -80,14 +80,8 @@
     <Compile Include="..\TiaAddIn-Spin\HMIScreenHandler.cs">
       <Link>HMIScreenHandler.cs</Link>
     </Compile>
-    <Compile Include="..\TiaAddIn-Spin\PlcBlockHandler.cs">
-      <Link>PlcBlockHandler.cs</Link>
-    </Compile>
-    <Compile Include="..\TiaAddIn-Spin\PlcTagTableHandler.cs">
-      <Link>PlcTagTableHandler.cs</Link>
-    </Compile>
-    <Compile Include="..\TiaAddIn-Spin\PlcUDTHandler.cs">
-      <Link>PlcUDTHandler.cs</Link>
+    <Compile Include="..\TiaAddIn-Spin\PlcSoftwareHandler.cs">
+      <Link>PlcSoftwareHandler.cs</Link>
     </Compile>
     <Compile Include="..\TiaAddIn-Spin\SpinAddinMenuRegistrationService.cs">
       <Link>SpinAddinMenuRegistrationService.cs</Link>
@@ -97,7 +91,6 @@
     </Compile>
     <Compile Include="AddInProvider.cs" />
     <Compile Include="AddIn_V16.cs" />
-    <Compile Include="PlcWatchTablesHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

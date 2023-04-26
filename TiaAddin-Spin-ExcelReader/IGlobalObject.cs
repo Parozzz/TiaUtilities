@@ -29,6 +29,7 @@ namespace SpinXmlReader
     public class GlobalObjectData
     {
         private uint id;
+        //Nullable
         private string compositionName;
 
         public GlobalObjectData(uint id, string compositionName)
@@ -37,33 +38,30 @@ namespace SpinXmlReader
             this.compositionName = compositionName;
         }
 
-        public GlobalObjectData(string compositionName)
+        public GlobalObjectData(string compositionName) : this(0, compositionName) { }
+
+        public GlobalObjectData() : this(0, "") { }
+
+        public GlobalObjectData GenerateNextID()
         {
             this.id = GlobalIDGenerator.GetNextID();
-            this.compositionName = compositionName;
+            return this;
         }
 
-        public GlobalObjectData()
+        public void ParseNode(XmlNode node)
         {
-            this.id = 0;
-            this.compositionName = "";
-        }
-
-        public void ParseXMLNode(XmlNode node)
-        {
-            if (node.Attributes["ID"] == null || node.Attributes["CompositionName"] == null)
+            if (node.Attributes["ID"] == null)
             {
-                throw new InvalidOperationException("Invalid GlobalObject Attributes from node " + node.Name);
+                throw new InvalidOperationException("Missing ID of IGlobalObject Attributes from node " + node.Name);
             }
 
-            id = uint.Parse(node.Attributes["ID"]?.InnerText, NumberStyles.HexNumber);
-            compositionName = node.Attributes["CompositionName"].InnerText;
+            id = uint.Parse(node.Attributes["ID"].InnerText, NumberStyles.HexNumber);
+            compositionName = node.Attributes["CompositionName"]?.InnerText; //A global object might not have a composition name (Like the main node of a XML)
         }
 
-        public void SetToXMLNode(XmlNode node)
+        public void SetToNode(XmlNode node)
         {
-            //This is an HEX value
-            node.Attributes.Append(node.OwnerDocument.CreateAttribute("ID")).InnerText = id.ToString("X");
+            node.Attributes.Append(node.OwnerDocument.CreateAttribute("ID")).InnerText = id.ToString("X"); //This is an HEX value
             //Ogni oggetto - ad eccezione dell'oggetto di avvio - contiene anche un attributo XML "CompositionName".
             //Quindi potrebbe essere che questo valore sia vuoto.
             if (compositionName != null && compositionName.Length > 0)

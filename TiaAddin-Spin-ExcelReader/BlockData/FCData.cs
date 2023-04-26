@@ -8,8 +8,8 @@ namespace SpinXmlReader.Block
         private readonly XmlDocument xmlDocument;
         private readonly BlockAttributeList blockAttributeList;
 
-        public MultilingualText Comment { get; private set; }
-        public MultilingualText Title { get; private set; }
+        private readonly MultilingualText title;
+        private readonly MultilingualText comment;
 
         private readonly List<CompileUnit> compileUnitList;
 
@@ -19,6 +19,9 @@ namespace SpinXmlReader.Block
             this.blockAttributeList = new BlockAttributeList(true);
 
             this.compileUnitList = new List<CompileUnit>();
+
+            this.title = new MultilingualText(MultilingualTextType.TITLE);
+            this.comment = new MultilingualText(MultilingualTextType.COMMENT);
         }
 
         public void ParseXMLDocument()
@@ -41,8 +44,8 @@ namespace SpinXmlReader.Block
             // ==============================
             // OBJECT LIST
             //==============================
-            Title = MultilingualText.FindInParent(objectListNode, "Title");
-            Comment = MultilingualText.FindInParent(objectListNode, "Comment");
+            title.ParseFirstFrom(objectListNode);
+            comment.ParseFirstFrom(objectListNode);
 
             foreach (XmlNode compileUnitNode in XmlSearchEngine.Of(objectListNode).AddSearch("SW.Blocks.CompileUnit").GetAllNodes())
             {

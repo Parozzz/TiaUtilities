@@ -31,7 +31,7 @@ namespace SpinXmlReader.Block
             this.DoXMLNode(node);
         }
 
-        public XmlNode GenerateXmlNode(XmlDocument document)
+        public XmlNode GenerateNode(XmlDocument document)
         {
             throw new NotImplementedException();
         }

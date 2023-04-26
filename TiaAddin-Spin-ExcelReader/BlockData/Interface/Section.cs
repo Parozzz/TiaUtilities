@@ -21,6 +21,9 @@ namespace SpinXmlReader.Block
 
     public class Section : IXMLNodeSerializable
     {
+        public const string NODE_NAME = "Section";
+        public const string NAME = "Name";
+
         public static string GetSectionNameFromType(SectionTypeEnum typeEnum)
         {
             switch (typeEnum)
@@ -45,20 +48,11 @@ namespace SpinXmlReader.Block
         }
 
         private SectionTypeEnum type;
-        public SectionTypeEnum Type { get => type; }
-
-
         private readonly List<Member> memberList;
-        public List<Member> MemberList { get => memberList; }
 
         private Section()
         {
             memberList = new List<Member>();
-        }
-
-        public Section(XmlNode node) : this()
-        {
-            this.DoXmlNode(node);
         }
 
         public Section(SectionTypeEnum type) : this()
@@ -79,14 +73,14 @@ namespace SpinXmlReader.Block
             return newMember;
         }
 
-        internal void DoXmlNode(XmlNode node)
+        public void ParseNode(XmlNode node)
         {
             Validate.NotNull(node);
-            Validate.IsTrue(node.Name.Equals("Section"), "Section node name is not valid.");
+            Validate.IsTrue(node.Name.Equals(Section.NODE_NAME), "Section node name is not valid.");
 
             this.memberList.Clear();
 
-            bool parseOK = Enum.TryParse(node.Attributes["Name"]?.Value, true, out type);
+            bool parseOK = Enum.TryParse(node.Attributes[Section.NAME]?.Value, true, out type);
             if (!parseOK)
             {
                 throw new InvalidOperationException("Some of the values inside a Interface/Sections/Section has not been parsed correctly");
@@ -98,16 +92,31 @@ namespace SpinXmlReader.Block
             }
         }
 
-        public XmlNode GenerateXmlNode(XmlDocument document)
+        public XmlNode GenerateNode(XmlDocument document)
         {
-            return XmlNodeBuilder.CreateNew(document, "Section")
-                .AppendAttribute("Name", GetSectionNameFromType(type))
-                .AppendSerializableCollectionAsChild(memberList)
-                .GetNode();
+            var xmlNode = document.CreateElement(Section.NODE_NAME);
+            xmlNode.SetAttribute(Section.NAME, GetSectionNameFromType(type));
+
+            foreach (var member in memberList)
+            {
+                var node = member.GenerateNode(document);
+                xmlNode.AppendChild(node);
+            }
+
+            return xmlNode;
         }
 
         public class Member : IXMLNodeSerializable
         {
+            public const string NODE_NAME = "Member";
+            public const string NAME = "Name";
+            public const string DATA_TYPE = "Datatype";
+            public const string START_VALUE = "StartValue";
+
+            public const string COMMENT = "Comment";
+            public const string COMMENT_LANGUAGE = "Lang";
+            public const string COMMENT_MULTI_LANGUAGE_TEXT = "MultiLanguageText";
+
             private string name;
             public String Name { get => name; }
 
@@ -130,7 +139,7 @@ namespace SpinXmlReader.Block
 
             public Member(XmlNode node) : this()
             {
-                this.DoXmlNode(node);
+                this.ParseNode(node);
             }
 
             public Member(string name, string dataType, string startValue) : this()
@@ -140,17 +149,17 @@ namespace SpinXmlReader.Block
                 this.startValue = startValue;
             }
 
-            internal void DoXmlNode(XmlNode node)
+            public void ParseNode(XmlNode node)
             {
                 Validate.NotNull(node);
-                Validate.IsTrue(node.Name.Equals("Member"), "Section/Member node name is not valid.");
+                Validate.IsTrue(node.Name.Equals(Member.NODE_NAME), "Section/Member node name is not valid.");
 
                 stringAttributeList.Clear();
                 commentDictionary.Clear();
                 subMemberList.Clear();
 
-                var parseOK = Utils.TryNotNull(node.Attributes["Name"].Value, out name);
-                parseOK &= Utils.TryNotNull(node.Attributes["Datatype"].Value, out dataType);
+                var parseOK = Utils.TryNotNull(node.Attributes[Member.NAME].Value, out name);
+                parseOK &= Utils.TryNotNull(node.Attributes[Member.DATA_TYPE].Value, out dataType);
                 if (!parseOK)
                 {
                     throw new InvalidOperationException("Some of the values inside a Section/Member has not been parsed correctly");
@@ -160,30 +169,25 @@ namespace SpinXmlReader.Block
                 {
                     switch (childNode.Name)
                     {
-                        case "StartValue":
+                        case Member.START_VALUE:
                             startValue = childNode.InnerText;
                             break;
-                        case "Member":
+                        case Member.NODE_NAME:
                             subMemberList.Add(new Member(childNode));
                             break;
-                        case "AttributeList":
+                        case Constants.ATTRIBUTE_LIST_NAME:
                             foreach (XmlNode attributeNode in childNode)
                             {
-                                if (attributeNode.Name == "StringAttribute")
+                                if (attributeNode.Name == StringMemberAttribute.NODE_NAME)
                                 {
                                     stringAttributeList.Add(new StringMemberAttribute(attributeNode));
                                 }
                             }
                             break;
-                        case "Comment":
-                            foreach (XmlNode languangeTextNode in XmlSearchEngine.Of(childNode).GetAllNodes("MultiLanguageText"))
+                        case Member.COMMENT:
+                            foreach (XmlNode languangeTextNode in XmlSearchEngine.Of(childNode).GetAllNodes(Member.COMMENT_MULTI_LANGUAGE_TEXT))
                             {
-                                var lang = languangeTextNode.Attributes["Lang"]?.Value;
-                                if (lang == null)
-                                {
-                                    continue;
-                                }
-
+                                var lang = languangeTextNode.Attributes[Member.COMMENT_LANGUAGE].Value;
                                 var cultureInfo = CultureInfo.GetCultureInfo(lang);
                                 if (cultureInfo != null)
                                 {
@@ -195,41 +199,50 @@ namespace SpinXmlReader.Block
                 }
             }
 
-            public XmlNode GenerateXmlNode(XmlDocument document)
+            public XmlNode GenerateNode(XmlDocument document)
             {
-                var builder = XmlNodeBuilder.CreateNew(document, "Member")
-                    .AppendAttribute("Name", this.name).AppendAttribute("Datatype", this.dataType);
+                var xmlNode = document.CreateElement(Member.NODE_NAME);
+                xmlNode.SetAttribute(Member.NAME, this.name);
+                xmlNode.SetAttribute(Member.DATA_TYPE, this.dataType);
 
                 if (this.startValue != null)
                 {
-                    builder.AppendChild("StartValue", this.startValue);
+                    xmlNode.AppendChild(document.CreateElement(Member.START_VALUE)).InnerText = this.startValue;
                 }
 
                 if (stringAttributeList.Count > 0)
                 {
-                    XmlNodeBuilder.CreateNew(document, "AttributeList")
-                        .AppendSerializableCollectionAsChild(stringAttributeList)
-                        .ChildToBuilder(builder);
+                    var attributeListNode = xmlNode.AppendChild(document.CreateElement(Constants.ATTRIBUTE_LIST_NAME));
+                    foreach (var stringAttribute in stringAttributeList)
+                    {
+                        var node = stringAttribute.GenerateNode(document);
+                        attributeListNode.AppendChild(node);
+                    }
                 }
 
+                //This part has a custom comment part without global ID
                 if (commentDictionary.Count > 0)
                 {
-                    var commentNode = document.CreateNode(XmlNodeType.Element, "Comment", "");
+                    var commentNode = document.CreateElement(Member.COMMENT);
                     foreach (KeyValuePair<CultureInfo, string> commentPair in commentDictionary)
                     {
-                        XmlNodeBuilder.CreateNew(document, "MultiLanguageText")
-                            .InnerText(commentPair.Value)
-                            .AppendAttribute("Lang", commentPair.Key.IetfLanguageTag)
-                            .ChildTo(commentNode);
+                        var textNode = document.CreateElement(Member.COMMENT_MULTI_LANGUAGE_TEXT);
+                        textNode.SetAttribute(Member.COMMENT_LANGUAGE, commentPair.Key.IetfLanguageTag);
+                        textNode.InnerText = commentPair.Value;
+                        commentNode.AppendChild(textNode);
                     }
-                    builder.AppendChild(commentNode);
+                    xmlNode.AppendChild(commentNode);
                 }
 
-                return builder.GetNode();
+                return xmlNode;
             }
 
             public class StringMemberAttribute : IXMLNodeSerializable
             {
+                public const string NODE_NAME = "StringAttribute";
+                public const string NAME = "Name";
+                public const string SYSTEM_DEFINED = "SystemDefined";
+
                 private string name;
                 public string Name { get => name; }
 
@@ -241,7 +254,7 @@ namespace SpinXmlReader.Block
 
                 public StringMemberAttribute(XmlNode node)
                 {
-                    this.ParseXmlNode(node);
+                    this.ParseNode(node);
                 }
 
                 public StringMemberAttribute(string name, bool systemDefined, string value)
@@ -251,26 +264,25 @@ namespace SpinXmlReader.Block
                     this.value = value;
                 }
 
-                private void ParseXmlNode(XmlNode node)
+                public void ParseNode(XmlNode node)
                 {
                     Validate.NotNull(node);
-                    Validate.IsTrue(node.Name == "StringAttribute", "Section/Member/Attribute node name is not valid.");
+                    Validate.IsTrue(node.Name == StringMemberAttribute.NODE_NAME, "Section/Member/Attribute node name is not valid.");
 
-                    var parseOK = Utils.TryNotNull(node.Attributes["Name"]?.Value, out string name);
-                    parseOK &= bool.TryParse(node.Attributes["SystemDefined"]?.Value, out bool systemDefined);
+                    var parseOK = Utils.TryNotNull(node.Attributes[StringMemberAttribute.NAME]?.Value, out string name);
+                    parseOK &= bool.TryParse(node.Attributes[StringMemberAttribute.SYSTEM_DEFINED]?.Value, out bool systemDefined);
                     parseOK &= Utils.TryNotNull(node.InnerText, out value);
                     if (!parseOK)
                     {
                         throw new InvalidOperationException("Some of the values inside a Section/Member/AttributeList has not been parsed correctly");
                     }
                 }
-                public XmlNode GenerateXmlNode(XmlDocument document)
+                public XmlNode GenerateNode(XmlDocument document)
                 {
-                    return XmlNodeBuilder.CreateNew(document, "StringAttribute")
-                        .InnerText(value)
-                        .AppendAttribute("Name", name)
-                        .AppendAttribute("SystemDefined", systemDefined)
-                        .GetNode();
+                    var xmlNode = document.CreateElement(StringMemberAttribute.NODE_NAME);
+                    xmlNode.SetAttribute(StringMemberAttribute.NAME, this.name);
+                    xmlNode.SetAttribute(StringMemberAttribute.SYSTEM_DEFINED, this.SystemDefined.ToString());
+                    return xmlNode;
                 }
 
             }

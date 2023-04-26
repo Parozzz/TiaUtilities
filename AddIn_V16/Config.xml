@@ -1,12 +1,12 @@
 ﻿<PackageConfiguration xmlns="http://www.siemens.com/automation/Openness/AddIn/Publisher/V16">
 	<Author>Giacomo P. Spin S.R.L.</Author>
 	<AddInVersion>V16</AddInVersion>
-	<Description>Usato per esportare i blocchi e pagine HMI come file .xml</Description>
+	<Description>sato per esportare dati PLC come file .xml</Description>
 
 	<Product>
 		<Name>SpinAddIn</Name>
 		<Id>fspin-addin</Id>
-		<Version>0.0.2</Version>
+		<Version>0.1.0</Version>
 	</Product>
 
 	<FeatureAssembly>

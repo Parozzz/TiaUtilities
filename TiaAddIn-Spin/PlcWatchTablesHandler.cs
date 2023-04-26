@@ -163,23 +163,31 @@ namespace SpinAddIn
             }
         }
 
-        private void ImportBlocksFromFolder(PlcWatchAndForceTableGroup group, string folderName, bool searchSubDirectories)
+        private bool ImportBlocksFromFolder(PlcWatchAndForceTableGroup group, string folderName, bool searchSubDirectories)
         {
             if (searchSubDirectories)
             {
                 foreach (var directoryName in Directory.GetDirectories(folderName))
                 {
-                    this.ImportBlocksFromFolder(group, directoryName, true);
+                    if(!this.ImportBlocksFromFolder(group, directoryName, true))
+                    {
+                        return false;
+                    }
                 }
             }
 
             foreach (var fileName in Directory.GetFiles(folderName))
             {
-                ImportBlock(group, fileName);
+                if(!ImportBlock(group, fileName))
+                {
+                    return false;
+                }
             }
+
+            return true;
         }
 
-        private void ImportBlock(PlcWatchAndForceTableGroup group, string fileName)
+        private bool ImportBlock(PlcWatchAndForceTableGroup group, string fileName)
         {
             if (fileName.ToLower().EndsWith(".xml"))
             {
@@ -187,12 +195,15 @@ namespace SpinAddIn
                 {
                     var fileInfo = new FileInfo(fileName);
                     group.WatchTables.Import(fileInfo, ImportOptions.Override);
+                    return true;
                 }
                 catch (Exception ex)
                 {
                     Util.ShowExceptionMessage(ex);
                 }
             }
+
+            return false;
         }
 
     }

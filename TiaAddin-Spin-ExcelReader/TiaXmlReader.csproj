@@ -112,6 +112,7 @@
     <Compile Include="TagTable\XMLTag.cs" />
     <Compile Include="TagTable\XMLTagTable.cs" />
     <Compile Include="Utility\Constants.cs" />
+    <Compile Include="Utility\XmlConfigurator.cs" />
     <Compile Include="Utility\Utils.cs" />
     <Compile Include="Utility\XMLUtils.cs" />
     <Compile Include="IXMLNodeSerializable.cs" />

@@ -9,7 +9,7 @@ namespace SpinXmlReader
 {
     public interface IXMLNodeSerializable
     {
-        void ParseXMLNode(XmlNode tagNode);
-        XmlNode GenerateXmlNode(XmlDocument document);
+        void ParseNode(XmlNode tagNode);
+        XmlNode GenerateNode(XmlDocument document);
     }
 }

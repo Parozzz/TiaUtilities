@@ -80,18 +80,25 @@ namespace SpinAddin.Utility
             return Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         }
 
-        public static void ShowExceptionMessage(Exception ex)
+        public static void ShowMessage(string message, string caption)
+        {
+            MessageBox.Show(Util.CreateForm(), message, caption);
+        }
+
+        public static bool ShowExceptionMessage(Exception ex)
         {
             string message = "Message: " + ex.Message + "\r\nStackTrace: " + ex.StackTrace;
             string caption = "An exception occoured while executing Spin Addin!";
 
-            MessageBox.Show(Util.CreateForm(), message, caption);
+            return MessageBox.Show(Util.CreateForm(), message, caption, MessageBoxButtons.OKCancel, MessageBoxIcon.Error) == DialogResult.OK;
         }
     }
 
     public static class ExportUtil
     {
         public delegate void ExportDelegate(FileInfo fileInfo, ExportOptions options);
+
+        public delegate String NameDelegate(Object obj);
 
         public static bool Export(ExportDelegate exportDelegate, string filePath)
         {
@@ -111,9 +118,9 @@ namespace SpinAddin.Utility
             }
             catch (Exception ex)
             {
-                Util.ShowExceptionMessage(ex);
-                return false;
+                return Util.ShowExceptionMessage(ex); //If it return true it means that the error is ignored and will continue.
             }
+
             return true;
         }
     }
