@@ -1,4 +1,4 @@
-C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\SiemensAPI\V17\Siemens.Engineering.AddIn.Publisher.exe --> 26/04/2023 12:14:58 UTC
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\SiemensAPI\V17\Siemens.Engineering.AddIn.Publisher.exe --> 27/11/2023 16:31:06 UTC
 
 Calling Arguments:
 --configuration              :C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\AddIn_V17\Config.xml
@@ -38,4 +38,4 @@ Packaging Permission 'System.Security.Permissions.EnvironmentPermission'.
 Packaging Permission 'System.Net.Mail.SmtpPermission'.
 Packaging Permission 'TIA.ReadWrite'.
 
- --> S U C C E E D E D <-- (0,116s)
+ --> S U C C E E D E D <-- (0,167s)

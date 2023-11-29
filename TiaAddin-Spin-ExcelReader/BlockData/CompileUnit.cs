@@ -1,70 +1,132 @@
-﻿using Siemens.Engineering.SW.Blocks;
-using System;
-using System.Xml;
+﻿using System.Xml;
+using TiaXmlReader;
+using TiaXmlReader.Utility;
 
 namespace SpinXmlReader.Block
 {
-    public class CompileUnit : IXMLNodeSerializable, IGlobalObject
+    public class CompileUnit : XmlNodeConfiguration, IGlobalObject
     {
-        public MultilingualText Title { get; private set; }
-        public MultilingualText Comment { get; private set; }
-        public ProgrammingLanguage ProgrammingLanguage { get; private set; }
-        public FlagNet Net { get; private set; }
-
-        private readonly FCData fcData;
-
-        internal CompileUnit(FCData fcData)
+        public const string NODE_NAME = "SW.Blocks.CompileUnit";
+        private static XmlNodeConfiguration CreatePart(XmlNode node)
         {
-            this.fcData = fcData;
+            switch (node.Name)
+            {
+                case Access.NODE_NAME:
+                    return new Access();
+                case Part.NODE_NAME:
+                    return new Part();
+            }
+
+            return null;
         }
 
-        internal CompileUnit ParseXmlNode(XmlNode node)
+        private readonly GlobalObjectData globalObjectData;
+
+        private readonly XmlAttributeConfiguration compositionName;
+
+        private readonly XmlNodeListConfiguration<MultilingualText> objectList;
+
+        private readonly XmlNodeConfiguration networkSource;
+        private readonly XmlNodeConfiguration flgNet;
+        private readonly XmlNodeListConfiguration<XmlNodeConfiguration> parts;
+        private readonly XmlNodeListConfiguration<Wire> wires;
+
+        private readonly XmlNodeConfiguration programmingLanguange;
+
+        public CompileUnit() : base(CompileUnit.NODE_NAME)
         {
-            var attributeListNode = node.SelectSingleNode("AttributeList");
-            var objectListNode = node.SelectSingleNode("ObjectList");
-            if(attributeListNode == null || objectListNode == null)
-            {
-                return null;
-            }
+            //==== INIT CONFIGURATION ====
+            globalObjectData = this.AddAttribute(new GlobalObjectData());
 
-            var convOK = true;
-            convOK &= Enum.TryParse(attributeListNode["ProgrammingLanguage"]?.InnerText, true, out ProgrammingLanguage language);
-            if(!convOK)
-            {
-                return null;
-            }
+            compositionName = this.AddAttribute("CompositionName", required: true, requiredValue: "CompileUnits");
 
-            ProgrammingLanguage = language;
-            Title = MultilingualText.FindInParent(objectListNode, "Title");
-            Comment = MultilingualText.FindInParent(objectListNode, "Comment");
+            var attributeList = AddNode(Constants.ATTRIBUTE_LIST_KEY, required: true);
+            networkSource = attributeList.AddNode("NetworkSource", required: true);
+            flgNet = networkSource.AddNode("FlgNet", namespaceURI: Constants.GET_FLAG_NET_NAMESPACE());
+            parts = flgNet.AddNodeList("Parts", CompileUnit.CreatePart, namespaceURI: Constants.GET_FLAG_NET_NAMESPACE());
+            wires = flgNet.AddNodeList("Wires", Wire.CreateWire, namespaceURI: Constants.GET_FLAG_NET_NAMESPACE());
 
-            var networkSourceNode = attributeListNode.SelectSingleNode("NetworkSource");
-            if (networkSourceNode != null)
+            objectList = this.AddNodeList(Constants.OBJECT_LIST_KEY, MultilingualText.CreateMultilingualText, required: true);
+
+
+            programmingLanguange = attributeList.AddNode("ProgrammingLanguage", required: true, defaultInnerText: "LAD");
+            //==== INIT CONFIGURATION ====
+        }
+
+        public GlobalObjectData GetGlobalObjectData()
+        {
+            return globalObjectData;
+        }
+
+        public void Init()
+        {
+            var title = this.ComputeBlockTitle();
+            title.AddText(Constants.DEFAULT_CULTURE, "");
+
+            var comment = this.ComputeBlockComment();
+            comment.AddText(Constants.DEFAULT_CULTURE, "");
+        }
+
+        public MultilingualText ComputeBlockTitle()
+        {
+            foreach (var item in objectList.GetItems())
             {
-                foreach (XmlNode networkSourceChildNode in networkSourceNode.ChildNodes)
+                if (item.GetMultilingualTextType() == MultilingualTextType.TITLE)
                 {
-                    switch (networkSourceChildNode.Name)
-                    {
-                        case "StructuredText":
-                            break;
-                        case "FlgNet":
-                            //Net = new FlagNet(fcData).ParseXMLNode(networkSourceChildNode);
-                            break;
-                    }
+                    return item;
                 }
             }
 
-            return this;
+            var title = new MultilingualText(MultilingualTextType.TITLE);
+            objectList.GetItems().Add(title);
+            return title;
         }
 
-        public uint GetID()
+        public MultilingualText ComputeBlockComment()
         {
-            throw new NotImplementedException();
+            foreach (var item in objectList.GetItems())
+            {
+                if (item.GetMultilingualTextType() == MultilingualTextType.COMMENT)
+                {
+                    return item;
+                }
+            }
+
+            var comment = new MultilingualText(MultilingualTextType.COMMENT);
+            objectList.GetItems().Add(comment);
+            return comment;
         }
 
-        public XmlNode GenerateNode(XmlDocument document)
+        public string GetBlockProgrammingLanguage()
         {
-            throw new NotImplementedException();
+            return programmingLanguange.GetInnerText();
+        }
+
+        public Access AddAccess()
+        {
+            return parts.AddNode(new Access());
+        }
+
+        public Part AddPart(Part.Type partType)
+        {
+            var part = new Part();
+            part.SetPartType(partType);
+            return parts.AddNode(part);
+        }
+
+        public void AddIdentWire(Access.Type accessType, string accessSymbol, uint partUId, string partConnectionName)
+        {
+            var access = this.AddAccess();
+            access.SetAccessType(accessType);
+            access.SetSymbol(accessSymbol);
+
+            var identWire = this.AddWire();
+            identWire.SetIdentCon(access.GetLocalObjectData().GetUId(), partUId, partConnectionName);
+        }
+
+        public Wire AddWire()
+        {
+            return wires.AddNode(new Wire());
         }
     }
 }

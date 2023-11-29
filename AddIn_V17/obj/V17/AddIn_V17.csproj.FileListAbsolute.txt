@@ -11,3 +11,4 @@ C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\AddIn_V17\obj\V17\AddIn_V17.
 C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\AddIn_V17\obj\V17\AddIn_V17.csproj.CoreCompileInputs.cache
 C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\AddIn_V17\obj\V17\AddIn_V17.csproj.CopyComplete
 C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\AddIn_V17\obj\V17\AddIn_V17.dll
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\AddIn_V17\obj\V17\AddIn_V17.csproj.AssemblyReference.cache

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -11,141 +12,144 @@ namespace SpinXmlReader
 {
     public enum MultilingualTextType
     {
+        [Description("Title")]
+        TITLE,
+        [Description("Comment")]
         COMMENT,
-        TITLE
+
+    }
+
+    public static class MultilingualTextTypeExtensions
+    {
+        public static string GetCompositionName(this MultilingualTextType val)
+        {
+            DescriptionAttribute[] attributes = (DescriptionAttribute[])val
+               .GetType()
+               .GetField(val.ToString())
+               .GetCustomAttributes(typeof(DescriptionAttribute), false);
+            return attributes.Length > 0 ? attributes[0].Description : string.Empty;
+        }
     }
 
     public class MultilingualText : XmlNodeConfiguration, IGlobalObject
     {
-        public static string NODE_NAME = "MultilingualText";
-        public static string TITLE_COMPOSITION_NAME = "Title";
-        public static string COMMENT_COMPOSITION_NAME = "Comment";
-
-        public MultilingualTextType Type { get; set; }
-
-        private readonly GlobalObjectData globalObjectData;
-        private readonly Dictionary<CultureInfo, MultilingualTextItem> itemDictionary;
-
-        public MultilingualText(MultilingualTextType type) : base(MultilingualText.NODE_NAME, false, "", "")
+        public const string NODE_NAME = "MultilingualText";
+        public static MultilingualText CreateMultilingualText(XmlNode node)
         {
-            this.Type = type;
+            if(node.Name == MultilingualText.NODE_NAME)
+            {
+                switch(node.Attributes["CompositionName"].Value)
+                {
+                    case "Title":
+                        return new MultilingualText(MultilingualTextType.TITLE);
+                    case "Comment":
+                        return new MultilingualText(MultilingualTextType.COMMENT);
+                }
+            }
 
-            globalObjectData = new GlobalObjectData();
-            itemDictionary = new Dictionary<CultureInfo, MultilingualTextItem>();
+            return null;
+        }
+
+        public const string TITLE_COMPOSITION_NAME = "Title";
+        public const string COMMENT_COMPOSITION_NAME = "Comment";
+
+        private readonly XmlNodeListConfiguration<MultilingualTextItem> objectList; //MultilingualTextItems
+
+        private MultilingualTextType type;
+        private readonly GlobalObjectData globalObjectData;
+
+        public MultilingualText(MultilingualTextType type) : base(MultilingualText.NODE_NAME)
+        {
+            this.type = type;
+
+            //==== INIT CONFIGURATION ====
+            globalObjectData = this.AddAttribute(new GlobalObjectData());
+
+            this.AddAttribute(Constants.COMPOSITION_NAME_KEY, required: true, value: type.GetCompositionName());
+
+            objectList = this.AddNodeList(Constants.OBJECT_LIST_KEY, MultilingualTextItem.CreateMultilingualTextItem, required: true);
+            //==== INIT CONFIGURATION ====
+        }
+
+        public MultilingualTextType GetMultilingualTextType()
+        {
+            return type;
+        }
+
+        public void AddText(CultureInfo culture, string text)
+        {
+            var item = new MultilingualTextItem(culture, text);
+            objectList.GetItems().Add(item);
         }
 
         public MultilingualTextItem GetByDefaultLocale()
         {
-            return itemDictionary[Constants.DEFAULT_CULTURE];
+            return GetByLocale(Constants.DEFAULT_CULTURE);
         }
 
         public MultilingualTextItem GetByLocale(CultureInfo culture)
         {
-            return itemDictionary[culture];
+            foreach (var item in objectList.GetItems())
+            {
+                if (item.GetCulture() == culture)
+                {
+                    return item;
+                }
+            }
+
+            return null;
         }
 
         public string GetCompositionName()
         {
-            switch (Type)
-            {
-                case MultilingualTextType.COMMENT:
-                    return MultilingualText.COMMENT_COMPOSITION_NAME;
-                case MultilingualTextType.TITLE:
-                    return MultilingualText.TITLE_COMPOSITION_NAME;
-                default:
-                    return null;
-            }
+            return type.GetCompositionName();
         }
 
-        public GlobalObjectData GetGlobalObjectIdata()
+        public GlobalObjectData GetGlobalObjectData()
         {
             return globalObjectData;
         }
-
-        public void ParseFirstFrom(XmlNode parent)
+        /*
+        public override bool Parse(XmlNode xmlNode)
         {
-            var node = XmlSearchEngine.Of(parent).AddSearch("MultilingualText")
-                .AttributeRequired("CompositionName", GetCompositionName())
-                .GetFirstNode();
-            if (node != null)
+            if(base.Parse(xmlNode))
             {
-                this.Parse(node);
-            }
-        }
-
-        public bool Parse(XmlNode node)
-        {
-            Validate.NotNull(node);
-            Validate.IsTrue(node.Name.Equals(MultilingualText.NODE_NAME), "MultilingualText node name is not valid.");
-
-            globalObjectData.ParseNode(node);
-            if (globalObjectData.GetCompositionName() == MultilingualText.TITLE_COMPOSITION_NAME)
-            {
-                Type = MultilingualTextType.TITLE;
-            }
-            else if (globalObjectData.GetCompositionName() == MultilingualText.COMMENT_COMPOSITION_NAME)
-            {
-                Type = MultilingualTextType.COMMENT;
-            }
-            else
-            {
-                throw new InvalidOperationException("Invalid CompositionName for MultilingualText with ID=" + globalObjectData.GetHexId());
-            }
-
-            // ========== OBJECT_LIST ==========
-            var objectList = XMLUtils.GetFirstChild(node, Constants.OBJECT_LIST_NAME);
-            if (objectList != null)
-            {
-                foreach (XmlNode itemNode in XMLUtils.GetAllChild(objectList, MultilingualTextItem.NAME))
+                foreach(var item in objectList.GetItems())
                 {
-                    var item = new MultilingualTextItem();
-                    item.ParseNode(itemNode);
-
-                    itemDictionary.Add(item.Culture, item);
+                    itemDictionary.Add(item.GetCulture(), item);
                 }
+                return true;
             }
-            // ========== OBJECT_LIST ==========
 
-            return true;
-        }
-
-        public XmlNode Generate(XmlDocument document)
-        {
-            var xmlNode = document.CreateElement(MultilingualText.NODE_NAME);
-
-            new GlobalObjectData(this.GetCompositionName()).GenerateNextID().SetToNode(xmlNode);
-
-            // ========== OBJECT_LIST ==========
-            var objectList = xmlNode.AppendChild(document.CreateElement(Constants.OBJECT_LIST_NAME));
-            foreach (var item in itemDictionary.Values)
-            {
-                objectList.AppendChild(item.GenerateNode(document));
-            }
-            // ========== OBJECT_LIST ==========
-
-            return xmlNode;
-        }
+            return false;
+        }*/
     }
 
-    public class MultilingualTextItem : IXMLNodeSerializable, IGlobalObject
+    public class MultilingualTextItem : XmlNodeConfiguration, IGlobalObject
     {
-        public static string NAME = "MultilingualTextItem";
-        public static string COMPOSITION_NAME = "Items";
-
-        private string text;
-        public string Text { get => text; }
-
-        private CultureInfo culture;
-        public CultureInfo Culture { get => culture; }
+        public const string NODE_KEY = "MultilingualTextItem";
+        public static MultilingualTextItem CreateMultilingualTextItem(XmlNode node)
+        {
+            return node.Name == MultilingualTextItem.NODE_KEY ? new MultilingualTextItem() : null;
+        }
 
         private readonly GlobalObjectData globalObjectData;
 
-        public MultilingualTextItem(CultureInfo cultureInfo, string text)
-        {
-            this.text = text;
-            this.culture = cultureInfo;
+        private readonly XmlNodeConfiguration attributeList;
+        private readonly XmlNodeConfiguration culture;
+        private readonly XmlNodeConfiguration text;
 
-            globalObjectData = new GlobalObjectData(COMPOSITION_NAME);
+        public MultilingualTextItem(CultureInfo defaultCultureInfo, string defaultText) : base(MultilingualTextItem.NODE_KEY)
+        {
+            //==== INIT CONFIGURATION ====
+            globalObjectData = this.AddAttribute(new GlobalObjectData());
+
+            this.AddAttribute(Constants.COMPOSITION_NAME_KEY, required: true, requiredValue: "Items");
+
+            attributeList = this.AddNode(Constants.ATTRIBUTE_LIST_KEY, required: true);
+            culture = attributeList.AddNode("Culture", required: true, defaultInnerText: defaultCultureInfo.IetfLanguageTag);
+            text = attributeList.AddNode("Text", required: true, defaultInnerText: defaultText);
+            //==== INIT CONFIGURATION ====
         }
 
         public MultilingualTextItem() : this(Constants.DEFAULT_CULTURE, "")
@@ -153,41 +157,19 @@ namespace SpinXmlReader
 
         }
 
-        public GlobalObjectData GetGlobalObjectIdata()
+        public CultureInfo GetCulture()
+        {
+            return CultureInfo.GetCultureInfo(culture.GetInnerText());
+        }
+
+        public string GetText()
+        {
+            return text.GetInnerText();
+        }
+
+        public GlobalObjectData GetGlobalObjectData()
         {
             return globalObjectData;
-        }
-
-        public void ParseNode(XmlNode node)
-        {
-            Validate.NotNull(node);
-            Validate.IsTrue(node.Name.Equals(MultilingualTextItem.NAME), "MultilingualText node name is not valid.");
-
-            globalObjectData.ParseNode(node);
-
-            // ========== ATTRIBUTE LIST ==========
-            var attributeList = node[Constants.ATTRIBUTE_LIST_NAME];
-            if (attributeList != null)
-            {
-                culture = CultureInfo.GetCultureInfo(attributeList["Culture"].InnerText);
-                text = attributeList["Text"].InnerText;
-            }
-            // ========== ATTRIBUTE LIST ==========
-
-        }
-
-        public XmlNode GenerateNode(XmlDocument document)
-        {
-            var xmlNode = document.CreateElement(MultilingualTextItem.NAME);
-            new GlobalObjectData(MultilingualTextItem.COMPOSITION_NAME).GenerateNextID().SetToNode(xmlNode);
-
-            // ========== ATTRIBUTE LIST ==========
-            var attributeList = xmlNode.AppendChild(document.CreateElement(Constants.ATTRIBUTE_LIST_NAME));
-            attributeList.AppendChild(document.CreateElement("Culture")).InnerText = culture.IetfLanguageTag;
-            attributeList.AppendChild(document.CreateElement("Text")).InnerText = text;
-            // ========== ATTRIBUTE LIST ==========
-
-            return xmlNode;
         }
     }
 }

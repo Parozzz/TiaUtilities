@@ -1,96 +1,65 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
+using TiaXmlReader.Utility;
 
 namespace SpinXmlReader.TagTable
 {
-    public class XMLTagTable : IXMLNodeSerializable, IGlobalObject
+    public class XMLTagTable : XmlNodeConfiguration, IGlobalObject
     {
-        public static string NAME = "SW.Tags.PlcTagTable";
-
-        private readonly XmlDocument document;
-
-        public string Name { get; set; }
+        public const string NODE_KEY = "SW.Tags.PlcTagTable";
 
         private readonly GlobalObjectData globalObjectData;
-        private readonly Dictionary<string, XMLTag> tags;
-        public XMLTagTable(XmlDocument document)
+
+        private readonly XmlNodeConfiguration attributeList;
+        private readonly XmlNodeConfiguration name;
+        private readonly XmlNodeListConfiguration<XMLTag> objectList; //Tags
+
+        public XMLTagTable() : base(XMLTagTable.NODE_KEY, main: true)
         {
-            this.document = document;
+            //==== INIT CONFIGURATION ====
+            globalObjectData = this.AddAttribute(new GlobalObjectData());
 
-            this.Name = "DefaultTagTable";
+            attributeList = this.AddNode(Constants.ATTRIBUTE_LIST_KEY, required: true);
+            name = attributeList.AddNode("Name", required: true, defaultInnerText: "DefaultTagTable");
 
-            globalObjectData = new GlobalObjectData();
-            tags = new Dictionary<string, XMLTag>();
+            objectList = this.AddNodeList(Constants.OBJECT_LIST_KEY, XMLTag.CreateTag);
+            //==== INIT CONFIGURATION ====
         }
 
-        public Dictionary<string, XMLTag> GetTags()
-        {
-            return tags;
-        }
-
-        public GlobalObjectData GetGlobalObjectIdata()
+        public GlobalObjectData GetGlobalObjectData()
         {
             return globalObjectData;
         }
 
-        public void ParseNode(XmlNode tagTableNode)
+        public void SetTagTableName(string name)
         {
-            globalObjectData.ParseNode(tagTableNode);
-
-            var attributeList = XMLUtils.GetFirstChild(tagTableNode, "AttributeList");
-            if (attributeList != null)
-            {
-                Name = attributeList["Name"]?.InnerText;
-            }
-
-            var objectList = XMLUtils.GetFirstChild(tagTableNode, "ObjectList");
-            if (objectList == null)
-            {
-                return;
-            }
-
-            var tagNodeList = XMLUtils.GetAllChild(objectList, "SW.Tags.PlcTag");
-            if (tagNodeList == null || tagNodeList.Count == 0)
-            {
-                return;
-            }
-
-            foreach (var tagNode in tagNodeList)
-            {
-                var tag = new XMLTag();
-                tag.ParseNode(tagNode);
-
-                if (!tags.ContainsKey(tag.LogicalAddress))
-                {
-                    tags.Add(tag.LogicalAddress, tag);
-                }
-            }
-
+            this.name.SetInnerText(name);
         }
 
-        public XmlNode GenerateNode(XmlDocument document)
+        public string GetTagTableName()
         {
-            var xmlNode = document.CreateNode(XmlNodeType.Element, NAME, "");
-
-            var globalObjectData = new GlobalObjectData();
-            globalObjectData.SetToNode(xmlNode);
-
-
-            // ========== ATTRIBUTE LIST ==========
-            var attributeList = xmlNode.AppendChild(document.CreateElement(Constants.ATTRIBUTE_LIST_NAME));
-            attributeList.AppendChild(document.CreateElement("Name")).InnerText = Name;
-            // ========== ATTRIBUTE LIST ==========
-
-            // ========== OBJECT LIST ==========
-            var objectList = xmlNode.AppendChild(document.CreateElement(Constants.OBJECT_LIST_NAME));
-            foreach (var tag in tags.Values)
-            {
-                objectList.AppendChild(tag.GenerateNode(document));
-            }
-            // ========== OBJECT LIST ==========
-
-            return xmlNode;
+            return name.GetInnerText();
         }
+
+        public XMLTag AddTag()
+        {
+            var tag = new XMLTag();
+            objectList.GetItems().Add(tag);
+            return tag;
+        }
+
+        public Dictionary<string, XMLTag> GetTags()
+        {
+            var tagsList = objectList.GetItems();
+
+            var dict = new Dictionary<string, XMLTag>();
+            foreach(var tag in tagsList)
+            {
+                dict.Add(tag.GetTagName(), tag);
+            }
+            return dict;
+        }
+
     }
 }

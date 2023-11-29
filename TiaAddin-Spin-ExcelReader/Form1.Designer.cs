@@ -31,6 +31,8 @@
             this.FilePathTextBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.ParseFileButton = new System.Windows.Forms.Button();
+            this.generateButton = new System.Windows.Forms.Button();
+            this.generateTagTableButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // FilePathTextBox
@@ -55,19 +57,43 @@
             // ParseFileButton
             // 
             this.ParseFileButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ParseFileButton.Location = new System.Drawing.Point(257, 71);
+            this.ParseFileButton.Location = new System.Drawing.Point(12, 71);
             this.ParseFileButton.Name = "ParseFileButton";
-            this.ParseFileButton.Size = new System.Drawing.Size(311, 39);
+            this.ParseFileButton.Size = new System.Drawing.Size(200, 39);
             this.ParseFileButton.TabIndex = 2;
             this.ParseFileButton.Text = "Parse File";
             this.ParseFileButton.UseVisualStyleBackColor = true;
             this.ParseFileButton.Click += new System.EventHandler(this.ParseFileButton_Click);
+            // 
+            // generateButton
+            // 
+            this.generateButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.generateButton.Location = new System.Drawing.Point(249, 71);
+            this.generateButton.Name = "generateButton";
+            this.generateButton.Size = new System.Drawing.Size(181, 39);
+            this.generateButton.TabIndex = 3;
+            this.generateButton.Text = "Generate FC";
+            this.generateButton.UseVisualStyleBackColor = true;
+            this.generateButton.Click += new System.EventHandler(this.generateButton_Click);
+            // 
+            // generateTagTableButton
+            // 
+            this.generateTagTableButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.generateTagTableButton.Location = new System.Drawing.Point(477, 71);
+            this.generateTagTableButton.Name = "generateTagTableButton";
+            this.generateTagTableButton.Size = new System.Drawing.Size(257, 39);
+            this.generateTagTableButton.TabIndex = 4;
+            this.generateTagTableButton.Text = "Generate TagTable";
+            this.generateTagTableButton.UseVisualStyleBackColor = true;
+            this.generateTagTableButton.Click += new System.EventHandler(this.generateTagTableButton_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 120);
+            this.Controls.Add(this.generateTagTableButton);
+            this.Controls.Add(this.generateButton);
             this.Controls.Add(this.ParseFileButton);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.FilePathTextBox);
@@ -83,6 +109,8 @@
         private System.Windows.Forms.TextBox FilePathTextBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button ParseFileButton;
+        private System.Windows.Forms.Button generateButton;
+        private System.Windows.Forms.Button generateTagTableButton;
     }
 }
 

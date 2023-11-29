@@ -5,17 +5,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using TiaXmlReader.Utility;
 
 namespace SpinXmlReader
 {
     //ONLY SAFE INSIDE THE XML GENERATION THREAD
     public static class GlobalIDGenerator
     {
-        private static uint counter = 1;
+        private static uint counter = 0;
 
         public static void ResetID()
         {
-            counter = 1;
+            counter = 0;
         }
 
         public static uint GetNextID()
@@ -25,69 +26,45 @@ namespace SpinXmlReader
             return ret;
         }
     }
-
-    public class GlobalObjectData
+    public interface IGlobalObject
     {
-        private uint id;
-        //Nullable
-        private string compositionName;
+        GlobalObjectData GetGlobalObjectData();
+    }
 
-        public GlobalObjectData(uint id, string compositionName)
+    public class GlobalObjectData : XmlAttributeConfiguration
+    {
+        public GlobalObjectData() : base("ID", required: true)
         {
-            this.id = id;
-            this.compositionName = compositionName;
-        }
-
-        public GlobalObjectData(string compositionName) : this(0, compositionName) { }
-
-        public GlobalObjectData() : this(0, "") { }
-
-        public GlobalObjectData GenerateNextID()
-        {
-            this.id = GlobalIDGenerator.GetNextID();
-            return this;
-        }
-
-        public void ParseNode(XmlNode node)
-        {
-            if (node.Attributes["ID"] == null)
-            {
-                throw new InvalidOperationException("Missing ID of IGlobalObject Attributes from node " + node.Name);
-            }
-
-            id = uint.Parse(node.Attributes["ID"].InnerText, NumberStyles.HexNumber);
-            compositionName = node.Attributes["CompositionName"]?.InnerText; //A global object might not have a composition name (Like the main node of a XML)
-        }
-
-        public void SetToNode(XmlNode node)
-        {
-            node.Attributes.Append(node.OwnerDocument.CreateAttribute("ID")).InnerText = id.ToString("X"); //This is an HEX value
-            //Ogni oggetto - ad eccezione dell'oggetto di avvio - contiene anche un attributo XML "CompositionName".
-            //Quindi potrebbe essere che questo valore sia vuoto.
-            if (compositionName != null && compositionName.Length > 0)
-            {
-                node.Attributes.Append(node.OwnerDocument.CreateAttribute("CompositionName")).InnerText = compositionName;
-            }
+            base.value = "" + GlobalIDGenerator.GetNextID().ToString("X"); //HEX
         }
 
         public string GetHexId()
         {
-            return id.ToString("X");
+            return base.value;
         }
 
         public uint GetId()
         {
-            return id;
-        }
-
-        public string GetCompositionName()
-        {
-            return compositionName;
+            return uint.Parse(base.value);
         }
     }
 
-    public interface IGlobalObject
+    public interface ILocalObject
     {
-        GlobalObjectData GetGlobalObjectIdata();
+        LocalObjectData GetLocalObjectData();
     }
+
+    public class LocalObjectData : XmlAttributeConfiguration
+    {
+        public LocalObjectData() : base("UId", required: true)
+        {
+            base.value = "" + GlobalIDGenerator.GetNextID().ToString(); //UINT
+        }
+
+        public uint GetUId()
+        {
+            return uint.Parse(base.value);
+        }
+    }
+
 }

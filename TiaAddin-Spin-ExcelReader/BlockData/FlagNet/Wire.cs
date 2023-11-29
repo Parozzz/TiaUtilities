@@ -5,56 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
+using TiaXmlReader.Utility;
 
 namespace SpinXmlReader.Block
 {
-    public abstract class Wire : UIdObject
-    {
-    }
-
-    public class PowerrailWire : Wire
-    {
-        private readonly List<WirePart> wireParts;
-
-        public PowerrailWire()
-        {
-            wireParts = new List<WirePart>();
-        }
-
-        public void AddWirePart(WirePart part)
-        {
-            wireParts.Add(part);
-        }
-
-        public ICollection<WirePart> GetWireParts()
-        {
-            return wireParts;
-        }
-    }
-
-    public class NormalWire : Wire
-    {
-
-        private readonly WirePart leftWirePart;
-        private readonly WirePart rightWirePart;
-
-        public NormalWire(WirePart leftWirePart, WirePart rightWirePart)
-        {
-            this.leftWirePart = leftWirePart;
-            this.rightWirePart = rightWirePart;
-        }
-
-        public WirePart GetLeftWirePart()
-        {
-            return leftWirePart;
-        }
-
-        public WirePart GetRightWirePart()
-        {
-            return rightWirePart;
-        }
-    }
-
     public enum WirePartType
     {
         POWERRAIL,
@@ -63,39 +17,199 @@ namespace SpinXmlReader.Block
         OPENCON
     }
 
-    public class WirePart
+    public class Wire : XmlNodeListConfiguration<NameCon>, ILocalObject
     {
-        public string Name { get; protected internal set; }
-
-        private readonly WirePartType type;
-        private readonly UIdObject partUIdObject;
-        private readonly string name;
-
-        public WirePart(WirePartType type, UIdObject partUIdObject, string name)
+        public const string NODE_NAME = "Wire";
+        public static Wire CreateWire(XmlNode node)
         {
-            this.type = type;
-            this.partUIdObject = partUIdObject;
-            this.name = name;
+            return node.Name == Wire.NODE_NAME ? new Wire() : null;
         }
 
-        public WirePartType GetWirePart()
+        private readonly LocalObjectData localObjectData;
+
+        private readonly XmlNodeConfiguration powerrail;
+
+        private readonly XmlNodeConfiguration identCon; //If this is preset, it means this wire identify a connection between an Access and a Part.
+        private readonly XmlAttributeConfiguration identConUId;
+
+        private readonly XmlNodeConfiguration openCon;
+
+        public Wire() : base(Wire.NODE_NAME, NameCon.CreateNameCon, namespaceURI: Constants.GET_FLAG_NET_NAMESPACE())
         {
-            return type;
+            //==== INIT CONFIGURATION ====
+            localObjectData = this.AddAttribute(new LocalObjectData());
+
+            powerrail = this.AddNode("Powerrail", namespaceURI: Constants.GET_FLAG_NET_NAMESPACE());
+
+            identCon = this.AddCon("IdentCon");
+            identConUId = identCon.AddAttribute("UId"); //This UId refers to an Access
+
+            openCon = this.AddCon("OpenCon");
+            //==== INIT CONFIGURATION ====
         }
 
-        public UIdObject GetPartUIdObject()
+        private Con AddCon(string name)
         {
-            return partUIdObject;
+            return this.AddNode(new Con(name));
         }
 
-        public bool HasName()
+        public LocalObjectData GetLocalObjectData()
         {
-            return Name != null && Name.Length > 0;
+            return localObjectData;
         }
 
-        public string GetName()
+        public bool IsPowerrail()
         {
-            return name;
+            return powerrail.IsParsed();
+        }
+
+        public void SetPowerrail()
+        {
+            powerrail.SetParsed();
+            powerrail.SetRequired();
+        }
+
+        public void AddPowerrailCon(uint partUId, string partConnectionName)
+        {
+            if(IsPowerrail())
+            {
+                var nameCon = this.AddNode(new NameCon());
+                nameCon.SetConUId(partUId);
+                nameCon.SetConName(partConnectionName);
+            }
+        }
+
+        public bool IsIdentCon()
+        {
+            return identCon.IsParsed();
+        }
+
+        public void SetIdentCon(uint accessUId, uint partUId, string partConnectionName)
+        {
+            if(!IsPowerrail() && !IsIdentCon())
+            {
+                var con = this.AddCon("IdentCon");
+                con.SetConUId(accessUId);
+
+                var nameCon = this.AddNode(new NameCon());
+                nameCon.SetConUId(partUId);
+                nameCon.SetConName(partConnectionName);
+            }
+        }
+
+        public uint GetIdentAccessUId()
+        {
+            if(IsIdentCon() && identConUId.GetUIntValue(out uint uid))
+            {
+                return uid; 
+            }
+
+            return 0;
+        }
+
+        public uint GetIdentPartUId()
+        {
+            return IsIdentCon() && this.GetItems().Count == 1 ? this.GetItems()[0].GetConUId() : 0;
+        }
+
+        public string GetIdentPartName()
+        {
+            return IsIdentCon() && this.GetItems().Count == 1 ? this.GetItems()[0].GetConName() : "";
+        }
+
+
+        public uint GetWireStartUId()
+        {
+            return this.GetItems().Count == 2 ? this.GetItems()[0].GetConUId() : 0;
+        }
+
+        public string GetWireStartName()
+        {
+            return this.GetItems().Count == 2 ? this.GetItems()[0].GetConName() : "";
+        }
+        public void SetWireStart(uint partUId, string partConnectionName)
+        {
+            if (this.GetItems().Count < 2)
+            {
+                var nameCon = this.AddNode(new NameCon());
+                nameCon.SetConUId(partUId);
+                nameCon.SetConName(partConnectionName);
+            }
+        }
+
+        public bool IsExitOpenCon()
+        {
+            return openCon.IsParsed();
+        }
+
+        public uint GetWireExitUId()
+        {
+            return this.GetItems().Count == 2 ? this.GetItems()[1].GetConUId() : 0;
+        }
+
+        public string GetWireExitName()
+        {
+            return this.GetItems().Count == 2 ? this.GetItems()[1].GetConName() : "";
+        }
+
+        public void SetWireExit(uint partUId, string partConnectionName)
+        {
+            if (this.GetItems().Count < 2)
+            {
+                var nameCon = this.AddNode(new NameCon());
+                nameCon.SetConUId(partUId);
+                nameCon.SetConName(partConnectionName);
+            }
+        }
+    }
+
+    public class Con : XmlNodeConfiguration
+    {
+        private readonly XmlAttributeConfiguration uid; //This identify a Part or an Access.
+
+        public Con(string name) : base(name, namespaceURI: Constants.GET_FLAG_NET_NAMESPACE())
+        {
+            //==== INIT CONFIGURATION ====
+            uid = this.AddAttribute("UId", required: true);
+            //==== INIT CONFIGURATION ====
+        }
+
+        public void SetConUId(uint uId)
+        {
+            uid.SetValue(uId.ToString());
+        }
+
+        public uint GetConUId()
+        {
+            return uid.GetUIntValue(out uint value) ? value : 0;
+        }
+    }
+
+    public class NameCon : Con
+    {
+        public const string NODE_NAME = "NameCon";
+        public static NameCon CreateNameCon(XmlNode node)
+        {
+            return node.Name == NameCon.NODE_NAME ? new NameCon() : null;
+        }
+
+        private readonly XmlAttributeConfiguration name;
+
+        public NameCon() : base(NameCon.NODE_NAME)
+        {
+            //==== INIT CONFIGURATION ====
+            name = this.AddAttribute("Name", required: true);
+            //==== INIT CONFIGURATION ====
+        }
+
+        public void SetConName(string name)
+        {
+            this.name.SetValue(name);
+        }
+
+        public string GetConName()
+        {
+            return name.GetValue();
         }
     }
 }
