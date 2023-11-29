@@ -114,14 +114,14 @@ namespace SpinXmlReader.Block
             return parts.AddNode(part);
         }
 
-        public void AddIdentWire(Access.Type accessType, string accessSymbol, uint partUId, string partConnectionName)
+        public void AddIdentWire(Access.Type accessType, string accessSymbol, Part part, string partConnectionName)
         {
             var access = this.AddAccess();
             access.SetAccessType(accessType);
             access.SetSymbol(accessSymbol);
 
             var identWire = this.AddWire();
-            identWire.SetIdentCon(access.GetLocalObjectData().GetUId(), partUId, partConnectionName);
+            identWire.SetIdentCon(access.GetLocalObjectData().GetUId(), part.GetLocalObjectData().GetUId(), partConnectionName);
         }
 
         public Wire AddWire()

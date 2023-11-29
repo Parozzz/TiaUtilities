@@ -69,12 +69,12 @@ namespace SpinXmlReader.Block
             powerrail.SetRequired();
         }
 
-        public void AddPowerrailCon(uint partUId, string partConnectionName)
+        public void AddPowerrailCon(Part part, string partConnectionName)
         {
             if(IsPowerrail())
             {
                 var nameCon = this.AddNode(new NameCon());
-                nameCon.SetConUId(partUId);
+                nameCon.SetConUId(part.GetLocalObjectData().GetUId());
                 nameCon.SetConName(partConnectionName);
             }
         }
@@ -127,12 +127,12 @@ namespace SpinXmlReader.Block
         {
             return this.GetItems().Count == 2 ? this.GetItems()[0].GetConName() : "";
         }
-        public void SetWireStart(uint partUId, string partConnectionName)
+        public void SetWireStart(Part part, string partConnectionName)
         {
             if (this.GetItems().Count < 2)
             {
                 var nameCon = this.AddNode(new NameCon());
-                nameCon.SetConUId(partUId);
+                nameCon.SetConUId(part.GetLocalObjectData().GetUId());
                 nameCon.SetConName(partConnectionName);
             }
         }
@@ -152,12 +152,12 @@ namespace SpinXmlReader.Block
             return this.GetItems().Count == 2 ? this.GetItems()[1].GetConName() : "";
         }
 
-        public void SetWireExit(uint partUId, string partConnectionName)
+        public void SetWireExit(Part part, string partConnectionName)
         {
             if (this.GetItems().Count < 2)
             {
                 var nameCon = this.AddNode(new NameCon());
-                nameCon.SetConUId(partUId);
+                nameCon.SetConUId(part.GetLocalObjectData().GetUId());
                 nameCon.SetConName(partConnectionName);
             }
         }

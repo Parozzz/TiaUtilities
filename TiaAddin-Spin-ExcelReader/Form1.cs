@@ -4,6 +4,7 @@ using System;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml;
+using TiaXmlReader;
 
 namespace SpinXmlReader
 {
@@ -78,14 +79,14 @@ namespace SpinXmlReader
 
             var powerrail = compileUnit.AddWire();
             powerrail.SetPowerrail();
-            powerrail.AddPowerrailCon(contactPart.GetLocalObjectData().GetUId(), "in");
+            powerrail.AddPowerrailCon(contactPart, "in");
 
-            compileUnit.AddIdentWire(TiaXmlReader.Access.Type.GLOBAL_VARIABLE, "IO.IN_01", contactPart.GetLocalObjectData().GetUId(), "operand");
-            compileUnit.AddIdentWire(TiaXmlReader.Access.Type.GLOBAL_VARIABLE, "IO.IN_02", coilPart.GetLocalObjectData().GetUId(), "operand");
+            compileUnit.AddIdentWire(Access.Type.GLOBAL_VARIABLE, "IO.IN_01", contactPart, "operand");
+            compileUnit.AddIdentWire(Access.Type.GLOBAL_VARIABLE, "IO.IN_02", coilPart, "operand");
 
             var contactToCoilWire = compileUnit.AddWire();
-            contactToCoilWire.SetWireStart(contactPart.GetLocalObjectData().GetUId(), "out");
-            contactToCoilWire.SetWireExit(coilPart.GetLocalObjectData().GetUId(), "in");
+            contactToCoilWire.SetWireStart(contactPart, "out");
+            contactToCoilWire.SetWireExit(coilPart, "in");
             //COMPILE UNITS
 
             var xmlDocument = SiemensMLParser.CreateDocument();
