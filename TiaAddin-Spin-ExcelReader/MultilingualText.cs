@@ -76,11 +76,23 @@ namespace SpinXmlReader
             return type;
         }
 
-        public void AddText(CultureInfo culture, string text)
+        public void SetText(CultureInfo culture, string text)
         {
+            foreach(var loopItem in objectList.GetItems())
+            {
+                if(loopItem.GetCulture() == culture)
+                {
+                    loopItem.SetMultilingualText(text);
+                    return;
+                }
+            }
+
+
             var item = new MultilingualTextItem(culture, text);
             objectList.GetItems().Add(item);
         }
+
+
 
         public MultilingualTextItem GetByDefaultLocale()
         {
@@ -162,9 +174,14 @@ namespace SpinXmlReader
             return CultureInfo.GetCultureInfo(culture.GetInnerText());
         }
 
-        public string GetText()
+        public string GetMultilingualText()
         {
             return text.GetInnerText();
+        }
+
+        public void SetMultilingualText(string text)
+        {
+            this.text.SetInnerText(text);
         }
 
         public GlobalObjectData GetGlobalObjectData()

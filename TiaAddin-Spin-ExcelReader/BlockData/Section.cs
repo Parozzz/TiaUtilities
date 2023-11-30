@@ -78,17 +78,22 @@ namespace SpinXmlReader.Block
             Enum.TryParse<SectionTypeEnum>(name.GetValue(), ignoreCase: true, out type);
         }
 
-        public void AddReturnRetValMember()
+        public void SetReturnRetValMember(string name, string dataType)
         {
-            var member = this.AddMember();
-            member.SetMemberName("Ret_Val");
-            member.SetMemberDataType("Void");
+            this.GetItems().Clear();
+            this.AddMember(name, dataType);
         }
 
-        public Member AddMember()
+        public void SetVoidReturnRetValMember()
         {
-            var member = new Member();
-            this.AddNode(member);
+            this.SetReturnRetValMember("Ret_Val", "Void");
+        }
+
+        public Member AddMember(string name, string dataType)
+        {
+            var member = this.AddNode(new Member());
+            member.SetMemberName(name);
+            member.SetMemberDataType(dataType);
             return member;
         }
 

@@ -1,6 +1,7 @@
 ﻿using SpinXmlReader;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,47 +10,88 @@ using System.Xml.Linq;
 
 namespace TiaXmlReader.Utility
 {
-    public class XmlConfigurator : XmlNodeConfiguration
+    public abstract class XmlConfiguration
     {
-        public XmlConfigurator(string nodeName, string namespaceURI = "") : base(nodeName, true, namespaceURI, "")
+        protected readonly string name;
+        protected bool required;
+        protected XmlNodeConfiguration parentConfiguration;
+
+        public XmlConfiguration(string name, bool required = false) 
         {
+            this.name = name;
+            this.required = required;
         }
 
+        public string GetConfigurationName()
+        {
+            return this.name;
+        }
+
+        public bool IsRequired()
+        {
+            return this.required;
+        }
+
+        public void SetRequired()
+        {
+            this.required = true;
+        }
+
+        public XmlNodeConfiguration GetParentConfiguration()
+        {
+            return parentConfiguration;
+        }
+
+        public void SetParentConfiguration(XmlNodeConfiguration parentConfiguration)
+        {
+            if(this.parentConfiguration != null)
+            {
+                throw new Exception("Setting a Parent Configuration for a XmlConfiguration that already have it (Double add?) for " + name + ".");
+            }
+            this.parentConfiguration = parentConfiguration;
+        }
+
+        public abstract void Parse(XmlNode xmlNode);
+
+        public abstract bool IsEmpty();
     }
 
     public class XmlNodeListConfiguration<T> : XmlNodeConfiguration where T : XmlNodeConfiguration
     {
         private readonly Func<XmlNode, T> creationFunction;
-        private readonly List<T> items;
+        private readonly ObservableCollection<T> items;
 
         public XmlNodeListConfiguration(string name, Func<XmlNode, T> creationFunction, bool required = false, string namespaceURI = "", string defaultInnerText = "") : base(name, required, namespaceURI, defaultInnerText)
         {
             this.creationFunction = creationFunction;
-            this.items = new List<T>();
+            this.items = new ObservableCollection<T>();
+            this.items.CollectionChanged += Items_CollectionChanged;
         }
 
-        public override bool Parse(XmlNode xmlNode)
+        private void Items_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            if (base.Parse(xmlNode))
+            if(e.NewItems != null)
             {
-                foreach (XmlNode childNode in base.xmlElement.ChildNodes)
+                foreach (XmlNodeConfiguration newItem in e.NewItems)
                 {
-                    var configuration = creationFunction.Invoke(childNode);
-                    if (configuration != null)
-                    {
-                        items.Add(configuration);
-
-                        if (!configuration.Parse(childNode))
-                        {
-                            return false;
-                        }
-                    }
+                    newItem.SetParentConfiguration(this);
                 }
-
-                return true;
             }
+        }
 
-            return false;
+        public override void Parse(XmlNode xmlNode)
+        {
+            base.Parse(xmlNode);
+
+            foreach (XmlNode childNode in base.xmlElement.ChildNodes)
+            {
+                var configuration = creationFunction.Invoke(childNode);
+                if (configuration != null)
+                {
+                    items.Add(configuration);
+                    configuration.Parse(childNode);
+                }
+            }
         }
 
         public override bool IsEmpty()
@@ -61,10 +103,10 @@ namespace TiaXmlReader.Utility
         {
             var xmlElement = base.Generate(document);
 
-            foreach(var item in items)
+            foreach (var item in items)
             {
                 var itemXmlElement = item.Generate(document);
-                if(itemXmlElement != null)
+                if (itemXmlElement != null)
                 {
                     xmlElement.AppendChild(itemXmlElement);
                 }
@@ -73,70 +115,45 @@ namespace TiaXmlReader.Utility
             return xmlElement;
         }
 
-        public List<T> GetItems()
+        public ObservableCollection<T> GetItems()
         {
             return items;
         }
     }
 
-    public class XmlNodeConfiguration
+    public class XmlNodeConfiguration : XmlConfiguration
     {
-        private readonly string name;
-        private bool required;
         private readonly string namespaceURI;
 
         private string innerText;
         private bool parsed = false;
         protected XmlElement xmlElement;
 
-        private readonly bool main;
-
         protected readonly List<XmlAttributeConfiguration> attributeConfigurations;
         protected readonly List<XmlNodeConfiguration> childrenNodeConfigurations;
 
-        public XmlNodeConfiguration(string name, bool required = false, string namespaceURI = "", string defaultInnerText = "", bool main = false)
+        public XmlNodeConfiguration(string name, bool required = false, string namespaceURI = "", string defaultInnerText = "") : base(name, required)
         {
-            this.name = name;
-            this.required = required;
             this.namespaceURI = namespaceURI;
             this.innerText = defaultInnerText;
-            this.main = main;
 
             attributeConfigurations = new List<XmlAttributeConfiguration>();
             childrenNodeConfigurations = new List<XmlNodeConfiguration>();
-        }
-
-        public string GetConfigurationName()
-        {
-            return this.name;
         }
 
         public bool IsParsed()
         {
             return parsed;
         }
+
         public void SetParsed()
         {
             parsed = true;
         }
 
-        public bool IsRequired()
-        {
-            return this.required;
-        }
-
-        public void SetRequired()
-        {
-            required = true;
-        }
-
-        public string GetNamespaceURI()
-        {
-            return namespaceURI;
-        }
-
         public T AddAttribute<T>(T attributeConfiguration) where T : XmlAttributeConfiguration
         {
+            attributeConfiguration.SetParentConfiguration(this);
             attributeConfigurations.Add(attributeConfiguration);
             return attributeConfiguration;
         }
@@ -148,6 +165,8 @@ namespace TiaXmlReader.Utility
 
         public T AddNode<T>(T nodeConfiguration) where T : XmlNodeConfiguration
         {
+            nodeConfiguration.SetParentConfiguration(this);
+
             childrenNodeConfigurations.Add(nodeConfiguration);
             return nodeConfiguration;
         }
@@ -172,7 +191,7 @@ namespace TiaXmlReader.Utility
             return innerText;
         }
 
-        public virtual bool Parse(XmlNode xmlNode)
+        public override void Parse(XmlNode xmlNode)
         {
             Validate.NotNull(xmlNode);
 
@@ -196,13 +215,13 @@ namespace TiaXmlReader.Utility
                 }
             }
 
-            parsed = true;
+            this.parsed = true;
 
             foreach (var attributeConfig in attributeConfigurations)
             {
                 if (attributeConfig.IsRequired() && !attributeConfig.IsParsed())
                 {
-                    throw new Exception("A required Attribute has not been parsed. Name=" + attributeConfig.GetName() + " for " + this.GetConfigurationName());
+                    throw new Exception("A required Attribute has not been parsed. Name=" + attributeConfig.GetConfigurationName() + " for " + this.GetConfigurationName());
                 }
             }
 
@@ -213,20 +232,17 @@ namespace TiaXmlReader.Utility
                     throw new Exception("A required Node has not been parsed. Name=" + childNodeConfig.GetConfigurationName() + " for " + this.GetConfigurationName());
                 }
             }
-
-            return true;
         }
 
-        public virtual bool IsEmpty()
+        public override bool IsEmpty()
         {
-            if(string.IsNullOrEmpty(this.innerText) && attributeConfigurations.Count == 0 && childrenNodeConfigurations.Count == 0)
+            if (string.IsNullOrEmpty(this.innerText) && attributeConfigurations.Count == 0 && childrenNodeConfigurations.Count == 0)
             {
                 return true;
             }
 
-            
             var allChildEmpty = true;
-            foreach(var childNodeConfig in childrenNodeConfigurations)
+            foreach (var childNodeConfig in childrenNodeConfigurations)
             {
                 allChildEmpty &= childNodeConfig.IsEmpty();
             }
@@ -238,26 +254,26 @@ namespace TiaXmlReader.Utility
             }
 
             return allChildEmpty && allAttributesEmpty;
-
-            return false;
         }
 
         public virtual XmlElement Generate(XmlDocument document)
         {
-            if(this.IsEmpty() && !IsRequired())
+            if (this.IsEmpty() && !IsRequired())
             {
                 return null;
             }
 
-            var xmlElement = string.IsNullOrWhiteSpace(namespaceURI) ? document.CreateElement(name) : document.CreateElement(name, namespaceURI);
-            if(!string.IsNullOrEmpty(this.innerText))
+            //If i don't recall the first NamespaceURI all the nodes that are inside a node with a namespace will show xmlns=""
+            var namespaceURI = FindFirstNamespaceURI(this);
+            xmlElement = string.IsNullOrEmpty(namespaceURI) ? document.CreateElement(name) : document.CreateElement(name, namespaceURI);
+            if (!string.IsNullOrEmpty(this.innerText))
             {
                 xmlElement.InnerText = this.innerText;
             }
 
             foreach (var attributeConfig in attributeConfigurations)
             {
-                if(!attributeConfig.IsEmpty())
+                if (!attributeConfig.IsEmpty())
                 {
                     attributeConfig.Set(document, xmlElement);
                 }
@@ -266,7 +282,7 @@ namespace TiaXmlReader.Utility
             foreach (var nodeConfig in childrenNodeConfigurations)
             {
                 var childXmlElement = nodeConfig.Generate(document);
-                if(childXmlElement != null)
+                if (childXmlElement != null)
                 {
                     xmlElement.AppendChild(childXmlElement);
                 }
@@ -274,37 +290,35 @@ namespace TiaXmlReader.Utility
 
             return xmlElement;
         }
+
+        protected string FindFirstNamespaceURI(XmlNodeConfiguration configuration)
+        {
+            if(configuration == null)
+            {
+                return "";
+            }
+
+            return string.IsNullOrEmpty(configuration.namespaceURI) ? FindFirstNamespaceURI(configuration.parentConfiguration) : configuration.namespaceURI;
+        }
     }
 
-    public class XmlAttributeConfiguration
+    public class XmlAttributeConfiguration : XmlConfiguration
     {
-        private readonly string name;
-        private readonly bool required;
         private readonly string requiredValue;
 
         protected string value;
         private bool parsed = false;
+        protected XmlAttribute xmlAttribute;
 
-        public XmlAttributeConfiguration(string name, bool required = false, string requiredValue = "", string value = "")
+        public XmlAttributeConfiguration(string name, bool required = false, string requiredValue = "", string value = "") : base(name, required)
         {
-            this.name = name;
-            this.required = required;
             this.requiredValue = requiredValue;
             this.value = value;
-        }
-        public string GetName()
-        {
-            return this.name;
         }
 
         public bool IsParsed()
         {
             return parsed;
-        }
-
-        public bool IsRequired()
-        {
-            return this.required;
         }
 
         public void SetValue(string value)
@@ -322,29 +336,26 @@ namespace TiaXmlReader.Utility
             return uint.TryParse(this.value, out value);
         }
 
-        public virtual bool Parse(XmlNode xmlNode)
+        public override void Parse(XmlNode xmlNode)
         {
-            var attribute = xmlNode.Attributes[name];
-            if (attribute != null)
+            xmlAttribute = xmlNode.Attributes[name];
+            if (xmlAttribute != null)
             {
-                this.value = attribute.Value;
-
+                this.value = xmlAttribute.Value;
                 this.parsed = !this.IsRequired() || requiredValue == "" || requiredValue == this.value;
             }
-
-            return true;
         }
 
-        public virtual bool IsEmpty()
+        public override bool IsEmpty()
         {
             return string.IsNullOrEmpty(this.value) && string.IsNullOrEmpty(this.requiredValue);
         }
 
         public virtual void Set(XmlDocument document, XmlNode xmlNode)
         {
-            var attribute = document.CreateAttribute(name);
-            attribute.Value = string.IsNullOrEmpty(this.value) ? this.requiredValue : this.value;
-            xmlNode.Attributes.Append(attribute);
+            xmlAttribute = document.CreateAttribute(name);
+            xmlAttribute.Value = string.IsNullOrEmpty(this.value) ? this.requiredValue : this.value;
+            xmlNode.Attributes.Append(xmlAttribute);
         }
     }
 

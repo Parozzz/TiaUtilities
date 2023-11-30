@@ -25,7 +25,7 @@ namespace SpinXmlReader.Block
         private readonly BlockAttributeList blockAttributeList;
         private readonly XmlNodeListConfiguration<XmlNodeConfiguration> objectList;
 
-        public BlockFC() : base(BlockFC.NODE_NAME, main: true)
+        public BlockFC() : base(BlockFC.NODE_NAME)
         {
             //==== INIT CONFIGURATION ====
             globalObjectData = this.AddAttribute(new GlobalObjectData());
@@ -35,10 +35,25 @@ namespace SpinXmlReader.Block
             this.objectList = this.AddNodeList(Constants.OBJECT_LIST_KEY, BlockFC.CreateObjectListConfiguration, required: true);
             //==== INIT CONFIGURATION ====
         }
-
+        
         public GlobalObjectData GetGlobalObjectData()
         {
             return globalObjectData;
+        }
+
+        public void Init()
+        {
+            this.ComputeBlockTitle().SetText(Constants.DEFAULT_CULTURE, "");
+            this.ComputeBlockComment().SetText(Constants.DEFAULT_CULTURE, "");
+
+            var inputSection = blockAttributeList.ComputeSection(SectionTypeEnum.INPUT);
+            var outputSection = blockAttributeList.ComputeSection(SectionTypeEnum.OUTPUT);
+            var inOutSection = blockAttributeList.ComputeSection(SectionTypeEnum.INOUT);
+            var tempSection = blockAttributeList.ComputeSection(SectionTypeEnum.TEMP);
+            var constantSection = blockAttributeList.ComputeSection(SectionTypeEnum.CONSTANT);
+
+            var returnSection = blockAttributeList.ComputeSection(SectionTypeEnum.RETURN);
+            returnSection.SetVoidReturnRetValMember();
         }
 
         public MultilingualText ComputeBlockTitle() //Add if does not exists.

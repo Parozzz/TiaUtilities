@@ -1,4 +1,6 @@
-﻿using System.Xml;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Xml;
 using TiaXmlReader;
 using TiaXmlReader.Utility;
 
@@ -43,8 +45,8 @@ namespace SpinXmlReader.Block
             var attributeList = AddNode(Constants.ATTRIBUTE_LIST_KEY, required: true);
             networkSource = attributeList.AddNode("NetworkSource", required: true);
             flgNet = networkSource.AddNode("FlgNet", namespaceURI: Constants.GET_FLAG_NET_NAMESPACE());
-            parts = flgNet.AddNodeList("Parts", CompileUnit.CreatePart, namespaceURI: Constants.GET_FLAG_NET_NAMESPACE());
-            wires = flgNet.AddNodeList("Wires", Wire.CreateWire, namespaceURI: Constants.GET_FLAG_NET_NAMESPACE());
+            parts = flgNet.AddNodeList("Parts", CompileUnit.CreatePart);
+            wires = flgNet.AddNodeList("Wires", Wire.CreateWire);
 
             objectList = this.AddNodeList(Constants.OBJECT_LIST_KEY, MultilingualText.CreateMultilingualText, required: true);
 
@@ -61,10 +63,10 @@ namespace SpinXmlReader.Block
         public void Init()
         {
             var title = this.ComputeBlockTitle();
-            title.AddText(Constants.DEFAULT_CULTURE, "");
+            title.SetText(Constants.DEFAULT_CULTURE, "");
 
             var comment = this.ComputeBlockComment();
-            comment.AddText(Constants.DEFAULT_CULTURE, "");
+            comment.SetText(Constants.DEFAULT_CULTURE, "");
         }
 
         public MultilingualText ComputeBlockTitle()
@@ -114,6 +116,16 @@ namespace SpinXmlReader.Block
             return parts.AddNode(part);
         }
 
+        public void AddPowerrail(Dictionary<Part, string> partConnectionDict)
+        {
+            var powerrail = this.AddWire();
+            powerrail.SetPowerrail();
+            foreach (KeyValuePair<Part, string> entry in partConnectionDict)
+            {
+                powerrail.AddPowerrailCon(entry.Key, entry.Value);
+            }
+        }
+
         public void AddIdentWire(Access.Type accessType, string accessSymbol, Part part, string partConnectionName)
         {
             var access = this.AddAccess();
@@ -122,6 +134,13 @@ namespace SpinXmlReader.Block
 
             var identWire = this.AddWire();
             identWire.SetIdentCon(access.GetLocalObjectData().GetUId(), part.GetLocalObjectData().GetUId(), partConnectionName);
+        }
+
+        public void AddBoolANDWire(Part startPart, string startPartConnectionName, Part exitPart, string exitPartConnectionName)
+        {
+            var andWire = this.AddWire();
+            andWire.SetWireStart(startPart, startPartConnectionName);
+            andWire.SetWireExit(exitPart, exitPartConnectionName);
         }
 
         public Wire AddWire()

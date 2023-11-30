@@ -29,18 +29,18 @@ namespace TiaXmlReader
         private readonly XmlNodeConfiguration constantType;          //FOR LITERAL CONSTANT (NUMBER WRITTEN DIRECTLY)
         private readonly XmlNodeConfiguration constantValue;         //FOR LITERAL CONSTANT (NUMBER WRITTEN DIRECTLY)
 
-        public Access() : base(Access.NODE_NAME, namespaceURI: Constants.GET_FLAG_NET_NAMESPACE())
+        public Access() : base(Access.NODE_NAME)
         {
             //==== INIT CONFIGURATION ====
             localObjectData = this.AddAttribute(new LocalObjectData());
             scope = this.AddAttribute("Scope", required: true);
 
-            symbol = this.AddNodeList("Symbol", Component.CreateComponent, namespaceURI: Constants.GET_FLAG_NET_NAMESPACE());
+            symbol = this.AddNodeList("Symbol", Component.CreateComponent);
 
-            constant = this.AddNode("Constant", namespaceURI: Constants.GET_FLAG_NET_NAMESPACE());
+            constant = this.AddNode("Constant");
             constantName = constant.AddAttribute("Name");
-            constantType = constant.AddNode("ConstantType", namespaceURI: Constants.GET_FLAG_NET_NAMESPACE());
-            constantValue = constant.AddNode("ConstantValue", namespaceURI: Constants.GET_FLAG_NET_NAMESPACE());
+            constantType = constant.AddNode("ConstantType");
+            constantValue = constant.AddNode("ConstantValue");
             //==== INIT CONFIGURATION ====
         }
         public LocalObjectData GetLocalObjectData()
@@ -167,7 +167,7 @@ namespace TiaXmlReader
 
         private readonly XmlAttributeConfiguration name;
 
-        public Component(string value = "") : base(Component.NODE_NAME, required: true, namespaceURI: Constants.GET_FLAG_NET_NAMESPACE())
+        public Component(string value = "") : base(Component.NODE_NAME, required: true)
         {
             //==== INIT CONFIGURATION ====
             name = this.AddAttribute("Name", required: true, value: value);

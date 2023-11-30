@@ -30,7 +30,7 @@ namespace SpinXmlReader.Block
         private readonly XmlNodeConfiguration automaticTyped;
         private readonly XmlAttributeConfiguration automaticTypedName;
 
-        public Part() : base(Part.NODE_NAME, namespaceURI: Constants.GET_FLAG_NET_NAMESPACE())
+        public Part() : base(Part.NODE_NAME)
         {
             //==== INIT CONFIGURATION ====
             localObjectData = this.AddAttribute(new LocalObjectData());
@@ -38,10 +38,10 @@ namespace SpinXmlReader.Block
             partName = this.AddAttribute("Name", required: true);
             disabledENO = this.AddAttribute("DisabledENO");
 
-            negated = this.AddNode("Negated", namespaceURI: Constants.GET_FLAG_NET_NAMESPACE());
+            negated = this.AddNode("Negated");
             negatedName = negated.AddAttribute("Name");
 
-            automaticTyped = this.AddNode("AutomaticTyped", namespaceURI: Constants.GET_FLAG_NET_NAMESPACE());
+            automaticTyped = this.AddNode("AutomaticTyped");
             automaticTypedName = automaticTyped.AddAttribute("Name", required: true);
 
             //==== INIT CONFIGURATION ====

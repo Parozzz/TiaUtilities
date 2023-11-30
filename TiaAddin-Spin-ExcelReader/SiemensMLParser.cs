@@ -64,7 +64,7 @@ namespace SpinXmlReader
             var engineering = xmlDocument.CreateElement("Engineering");
 
             var versionAttribute = xmlDocument.CreateAttribute("version");
-            versionAttribute.Value = Constants.VERSION;
+            versionAttribute.Value = Constants.GET_STRING_VERSION();
             engineering.Attributes.Append(versionAttribute);
 
             root.AppendChild(engineering);
@@ -77,24 +77,5 @@ namespace SpinXmlReader
             return new XMLTagTable();
         }
 
-        public static BlockFC CreateEmptyFC()
-        {
-            var blockFC = new BlockFC();
-
-            blockFC.ComputeBlockTitle().AddText(Constants.DEFAULT_CULTURE, "A Title? WOW!");
-            blockFC.ComputeBlockComment().AddText(Constants.DEFAULT_CULTURE, "A Comment? WOW!");
-
-            var blockAttributes = blockFC.GetBlockAttributes();
-            var inputSection = blockAttributes.ComputeSection(SectionTypeEnum.INPUT);
-            var outputSection = blockAttributes.ComputeSection(SectionTypeEnum.OUTPUT);
-            var inOutSection = blockAttributes.ComputeSection(SectionTypeEnum.INOUT);
-            var tempSection = blockAttributes.ComputeSection(SectionTypeEnum.TEMP);
-            var constantSection = blockAttributes.ComputeSection(SectionTypeEnum.CONSTANT);
-
-            var returnSection = blockAttributes.ComputeSection(SectionTypeEnum.RETURN);
-            returnSection.AddReturnRetValMember();
-
-            return blockFC;
-        }
     }
 }

@@ -28,77 +28,103 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.FilePathTextBox = new System.Windows.Forms.TextBox();
+            this.excelPathTextBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.ParseFileButton = new System.Windows.Forms.Button();
-            this.generateButton = new System.Windows.Forms.Button();
-            this.generateTagTableButton = new System.Windows.Forms.Button();
+            this.generateAlarmsFCButton = new System.Windows.Forms.Button();
+            this.xmlPathTextBlock = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.tiaVersionComboBox = new System.Windows.Forms.ComboBox();
+            this.label3 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
-            // FilePathTextBox
+            // excelPathTextBox
             // 
-            this.FilePathTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.FilePathTextBox.Location = new System.Drawing.Point(143, 17);
-            this.FilePathTextBox.Name = "FilePathTextBox";
-            this.FilePathTextBox.Size = new System.Drawing.Size(645, 29);
-            this.FilePathTextBox.TabIndex = 0;
-            this.FilePathTextBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.FilePathTextBox_MouseClick);
+            this.excelPathTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.excelPathTextBox.Location = new System.Drawing.Point(143, 21);
+            this.excelPathTextBox.Name = "excelPathTextBox";
+            this.excelPathTextBox.Size = new System.Drawing.Size(832, 21);
+            this.excelPathTextBox.TabIndex = 0;
+            this.excelPathTextBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ExcelPathTextBox_MouseClick);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(12, 19);
+            this.label1.Location = new System.Drawing.Point(17, 19);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(116, 25);
             this.label1.TabIndex = 1;
             this.label1.Text = "File Excel";
             // 
-            // ParseFileButton
+            // generateAlarmsFCButton
             // 
-            this.ParseFileButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ParseFileButton.Location = new System.Drawing.Point(12, 71);
-            this.ParseFileButton.Name = "ParseFileButton";
-            this.ParseFileButton.Size = new System.Drawing.Size(200, 39);
-            this.ParseFileButton.TabIndex = 2;
-            this.ParseFileButton.Text = "Parse File";
-            this.ParseFileButton.UseVisualStyleBackColor = true;
-            this.ParseFileButton.Click += new System.EventHandler(this.ParseFileButton_Click);
+            this.generateAlarmsFCButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.generateAlarmsFCButton.Location = new System.Drawing.Point(369, 145);
+            this.generateAlarmsFCButton.Name = "generateAlarmsFCButton";
+            this.generateAlarmsFCButton.Size = new System.Drawing.Size(249, 39);
+            this.generateAlarmsFCButton.TabIndex = 5;
+            this.generateAlarmsFCButton.Text = "Genera FC Allarmi";
+            this.generateAlarmsFCButton.UseVisualStyleBackColor = true;
+            this.generateAlarmsFCButton.MouseClick += new System.Windows.Forms.MouseEventHandler(this.GenerateAlarmsFCButton_MouseClick);
             // 
-            // generateButton
+            // xmlPathTextBlock
             // 
-            this.generateButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.generateButton.Location = new System.Drawing.Point(249, 71);
-            this.generateButton.Name = "generateButton";
-            this.generateButton.Size = new System.Drawing.Size(181, 39);
-            this.generateButton.TabIndex = 3;
-            this.generateButton.Text = "Generate FC";
-            this.generateButton.UseVisualStyleBackColor = true;
-            this.generateButton.Click += new System.EventHandler(this.generateButton_Click);
+            this.xmlPathTextBlock.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.xmlPathTextBlock.Location = new System.Drawing.Point(143, 58);
+            this.xmlPathTextBlock.Name = "xmlPathTextBlock";
+            this.xmlPathTextBlock.Size = new System.Drawing.Size(832, 21);
+            this.xmlPathTextBlock.TabIndex = 6;
+            this.xmlPathTextBlock.MouseClick += new System.Windows.Forms.MouseEventHandler(this.XMLPathTextBlock_MouseClick);
             // 
-            // generateTagTableButton
+            // label2
             // 
-            this.generateTagTableButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.generateTagTableButton.Location = new System.Drawing.Point(477, 71);
-            this.generateTagTableButton.Name = "generateTagTableButton";
-            this.generateTagTableButton.Size = new System.Drawing.Size(257, 39);
-            this.generateTagTableButton.TabIndex = 4;
-            this.generateTagTableButton.Text = "Generate TagTable";
-            this.generateTagTableButton.UseVisualStyleBackColor = true;
-            this.generateTagTableButton.Click += new System.EventHandler(this.generateTagTableButton_Click);
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(17, 56);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(105, 25);
+            this.label2.TabIndex = 7;
+            this.label2.Text = "File XML";
+            // 
+            // tiaVersionComboBox
+            // 
+            this.tiaVersionComboBox.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.tiaVersionComboBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tiaVersionComboBox.FormattingEnabled = true;
+            this.tiaVersionComboBox.Items.AddRange(new object[] {
+            "17",
+            "18"});
+            this.tiaVersionComboBox.Location = new System.Drawing.Point(170, 102);
+            this.tiaVersionComboBox.Name = "tiaVersionComboBox";
+            this.tiaVersionComboBox.Size = new System.Drawing.Size(48, 32);
+            this.tiaVersionComboBox.TabIndex = 8;
+            this.tiaVersionComboBox.Text = "17";
+            this.tiaVersionComboBox.TextUpdate += new System.EventHandler(this.tiaVersionComboBox_TextUpdate);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(17, 104);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(147, 25);
+            this.label3.TabIndex = 9;
+            this.label3.Text = "Versione TIA";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 120);
-            this.Controls.Add(this.generateTagTableButton);
-            this.Controls.Add(this.generateButton);
-            this.Controls.Add(this.ParseFileButton);
+            this.ClientSize = new System.Drawing.Size(987, 198);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.tiaVersionComboBox);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.xmlPathTextBlock);
+            this.Controls.Add(this.generateAlarmsFCButton);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.FilePathTextBox);
+            this.Controls.Add(this.excelPathTextBox);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "TIA Block Generator";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -106,11 +132,13 @@
 
         #endregion
 
-        private System.Windows.Forms.TextBox FilePathTextBox;
+        private System.Windows.Forms.TextBox excelPathTextBox;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button ParseFileButton;
-        private System.Windows.Forms.Button generateButton;
-        private System.Windows.Forms.Button generateTagTableButton;
+        private System.Windows.Forms.Button generateAlarmsFCButton;
+        private System.Windows.Forms.TextBox xmlPathTextBlock;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.ComboBox tiaVersionComboBox;
+        private System.Windows.Forms.Label label3;
     }
 }
 

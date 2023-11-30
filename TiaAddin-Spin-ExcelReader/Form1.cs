@@ -1,10 +1,17 @@
-﻿using SpinXmlReader.Block;
+﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
+using SpinXmlReader.Block;
 using SpinXmlReader.TagTable;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml;
 using TiaXmlReader;
+using TiaXmlReader.AlarmGeneration;
+using TiaXmlReader.Generation;
 
 namespace SpinXmlReader
 {
@@ -14,9 +21,34 @@ namespace SpinXmlReader
         public Form1()
         {
             InitializeComponent();
+
+            tiaVersionComboBox.Text = "" + Constants.VERSION;
         }
 
-        private void FilePathTextBox_MouseClick(object sender, MouseEventArgs e)
+        private void tiaVersionComboBox_TextUpdate(object sender, EventArgs e)
+        {
+            if (uint.TryParse(tiaVersionComboBox.Text, out var version))
+            {
+                Constants.VERSION = version;
+            }
+        }
+
+        private void ExcelPathTextBox_MouseClick(object sender, MouseEventArgs e)
+        {
+            var fileDialog = new OpenFileDialog
+            {
+                Filter = "Excel Files (*.xlsx)|*.xlsx",
+                CheckFileExists = true
+            };
+
+            var result = fileDialog.ShowDialog();
+            if (result == DialogResult.OK || result == DialogResult.Yes)
+            {
+                excelPathTextBox.Text = fileDialog.FileName;
+            }
+        }
+
+        private void XMLPathTextBlock_MouseClick(object sender, MouseEventArgs e)
         {
             var fileDialog = new OpenFileDialog
             {
@@ -25,49 +57,198 @@ namespace SpinXmlReader
             };
 
             var result = fileDialog.ShowDialog();
-            if(result == DialogResult.OK || result == DialogResult.Yes)
+            if (result == DialogResult.OK || result == DialogResult.Yes)
             {
-                FilePathTextBox.Text = fileDialog.FileName;
+                xmlPathTextBlock.Text = fileDialog.FileName;
             }
         }
 
-        private void ParseFileButton_Click(object sender, EventArgs e)
+        private void GenerateAlarmsFCButton_MouseClick(object sender, MouseEventArgs e)
         {
+            GlobalIDGenerator.ResetID();
+
+            var fc = new BlockFC();
+            fc.Init();
             try
             {
-                var xmlDocument = new XmlDocument();
-                xmlDocument.Load(FilePathTextBox.Text);
-
-                var parsedBlock = SiemensMLParser.ParseXML(xmlDocument);
-                if(parsedBlock is XMLTagTable)
+                using (var workbook = new XLWorkbook(excelPathTextBox.Text))
                 {
+                    var worksheet = workbook.Worksheets.Worksheet(1);
 
+                    var blockName = worksheet.Cell("C4").Value.GetText();
+                    var blockNumber = (uint)worksheet.Cell("C5").Value.GetNumber();
+                    var startingAlarmNum = (uint)worksheet.Cell("C7").Value.GetNumber();
+                    var alarmNumFormat = worksheet.Cell("C8").Value.GetText();
+                    var divisionType = worksheet.Cell("C9").Value.GetText();
+                    var groupingType = worksheet.Cell("C10").Value.GetText();
+                    var skipNumberAfterGroup = (uint)worksheet.Cell("C11").Value.GetNumber();
+
+                    fc.GetBlockAttributes().SetBlockName(blockName);
+                    fc.GetBlockAttributes().SetBlockNumber(blockNumber);
+
+                    var generationDataList = new List<AlarmGenerationData>();
+
+                    uint variablesCellIndex = 4;
+                    while (true)
+                    {
+                        var consumerAddressValue = worksheet.Cell("H" + variablesCellIndex).Value;
+                        var coil1AddressValue = worksheet.Cell("I" + variablesCellIndex).Value;
+                        var coil2AddressValue = worksheet.Cell("J" + variablesCellIndex).Value;
+                        var descriptionValue = worksheet.Cell("K" + variablesCellIndex).Value;
+                        var enableValue = worksheet.Cell("L" + variablesCellIndex).Value;
+
+                        variablesCellIndex++;
+
+                        if (!consumerAddressValue.IsText || !coil1AddressValue.IsText || !coil2AddressValue.IsText || !descriptionValue.IsText || !enableValue.IsText)
+                        {
+                            break;
+                        }
+
+                        var generationData = new AlarmGenerationData(consumerAddressValue.GetText(), coil1AddressValue.GetText(), coil2AddressValue.GetText(), descriptionValue.GetText(), bool.Parse(enableValue.GetText())); ;
+                        generationDataList.Add(generationData);
+                    }
+
+                    var consumerDataList = new List<ConsumerData>();
+
+                    var consumerCellIndex = 4;
+                    while (true)
+                    {
+                        var consumerNameValue = worksheet.Cell("E" + consumerCellIndex).Value;
+                        var dbNameValue = worksheet.Cell("F" + consumerCellIndex).Value;
+                        consumerCellIndex++;
+
+                        if (!consumerNameValue.IsText || !dbNameValue.IsText)
+                        {
+                            break;
+                        }
+
+                        consumerDataList.Add(new ConsumerData(consumerNameValue.GetText(), dbNameValue.GetText()));
+                    }
+
+                    var nextAlarmNum = startingAlarmNum;
+
+                    CompileUnit compileUnit = null;
+                    switch (groupingType)
+                    {
+                        case "PerUtenza":
+                            foreach (var consumerData in consumerDataList)
+                            {
+                                if (divisionType == "GruppoPerSegmento")
+                                {
+                                    compileUnit = fc.AddCompileUnit();
+                                    compileUnit.Init();
+                                }
+
+                                foreach (var generationData in generationDataList)
+                                {
+                                    if (!generationData.GetEnable())
+                                    {
+                                        continue;
+                                    }
+
+                                    if (divisionType == "UnoPerSegmento")
+                                    {
+                                        compileUnit = fc.AddCompileUnit();
+                                        compileUnit.Init();
+                                    }
+
+                                    var placeholders = new GenerationPlaceholders()
+                                            .SetConsumerData(consumerData)
+                                            .SetAlarmNumFormat(alarmNumFormat);
+                                    FillAlarmCompileUnit(compileUnit, placeholders, generationData, ref nextAlarmNum);
+                                }
+
+                                nextAlarmNum += (skipNumberAfterGroup - 1); //Decrease by one since this is already the NEXT. If i add without decrementing it will loose one alarm.
+                            }
+                            break;
+                        case "PerTipoAllarme":
+                            foreach (var generationData in generationDataList)
+                            {
+                                if (!generationData.GetEnable())
+                                {
+                                    continue;
+                                }
+
+                                if (divisionType == "GruppoPerSegmento")
+                                {
+                                    compileUnit = fc.AddCompileUnit();
+                                    compileUnit.Init();
+                                }
+
+                                foreach (var consumerData in consumerDataList)
+                                {
+
+                                    if (divisionType == "UnoPerSegmento")
+                                    {
+                                        compileUnit = fc.AddCompileUnit();
+                                        compileUnit.Init();
+                                    }
+
+                                    var placeholders = new GenerationPlaceholders()
+                                            .SetConsumerData(consumerData)
+                                            .SetAlarmNumFormat(alarmNumFormat);
+                                    FillAlarmCompileUnit(compileUnit, placeholders, generationData, ref nextAlarmNum);
+                                }
+
+                                nextAlarmNum += (skipNumberAfterGroup - 1); //Decrease by one since this is already the NEXT. If i add without decrementing it will loose one alarm.
+                            }
+                            break;
+                    }
                 }
-                else if (parsedBlock is BlockFC)
+
+                var xmlDocument = SiemensMLParser.CreateDocument();
+                xmlDocument.DocumentElement.AppendChild(fc.Generate(xmlDocument));
+                if (!string.IsNullOrEmpty(xmlPathTextBlock.Text))
                 {
-                }
-                else if (parsedBlock is BlockFB) 
-                { 
+                    xmlDocument.Save(xmlPathTextBlock.Text);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message + "\n" + ex.StackTrace);
+                Console.WriteLine("Exception: {0}", ex.ToString());
             }
         }
+
+        private void FillAlarmCompileUnit(CompileUnit compileUnit, GenerationPlaceholders placeholders, AlarmGenerationData alarmGenerationData, ref uint nextAlarmNum)
+        {
+            placeholders.SetAlarmNum(nextAlarmNum); //PLACEHOLDERS ALWAYS FIRST!.
+            nextAlarmNum++;
+
+            compileUnit.ComputeBlockTitle().SetText(Constants.DEFAULT_CULTURE, alarmGenerationData.GetDescription(placeholders.Parse));
+
+            var contact = compileUnit.AddPart(Part.Type.CONTACT);
+            var coil1 = compileUnit.AddPart(Part.Type.COIL);
+            var coil2 = compileUnit.AddPart(Part.Type.COIL);
+
+            compileUnit.AddPowerrail(new Dictionary<Part, string> {
+                    { contact, "in" }
+            });
+
+            compileUnit.AddIdentWire(Access.Type.GLOBAL_VARIABLE, alarmGenerationData.GetConsumerAddress(placeholders.Parse), contact, "operand");
+            compileUnit.AddIdentWire(Access.Type.GLOBAL_VARIABLE, alarmGenerationData.GetCoil1Address(placeholders.Parse), coil1, "operand");
+            compileUnit.AddIdentWire(Access.Type.GLOBAL_VARIABLE, alarmGenerationData.GetCoil2Address(placeholders.Parse), coil2, "operand");
+
+            compileUnit.AddBoolANDWire(contact, "out", coil1, "in");
+            compileUnit.AddBoolANDWire(coil1, "out", coil2, "in");
+        }
+    }
+}
+
+/*
+ 
+
 
         private void generateButton_Click(object sender, EventArgs e)
         {
             GlobalIDGenerator.ResetID();
 
-            var fc = SiemensMLParser.CreateEmptyFC();
+            var fc = new BlockFC();
+            fc.Init();
 
             //BLOCK ATTRIBUTES
             var inputSection = fc.GetBlockAttributes().ComputeSection(SectionTypeEnum.INPUT);
 
-            var member = inputSection.AddMember();
-            member.SetMemberName("VariableName");
-            member.SetMemberDataType("Int");
+            var variableInput = inputSection.AddMember("VariableInput", "Int");
             //BLOCK ATTRIBUTES
 
             //COMPILE UNITS
@@ -77,21 +258,21 @@ namespace SpinXmlReader
             var contactPart = compileUnit.AddPart(Part.Type.CONTACT).SetNegated();
             var coilPart = compileUnit.AddPart(Part.Type.COIL);
 
-            var powerrail = compileUnit.AddWire();
-            powerrail.SetPowerrail();
-            powerrail.AddPowerrailCon(contactPart, "in");
-
+            compileUnit.AddPowerrail(new Dictionary<Part, string> {
+                    { contactPart, "in" }
+            });
             compileUnit.AddIdentWire(Access.Type.GLOBAL_VARIABLE, "IO.IN_01", contactPart, "operand");
             compileUnit.AddIdentWire(Access.Type.GLOBAL_VARIABLE, "IO.IN_02", coilPart, "operand");
+            compileUnit.AddBoolANDWire(contactPart, "out", coilPart, "in");
 
-            var contactToCoilWire = compileUnit.AddWire();
-            contactToCoilWire.SetWireStart(contactPart, "out");
-            contactToCoilWire.SetWireExit(coilPart, "in");
             //COMPILE UNITS
 
             var xmlDocument = SiemensMLParser.CreateDocument();
             xmlDocument.DocumentElement.AppendChild(fc.Generate(xmlDocument));
-            xmlDocument.Save(FilePathTextBox.Text);
+            if (!string.IsNullOrEmpty(xmlPathTextBlock.Text))
+            {
+                xmlDocument.Save(xmlPathTextBlock.Text);
+            }
         }
 
         private void generateTagTableButton_Click(object sender, EventArgs e)
@@ -105,7 +286,6 @@ namespace SpinXmlReader
 
             var xmlDocument = SiemensMLParser.CreateDocument();
             xmlDocument.DocumentElement.AppendChild(tagTable.Generate(xmlDocument));
-            xmlDocument.Save(FilePathTextBox.Text);
+            xmlDocument.Save(excelPathTextBox.Text);
         }
-    }
-}
+*/

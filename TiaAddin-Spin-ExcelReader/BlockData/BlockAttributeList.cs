@@ -29,7 +29,7 @@ namespace SpinXmlReader.Block
 
             memoryLayout = this.AddNode("MemoryLayout",               required: true, defaultInnerText: "Optimized");
             name = this.AddNode("Name",                               required: true, defaultInnerText: "fcTest");
-            if(Constants.VERSION == "V18")
+            if(Constants.VERSION >= 18)
             {
                 this.AddNode("Namespace",                             required: true);
             }
@@ -44,14 +44,29 @@ namespace SpinXmlReader.Block
             return memoryLayout.GetInnerText();
         }
 
+        public void SetBlockMemoryLayout(string memorylaout)
+        {
+            this.memoryLayout.SetInnerText(memorylaout);
+        }
+
         public string GetBlockName()
         {
             return name.GetInnerText();
         }
 
-        public string GetBlockNumber()
+        public void SetBlockName(string name)
         {
-            return number.GetInnerText();
+            this.name.SetInnerText(name);
+        }
+
+        public uint GetBlockNumber()
+        {
+            return uint.Parse(number.GetInnerText());
+        }
+
+        public void SetBlockNumber(uint number)
+        {
+            this.number.SetInnerText(number.ToString());
         }
 
         public string GetBlockProgrammingLanguage()
@@ -59,11 +74,21 @@ namespace SpinXmlReader.Block
             return programmingLanguage.GetInnerText();
         }
 
-        public string GetBlockSetENOAutomatically()
+        public void SetBlockProgrammingLanguage(string programmingLanguage)
         {
-            return setENOAutomatically.GetInnerText();
+            this.programmingLanguage.SetInnerText(programmingLanguage);
+        }
+
+        public bool GetBlockSetENOAutomatically()
+        {
+            return !string.IsNullOrEmpty(setENOAutomatically.GetInnerText()) && bool.Parse(setENOAutomatically.GetInnerText());
         }
         
+        public void SetBlockSetENOAutomatically(bool setENOAutomatically)
+        {
+            this.setENOAutomatically.SetInnerText(setENOAutomatically.ToString());
+        }
+
         public Section ComputeSection(SectionTypeEnum sectionType)
         {
             foreach(var item in blockSections.GetItems())
@@ -83,19 +108,5 @@ namespace SpinXmlReader.Block
         {
             return blockSections.GetItems();
         }
-
-        public Section GetBlockSection(SectionTypeEnum sectionType) //Nullable
-        {
-            foreach(var item in blockSections.GetItems())
-            {
-                if(item.GetSectionType() == sectionType)
-                {
-                    return item;
-                }
-            }
-
-            return null;
-        }
-
     }
 }

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using Siemens.Engineering.SW.Types;
 using Siemens.Engineering.SW.WatchAndForceTables;
 using Siemens.Engineering.SW.TechnologicalObjects;
+using SpinAddin.Utility;
 
 namespace AddIn_V17
 {
@@ -51,9 +52,9 @@ namespace AddIn_V17
                         importData.group.Blocks.Import(importData.fileInfo, importData.importOptions, importData.swImportOptions);
                         return true;
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
-                        return false;
+                        return Util.ShowExceptionMessage(ex); //Return false if the message box is cancelled
                     }
                 });
             this.plcBlockHandler = plcBlockHandler;
@@ -72,9 +73,9 @@ namespace AddIn_V17
                         importData.group.TagTables.Import(importData.fileInfo, importData.importOptions);
                         return true;
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
-                        return false;
+                        return Util.ShowExceptionMessage(ex); //Return false if the message box is cancelled
                     }
                 });
             this.plcTagTableHandler = plcTagTableHandler;
@@ -93,9 +94,9 @@ namespace AddIn_V17
                         importData.group.Types.Import(importData.fileInfo, importData.importOptions, importData.swImportOptions);
                         return true;
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
-                        return false;
+                        return Util.ShowExceptionMessage(ex); //Return false if the message box is cancelled
                     }
                 });
             this.plcUDTHandler = plcUDTHandler;
@@ -114,9 +115,9 @@ namespace AddIn_V17
                         importData.group.WatchTables.Import(importData.fileInfo, importData.importOptions);
                         return true;
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
-                        return false;
+                        return Util.ShowExceptionMessage(ex); //Return false if the message box is cancelled
                     }
                 });
             this.plcWatchtableHandler = plcWatchtableHandler;

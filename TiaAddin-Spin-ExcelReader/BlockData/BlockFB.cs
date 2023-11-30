@@ -25,7 +25,7 @@ namespace SpinXmlReader.Block
         private readonly BlockAttributeList blockAttributeList;
         private readonly XmlNodeListConfiguration<XmlNodeConfiguration> objectList;
 
-        public BlockFB() : base(BlockFB.NODE_NAME, main: true)
+        public BlockFB() : base(BlockFB.NODE_NAME)
         {
             //==== INIT CONFIGURATION ====
             globalObjectData = this.AddAttribute(new GlobalObjectData());
@@ -40,21 +40,38 @@ namespace SpinXmlReader.Block
         {
             return globalObjectData;
         }
-
-        public MultilingualText GetBlockTitle()
+        public void Init()
         {
-            foreach(var item in objectList.GetItems())
+            this.ComputeBlockTitle().SetText(Constants.DEFAULT_CULTURE, "");
+            this.ComputeBlockComment().SetText(Constants.DEFAULT_CULTURE, "");
+
+            var inputSection = blockAttributeList.ComputeSection(SectionTypeEnum.INPUT);
+            var outputSection = blockAttributeList.ComputeSection(SectionTypeEnum.OUTPUT);
+            var inOutSection = blockAttributeList.ComputeSection(SectionTypeEnum.INOUT);
+            var staticSection = blockAttributeList.ComputeSection(SectionTypeEnum.STATIC);
+            var tempSection = blockAttributeList.ComputeSection(SectionTypeEnum.TEMP);
+            var constantSection = blockAttributeList.ComputeSection(SectionTypeEnum.CONSTANT);
+
+            var returnSection = blockAttributeList.ComputeSection(SectionTypeEnum.RETURN);
+            returnSection.SetVoidReturnRetValMember();
+        }
+
+        public MultilingualText ComputeBlockTitle() //Add if does not exists.
+        {
+            foreach (var item in objectList.GetItems())
             {
-                if(item is MultilingualText text && text.GetMultilingualTextType() == MultilingualTextType.TITLE)
+                if (item is MultilingualText text && text.GetMultilingualTextType() == MultilingualTextType.TITLE)
                 {
                     return text;
                 }
             }
 
-            return null;
+            var title = new MultilingualText(MultilingualTextType.TITLE);
+            objectList.GetItems().Add(title);
+            return title;
         }
 
-        public MultilingualText GetBlockComment()
+        public MultilingualText ComputeBlockComment() //Add if does not exists.
         {
             foreach (var item in objectList.GetItems())
             {
@@ -64,12 +81,21 @@ namespace SpinXmlReader.Block
                 }
             }
 
-            return null;
+            var comment = new MultilingualText(MultilingualTextType.COMMENT);
+            objectList.GetItems().Add(comment);
+            return comment;
         }
 
         public BlockAttributeList GetAttributes()
         {
             return blockAttributeList;
+        }
+
+        public CompileUnit AddCompileUnit()
+        {
+            var compileUnit = new CompileUnit();
+            objectList.GetItems().Add(compileUnit);
+            return compileUnit;
         }
     }
 

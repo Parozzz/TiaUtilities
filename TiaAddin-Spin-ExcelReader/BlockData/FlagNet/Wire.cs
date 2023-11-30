@@ -34,7 +34,7 @@ namespace SpinXmlReader.Block
 
         private readonly XmlNodeConfiguration openCon;
 
-        public Wire() : base(Wire.NODE_NAME, NameCon.CreateNameCon, namespaceURI: Constants.GET_FLAG_NET_NAMESPACE())
+        public Wire() : base(Wire.NODE_NAME, NameCon.CreateNameCon)
         {
             //==== INIT CONFIGURATION ====
             localObjectData = this.AddAttribute(new LocalObjectData());
@@ -167,7 +167,7 @@ namespace SpinXmlReader.Block
     {
         private readonly XmlAttributeConfiguration uid; //This identify a Part or an Access.
 
-        public Con(string name) : base(name, namespaceURI: Constants.GET_FLAG_NET_NAMESPACE())
+        public Con(string name) : base(name)
         {
             //==== INIT CONFIGURATION ====
             uid = this.AddAttribute("UId", required: true);

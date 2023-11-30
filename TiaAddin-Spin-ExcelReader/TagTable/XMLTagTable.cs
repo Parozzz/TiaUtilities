@@ -15,7 +15,7 @@ namespace SpinXmlReader.TagTable
         private readonly XmlNodeConfiguration name;
         private readonly XmlNodeListConfiguration<XMLTag> objectList; //Tags
 
-        public XMLTagTable() : base(XMLTagTable.NODE_KEY, main: true)
+        public XMLTagTable() : base(XMLTagTable.NODE_KEY)
         {
             //==== INIT CONFIGURATION ====
             globalObjectData = this.AddAttribute(new GlobalObjectData());
