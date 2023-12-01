@@ -11,7 +11,8 @@ namespace TiaXmlReader.Generation
         private readonly string name;
         private readonly string dbName;
 
-        public ConsumerData(string name, string dbName)        {
+        public ConsumerData(string name, string dbName)
+        {
             this.name = name;
             this.dbName = dbName;
         }

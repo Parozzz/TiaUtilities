@@ -153,20 +153,23 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Generation\AlarmGenerationData.cs" />
+    <Compile Include="Generation\AlarmData.cs" />
     <Compile Include="Attributes\Attribute.cs" />
-    <Compile Include="BlockData\BlockAttributeList.cs" />
-    <Compile Include="BlockData\BlockFB.cs" />
-    <Compile Include="BlockData\FlagNet\Access.cs" />
-    <Compile Include="BlockData\CompileUnit.cs" />
-    <Compile Include="BlockData\BlockFC.cs" />
-    <Compile Include="BlockData\FlagNet\Part.cs" />
-    <Compile Include="BlockData\FlagNet\Wire.cs" />
-    <Compile Include="BlockData\Section.cs" />
+    <Compile Include="Generation\CadData.cs" />
+    <Compile Include="Generation\InOutData.cs" />
+    <Compile Include="SimaticML\BlockAttributeList\BlockAttributeList.cs" />
+    <Compile Include="SimaticML\BlockFCFB\BlockFB.cs" />
+    <Compile Include="SimaticML\BlockFCFB\FlagNet\Access.cs" />
+    <Compile Include="SimaticML\BlockFCFB\CompileUnit.cs" />
+    <Compile Include="SimaticML\BlockFCFB\BlockFC.cs" />
+    <Compile Include="SimaticML\BlockFCFB\FlagNet\Part.cs" />
+    <Compile Include="SimaticML\BlockFCFB\FlagNet\Wire.cs" />
+    <Compile Include="SimaticML\BlockAttributeList\Section.cs" />
     <Compile Include="Generation\ConsumerData.cs" />
     <Compile Include="Generation\GenerationPlaceholders.cs" />
     <Compile Include="IGlobalObject.cs" />
     <Compile Include="MultiLanguageText.cs" />
+    <Compile Include="SimaticML\GlobalDB.cs" />
     <Compile Include="UIdObject.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>

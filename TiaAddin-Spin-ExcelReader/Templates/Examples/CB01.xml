@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Document>
+	<Engineering version="V17"/>
+	<DocumentInfo>
+		<Created>2023-12-01T06:57:14.8703964Z</Created>
+		<ExportSetting>None</ExportSetting>
+		<InstalledProducts>
+			<Product>
+				<DisplayName>Totally Integrated Automation Portal</DisplayName>
+				<DisplayVersion>V17 Update 5</DisplayVersion>
+			</Product>
+			<OptionPackage>
+				<DisplayName>TIA Portal Openness</DisplayName>
+				<DisplayVersion>V17 Update 5</DisplayVersion>
+			</OptionPackage>
+			<OptionPackage>
+				<DisplayName>TIA Portal Teamcenter Gateway</DisplayName>
+				<DisplayVersion>V17 Update 5</DisplayVersion>
+			</OptionPackage>
+			<OptionPackage>
+				<DisplayName>TIA Portal Version Control Interface</DisplayName>
+				<DisplayVersion>V17</DisplayVersion>
+			</OptionPackage>
+			<Product>
+				<DisplayName>SINAMICS Startdrive Advanced</DisplayName>
+				<DisplayVersion>V17</DisplayVersion>
+			</Product>
+			<OptionPackage>
+				<DisplayName>SINAMICS Startdrive G130, G150, S120, S150, SINAMICS MV, S210</DisplayName>
+				<DisplayVersion>V17</DisplayVersion>
+			</OptionPackage>
+			<OptionPackage>
+				<DisplayName>SINAMICS Startdrive G110M, G120, G120C, G120D, G120P, G115D</DisplayName>
+				<DisplayVersion>V17</DisplayVersion>
+			</OptionPackage>
+			<Product>
+				<DisplayName>STEP 7 Professional</DisplayName>
+				<DisplayVersion>V17 Update 5</DisplayVersion>
+			</Product>
+			<OptionPackage>
+				<DisplayName>STEP 7 Safety</DisplayName>
+				<DisplayVersion>V17</DisplayVersion>
+			</OptionPackage>
+			<Product>
+				<DisplayName>WinCC Advanced / Unified PC</DisplayName>
+				<DisplayVersion>V17 Update 5</DisplayVersion>
+			</Product>
+		</InstalledProducts>
+	</DocumentInfo>
+	<SW.Blocks.InstanceDB ID="0">
+		<AttributeList>
+			<AutoNumber>false</AutoNumber>
+			<InstanceOfName>SpinMotor_V0.1</InstanceOfName>
+			<InstanceOfType>FB</InstanceOfType>
+			<Interface>
+				<Sections xmlns="http://www.siemens.com/automation/Openness/SW/Interface/v5">
+					<Section Name="Input">
+						<Member Name="BwdEn" Datatype="Bool"/>
+						<Member Name="With Drive" Datatype="Bool"/>
+					</Section>
+					<Section Name="Output"/>
+					<Section Name="InOut"/>
+					<Section Name="Static">
+						<Member Name="Auto" Datatype="Bool"/>
+						<Member Name="Man" Datatype="Bool"/>
+						<Member Name="ManStop" Datatype="Bool"/>
+						<Member Name="PowerOn" Datatype="Bool"/>
+						<Member Name="Overload" Datatype="Bool"/>
+						<Member Name="RepairSwitch" Datatype="Bool"/>
+						<Member Name="Overtemperature" Datatype="Bool"/>
+						<Member Name="Alm" Datatype="&quot;UdtMotorsAlm_IM&quot;">
+							<AttributeList>
+								<BooleanAttribute Name="SetPoint" SystemDefined="true">true</BooleanAttribute>
+							</AttributeList>
+						</Member>
+						<Member Name="FWD" Datatype="&quot;UdtMotorsState_IM&quot;">
+							<AttributeList>
+								<BooleanAttribute Name="SetPoint" SystemDefined="true">true</BooleanAttribute>
+							</AttributeList>
+						</Member>
+						<Member Name="BWD" Datatype="&quot;UdtMotorsState_IM&quot;">
+							<AttributeList>
+								<BooleanAttribute Name="SetPoint" SystemDefined="true">true</BooleanAttribute>
+							</AttributeList>
+						</Member>
+						<Member Name="Drive" Datatype="&quot;UdtMotorDrive_IM&quot;">
+							<AttributeList>
+								<BooleanAttribute Name="SetPoint" SystemDefined="true">true</BooleanAttribute>
+							</AttributeList>
+						</Member>
+						<Member Name="HMIStatus" Datatype="&quot;UdtMotorsHMIStatus_IM&quot;"/>
+						<Member Name="HMICommand" Datatype="&quot;UdtMotorsHMICommand_IM&quot;">
+							<AttributeList>
+								<BooleanAttribute Name="SetPoint" SystemDefined="true">true</BooleanAttribute>
+							</AttributeList>
+						</Member>
+					</Section>
+				</Sections>
+			</Interface>
+			<Name>CB01</Name>
+			<Number>1000</Number>
+			<ProgrammingLanguage>DB</ProgrammingLanguage>
+		</AttributeList>
+		<ObjectList>
+			<MultilingualText ID="1" CompositionName="Comment">
+				<ObjectList>
+					<MultilingualTextItem ID="2" CompositionName="Items">
+						<AttributeList>
+							<Culture>it-IT</Culture>
+							<Text/>
+						</AttributeList>
+					</MultilingualTextItem>
+					<MultilingualTextItem ID="3" CompositionName="Items">
+						<AttributeList>
+							<Culture>en-US</Culture>
+							<Text/>
+						</AttributeList>
+					</MultilingualTextItem>
+				</ObjectList>
+			</MultilingualText>
+			<MultilingualText ID="4" CompositionName="Title">
+				<ObjectList>
+					<MultilingualTextItem ID="5" CompositionName="Items">
+						<AttributeList>
+							<Culture>it-IT</Culture>
+							<Text/>
+						</AttributeList>
+					</MultilingualTextItem>
+					<MultilingualTextItem ID="6" CompositionName="Items">
+						<AttributeList>
+							<Culture>en-US</Culture>
+							<Text/>
+						</AttributeList>
+					</MultilingualTextItem>
+				</ObjectList>
+			</MultilingualText>
+		</ObjectList>
+	</SW.Blocks.InstanceDB>
+</Document>
