@@ -16,7 +16,7 @@ namespace TiaXmlReader.Utility
         protected bool required;
         protected XmlNodeConfiguration parentConfiguration;
 
-        public XmlConfiguration(string name, bool required = false) 
+        public XmlConfiguration(string name, bool required = false)
         {
             this.name = name;
             this.required = required;
@@ -44,7 +44,7 @@ namespace TiaXmlReader.Utility
 
         public void SetParentConfiguration(XmlNodeConfiguration parentConfiguration)
         {
-            if(this.parentConfiguration != null)
+            if (this.parentConfiguration != null)
             {
                 throw new Exception("Setting a Parent Configuration for a XmlConfiguration that already have it (Double add?) for " + name + ".");
             }
@@ -70,7 +70,7 @@ namespace TiaXmlReader.Utility
 
         private void Items_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            if(e.NewItems != null)
+            if (e.NewItems != null)
             {
                 foreach (XmlNodeConfiguration newItem in e.NewItems)
                 {
@@ -236,9 +236,9 @@ namespace TiaXmlReader.Utility
 
         public override bool IsEmpty()
         {
-            if (string.IsNullOrEmpty(this.innerText) && attributeConfigurations.Count == 0 && childrenNodeConfigurations.Count == 0)
+            if (!string.IsNullOrEmpty(this.innerText))
             {
-                return true;
+                return false;
             }
 
             var allChildEmpty = true;
@@ -293,7 +293,7 @@ namespace TiaXmlReader.Utility
 
         protected string FindFirstNamespaceURI(XmlNodeConfiguration configuration)
         {
-            if(configuration == null)
+            if (configuration == null)
             {
                 return "";
             }

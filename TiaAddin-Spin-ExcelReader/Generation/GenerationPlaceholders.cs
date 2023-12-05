@@ -7,27 +7,49 @@ using System.Threading.Tasks;
 
 namespace TiaXmlReader.Generation
 {
-    public class GenerationPlaceholders
+    public interface IGenerationPlaceholderData
     {
-        private string consumerName;
-        private string dbName;
+        string GetSubstitution();
+    }
 
-        private string alarmNumFormat;
-        private uint alarmNum;
+    public class StringGenerationPlaceholderData : IGenerationPlaceholderData
+    {
+        public string Value { get; set; }
+        public Func<string, string> Function { get; set; }
 
-        //CAD 
-        private string address;
-        private string comment1;
-        private string comment2;
-        private string comment3;
-        private string comment4;
-        private string cadPage;
-        private string cadPanel;
-        private string cadType;
+        public StringGenerationPlaceholderData() 
+        { 
 
-        public GenerationPlaceholders()
+        }
+
+        public string GetSubstitution()
+        {
+            return Function != null ? Function.Invoke(Value) : Value;
+        }
+    }
+
+    public class UIntGenerationPlaceholderData : IGenerationPlaceholderData
+    {
+        public uint Value { get; set; }
+        public Func<uint, string> Function { get; set; }
+
+        public UIntGenerationPlaceholderData()
         {
 
+        }
+
+        public string GetSubstitution()
+        {
+            return Function.Invoke(Value);
+        }
+    }
+
+    public class GenerationPlaceholders
+    {
+        Dictionary<string, IGenerationPlaceholderData> generationPlaceholdersDict; 
+        public GenerationPlaceholders()
+        {
+            generationPlaceholdersDict = new Dictionary<string, IGenerationPlaceholderData>();
         }
 
         public GenerationPlaceholders SetConsumerData(ConsumerData consumerData)
@@ -37,26 +59,27 @@ namespace TiaXmlReader.Generation
 
         public GenerationPlaceholders SetConsumerName(string consumerName)
         {
-            this.consumerName = consumerName;
-            return this;
+            return AddOrReplace("{nome_utenza}", new StringGenerationPlaceholderData()
+            {
+                Value = consumerName
+            });
         }
 
         public GenerationPlaceholders SetDBName(string dbName)
         {
-            this.dbName = dbName;
-            return this;
+            return AddOrReplace("{nome_db}", new StringGenerationPlaceholderData()
+            {
+                Value = dbName
+            });
         }
 
-        public GenerationPlaceholders SetAlarmNumFormat(string alarmNumFormat)
+        public GenerationPlaceholders SetAlarmNum(uint alarmNum, string alarmNumFormat)
         {
-            this.alarmNumFormat = alarmNumFormat;
-            return this;
-        }
-
-        public GenerationPlaceholders SetAlarmNum(uint alarmNum)
-        {
-            this.alarmNum = alarmNum;
-            return this;
+            return AddOrReplace("{num_allarme}", new UIntGenerationPlaceholderData()
+            {
+                Value = alarmNum,
+                Function = (value) => value.ToString(alarmNumFormat)
+            });
         }
 
         public GenerationPlaceholders SetCadData(CadData cadData)
@@ -73,86 +96,118 @@ namespace TiaXmlReader.Generation
 
         public GenerationPlaceholders SetAddress(string address)
         {
-            this.address = address;
-            return this;
+            AddOrReplace("{cad_address}", new StringGenerationPlaceholderData()
+            {
+                Value = address
+            });
+            AddOrReplace("{siemens_memory_type}", new StringGenerationPlaceholderData()
+            {
+                Value = address,
+                Function = (value) => CadData.GetSiemensMemoryType(address).GetInitial()
+            });
+            AddOrReplace("{cad_memory_type}", new StringGenerationPlaceholderData()
+            {
+                Value = address,
+                Function = (value) => CadData.GetCadMemoryType(address)
+            });
+            AddOrReplace("{bit_address}", new StringGenerationPlaceholderData() 
+            { 
+                Value = address, 
+                Function = (value) => "" + CadData.GetAddressBit(address) 
+            });
+            return AddOrReplace("{byte_address}", new StringGenerationPlaceholderData()
+            {
+                Value = address,
+                Function = (value) => "" + CadData.GetAddressByte(address)
+            });
         }
 
         public GenerationPlaceholders SetComment1(string comment1)
         {
-            this.comment1 = comment1;
-            return this;
+            return AddOrReplace("{cad_comment1}", new StringGenerationPlaceholderData()
+            {
+                Value = comment1
+            });
         }
 
         public GenerationPlaceholders SetComment2(string comment2)
         {
-            this.comment2 = comment2;
-            return this;
+            return AddOrReplace("{cad_comment2}", new StringGenerationPlaceholderData()
+            {
+                Value = comment2
+            });
         }
 
         public GenerationPlaceholders SetComment3(string comment3)
         {
-            this.comment3 = comment3;
-            return this;
+            return AddOrReplace("{cad_comment3}", new StringGenerationPlaceholderData()
+            {
+                Value = comment3
+            });
         }
 
         public GenerationPlaceholders SetComment4(string comment4)
         {
-            this.comment4 = comment4;
-            return this;
+            return AddOrReplace("{cad_comment4}", new StringGenerationPlaceholderData()
+            {
+                Value = comment4
+            });
         }
 
         public GenerationPlaceholders SetCadPage(string cadPage)
         {
-            this.cadPage = cadPage;
-            return this;
+            return AddOrReplace("{cad_page}", new StringGenerationPlaceholderData()
+            {
+                Value = cadPage
+            });
         }
 
         public GenerationPlaceholders SetCadPanel(string cadPanel)
         {
-            this.cadPanel = cadPanel;
-            return this;
+            return AddOrReplace("{cad_panel}", new StringGenerationPlaceholderData()
+            {
+                Value = cadPanel
+            });
         }
         public GenerationPlaceholders SetCadType(string cadType)
         {
-            this.cadType = cadType;
+            return AddOrReplace("{cad_type}", new StringGenerationPlaceholderData() 
+            { 
+                Value = cadType 
+            });
+        }
+
+        private GenerationPlaceholders AddOrReplace(string placeholder, IGenerationPlaceholderData placeholderData)
+        {
+            if(generationPlaceholdersDict.Keys.Contains(placeholder))
+            {
+                generationPlaceholdersDict[placeholder] = placeholderData;
+                return this;
+            }
+
+            generationPlaceholdersDict.Add(placeholder, placeholderData);
             return this;
         }
 
         public string Parse(string str)
         {
-            var dict = new Dictionary<string, string>()
-            {
-                { "{nome_db}", dbName },
-                { "{nome_utenza}", consumerName },
-                { "{num_allarme}", alarmNum.ToString(alarmNumFormat) },
-                { "{bit_address}", "" + CadData.GetAddressBit(address) },
-                { "{byte_address}", "" + CadData.GetAddressByte(address) },
-                { "{cad_address}", address },
-                { "{cad_comment1}", comment1 },
-                { "{cad_comment2}", comment2 },
-                { "{cad_comment3}", comment3 },
-                { "{cad_comment4}", comment4 },
-                { "{cad_page}", cadPage },
-                { "{cad_panel}", cadPanel },
-                { "{cad_type}", cadType }
-            };
-
             var loopStr = str;
-            foreach(KeyValuePair<string, string> entry in dict)
+            foreach(KeyValuePair<string, IGenerationPlaceholderData> entry in generationPlaceholdersDict)
             {
                 var placeholder = entry.Key;
-                var substitution = entry.Value;
+                var placeholderData = entry.Value;
 
-                if(string.IsNullOrEmpty(placeholder) || string.IsNullOrEmpty(substitution))
+                if(string.IsNullOrEmpty(placeholder))
                 {
                     continue;
                 }
 
-                loopStr.Replace(placeholder, substitution);
+                loopStr =  loopStr.Replace(placeholder, placeholderData.GetSubstitution());
             }
 
             //{mnemonic} {bit_address} {byte_address} {cad_address} {cad_comment1} {cad_comment2} {cad_comment3} {cad_comment4} {cad_page} {cad_panel} {cad_type}
             return loopStr;
         }
     }
+
 }

@@ -45,6 +45,9 @@ namespace SpinXmlReader.Block
             this.ComputeBlockComment().SetText(Constants.DEFAULT_CULTURE, "");
 
             blockAttributeList.ComputeSection(SectionTypeEnum.STATIC);
+
+            blockAttributeList.SetBlockMemoryReserve(100);
+            blockAttributeList.SetBlockProgrammingLanguage("DB");
         }
 
         public MultilingualText ComputeBlockTitle() //Add if does not exists.

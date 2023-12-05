@@ -68,6 +68,7 @@ namespace SpinXmlReader
             this.AddAttribute(Constants.COMPOSITION_NAME_KEY, required: true, value: type.GetCompositionName());
 
             objectList = this.AddNodeList(Constants.OBJECT_LIST_KEY, MultilingualTextItem.CreateMultilingualTextItem, required: true);
+            this.SetText(Constants.DEFAULT_CULTURE, "");
             //==== INIT CONFIGURATION ====
         }
 
@@ -86,7 +87,6 @@ namespace SpinXmlReader
                     return;
                 }
             }
-
 
             var item = new MultilingualTextItem(culture, text);
             objectList.GetItems().Add(item);

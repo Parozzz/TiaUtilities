@@ -32,6 +32,13 @@ namespace SpinXmlReader
         {
             return CultureInfo.GetCultureInfo(lang.GetValue());
         }
+
+        public void SetLangText(CultureInfo lang, string text)
+        {
+            this.lang.SetValue(lang.IetfLanguageTag);
+            this.SetInnerText(text);
+        }
+
     }
 
     public class MultiLanguageTextCollection : XmlNodeListConfiguration<MultiLanguageText>

@@ -114,8 +114,6 @@ namespace SpinXmlReader.Block
             private readonly XmlNodeListConfiguration<XmlNodeConfiguration> attributeList;
             private readonly MultiLanguageTextCollection comment;
 
-            protected XmlNodeConfiguration parentConfiguration;
-
             public Member(XmlNodeConfiguration parentConfiguration = null) : base(Member.NODE_NAME, CreateMember, namespaceURI: Constants.GET_SECTIONS_NAMESPACE())
             {
                 //==== INIT CONFIGURATION ====
@@ -172,7 +170,7 @@ namespace SpinXmlReader.Block
 
             public string GetCompleteSymbol()
             {
-                return this.name.GetValue() + "" + this.GetParentSymbol(this.parentConfiguration);
+                return this.GetParentSymbol(base.GetParentConfiguration()) + "." + this.name.GetValue();
 
             }
 
@@ -182,9 +180,22 @@ namespace SpinXmlReader.Block
                 {
                     return parentMember.GetMemberName() + this.GetParentSymbol(parentMember.parentConfiguration);
                 }
-                else if(parentConfiguration is GlobalDB globalDB)
+                else if(parentConfiguration != null)
                 {
-                    return globalDB.GetAttributes().GetBlockName();
+                    var loopParentConfiguration = parentConfiguration.GetParentConfiguration();
+                    while(true)
+                    {
+                        if(loopParentConfiguration == null)
+                        {
+                            return "";
+                        }
+                        else if(loopParentConfiguration is GlobalDB globalDB)
+                        {
+                            return globalDB.GetAttributes().GetBlockName();
+                        }
+
+                        loopParentConfiguration = loopParentConfiguration.GetParentConfiguration();
+                    }
                 }
 
                 return "";
@@ -194,6 +205,24 @@ namespace SpinXmlReader.Block
             public ICollection<XmlNodeConfiguration> GetAttributeList()
             {
                 return attributeList.GetItems();
+            }
+
+            public Member SetComment(CultureInfo culture, string text)
+            {
+                foreach (var item in comment.GetItems())
+                {
+                    if(item.GetLang() == culture)
+                    {
+                        item.SetLangText(culture, text);
+                        return this;
+                    }
+                }
+
+                var multiLanguageText = new MultiLanguageText();
+                multiLanguageText.SetLangText(culture, text);
+                comment.GetItems().Add(multiLanguageText);
+
+                return this;
             }
 
             public Dictionary<CultureInfo, string> GetComments()

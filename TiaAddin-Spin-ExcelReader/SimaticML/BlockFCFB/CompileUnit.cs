@@ -116,14 +116,37 @@ namespace SpinXmlReader.Block
             return parts.AddNode(part);
         }
 
-        public void AddPowerrail(Dictionary<Part, string> partConnectionDict)
+        public CompileUnit AddPowerrailConnections(Dictionary<Part, string> partConnectionDict)
         {
-            var powerrail = this.AddWire();
-            powerrail.SetPowerrail();
+            Wire powerrail = null;
+            foreach(var wire in this.wires.GetItems())
+            {
+                if(wire.IsPowerrail())
+                {
+                    powerrail = wire;
+                }
+            }
+
+            if(powerrail == null)
+            {
+                powerrail = this.AddWire();
+                powerrail.SetPowerrail();
+            }
+            
             foreach (KeyValuePair<Part, string> entry in partConnectionDict)
             {
                 powerrail.AddPowerrailCon(entry.Key, entry.Value);
             }
+
+            return this;
+        }
+
+        public CompileUnit AddPowerrailSingleConnection(Part part, string partConnection)
+        {
+            return AddPowerrailConnections(new Dictionary<Part, string>()
+            {
+                { part, partConnection }
+            });
         }
 
         public void AddIdentWire(Access.Type accessType, string accessSymbol, Part part, string partConnectionName)
@@ -145,7 +168,9 @@ namespace SpinXmlReader.Block
 
         public Wire AddWire()
         {
-            return wires.AddNode(new Wire());
+            var wire = new Wire();
+            wires.GetItems().Add(wire);
+            return wire;
         }
     }
 }

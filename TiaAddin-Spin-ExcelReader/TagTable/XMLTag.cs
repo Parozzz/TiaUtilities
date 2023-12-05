@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using System.Globalization;
+using System.Xml;
 using TiaXmlReader.Utility;
 
 namespace SpinXmlReader.TagTable
@@ -53,9 +54,10 @@ namespace SpinXmlReader.TagTable
             return dataTypeName.GetInnerText();
         }
 
-        public void SetDataTypeName(string str)
+        public XMLTag SetDataTypeName(string str)
         {
             dataTypeName.SetInnerText(str);
+            return this;
         }
 
         public string GetLogicalAddress()
@@ -63,9 +65,10 @@ namespace SpinXmlReader.TagTable
             return logicalAddress.GetInnerText();
         }
 
-        public void SetLogicalAddress(string str)
+        public XMLTag SetLogicalAddress(string str)
         {
             logicalAddress.SetInnerText(str);
+            return this;
         }
 
         public string GetTagName()
@@ -73,9 +76,16 @@ namespace SpinXmlReader.TagTable
             return tagName.GetInnerText();
         }
 
-        public void SetTagName(string str)
+        public XMLTag SetTagName(string str)
         {
             tagName.SetInnerText(str);
+            return this;
+        }
+
+        public XMLTag SetCommentText(CultureInfo cultureInfo, string text)
+        {
+            comment.SetText(cultureInfo, text);
+            return this;
         }
     }
 }

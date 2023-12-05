@@ -14,6 +14,7 @@ namespace SpinXmlReader.Block
         private readonly XmlNodeListConfiguration<Section> blockSections;
 
         private readonly XmlNodeConfiguration memoryLayout;
+        private readonly XmlNodeConfiguration memoryReserve;
         private readonly XmlNodeConfiguration blockName;
         private readonly XmlNodeConfiguration blockNumber;
         private readonly XmlNodeConfiguration programmingLanguage;
@@ -30,10 +31,12 @@ namespace SpinXmlReader.Block
             instanceOfName = this.AddNode("InstanceOfName");
             instanceOfType = this.AddNode("InstanceOfType");
 
+
             blockInterface = this.AddNode("Interface",                                               required: true);
             blockSections = blockInterface.AddNodeList("Sections", this.CreateSection, required: true, namespaceURI: Constants.GET_SECTIONS_NAMESPACE());
 
-            memoryLayout = this.AddNode("MemoryLayout",                                              required: true, defaultInnerText: "Optimized");
+            memoryLayout = this.AddNode("MemoryLayout",                                              required: true,  defaultInnerText: "Optimized");
+            memoryReserve = this.AddNode("MemoryReserve",                                            required: false);
             blockName = this.AddNode("Name",                                                         required: true, defaultInnerText: "fcTest");
             if(Constants.VERSION >= 18)                                                              
             {                                                                                        
@@ -41,7 +44,7 @@ namespace SpinXmlReader.Block
             }                                                                                        
             blockNumber = this.AddNode("Number",                                                     required: true, defaultInnerText: "1");
             programmingLanguage = this.AddNode("ProgrammingLanguage",                                required: true, defaultInnerText: "LAD");
-            setENOAutomatically = this.AddNode("SetENOAutomatically",                                required: true, defaultInnerText: "false");
+            setENOAutomatically = this.AddNode("SetENOAutomatically",                                required: false);
             //==== INIT CONFIGURATION ====
         }
         private Section CreateSection(XmlNode node)
@@ -59,9 +62,10 @@ namespace SpinXmlReader.Block
             return string.IsNullOrEmpty(autoNumber.GetInnerText()) && bool.Parse(autoNumber.GetInnerText());
         }
 
-        public void SetAutoNumber(bool autoNumber)
+        public BlockAttributeList SetAutoNumber(bool autoNumber)
         {
-            this.autoNumber.SetInnerText(autoNumber.ToString());
+            this.autoNumber.SetInnerText(autoNumber.ToString().ToLower()); //HE WANTS LOWERCASE!
+            return this;
         }
 
         public string GetInstanceOfName()
@@ -94,14 +98,25 @@ namespace SpinXmlReader.Block
             this.memoryLayout.SetInnerText(memorylaout);
         }
 
+        public uint GetBlockMemoryReserve()
+        {
+            return string.IsNullOrEmpty(memoryReserve.GetInnerText()) ? 0 : uint.Parse(memoryReserve.GetInnerText());
+        }
+
+        public void SetBlockMemoryReserve(uint memoryReserve)
+        {
+            this.memoryReserve.SetInnerText("" + memoryReserve);
+        }
+
         public string GetBlockName()
         {
             return blockName.GetInnerText();
         }
 
-        public void SetBlockName(string name)
+        public BlockAttributeList SetBlockName(string name)
         {
             this.blockName.SetInnerText(name);
+            return this;
         }
 
         public uint GetBlockNumber()
@@ -109,9 +124,10 @@ namespace SpinXmlReader.Block
             return uint.Parse(blockNumber.GetInnerText());
         }
 
-        public void SetBlockNumber(uint number)
+        public BlockAttributeList SetBlockNumber(uint number)
         {
             this.blockNumber.SetInnerText(number.ToString());
+            return this;
         }
 
         public string GetBlockProgrammingLanguage()
@@ -131,7 +147,7 @@ namespace SpinXmlReader.Block
         
         public void SetBlockSetENOAutomatically(bool setENOAutomatically)
         {
-            this.setENOAutomatically.SetInnerText(setENOAutomatically.ToString());
+            this.setENOAutomatically.SetInnerText(setENOAutomatically.ToString().ToLower()); //HE WANTS LOWERCASE!
         }
 
         public Section ComputeSection(SectionTypeEnum sectionType)

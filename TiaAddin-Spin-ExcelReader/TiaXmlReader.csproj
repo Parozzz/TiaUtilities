@@ -153,10 +153,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Generation\AlarmData.cs" />
+    <Compile Include="Generation\IO_Cad\GenerationIO_CAD.cs" />
+    <Compile Include="Generation\ConsumerAlarms\AlarmData.cs" />
     <Compile Include="Attributes\Attribute.cs" />
-    <Compile Include="Generation\CadData.cs" />
-    <Compile Include="Generation\InOutData.cs" />
+    <Compile Include="Generation\IO_Cad\CadData.cs" />
+    <Compile Include="Generation\ConsumerAlarms\GenerationConsumerAlarms.cs" />
+    <Compile Include="Generation\IGeneration.cs" />
     <Compile Include="SimaticML\BlockAttributeList\BlockAttributeList.cs" />
     <Compile Include="SimaticML\BlockFCFB\BlockFB.cs" />
     <Compile Include="SimaticML\BlockFCFB\FlagNet\Access.cs" />
@@ -165,7 +167,7 @@
     <Compile Include="SimaticML\BlockFCFB\FlagNet\Part.cs" />
     <Compile Include="SimaticML\BlockFCFB\FlagNet\Wire.cs" />
     <Compile Include="SimaticML\BlockAttributeList\Section.cs" />
-    <Compile Include="Generation\ConsumerData.cs" />
+    <Compile Include="Generation\ConsumerAlarms\ConsumerData.cs" />
     <Compile Include="Generation\GenerationPlaceholders.cs" />
     <Compile Include="IGlobalObject.cs" />
     <Compile Include="MultiLanguageText.cs" />
@@ -228,5 +230,6 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

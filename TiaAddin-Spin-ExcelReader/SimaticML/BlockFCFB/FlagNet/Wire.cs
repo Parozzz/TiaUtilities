@@ -39,7 +39,7 @@ namespace SpinXmlReader.Block
             //==== INIT CONFIGURATION ====
             localObjectData = this.AddAttribute(new LocalObjectData());
 
-            powerrail = this.AddNode("Powerrail", namespaceURI: Constants.GET_FLAG_NET_NAMESPACE());
+            powerrail = this.AddNode("Powerrail");
 
             identCon = this.AddCon("IdentCon");
             identConUId = identCon.AddAttribute("UId"); //This UId refers to an Access

@@ -46,6 +46,8 @@ namespace SpinXmlReader.Block
             this.ComputeBlockTitle().SetText(Constants.DEFAULT_CULTURE, "");
             this.ComputeBlockComment().SetText(Constants.DEFAULT_CULTURE, "");
 
+            blockAttributeList.SetBlockSetENOAutomatically(false);
+
             var inputSection = blockAttributeList.ComputeSection(SectionTypeEnum.INPUT);
             var outputSection = blockAttributeList.ComputeSection(SectionTypeEnum.OUTPUT);
             var inOutSection = blockAttributeList.ComputeSection(SectionTypeEnum.INOUT);
