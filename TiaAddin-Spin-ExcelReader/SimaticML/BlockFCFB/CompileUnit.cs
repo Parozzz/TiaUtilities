@@ -1,22 +1,23 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Xml;
-using TiaXmlReader;
+using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace;
+using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace;
 using TiaXmlReader.Utility;
+using System;
 
 namespace SpinXmlReader.Block
 {
     public class CompileUnit : XmlNodeConfiguration, IGlobalObject
     {
         public const string NODE_NAME = "SW.Blocks.CompileUnit";
-        private static XmlNodeConfiguration CreatePart(XmlNode node)
+        private static XmlNodeConfiguration CreatePart(CompileUnit compileUnit, XmlNode node)
         {
             switch (node.Name)
             {
                 case Access.NODE_NAME:
-                    return new Access();
+                    return new Access(compileUnit);
                 case Part.NODE_NAME:
-                    return new Part();
+                    return new Part(compileUnit);
             }
 
             return null;
@@ -45,8 +46,8 @@ namespace SpinXmlReader.Block
             var attributeList = AddNode(Constants.ATTRIBUTE_LIST_KEY, required: true);
             networkSource = attributeList.AddNode("NetworkSource", required: true);
             flgNet = networkSource.AddNode("FlgNet", namespaceURI: Constants.GET_FLAG_NET_NAMESPACE());
-            parts = flgNet.AddNodeList("Parts", CompileUnit.CreatePart);
-            wires = flgNet.AddNodeList("Wires", Wire.CreateWire);
+            parts = flgNet.AddNodeList("Parts", xmlNode => CompileUnit.CreatePart(this, xmlNode));
+            wires = flgNet.AddNodeList("Wires", xmlNode => Wire.CreateWire(this, xmlNode));
 
             objectList = this.AddNodeList(Constants.OBJECT_LIST_KEY, MultilingualText.CreateMultilingualText, required: true);
 
@@ -104,35 +105,45 @@ namespace SpinXmlReader.Block
             return programmingLanguange.GetInnerText();
         }
 
-        public Access AddAccess()
+        public Access AddAccess(Access access)
         {
-            return parts.AddNode(new Access());
+            if (parts.GetItems().Contains(access))
+            {
+                throw new Exception("An Access has been added twice to the same CompileUnit.");
+            }
+
+            parts.AddNode(access);
+            return access;
         }
 
-        public Part AddPart(Part.Type partType)
+        public CompileUnit AddPart(Part part)
         {
-            var part = new Part();
-            part.SetPartType(partType);
-            return parts.AddNode(part);
+            if (parts.GetItems().Contains(part))
+            {
+                throw new Exception("A Part has been added twice to the same CompileUnit.");
+            }
+
+            parts.GetItems().Add(part);
+            return this;
         }
 
         public CompileUnit AddPowerrailConnections(Dictionary<Part, string> partConnectionDict)
         {
             Wire powerrail = null;
-            foreach(var wire in this.wires.GetItems())
+            foreach (var wire in this.wires.GetItems())
             {
-                if(wire.IsPowerrail())
+                if (wire.IsPowerrail())
                 {
                     powerrail = wire;
                 }
             }
 
-            if(powerrail == null)
+            if (powerrail == null)
             {
-                powerrail = this.AddWire();
+                powerrail = new Wire(this);
                 powerrail.SetPowerrail();
             }
-            
+
             foreach (KeyValuePair<Part, string> entry in partConnectionDict)
             {
                 powerrail.AddPowerrailCon(entry.Key, entry.Value);
@@ -149,26 +160,26 @@ namespace SpinXmlReader.Block
             });
         }
 
-        public void AddIdentWire(Access.Type accessType, string accessSymbol, Part part, string partConnectionName)
+        public CompileUnit AddIdentWire(IAccessData accessData, IPartData partData, string partConnectionName)
         {
-            var access = this.AddAccess();
-            access.SetAccessType(accessType);
-            access.SetSymbol(accessSymbol);
-
-            var identWire = this.AddWire();
-            identWire.SetIdentCon(access.GetLocalObjectData().GetUId(), part.GetLocalObjectData().GetUId(), partConnectionName);
+            new Wire(this).SetIdentCon(accessData.GetAccess().GetLocalObjectData().GetUId(), partData.GetPart().GetLocalObjectData().GetUId(), partConnectionName);
+            return this;
         }
 
-        public void AddBoolANDWire(Part startPart, string startPartConnectionName, Part exitPart, string exitPartConnectionName)
+        public CompileUnit AddBoolANDWire(Part startPart, string startPartConnectionName, Part exitPart, string exitPartConnectionName)
         {
-            var andWire = this.AddWire();
-            andWire.SetWireStart(startPart, startPartConnectionName);
-            andWire.SetWireExit(exitPart, exitPartConnectionName);
+            new Wire(this).SetWireStart(startPart, startPartConnectionName)
+                .SetWireExit(exitPart, exitPartConnectionName);
+            return this;
         }
 
-        public Wire AddWire()
+        public Wire AddWire(Wire wire)
         {
-            var wire = new Wire();
+            if(wires.GetItems().Contains(wire))
+            {
+                throw new Exception("A wire has been added twice to the same CompileUnit.");
+            }
+
             wires.GetItems().Add(wire);
             return wire;
         }

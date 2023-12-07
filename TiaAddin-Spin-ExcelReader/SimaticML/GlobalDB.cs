@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Xml;
+using TiaXmlReader.SimaticML;
 using TiaXmlReader.Utility;
 
 namespace SpinXmlReader.Block
@@ -46,8 +47,8 @@ namespace SpinXmlReader.Block
 
             blockAttributeList.ComputeSection(SectionTypeEnum.STATIC);
 
-            blockAttributeList.SetBlockMemoryReserve(100);
-            blockAttributeList.SetBlockProgrammingLanguage("DB");
+            blockAttributeList.SetBlockMemoryReserve(100)
+                .SetBlockProgrammingLanguage(SimaticProgrammingLanguage.DB);
         }
 
         public MultilingualText ComputeBlockTitle() //Add if does not exists.

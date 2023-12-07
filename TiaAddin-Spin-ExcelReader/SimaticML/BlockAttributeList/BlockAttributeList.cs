@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Xml;
+using TiaXmlReader.SimaticML;
 using TiaXmlReader.Utility;
 
 namespace SpinXmlReader.Block
@@ -19,8 +20,6 @@ namespace SpinXmlReader.Block
         private readonly XmlNodeConfiguration blockNumber;
         private readonly XmlNodeConfiguration programmingLanguage;
         private readonly XmlNodeConfiguration setENOAutomatically;
-
-        private readonly XmlNodeConfiguration parentConfiguration;
 
         public BlockAttributeList(XmlNodeConfiguration parentConfiguration) : base(Constants.ATTRIBUTE_LIST_KEY, required: true)
         {
@@ -47,14 +46,10 @@ namespace SpinXmlReader.Block
             setENOAutomatically = this.AddNode("SetENOAutomatically",                                required: false);
             //==== INIT CONFIGURATION ====
         }
+
         private Section CreateSection(XmlNode node)
         {
             return node.Name == Section.NODE_NAME ? new Section(this) : null;
-        }
-
-        public XmlNodeConfiguration GetParentConfiguration()
-        {
-            return parentConfiguration;
         }
 
         public bool GetAutoNumber()
@@ -73,9 +68,10 @@ namespace SpinXmlReader.Block
             return instanceOfName.GetInnerText();
         }
 
-        public void SetInstanceOfName(string name)
+        public BlockAttributeList SetInstanceOfName(string name)
         {
             this.instanceOfName.SetInnerText(name);
+            return this;
         }
 
         public string GetInstanceOfType()
@@ -83,9 +79,10 @@ namespace SpinXmlReader.Block
             return instanceOfType.GetInnerText();
         }
 
-        public void SetInstanceOfType(string type)
+        public BlockAttributeList SetInstanceOfType(string type)
         {
             this.instanceOfType.SetInnerText(type);
+            return this;
         }
 
         public string GetBlockMemoryLayout()
@@ -93,9 +90,10 @@ namespace SpinXmlReader.Block
             return memoryLayout.GetInnerText();
         }
 
-        public void SetBlockMemoryLayout(string memorylaout)
+        public BlockAttributeList SetBlockMemoryLayout(string memorylaout)
         {
             this.memoryLayout.SetInnerText(memorylaout);
+            return this;
         }
 
         public uint GetBlockMemoryReserve()
@@ -103,9 +101,10 @@ namespace SpinXmlReader.Block
             return string.IsNullOrEmpty(memoryReserve.GetInnerText()) ? 0 : uint.Parse(memoryReserve.GetInnerText());
         }
 
-        public void SetBlockMemoryReserve(uint memoryReserve)
+        public BlockAttributeList SetBlockMemoryReserve(uint memoryReserve)
         {
             this.memoryReserve.SetInnerText("" + memoryReserve);
+            return this;
         }
 
         public string GetBlockName()
@@ -130,14 +129,15 @@ namespace SpinXmlReader.Block
             return this;
         }
 
-        public string GetBlockProgrammingLanguage()
+        public SimaticProgrammingLanguage GetBlockProgrammingLanguage()
         {
-            return programmingLanguage.GetInnerText();
+            return SimaticProgrammingLanguageUtil.GetFromSimaticMLString(programmingLanguage.GetInnerText());
         }
 
-        public void SetBlockProgrammingLanguage(string programmingLanguage)
+        public BlockAttributeList SetBlockProgrammingLanguage(SimaticProgrammingLanguage programmingLanguage)
         {
-            this.programmingLanguage.SetInnerText(programmingLanguage);
+            this.programmingLanguage.SetInnerText(programmingLanguage.GetSimaticMLString());
+            return this;
         }
 
         public bool GetBlockSetENOAutomatically()
@@ -145,9 +145,10 @@ namespace SpinXmlReader.Block
             return !string.IsNullOrEmpty(setENOAutomatically.GetInnerText()) && bool.Parse(setENOAutomatically.GetInnerText());
         }
         
-        public void SetBlockSetENOAutomatically(bool setENOAutomatically)
+        public BlockAttributeList SetBlockSetENOAutomatically(bool setENOAutomatically)
         {
             this.setENOAutomatically.SetInnerText(setENOAutomatically.ToString().ToLower()); //HE WANTS LOWERCASE!
+            return this;
         }
 
         public Section ComputeSection(SectionTypeEnum sectionType)

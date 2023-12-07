@@ -3,10 +3,9 @@ using SpinXmlReader;
 using SpinXmlReader.Block;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TiaXmlReader.AlarmGeneration;
+using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace;
+using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace;
 
 namespace TiaXmlReader.Generation
 {
@@ -160,19 +159,20 @@ namespace TiaXmlReader.Generation
             }
         }
 
-        private void FillAlarmCompileUnit(CompileUnit compileUnit, GenerationPlaceholders placeholders, AlarmData alarmGenerationData)
+        private void FillAlarmCompileUnit(CompileUnit compileUnit, GenerationPlaceholders placeholders, AlarmData alarmData)
         {
-            var contact = compileUnit.AddPart(Part.Type.CONTACT);
-            var coil1 = compileUnit.AddPart(Part.Type.COIL);
-            var coil2 = compileUnit.AddPart(Part.Type.COIL);
+            var contact = new ContactPartData(compileUnit);
+            var coil1 = new CoilPartData(compileUnit);
+            var coil2 = new CoilPartData(compileUnit);
 
-            compileUnit.AddPowerrailSingleConnection(contact, "in");
-            compileUnit.AddIdentWire(Access.Type.GLOBAL_VARIABLE, alarmGenerationData.GetConsumerAddress(placeholders.Parse), contact, "operand");
-            compileUnit.AddIdentWire(Access.Type.GLOBAL_VARIABLE, alarmGenerationData.GetCoil1Address(placeholders.Parse), coil1, "operand");
-            compileUnit.AddIdentWire(Access.Type.GLOBAL_VARIABLE, alarmGenerationData.GetCoil2Address(placeholders.Parse), coil2, "operand");
 
-            compileUnit.AddBoolANDWire(contact, "out", coil1, "in");
-            compileUnit.AddBoolANDWire(coil1, "out", coil2, "in");
+            contact.CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, alarmData.GetConsumerAddress(placeholders.Parse)));
+            coil1.CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, alarmData.GetCoil1Address(placeholders.Parse)));
+            coil2.CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, alarmData.GetCoil2Address(placeholders.Parse)));
+
+            contact.CreatePowerrailConnection()
+                .CreateOutputConnection(coil1)
+                .CreateOutputConnection(coil2);
         }
 
         public void ExportXML(string exportPath)

@@ -5,8 +5,9 @@ using SpinXmlReader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using TiaXmlReader.SimaticML;
+using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace;
+using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace;
 
 namespace TiaXmlReader.Generation.Cad
 {
@@ -144,10 +145,10 @@ namespace TiaXmlReader.Generation.Cad
                 switch (memoryType)
                 {
                     case "Merker":
-                        var tag = supportsTagTable.AddTag().SetTagName(placeholders.Parse(variableName))
-                                        .SetDataTypeName("Bool")
-                                        .SetLogicalAddress("%M" + merkerByte + "." + merkerBit)
-                                        .SetCommentText(Constants.DEFAULT_CULTURE, placeholders.Parse(variableComment));
+                        var tag = supportsTagTable.AddTag()
+                                        .SetTagName(placeholders.Parse(variableName))
+                                        .SetCommentText(Constants.DEFAULT_CULTURE, placeholders.Parse(variableComment))
+                                        .SetBoolean(SimaticMemoryArea.MERKER, merkerByte, merkerBit);
                         outputAddress = tag.GetTagName();
 
                         merkerBit++;
@@ -187,13 +188,14 @@ namespace TiaXmlReader.Generation.Cad
 
         private void FillInOutCompileUnit(CompileUnit compileUnit, string inputAddress, string outputAddress)
         {
-            var contact = compileUnit.AddPart(Part.Type.CONTACT);
-            var coil = compileUnit.AddPart(Part.Type.COIL);
+            var contact = new ContactPartData(compileUnit);
+            var coil = new CoilPartData(compileUnit);
 
-            compileUnit.AddPowerrailSingleConnection(contact, "in");
-            compileUnit.AddIdentWire(Access.Type.GLOBAL_VARIABLE, inputAddress, contact, "operand");
-            compileUnit.AddIdentWire(Access.Type.GLOBAL_VARIABLE, outputAddress, coil, "operand");
-            compileUnit.AddBoolANDWire(contact, "out", coil, "in");
+            contact.CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, inputAddress));
+            coil.CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, outputAddress));
+
+            contact.CreatePowerrailConnection()
+                .CreateOutputConnection(coil);
         }
 
         public void ExportXML(string exportPath)

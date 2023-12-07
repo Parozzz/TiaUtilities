@@ -161,17 +161,23 @@
     <Compile Include="Generation\IGeneration.cs" />
     <Compile Include="SimaticML\BlockAttributeList\BlockAttributeList.cs" />
     <Compile Include="SimaticML\BlockFCFB\BlockFB.cs" />
-    <Compile Include="SimaticML\BlockFCFB\FlagNet\Access.cs" />
+    <Compile Include="SimaticML\BlockFCFB\FlagNet\nAccess\Access.cs" />
     <Compile Include="SimaticML\BlockFCFB\CompileUnit.cs" />
     <Compile Include="SimaticML\BlockFCFB\BlockFC.cs" />
-    <Compile Include="SimaticML\BlockFCFB\FlagNet\Part.cs" />
+    <Compile Include="SimaticML\BlockFCFB\FlagNet\nAccess\IAccessData.cs" />
+    <Compile Include="SimaticML\BlockFCFB\FlagNet\nPart\IPartData.cs" />
+    <Compile Include="SimaticML\BlockFCFB\FlagNet\nPart\Part.cs" />
     <Compile Include="SimaticML\BlockFCFB\FlagNet\Wire.cs" />
     <Compile Include="SimaticML\BlockAttributeList\Section.cs" />
     <Compile Include="Generation\ConsumerAlarms\ConsumerData.cs" />
     <Compile Include="Generation\GenerationPlaceholders.cs" />
     <Compile Include="IGlobalObject.cs" />
     <Compile Include="MultiLanguageText.cs" />
+    <Compile Include="SimaticML\SimaticDataType.cs" />
     <Compile Include="SimaticML\GlobalDB.cs" />
+    <Compile Include="SimaticML\SimaticMemoryArea.cs" />
+    <Compile Include="SimaticML\SimaticMLUtil.cs" />
+    <Compile Include="SimaticML\SimaticProgrammingLanguage.cs" />
     <Compile Include="UIdObject.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -204,6 +210,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="!!!REMEMBER!!!" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

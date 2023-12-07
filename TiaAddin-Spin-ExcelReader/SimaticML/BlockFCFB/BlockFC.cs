@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Xml;
+using TiaXmlReader.SimaticML;
 using TiaXmlReader.Utility;
 
 namespace SpinXmlReader.Block
@@ -46,7 +47,8 @@ namespace SpinXmlReader.Block
             this.ComputeBlockTitle().SetText(Constants.DEFAULT_CULTURE, "");
             this.ComputeBlockComment().SetText(Constants.DEFAULT_CULTURE, "");
 
-            blockAttributeList.SetBlockSetENOAutomatically(false);
+            blockAttributeList.SetBlockSetENOAutomatically(true)
+                .SetBlockProgrammingLanguage(SimaticProgrammingLanguage.LADDER);
 
             var inputSection = blockAttributeList.ComputeSection(SectionTypeEnum.INPUT);
             var outputSection = blockAttributeList.ComputeSection(SectionTypeEnum.OUTPUT);

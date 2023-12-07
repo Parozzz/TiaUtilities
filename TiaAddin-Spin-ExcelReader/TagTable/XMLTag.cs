@@ -1,5 +1,7 @@
-﻿using System.Globalization;
+﻿using DocumentFormat.OpenXml.Wordprocessing;
+using System.Globalization;
 using System.Xml;
+using TiaXmlReader.SimaticML;
 using TiaXmlReader.Utility;
 
 namespace SpinXmlReader.TagTable
@@ -68,6 +70,20 @@ namespace SpinXmlReader.TagTable
         public XMLTag SetLogicalAddress(string str)
         {
             logicalAddress.SetInnerText(str);
+            return this;
+        }
+
+        public XMLTag SetBoolean(SimaticMemoryArea memoryArea, int memoryByte, int memoryBit)
+        {
+            this.SetDataTypeName(SimaticDataType.BOOLEAN.GetSimaticMLString());
+            logicalAddress.SetInnerText("%" + memoryArea.GetTIAMnemonic() + memoryByte + "." + memoryBit);
+            return this;
+        }
+
+        public XMLTag SetComplex(SimaticMemoryArea memoryArea, SimaticDataType dataType, int memoryByte)
+        {
+            this.SetDataTypeName(dataType.GetSimaticMLString());
+            logicalAddress.SetInnerText("%" + memoryArea.GetTIAMnemonic() + dataType.GetSimaticLengthIdentifier() + memoryByte);
             return this;
         }
 

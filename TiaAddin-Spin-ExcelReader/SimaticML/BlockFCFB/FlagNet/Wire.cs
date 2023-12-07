@@ -1,10 +1,5 @@
-﻿ using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Xml;
+﻿using System.Xml;
+using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace;
 using TiaXmlReader.Utility;
 
 namespace SpinXmlReader.Block
@@ -20,9 +15,9 @@ namespace SpinXmlReader.Block
     public class Wire : XmlNodeListConfiguration<NameCon>, ILocalObject
     {
         public const string NODE_NAME = "Wire";
-        public static Wire CreateWire(XmlNode node)
+        public static Wire CreateWire(CompileUnit compileUnit, XmlNode node)
         {
-            return node.Name == Wire.NODE_NAME ? new Wire() : null;
+            return node.Name == Wire.NODE_NAME ? new Wire(compileUnit) : null;
         }
 
         private readonly LocalObjectData localObjectData;
@@ -34,8 +29,10 @@ namespace SpinXmlReader.Block
 
         private readonly XmlNodeConfiguration openCon;
 
-        public Wire() : base(Wire.NODE_NAME, NameCon.CreateNameCon)
+        public Wire(CompileUnit compileUnit) : base(Wire.NODE_NAME, NameCon.CreateNameCon)
         {
+            compileUnit.AddWire(this);
+
             //==== INIT CONFIGURATION ====
             localObjectData = this.AddAttribute(new LocalObjectData());
 
@@ -84,7 +81,7 @@ namespace SpinXmlReader.Block
             return identCon.IsParsed();
         }
 
-        public void SetIdentCon(uint accessUId, uint partUId, string partConnectionName)
+        public Wire SetIdentCon(uint accessUId, uint partUId, string partConnectionName)
         {
             if(!IsPowerrail() && !IsIdentCon())
             {
@@ -95,6 +92,8 @@ namespace SpinXmlReader.Block
                 nameCon.SetConUId(partUId);
                 nameCon.SetConName(partConnectionName);
             }
+
+            return this;
         }
 
         public uint GetIdentAccessUId()
@@ -127,7 +126,7 @@ namespace SpinXmlReader.Block
         {
             return this.GetItems().Count == 2 ? this.GetItems()[0].GetConName() : "";
         }
-        public void SetWireStart(Part part, string partConnectionName)
+        public Wire SetWireStart(Part part, string partConnectionName)
         {
             if (this.GetItems().Count < 2)
             {
@@ -135,6 +134,8 @@ namespace SpinXmlReader.Block
                 nameCon.SetConUId(part.GetLocalObjectData().GetUId());
                 nameCon.SetConName(partConnectionName);
             }
+
+            return this;
         }
 
         public bool IsExitOpenCon()
@@ -152,7 +153,7 @@ namespace SpinXmlReader.Block
             return this.GetItems().Count == 2 ? this.GetItems()[1].GetConName() : "";
         }
 
-        public void SetWireExit(Part part, string partConnectionName)
+        public Wire SetWireExit(Part part, string partConnectionName)
         {
             if (this.GetItems().Count < 2)
             {
@@ -160,6 +161,8 @@ namespace SpinXmlReader.Block
                 nameCon.SetConUId(part.GetLocalObjectData().GetUId());
                 nameCon.SetConName(partConnectionName);
             }
+
+            return this;
         }
     }
 
@@ -193,23 +196,23 @@ namespace SpinXmlReader.Block
             return node.Name == NameCon.NODE_NAME ? new NameCon() : null;
         }
 
-        private readonly XmlAttributeConfiguration name;
+        private readonly XmlAttributeConfiguration connectionName;
 
         public NameCon() : base(NameCon.NODE_NAME)
         {
             //==== INIT CONFIGURATION ====
-            name = this.AddAttribute("Name", required: true);
+            connectionName = this.AddAttribute("Name", required: true);
             //==== INIT CONFIGURATION ====
         }
 
         public void SetConName(string name)
         {
-            this.name.SetValue(name);
+            this.connectionName.SetValue(name);
         }
 
         public string GetConName()
         {
-            return name.GetValue();
+            return connectionName.GetValue();
         }
     }
 }

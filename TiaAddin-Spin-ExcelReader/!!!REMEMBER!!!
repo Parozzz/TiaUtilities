@@ -1,0 +1,2 @@
+The reason why classes has been implemented this way (So not without an abstract class or an interface) is because they are though both for parsing the XML and Genrating it.
+If i change the structure of the code to support a more OOP approach with inheritance, i will break this proposition.

@@ -1,22 +1,39 @@
-﻿using System.Collections.Generic;
+﻿using SpinXmlReader;
+using SpinXmlReader.Block;
+using System;
 using System.Xml;
 using TiaXmlReader.Utility;
 
-namespace SpinXmlReader.Block
+namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
 {
+    public enum PartType
+    {
+        CONTACT,
+        COIL,
+        NOT_IMPLEMENTED
+    }
+
+    public static class PartTypeExtension
+    {
+        public static string GetSimaticMLString(this PartType partType)
+        {
+            switch(partType)
+            {
+                case PartType.CONTACT: return "Contact";
+                case PartType.COIL: return "Coil";
+                default:
+                    throw new Exception("Part " + partType.ToString() + "  not yet implemented");
+            }
+
+        }
+    }
+
     public class Part : XmlNodeConfiguration, ILocalObject
     {
         public const string NODE_NAME = "Part";
-        public static Part CreatePart(XmlNode node)
+        public static Part CreatePart(CompileUnit compileUnit, XmlNode node)
         {
-            return node.Name == Part.NODE_NAME ? new Part() : null;
-        }
-
-        public enum Type
-        {
-            CONTACT,
-            COIL,
-            NOT_IMPLEMENTED
+            return node.Name == Part.NODE_NAME ? new Part(compileUnit) : null;
         }
 
         private readonly LocalObjectData localObjectData;
@@ -30,8 +47,10 @@ namespace SpinXmlReader.Block
         private readonly XmlNodeConfiguration automaticTyped;
         private readonly XmlAttributeConfiguration automaticTypedName;
 
-        public Part() : base(Part.NODE_NAME)
+        public Part(CompileUnit compileUnit) : base(Part.NODE_NAME)
         {
+            compileUnit.AddPart(this);
+
             //==== INIT CONFIGURATION ====
             localObjectData = this.AddAttribute(new LocalObjectData());
 
@@ -51,31 +70,22 @@ namespace SpinXmlReader.Block
             return localObjectData;
         }
 
-        public void SetPartType(Type type)
+        public Part SetPartType(PartType type)
         {
-            switch(type)
-            {
-                case Type.CONTACT:
-                    partName.SetValue("Contact");
-                    break;
-                case Type.COIL:
-                    partName.SetValue("Coil");
-                    break;
-                default:
-                    throw new System.Exception("PartType not implemented yet.");
-            }
+            partName.SetValue(type.GetSimaticMLString());
+            return this;
         }
 
-        public Type GetPartType()
+        public PartType GetPartType()
         {
             switch(partName.GetValue())
             {
                 case "Contact":
-                    return Type.CONTACT;
+                    return PartType.CONTACT;
                 case "Coil":
-                    return Type.COIL;
+                    return PartType.COIL;
                 default:
-                    return Type.NOT_IMPLEMENTED;
+                    return PartType.NOT_IMPLEMENTED;
             }
         }
 
@@ -100,7 +110,7 @@ namespace SpinXmlReader.Block
             var partType = this.GetPartType();
             switch(partType)
             {
-                case Type.CONTACT:
+                case PartType.CONTACT:
                     negatedName.SetValue("operand");
                     break;
             }

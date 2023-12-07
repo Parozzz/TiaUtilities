@@ -36,20 +36,13 @@ namespace SpinXmlReader.Block
         {
             switch (typeEnum)
             {
-                case SectionTypeEnum.INPUT:
-                    return "Input";
-                case SectionTypeEnum.OUTPUT:
-                    return "Output";
-                case SectionTypeEnum.INOUT:
-                    return "InOut";
-                case SectionTypeEnum.STATIC:
-                    return "Static";
-                case SectionTypeEnum.TEMP:
-                    return "Temp";
-                case SectionTypeEnum.CONSTANT:
-                    return "Constant";
-                case SectionTypeEnum.RETURN:
-                    return "Return";
+                case SectionTypeEnum.INPUT: return "Input";
+                case SectionTypeEnum.OUTPUT: return "Output";
+                case SectionTypeEnum.INOUT: return "InOut";
+                case SectionTypeEnum.STATIC: return "Static";
+                case SectionTypeEnum.TEMP: return "Temp";
+                case SectionTypeEnum.CONSTANT: return "Constant";
+                case SectionTypeEnum.RETURN: return "Return";
                 default:
                     return null;
             }
@@ -78,20 +71,22 @@ namespace SpinXmlReader.Block
             return (SectionTypeEnum) Enum.Parse(typeof(SectionTypeEnum), name.GetValue(), ignoreCase: true);
         }
 
-        public void GetType(out SectionTypeEnum type)
+        public void GetSectionType(out SectionTypeEnum type)
         {
             Enum.TryParse<SectionTypeEnum>(name.GetValue(), ignoreCase: true, out type);
         }
 
-        public void SetReturnRetValMember(string name, string dataType)
+        public Section SetReturnRetValMember(string name, string dataType)
         {
             this.GetItems().Clear();
             this.AddMember(name, dataType);
+            return this;
         }
 
-        public void SetVoidReturnRetValMember()
+        public Section SetVoidReturnRetValMember()
         {
             this.SetReturnRetValMember("Ret_Val", "Void");
+            return this;
         }
 
         public Member AddMember(string name, string dataType)
@@ -154,6 +149,7 @@ namespace SpinXmlReader.Block
             {
                 return dataType.GetValue();
             }
+
             public void SetMemberDataType(string dataType)
             {
                 this.dataType.SetValue(dataType);
@@ -163,6 +159,7 @@ namespace SpinXmlReader.Block
             {
                 return startValue.GetInnerText();
             }
+
             public void SetMemberStartValue(string startValue)
             {
                 this.startValue.SetInnerText(startValue);

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Xml;
+using TiaXmlReader.SimaticML;
 using TiaXmlReader.Utility;
 
 namespace SpinXmlReader.Block
@@ -9,7 +10,7 @@ namespace SpinXmlReader.Block
         public const string NODE_NAME = "SW.Blocks.FB";
         public static XmlNodeConfiguration CreateObjectListConfiguration(XmlNode node)
         {
-            switch(node.Name)
+            switch (node.Name)
             {
                 case MultilingualText.NODE_NAME:
                     return MultilingualText.CreateMultilingualText(node);
@@ -40,10 +41,14 @@ namespace SpinXmlReader.Block
         {
             return globalObjectData;
         }
+
         public void Init()
         {
             this.ComputeBlockTitle().SetText(Constants.DEFAULT_CULTURE, "");
             this.ComputeBlockComment().SetText(Constants.DEFAULT_CULTURE, "");
+
+            blockAttributeList.SetBlockSetENOAutomatically(true)
+                .SetBlockProgrammingLanguage(SimaticProgrammingLanguage.LADDER);
 
             var inputSection = blockAttributeList.ComputeSection(SectionTypeEnum.INPUT);
             var outputSection = blockAttributeList.ComputeSection(SectionTypeEnum.OUTPUT);
