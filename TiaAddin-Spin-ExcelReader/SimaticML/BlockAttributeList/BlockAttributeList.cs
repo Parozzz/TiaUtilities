@@ -21,10 +21,8 @@ namespace SpinXmlReader.Block
         private readonly XmlNodeConfiguration programmingLanguage;
         private readonly XmlNodeConfiguration setENOAutomatically;
 
-        public BlockAttributeList(XmlNodeConfiguration parentConfiguration) : base(Constants.ATTRIBUTE_LIST_KEY, required: true)
+        public BlockAttributeList() : base(Constants.ATTRIBUTE_LIST_KEY, required: true)
         {
-            this.parentConfiguration = parentConfiguration;
-
             //==== INIT CONFIGURATION ====
             autoNumber = this.AddNode("AutoNumber");
             instanceOfName = this.AddNode("InstanceOfName");
@@ -49,7 +47,7 @@ namespace SpinXmlReader.Block
 
         private Section CreateSection(XmlNode node)
         {
-            return node.Name == Section.NODE_NAME ? new Section(this) : null;
+            return node.Name == Section.NODE_NAME ? new Section() : null;
         }
 
         public bool GetAutoNumber()
@@ -161,7 +159,7 @@ namespace SpinXmlReader.Block
                 }
             }
 
-            var section = new Section(this, sectionType);
+            var section = new Section(sectionType);
             blockSections.GetItems().Add(section);
             return section;
         }

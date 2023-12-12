@@ -4,6 +4,7 @@ using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace;
 using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace;
 using TiaXmlReader.Utility;
 using System;
+using TiaXmlReader.SimaticML;
 
 namespace SpinXmlReader.Block
 {
@@ -25,8 +26,6 @@ namespace SpinXmlReader.Block
 
         private readonly GlobalObjectData globalObjectData;
 
-        private readonly XmlAttributeConfiguration compositionName;
-
         private readonly XmlNodeListConfiguration<MultilingualText> objectList;
 
         private readonly XmlNodeConfiguration networkSource;
@@ -34,14 +33,14 @@ namespace SpinXmlReader.Block
         private readonly XmlNodeListConfiguration<XmlNodeConfiguration> parts;
         private readonly XmlNodeListConfiguration<Wire> wires;
 
-        private readonly XmlNodeConfiguration programmingLanguange;
+        private readonly XmlNodeConfiguration programmingLanguage;
 
         public CompileUnit() : base(CompileUnit.NODE_NAME)
         {
             //==== INIT CONFIGURATION ====
             globalObjectData = this.AddAttribute(new GlobalObjectData());
 
-            compositionName = this.AddAttribute("CompositionName", required: true, requiredValue: "CompileUnits");
+            this.AddAttribute("CompositionName", required: true, requiredValue: "CompileUnits");
 
             var attributeList = AddNode(Constants.ATTRIBUTE_LIST_KEY, required: true);
             networkSource = attributeList.AddNode("NetworkSource", required: true);
@@ -51,8 +50,7 @@ namespace SpinXmlReader.Block
 
             objectList = this.AddNodeList(Constants.OBJECT_LIST_KEY, MultilingualText.CreateMultilingualText, required: true);
 
-
-            programmingLanguange = attributeList.AddNode("ProgrammingLanguage", required: true, defaultInnerText: "LAD");
+            programmingLanguage = attributeList.AddNode("ProgrammingLanguage", required: true, defaultInnerText: SimaticProgrammingLanguage.LADDER.GetSimaticMLString());
             //==== INIT CONFIGURATION ====
         }
 
@@ -63,11 +61,8 @@ namespace SpinXmlReader.Block
 
         public void Init()
         {
-            var title = this.ComputeBlockTitle();
-            title.SetText(Constants.DEFAULT_CULTURE, "");
-
-            var comment = this.ComputeBlockComment();
-            comment.SetText(Constants.DEFAULT_CULTURE, "");
+            this.ComputeBlockTitle().SetText(Constants.DEFAULT_CULTURE, "");
+            this.ComputeBlockComment().SetText(Constants.DEFAULT_CULTURE, "");
         }
 
         public MultilingualText ComputeBlockTitle()
@@ -100,11 +95,16 @@ namespace SpinXmlReader.Block
             return comment;
         }
 
-        public string GetBlockProgrammingLanguage()
+        public SimaticProgrammingLanguage GetBlockProgrammingLanguage()
         {
-            return programmingLanguange.GetInnerText();
+            return SimaticProgrammingLanguageUtil.GetFromSimaticMLString(programmingLanguage.GetInnerText());
         }
 
+        public CompileUnit SetBlockProgrammingLanguage(SimaticProgrammingLanguage programmingLanguage)
+        {
+            this.programmingLanguage.SetInnerText(programmingLanguage.GetSimaticMLString());
+            return this;
+        }
         public Access AddAccess(Access access)
         {
             if (parts.GetItems().Contains(access))
@@ -116,7 +116,7 @@ namespace SpinXmlReader.Block
             return access;
         }
 
-        public CompileUnit AddPart(Part part)
+        public Part AddPart(Part part)
         {
             if (parts.GetItems().Contains(part))
             {
@@ -124,7 +124,18 @@ namespace SpinXmlReader.Block
             }
 
             parts.GetItems().Add(part);
-            return this;
+            return part;
+        }
+
+        public Wire AddWire(Wire wire)
+        {
+            if (wires.GetItems().Contains(wire))
+            {
+                throw new Exception("A wire has been added twice to the same CompileUnit.");
+            }
+
+            wires.GetItems().Add(wire);
+            return wire;
         }
 
         public CompileUnit AddPowerrailConnections(Dictionary<Part, string> partConnectionDict)
@@ -158,30 +169,6 @@ namespace SpinXmlReader.Block
             {
                 { part, partConnection }
             });
-        }
-
-        public CompileUnit AddIdentWire(IAccessData accessData, IPartData partData, string partConnectionName)
-        {
-            new Wire(this).SetIdentCon(accessData.GetAccess().GetLocalObjectData().GetUId(), partData.GetPart().GetLocalObjectData().GetUId(), partConnectionName);
-            return this;
-        }
-
-        public CompileUnit AddBoolANDWire(Part startPart, string startPartConnectionName, Part exitPart, string exitPartConnectionName)
-        {
-            new Wire(this).SetWireStart(startPart, startPartConnectionName)
-                .SetWireExit(exitPart, exitPartConnectionName);
-            return this;
-        }
-
-        public Wire AddWire(Wire wire)
-        {
-            if(wires.GetItems().Contains(wire))
-            {
-                throw new Exception("A wire has been added twice to the same CompileUnit.");
-            }
-
-            wires.GetItems().Add(wire);
-            return wire;
         }
     }
 }

@@ -45,5 +45,7 @@ namespace SpinXmlReader
         public const string COMPOSITION_NAME_KEY = "CompositionName";
         public const string ATTRIBUTE_LIST_KEY = "AttributeList";
         public const string OBJECT_LIST_KEY = "ObjectList";
+
+        public const string DEFAULT_EMPTY_STRUCT_NAME = "_";
     }
 }

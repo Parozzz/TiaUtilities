@@ -153,6 +153,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Generation\IO\IOData.cs" />
+    <Compile Include="Generation\IO\GenerationIO.cs" />
     <Compile Include="Generation\IO_Cad\GenerationIO_CAD.cs" />
     <Compile Include="Generation\ConsumerAlarms\AlarmData.cs" />
     <Compile Include="Attributes\Attribute.cs" />

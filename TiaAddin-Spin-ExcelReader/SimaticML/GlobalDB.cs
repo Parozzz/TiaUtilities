@@ -29,7 +29,7 @@ namespace SpinXmlReader.Block
             //==== INIT CONFIGURATION ====
             globalObjectData = this.AddAttribute(new GlobalObjectData());
 
-            this.blockAttributeList = this.AddNode(new BlockAttributeList(this));
+            this.blockAttributeList = this.AddNode(new BlockAttributeList());
 
             this.objectList = this.AddNodeList(Constants.OBJECT_LIST_KEY, GlobalDB.CreateObjectListConfiguration, required: true);
             //==== INIT CONFIGURATION ====

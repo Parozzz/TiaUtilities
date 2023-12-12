@@ -89,7 +89,7 @@
             this.tiaVersionComboBox.Size = new System.Drawing.Size(48, 32);
             this.tiaVersionComboBox.TabIndex = 8;
             this.tiaVersionComboBox.Text = "17";
-            this.tiaVersionComboBox.TextUpdate += new System.EventHandler(this.tiaVersionComboBox_TextUpdate);
+            this.tiaVersionComboBox.TextUpdate += new System.EventHandler(this.TiaVersionComboBox_TextUpdate);
             // 
             // label3
             // 

@@ -11,14 +11,15 @@ namespace TiaXmlReader.Generation
 {
     public class GenerationConsumerAlarms : IGeneration
     {
-        private string blockName;
-        private uint blockNumber;
+        private string fcBlockName;
+        private uint fcBlockNumber;
 
         private uint startingAlarmNum;
         private string alarmNumFormat;
 
-        private string divisionType;
         private string groupingType;
+        private string divisionType;
+        private uint antiSlipNumber;
         private uint skipNumberAfterGroup;
 
         private readonly List<AlarmData> alarmDataList;
@@ -35,13 +36,14 @@ namespace TiaXmlReader.Generation
 
         public void ImportExcelConfig(IXLWorksheet worksheet)
         {
-            blockName = worksheet.Cell("C4").Value.GetText();
-            blockNumber = (uint)worksheet.Cell("C5").Value.GetNumber();
-            startingAlarmNum = (uint)worksheet.Cell("C7").Value.GetNumber();
-            alarmNumFormat = worksheet.Cell("C8").Value.GetText();
-            divisionType = worksheet.Cell("C9").Value.GetText();
+            fcBlockName = worksheet.Cell("C5").Value.GetText();
+            fcBlockNumber = (uint)worksheet.Cell("C6").Value.GetNumber();
+            startingAlarmNum = (uint)worksheet.Cell("C8").Value.GetNumber();
+            alarmNumFormat = worksheet.Cell("C9").Value.GetText();
             groupingType = worksheet.Cell("C10").Value.GetText();
-            skipNumberAfterGroup = (uint)worksheet.Cell("C11").Value.GetNumber();
+            divisionType = worksheet.Cell("C11").Value.GetText();
+            antiSlipNumber = (uint)worksheet.Cell("C13").Value.GetNumber();
+            skipNumberAfterGroup = (uint)worksheet.Cell("C14").Value.GetNumber();
 
             alarmDataList.Clear();
 
@@ -89,7 +91,7 @@ namespace TiaXmlReader.Generation
 
             fc = new BlockFC();
             fc.Init();
-            fc.GetBlockAttributes().SetBlockName(blockName).SetBlockNumber(blockNumber).SetAutoNumber(blockNumber > 0);
+            fc.GetBlockAttributes().SetBlockName(fcBlockName).SetBlockNumber(fcBlockNumber).SetAutoNumber(fcBlockNumber > 0);
 
             var nextAlarmNum = startingAlarmNum;
             switch (groupingType)
@@ -122,6 +124,11 @@ namespace TiaXmlReader.Generation
                             FillAlarmCompileUnit(compileUnit, placeholders, generationData);
                         }
 
+                        if(antiSlipNumber > 0 && nextAlarmNum % antiSlipNumber != 0)
+                        {
+                            nextAlarmNum = (nextAlarmNum / antiSlipNumber) * antiSlipNumber + antiSlipNumber;
+                        }
+
                         nextAlarmNum += skipNumberAfterGroup;
                     }
                     break;
@@ -152,6 +159,10 @@ namespace TiaXmlReader.Generation
                             FillAlarmCompileUnit(compileUnit, placeholders, generationData);
                         }
 
+                        if (antiSlipNumber > 0 && nextAlarmNum % antiSlipNumber != 0)
+                        {
+                            nextAlarmNum = (nextAlarmNum / antiSlipNumber) * antiSlipNumber + antiSlipNumber;
+                        }
 
                         nextAlarmNum += skipNumberAfterGroup;
                     }
@@ -164,7 +175,6 @@ namespace TiaXmlReader.Generation
             var contact = new ContactPartData(compileUnit);
             var coil1 = new CoilPartData(compileUnit);
             var coil2 = new CoilPartData(compileUnit);
-
 
             contact.CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, alarmData.GetConsumerAddress(placeholders.Parse)));
             coil1.CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, alarmData.GetCoil1Address(placeholders.Parse)));

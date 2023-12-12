@@ -8,8 +8,9 @@ using System.Linq;
 using TiaXmlReader.SimaticML;
 using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace;
 using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace;
+using static SpinXmlReader.Block.Section;
 
-namespace TiaXmlReader.Generation.Cad
+namespace TiaXmlReader.Generation.IO_Cad
 {
     internal class GenerationIO_CAD : IGeneration
     {
@@ -30,6 +31,7 @@ namespace TiaXmlReader.Generation.Cad
         private string variableComment;
         private string segmentNameBitGrouping;
         private string segmentNameByteGrouping;
+        private string structGrouping;
 
         private readonly List<CadData> cadDataList;
 
@@ -99,6 +101,7 @@ namespace TiaXmlReader.Generation.Cad
             variableComment = worksheet.Cell("C22").Value.GetText();
             segmentNameBitGrouping = worksheet.Cell("C23").Value.GetText();
             segmentNameByteGrouping = worksheet.Cell("C24").Value.GetText();
+            structGrouping = worksheet.Cell("C25").Value.GetText();
         }
 
         public void GenerateBlocks()
@@ -159,9 +162,39 @@ namespace TiaXmlReader.Generation.Cad
                         }
                         break;
                     case "GlobalDB":
+                        string memberAddress = placeholders.Parse(variableName);
+                        switch (structGrouping)
+                        {
+                            case "Comment1":
+                                if (!string.IsNullOrEmpty(cadData.Comment1))
+                                {
+                                    memberAddress = $"{SimaticMLUtil.WrapAddressComponent(cadData.Comment1)}.{placeholders.Parse(variableName)}";
+                                }
+                                break;
+                            case "Comment2":
+                                if (!string.IsNullOrEmpty(cadData.Comment2))
+                                {
+                                    memberAddress = $"{SimaticMLUtil.WrapAddressComponent(cadData.Comment2)}.{placeholders.Parse(variableName)}";
+                                }
+                                break;
+                            case "Comment3":
+                                if (!string.IsNullOrEmpty(cadData.Comment3))
+                                {
+                                    memberAddress = $"{SimaticMLUtil.WrapAddressComponent(cadData.Comment3)}.{placeholders.Parse(variableName)}";
+                                }
+                                break;
+                            case "Comment4":
+                                if (!string.IsNullOrEmpty(cadData.Comment4))
+                                {
+                                    memberAddress = $"{SimaticMLUtil.WrapAddressComponent(cadData.Comment4)}.{placeholders.Parse(variableName)}";
+                                }
+                                break;
+                        }
+
                         var member = db.GetAttributes().ComputeSection(SectionTypeEnum.STATIC)
-                            .AddMember(placeholders.Parse(variableName), "Bool")
+                            .AddMembersFromAddress(memberAddress, SimaticDataType.BOOLEAN)
                             .SetComment(Constants.DEFAULT_CULTURE, placeholders.Parse(variableComment));
+
                         outputAddress = member.GetCompleteSymbol();
                         break;
                 }

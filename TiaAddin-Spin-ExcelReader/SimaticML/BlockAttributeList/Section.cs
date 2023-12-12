@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using TiaXmlReader.Attributes;
+using TiaXmlReader.SimaticML;
 using TiaXmlReader.Utility;
 using static SpinXmlReader.Block.Section;
 
@@ -48,35 +49,31 @@ namespace SpinXmlReader.Block
             }
         }
 
-        private readonly BlockAttributeList parentAttributeList;
+        private readonly XmlAttributeConfiguration sectionName;
 
-        private readonly XmlAttributeConfiguration name;
-
-        public Section(BlockAttributeList parentAttributeList) : base(Section.NODE_NAME, Section.CreateMember, required: true, namespaceURI: Constants.GET_SECTIONS_NAMESPACE())
+        public Section() : base(Section.NODE_NAME, Section.CreateMember, required: true, namespaceURI: Constants.GET_SECTIONS_NAMESPACE())
         {
-            this.parentAttributeList = parentAttributeList;
-
             //==== INIT CONFIGURATION ====
-            name = this.AddAttribute("Name", required: true);
+            sectionName = this.AddAttribute("Name", required: true, value: "Namehere");
             //==== INIT CONFIGURATION ====
         }
 
-        public Section(BlockAttributeList parentAttributeList, SectionTypeEnum type) : this(parentAttributeList)
+        public Section(SectionTypeEnum type) : this()
         {
-            name.SetValue(GetSectionNameFromType(type));
+            sectionName.SetValue(GetSectionNameFromType(type));
         }
 
         public SectionTypeEnum GetSectionType()
         {
-            return (SectionTypeEnum) Enum.Parse(typeof(SectionTypeEnum), name.GetValue(), ignoreCase: true);
+            return (SectionTypeEnum) Enum.Parse(typeof(SectionTypeEnum), sectionName.GetValue(), ignoreCase: true);
         }
 
         public void GetSectionType(out SectionTypeEnum type)
         {
-            Enum.TryParse<SectionTypeEnum>(name.GetValue(), ignoreCase: true, out type);
+            Enum.TryParse<SectionTypeEnum>(sectionName.GetValue(), ignoreCase: true, out type);
         }
 
-        public Section SetReturnRetValMember(string name, string dataType)
+        public Section SetReturnRetValMember(string name, SimaticDataType dataType)
         {
             this.GetItems().Clear();
             this.AddMember(name, dataType);
@@ -85,16 +82,63 @@ namespace SpinXmlReader.Block
 
         public Section SetVoidReturnRetValMember()
         {
-            this.SetReturnRetValMember("Ret_Val", "Void");
+            this.SetReturnRetValMember("Ret_Val", SimaticDataType.VOID);
             return this;
         }
 
-        public Member AddMember(string name, string dataType)
+        public Member AddMember(string name, SimaticDataType dataType)
         {
-            var member = this.AddNode(new Member(this));
-            member.SetMemberName(name);
-            member.SetMemberDataType(dataType);
+            var member = new Member()
+                .SetMemberName(string.IsNullOrEmpty(name) ? Constants.DEFAULT_EMPTY_STRUCT_NAME : name)
+                .SetMemberDataType(dataType.GetSimaticMLString());
+            this.GetItems().Add(member);
             return member;
+        }
+
+        public Member AddMembersFromAddress(string address, SimaticDataType dataType)
+        {
+            var components = SimaticMLUtil.SplitAddressIntoComponents(address);
+            if(components.Count == 0)
+            {
+                return null;
+            }
+
+            Member lastMember = null;
+            IEnumerable<Member> lastMembersList = this.GetItems();
+            for(int x = 0; x < components.Count; x++)
+            {
+                Member foundMember = null;
+
+                var str = components[x];
+                str = string.IsNullOrEmpty(str) ? Constants.DEFAULT_EMPTY_STRUCT_NAME : str;
+                foreach (var member in lastMembersList)
+                {
+                    if (member.GetMemberName().ToLower() == str.ToLower())
+                    {
+                        foundMember = member;
+                        break;
+                    }
+                }
+
+                var isLastComponent = (x == components.Count - 1);
+                if (foundMember == null)
+                {
+                    if(x == 0)
+                    {
+                        foundMember = this.AddMember(str, isLastComponent ? dataType : SimaticDataType.STRUCTURE);
+                    }
+                    else
+                    {
+                        Validate.IsTrue(lastMember != null, "Somethign went wrong while adding members from address");
+                        foundMember = lastMember.AddMember(str, isLastComponent ? dataType : SimaticDataType.STRUCTURE);
+                    }
+                }
+
+                lastMember = foundMember;
+                lastMembersList = foundMember.GetItems();
+            }
+
+            return lastMember;
         }
 
         //Members can have other members inside (In case of structs)
@@ -102,17 +146,17 @@ namespace SpinXmlReader.Block
         {
             public const string NODE_NAME = "Member";
 
-            private readonly XmlAttributeConfiguration name;
+            private readonly XmlAttributeConfiguration memberName;
             private readonly XmlAttributeConfiguration dataType;
             private readonly XmlNodeConfiguration startValue;
             
             private readonly XmlNodeListConfiguration<XmlNodeConfiguration> attributeList;
             private readonly MultiLanguageTextCollection comment;
 
-            public Member(XmlNodeConfiguration parentConfiguration = null) : base(Member.NODE_NAME, CreateMember, namespaceURI: Constants.GET_SECTIONS_NAMESPACE())
+            public Member() : base(Member.NODE_NAME, CreateMember, namespaceURI: Constants.GET_SECTIONS_NAMESPACE())
             {
                 //==== INIT CONFIGURATION ====
-                name = this.AddAttribute("Name",         required: true, value: "DefaultName");
+                memberName = this.AddAttribute("Name",   required: true, value: "DefaultName");
                 dataType = this.AddAttribute("Datatype", required: true, value: "Bool");
                 startValue = this.AddNode("StartValue");
 
@@ -137,12 +181,13 @@ namespace SpinXmlReader.Block
 
             public string GetMemberName()
             {
-                return name.GetValue();
+                return memberName.GetValue();
             }
 
-            public void SetMemberName(string name)
+            public Member SetMemberName(string name)
             {
-                this.name.SetValue(name);
+                this.memberName.SetValue(name);
+                return this;
             }
 
             public string GetMemberDataType()
@@ -150,9 +195,10 @@ namespace SpinXmlReader.Block
                 return dataType.GetValue();
             }
 
-            public void SetMemberDataType(string dataType)
+            public Member SetMemberDataType(string dataType)
             {
                 this.dataType.SetValue(dataType);
+                return this;
             }
 
             public string GetStartValue()
@@ -165,17 +211,25 @@ namespace SpinXmlReader.Block
                 this.startValue.SetInnerText(startValue);
             }
 
+            public Member AddMember(string name, SimaticDataType dataType)
+            {
+                var member = this.AddNode(new Member());
+                member.SetMemberName(name);
+                member.SetMemberDataType(dataType.GetSimaticMLString());
+                return member;
+            }
+
             public string GetCompleteSymbol()
             {
-                return this.GetParentSymbol(base.GetParentConfiguration()) + "." + this.name.GetValue();
-
+                return this.GetParentSymbol(this);
             }
 
             private string GetParentSymbol(XmlNodeConfiguration parentConfiguration)
             {
                 if(parentConfiguration is Member parentMember)
                 {
-                    return parentMember.GetMemberName() + this.GetParentSymbol(parentMember.parentConfiguration);
+                    //Wrap the member name in double quotes to "join" all the values toghether. If the name contains special chars (Like a dot) it will create problems.
+                    return this.GetParentSymbol(parentMember.parentConfiguration) + "." + SimaticMLUtil.WrapAddressComponentIfRequired(parentMember.GetMemberName());
                 }
                 else if(parentConfiguration != null)
                 {
@@ -188,7 +242,7 @@ namespace SpinXmlReader.Block
                         }
                         else if(loopParentConfiguration is GlobalDB globalDB)
                         {
-                            return globalDB.GetAttributes().GetBlockName();
+                            return SimaticMLUtil.WrapAddressComponentIfRequired(globalDB.GetAttributes().GetBlockName());
                         }
 
                         loopParentConfiguration = loopParentConfiguration.GetParentConfiguration();

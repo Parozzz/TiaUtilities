@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TiaXmlReader.Generation.IO_Cad;
+using TiaXmlReader.SimaticML;
 
 namespace TiaXmlReader.Generation
 {
@@ -175,6 +177,42 @@ namespace TiaXmlReader.Generation
             { 
                 Value = cadType 
             });
+        }
+
+        public GenerationPlaceholders SetIOData(IOData ioData)
+        {
+            AddOrReplace("{siemens_memory_type}", new StringGenerationPlaceholderData()
+            {
+                Value = ioData.GetMemoryArea().GetTIAMnemonic()
+            });
+
+            AddOrReplace("{bit_address}", new StringGenerationPlaceholderData()
+            {
+                Value = "" + ioData.GetAddressBit()
+            });
+
+            AddOrReplace("{byte_address}", new StringGenerationPlaceholderData()
+            {
+                Value = "" + ioData.GetAddressByte()
+            });
+
+            AddOrReplace("{io_tag_name}", new StringGenerationPlaceholderData()
+            {
+                Value = ioData.IOTagName
+            });
+
+            AddOrReplace("{io_tag_comment}", new StringGenerationPlaceholderData()
+            {
+                Value = ioData.IOTagComment
+            });
+
+            AddOrReplace("{support_variable_comment}", new StringGenerationPlaceholderData()
+            {
+                Value = ioData.VariableComment
+            });
+
+            return this;
+
         }
 
         private GenerationPlaceholders AddOrReplace(string placeholder, IGenerationPlaceholderData placeholderData)

@@ -20,7 +20,8 @@ namespace TiaXmlReader.SimaticML
         REAL,
         LREAL,
         TIMER,
-        COUNTER
+        COUNTER,
+        STRUCTURE,
     }
 
     public static class DataTypeExtension
@@ -41,6 +42,7 @@ namespace TiaXmlReader.SimaticML
                 case SimaticDataType.LREAL: return "LReal";
                 case SimaticDataType.TIMER: return "Timer";
                 case SimaticDataType.COUNTER: return "Counter";
+                case SimaticDataType.STRUCTURE: return "Struct";
                 default:
                     throw new Exception("SimaticML string not set for DataType " + dataType.ToString());
             }
@@ -62,6 +64,7 @@ namespace TiaXmlReader.SimaticML
                 case SimaticDataType.LREAL: return 8;
                 case SimaticDataType.TIMER: return 0;
                 case SimaticDataType.COUNTER: return 0;
+                case SimaticDataType.STRUCTURE: return 0;
                 default:
                     throw new Exception("SimaticML string not set for DataType " + dataType.ToString());
             }

@@ -1,19 +1,9 @@
 ﻿using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Spreadsheet;
-using SpinXmlReader.Block;
-using SpinXmlReader.TagTable;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Windows.Forms;
-using System.Xml;
-using TiaXmlReader;
-using TiaXmlReader.AlarmGeneration;
 using TiaXmlReader.Generation;
-using TiaXmlReader.Generation.Cad;
+using TiaXmlReader.Generation.IO;
+using TiaXmlReader.Generation.IO_Cad;
 
 namespace SpinXmlReader
 {
@@ -27,7 +17,7 @@ namespace SpinXmlReader
             tiaVersionComboBox.Text = "" + Constants.VERSION;
         }
 
-        private void tiaVersionComboBox_TextUpdate(object sender, EventArgs e)
+        private void TiaVersionComboBox_TextUpdate(object sender, EventArgs e)
         {
             if (uint.TryParse(tiaVersionComboBox.Text, out var version))
             {
@@ -88,6 +78,12 @@ namespace SpinXmlReader
                             generationIO_Cad.ImportExcelConfig(configWorksheet);
                             generationIO_Cad.GenerateBlocks();
                             generationIO_Cad.ExportXML(exportPathTextBlock.Text);
+                            break;
+                        case "type3":
+                            var generationIO = new GenerationIO();
+                            generationIO.ImportExcelConfig(configWorksheet);
+                            generationIO.GenerateBlocks();
+                            generationIO.ExportXML(exportPathTextBlock.Text);
                             break;
                     }
                 }

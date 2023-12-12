@@ -9,6 +9,18 @@ namespace TiaXmlReader.SimaticML
 {
     public static class SimaticMLUtil
     {
+
+        public static string WrapAddressComponent(string component)
+        {
+            return '\"' + component + '\"';
+        }
+
+        public static string WrapAddressComponentIfRequired(string component)
+        {
+            return SimaticMLUtil.ContainsSpecialChars(component) ? SimaticMLUtil.WrapAddressComponent(component) : component;
+        }
+
+
         public static string GetLengthIdentifier(uint len)
         {
             switch(len)
@@ -24,7 +36,7 @@ namespace TiaXmlReader.SimaticML
 
         public static bool ContainsSpecialChars(string str)
         {
-            return str.Contains('.') || str.Contains(" ");
+            return str.Contains('.') || str.Contains(" ") || str.Contains("\"") || str.Contains("\'");
         }
 
         public static string JoinComponentsIntoAddress(List<string> components)

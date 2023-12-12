@@ -92,8 +92,6 @@ namespace SpinXmlReader
             objectList.GetItems().Add(item);
         }
 
-
-
         public MultilingualTextItem GetByDefaultLocale()
         {
             return GetByLocale(Constants.DEFAULT_CULTURE);

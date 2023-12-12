@@ -14,7 +14,25 @@ namespace TiaXmlReader.SimaticML
         INPUT,
         OUTPUT,
         TIMER,
-        COUNTER
+        COUNTER,
+        UNDEFINED
+    }
+
+    public static class SimaticMemoryAreaUtil
+    {
+        public static SimaticMemoryArea GetFromAddress(string address)
+        {
+            var str = address.Replace("%", "").ToUpper();
+            switch(str[0])
+            {
+                case 'I': case 'E': return SimaticMemoryArea.INPUT;
+                case 'Q': case 'A': return SimaticMemoryArea.OUTPUT;
+                case 'M': return SimaticMemoryArea.MERKER;
+                case 'T': return SimaticMemoryArea.TIMER;
+                case 'C': return SimaticMemoryArea.COUNTER;
+                default:  return SimaticMemoryArea.UNDEFINED;
+            }
+        }
     }
 
     public static class SimaticMemoryAreaExtension

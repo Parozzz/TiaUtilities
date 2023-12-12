@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TiaXmlReader.Generation
+namespace TiaXmlReader.Generation.IO_Cad
 {
     public enum CadDataSiemensMemoryType { INPUT = 0, SAFE_INPUT = 1, OUTPUT = 2, SAFE_OUTPUT = 3, UNDEFINED = 99 }
     // Define an extension method in a non-nested static class.
