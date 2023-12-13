@@ -27,20 +27,20 @@ namespace TiaXmlReader.Attributes
 
     public abstract class IAttribute<V> : XmlNodeConfiguration
     {
-        private readonly XmlAttributeConfiguration name;
+        private readonly XmlAttributeConfiguration attributeName;
         private readonly XmlAttributeConfiguration systemDefined;
 
-        public IAttribute(string nodeName, string defaultInnerText = "") : base(nodeName, required: false, defaultInnerText)
+        public IAttribute(string nodeName, string defaultInnerText = "") : base(nodeName, required: false, defaultInnerText: defaultInnerText)
         {
             //==== INIT CONFIGURATION ====
-            name = new XmlAttributeConfiguration("Name",                   required: true);
-            systemDefined = new XmlAttributeConfiguration("SystemDefined", required: true, value: "true");
+            attributeName = this.AddAttribute("Name", required: true);
+            systemDefined = this.AddAttribute("SystemDefined", required: true, value: "true");
             //==== INIT CONFIGURATION ====
         }
 
         public string GetAttributeName()
         {
-            return name.GetValue();
+            return attributeName.GetValue();
         }
 
         public void GetAttributeSystemDefined(out bool value)
@@ -50,6 +50,7 @@ namespace TiaXmlReader.Attributes
 
         public abstract void GetAttributeValue(out V value);
     }
+
     public class BooleanAttribute : IAttribute<bool>
     {
         public const string NODE_NAME = "BooleanAttribute";

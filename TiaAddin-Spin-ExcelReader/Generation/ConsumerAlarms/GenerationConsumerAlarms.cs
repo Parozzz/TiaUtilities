@@ -1,6 +1,7 @@
 ﻿using ClosedXML.Excel;
 using SpinXmlReader;
 using SpinXmlReader.Block;
+using SpinXmlReader.SimaticML;
 using System;
 using System.Collections.Generic;
 using TiaXmlReader.AlarmGeneration;
@@ -87,8 +88,6 @@ namespace TiaXmlReader.Generation
 
         public void GenerateBlocks()
         {
-            GlobalIDGenerator.ResetID();
-
             fc = new BlockFC();
             fc.Init();
             fc.GetBlockAttributes().SetBlockName(fcBlockName).SetBlockNumber(fcBlockNumber).SetAutoNumber(fcBlockNumber > 0);
@@ -197,8 +196,8 @@ namespace TiaXmlReader.Generation
                 throw new ArgumentNullException("Blocks has not been generated");
             }
 
-            var xmlDocument = SiemensMLParser.CreateDocument();
-            xmlDocument.DocumentElement.AppendChild(fc.Generate(xmlDocument));
+            var xmlDocument = SimaticMLParser.CreateDocument();
+            xmlDocument.DocumentElement.AppendChild(fc.Generate(xmlDocument, new IDGenerator()));
             xmlDocument.Save(exportPath + "/fcExport_" + fc.GetBlockAttributes().GetBlockName() + ".xml");
         }
 

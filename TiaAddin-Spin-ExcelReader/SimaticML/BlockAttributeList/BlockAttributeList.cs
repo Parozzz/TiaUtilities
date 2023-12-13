@@ -32,7 +32,7 @@ namespace SpinXmlReader.Block
             blockInterface = this.AddNode("Interface",                                               required: true);
             blockSections = blockInterface.AddNodeList("Sections", this.CreateSection, required: true, namespaceURI: Constants.GET_SECTIONS_NAMESPACE());
 
-            memoryLayout = this.AddNode("MemoryLayout",                                              required: true,  defaultInnerText: "Optimized");
+            memoryLayout = this.AddNode("MemoryLayout",                                              required: false); //Not required for InstanceDB
             memoryReserve = this.AddNode("MemoryReserve",                                            required: false);
             blockName = this.AddNode("Name",                                                         required: true, defaultInnerText: "fcTest");
             if(Constants.VERSION >= 18)                                                              

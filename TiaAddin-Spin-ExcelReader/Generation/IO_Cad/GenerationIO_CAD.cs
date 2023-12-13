@@ -9,6 +9,7 @@ using TiaXmlReader.SimaticML;
 using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace;
 using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace;
 using static SpinXmlReader.Block.Section;
+using SpinXmlReader.SimaticML;
 
 namespace TiaXmlReader.Generation.IO_Cad
 {
@@ -37,7 +38,7 @@ namespace TiaXmlReader.Generation.IO_Cad
 
         private BlockFC fc;
         private CompileUnit compileUnit;
-        private GlobalDB db;
+        private BlockGlobalDB db;
         private XMLTagTable ioTagTable;
         private XMLTagTable supportsTagTable;
 
@@ -106,8 +107,6 @@ namespace TiaXmlReader.Generation.IO_Cad
 
         public void GenerateBlocks()
         {
-            GlobalIDGenerator.ResetID();
-
             fc = new BlockFC();
             fc.Init();
             fc.GetBlockAttributes().SetBlockName(blockName).SetBlockNumber(blockNumber).SetAutoNumber(blockNumber > 0);
@@ -122,7 +121,7 @@ namespace TiaXmlReader.Generation.IO_Cad
                     supportsTagTable.SetTagTableName(variableTableName);
                     break;
                 case "GlobalDB":
-                    db = new GlobalDB();
+                    db = new BlockGlobalDB();
                     db.Init();
                     db.GetAttributes().SetBlockName(dbName).SetBlockNumber(dbNumber).SetAutoNumber(dbNumber > 0);
                     break;
@@ -243,25 +242,25 @@ namespace TiaXmlReader.Generation.IO_Cad
                 throw new ArgumentNullException("Blocks has not been generated");
             }
 
-            var xmlDocument = SiemensMLParser.CreateDocument();
-            xmlDocument.DocumentElement.AppendChild(fc.Generate(xmlDocument));
+            var xmlDocument = SimaticMLParser.CreateDocument();
+            xmlDocument.DocumentElement.AppendChild(fc.Generate(xmlDocument, new IDGenerator()));
             xmlDocument.Save(exportPath + "/fcExport_" + fc.GetBlockAttributes().GetBlockName() + ".xml");
 
-            xmlDocument = SiemensMLParser.CreateDocument();
-            xmlDocument.DocumentElement.AppendChild(ioTagTable.Generate(xmlDocument));
+            xmlDocument = SimaticMLParser.CreateDocument();
+            xmlDocument.DocumentElement.AppendChild(ioTagTable.Generate(xmlDocument, new IDGenerator()));
             xmlDocument.Save(exportPath + "/ioTagTable.xml");
 
             if (supportsTagTable != null)
             {
-                xmlDocument = SiemensMLParser.CreateDocument();
-                xmlDocument.DocumentElement.AppendChild(supportsTagTable.Generate(xmlDocument));
+                xmlDocument = SimaticMLParser.CreateDocument();
+                xmlDocument.DocumentElement.AppendChild(supportsTagTable.Generate(xmlDocument, new IDGenerator()));
                 xmlDocument.Save(exportPath + "/tagTableExport_" + supportsTagTable.GetTagTableName() + ".xml");
             }
 
             if (db != null)
             {
-                xmlDocument = SiemensMLParser.CreateDocument();
-                xmlDocument.DocumentElement.AppendChild(db.Generate(xmlDocument));
+                xmlDocument = SimaticMLParser.CreateDocument();
+                xmlDocument.DocumentElement.AppendChild(db.Generate(xmlDocument, new IDGenerator()));
                 xmlDocument.Save(exportPath + "/dbExport_" + db.GetAttributes().GetBlockName() + ".xml");
             }
         }

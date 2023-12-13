@@ -148,6 +148,9 @@ namespace SpinXmlReader.Block
 
             private readonly XmlAttributeConfiguration memberName;
             private readonly XmlAttributeConfiguration dataType;
+            private readonly XmlAttributeConfiguration version;
+            private readonly XmlAttributeConfiguration remanence;
+
             private readonly XmlNodeConfiguration startValue;
             
             private readonly XmlNodeListConfiguration<XmlNodeConfiguration> attributeList;
@@ -158,6 +161,9 @@ namespace SpinXmlReader.Block
                 //==== INIT CONFIGURATION ====
                 memberName = this.AddAttribute("Name",   required: true, value: "DefaultName");
                 dataType = this.AddAttribute("Datatype", required: true, value: "Bool");
+                version = this.AddAttribute("Version");
+                remanence = this.AddAttribute("Remanence");
+
                 startValue = this.AddNode("StartValue");
 
                 attributeList = this.AddNode(new XmlNodeListConfiguration<XmlNodeConfiguration>(Constants.ATTRIBUTE_LIST_KEY, AttributeUtil.CreateAttribute));
@@ -206,9 +212,38 @@ namespace SpinXmlReader.Block
                 return startValue.GetInnerText();
             }
 
-            public void SetMemberStartValue(string startValue)
+            public Member SetMemberStartValue(string startValue)
             {
                 this.startValue.SetInnerText(startValue);
+                return this;
+            }
+
+            public string GetVersion()
+            {
+                return this.version.GetValue();
+            }
+
+            public Member SetVersion(string version)
+            {
+                this.version.SetValue(version);
+                return this;
+            }
+
+            public string GetRemanence()
+            {
+                return this.remanence.GetValue();
+            }
+
+            public Member SetRemanenceRetain()
+            {
+                this.remanence.SetValue("Retain");
+                return this;
+            }
+
+            public Member SeRemancenceSetInIDB()
+            {
+                this.remanence.SetValue("SetInIDB");
+                return this;
             }
 
             public Member AddMember(string name, SimaticDataType dataType)
@@ -240,7 +275,7 @@ namespace SpinXmlReader.Block
                         {
                             return "";
                         }
-                        else if(loopParentConfiguration is GlobalDB globalDB)
+                        else if(loopParentConfiguration is BlockGlobalDB globalDB)
                         {
                             return SimaticMLUtil.WrapAddressComponentIfRequired(globalDB.GetAttributes().GetBlockName());
                         }

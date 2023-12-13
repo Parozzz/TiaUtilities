@@ -1,4 +1,5 @@
 ﻿using SpinXmlReader;
+using SpinXmlReader.SimaticML;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -51,74 +52,9 @@ namespace TiaXmlReader.Utility
             this.parentConfiguration = parentConfiguration;
         }
 
-        public abstract void Parse(XmlNode xmlNode);
+        public abstract void Parse(XmlNode xmlNode, IDGenerator globalIDGenerator);
 
         public abstract bool IsEmpty();
-    }
-
-    public class XmlNodeListConfiguration<T> : XmlNodeConfiguration where T : XmlNodeConfiguration
-    {
-        private readonly Func<XmlNode, T> creationFunction;
-        private readonly ObservableCollection<T> items;
-
-        public XmlNodeListConfiguration(string name, Func<XmlNode, T> creationFunction, bool required = false, string namespaceURI = "", string defaultInnerText = "") : base(name, required, namespaceURI, defaultInnerText)
-        {
-            this.creationFunction = creationFunction;
-            this.items = new ObservableCollection<T>();
-            this.items.CollectionChanged += Items_CollectionChanged;
-        }
-
-        private void Items_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            if (e.NewItems != null)
-            {
-                foreach (XmlNodeConfiguration newItem in e.NewItems)
-                {
-                    newItem.SetParentConfiguration(this);
-                }
-            }
-        }
-
-        public override void Parse(XmlNode xmlNode)
-        {
-            base.Parse(xmlNode);
-
-            foreach (XmlNode childNode in base.xmlElement.ChildNodes)
-            {
-                var configuration = creationFunction.Invoke(childNode);
-                if (configuration != null)
-                {
-                    items.Add(configuration);
-                    configuration.Parse(childNode);
-                }
-            }
-        }
-
-        public override bool IsEmpty()
-        {
-            return base.IsEmpty() && items.Count == 0;
-        }
-
-        public override XmlElement Generate(XmlDocument document)
-        {
-            var xmlElement = base.Generate(document);
-
-            foreach (var item in items)
-            {
-                var itemXmlElement = item.Generate(document);
-                if (itemXmlElement != null)
-                {
-                    xmlElement.AppendChild(itemXmlElement);
-                }
-            }
-
-            return xmlElement;
-        }
-
-        public ObservableCollection<T> GetItems()
-        {
-            return items;
-        }
     }
 
     public class XmlNodeConfiguration : XmlConfiguration
@@ -191,16 +127,25 @@ namespace TiaXmlReader.Utility
             return innerText;
         }
 
-        public override void Parse(XmlNode xmlNode)
+        public override void Parse(XmlNode xmlNode, IDGenerator globalIDGenerator)
         {
             Validate.NotNull(xmlNode);
 
             this.xmlElement = (XmlElement)xmlNode;
 
-            this.innerText = xmlElement.InnerText;
+            //I use the innerText wrongly. In reality, inner text is a text based version of all the childs. So when i parse it, i will check for a child which has a value inside.
+            foreach (XmlNode child in xmlNode.ChildNodes)
+            {
+                if(child.Value != null)
+                {
+                    this.innerText = child.Value;
+                    break;
+                }
+            }
+
             foreach (var attributeConfig in attributeConfigurations)
             {
-                attributeConfig.Parse(xmlElement);
+                attributeConfig.Parse(xmlElement, globalIDGenerator);
             }
 
             foreach (var childNodeConfig in childrenNodeConfigurations)
@@ -209,7 +154,7 @@ namespace TiaXmlReader.Utility
                 {
                     if (child.Name == childNodeConfig.GetConfigurationName())
                     {
-                        childNodeConfig.Parse((XmlElement)child);
+                        childNodeConfig.Parse((XmlElement)child, globalIDGenerator);
                         break;
                     }
                 }
@@ -231,6 +176,11 @@ namespace TiaXmlReader.Utility
                 {
                     throw new Exception("A required Node has not been parsed. Name=" + childNodeConfig.GetConfigurationName() + " for " + this.GetConfigurationName());
                 }
+            }
+            //At the end after everything has been parsed.
+            if(this is IGlobalObject globalObject)
+            {
+                globalIDGenerator.SetHighest(globalObject.GetGlobalObjectData().GetId());
             }
         }
 
@@ -256,11 +206,17 @@ namespace TiaXmlReader.Utility
             return allChildEmpty && allAttributesEmpty;
         }
 
-        public virtual XmlElement Generate(XmlDocument document)
+        public virtual XmlElement Generate(XmlDocument document, IDGenerator globalIDGenerator)
         {
             if (this.IsEmpty() && !IsRequired())
             {
                 return null;
+            }
+
+            //This need to be done top first since the XmlNodeAttribute will be added below.
+            if (this is IGlobalObject globalObject)
+            {
+                globalObject.GetGlobalObjectData().SetValue(globalIDGenerator.GetNextHex());
             }
 
             //If i don't recall the first NamespaceURI all the nodes that are inside a node with a namespace will show xmlns=""
@@ -281,7 +237,7 @@ namespace TiaXmlReader.Utility
 
             foreach (var nodeConfig in childrenNodeConfigurations)
             {
-                var childXmlElement = nodeConfig.Generate(document);
+                var childXmlElement = nodeConfig.Generate(document, globalIDGenerator);
                 if (childXmlElement != null)
                 {
                     xmlElement.AppendChild(childXmlElement);
@@ -299,6 +255,70 @@ namespace TiaXmlReader.Utility
             }
 
             return string.IsNullOrEmpty(configuration.namespaceURI) ? FindFirstNamespaceURI(configuration.parentConfiguration) : configuration.namespaceURI;
+        }
+    }
+    public class XmlNodeListConfiguration<T> : XmlNodeConfiguration where T : XmlNodeConfiguration
+    {
+        private readonly Func<XmlNode, T> creationFunction;
+        private readonly ObservableCollection<T> items;
+
+        public XmlNodeListConfiguration(string name, Func<XmlNode, T> creationFunction, bool required = false, string namespaceURI = "", string defaultInnerText = "") : base(name, required, namespaceURI, defaultInnerText)
+        {
+            this.creationFunction = creationFunction;
+            this.items = new ObservableCollection<T>();
+            this.items.CollectionChanged += Items_CollectionChanged;
+        }
+
+        private void Items_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewItems != null)
+            {
+                foreach (XmlNodeConfiguration newItem in e.NewItems)
+                {
+                    newItem.SetParentConfiguration(this);
+                }
+            }
+        }
+
+        public override void Parse(XmlNode xmlNode, IDGenerator globalIDGenerator)
+        {
+            base.Parse(xmlNode, globalIDGenerator);
+
+            foreach (XmlNode childNode in base.xmlElement.ChildNodes)
+            {
+                var configuration = creationFunction.Invoke(childNode);
+                if (configuration != null)
+                {
+                    items.Add(configuration);
+                    configuration.Parse(childNode, globalIDGenerator);
+                }
+            }
+        }
+
+        public override bool IsEmpty()
+        {
+            return base.IsEmpty() && items.Count == 0;
+        }
+
+        public override XmlElement Generate(XmlDocument document, IDGenerator globalIDGenerator)
+        {
+            var xmlElement = base.Generate(document, globalIDGenerator);
+
+            foreach (var item in items)
+            {
+                var itemXmlElement = item.Generate(document, globalIDGenerator);
+                if (itemXmlElement != null)
+                {
+                    xmlElement.AppendChild(itemXmlElement);
+                }
+            }
+
+            return xmlElement;
+        }
+
+        public ObservableCollection<T> GetItems()
+        {
+            return items;
         }
     }
 
@@ -336,7 +356,7 @@ namespace TiaXmlReader.Utility
             return uint.TryParse(this.value, out value);
         }
 
-        public override void Parse(XmlNode xmlNode)
+        public override void Parse(XmlNode xmlNode, IDGenerator globalIDGenerator)
         {
             xmlAttribute = xmlNode.Attributes[name];
             if (xmlAttribute != null)

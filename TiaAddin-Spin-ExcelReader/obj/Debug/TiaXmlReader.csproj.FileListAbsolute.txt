@@ -1,4 +1,3 @@
-C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\Debug\SpinXmlReader.Form1.resources
 C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\Debug\TiaXmlReader.Properties.Resources.resources
 C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\Debug\TiaXmlReader.csproj.GenerateResource.cache
 C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\Debug\TiaXmlReader.csproj.CoreCompileInputs.cache
@@ -29,3 +28,7 @@ C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\bi
 C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\bin\Debug\System.Numerics.Vectors.xml
 C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
 C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\Debug\TiaXmlReader.csproj.CopyComplete
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\bin\Debug\Newtonsoft.Json.dll
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\bin\Debug\Newtonsoft.Json.xml
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\Debug\SpinXmlReader.MainImportExportForm.resources
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\Debug\TiaXmlReader.DBDuplicationForm.resources
