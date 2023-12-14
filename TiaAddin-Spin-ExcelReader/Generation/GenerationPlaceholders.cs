@@ -211,6 +211,11 @@ namespace TiaXmlReader.Generation
                 Value = ioData.VariableComment
             });
 
+            AddOrReplace("{consumer_name}", new StringGenerationPlaceholderData()
+            {
+                Value = ioData.ConsumerName
+            });
+
             return this;
 
         }

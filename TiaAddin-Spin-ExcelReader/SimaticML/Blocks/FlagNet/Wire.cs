@@ -25,23 +25,19 @@ namespace SpinXmlReader.Block
 
         private readonly XmlNodeConfiguration powerrail;
 
-        private readonly XmlNodeConfiguration identCon; //If this is preset, it means this wire identify a connection between an Access and a Part.
-        private readonly XmlAttributeConfiguration identConUId;
-
-        private readonly XmlNodeConfiguration openCon;
+        private readonly Con identCon; //If this is preset, it means this wire identify a connection between an Access and a Part.
+        private readonly Con openCon;
 
         public Wire(CompileUnit compileUnit) : base(Wire.NODE_NAME, NameCon.CreateNameCon)
         {
             compileUnit.AddWire(this);
 
             //==== INIT CONFIGURATION ====
-            localObjectData = this.AddAttribute(new LocalObjectData());
+            localObjectData = this.AddAttribute(new LocalObjectData(compileUnit.LocalIDGenerator));
 
             powerrail = this.AddNode("Powerrail");
 
             identCon = this.AddCon("IdentCon");
-            identConUId = identCon.AddAttribute("UId"); //This UId refers to an Access
-
             openCon = this.AddCon("OpenCon");
             //==== INIT CONFIGURATION ====
         }
@@ -86,8 +82,8 @@ namespace SpinXmlReader.Block
         {
             if(!IsPowerrail() && !IsIdentCon())
             {
-                var con = this.AddCon("IdentCon");
-                con.SetConUId(accessUId);
+                identCon.SetConUId(accessUId);
+                identCon.SetParsed();
 
                 var nameCon = this.AddNode(new NameCon());
                 nameCon.SetConUId(partUId);
@@ -99,9 +95,9 @@ namespace SpinXmlReader.Block
 
         public uint GetIdentAccessUId()
         {
-            if(IsIdentCon() && identConUId.GetUIntValue(out uint uid))
+            if(IsIdentCon())
             {
-                return uid; 
+                return identCon.GetConUId(); 
             }
 
             return 0;
@@ -117,53 +113,18 @@ namespace SpinXmlReader.Block
             return IsIdentCon() && this.GetItems().Count == 1 ? this.GetItems()[0].GetConName() : "";
         }
 
-
-        public uint GetWireStartUId()
+        public Wire AddNameCon(Part part, string partConnectionName)
         {
-            return this.GetItems().Count == 2 ? this.GetItems()[0].GetConUId() : 0;
-        }
-
-        public string GetWireStartName()
-        {
-            return this.GetItems().Count == 2 ? this.GetItems()[0].GetConName() : "";
-        }
-        public Wire SetWireStart(Part part, string partConnectionName)
-        {
-            if (this.GetItems().Count < 2)
-            {
-                var nameCon = this.AddNode(new NameCon());
-                nameCon.SetConUId(part.GetLocalObjectData().GetUId());
-                nameCon.SetConName(partConnectionName);
-            }
+            var nameCon = this.AddNode(new NameCon());
+            nameCon.SetConUId(part.GetLocalObjectData().GetUId());
+            nameCon.SetConName(partConnectionName);
 
             return this;
         }
 
-        public bool IsExitOpenCon()
+        public bool IsOpenCon()
         {
             return openCon.IsParsed();
-        }
-
-        public uint GetWireExitUId()
-        {
-            return this.GetItems().Count == 2 ? this.GetItems()[1].GetConUId() : 0;
-        }
-
-        public string GetWireExitName()
-        {
-            return this.GetItems().Count == 2 ? this.GetItems()[1].GetConName() : "";
-        }
-
-        public Wire SetWireExit(Part part, string partConnectionName)
-        {
-            if (this.GetItems().Count < 2)
-            {
-                var nameCon = this.AddNode(new NameCon());
-                nameCon.SetConUId(part.GetLocalObjectData().GetUId());
-                nameCon.SetConName(partConnectionName);
-            }
-
-            return this;
         }
     }
 

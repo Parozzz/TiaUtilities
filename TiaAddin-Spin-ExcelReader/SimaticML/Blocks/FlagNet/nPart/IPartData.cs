@@ -52,16 +52,16 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
         public T CreateInputConnection<T>(T inputPartData) where T : IPartData
         {
             new Wire(this.compileUnit)
-                .SetWireStart(inputPartData.GetPart(), inputPartData.GetOuputConName())
-                .SetWireExit(this.part, this.GetInputConName());
+                .AddNameCon(inputPartData.GetPart(), inputPartData.GetOuputConName())
+                .AddNameCon(this.part, this.GetInputConName());
             return inputPartData;
         }
 
         public T CreateOutputConnection<T>(T outputPartData) where T : IPartData
         {
             new Wire(this.compileUnit)
-                .SetWireStart(this.part, this.GetOuputConName())
-                .SetWireExit(outputPartData.GetPart(), outputPartData.GetInputConName());
+                .AddNameCon(this.part, this.GetOuputConName())
+                .AddNameCon(outputPartData.GetPart(), outputPartData.GetInputConName());
             return outputPartData;
         }
 
@@ -92,16 +92,16 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
         public T CreateInputConnection<T>(T inputPartData) where T : IPartData
         {
             new Wire(this.compileUnit)
-                .SetWireStart(inputPartData.GetPart(), inputPartData.GetOuputConName())
-                .SetWireExit(this.part, this.GetInputConName());
+                .AddNameCon(inputPartData.GetPart(), inputPartData.GetOuputConName())
+                .AddNameCon(this.part, this.GetInputConName());
             return inputPartData;
         }
 
         public T CreateOutputConnection<T>(T outputPartData) where T : IPartData
         {
             new Wire(this.compileUnit)
-                .SetWireStart(this.part, this.GetOuputConName())
-                .SetWireExit(outputPartData.GetPart(), outputPartData.GetInputConName());
+                .AddNameCon(this.part, this.GetOuputConName())
+                .AddNameCon(outputPartData.GetPart(), outputPartData.GetInputConName());
             return outputPartData;
         }
 

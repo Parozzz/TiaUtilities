@@ -202,7 +202,7 @@ namespace TiaXmlReader.Utility
             {
                 allAttributesEmpty &= attributeConfig.IsEmpty();
             }
-
+            
             return allChildEmpty && allAttributesEmpty;
         }
 

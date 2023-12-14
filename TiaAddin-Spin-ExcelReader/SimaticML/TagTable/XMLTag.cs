@@ -42,6 +42,11 @@ namespace SpinXmlReader.TagTable
             //==== INIT CONFIGURATION ====
         }
 
+        public void Init()
+        {
+            comment.SetText(Constants.DEFAULT_CULTURE, "");
+        }
+
         public GlobalObjectData GetGlobalObjectData()
         {
             return globalObjectData;

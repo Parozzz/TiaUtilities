@@ -14,6 +14,8 @@ namespace TiaXmlReader.Generation
         public String IOTagComment { get; set; }
         public String VariableAddress { get; set; }
         public String VariableComment { get; set; }
+        public string ConsumerName {  get; set; }
+        public string ConsumerVariable {  get; set; }
 
         public SimaticMemoryArea GetMemoryArea()
         {

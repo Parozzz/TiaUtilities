@@ -25,6 +25,8 @@ namespace SpinXmlReader.Block
             return null;
         }
 
+        public IDGenerator LocalIDGenerator { get; private set; } = new IDGenerator(20);
+
         private readonly GlobalObjectData globalObjectData;
 
         private readonly XmlNodeListConfiguration<MultilingualText> objectList;

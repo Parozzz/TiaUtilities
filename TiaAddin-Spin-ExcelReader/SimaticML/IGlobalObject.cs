@@ -11,7 +11,13 @@ namespace SpinXmlReader.SimaticML
 {
     public class IDGenerator
     {
-        public uint counter = 0;
+        private uint counter;
+
+        public IDGenerator(uint counter = 0)
+        {
+            this.counter = counter;
+        }
+
         public void Reset()
         {
             counter = 0;
@@ -66,8 +72,9 @@ namespace SpinXmlReader.SimaticML
 
     public class LocalObjectData : XmlAttributeConfiguration
     {
-        public LocalObjectData() : base("UId", required: true)
+        public LocalObjectData(IDGenerator iDGenerator) : base("UId", required: true)
         {
+            this.SetValue("" + iDGenerator.GetNext());
         }
 
         public uint GetUId()

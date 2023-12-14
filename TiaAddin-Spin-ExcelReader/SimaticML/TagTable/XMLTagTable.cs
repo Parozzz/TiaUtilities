@@ -44,6 +44,7 @@ namespace SpinXmlReader.TagTable
         public XMLTag AddTag()
         {
             var tag = new XMLTag();
+            tag.Init();
             objectList.GetItems().Add(tag);
             return tag;
         }

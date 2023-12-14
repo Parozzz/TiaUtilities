@@ -42,6 +42,10 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
         private readonly XmlAttributeConfiguration partName;
         private readonly XmlAttributeConfiguration disabledENO;
 
+        private readonly XmlNodeConfiguration templateValue;
+        private readonly XmlAttributeConfiguration templateValueName;
+        private readonly XmlAttributeConfiguration templateValueType;
+
         private readonly XmlNodeConfiguration negated; //FOR COIL - CONTACT
         private readonly XmlAttributeConfiguration negatedName;
 
@@ -53,10 +57,15 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
             compileUnit.AddPart(this);
 
             //==== INIT CONFIGURATION ====
-            localObjectData = this.AddAttribute(new LocalObjectData());
+            localObjectData = this.AddAttribute(new LocalObjectData(compileUnit.LocalIDGenerator));
 
             partName = this.AddAttribute("Name", required: true);
             disabledENO = this.AddAttribute("DisabledENO");
+
+            templateValue = this.AddNode("TemplateValue");
+            templateValueName = templateValue.AddAttribute("Name");
+            //Cardinality means how many connections that block have. For O for example, it means how many input connections it has. For move, how many outputs.
+            templateValueType = templateValue.AddAttribute("Cardinality");
 
             negated = this.AddNode("Negated");
             negatedName = negated.AddAttribute("Name");

@@ -1,12 +1,7 @@
-﻿using DocumentFormat.OpenXml.Drawing.Charts;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
-using System.Xml.Linq;
 using TiaXmlReader.Attributes;
 using TiaXmlReader.SimaticML;
 using TiaXmlReader.Utility;
@@ -22,7 +17,28 @@ namespace SpinXmlReader.Block
         STATIC,
         TEMP,
         CONSTANT,
-        RETURN
+        RETURN,
+        NONE //Used inside member to define start value in case of an array of UDT.
+    }
+
+    public static class SectionTypeEnumExtension
+    {
+        public static string GetSimaticMLString(this SectionTypeEnum sectionType)
+        {
+            switch (sectionType)
+            {
+                case SectionTypeEnum.INPUT: return "Input";
+                case SectionTypeEnum.OUTPUT: return "Output";
+                case SectionTypeEnum.INOUT: return "InOut";
+                case SectionTypeEnum.STATIC: return "Static";
+                case SectionTypeEnum.TEMP: return "Temp";
+                case SectionTypeEnum.CONSTANT: return "Constant";
+                case SectionTypeEnum.RETURN: return "Return";
+                case SectionTypeEnum.NONE: return "None";
+                default:
+                    return null;
+            }
+        }
     }
 
     public class Section :  XmlNodeListConfiguration<Member>
@@ -33,25 +49,9 @@ namespace SpinXmlReader.Block
             return node.Name == Member.NODE_NAME ? new Member() : null;
         }
 
-        public static string GetSectionNameFromType(SectionTypeEnum typeEnum)
-        {
-            switch (typeEnum)
-            {
-                case SectionTypeEnum.INPUT: return "Input";
-                case SectionTypeEnum.OUTPUT: return "Output";
-                case SectionTypeEnum.INOUT: return "InOut";
-                case SectionTypeEnum.STATIC: return "Static";
-                case SectionTypeEnum.TEMP: return "Temp";
-                case SectionTypeEnum.CONSTANT: return "Constant";
-                case SectionTypeEnum.RETURN: return "Return";
-                default:
-                    return null;
-            }
-        }
-
         private readonly XmlAttributeConfiguration sectionName;
 
-        public Section() : base(Section.NODE_NAME, Section.CreateMember, required: true, namespaceURI: Constants.GET_SECTIONS_NAMESPACE())
+        public Section() : base(Section.NODE_NAME, Section.CreateMember, namespaceURI: Constants.GET_SECTIONS_NAMESPACE())
         {
             //==== INIT CONFIGURATION ====
             sectionName = this.AddAttribute("Name", required: true, value: "Namehere");
@@ -60,7 +60,13 @@ namespace SpinXmlReader.Block
 
         public Section(SectionTypeEnum type) : this()
         {
-            sectionName.SetValue(GetSectionNameFromType(type));
+            sectionName.SetValue(type.GetSimaticMLString());
+        }
+
+        //Override base IsEmpty. A section is empty if there is no items inside. Don't care about other stuff.
+        public override bool IsEmpty()
+        {
+            return this.GetItems().Count == 0;
         }
 
         public SectionTypeEnum GetSectionType()
@@ -151,6 +157,12 @@ namespace SpinXmlReader.Block
             private readonly XmlAttributeConfiguration version;
             private readonly XmlAttributeConfiguration remanence;
 
+            private readonly XmlNodeConfiguration subElement;           //Not implemented yet
+            private readonly XmlAttributeConfiguration subElementPath;  //Not implemented yet
+            private readonly XmlNodeConfiguration subElementStartValue; //Not implemented yet
+
+            private readonly Section section;                           //Not implemented yet. Used to define start value in case of an array of UDT.
+
             private readonly XmlNodeConfiguration startValue;
             
             private readonly XmlNodeListConfiguration<XmlNodeConfiguration> attributeList;
@@ -163,6 +175,12 @@ namespace SpinXmlReader.Block
                 dataType = this.AddAttribute("Datatype", required: true, value: "Bool");
                 version = this.AddAttribute("Version");
                 remanence = this.AddAttribute("Remanence");
+
+                subElement = this.AddNode("Subelement");
+                subElementPath = subElement.AddAttribute("Path", required: true);
+                subElementStartValue = subElement.AddNode("StartValue", required: true);
+
+                section = this.AddNode(new Section(SectionTypeEnum.NONE));
 
                 startValue = this.AddNode("StartValue");
 

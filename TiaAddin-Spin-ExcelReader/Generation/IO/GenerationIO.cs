@@ -56,9 +56,11 @@ namespace TiaXmlReader.Generation.IO
                 var ioTagComment = worksheet.Cell("G" + cadIndex).Value;
                 var variableAddress = worksheet.Cell("H" + cadIndex).Value;
                 var variableComment = worksheet.Cell("I" + cadIndex).Value;
+                var consumerName = worksheet.Cell("J" + cadIndex).Value;
+                var consumerVariable = worksheet.Cell("K" + cadIndex).Value;
                 cadIndex++;
 
-                if (!address.IsText && !ioTagName.IsText && !ioTagComment.IsText && !variableAddress.IsText && !variableComment.IsText)
+                if (!address.IsText && !ioTagName.IsText && !ioTagComment.IsText && !variableAddress.IsText && !variableComment.IsText && !consumerName.IsText && !consumerVariable.IsText)
                 {
                     break;
                 }
@@ -67,11 +69,13 @@ namespace TiaXmlReader.Generation.IO
                 {
                     ioDataList.Add(new IOData()
                     {
-                        Address = address.GetText(),
-                        IOTagName = ioTagName.GetText(),
-                        IOTagComment = ioTagComment.GetText(),
-                        VariableAddress = variableAddress.GetText(),
-                        VariableComment = variableComment.GetText()
+                        Address = address.ToString(),
+                        IOTagName = ioTagName.ToString(),
+                        IOTagComment = ioTagComment.ToString(),
+                        VariableAddress = variableAddress.ToString(),
+                        VariableComment = variableComment.ToString(),
+                        ConsumerName = consumerName.ToString(),
+                        ConsumerVariable = consumerVariable.ToString(),
                     });
                 }
             }
@@ -121,7 +125,7 @@ namespace TiaXmlReader.Generation.IO
             var merkerByte = variableTableStartAddress;
             var merkerBit = 0;
             //Order list by ADRESS TYPE - BYTE - BIT 
-            foreach (var ioData in ioDataList.OrderBy(x => ((int)x.GetMemoryArea()) * 10000 + x.GetAddressByte() * 100 + x.GetAddressBit()).ToList())
+            foreach (var ioData in ioDataList.OrderBy(x => ((int)x.GetMemoryArea()) * Math.Pow(10, 9) + x.GetAddressByte() * Math.Pow(10, 3) + x.GetAddressBit()).ToList())
             {
                 var placeholders = new GenerationPlaceholders()
                     .SetIOData(ioData);
@@ -142,48 +146,56 @@ namespace TiaXmlReader.Generation.IO
                 }
 
                 string inOutAddress = null;
-                switch (memoryType)
+                if (string.IsNullOrEmpty(ioData.ConsumerName))
                 {
-                    case "Merker":
-                        var variableTag = supportsTagTable.AddTag()
-                                        .SetTagName(placeholders.Parse(defaultVariableName))
-                                        .SetBoolean(SimaticMemoryArea.MERKER, merkerByte, merkerBit);
-                        if (!string.IsNullOrEmpty(ioData.VariableAddress))
-                        {
-                            variableTag.SetTagName(placeholders.Parse(ioData.VariableAddress));
-                        }
-                        if (!string.IsNullOrEmpty(ioData.VariableComment))
-                        {
-                            variableTag.SetCommentText(Constants.DEFAULT_CULTURE, placeholders.Parse(ioData.VariableComment));
-                        }
-                        inOutAddress = variableTag.GetTagName();
+                    switch (memoryType)
+                    {
+                        case "Merker":
+                            var variableTag = supportsTagTable.AddTag()
+                                            .SetTagName(placeholders.Parse(defaultVariableName))
+                                            .SetBoolean(SimaticMemoryArea.MERKER, merkerByte, merkerBit);
+                            if (!string.IsNullOrEmpty(ioData.VariableAddress))
+                            {
+                                variableTag.SetTagName(placeholders.Parse(ioData.VariableAddress));
+                            }
+                            if (!string.IsNullOrEmpty(ioData.VariableComment))
+                            {
+                                variableTag.SetCommentText(Constants.DEFAULT_CULTURE, placeholders.Parse(ioData.VariableComment));
+                            }
+                            inOutAddress = variableTag.GetTagName();
 
-                        merkerBit++;
-                        if (merkerBit >= 8)
-                        {
-                            merkerByte++;
-                            merkerBit = 0;
-                        }
-                        break;
-                    case "GlobalDB":
-                        Member variableMember;
-                        if(string.IsNullOrEmpty(ioData.VariableAddress))
-                        {
-                            variableMember = db.GetAttributes().ComputeSection(SectionTypeEnum.STATIC)
-                                .AddMember(placeholders.Parse(defaultVariableName), SimaticDataType.BOOLEAN);
-                        }
-                        else
-                        {
-                            variableMember = db.GetAttributes().ComputeSection(SectionTypeEnum.STATIC)
-                                .AddMembersFromAddress(ioData.VariableAddress, SimaticDataType.BOOLEAN);
-                        }
+                            merkerBit++;
+                            if (merkerBit >= 8)
+                            {
+                                merkerByte++;
+                                merkerBit = 0;
+                            }
+                            break;
+                        case "GlobalDB":
+                            Member variableMember;
+                            if (!string.IsNullOrEmpty(ioData.VariableAddress))
+                            {
+                                variableMember = db.GetAttributes().ComputeSection(SectionTypeEnum.STATIC)
+                                    .AddMembersFromAddress(ioData.VariableAddress, SimaticDataType.BOOLEAN);
 
-                        if (!string.IsNullOrEmpty(ioData.VariableComment))
-                        {
-                            variableMember.SetComment(Constants.DEFAULT_CULTURE, placeholders.Parse(ioData.VariableComment));
-                        }
-                        inOutAddress = variableMember.GetCompleteSymbol();
-                        break;
+                            }
+                            else
+                            {
+                                variableMember = db.GetAttributes().ComputeSection(SectionTypeEnum.STATIC)
+                                    .AddMember(placeholders.Parse(defaultVariableName), SimaticDataType.BOOLEAN);
+                            }
+
+                            if (!string.IsNullOrEmpty(ioData.VariableComment))
+                            {
+                                variableMember.SetComment(Constants.DEFAULT_CULTURE, placeholders.Parse(ioData.VariableComment));
+                            }
+                            inOutAddress = variableMember.GetCompleteSymbol();
+                            break;
+                    }
+                }
+                else
+                {
+                    inOutAddress = SimaticMLUtil.WrapAddressComponentIfRequired(ioData.ConsumerName) + "." + placeholders.Parse(ioData.ConsumerVariable);
                 }
 
                 if (groupingType == "BitPerSegmento")
@@ -202,7 +214,7 @@ namespace TiaXmlReader.Generation.IO
                     compileUnit.ComputeBlockTitle().SetText(Constants.DEFAULT_CULTURE, placeholders.Parse(segmentNameByteGrouping));
                 }
 
-                switch(ioData.GetMemoryArea())
+                switch (ioData.GetMemoryArea())
                 {
                     case SimaticMemoryArea.INPUT:
                         FillInOutCompileUnit(compileUnit, ioTag.GetTagName(), inOutAddress);

@@ -1,5 +1,6 @@
 ﻿using ClosedXML.Excel;
 using System;
+using System.IO;
 using System.Windows.Forms;
 using TiaXmlReader;
 using TiaXmlReader.Generation;
@@ -38,7 +39,7 @@ namespace SpinXmlReader
             {
                 Filter = "Excel Files (*.xlsx)|*.xlsx",
                 CheckFileExists = true,
-                FileName = saveData.lastExcelFileName,
+                InitialDirectory = Path.GetDirectoryName(saveData.lastExcelFileName)
             };
 
             var result = fileDialog.ShowDialog();

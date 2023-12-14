@@ -71,7 +71,7 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace
             compileUnit.AddAccess(this);
 
             //==== INIT CONFIGURATION ====
-            localObjectData = this.AddAttribute(new LocalObjectData());
+            localObjectData = this.AddAttribute(new LocalObjectData(compileUnit.LocalIDGenerator));
             scope = this.AddAttribute("Scope", required: true);
 
             symbol = this.AddNodeList("Symbol", Component.CreateComponent);

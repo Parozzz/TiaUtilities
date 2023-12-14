@@ -82,7 +82,7 @@ namespace TiaXmlReader.SimaticML
         {
             foreach(SimaticDataType dataType in Enum.GetValues(typeof(SimaticDataType)))
             {
-                if(dataType.GetSimaticMLString() == str)
+                if(str.StartsWith(dataType.GetSimaticMLString())) //For arrays there will be other stuff after the type.
                 {
                     return dataType;
                 }
