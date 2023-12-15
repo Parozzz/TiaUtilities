@@ -6,6 +6,8 @@ using TiaXmlReader.Utility;
 using System;
 using TiaXmlReader.SimaticML;
 using SpinXmlReader.SimaticML;
+using System.Linq;
+using TiaXmlReader.SimaticML.Blocks.FlagNet;
 
 namespace SpinXmlReader.Block
 {
@@ -35,6 +37,7 @@ namespace SpinXmlReader.Block
         private readonly XmlNodeConfiguration flgNet;
         private readonly XmlNodeListConfiguration<XmlNodeConfiguration> parts;
         private readonly XmlNodeListConfiguration<Wire> wires;
+        private readonly XmlNodeListConfiguration<LabelDeclaration> labels;
 
         private readonly XmlNodeConfiguration programmingLanguage;
 
@@ -50,6 +53,7 @@ namespace SpinXmlReader.Block
             flgNet = networkSource.AddNode("FlgNet", namespaceURI: Constants.GET_FLAG_NET_NAMESPACE());
             parts = flgNet.AddNodeList("Parts", xmlNode => CompileUnit.CreatePart(this, xmlNode));
             wires = flgNet.AddNodeList("Wires", xmlNode => Wire.CreateWire(this, xmlNode));
+            labels = flgNet.AddNodeList("Labels", xmlNode => LabelDeclaration.CreateLabelDeclaration(xmlNode, LocalIDGenerator));
 
             objectList = this.AddNodeList(Constants.OBJECT_LIST_KEY, MultilingualText.CreateMultilingualText, required: true);
 
@@ -143,15 +147,7 @@ namespace SpinXmlReader.Block
 
         public CompileUnit AddPowerrailConnections(Dictionary<Part, string> partConnectionDict)
         {
-            Wire powerrail = null;
-            foreach (var wire in this.wires.GetItems())
-            {
-                if (wire.IsPowerrail())
-                {
-                    powerrail = wire;
-                }
-            }
-
+            var powerrail = this.wires.GetItems().SingleOrDefault(wire => wire.IsPowerrail());
             if (powerrail == null)
             {
                 powerrail = new Wire(this);

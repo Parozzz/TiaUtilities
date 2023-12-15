@@ -313,6 +313,11 @@ namespace SpinXmlReader.Block
 
             public Member SetComment(CultureInfo culture, string text)
             {
+                if(string.IsNullOrEmpty(text))
+                {
+                    return this;
+                }
+
                 foreach (var item in comment.GetItems())
                 {
                     if(item.GetLang() == culture)

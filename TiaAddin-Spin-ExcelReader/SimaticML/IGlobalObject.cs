@@ -28,6 +28,11 @@ namespace SpinXmlReader.SimaticML
             return counter++;
         }
 
+        public string GetNextString()
+        {
+            return "" + counter++;
+        }
+
         public string GetNextHex()
         {
             return counter++.ToString("X");

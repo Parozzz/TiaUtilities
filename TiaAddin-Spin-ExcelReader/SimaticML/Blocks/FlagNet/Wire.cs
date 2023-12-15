@@ -1,4 +1,5 @@
 ﻿using SpinXmlReader.SimaticML;
+using System.Linq;
 using System.Xml;
 using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace;
 using TiaXmlReader.Utility;
@@ -13,7 +14,7 @@ namespace SpinXmlReader.Block
         OPENCON
     }
 
-    public class Wire : XmlNodeListConfiguration<NameCon>, ILocalObject
+    public class Wire : XmlNodeListConfiguration<Con>, ILocalObject
     {
         public const string NODE_NAME = "Wire";
         public static Wire CreateWire(CompileUnit compileUnit, XmlNode node)
@@ -23,22 +24,12 @@ namespace SpinXmlReader.Block
 
         private readonly LocalObjectData localObjectData;
 
-        private readonly XmlNodeConfiguration powerrail;
-
-        private readonly Con identCon; //If this is preset, it means this wire identify a connection between an Access and a Part.
-        private readonly Con openCon;
-
-        public Wire(CompileUnit compileUnit) : base(Wire.NODE_NAME, NameCon.CreateNameCon)
+        public Wire(CompileUnit compileUnit) : base(Wire.NODE_NAME, Con.CreateCon)
         {
             compileUnit.AddWire(this);
 
             //==== INIT CONFIGURATION ====
             localObjectData = this.AddAttribute(new LocalObjectData(compileUnit.LocalIDGenerator));
-
-            powerrail = this.AddNode("Powerrail");
-
-            identCon = this.AddCon("IdentCon");
-            openCon = this.AddCon("OpenCon");
             //==== INIT CONFIGURATION ====
         }
 
@@ -52,42 +43,57 @@ namespace SpinXmlReader.Block
             return localObjectData;
         }
 
+        public PowerrailCon GetPowerrail()
+        {
+            return this.GetItems().SingleOrDefault(con => con.GetConfigurationName() == PowerrailCon.NODE_NAME) is PowerrailCon powerrailCon ? powerrailCon : null;
+        }
+
         public bool IsPowerrail()
         {
-            return powerrail.IsParsed();
+            return GetPowerrail() != null;
         }
 
         public void SetPowerrail()
         {
-            powerrail.SetParsed();
-            powerrail.SetRequired();
+            if (!IsPowerrail() && !IsIdentCon())
+            {
+                this.GetItems().Add(new PowerrailCon());
+            }
         }
 
         public void AddPowerrailCon(Part part, string partConnectionName)
         {
-            if(IsPowerrail())
+            if (IsPowerrail())
             {
-                var nameCon = this.AddNode(new NameCon());
+                var nameCon = new NameCon();
                 nameCon.SetConUId(part.GetLocalObjectData().GetUId());
                 nameCon.SetConName(partConnectionName);
+                this.GetItems().Add(nameCon);
             }
+        }
+
+        public IdentCon GetIdentCon()
+        {
+            return this.GetItems().SingleOrDefault(con => con.GetConfigurationName() == IdentCon.NODE_NAME) is IdentCon identCon ? identCon : null;
         }
 
         public bool IsIdentCon()
         {
-            return identCon.IsParsed();
+            return GetIdentCon() != null;
         }
 
         public Wire SetIdentCon(uint accessUId, uint partUId, string partConnectionName)
         {
-            if(!IsPowerrail() && !IsIdentCon())
+            if (!IsPowerrail() && !IsIdentCon())
             {
+                var identCon = new IdentCon();
                 identCon.SetConUId(accessUId);
-                identCon.SetParsed();
+                this.GetItems().Add(identCon);
 
-                var nameCon = this.AddNode(new NameCon());
+                var nameCon = new NameCon();
                 nameCon.SetConUId(partUId);
                 nameCon.SetConName(partConnectionName);
+                this.GetItems().Add(nameCon);
             }
 
             return this;
@@ -95,22 +101,8 @@ namespace SpinXmlReader.Block
 
         public uint GetIdentAccessUId()
         {
-            if(IsIdentCon())
-            {
-                return identCon.GetConUId(); 
-            }
-
-            return 0;
-        }
-
-        public uint GetIdentPartUId()
-        {
-            return IsIdentCon() && this.GetItems().Count == 1 ? this.GetItems()[0].GetConUId() : 0;
-        }
-
-        public string GetIdentPartName()
-        {
-            return IsIdentCon() && this.GetItems().Count == 1 ? this.GetItems()[0].GetConName() : "";
+            var identCon = this.GetIdentCon();
+            return identCon != null ? identCon.GetConUId() : 0;
         }
 
         public Wire AddNameCon(Part part, string partConnectionName)
@@ -122,17 +114,34 @@ namespace SpinXmlReader.Block
             return this;
         }
 
-        public bool IsOpenCon()
+        public bool HasOpenCon()
         {
-            return openCon.IsParsed();
+            return this.GetItems().Select(con => con.GetConfigurationName() == OpenCon.NODE_NAME).Any();
         }
     }
 
-    public class Con : XmlNodeConfiguration
+    public class Con : XmlNodeConfiguration 
     {
+        public static Con CreateCon(XmlNode node)
+        {
+            switch (node.Name)
+            {
+                case PowerrailCon.NODE_NAME:
+                    return new PowerrailCon();
+                case IdentCon.NODE_NAME:
+                    return new IdentCon();
+                case OpenCon.NODE_NAME:
+                    return new OpenCon();
+                case NameCon.NODE_NAME:
+                    return new NameCon();
+                default:
+                    throw new System.Exception("Cannot find Wire Connection with name " + node.Name);
+            }
+        }
+
         private readonly XmlAttributeConfiguration uid; //This identify a Part or an Access.
 
-        public Con(string name) : base(name)
+        public Con(string name, bool required = false) : base(name, required: required)
         {
             //==== INIT CONFIGURATION ====
             uid = this.AddAttribute("UId", required: true);
@@ -150,13 +159,27 @@ namespace SpinXmlReader.Block
         }
     }
 
+    public class PowerrailCon : Con
+    {
+        public const string NODE_NAME = "Powerrail";
+        public PowerrailCon() : base(NODE_NAME, required: true) { } //Adding required ensure it is added even if empty!
+    }
+
+    public class IdentCon : Con
+    {
+        public const string NODE_NAME = "IdentCon";
+        public IdentCon() : base(NODE_NAME) { }
+    }
+
+    public class OpenCon : Con
+    {
+        public const string NODE_NAME = "OpenCon";
+        public OpenCon() : base(NODE_NAME) { }
+    }
+
     public class NameCon : Con
     {
         public const string NODE_NAME = "NameCon";
-        public static NameCon CreateNameCon(XmlNode node)
-        {
-            return node.Name == NameCon.NODE_NAME ? new NameCon() : null;
-        }
 
         private readonly XmlAttributeConfiguration connectionName;
 

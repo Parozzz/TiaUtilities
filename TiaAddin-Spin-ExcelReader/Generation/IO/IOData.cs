@@ -9,30 +9,37 @@ namespace TiaXmlReader.Generation
 {
     public class IOData
     {
-        public String Address { get; set; }
-        public String IOTagName { get; set; }
-        public String IOTagComment { get; set; }
-        public String VariableAddress { get; set; }
-        public String VariableComment { get; set; }
-        public string ConsumerName {  get; set; }
-        public string ConsumerVariable {  get; set; }
+        public String IOAddress { get; set; }
+        public String IOName { get; set; }
+        public String VariableName { get; set; }
+        public string DBName {  get; set; }
+        public string Comment {  get; set; }
+
+        public void ParsePlaceholders(GenerationPlaceholders placeholders)
+        {
+            IOAddress = placeholders.Parse(IOAddress);
+            IOName = placeholders.Parse(IOName);
+            VariableName = placeholders.Parse(VariableName);
+            DBName = placeholders.Parse(DBName);
+            Comment = placeholders.Parse(Comment);
+        }
 
         public SimaticMemoryArea GetMemoryArea()
         {
-            return SimaticMemoryAreaUtil.GetFromAddress(Address);
+            return SimaticMemoryAreaUtil.GetFromAddress(IOAddress);
         }
 
         public uint GetAddressBit()
         {
-            if (string.IsNullOrEmpty(Address))
+            if (string.IsNullOrEmpty(IOAddress))
             {
                 return 0;
             }
 
             int firstDigit = 0;
-            for (var x = 0; x < Address.Length; x++)
+            for (var x = 0; x < IOAddress.Length; x++)
             {
-                var c = Address[x];
+                var c = IOAddress[x];
                 if (Char.IsDigit(c))
                 {
                     firstDigit = x;
@@ -40,21 +47,21 @@ namespace TiaXmlReader.Generation
                 }
             }
 
-            var substring = Address.Substring(firstDigit);
+            var substring = IOAddress.Substring(firstDigit);
             return uint.Parse(substring.Split('.')[1]);
         }
 
         public uint GetAddressByte()
         {
-            if (string.IsNullOrEmpty(Address))
+            if (string.IsNullOrEmpty(IOAddress))
             {
                 return 0;
             }
 
             int firstDigit = 0;
-            for (var x = 0; x < Address.Length; x++)
+            for (var x = 0; x < IOAddress.Length; x++)
             {
-                var c = Address[x];
+                var c = IOAddress[x];
                 if (Char.IsDigit(c))
                 {
                     firstDigit = x;
@@ -62,7 +69,7 @@ namespace TiaXmlReader.Generation
                 }
             }
 
-            var substring = Address.Substring(firstDigit);
+            var substring = IOAddress.Substring(firstDigit);
             return uint.Parse(substring.Split('.')[0]);
         }
     }

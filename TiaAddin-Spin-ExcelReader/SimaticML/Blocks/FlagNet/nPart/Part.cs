@@ -1,7 +1,9 @@
-﻿using SpinXmlReader;
+﻿using DocumentFormat.OpenXml.Bibliography;
+using SpinXmlReader;
 using SpinXmlReader.Block;
 using SpinXmlReader.SimaticML;
 using System;
+using System.Linq;
 using System.Xml;
 using TiaXmlReader.Utility;
 
@@ -11,17 +13,23 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
     {
         CONTACT,
         COIL,
-        NOT_IMPLEMENTED
+        SET_COIL,
+        RESET_COIL,
+        NOT,
+        UNKNOWN = 0 //Default value.
     }
 
     public static class PartTypeExtension
     {
         public static string GetSimaticMLString(this PartType partType)
         {
-            switch(partType)
+            switch (partType)
             {
                 case PartType.CONTACT: return "Contact";
                 case PartType.COIL: return "Coil";
+                case PartType.SET_COIL: return "SCoil";
+                case PartType.RESET_COIL: return "RCoil";
+                case PartType.NOT: return "Not";
                 default:
                     throw new Exception("Part " + partType.ToString() + "  not yet implemented");
             }
@@ -41,6 +49,7 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
 
         private readonly XmlAttributeConfiguration partName;
         private readonly XmlAttributeConfiguration disabledENO;
+        private readonly XmlAttributeConfiguration version; //This is not required. If omitted, it should use the project version.
 
         private readonly XmlNodeConfiguration templateValue;
         private readonly XmlAttributeConfiguration templateValueName;
@@ -61,6 +70,7 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
 
             partName = this.AddAttribute("Name", required: true);
             disabledENO = this.AddAttribute("DisabledENO");
+            version = this.AddAttribute("Version");
 
             templateValue = this.AddNode("TemplateValue");
             templateValueName = templateValue.AddAttribute("Name");
@@ -88,15 +98,9 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
 
         public PartType GetPartType()
         {
-            switch(partName.GetValue())
-            {
-                case "Contact":
-                    return PartType.CONTACT;
-                case "Coil":
-                    return PartType.COIL;
-                default:
-                    return PartType.NOT_IMPLEMENTED;
-            }
+            return Enum.GetValues(typeof(PartType))
+                .Cast<PartType>()
+                .SingleOrDefault(partType => partType.GetSimaticMLString() == partName.GetValue());
         }
 
         public bool IsDisabledENO()
@@ -110,15 +114,26 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
             return this;
         }
 
+        public string GetVersion()
+        {
+            return version.GetValue();
+        }
+
+        public Part SetVersion(string version)
+        {
+            this.version.SetValue(version);
+            return this;
+        }
+
         public bool IsNegated()
         {
             return negated.IsParsed();
         }
-        
+
         public Part SetNegated()
         {
             var partType = this.GetPartType();
-            switch(partType)
+            switch (partType)
             {
                 case PartType.CONTACT:
                     negatedName.SetValue("operand");

@@ -7,6 +7,28 @@ using System.Threading.Tasks;
 
 namespace TiaXmlReader.SimaticML
 {
+    public class SimaticAddressComponent
+    {
+        private readonly string name;
+        private readonly List<SimaticAddressComponent> components;
+
+        public SimaticAddressComponent(string name)
+        {
+            this.name = name;
+            this.components = new List<SimaticAddressComponent>();
+        }
+
+        public string GetName()
+        {
+            return name;
+        }
+
+        public List<SimaticAddressComponent> GetComponents()
+        {
+            return components;
+        }
+    }
+
     public static class SimaticMLUtil
     {
 
@@ -23,7 +45,7 @@ namespace TiaXmlReader.SimaticML
 
         public static string GetLengthIdentifier(uint len)
         {
-            switch(len)
+            switch (len)
             {
                 case 1: return "B";
                 case 2: return "W";
@@ -36,7 +58,7 @@ namespace TiaXmlReader.SimaticML
 
         public static bool ContainsSpecialChars(string str)
         {
-            return str.Contains('.') || str.Contains(" ") || str.Contains("\"") || str.Contains("\'");
+            return str.Contains('.') || str.Contains(" ") || str.Contains(",") || str.Contains("\"") || str.Contains("\'") || str.Contains("[") || str.Contains("]");
         }
 
         public static string JoinComponentsIntoAddress(List<string> components)
@@ -45,7 +67,7 @@ namespace TiaXmlReader.SimaticML
             foreach (var component in components)
             {
                 var finalComponent = component;
-                if(SimaticMLUtil.ContainsSpecialChars(component))
+                if (SimaticMLUtil.ContainsSpecialChars(component))
                 {//If the component contains a
                     finalComponent = '\"' + finalComponent + '\"';
                 }
@@ -58,6 +80,44 @@ namespace TiaXmlReader.SimaticML
         public static List<string> SplitAddressIntoComponents(string address)
         {
             var componentList = new List<string>();
+
+            //"Blocco_dati_1"."Wow,"[0]
+            //The first part of the address cannot be an array so it can't contain any indexes of array.
+
+            //REMEMBER, THERE COULD BE NO DOUBLE QUOTES INSIDE A COMPONENT OF AN ADDRESS!
+            bool waitingCurrentComponent = false;
+            int startCurrentComponent = 0;
+
+            var splitAddress = address.Split('.');
+            for (int x = 0; x < splitAddress.Length; x++)
+            {
+                var str = splitAddress[x];
+                if (str.StartsWith("\""))
+                {
+                    if (str.EndsWith("\""))
+                    {
+                        componentList.Add(str);
+                        continue;
+                    }
+
+                    if (waitingCurrentComponent)
+                    {
+                        if(str.EndsWith("\"")) //If it ends with a double quote, the address is completed like this "Wow,"
+                        {
+                            var segment = new ArraySegment<string>(splitAddress, startCurrentComponent, x);
+                            componentList.Add(string.Join(".", segment.Array));
+                            continue;
+                        }
+                        else if(str.Contains("\"") && str.Contains("[")) //If it contains a double quote the address is already completed. This is only valid if also contains an Array sliceAccess (Square braket)
+                        {
+
+                        }
+                    }
+
+                    startCurrentComponent = x;
+                    waitingCurrentComponent = true;
+                }
+            }
 
             var loopAddress = address;
             while (true)
@@ -84,7 +144,14 @@ namespace TiaXmlReader.SimaticML
                     str = loopAddress.Substring(0, indexOfDot);
                 }
 
-                componentList.Add(str.Replace("\"", "")); //There cannot be any double quote in the address.
+                str = str.Replace("\"", "");
+
+                if (str.Contains("[") && str.EndsWith("]")) //If it contains the open square and ENDS with a closed square (It could be containing them inside the actual name of address) is an array access.
+                {
+
+                }
+
+                componentList.Add(str); //There cannot be any double quote in the address.
                 if (indexOfDot == -1)
                 {
                     break;

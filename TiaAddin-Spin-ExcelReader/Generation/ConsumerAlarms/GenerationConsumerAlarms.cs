@@ -51,20 +51,26 @@ namespace TiaXmlReader.Generation
             uint variablesCellIndex = 4;
             while (true)
             {
-                var consumerAddressValue = worksheet.Cell("H" + variablesCellIndex).Value;
-                var coil1AddressValue = worksheet.Cell("I" + variablesCellIndex).Value;
-                var coil2AddressValue = worksheet.Cell("J" + variablesCellIndex).Value;
-                var descriptionValue = worksheet.Cell("K" + variablesCellIndex).Value;
-                var enableValue = worksheet.Cell("L" + variablesCellIndex).Value;
-
+                var consumerAddress = worksheet.Cell("H" + variablesCellIndex).Value;
+                var coilAddress = worksheet.Cell("I" + variablesCellIndex).Value;
+                var setCoilAddress = worksheet.Cell("J" + variablesCellIndex).Value;
+                var description = worksheet.Cell("K" + variablesCellIndex).Value;
+                var enable = worksheet.Cell("L" + variablesCellIndex).Value;
                 variablesCellIndex++;
 
-                if (!consumerAddressValue.IsText || !coil1AddressValue.IsText || !coil2AddressValue.IsText || !descriptionValue.IsText || !enableValue.IsText)
+                if (!consumerAddress.IsText || !setCoilAddress.IsText || !coilAddress.IsText || !description.IsText || !enable.IsText)
                 {
                     break;
                 }
 
-                var alarmData = new AlarmData(consumerAddressValue.GetText(), coil1AddressValue.GetText(), coil2AddressValue.GetText(), descriptionValue.GetText(), bool.Parse(enableValue.GetText()));
+                var alarmData = new AlarmData()
+                {
+                    ConsumerAddress = consumerAddress.ToString(),
+                    CoilAddress = coilAddress.ToString(),
+                    SetCoilAddress = setCoilAddress.ToString(),
+                    Description = description.ToString(),
+                    Enable = bool.Parse(enable.ToString()),
+                };
                 alarmDataList.Add(alarmData);
             }
 
@@ -73,16 +79,21 @@ namespace TiaXmlReader.Generation
             var consumerCellIndex = 4;
             while (true)
             {
-                var consumerNameValue = worksheet.Cell("E" + consumerCellIndex).Value;
-                var dbNameValue = worksheet.Cell("F" + consumerCellIndex).Value;
+                var consumerName = worksheet.Cell("E" + consumerCellIndex).Value;
+                var dbName = worksheet.Cell("F" + consumerCellIndex).Value;
                 consumerCellIndex++;
 
-                if (!consumerNameValue.IsText || !dbNameValue.IsText)
+                if (!consumerName.IsText || !dbName.IsText)
                 {
                     break;
                 }
 
-                consumerDataList.Add(new ConsumerData(consumerNameValue.GetText(), dbNameValue.GetText()));
+                var consumerData = new ConsumerData()
+                {
+                    Name = consumerName.ToString(),
+                    DBName = dbName.ToString(),
+                };
+                consumerDataList.Add(consumerData);
             }
         }
 
@@ -104,9 +115,9 @@ namespace TiaXmlReader.Generation
                             compileUnit.Init();
                         }
 
-                        foreach (var generationData in alarmDataList)
+                        foreach (var alarmData in alarmDataList)
                         {
-                            if (!generationData.GetEnable())
+                            if (!alarmData.Enable)
                             {
                                 continue;
                             }
@@ -117,10 +128,12 @@ namespace TiaXmlReader.Generation
                                 compileUnit.Init();
                             }
 
-                            var placeholders = new GenerationPlaceholders().SetConsumerData(consumerData).SetAlarmNum(nextAlarmNum++, alarmNumFormat);
-                            compileUnit.ComputeBlockTitle().SetText(Constants.DEFAULT_CULTURE, generationData.GetDescription(placeholders.Parse));
+                            var placeholders = new GenerationPlaceholders()
+                                .SetConsumerData(consumerData)
+                                .SetAlarmNum(nextAlarmNum++, alarmNumFormat);
+                            compileUnit.ComputeBlockTitle().SetText(Constants.DEFAULT_CULTURE, placeholders.Parse(alarmData.Description));
 
-                            FillAlarmCompileUnit(compileUnit, placeholders, generationData);
+                            FillAlarmCompileUnit(compileUnit, placeholders, alarmData);
                         }
 
                         if(antiSlipNumber > 0 && nextAlarmNum % antiSlipNumber != 0)
@@ -132,9 +145,9 @@ namespace TiaXmlReader.Generation
                     }
                     break;
                 case "PerTipoAllarme":
-                    foreach (var generationData in alarmDataList)
+                    foreach (var alarmData in alarmDataList)
                     {
-                        if (!generationData.GetEnable())
+                        if (!alarmData.Enable)
                         {
                             continue;
                         }
@@ -153,9 +166,11 @@ namespace TiaXmlReader.Generation
                                 compileUnit.Init();
                             }
 
-                            var placeholders = new GenerationPlaceholders().SetConsumerData(consumerData).SetAlarmNum(nextAlarmNum++, alarmNumFormat);
-                            compileUnit.ComputeBlockTitle().SetText(Constants.DEFAULT_CULTURE, generationData.GetDescription(placeholders.Parse));
-                            FillAlarmCompileUnit(compileUnit, placeholders, generationData);
+                            var placeholders = new GenerationPlaceholders()
+                                .SetConsumerData(consumerData)
+                                .SetAlarmNum(nextAlarmNum++, alarmNumFormat);
+                            compileUnit.ComputeBlockTitle().SetText(Constants.DEFAULT_CULTURE, placeholders.Parse(alarmData.Description));
+                            FillAlarmCompileUnit(compileUnit, placeholders, alarmData);
                         }
 
                         if (antiSlipNumber > 0 && nextAlarmNum % antiSlipNumber != 0)
@@ -172,16 +187,16 @@ namespace TiaXmlReader.Generation
         private void FillAlarmCompileUnit(CompileUnit compileUnit, GenerationPlaceholders placeholders, AlarmData alarmData)
         {
             var contact = new ContactPartData(compileUnit);
-            var coil1 = new CoilPartData(compileUnit);
-            var coil2 = new CoilPartData(compileUnit);
+            var setCoil = new SetCoilPartData(compileUnit);
+            var coil = new CoilPartData(compileUnit);
 
-            contact.CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, alarmData.GetConsumerAddress(placeholders.Parse)));
-            coil1.CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, alarmData.GetCoil1Address(placeholders.Parse)));
-            coil2.CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, alarmData.GetCoil2Address(placeholders.Parse)));
+            contact.CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, placeholders.Parse(alarmData.ConsumerAddress)));
+            setCoil.CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, placeholders.Parse(alarmData.SetCoilAddress)));
+            coil.CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, placeholders.Parse(alarmData.CoilAddress)));
 
             contact.CreatePowerrailConnection()
-                .CreateOutputConnection(coil1)
-                .CreateOutputConnection(coil2);
+                .CreateOutputConnection(setCoil)
+                .CreateOutputConnection(coil);
         }
 
         public void ExportXML(string exportPath)

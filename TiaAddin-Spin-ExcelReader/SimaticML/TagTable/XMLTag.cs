@@ -106,7 +106,10 @@ namespace SpinXmlReader.TagTable
 
         public XMLTag SetCommentText(CultureInfo cultureInfo, string text)
         {
-            comment.SetText(cultureInfo, text);
+            if(!string.IsNullOrEmpty(text))
+            {
+                comment.SetText(cultureInfo, text);
+            }
             return this;
         }
     }

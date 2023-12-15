@@ -4,15 +4,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TiaXmlReader.SimaticML.Enums;
 
 namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace
 {
     public abstract class IAccessData
     {
         protected readonly Access access;
-        public IAccessData(CompileUnit compileUnit)
+        public IAccessData(CompileUnit compileUnit = null)
         {
-            access = new Access(compileUnit).SetAccessScope(this.GetScope());
+            access = new Access(compileUnit).SetVariableScope(this.GetScope());
         }
 
         public Access GetAccess()
@@ -20,7 +21,7 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace
             return access;
         }
 
-        public abstract AccessScope GetScope();
+        public abstract SimaticVariableScope GetScope();
     }
 
     public class LocalVariableAccessData : IAccessData
@@ -46,9 +47,9 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace
             return this;
         }
 
-        public override AccessScope GetScope()
+        public override SimaticVariableScope GetScope()
         {
-            return AccessScope.LOCAL_VARIABLE;
+            return SimaticVariableScope.LOCAL_VARIABLE;
         }
     }
 
@@ -75,9 +76,9 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace
             return this;
         }
 
-        public override AccessScope GetScope()
+        public override SimaticVariableScope GetScope()
         {
-            return AccessScope.GLOBAL_VARIABLE;
+            return SimaticVariableScope.GLOBAL_VARIABLE;
         }
     }
 
@@ -104,9 +105,9 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace
             return this;
         }
 
-        public override AccessScope GetScope()
+        public override SimaticVariableScope GetScope()
         {
-            return AccessScope.LOCAL_CONSTANT;
+            return SimaticVariableScope.LOCAL_CONSTANT;
         }
     }
 
@@ -133,9 +134,9 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace
             return this;
         }
 
-        public override AccessScope GetScope()
+        public override SimaticVariableScope GetScope()
         {
-            return AccessScope.GLOBAL_CONSTANT;
+            return SimaticVariableScope.GLOBAL_CONSTANT;
         }
     }
 
@@ -173,9 +174,9 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace
             return this;
         }
 
-        public override AccessScope GetScope()
+        public override SimaticVariableScope GetScope()
         {
-            return AccessScope.LITERAL_CONSTANT;
+            return SimaticVariableScope.LITERAL_CONSTANT;
         }
     }
 
@@ -202,9 +203,9 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace
             return this;
         }
 
-        public override AccessScope GetScope()
+        public override SimaticVariableScope GetScope()
         {
-            return AccessScope.TYPED_CONSTANT;
+            return SimaticVariableScope.TYPED_CONSTANT;
         }
     }
 }

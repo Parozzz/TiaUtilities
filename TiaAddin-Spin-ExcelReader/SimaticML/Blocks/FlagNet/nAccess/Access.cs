@@ -4,59 +4,16 @@ using SpinXmlReader.SimaticML;
 using System;
 using System.Linq;
 using System.Xml;
+using TiaXmlReader.SimaticML.Enums;
 using TiaXmlReader.Utility;
 
 namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace
 {
-    public enum AccessScope
-    {
-        LOCAL_VARIABLE,
-        LOCAL_CONSTANT,
-        LITERAL_CONSTANT,
-        TYPED_CONSTANT,
-        GLOBAL_CONSTANT,
-        GLOBAL_VARIABLE,
-    }
-
-    public static class AccessScopeExtension
-    {
-        public static string GetSimaticMLString(this AccessScope type)
-        {
-            switch (type)
-            {
-                case AccessScope.LOCAL_VARIABLE: return "LocalVariable";
-                case AccessScope.LOCAL_CONSTANT: return "LocalConstant";
-                case AccessScope.LITERAL_CONSTANT: return "LiteralConstant";
-                case AccessScope.TYPED_CONSTANT: return "TypedConstant";
-                case AccessScope.GLOBAL_CONSTANT: return "GlobalConstant";
-                case AccessScope.GLOBAL_VARIABLE: return "GlobalVariable";
-                default:
-                    throw new Exception("AccessScope " +type.ToString() + "  not yet implemented");
-            }
-        }
-
-        public static IAccessData CreateAccessData(this AccessScope type, CompileUnit compileUnit)
-        {
-            switch (type)
-            {
-                case AccessScope.LOCAL_VARIABLE: return new LocalVariableAccessData(compileUnit);
-                case AccessScope.LOCAL_CONSTANT: return new LocalConstantAccessData(compileUnit);
-                case AccessScope.LITERAL_CONSTANT: return new LiteralConstantAccessData(compileUnit);
-                case AccessScope.TYPED_CONSTANT: return new TypedConstantAccessData(compileUnit);
-                case AccessScope.GLOBAL_CONSTANT: return new GlobalConstantAccessData(compileUnit);
-                case AccessScope.GLOBAL_VARIABLE: return new GlobalVariableAccessData(compileUnit);
-                default:
-                    throw new Exception("AccessScope " + type.ToString() + "  not yet implemented");
-            }
-        }
-    }
-
-    public class Access : XmlNodeConfiguration, ILocalObject
+    public class Access : XmlNodeConfiguration
     {
         public const string NODE_NAME = "Access";
 
-        private readonly LocalObjectData localObjectData;
-
+        private readonly XmlAttributeConfiguration uid;
         private readonly XmlAttributeConfiguration scope;
 
         private readonly XmlNodeListConfiguration<Component> symbol; //FOR GLOBAL AND LOCAL VARIABLES
@@ -66,13 +23,23 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace
         private readonly XmlNodeConfiguration constantType;          //FOR LITERAL CONSTANT (NUMBER WRITTEN DIRECTLY)
         private readonly XmlNodeConfiguration constantValue;         //FOR LITERAL CONSTANT (NUMBER WRITTEN DIRECTLY) AND TYPED_CONSTANT
 
-        public Access(CompileUnit compileUnit) : base(Access.NODE_NAME)
+        private readonly XmlNodeConfiguration label;          //Not implemented
+        private readonly XmlAttributeConfiguration labelName; //Not implemented
+
+        public Access(CompileUnit compileUnit = null) : base(Access.NODE_NAME)
         {
-            compileUnit.AddAccess(this);
+            if(compileUnit != null)
+            {
+                compileUnit.AddAccess(this);
+            }
 
             //==== INIT CONFIGURATION ====
-            localObjectData = this.AddAttribute(new LocalObjectData(compileUnit.LocalIDGenerator));
             scope = this.AddAttribute("Scope", required: true);
+            uid = this.AddAttribute("UId"); //In case the access is innested inside a Component (For array access modifier) UId is not required.         
+            if (compileUnit != null) //If a compile unit has been added, it means it needs an UId to be associated with a Wire.
+            {
+                this.uid.SetValue("" + compileUnit.LocalIDGenerator.GetNext());
+            }
 
             symbol = this.AddNodeList("Symbol", Component.CreateComponent);
 
@@ -80,31 +47,34 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace
             constantName = constant.AddAttribute("Name");
             constantType = constant.AddNode("ConstantType");
             constantValue = constant.AddNode("ConstantValue");
+
+            label = this.AddNode("Label");
+            labelName = this.label.AddAttribute("Name");
             //==== INIT CONFIGURATION ====
         }
 
-        public LocalObjectData GetLocalObjectData()
+        public uint GetUId()
         {
-            return localObjectData;
+            return uint.TryParse(this.uid.GetValue(), out uint uid) ? uid : 0;
         }
 
-        public Access SetAccessScope(AccessScope scope)
+        public Access SetVariableScope(SimaticVariableScope scope)
         {
             this.scope.SetValue(scope.GetSimaticMLString());
             return this;
         }
 
-        public AccessScope GetAccessScope()
+        public SimaticVariableScope GetVariableScope()
         {
-            foreach (AccessScope accessType in Enum.GetValues(typeof(AccessScope)))
+            foreach (SimaticVariableScope variableScope in Enum.GetValues(typeof(SimaticVariableScope)))
             {
-                if (scope.GetValue() == accessType.GetSimaticMLString())
+                if (scope.GetValue() == variableScope.GetSimaticMLString())
                 {
-                    return accessType;
+                    return variableScope;
                 }
             }
 
-            throw new Exception("Invalid Access Type for " + scope.GetValue());
+            throw new Exception("Invalid VariableScope for " + scope.GetValue());
         }
 
         public string GetAddress()
@@ -159,7 +129,8 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace
         }
     }
 
-    public class Component : XmlNodeConfiguration
+    //In case of accessing a multi depth array (Like a Matrix) can have multiple access inside for the Array sliceAccessModifier.
+    public class Component : XmlNodeListConfiguration<Access>
     {
         public const string NODE_NAME = "Component";
         public static Component CreateComponent(XmlNode node)
@@ -167,10 +138,15 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace
             return node.Name == Component.NODE_NAME ? new Component() : null;
         }
 
+        public static Access CreateAccess(XmlNode node)
+        {
+            return node.Name == Access.NODE_NAME ? new Access() : null;
+        }
+
         private readonly XmlAttributeConfiguration componentName;
         private readonly XmlAttributeConfiguration sliceAccessModifier;
 
-        public Component(string value = "") : base(Component.NODE_NAME, required: true)
+        public Component(string value = "") : base(Component.NODE_NAME, Component.CreateAccess, required: true)
         {
             //==== INIT CONFIGURATION ====
             componentName = this.AddAttribute("Name", required: true, value: value);
@@ -182,6 +158,7 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace
         {
             return componentName.GetValue();
         }
+
         public Component SetComponentName(string name)
         {
             this.componentName.SetValue(name);
