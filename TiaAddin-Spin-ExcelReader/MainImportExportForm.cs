@@ -6,6 +6,7 @@ using TiaXmlReader;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.IO;
 using TiaXmlReader.Generation.IO_Cad;
+using TiaXmlReader.SimaticML;
 
 namespace SpinXmlReader
 {
@@ -20,6 +21,9 @@ namespace SpinXmlReader
             configExcelPathTextBox.Text = saveData.lastExcelFileName;
             exportPathTextBlock.Text = saveData.lastXMLExportPath;
             tiaVersionComboBox.Text = "" + saveData.lastTIAVersion;
+
+            var address1 = "\"GlobalDB.D\".\"Data,\"";
+            SimaticMLUtil.SplitFullAddressIntoComponents(address1 + "[" + address1 + "]");
         }
 
         private void TiaVersionComboBox_SelectedIndexChanged(object sender, EventArgs e)

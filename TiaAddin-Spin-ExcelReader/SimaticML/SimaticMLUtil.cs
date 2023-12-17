@@ -10,17 +10,32 @@ namespace TiaXmlReader.SimaticML
     public class SimaticAddressComponent
     {
         private readonly string name;
-        private readonly List<SimaticAddressComponent> components;
+        private readonly List<SimaticAddressArrayIndex> arrayIndexes;
 
         public SimaticAddressComponent(string name)
         {
             this.name = name;
-            this.components = new List<SimaticAddressComponent>();
+            this.arrayIndexes = new List<SimaticAddressArrayIndex>();
         }
 
         public string GetName()
         {
             return name;
+        }
+
+        public List<SimaticAddressArrayIndex> GetArrayIndexes()
+        {
+            return arrayIndexes;
+        }
+    }
+
+    public class SimaticAddressArrayIndex
+    {
+        private readonly List<SimaticAddressComponent> components;
+
+        public SimaticAddressArrayIndex()
+        {
+            this.components = new List<SimaticAddressComponent>();
         }
 
         public List<SimaticAddressComponent> GetComponents()
@@ -77,48 +92,130 @@ namespace TiaXmlReader.SimaticML
             return joinedSymbol.Substring(0, joinedSymbol.Length - 1); //Get the joined component names without the final dot.
         }
 
-        public static List<string> SplitAddressIntoComponents(string address)
+        public static List<SimaticAddressComponent> SplitFullAddressIntoComponents(string address)
         {
-            var componentList = new List<string>();
+            var components = FindComponentsInAddress(address);
+            return components;
+        }
 
-            //"Blocco_dati_1"."Wow,"[0]
+        private static List<SimaticAddressComponent> FindComponentsInAddress(string address)
+        {
+            var componentList = new List<SimaticAddressComponent>();
+
+            //"Blocco_dati_1"."Wow,"["Blocco_dati_1"."Wow,"]
             //The first part of the address cannot be an array so it can't contain any indexes of array.
 
             //REMEMBER, THERE COULD BE NO DOUBLE QUOTES INSIDE A COMPONENT OF AN ADDRESS!
-            bool waitingCurrentComponent = false;
-            int startCurrentComponent = 0;
+            var loopComponent = new LoopComponent();
 
             var splitAddress = address.Split('.');
             for (int x = 0; x < splitAddress.Length; x++)
             {
                 var str = splitAddress[x];
-                if (str.StartsWith("\""))
+                if (loopComponent.waiting)
                 {
-                    if (str.EndsWith("\""))
-                    {
-                        componentList.Add(str);
-                        continue;
-                    }
+                    str = loopComponent.str + "." + str;
+                }
 
-                    if (waitingCurrentComponent)
+                var doubleQuoteCount = str.Count(t => t == '\"');
+                if (doubleQuoteCount == 0 || doubleQuoteCount % 2 == 0) //If it has no double quote or is even, it means the address is complete (There cannot be double quotes inside an address).
+                {
+                    if (str.Contains("["))
                     {
-                        if(str.EndsWith("\"")) //If it ends with a double quote, the address is completed like this "Wow,"
+                        if (str.EndsWith("]"))
                         {
-                            var segment = new ArraySegment<string>(splitAddress, startCurrentComponent, x);
-                            componentList.Add(string.Join(".", segment.Array));
+                            var mainComponent = new SimaticAddressComponent(str.Substring(0, str.IndexOf("[")).Replace("\"", ""));
+
+                            var openSquareIndex = str.IndexOf("[");
+                            var closedSquareIndex = str.IndexOf("]");
+                            var arrayIndexesStr = str.Substring(openSquareIndex + 1, closedSquareIndex - openSquareIndex - 1); //Length decreased by one to ignore the closing square bracket.
+
+                            //If it contais a comma, it probably (Because it can be contains inside the address) means is an array with multiple depth (Like a matrix, with two indexes).
+                            //So split it preventively to catch this case.
+                            var subComponents = FindComponentsInArrayIndex(arrayIndexesStr);
+                            mainComponent.GetArrayIndexes().AddRange(subComponents);
+
+                            componentList.Add(mainComponent);
+
+                            loopComponent.Clear();
                             continue;
                         }
-                        else if(str.Contains("\"") && str.Contains("[")) //If it contains a double quote the address is already completed. This is only valid if also contains an Array sliceAccess (Square braket)
-                        {
-
-                        }
+                        //else
+                        //{
+                        //    throw new Exception("Error while parsing address " + string.Join(",", splitAddress) + ". Cannot parse " + str);
+                        //}
                     }
+                    else
+                    {
+                        var mainComponent = new SimaticAddressComponent(str.Replace("\"", ""));
+                        componentList.Add(mainComponent);
 
-                    startCurrentComponent = x;
-                    waitingCurrentComponent = true;
+                        loopComponent.Clear();
+                        continue;
+                    }
                 }
+
+                loopComponent.waiting = true;
+                loopComponent.str = str;
             }
 
+            return componentList;
+        }
+
+        private static List<SimaticAddressArrayIndex> FindComponentsInArrayIndex(string arrayIndexAddress)
+        {
+            var arrayIndexesList = new List<SimaticAddressArrayIndex>();
+
+            var loopComponent = new LoopComponent();
+
+            var splitArrayIndexes = arrayIndexAddress.Split(',');
+            for (int x = 0; x < splitArrayIndexes.Length; x++)
+            {
+                var str = splitArrayIndexes[x];
+                if (loopComponent.waiting)
+                {
+                    //In this case i don't have to join with a dot, since i am trying to find the complete address between commans for array indexes.
+                    str = loopComponent.str + str; 
+                }
+
+                var doubleQuoteCount = str.Count(t => t == '\"');
+                if (doubleQuoteCount == 0 || doubleQuoteCount % 2 == 0)
+                {
+                    var components = FindComponentsInAddress(str);
+
+                    var componentArrayIndexes = new SimaticAddressArrayIndex();
+                    componentArrayIndexes.GetComponents().AddRange(components);
+                    arrayIndexesList.Add(componentArrayIndexes);
+
+                    loopComponent.Clear();
+                    continue;
+                }
+
+                loopComponent.waiting = true;
+                loopComponent.str = str;
+            }
+
+            return arrayIndexesList;
+        }
+
+
+
+        private class LoopComponent
+        {
+            public bool waiting = false;
+            public string str = "";
+
+            public void Clear()
+            {
+                waiting = false;
+                str = "";
+            }
+        }
+    }
+}
+
+/*
+ 
             var loopAddress = address;
             while (true)
             {
@@ -160,7 +257,4 @@ namespace TiaXmlReader.SimaticML
                 loopAddress = loopAddress.Substring(indexOfDot + 1);
             }
 
-            return componentList;
-        }
-    }
-}
+ */

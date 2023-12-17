@@ -103,7 +103,7 @@ namespace SpinXmlReader.Block
 
         public Member AddMembersFromAddress(string address, SimaticDataType dataType)
         {
-            var components = SimaticMLUtil.SplitAddressIntoComponents(address);
+            var components = SimaticMLUtil.SplitFullAddressIntoComponents(address);
             if(components.Count == 0)
             {
                 return null;
@@ -115,8 +115,9 @@ namespace SpinXmlReader.Block
             {
                 Member foundMember = null;
 
-                var str = components[x];
-                str = string.IsNullOrEmpty(str) ? Constants.DEFAULT_EMPTY_STRUCT_NAME : str;
+                var addressComponent = components[x];
+
+                var str = string.IsNullOrEmpty(addressComponent.GetName()) ? Constants.DEFAULT_EMPTY_STRUCT_NAME : addressComponent.GetName();
                 foreach (var member in lastMembersList)
                 {
                     if (member.GetMemberName().ToLower() == str.ToLower())

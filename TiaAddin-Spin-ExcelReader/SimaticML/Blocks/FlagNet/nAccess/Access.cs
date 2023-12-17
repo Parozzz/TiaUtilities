@@ -1,7 +1,9 @@
-﻿using SpinXmlReader;
+﻿using DocumentFormat.OpenXml.Office2010.ExcelAc;
+using SpinXmlReader;
 using SpinXmlReader.Block;
 using SpinXmlReader.SimaticML;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using TiaXmlReader.SimaticML.Enums;
@@ -28,7 +30,7 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace
 
         public Access(CompileUnit compileUnit = null) : base(Access.NODE_NAME)
         {
-            if(compileUnit != null)
+            if (compileUnit != null)
             {
                 compileUnit.AddAccess(this);
             }
@@ -87,13 +89,41 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace
 
         public void SetAddress(string address)
         {
-            symbol.GetItems().Clear();
+            var addressComponentList = SimaticMLUtil.SplitFullAddressIntoComponents(address);
 
-            var componentList = SimaticMLUtil.SplitAddressIntoComponents(address);
-            foreach (var component in componentList)
+            symbol.GetItems().Clear();
+            foreach (var component in Access.ParseAddressComponents(addressComponentList))
             {
-                symbol.GetItems().Add(new Component().SetComponentName(component));
+                symbol.GetItems().Add(component);
             }
+        }
+
+        private static List<Component> ParseAddressComponents(List<SimaticAddressComponent> addressComponentList)
+        {
+            var componentList = new List<Component>();
+            foreach (var addressComponent in addressComponentList)
+            {
+                var component = new Component()
+                        .SetComponentName(addressComponent.GetName());
+
+                foreach (var arrayIndex in addressComponent.GetArrayIndexes())
+                {
+                    if (component.GetSliceAccessModifier() != "Array")
+                    {
+                        component.SetSliceAccessModifier("Array");
+                    }
+
+                    var access = new Access();
+                    foreach (var arrayIndexComponent in Access.ParseAddressComponents(arrayIndex.GetComponents()))
+                    {
+                        access.symbol.GetItems().Add(arrayIndexComponent);
+                    }
+                    component.GetItems().Add(access);
+                }
+
+                componentList.Add(component);
+            }
+            return componentList;
         }
 
         public string GetConstantName()

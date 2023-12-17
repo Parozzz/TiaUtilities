@@ -68,7 +68,7 @@ namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nPart
         {
             this.GetItems().Clear();
 
-            var componentList = SimaticMLUtil.SplitAddressIntoComponents(address);
+            var componentList = SimaticMLUtil.SplitFullAddressIntoComponents(address);
             foreach (var component in componentList)
             {
                 this.GetItems().Add(new Component().SetComponentName(component));
