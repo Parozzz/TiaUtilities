@@ -18,7 +18,7 @@ namespace SpinXmlReader.Block
         TEMP,
         CONSTANT,
         RETURN,
-        NONE //Used inside member to define start value in case of an array of UDT.
+        NONE //Used inside member to define start value in case of an array of UDT, or inside an UDT directly.1
     }
 
     public static class SectionTypeEnumExtension

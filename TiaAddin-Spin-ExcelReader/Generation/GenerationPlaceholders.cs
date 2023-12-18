@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TiaXmlReader.AlarmGeneration;
 using TiaXmlReader.Generation.IO_Cad;
 using TiaXmlReader.SimaticML;
 
@@ -55,26 +56,52 @@ namespace TiaXmlReader.Generation
             generationPlaceholdersDict = new Dictionary<string, IGenerationPlaceholderData>();
         }
 
-        public GenerationPlaceholders SetConsumerData(ConsumerData consumerData)
+        public GenerationPlaceholders SetConsumerData(UserData consumerData)
         {
-            AddOrReplace("{nome_utenza}", new StringGenerationPlaceholderData()
+            AddOrReplace("{user_name}", new StringGenerationPlaceholderData()
             {
                 Value = consumerData.Name
             });
 
-            AddOrReplace("{nome_db}", new StringGenerationPlaceholderData()
+            AddOrReplace("{user_description}", new StringGenerationPlaceholderData()
             {
-                Value = consumerData.DBName
+                Value = consumerData.Description
             });
 
             return this;
         }
 
+        public GenerationPlaceholders SetAlarmData(AlarmData alarmData)
+        {
+            AddOrReplace("{alarm_description}", new StringGenerationPlaceholderData()
+            {
+                Value = alarmData.Description
+            });
+
+            return this;
+        }
+
+
         public GenerationPlaceholders SetAlarmNum(uint alarmNum, string alarmNumFormat)
         {
-            return AddOrReplace("{num_allarme}", new UIntGenerationPlaceholderData()
+            return AddOrReplace("{alarm_num}", new UIntGenerationPlaceholderData()
             {
                 Value = alarmNum,
+                Function = (value) => value.ToString(alarmNumFormat)
+            });
+        }
+
+        public GenerationPlaceholders SetStartEndAlarmNum(uint startAlarmNum, uint endAlarmNum, string alarmNumFormat)
+        {
+            AddOrReplace("{alarm_num_start}", new UIntGenerationPlaceholderData()
+            {
+                Value = startAlarmNum,
+                Function = (value) => value.ToString(alarmNumFormat)
+            });
+
+            return AddOrReplace("{alarm_num_end}", new UIntGenerationPlaceholderData()
+            {
+                Value = endAlarmNum,
                 Function = (value) => value.ToString(alarmNumFormat)
             });
         }
@@ -218,6 +245,11 @@ namespace TiaXmlReader.Generation
 
             //{mnemonic} {bit_address} {byte_address} {cad_address} {cad_comment1} {cad_comment2} {cad_comment3} {cad_comment4} {cad_page} {cad_panel} {cad_type}
             return loopStr;
+        }
+
+        public string ParseFullOr(string str, string or)
+        {
+            return string.IsNullOrEmpty(str) ? this.Parse(or) : this.Parse(str);
         }
     }
 

@@ -28,7 +28,6 @@ namespace SpinXmlReader.Block
             instanceOfName = this.AddNode("InstanceOfName");
             instanceOfType = this.AddNode("InstanceOfType");
 
-
             blockInterface = this.AddNode("Interface",                                               required: true);
             blockSections = blockInterface.AddNodeList("Sections", this.CreateSection, required: true, namespaceURI: Constants.GET_SECTIONS_NAMESPACE());
 

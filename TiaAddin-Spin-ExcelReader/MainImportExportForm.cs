@@ -74,38 +74,47 @@ namespace SpinXmlReader
         {
             try
             {
-                using (var configWorkbook = new XLWorkbook(configExcelPathTextBox.Text))
+                //Allow opening file while having excel open. TIMESAVER!
+                using (var stream = new FileStream(configExcelPathTextBox.Text,
+                                 FileMode.Open,
+                                 FileAccess.Read,
+                                 FileShare.ReadWrite))
                 {
-                    var configWorksheet = configWorkbook.Worksheets.Worksheet(1);
 
-                    var configTypeValue = configWorksheet.Cell("A2").Value;
-                    if (!configTypeValue.IsText || string.IsNullOrEmpty(configTypeValue.GetText()))
+                    using (var configWorkbook = new XLWorkbook(stream))
                     {
-                        throw new ApplicationException("Configuration excel file invalid");
-                    }
+                        var configWorksheet = configWorkbook.Worksheets.Worksheet(1);
 
-                    switch (configTypeValue.GetText().ToLower())
-                    {
-                        case "type1":
-                            var importConsumerAlarms = new GenerationConsumerAlarms();
-                            importConsumerAlarms.ImportExcelConfig(configWorksheet);
-                            importConsumerAlarms.GenerateBlocks();
-                            importConsumerAlarms.ExportXML(exportPathTextBlock.Text);
-                            break;
-                        case "type2":
-                            var generationIO_Cad = new GenerationIO_CAD();
-                            generationIO_Cad.ImportExcelConfig(configWorksheet);
-                            generationIO_Cad.GenerateBlocks();
-                            generationIO_Cad.ExportXML(exportPathTextBlock.Text);
-                            break;
-                        case "type3":
-                            var generationIO = new GenerationIO();
-                            generationIO.ImportExcelConfig(configWorksheet);
-                            generationIO.GenerateBlocks();
-                            generationIO.ExportXML(exportPathTextBlock.Text);
-                            break;
+                        var configTypeValue = configWorksheet.Cell("A2").Value;
+                        if (!configTypeValue.IsText || string.IsNullOrEmpty(configTypeValue.GetText()))
+                        {
+                            throw new ApplicationException("Configuration excel file invalid");
+                        }
+
+                        switch (configTypeValue.GetText().ToLower())
+                        {
+                            case "type1":
+                                var importConsumerAlarms = new GenerationConsumerAlarms();
+                                importConsumerAlarms.ImportExcelConfig(configWorksheet);
+                                importConsumerAlarms.GenerateBlocks();
+                                importConsumerAlarms.ExportXML(exportPathTextBlock.Text);
+                                break;
+                            case "type2":
+                                var generationIO_Cad = new GenerationIO_CAD();
+                                generationIO_Cad.ImportExcelConfig(configWorksheet);
+                                generationIO_Cad.GenerateBlocks();
+                                generationIO_Cad.ExportXML(exportPathTextBlock.Text);
+                                break;
+                            case "type3":
+                                var generationIO = new GenerationIO();
+                                generationIO.ImportExcelConfig(configWorksheet);
+                                generationIO.GenerateBlocks();
+                                generationIO.ExportXML(exportPathTextBlock.Text);
+                                break;
+                        }
                     }
                 }
+
             }
             catch (Exception ex)
             {

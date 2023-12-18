@@ -29,6 +29,11 @@ namespace SpinXmlReader
             outObj = obj;
             return true;
         }
+
+        public static string StringFullOr(string str, string or)
+        {
+            return string.IsNullOrEmpty(str) ? or : str;
+        }
     }
 
     public static class Validate

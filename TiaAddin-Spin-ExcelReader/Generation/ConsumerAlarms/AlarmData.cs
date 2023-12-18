@@ -8,11 +8,12 @@ namespace TiaXmlReader.AlarmGeneration
 {
     public class AlarmData
     {
-        public string ConsumerAddress { get; set; }
+        public string UserAddress { get; set; }
         public string CoilAddress { get; set; }
         public string SetCoilAddress { get; set; }
         public string TimerAddress { get; set; }
         public string TimerType {  get; set; }
+        public string TimerValue {  get; set; }
         public string Description { get; set; }
         public bool Enable { get; set; }
     }

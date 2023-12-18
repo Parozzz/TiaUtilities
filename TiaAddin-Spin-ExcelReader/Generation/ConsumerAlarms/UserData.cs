@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace TiaXmlReader.Generation
 {
-    public class ConsumerData
+    public class UserData
     {
         public string Name {  get; set; }
-        public string DBName { get; set; }
+        public string Description { get; set; }
     }
 }

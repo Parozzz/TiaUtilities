@@ -67,9 +67,8 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
 
         public Wire CreateIdentWire(IAccessData accessData)
         {
-            var access = accessData.GetAccess();
             return new Wire(compileUnit)
-                  .AddIdentCon(access.GetUId(), part.GetLocalObjectData().GetUId(), "operand");
+                  .AddIdentCon(accessData.GetAccess(), part.GetLocalObjectData().GetUId(), "operand");
         }
     }
 
@@ -107,6 +106,7 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
 
     public class TimerPartData : IPartData
     {
+        private Access timeValueAccess;
         public TimerPartData(CompileUnit compileUnit, PartType partType) : base(compileUnit, partType)
         {
         }
@@ -114,7 +114,7 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
         public override string GetInputConName() => "IN";
         public override string GetOuputConName() => "Q";
 
-        public void SetPartInstance(SimaticVariableScope scope, string address)
+        public TimerPartData SetPartInstance(SimaticVariableScope scope, string address)
         {
             part.GetPartInstance().SetVariableScope(scope)
                 .SetAddress(address);
@@ -124,12 +124,19 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
                 .SetTemplateValueName("time_type")
                 .SetTemplateValueType("Type");
 
-            var access = new Access(compileUnit)
-                .SetVariableScope(SimaticVariableScope.TYPED_CONSTANT)
-                .SetConstantValue("T#0s");
-
+            SetTimeValue("T#0s");
             new Wire(this.compileUnit).AddNameCon(part, "ET").AddOpenCon();
-            new Wire(this.compileUnit).AddIdentCon(access, part.GetLocalObjectData().GetUId(), "PT");
+            new Wire(this.compileUnit).AddIdentCon(timeValueAccess, part.GetLocalObjectData().GetUId(), "PT");
+
+            return this;
+        }
+
+        public TimerPartData SetTimeValue(string timeValue)
+        {
+            timeValueAccess = (timeValueAccess ?? new Access(compileUnit))
+                .SetVariableScope(SimaticVariableScope.TYPED_CONSTANT)
+                .SetConstantValue(timeValue);
+            return this;
         }
 
         public T CreateInputConnection<T>(T inputPartData) where T : IPartData
