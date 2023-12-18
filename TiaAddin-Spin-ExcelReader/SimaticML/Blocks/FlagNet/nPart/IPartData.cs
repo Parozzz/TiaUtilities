@@ -1,5 +1,7 @@
 ﻿using SpinXmlReader.Block;
 using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace;
+using TiaXmlReader.SimaticML.Blocks.FlagNet.nPart;
+using TiaXmlReader.SimaticML.Enums;
 
 namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
 {
@@ -13,15 +15,10 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
             this.part = new Part(compileUnit).SetPartType(partType);
         }
 
-        public Part GetPart()
-        {
-            return part;
-        }
+        public Part GetPart() => part;
 
-        public PartType GetPartType()
-        {
-            return part.GetPartType();
-        }
+        public PartType GetPartType() => part.GetPartType();
+
 
         //all LADDER blocks have input / output connections ("in" and "out" for contact, "en" and "eno" for blocks).
         //Some, like FC, have more named connections.
@@ -34,8 +31,8 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
     {
         public SimplePartData(CompileUnit compileUnit, PartType partType) : base(compileUnit, partType) { }
 
-        public override string GetInputConName() { return "in"; }
-        public override string GetOuputConName() { return "out"; }
+        public override string GetInputConName() => "in";
+        public override string GetOuputConName() => "out";
 
         public SimplePartData CreatePowerrailConnection()
         {
@@ -72,15 +69,13 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
         {
             var access = accessData.GetAccess();
             return new Wire(compileUnit)
-                  .SetIdentCon(access.GetUId(), part.GetLocalObjectData().GetUId(), "operand");
+                  .AddIdentCon(access.GetUId(), part.GetLocalObjectData().GetUId(), "operand");
         }
     }
 
     public class ContactPartData : SimpleIdenfiablePartData
     {
-        public ContactPartData(CompileUnit compileUnit) : base(compileUnit, PartType.CONTACT)
-        {
-        }
+        public ContactPartData(CompileUnit compileUnit) : base(compileUnit, PartType.CONTACT) { }
 
         public ContactPartData SetNegated()
         {
@@ -108,5 +103,49 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
     public class ResetCoilPartData : SimpleIdenfiablePartData
     {
         public ResetCoilPartData(CompileUnit compileUnit) : base(compileUnit, PartType.RESET_COIL) { }
+    }
+
+    public class TimerPartData : IPartData
+    {
+        public TimerPartData(CompileUnit compileUnit, PartType partType) : base(compileUnit, partType)
+        {
+        }
+
+        public override string GetInputConName() => "IN";
+        public override string GetOuputConName() => "Q";
+
+        public void SetPartInstance(SimaticVariableScope scope, string address)
+        {
+            part.GetPartInstance().SetVariableScope(scope)
+                .SetAddress(address);
+
+            part.SetVersion("1.0")
+                .SetTemplateValue("Time")
+                .SetTemplateValueName("time_type")
+                .SetTemplateValueType("Type");
+
+            var access = new Access(compileUnit)
+                .SetVariableScope(SimaticVariableScope.TYPED_CONSTANT)
+                .SetConstantValue("T#0s");
+
+            new Wire(this.compileUnit).AddNameCon(part, "ET").AddOpenCon();
+            new Wire(this.compileUnit).AddIdentCon(access, part.GetLocalObjectData().GetUId(), "PT");
+        }
+
+        public T CreateInputConnection<T>(T inputPartData) where T : IPartData
+        {
+            new Wire(this.compileUnit)
+                .AddNameCon(inputPartData.GetPart(), inputPartData.GetOuputConName())
+                .AddNameCon(this.part, this.GetInputConName());
+            return inputPartData;
+        }
+
+        public T CreateOutputConnection<T>(T outputPartData) where T : IPartData
+        {
+            new Wire(this.compileUnit)
+                .AddNameCon(this.part, this.GetOuputConName())
+                .AddNameCon(outputPartData.GetPart(), outputPartData.GetInputConName());
+            return outputPartData;
+        }
     }
 }

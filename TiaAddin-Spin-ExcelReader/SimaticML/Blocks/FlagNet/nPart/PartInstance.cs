@@ -20,15 +20,18 @@ namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nPart
             return xmlNode.Name == Component.NODE_NAME ? new Component() : null;
         }
 
+        private readonly CompileUnit compileUnit;
+
         private readonly XmlAttributeConfiguration scope;
         private readonly XmlAttributeConfiguration uid;
 
         public PartInstance(CompileUnit compileUnit) : base(NODE_NAME, PartInstance.CreateComponent)
         {
+            this.compileUnit = compileUnit;
+
             //==== INIT CONFIGURATION ====
             scope = this.AddAttribute("Scope", required: true);
-            uid = this.AddAttribute("UId", required: true, value: compileUnit.LocalIDGenerator.GetNextString());
-
+            uid = this.AddAttribute("UId", required: true);
             //==== INIT CONFIGURATION ====
         }
 
@@ -37,8 +40,18 @@ namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nPart
             return uint.TryParse(this.uid.GetValue(), out uint uid) ? uid : 0;
         }
 
+        private void SetUId()
+        {
+            if (string.IsNullOrEmpty(uid.GetValue()))
+            {//Set the uid only if a value has been added, otherwise it will not be empty anymore and will be added even if not needed.
+                uid.SetValue("" + compileUnit.LocalIDGenerator.GetNextString());
+            }
+        }
+
         public PartInstance SetVariableScope(SimaticVariableScope scope)
         {
+            SetUId();
+
             this.scope.SetValue(scope.GetSimaticMLString());
             return this;
         }
@@ -64,15 +77,19 @@ namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nPart
             return SimaticMLUtil.JoinComponentsIntoAddress(componentList);
         }
 
-        public void SetAddress(string address)
+        public PartInstance SetAddress(string address)
         {
-            this.GetItems().Clear();
+            SetUId();
 
-            var componentList = SimaticMLUtil.SplitFullAddressIntoComponents(address);
-            foreach (var component in componentList)
+            this.GetItems().Clear();
+            
+            var addressComponentList = SimaticMLUtil.SplitFullAddressIntoComponents(address);
+            foreach (var component in Access.ParseAddressComponents(addressComponentList))
             {
-                this.GetItems().Add(new Component().SetComponentName(component));
+                this.GetItems().Add(component);
             }
+
+            return this;
         }
     }
 }

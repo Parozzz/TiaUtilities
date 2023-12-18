@@ -9,38 +9,22 @@ namespace TiaXmlReader.SimaticML
 {
     public class SimaticAddressComponent
     {
-        private readonly string name;
-        private readonly List<SimaticAddressArrayIndex> arrayIndexes;
+        public string Name;
+        public List<SimaticAddressArrayIndex> ArrayIndexes {  get; private set; }
 
-        public SimaticAddressComponent(string name)
+        public SimaticAddressComponent()
         {
-            this.name = name;
-            this.arrayIndexes = new List<SimaticAddressArrayIndex>();
-        }
-
-        public string GetName()
-        {
-            return name;
-        }
-
-        public List<SimaticAddressArrayIndex> GetArrayIndexes()
-        {
-            return arrayIndexes;
+            this.ArrayIndexes = new List<SimaticAddressArrayIndex>();
         }
     }
 
     public class SimaticAddressArrayIndex
     {
-        private readonly List<SimaticAddressComponent> components;
+        public List<SimaticAddressComponent> Components { get; private set; }
 
         public SimaticAddressArrayIndex()
         {
-            this.components = new List<SimaticAddressComponent>();
-        }
-
-        public List<SimaticAddressComponent> GetComponents()
-        {
-            return components;
+            this.Components = new List<SimaticAddressComponent>();
         }
     }
 
@@ -124,16 +108,20 @@ namespace TiaXmlReader.SimaticML
                     {
                         if (str.EndsWith("]"))
                         {
-                            var mainComponent = new SimaticAddressComponent(str.Substring(0, str.IndexOf("[")).Replace("\"", ""));
-
                             var openSquareIndex = str.IndexOf("[");
-                            var closedSquareIndex = str.IndexOf("]");
-                            var arrayIndexesStr = str.Substring(openSquareIndex + 1, closedSquareIndex - openSquareIndex - 1); //Length decreased by one to ignore the closing square bracket.
+                            var closedSquareIndex = str.LastIndexOf("]"); //Get the last index. If there are two square bracket one after the other (Array[i[1]]) i want the last.
+
+                            var mainComponent = new SimaticAddressComponent()
+                            {
+                                Name = str.Substring(0, openSquareIndex).Replace("\"", "")
+                            };
+
+                            var arrayIndexesStr = str.Substring(openSquareIndex + 1, closedSquareIndex - openSquareIndex - 1); //-1 because i don't won't the final square
 
                             //If it contais a comma, it probably (Because it can be contains inside the address) means is an array with multiple depth (Like a matrix, with two indexes).
                             //So split it preventively to catch this case.
                             var subComponents = FindComponentsInArrayIndex(arrayIndexesStr);
-                            mainComponent.GetArrayIndexes().AddRange(subComponents);
+                            mainComponent.ArrayIndexes.AddRange(subComponents);
 
                             componentList.Add(mainComponent);
 
@@ -147,7 +135,10 @@ namespace TiaXmlReader.SimaticML
                     }
                     else
                     {
-                        var mainComponent = new SimaticAddressComponent(str.Replace("\"", ""));
+                        var mainComponent = new SimaticAddressComponent()
+                        {
+                            Name = str.Replace("\"", "")
+                        };
                         componentList.Add(mainComponent);
 
                         loopComponent.Clear();
@@ -184,7 +175,7 @@ namespace TiaXmlReader.SimaticML
                     var components = FindComponentsInAddress(str);
 
                     var componentArrayIndexes = new SimaticAddressArrayIndex();
-                    componentArrayIndexes.GetComponents().AddRange(components);
+                    componentArrayIndexes.Components.AddRange(components);
                     arrayIndexesList.Add(componentArrayIndexes);
 
                     loopComponent.Clear();

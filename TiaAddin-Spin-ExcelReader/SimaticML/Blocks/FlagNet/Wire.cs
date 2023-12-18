@@ -1,6 +1,7 @@
 ﻿using SpinXmlReader.SimaticML;
 using System.Linq;
 using System.Xml;
+using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace;
 using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace;
 using TiaXmlReader.Utility;
 
@@ -22,10 +23,12 @@ namespace SpinXmlReader.Block
             return node.Name == Wire.NODE_NAME ? new Wire(compileUnit) : null;
         }
 
+        private readonly CompileUnit compileUnit;
         private readonly LocalObjectData localObjectData;
 
-        public Wire(CompileUnit compileUnit) : base(Wire.NODE_NAME, Con.CreateCon)
+        public Wire(CompileUnit compileUnit) : base(Wire.NODE_NAME, xmlNode => Con.CreateCon(xmlNode, compileUnit))
         {
+            this.compileUnit = compileUnit;
             compileUnit.AddWire(this);
 
             //==== INIT CONFIGURATION ====
@@ -82,12 +85,12 @@ namespace SpinXmlReader.Block
             return GetIdentCon() != null;
         }
 
-        public Wire SetIdentCon(uint accessUId, uint partUId, string partConnectionName)
+        public Wire AddIdentCon(Access access, uint partUId, string partConnectionName)
         {
             if (!IsPowerrail() && !IsIdentCon())
             {
                 var identCon = new IdentCon();
-                identCon.SetConUId(accessUId);
+                identCon.SetConUId(access.GetUId());
                 this.GetItems().Add(identCon);
 
                 var nameCon = new NameCon();
@@ -107,9 +110,10 @@ namespace SpinXmlReader.Block
 
         public Wire AddNameCon(Part part, string partConnectionName)
         {
-            var nameCon = this.AddNode(new NameCon());
+            var nameCon = new NameCon();
             nameCon.SetConUId(part.GetLocalObjectData().GetUId());
             nameCon.SetConName(partConnectionName);
+            this.GetItems().Add(nameCon);
 
             return this;
         }
@@ -118,11 +122,20 @@ namespace SpinXmlReader.Block
         {
             return this.GetItems().Select(con => con.GetConfigurationName() == OpenCon.NODE_NAME).Any();
         }
+
+        public Wire AddOpenCon()
+        {
+            var openCon = new OpenCon();
+            openCon.SetConUId(compileUnit.LocalIDGenerator.GetNext());
+            this.GetItems().Add(openCon);
+
+            return this;
+        }
     }
 
     public class Con : XmlNodeConfiguration 
     {
-        public static Con CreateCon(XmlNode node)
+        public static Con CreateCon(XmlNode node, CompileUnit compileUnit)
         {
             switch (node.Name)
             {
@@ -174,7 +187,8 @@ namespace SpinXmlReader.Block
     public class OpenCon : Con
     {
         public const string NODE_NAME = "OpenCon";
-        public OpenCon() : base(NODE_NAME) { }
+        public OpenCon() : base(NODE_NAME)  { }
+
     }
 
     public class NameCon : Con

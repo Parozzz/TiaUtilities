@@ -5,6 +5,7 @@ using SpinXmlReader.SimaticML;
 using System;
 using System.Linq;
 using System.Xml;
+using TiaXmlReader.SimaticML.Blocks.FlagNet.nPart;
 using TiaXmlReader.Utility;
 
 namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
@@ -16,6 +17,8 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
         SET_COIL,
         RESET_COIL,
         NOT,
+        TON,
+        TOF,
         UNKNOWN = 0 //Default value.
     }
 
@@ -30,6 +33,8 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
                 case PartType.SET_COIL: return "SCoil";
                 case PartType.RESET_COIL: return "RCoil";
                 case PartType.NOT: return "Not";
+                case PartType.TON: return "TON";
+                case PartType.TOF: return "TOF";
                 default:
                     throw new Exception("Part " + partType.ToString() + "  not yet implemented");
             }
@@ -61,6 +66,8 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
         private readonly XmlNodeConfiguration automaticTyped;
         private readonly XmlAttributeConfiguration automaticTypedName;
 
+        private readonly PartInstance instance;
+
         public Part(CompileUnit compileUnit) : base(Part.NODE_NAME)
         {
             compileUnit.AddPart(this);
@@ -72,17 +79,19 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
             disabledENO = this.AddAttribute("DisabledENO");
             version = this.AddAttribute("Version");
 
-            templateValue = this.AddNode("TemplateValue");
-            templateValueName = templateValue.AddAttribute("Name");
-            //Cardinality means how many connections that block have. For O for example, it means how many input connections it has. For move, how many outputs.
-            templateValueType = templateValue.AddAttribute("Cardinality");
-
             negated = this.AddNode("Negated");
             negatedName = negated.AddAttribute("Name");
 
             automaticTyped = this.AddNode("AutomaticTyped");
             automaticTypedName = automaticTyped.AddAttribute("Name", required: true);
 
+            //L'ORDINE TRA INSTANCE E TEMPLATE VALUE è IMPORTANTE! NON MUOVERE.
+            instance = this.AddNode(new PartInstance(compileUnit));
+
+            templateValue = this.AddNode("TemplateValue");
+            templateValueName = templateValue.AddAttribute("Name");
+            //Cardinality means how many connections that block have. For O for example, it means how many input connections it has. For move, how many outputs.
+            templateValueType = templateValue.AddAttribute("Type");
             //==== INIT CONFIGURATION ====
         }
         public LocalObjectData GetLocalObjectData()
@@ -151,5 +160,44 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
         {
             return IsAutomaticTyped() ? automaticTypedName.GetValue() : "";
         }
+
+        public PartInstance GetPartInstance()
+        {
+            return instance;
+        }
+
+        public string GetTemplateValue()
+        {
+            return this.templateValue.GetInnerText();
+        }
+
+        public Part SetTemplateValue(string value)
+        {
+            this.templateValue.SetInnerText(value);
+            return this;
+        }
+
+        public string GetTemplateValueName()
+        {
+            return templateValueName.GetValue();
+        }
+
+        public Part SetTemplateValueName(string templateValueName) 
+        {
+            this.templateValueName.SetValue(templateValueName);
+            return this;
+        }
+
+        public string GetTemplateValueType()
+        {
+            return this.templateValueType.GetValue();
+        }
+
+        public Part SetTemplateValueType(string templateValueType)
+        {
+            this.templateValueType.SetValue(templateValueType);
+            return this;
+        }
+
     }
 }

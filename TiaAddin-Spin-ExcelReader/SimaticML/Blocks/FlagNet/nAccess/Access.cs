@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Office2010.ExcelAc;
+using DocumentFormat.OpenXml.Office2019.Excel.RichData2;
 using SpinXmlReader;
 using SpinXmlReader.Block;
 using SpinXmlReader.SimaticML;
@@ -98,32 +99,48 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace
             }
         }
 
-        private static List<Component> ParseAddressComponents(List<SimaticAddressComponent> addressComponentList)
+        public static List<Component> ParseAddressComponents(List<SimaticAddressComponent> addressComponentList)
         {
             var componentList = new List<Component>();
             foreach (var addressComponent in addressComponentList)
             {
-                var component = new Component()
-                        .SetComponentName(addressComponent.GetName());
-
-                foreach (var arrayIndex in addressComponent.GetArrayIndexes())
+                var component = new Component().SetComponentName(addressComponent.Name);
+                //If there is any, it will be set to be an array and add an access for the index.
+                Access.ParseArrayIndexes(addressComponent.ArrayIndexes).ForEach(access =>
                 {
-                    if (component.GetSliceAccessModifier() != "Array")
-                    {
-                        component.SetSliceAccessModifier("Array");
-                    }
-
-                    var access = new Access();
-                    foreach (var arrayIndexComponent in Access.ParseAddressComponents(arrayIndex.GetComponents()))
-                    {
-                        access.symbol.GetItems().Add(arrayIndexComponent);
-                    }
-                    component.GetItems().Add(access);
-                }
-
+                    component.SetAccessModifier("Array")
+                            .GetItems().Add(access);
+                });
                 componentList.Add(component);
             }
             return componentList;
+        }
+
+        public static List<Access> ParseArrayIndexes(List<SimaticAddressArrayIndex> arrayIndexList)
+        {
+            var accessList = new List<Access>();
+            foreach (var arrayIndex in arrayIndexList)
+            {
+                var access = new Access();
+
+                if (arrayIndex.Components.Count == 1 && int.TryParse(arrayIndex.Components[0].Name, out int constant))
+                {
+                    access.SetVariableScope(SimaticVariableScope.LITERAL_CONSTANT)
+                        .SetConstantType(SimaticDataType.DINT)
+                        .SetConstantValue("" + constant);
+                }
+                else
+                {
+                    access.SetVariableScope(SimaticVariableScope.GLOBAL_VARIABLE);
+
+                    var arrayIndexComponents = Access.ParseAddressComponents(arrayIndex.Components);
+                    arrayIndexComponents.ForEach(access.symbol.GetItems().Add);
+                }
+
+                accessList.Add(access);
+            }
+
+            return accessList;
         }
 
         public string GetConstantName()
@@ -153,9 +170,10 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace
             return constantValue.GetInnerText();
         }
 
-        public void SetConstantValue(string constantValue)
+        public Access SetConstantValue(string constantValue)
         {
             this.constantValue.SetInnerText(constantValue);
+            return this;
         }
     }
 
@@ -175,12 +193,14 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace
 
         private readonly XmlAttributeConfiguration componentName;
         private readonly XmlAttributeConfiguration sliceAccessModifier;
+        private readonly XmlAttributeConfiguration accessModifier;
 
         public Component(string value = "") : base(Component.NODE_NAME, Component.CreateAccess, required: true)
         {
             //==== INIT CONFIGURATION ====
             componentName = this.AddAttribute("Name", required: true, value: value);
             sliceAccessModifier = this.AddAttribute("SliceAccessModifier");
+            accessModifier = this.AddAttribute("AccessModifier");
             //==== INIT CONFIGURATION ====
         }
 
@@ -203,6 +223,17 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace
         public Component SetSliceAccessModifier(string sliceAccessModifier)
         {
             this.sliceAccessModifier.SetValue(sliceAccessModifier);
+            return this;
+        }
+
+        public string GetAccessModifier()
+        {
+            return accessModifier.GetValue();
+        }
+
+        public Component SetAccessModifier(string accessModifier)
+        {
+            this.accessModifier.SetValue(accessModifier);
             return this;
         }
     }

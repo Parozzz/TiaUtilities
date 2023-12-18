@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using TiaXmlReader.AlarmGeneration;
 using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace;
 using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace;
+using TiaXmlReader.SimaticML.Enums;
 
 namespace TiaXmlReader.Generation
 {
@@ -54,8 +55,10 @@ namespace TiaXmlReader.Generation
                 var consumerAddress = worksheet.Cell("H" + variablesCellIndex).Value;
                 var coilAddress = worksheet.Cell("I" + variablesCellIndex).Value;
                 var setCoilAddress = worksheet.Cell("J" + variablesCellIndex).Value;
-                var description = worksheet.Cell("K" + variablesCellIndex).Value;
-                var enable = worksheet.Cell("L" + variablesCellIndex).Value;
+                var timerAddress = worksheet.Cell("K" + variablesCellIndex).Value;
+                var timerType = worksheet.Cell("L" + variablesCellIndex).Value;
+                var description = worksheet.Cell("M" + variablesCellIndex).Value;
+                var enable = worksheet.Cell("N" + variablesCellIndex).Value;
                 variablesCellIndex++;
 
                 if (!consumerAddress.IsText || !setCoilAddress.IsText || !coilAddress.IsText || !description.IsText || !enable.IsText)
@@ -68,6 +71,8 @@ namespace TiaXmlReader.Generation
                     ConsumerAddress = consumerAddress.ToString(),
                     CoilAddress = coilAddress.ToString(),
                     SetCoilAddress = setCoilAddress.ToString(),
+                    TimerAddress = timerAddress.ToString(),
+                    TimerType = timerType.ToString(),
                     Description = description.ToString(),
                     Enable = bool.Parse(enable.ToString()),
                 };
@@ -136,7 +141,7 @@ namespace TiaXmlReader.Generation
                             FillAlarmCompileUnit(compileUnit, placeholders, alarmData);
                         }
 
-                        if(antiSlipNumber > 0 && nextAlarmNum % antiSlipNumber != 0)
+                        if (antiSlipNumber > 0 && nextAlarmNum % antiSlipNumber != 0)
                         {
                             nextAlarmNum = (nextAlarmNum / antiSlipNumber) * antiSlipNumber + antiSlipNumber;
                         }
@@ -190,13 +195,40 @@ namespace TiaXmlReader.Generation
             var setCoil = new SetCoilPartData(compileUnit);
             var coil = new CoilPartData(compileUnit);
 
+
             contact.CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, placeholders.Parse(alarmData.ConsumerAddress)));
             setCoil.CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, placeholders.Parse(alarmData.SetCoilAddress)));
             coil.CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, placeholders.Parse(alarmData.CoilAddress)));
 
-            contact.CreatePowerrailConnection()
-                .CreateOutputConnection(setCoil)
-                .CreateOutputConnection(coil);
+            if (!string.IsNullOrEmpty(alarmData.TimerAddress))
+            {
+                PartType partType;
+                switch (alarmData.TimerType.ToLower())
+                {
+                    case "ton":
+                        partType = PartType.TON;
+                        break;
+                    case "tof":
+                        partType = PartType.TOF;
+                        break;
+                    default:
+                        throw new Exception("Unknow timer type of " + alarmData.TimerType);
+                }
+
+                var timer = new TimerPartData(compileUnit, partType);
+                timer.SetPartInstance(SimaticVariableScope.GLOBAL_VARIABLE, placeholders.Parse(alarmData.TimerAddress));
+
+                contact.CreatePowerrailConnection()
+                    .CreateOutputConnection(timer)
+                    .CreateOutputConnection(setCoil)
+                    .CreateOutputConnection(coil);
+            }
+            else
+            {
+                contact.CreatePowerrailConnection()
+                    .CreateOutputConnection(setCoil)
+                    .CreateOutputConnection(coil);
+            }
         }
 
         public void ExportXML(string exportPath)

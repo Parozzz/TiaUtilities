@@ -117,7 +117,8 @@ namespace SpinXmlReader.Block
 
                 var addressComponent = components[x];
 
-                var str = string.IsNullOrEmpty(addressComponent.GetName()) ? Constants.DEFAULT_EMPTY_STRUCT_NAME : addressComponent.GetName();
+
+                var str = string.IsNullOrEmpty(addressComponent.Name) ? Constants.DEFAULT_EMPTY_STRUCT_NAME : addressComponent.Name;
                 foreach (var member in lastMembersList)
                 {
                     if (member.GetMemberName().ToLower() == str.ToLower())
