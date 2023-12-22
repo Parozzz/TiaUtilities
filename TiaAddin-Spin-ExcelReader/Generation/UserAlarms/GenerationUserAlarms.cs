@@ -11,7 +11,7 @@ using TiaXmlReader.SimaticML.Enums;
 
 namespace TiaXmlReader.Generation
 {
-    public class GenerationConsumerAlarms : IGeneration
+    public class GenerationUserAlarms : IGeneration
     {
         private string fcBlockName;
         private uint fcBlockNumber;
@@ -41,7 +41,7 @@ namespace TiaXmlReader.Generation
         private BlockFC fc;
         private CompileUnit compileUnit;
 
-        public GenerationConsumerAlarms()
+        public GenerationUserAlarms()
         {
             this.alarmDataList = new List<AlarmData>();
             this.userDataList = new List<UserData>();
@@ -235,19 +235,16 @@ namespace TiaXmlReader.Generation
         private void FillAlarmCompileUnit(CompileUnit compileUnit, GenerationPlaceholders placeholders, AlarmData alarmData)
         {
             var contact = new ContactPartData(compileUnit);
-            var setCoil = new SetCoilPartData(compileUnit);
-            var coil = new CoilPartData(compileUnit);
-
+           
             var fullUserAddress = placeholders.Parse(userAddressPrefix) + placeholders.Parse(alarmData.UserAddress);
             contact.CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, fullUserAddress));
 
-            var fullCoilAddress = placeholders.ParseFullOr(alarmData.SetCoilAddress, defaultSetAddress);
-            setCoil.CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, fullCoilAddress));
+            contact.CreatePowerrailConnection();
 
-            var fullSetAddress = placeholders.ParseFullOr(alarmData.CoilAddress, defaultCoilAddress);
-            coil.CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, fullSetAddress));
+            IPartData nextPartData = contact;
 
-            if (!string.IsNullOrEmpty(alarmData.TimerAddress) || !string.IsNullOrEmpty(defaultTimerAddress))
+            var fullTimerAddress = placeholders.ParseFullOr(alarmData.TimerAddress, defaultTimerAddress);
+            if (!string.IsNullOrEmpty(fullTimerAddress) && fullTimerAddress.ToLower() != "\\")
             {
                 PartType partType;
 
@@ -265,19 +262,32 @@ namespace TiaXmlReader.Generation
                 }
 
                 var timer = new TimerPartData(compileUnit, partType);
-                timer.SetPartInstance(SimaticVariableScope.GLOBAL_VARIABLE, placeholders.ParseFullOr(alarmData.TimerAddress, defaultTimerAddress))
+                timer.SetPartInstance(SimaticVariableScope.GLOBAL_VARIABLE, fullTimerAddress)
                     .SetTimeValue(placeholders.ParseFullOr(alarmData.TimerValue, defaultTimerTime));
 
-                contact.CreatePowerrailConnection()
-                    .CreateOutputConnection(timer)
-                    .CreateOutputConnection(setCoil)
-                    .CreateOutputConnection(coil);
+                contact.CreateOutputConnection(nextPartData = timer);
             }
-            else
+
+            var fullSetCoilAddress = placeholders.ParseFullOr(alarmData.SetCoilAddress, defaultSetAddress);
+            if (fullSetCoilAddress.ToLower() != "\\")
             {
-                contact.CreatePowerrailConnection()
-                    .CreateOutputConnection(setCoil)
-                    .CreateOutputConnection(coil);
+                var setCoil = new SetCoilPartData(compileUnit);
+                setCoil.CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, fullSetCoilAddress));
+
+                nextPartData.CreateOutputConnection(nextPartData = setCoil);
+            }
+
+            var fullCoilAddress = placeholders.ParseFullOr(alarmData.CoilAddress, defaultCoilAddress);
+            if(fullCoilAddress.ToLower() != "\\")
+            {
+                var coil = new CoilPartData(compileUnit);
+                coil.CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, fullCoilAddress));
+                nextPartData.CreateOutputConnection(nextPartData = coil);
+            }
+
+            if (nextPartData == contact)
+            {
+                contact.CreateOpenCon();
             }
         }
 

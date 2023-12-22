@@ -94,7 +94,7 @@ namespace SpinXmlReader
                         switch (configTypeValue.GetText().ToLower())
                         {
                             case "type1":
-                                var importConsumerAlarms = new GenerationConsumerAlarms();
+                                var importConsumerAlarms = new GenerationUserAlarms();
                                 importConsumerAlarms.ImportExcelConfig(configWorksheet);
                                 importConsumerAlarms.GenerateBlocks();
                                 importConsumerAlarms.ExportXML(exportPathTextBlock.Text);

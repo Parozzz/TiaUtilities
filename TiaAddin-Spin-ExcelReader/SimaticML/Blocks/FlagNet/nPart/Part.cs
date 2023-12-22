@@ -66,7 +66,7 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
         private readonly XmlNodeConfiguration automaticTyped;
         private readonly XmlAttributeConfiguration automaticTypedName;
 
-        private readonly PartInstance instance;
+        private readonly Instance instance;
 
         public Part(CompileUnit compileUnit) : base(Part.NODE_NAME)
         {
@@ -86,7 +86,7 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
             automaticTypedName = automaticTyped.AddAttribute("Name", required: true);
 
             //L'ORDINE TRA INSTANCE E TEMPLATE VALUE è IMPORTANTE! NON MUOVERE.
-            instance = this.AddNode(new PartInstance(compileUnit));
+            instance = this.AddNode(new Instance(compileUnit));
 
             templateValue = this.AddNode("TemplateValue");
             templateValueName = templateValue.AddAttribute("Name");
@@ -161,7 +161,7 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
             return IsAutomaticTyped() ? automaticTypedName.GetValue() : "";
         }
 
-        public PartInstance GetPartInstance()
+        public Instance GetPartInstance()
         {
             return instance;
         }

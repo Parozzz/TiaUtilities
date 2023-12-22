@@ -25,16 +25,8 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
         public abstract string GetInputConName();
 
         public abstract string GetOuputConName();
-    }
 
-    public abstract class SimplePartData : IPartData
-    {
-        public SimplePartData(CompileUnit compileUnit, PartType partType) : base(compileUnit, partType) { }
-
-        public override string GetInputConName() => "in";
-        public override string GetOuputConName() => "out";
-
-        public SimplePartData CreatePowerrailConnection()
+        public IPartData CreatePowerrailConnection()
         {
             this.compileUnit.AddPowerrailSingleConnection(this.part, this.GetInputConName());
             return this;
@@ -55,6 +47,20 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
                 .AddNameCon(outputPartData.GetPart(), outputPartData.GetInputConName());
             return outputPartData;
         }
+
+        public IPartData CreateOpenCon()
+        {
+            new Wire(this.compileUnit).AddOpenCon();
+            return this;
+        }
+    }
+
+    public abstract class SimplePartData : IPartData
+    {
+        public SimplePartData(CompileUnit compileUnit, PartType partType) : base(compileUnit, partType) { }
+
+        public override string GetInputConName() => "in";
+        public override string GetOuputConName() => "out";
     }
     public class NOTPartData : SimplePartData
     {
@@ -116,11 +122,11 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
 
         public TimerPartData SetPartInstance(SimaticVariableScope scope, string address)
         {
-            part.GetPartInstance().SetVariableScope(scope)
+            part.GetPartInstance()
+                .SetVariableScope(scope)
                 .SetAddress(address);
 
-            part.SetVersion("1.0")
-                .SetTemplateValue("Time")
+            part.SetTemplateValue("Time")
                 .SetTemplateValueName("time_type")
                 .SetTemplateValueType("Type");
 

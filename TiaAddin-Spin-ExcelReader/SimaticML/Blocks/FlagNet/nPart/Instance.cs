@@ -12,7 +12,7 @@ using TiaXmlReader.Utility;
 
 namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nPart
 {
-    public class PartInstance : XmlNodeListConfiguration<Component>
+    public class Instance : XmlNodeListConfiguration<Component>
     {
         public const string NODE_NAME = "Instance";
         private static Component CreateComponent(XmlNode xmlNode)
@@ -25,7 +25,7 @@ namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nPart
         private readonly XmlAttributeConfiguration scope;
         private readonly XmlAttributeConfiguration uid;
 
-        public PartInstance(CompileUnit compileUnit) : base(NODE_NAME, PartInstance.CreateComponent)
+        public Instance(CompileUnit compileUnit) : base(NODE_NAME, Instance.CreateComponent)
         {
             this.compileUnit = compileUnit;
 
@@ -48,7 +48,7 @@ namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nPart
             }
         }
 
-        public PartInstance SetVariableScope(SimaticVariableScope scope)
+        public Instance SetVariableScope(SimaticVariableScope scope)
         {
             SetUId();
 
@@ -77,7 +77,7 @@ namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nPart
             return SimaticMLUtil.JoinComponentsIntoAddress(componentList);
         }
 
-        public PartInstance SetAddress(string address)
+        public Instance SetAddress(string address)
         {
             SetUId();
 

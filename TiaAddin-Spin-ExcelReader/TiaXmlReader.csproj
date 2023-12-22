@@ -165,10 +165,10 @@
     <Compile Include="Generation\IO\IOData.cs" />
     <Compile Include="Generation\IO\GenerationIO.cs" />
     <Compile Include="Generation\IO_Cad\GenerationIO_CAD.cs" />
-    <Compile Include="Generation\ConsumerAlarms\AlarmData.cs" />
+    <Compile Include="Generation\UserAlarms\AlarmData.cs" />
     <Compile Include="Attributes\Attribute.cs" />
     <Compile Include="Generation\IO_Cad\CadData.cs" />
-    <Compile Include="Generation\ConsumerAlarms\GenerationConsumerAlarms.cs" />
+    <Compile Include="Generation\UserAlarms\GenerationUserAlarms.cs" />
     <Compile Include="Generation\IGeneration.cs" />
     <Compile Include="SaveData.cs" />
     <Compile Include="SimaticML\BlockAttributeList\BlockAttributeList.cs" />
@@ -180,12 +180,12 @@
     <Compile Include="SimaticML\Blocks\CompileUnit.cs" />
     <Compile Include="SimaticML\Blocks\BlockFC.cs" />
     <Compile Include="SimaticML\Blocks\FlagNet\nAccess\IAccessData.cs" />
-    <Compile Include="SimaticML\Blocks\FlagNet\nPart\PartInstance.cs" />
+    <Compile Include="SimaticML\Blocks\FlagNet\nPart\Instance.cs" />
     <Compile Include="SimaticML\Blocks\FlagNet\nPart\IPartData.cs" />
     <Compile Include="SimaticML\Blocks\FlagNet\nPart\Part.cs" />
     <Compile Include="SimaticML\Blocks\FlagNet\Wire.cs" />
     <Compile Include="SimaticML\BlockAttributeList\Section.cs" />
-    <Compile Include="Generation\ConsumerAlarms\UserData.cs" />
+    <Compile Include="Generation\UserAlarms\UserData.cs" />
     <Compile Include="Generation\GenerationPlaceholders.cs" />
     <Compile Include="SimaticML\Enums\SimaticVariableScope.cs" />
     <Compile Include="SimaticML\IGlobalObject.cs" />
