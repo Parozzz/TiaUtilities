@@ -34,6 +34,11 @@ namespace SpinXmlReader
         {
             return string.IsNullOrEmpty(str) ? or : str;
         }
+
+        public static void StringFullOr(ref string str, string or)
+        {
+            str = string.IsNullOrEmpty(str) ? or : str;
+        }
     }
 
     public static class Validate

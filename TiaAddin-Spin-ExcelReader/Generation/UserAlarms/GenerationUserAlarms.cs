@@ -16,21 +16,24 @@ namespace TiaXmlReader.Generation
         private string fcBlockName;
         private uint fcBlockNumber;
 
-        private uint startingAlarmNum;
-        private string alarmNumFormat;
-
         private string groupingType;
         private string divisionType;
+
+        private uint startingAlarmNum;
+        private string alarmNumFormat;
         private uint antiSlipNumber;
         private uint skipNumberAfterGroup;
 
         private string defaultCoilAddress;
-        private string defaultSetAddress;
+        private string defaultSetCoilAddress;
         private string defaultTimerAddress;
         private string defaultTimerType;
-        private string defaultTimerTime;
+        private string defaultTimerValue;
 
-        private string userAddressPrefix;
+        private string alarmAddressPrefix;
+        private string coilAddressPrefix;
+        private string setCoilAddressPrefix;
+        private string timerAddressPrefix;
 
         private string segmentNameAlarmDivisionType;
         private string segmentNameUserDivisionType;
@@ -51,23 +54,28 @@ namespace TiaXmlReader.Generation
         {
             fcBlockName = worksheet.Cell("C5").Value.ToString();
             fcBlockNumber = (uint)worksheet.Cell("C6").Value.GetNumber();
-            startingAlarmNum = (uint)worksheet.Cell("C8").Value.GetNumber();
-            alarmNumFormat = worksheet.Cell("C9").Value.ToString();
-            groupingType = worksheet.Cell("C10").Value.ToString();
-            divisionType = worksheet.Cell("C11").Value.ToString();
-            antiSlipNumber = (uint)worksheet.Cell("C13").Value.GetNumber();
-            skipNumberAfterGroup = (uint)worksheet.Cell("C14").Value.GetNumber();
 
-            defaultCoilAddress = worksheet.Cell("C16").Value.ToString();
-            defaultSetAddress = worksheet.Cell("C17").Value.ToString();
-            defaultTimerAddress = worksheet.Cell("C18").Value.ToString();
-            defaultTimerType = worksheet.Cell("C19").Value.ToString();
-            defaultTimerTime = worksheet.Cell("C20").Value.ToString();
+            groupingType = worksheet.Cell("C8").Value.ToString();
+            divisionType = worksheet.Cell("C9").Value.ToString();
 
-            userAddressPrefix = worksheet.Cell("C22").Value.ToString();
+            startingAlarmNum = (uint)worksheet.Cell("C12").Value.GetNumber();
+            alarmNumFormat = worksheet.Cell("C13").Value.ToString();
+            antiSlipNumber = (uint)worksheet.Cell("C14").Value.GetNumber();
+            skipNumberAfterGroup = (uint)worksheet.Cell("C15").Value.GetNumber();
 
-            segmentNameAlarmDivisionType = worksheet.Cell("C24").Value.ToString();
-            segmentNameUserDivisionType = worksheet.Cell("C25").Value.ToString();
+            defaultCoilAddress = worksheet.Cell("C18").Value.ToString();
+            defaultSetCoilAddress = worksheet.Cell("C19").Value.ToString();
+            defaultTimerAddress = worksheet.Cell("C20").Value.ToString();
+            defaultTimerType = worksheet.Cell("C21").Value.ToString();
+            defaultTimerValue = worksheet.Cell("C22").Value.ToString();
+
+            alarmAddressPrefix = worksheet.Cell("C25").Value.ToString();
+            coilAddressPrefix = worksheet.Cell("C26").Value.ToString();
+            setCoilAddressPrefix = worksheet.Cell("C27").Value.ToString();
+            timerAddressPrefix = worksheet.Cell("C28").Value.ToString();
+
+            segmentNameAlarmDivisionType = worksheet.Cell("C31").Value.ToString();
+            segmentNameUserDivisionType = worksheet.Cell("C32").Value.ToString();
 
             alarmDataList.Clear();
 
@@ -91,7 +99,7 @@ namespace TiaXmlReader.Generation
 
                 var alarmData = new AlarmData()
                 {
-                    UserAddress = userAddress.ToString(),
+                    AlarmAddress = userAddress.ToString(),
                     CoilAddress = coilAddress.ToString(),
                     SetCoilAddress = setCoilAddress.ToString(),
                     TimerAddress = timerAddress.ToString(),
@@ -149,6 +157,7 @@ namespace TiaXmlReader.Generation
                         var startAlarmNum = nextAlarmNum;
                         foreach (var alarmData in alarmDataList)
                         {
+                            ReplaceAlarmDataWithDefaultAndPrefix(alarmData);
                             if (!alarmData.Enable)
                             {
                                 continue;
@@ -157,7 +166,7 @@ namespace TiaXmlReader.Generation
                             placeholders.SetConsumerData(consumerData)
                                 .SetAlarmData(alarmData)
                                 .SetAlarmNum(nextAlarmNum++, alarmNumFormat);
-
+                            
                             if (divisionType == "UnoPerSegmento")
                             {
                                 compileUnit = fc.AddCompileUnit();
@@ -185,6 +194,7 @@ namespace TiaXmlReader.Generation
                 case "PerTipoAllarme":
                     foreach (var alarmData in alarmDataList)
                     {
+                        ReplaceAlarmDataWithDefaultAndPrefix(alarmData);
                         if (!alarmData.Enable)
                         {
                             continue;
@@ -232,24 +242,28 @@ namespace TiaXmlReader.Generation
             }
         }
 
+        private void ReplaceAlarmDataWithDefaultAndPrefix(AlarmData alarmData)
+        {
+            alarmData.AlarmAddress = alarmAddressPrefix + alarmData.AlarmAddress;
+            alarmData.CoilAddress = string.IsNullOrEmpty(alarmData.CoilAddress) ? defaultCoilAddress : (coilAddressPrefix + alarmData.CoilAddress);
+            alarmData.SetCoilAddress = string.IsNullOrEmpty(alarmData.SetCoilAddress) ? defaultSetCoilAddress : (setCoilAddressPrefix + alarmData.SetCoilAddress);
+            alarmData.TimerAddress = string.IsNullOrEmpty(alarmData.TimerAddress) ? defaultTimerAddress : (timerAddressPrefix + alarmData.TimerAddress);
+            alarmData.TimerType = Utils.StringFullOr(alarmData.TimerType, defaultTimerType);
+            alarmData.TimerValue = Utils.StringFullOr(alarmData.TimerValue, defaultTimerValue);
+        }
+
         private void FillAlarmCompileUnit(CompileUnit compileUnit, GenerationPlaceholders placeholders, AlarmData alarmData)
         {
             var contact = new ContactPartData(compileUnit);
            
-            var fullUserAddress = placeholders.Parse(userAddressPrefix) + placeholders.Parse(alarmData.UserAddress);
-            contact.CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, fullUserAddress));
-
+            contact.CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, placeholders.Parse(alarmData.AlarmAddress)));
             contact.CreatePowerrailConnection();
 
             IPartData nextPartData = contact;
-
-            var fullTimerAddress = placeholders.ParseFullOr(alarmData.TimerAddress, defaultTimerAddress);
-            if (!string.IsNullOrEmpty(fullTimerAddress) && fullTimerAddress.ToLower() != "\\")
+            if (!string.IsNullOrEmpty(alarmData.TimerAddress) && alarmData.AlarmAddress.ToLower() != "\\")
             {
                 PartType partType;
-
-                var timerType = string.IsNullOrEmpty(alarmData.TimerType) ? defaultTimerType : alarmData.TimerType;
-                switch (timerType.ToLower())
+                switch (alarmData.TimerType.ToLower())
                 {
                     case "ton":
                         partType = PartType.TON;
@@ -262,26 +276,24 @@ namespace TiaXmlReader.Generation
                 }
 
                 var timer = new TimerPartData(compileUnit, partType);
-                timer.SetPartInstance(SimaticVariableScope.GLOBAL_VARIABLE, fullTimerAddress)
-                    .SetTimeValue(placeholders.ParseFullOr(alarmData.TimerValue, defaultTimerTime));
+                timer.SetPartInstance(SimaticVariableScope.GLOBAL_VARIABLE, placeholders.Parse(alarmData.AlarmAddress))
+                    .SetTimeValue(alarmData.TimerValue);
 
                 contact.CreateOutputConnection(nextPartData = timer);
             }
 
-            var fullSetCoilAddress = placeholders.ParseFullOr(alarmData.SetCoilAddress, defaultSetAddress);
-            if (fullSetCoilAddress.ToLower() != "\\")
+            if (alarmData.SetCoilAddress.ToLower() != "\\")
             {
                 var setCoil = new SetCoilPartData(compileUnit);
-                setCoil.CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, fullSetCoilAddress));
+                setCoil.CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, placeholders.Parse(alarmData.SetCoilAddress)));
 
                 nextPartData.CreateOutputConnection(nextPartData = setCoil);
             }
 
-            var fullCoilAddress = placeholders.ParseFullOr(alarmData.CoilAddress, defaultCoilAddress);
-            if(fullCoilAddress.ToLower() != "\\")
+            if(alarmData.CoilAddress.ToLower() != "\\")
             {
                 var coil = new CoilPartData(compileUnit);
-                coil.CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, fullCoilAddress));
+                coil.CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, placeholders.Parse(alarmData.CoilAddress)));
                 nextPartData.CreateOutputConnection(nextPartData = coil);
             }
 

@@ -13,6 +13,7 @@ namespace SpinXmlReader.Block
         private readonly XmlNodeConfiguration headerAuthor;
         private readonly XmlNodeConfiguration headerFamily;
         private readonly XmlNodeConfiguration headerName;
+        private readonly XmlNodeConfiguration headerVersion;
 
         private readonly XmlNodeConfiguration autoNumber;
         private readonly XmlNodeConfiguration instanceOfName; //ONLY FOR InstanceDB
@@ -21,15 +22,22 @@ namespace SpinXmlReader.Block
         private readonly XmlNodeConfiguration blockInterface;
         private readonly XmlNodeListConfiguration<Section> blockSections;
 
+        private readonly XmlNodeConfiguration secondaryType; //FOR OBS
+        private readonly XmlNodeConfiguration assignedProDiagFB;
+        private readonly XmlNodeConfiguration supervisions;
         private readonly XmlNodeConfiguration isOnlyStoredInLoadMemory;
         private readonly XmlNodeConfiguration isWriteProtectedInAS;
+        private readonly XmlNodeConfiguration isRetainMemResEnabled;
         private readonly XmlNodeConfiguration isIECCheckEnabled;
         private readonly XmlNodeConfiguration memoryLayout;
         private readonly XmlNodeConfiguration memoryReserve;
+        private readonly XmlNodeConfiguration retainMemoryReserve;
+        private readonly XmlNodeConfiguration parameterPassing;
         private readonly XmlNodeConfiguration blockName;
         private readonly XmlNodeConfiguration blockNumber;
         private readonly XmlNodeConfiguration programmingLanguage;
         private readonly XmlNodeConfiguration setENOAutomatically;
+        private readonly XmlNodeConfiguration libraryConformanceStatus;
         private readonly XmlNodeConfiguration udaBlockProperties;
         private readonly XmlNodeConfiguration udaEnableTagReadback;
 
@@ -41,6 +49,7 @@ namespace SpinXmlReader.Block
             headerAuthor = this.AddNode("HeaderAuthor");
             headerFamily = this.AddNode("HeaderFamily");
             headerName = this.AddNode("HeaderName");
+            headerVersion = this.AddNode("HeaderVersion");
 
             autoNumber = this.AddNode("AutoNumber");
             instanceOfName = this.AddNode("InstanceOfName");
@@ -49,11 +58,17 @@ namespace SpinXmlReader.Block
             blockInterface = this.AddNode("Interface", required: true);
             blockSections = blockInterface.AddNodeList("Sections", this.CreateSection, required: true, namespaceURI: Constants.GET_SECTIONS_NAMESPACE());
 
+            secondaryType = this.AddNode("SecondaryType");
+            assignedProDiagFB = this.AddNode("AssignedProDiagFB");
+            supervisions = this.AddNode("Supervisions");
             isOnlyStoredInLoadMemory = this.AddNode("IsOnlyStoredInLoadMemory");
             isWriteProtectedInAS = this.AddNode("IsWriteProtectedInAS");
+            isRetainMemResEnabled = this.AddNode("IsRetainMemResEnabled");
             isIECCheckEnabled = this.AddNode("IsIECCheckEnabled");
             memoryLayout = this.AddNode("MemoryLayout");
             memoryReserve = this.AddNode("MemoryReserve");
+            retainMemoryReserve = this.AddNode("RetainMemoryReserve");
+            parameterPassing = this.AddNode("ParameterPassing");
             blockName = this.AddNode("Name", required: true, defaultInnerText: "fcTest");
             if (Constants.VERSION >= 18)
             {
@@ -62,6 +77,7 @@ namespace SpinXmlReader.Block
             blockNumber = this.AddNode("Number", required: true, defaultInnerText: "1");
             programmingLanguage = this.AddNode("ProgrammingLanguage", required: true, defaultInnerText: "LAD");
             setENOAutomatically = this.AddNode("SetENOAutomatically");
+            libraryConformanceStatus = this.AddNode("LibraryConformanceStatus");
             udaBlockProperties = this.AddNode("UDABlockProperties");
             udaEnableTagReadback = this.AddNode("UDAEnableTagReadback");
             //==== INIT CONFIGURATION ====
