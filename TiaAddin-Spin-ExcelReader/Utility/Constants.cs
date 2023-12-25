@@ -47,5 +47,9 @@ namespace SpinXmlReader
         public const string OBJECT_LIST_KEY = "ObjectList";
 
         public const string DEFAULT_EMPTY_STRUCT_NAME = "_";
+
+        public const string HEADER_AUTHOR = "Giacomo P.";
+        public const string HEADER_FAMILY = "SPIN_SRL"; //DO NOT USE SPACE
+        public const string UDA_BLOCK_PROPERTIES = "GENERATED_BY_XMLREADER";
     }
 }

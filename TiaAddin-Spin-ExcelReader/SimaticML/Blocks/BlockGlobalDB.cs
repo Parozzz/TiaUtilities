@@ -50,7 +50,9 @@ namespace SpinXmlReader.Block
 
             blockAttributeList.SetBlockMemoryReserve(100)
                 .SetBlockProgrammingLanguage(SimaticProgrammingLanguage.DB)
-                .SetBlockMemoryLayout("Optimized");
+                .SetBlockMemoryLayout("Optimized")
+                .SetHeaderAuthor(Constants.HEADER_AUTHOR)
+                .SetHeaderFamily(Constants.HEADER_FAMILY);
         }
 
         public MultilingualText ComputeBlockTitle() //Add if does not exists.

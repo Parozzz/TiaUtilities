@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TiaXmlReader.SimaticML;
 
 namespace TiaXmlReader.Generation.IO_Cad
 {
@@ -22,6 +23,21 @@ namespace TiaXmlReader.Generation.IO_Cad
                     return "Q";
                 default:
                     return "NULL";
+            }
+        }
+
+        public static SimaticMemoryArea GetSimatic(this CadDataSiemensMemoryType type)
+        {
+            switch (type)
+            {
+                case CadDataSiemensMemoryType.INPUT:
+                case CadDataSiemensMemoryType.SAFE_INPUT:
+                    return SimaticMemoryArea.INPUT;
+                case CadDataSiemensMemoryType.OUTPUT:
+                case CadDataSiemensMemoryType.SAFE_OUTPUT:
+                    return SimaticMemoryArea.OUTPUT;
+                default:
+                    return SimaticMemoryArea.UNDEFINED;
             }
         }
     }

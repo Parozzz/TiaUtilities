@@ -48,7 +48,9 @@ namespace SpinXmlReader.Block
 
             blockAttributeList.ComputeSection(SectionTypeEnum.STATIC);
 
-            blockAttributeList.SetBlockProgrammingLanguage(SimaticProgrammingLanguage.DB);
+            blockAttributeList.SetBlockProgrammingLanguage(SimaticProgrammingLanguage.DB)
+                .SetHeaderAuthor(Constants.HEADER_AUTHOR)
+                .SetHeaderFamily(Constants.HEADER_FAMILY);
         }
 
         public MultilingualText ComputeBlockTitle() //Add if does not exists.

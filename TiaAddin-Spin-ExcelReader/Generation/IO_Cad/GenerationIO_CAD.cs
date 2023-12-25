@@ -22,7 +22,7 @@ namespace TiaXmlReader.Generation.IO_Cad
         private uint dbNumber;
 
         private string variableTableName;
-        private int variableTableStartAddress;
+        private uint variableTableStartAddress;
 
         private string memoryType;
         private string groupingType;
@@ -91,7 +91,7 @@ namespace TiaXmlReader.Generation.IO_Cad
             dbNumber = (uint)worksheet.Cell("C10").Value.GetNumber();
 
             variableTableName = worksheet.Cell("C13").Value.GetText();
-            variableTableStartAddress = (int)worksheet.Cell("C14").Value.GetNumber();
+            variableTableStartAddress = (uint) worksheet.Cell("C14").Value.GetNumber();
 
             memoryType = worksheet.Cell("C16").Value.GetText();
             groupingType = worksheet.Cell("C17").Value.GetText();
@@ -129,8 +129,10 @@ namespace TiaXmlReader.Generation.IO_Cad
 
             var lastByteAddress = -1;
             var lastMemoryType = CadDataSiemensMemoryType.UNDEFINED;
-            var merkerByte = variableTableStartAddress;
-            var merkerBit = 0;
+
+            uint merkerByte = variableTableStartAddress;
+            uint merkerBit = 0;
+
             //Order list by ADRESS TYPE - BYTE - BIT 
             foreach (var cadData in cadDataList.OrderBy(x => ((int)x.GetAddressType()) * 10000 + x.GetAddressByte() * 100 + x.GetAddressBit()).ToList())
             {
@@ -138,9 +140,9 @@ namespace TiaXmlReader.Generation.IO_Cad
                     .SetCadData(cadData);
 
                 var ioTag = ioTagTable.AddTag()
-                    .SetDataTypeName("Bool")
+                    .SetDataType(SimaticDataType.BOOLEAN)
                     .SetTagName(placeholders.Parse(ioTagName))
-                    .SetLogicalAddress("%" + cadData.GetAddressType().GetInitial() + cadData.GetAddressByte() + "." + cadData.GetAddressBit())
+                    .SetLogicalAddress(cadData.GetAddressType().GetSimatic(), cadData.GetAddressByte(), cadData.GetAddressBit())
                     .SetCommentText(Constants.DEFAULT_CULTURE, placeholders.Parse(ioTagComment));
 
                 string outputAddress = null;

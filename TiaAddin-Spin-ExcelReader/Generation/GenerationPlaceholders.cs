@@ -177,24 +177,19 @@ namespace TiaXmlReader.Generation
 
         public GenerationPlaceholders SetIOData(IOData ioData)
         {
-            AddOrReplace("{siemens_memory_type}", new StringGenerationPlaceholderData()
+            AddOrReplace("{memory_type}", new StringGenerationPlaceholderData()
             {
                 Value = ioData.GetMemoryArea().GetTIAMnemonic()
             });
 
-            AddOrReplace("{bit_address}", new StringGenerationPlaceholderData()
+            AddOrReplace("{bit}", new StringGenerationPlaceholderData()
             {
                 Value = "" + ioData.GetAddressBit()
             });
 
-            AddOrReplace("{byte_address}", new StringGenerationPlaceholderData()
+            AddOrReplace("{byte}", new StringGenerationPlaceholderData()
             {
                 Value = "" + ioData.GetAddressByte()
-            });
-
-            AddOrReplace("{io_tag_name}", new StringGenerationPlaceholderData()
-            {
-                Value = ioData.IOName
             });
 
             AddOrReplace("{db_name}", new StringGenerationPlaceholderData()
@@ -210,6 +205,11 @@ namespace TiaXmlReader.Generation
             AddOrReplace("{comment}", new StringGenerationPlaceholderData()
             {
                 Value = ioData.Comment
+            });
+            //This one for last!
+            AddOrReplace("{io_name}", new StringGenerationPlaceholderData()
+            {
+                Value = this.Parse(ioData.IOName)
             });
 
             return this;

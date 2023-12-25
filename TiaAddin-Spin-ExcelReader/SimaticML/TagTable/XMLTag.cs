@@ -2,6 +2,7 @@
 using SpinXmlReader.SimaticML;
 using System.Globalization;
 using System.Xml;
+using TiaXmlReader.Generation;
 using TiaXmlReader.SimaticML;
 using TiaXmlReader.Utility;
 
@@ -57,14 +58,14 @@ namespace SpinXmlReader.TagTable
             return comment;
         }
 
-        public string GetDataTypeName()
+        public SimaticDataType GetDataType()
         {
-            return dataTypeName.GetInnerText();
+            return SimaticDataTypeUtil.GetFromSimaticMLString(dataTypeName.GetInnerText());
         }
 
-        public XMLTag SetDataTypeName(string str)
+        public XMLTag SetDataType(SimaticDataType dataType)
         {
-            dataTypeName.SetInnerText(str);
+            dataTypeName.SetInnerText(dataType.GetSimaticMLString());
             return this;
         }
 
@@ -73,22 +74,22 @@ namespace SpinXmlReader.TagTable
             return logicalAddress.GetInnerText();
         }
 
-        public XMLTag SetLogicalAddress(string str)
+        public XMLTag SetLogicalAddress(SimaticMemoryArea memoryArea, uint memoryByte, uint memoryBit)
         {
-            logicalAddress.SetInnerText(str);
-            return this;
-        }
-
-        public XMLTag SetBoolean(SimaticMemoryArea memoryArea, int memoryByte, int memoryBit)
-        {
-            this.SetDataTypeName(SimaticDataType.BOOLEAN.GetSimaticMLString());
             logicalAddress.SetInnerText("%" + memoryArea.GetTIAMnemonic() + memoryByte + "." + memoryBit);
             return this;
         }
 
-        public XMLTag SetComplex(SimaticMemoryArea memoryArea, SimaticDataType dataType, int memoryByte)
+        public XMLTag SetBoolean(SimaticMemoryArea memoryArea, uint memoryByte, uint memoryBit)
         {
-            this.SetDataTypeName(dataType.GetSimaticMLString());
+            this.SetDataType(SimaticDataType.BOOLEAN);
+            logicalAddress.SetInnerText("%" + memoryArea.GetTIAMnemonic() + memoryByte + "." + memoryBit);
+            return this;
+        }
+
+        public XMLTag SetComplex(SimaticMemoryArea memoryArea, SimaticDataType dataType, uint memoryByte)
+        {
+            this.SetDataType(dataType);
             logicalAddress.SetInnerText("%" + memoryArea.GetTIAMnemonic() + dataType.GetSimaticLengthIdentifier() + memoryByte);
             return this;
         }

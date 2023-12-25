@@ -7,6 +7,13 @@ namespace SpinXmlReader.Block
 {
     public class BlockAttributeList : XmlNodeConfiguration
     {
+        private readonly XmlNodeConfiguration dbAccessibleFromOPCUA;
+        private readonly XmlNodeConfiguration dbAccessibleFromWebserver;
+
+        private readonly XmlNodeConfiguration headerAuthor;
+        private readonly XmlNodeConfiguration headerFamily;
+        private readonly XmlNodeConfiguration headerName;
+
         private readonly XmlNodeConfiguration autoNumber;
         private readonly XmlNodeConfiguration instanceOfName; //ONLY FOR InstanceDB
         private readonly XmlNodeConfiguration instanceOfType; //ONLY FOR InstanceDB
@@ -14,39 +21,88 @@ namespace SpinXmlReader.Block
         private readonly XmlNodeConfiguration blockInterface;
         private readonly XmlNodeListConfiguration<Section> blockSections;
 
+        private readonly XmlNodeConfiguration isOnlyStoredInLoadMemory;
+        private readonly XmlNodeConfiguration isWriteProtectedInAS;
+        private readonly XmlNodeConfiguration isIECCheckEnabled;
         private readonly XmlNodeConfiguration memoryLayout;
         private readonly XmlNodeConfiguration memoryReserve;
         private readonly XmlNodeConfiguration blockName;
         private readonly XmlNodeConfiguration blockNumber;
         private readonly XmlNodeConfiguration programmingLanguage;
         private readonly XmlNodeConfiguration setENOAutomatically;
+        private readonly XmlNodeConfiguration udaBlockProperties;
+        private readonly XmlNodeConfiguration udaEnableTagReadback;
 
         public BlockAttributeList() : base(Constants.ATTRIBUTE_LIST_KEY, required: true)
         {
             //==== INIT CONFIGURATION ====
+            dbAccessibleFromOPCUA = this.AddNode("DBAccessibleFromOPCUA");
+            dbAccessibleFromWebserver = this.AddNode("DBAccessibleFromWebserver");
+            headerAuthor = this.AddNode("HeaderAuthor");
+            headerFamily = this.AddNode("HeaderFamily");
+            headerName = this.AddNode("HeaderName");
+
             autoNumber = this.AddNode("AutoNumber");
             instanceOfName = this.AddNode("InstanceOfName");
             instanceOfType = this.AddNode("InstanceOfType");
 
-            blockInterface = this.AddNode("Interface",                                               required: true);
+            blockInterface = this.AddNode("Interface", required: true);
             blockSections = blockInterface.AddNodeList("Sections", this.CreateSection, required: true, namespaceURI: Constants.GET_SECTIONS_NAMESPACE());
 
-            memoryLayout = this.AddNode("MemoryLayout",                                              required: false); //Not required for InstanceDB
-            memoryReserve = this.AddNode("MemoryReserve",                                            required: false);
-            blockName = this.AddNode("Name",                                                         required: true, defaultInnerText: "fcTest");
-            if(Constants.VERSION >= 18)                                                              
-            {                                                                                        
-                this.AddNode("Namespace",                                                            required: true);
-            }                                                                                        
-            blockNumber = this.AddNode("Number",                                                     required: true, defaultInnerText: "1");
-            programmingLanguage = this.AddNode("ProgrammingLanguage",                                required: true, defaultInnerText: "LAD");
-            setENOAutomatically = this.AddNode("SetENOAutomatically",                                required: false);
+            isOnlyStoredInLoadMemory = this.AddNode("IsOnlyStoredInLoadMemory");
+            isWriteProtectedInAS = this.AddNode("IsWriteProtectedInAS");
+            isIECCheckEnabled = this.AddNode("IsIECCheckEnabled");
+            memoryLayout = this.AddNode("MemoryLayout");
+            memoryReserve = this.AddNode("MemoryReserve");
+            blockName = this.AddNode("Name", required: true, defaultInnerText: "fcTest");
+            if (Constants.VERSION >= 18)
+            {
+                this.AddNode("Namespace", required: true);
+            }
+            blockNumber = this.AddNode("Number", required: true, defaultInnerText: "1");
+            programmingLanguage = this.AddNode("ProgrammingLanguage", required: true, defaultInnerText: "LAD");
+            setENOAutomatically = this.AddNode("SetENOAutomatically");
+            udaBlockProperties = this.AddNode("UDABlockProperties");
+            udaEnableTagReadback = this.AddNode("UDAEnableTagReadback");
             //==== INIT CONFIGURATION ====
         }
 
         private Section CreateSection(XmlNode node)
         {
             return node.Name == Section.NODE_NAME ? new Section() : null;
+        }
+
+        public string GetHeaderAuthor()
+        {
+            return this.headerAuthor.GetInnerText();
+        }
+
+        public BlockAttributeList SetHeaderAuthor(string headerAuthor)
+        {
+            this.headerAuthor.SetInnerText(headerAuthor);
+            return this;
+        }
+
+        public string GetHeaderFamily()
+        {
+            return this.headerFamily.GetInnerText();
+        }
+
+        public BlockAttributeList SetHeaderFamily(string headerFamily)
+        {
+            this.headerFamily.SetInnerText(headerFamily);
+            return this;
+        }
+
+        public string GetHeaderName()
+        {
+            return this.headerName.GetInnerText();
+        }
+
+        public BlockAttributeList SetHeaderName(string headerName)
+        {
+            this.headerName.SetInnerText(headerName);
+            return this;
         }
 
         public bool GetAutoNumber()
@@ -141,18 +197,30 @@ namespace SpinXmlReader.Block
         {
             return !string.IsNullOrEmpty(setENOAutomatically.GetInnerText()) && bool.Parse(setENOAutomatically.GetInnerText());
         }
-        
+
         public BlockAttributeList SetBlockSetENOAutomatically(bool setENOAutomatically)
         {
             this.setENOAutomatically.SetInnerText(setENOAutomatically.ToString().ToLower()); //HE WANTS LOWERCASE!
             return this;
         }
 
+        public string GetUDABlockProperties()
+        {
+            return this.udaBlockProperties.GetInnerText();
+        }
+
+        public BlockAttributeList SetUDABlockProperties(string udaBlockProperties)
+        {
+            this.udaEnableTagReadback.SetInnerText(string.IsNullOrEmpty(udaBlockProperties) ? "false" : "true");
+            this.udaBlockProperties.SetInnerText(udaBlockProperties);
+            return this;
+        }
+
         public Section ComputeSection(SectionTypeEnum sectionType)
         {
-            foreach(var item in blockSections.GetItems())
+            foreach (var item in blockSections.GetItems())
             {
-                if(item.GetSectionType() == sectionType)
+                if (item.GetSectionType() == sectionType)
                 {
                     return item;
                 }

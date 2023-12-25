@@ -144,21 +144,5 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
                 .SetConstantValue(timeValue);
             return this;
         }
-
-        public T CreateInputConnection<T>(T inputPartData) where T : IPartData
-        {
-            new Wire(this.compileUnit)
-                .AddNameCon(inputPartData.GetPart(), inputPartData.GetOuputConName())
-                .AddNameCon(this.part, this.GetInputConName());
-            return inputPartData;
-        }
-
-        public T CreateOutputConnection<T>(T outputPartData) where T : IPartData
-        {
-            new Wire(this.compileUnit)
-                .AddNameCon(this.part, this.GetOuputConName())
-                .AddNameCon(outputPartData.GetPart(), outputPartData.GetInputConName());
-            return outputPartData;
-        }
     }
 }

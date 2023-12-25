@@ -50,7 +50,10 @@ namespace SpinXmlReader.Block
 
             blockAttributeList.SetBlockSetENOAutomatically(true)
                 .SetBlockProgrammingLanguage(SimaticProgrammingLanguage.LADDER)
-                .SetBlockMemoryLayout("Optimized");
+                .SetBlockMemoryLayout("Optimized")
+                .SetHeaderAuthor(Constants.HEADER_AUTHOR)
+                .SetHeaderFamily(Constants.HEADER_FAMILY)
+                .SetUDABlockProperties(Constants.UDA_BLOCK_PROPERTIES);
 
             var inputSection = blockAttributeList.ComputeSection(SectionTypeEnum.INPUT);
             var outputSection = blockAttributeList.ComputeSection(SectionTypeEnum.OUTPUT);
