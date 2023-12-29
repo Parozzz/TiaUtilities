@@ -15,24 +15,28 @@ namespace TiaXmlReader.Generation.IO_Cad
 {
     internal class GenerationIO_CAD : IGeneration
     {
-        private string blockName;
-        private uint blockNumber;
+        private string fcBlockName;
+        private uint fcBlockNumber;
+
+        private string memoryType;
+        private string groupingType;
 
         private string dbName;
         private uint dbNumber;
 
         private string variableTableName;
         private uint variableTableStartAddress;
+        private uint variableTableSplitEvery;
 
-        private string memoryType;
-        private string groupingType;
-        private string ioTagName;
-        private string ioTagComment;
-        private string variableName;
-        private string variableComment;
+        private string ioTableName;
+        private uint ioTableSplitEvery;
+
+        private string defaultIOName;
+        private string defaultVariableName;
+        private string defaultComment;
+
         private string segmentNameBitGrouping;
         private string segmentNameByteGrouping;
-        private string structGrouping;
 
         private readonly List<CadData> cadDataList;
 
@@ -46,70 +50,85 @@ namespace TiaXmlReader.Generation.IO_Cad
         {
             cadDataList = new List<CadData>();
         }
+
         public void ImportExcelConfig(IXLWorksheet worksheet)
         {
             cadDataList.Clear();
 
-            uint cadIndex = 4;
+            uint cadIndex = 5;
             while (true)
             {
-                var addressValue = worksheet.Cell("E" + cadIndex).Value;
-                var comment1Value = worksheet.Cell("I" + cadIndex).Value;
-                var comment2Value = worksheet.Cell("J" + cadIndex).Value;
-                var comment3Value = worksheet.Cell("K" + cadIndex).Value;
-                var comment4Value = worksheet.Cell("L" + cadIndex).Value;
-                var cadPageValue = worksheet.Cell("O" + cadIndex).Value;
-                var cadPanelValue = worksheet.Cell("Q" + cadIndex).Value;
-                var cadTypeValue = worksheet.Cell("T" + cadIndex).Value;
+                //Generation data
+                var ioName = worksheet.Cell("E" + cadIndex).Value;
+                var dbName = worksheet.Cell("F" + cadIndex).Value;
+                var variableName = worksheet.Cell("G" + cadIndex).Value;
+                //Cad export
+                var address = worksheet.Cell("H" + cadIndex).Value;
+                var comment1 = worksheet.Cell("L" + cadIndex).Value;
+                var comment2 = worksheet.Cell("M" + cadIndex).Value;
+                var comment3 = worksheet.Cell("N" + cadIndex).Value;
+                var comment4 = worksheet.Cell("O" + cadIndex).Value;
+                var mnemonic = worksheet.Cell("P" + cadIndex).Value;
+                var wireNum = worksheet.Cell("Q" + cadIndex).Value;
+                var page = worksheet.Cell("R" + cadIndex).Value;
+                var panel = worksheet.Cell("T" + cadIndex).Value;
                 cadIndex++;
 
-                if (!addressValue.IsText && !comment1Value.IsText && !comment2Value.IsText && !comment3Value.IsText && !comment4Value.IsText && !cadPageValue.IsText && !cadPanelValue.IsText && !cadTypeValue.IsText)
+                //If none of the fields are text, i will stop going down the table.
+                if (!address.IsText && !comment1.IsText && !comment2.IsText && !comment3.IsText && !comment4.IsText && !mnemonic.IsText && !wireNum.IsText && !pageValue.IsText && !panelValue.IsText)
                 {
                     break;
                 }
 
-                if (addressValue.IsText && !string.IsNullOrEmpty(addressValue.GetText())) //If there is no address, i don't care about other data.
+                if (address.IsText && !string.IsNullOrEmpty(address.ToString())) //If there is no address, i don't care about other data.
                 {
                     cadDataList.Add(new CadData()
                     {
-                        Address = addressValue.GetText(),
-                        Comment1 = comment1Value.GetText(),
-                        Comment2 = comment2Value.GetText(),
-                        Comment3 = comment3Value.GetText(),
-                        Comment4 = comment4Value.GetText(),
-                        CadPage = cadPageValue.GetText(),
-                        CadPanel = cadPanelValue.GetText(),
-                        CadType = cadTypeValue.GetText()
+                        IOName = ioName.ToString(),
+                        DBName = dbName.ToString(),
+                        VariableName = variableName.ToString(),
+                        CadAddress = address.ToString(),
+                        Comment1 = comment1.ToString(),
+                        Comment2 = comment2.ToString(),
+                        Comment3 = comment3.ToString(),
+                        Comment4 = comment4.ToString(),
+                        Mnemonic = mnemonic.ToString(),
+                        WireNum = wireNum.ToString(),
+                        Page = page.ToString(),
+                        Panel = panel.ToString(),
                     });
                 }
             }
 
-            blockName = worksheet.Cell("C5").Value.GetText();
-            blockNumber = (uint)worksheet.Cell("C6").Value.GetNumber();
+            fcBlockName = worksheet.Cell("C5").Value.ToString();
+            fcBlockNumber = (uint)worksheet.Cell("C6").Value.GetNumber();
 
-            dbName = worksheet.Cell("C9").Value.GetText();
-            dbNumber = (uint)worksheet.Cell("C10").Value.GetNumber();
+            memoryType = worksheet.Cell("C8").Value.ToString();
+            groupingType = worksheet.Cell("C9").Value.ToString();
 
-            variableTableName = worksheet.Cell("C13").Value.GetText();
-            variableTableStartAddress = (uint) worksheet.Cell("C14").Value.GetNumber();
+            dbName = worksheet.Cell("C12").Value.ToString();
+            dbNumber = (uint)worksheet.Cell("C13").Value.GetNumber();
 
-            memoryType = worksheet.Cell("C16").Value.GetText();
-            groupingType = worksheet.Cell("C17").Value.GetText();
+            variableTableName = worksheet.Cell("C16").Value.ToString();
+            variableTableStartAddress = (uint)worksheet.Cell("C17").Value.GetNumber();
+            variableTableSplitEvery = (uint)worksheet.Cell("C18").Value.GetNumber();
 
-            ioTagName = worksheet.Cell("C19").Value.GetText();
-            ioTagComment = worksheet.Cell("C20").Value.GetText();
-            variableName = worksheet.Cell("C21").Value.GetText();
-            variableComment = worksheet.Cell("C22").Value.GetText();
-            segmentNameBitGrouping = worksheet.Cell("C23").Value.GetText();
-            segmentNameByteGrouping = worksheet.Cell("C24").Value.GetText();
-            structGrouping = worksheet.Cell("C25").Value.GetText();
+            ioTableName = worksheet.Cell("C21").Value.ToString();
+            ioTableSplitEvery = (uint)worksheet.Cell("C22").Value.GetNumber();
+
+            defaultIOName = worksheet.Cell("C25").Value.ToString();
+            defaultVariableName = worksheet.Cell("C26").Value.ToString();
+            defaultComment = worksheet.Cell("C27").Value.ToString();
+
+            segmentNameBitGrouping = worksheet.Cell("C30").Value.ToString();
+            segmentNameByteGrouping = worksheet.Cell("C31").Value.ToString();
         }
 
         public void GenerateBlocks()
         {
             fc = new BlockFC();
             fc.Init();
-            fc.GetBlockAttributes().SetBlockName(blockName).SetBlockNumber(blockNumber).SetAutoNumber(blockNumber > 0);
+            fc.GetBlockAttributes().SetBlockName(fcBlockName).SetBlockNumber(fcBlockNumber).SetAutoNumber(fcBlockNumber > 0);
 
             ioTagTable = new XMLTagTable();
             ioTagTable.SetTagTableName("IOTags");

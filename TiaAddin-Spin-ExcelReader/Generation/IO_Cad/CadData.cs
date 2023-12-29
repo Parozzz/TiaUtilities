@@ -131,28 +131,32 @@ namespace TiaXmlReader.Generation.IO_Cad
             return uint.Parse(substring.Split('.')[0]);
         }
 
-        public String Address { get; set; }
-        public String Comment1 { get; set; }
-        public String Comment2 { get; set; }
-        public String Comment3 { get; set; }
-        public String Comment4 { get; set; }
-        public String CadPage { get; set; }
-        public String CadPanel { get; set; }
-        public String CadType { get; set; }
+        public string IOName { get; set; }
+        public string VariableName { get; set; }
+        public string DBName { get; set; }
+        public string CadAddress { get; set; }
+        public string Comment1 { get; set; }
+        public string Comment2 { get; set; }
+        public string Comment3 { get; set; }
+        public string Comment4 { get; set; }
+        public string Mnemonic { get; set; }
+        public string WireNum { get; set; }
+        public string Page { get; set; }
+        public string Panel { get; set; }
 
         public CadDataSiemensMemoryType GetAddressType()
         {
-            return CadData.GetSiemensMemoryType(Address);
+            return CadData.GetSiemensMemoryType(CadAddress);
         }
 
         public uint GetAddressBit()
         {
-            return CadData.GetAddressBit(Address);
+            return CadData.GetAddressBit(CadAddress);
         }
 
         public uint GetAddressByte()
         {
-            return CadData.GetAddressByte(Address);
+            return CadData.GetAddressByte(CadAddress);
         }
     }
 }

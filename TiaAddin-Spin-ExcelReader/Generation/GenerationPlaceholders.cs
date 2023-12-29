@@ -108,70 +108,89 @@ namespace TiaXmlReader.Generation
 
         public GenerationPlaceholders SetCadData(CadData cadData)
         {
-            AddOrReplace("{cad_address}", new StringGenerationPlaceholderData()
-            {
-                Value = cadData.Address
-            });
-
             AddOrReplace("{siemens_memory_type}", new StringGenerationPlaceholderData()
             {
-                Value = cadData.Address,
+                Value = cadData.CadAddress,
                 Function = (value) => CadData.GetSiemensMemoryType(value).GetInitial()
             });
 
             AddOrReplace("{cad_memory_type}", new StringGenerationPlaceholderData()
             {
-                Value = cadData.Address,
+                Value = cadData.CadAddress,
                 Function = (value) => CadData.GetCadMemoryType(value)
             });
 
-            AddOrReplace("{bit_address}", new StringGenerationPlaceholderData()
+            AddOrReplace("{bit}", new StringGenerationPlaceholderData()
             {
-                Value = cadData.Address,
+                Value = cadData.CadAddress,
                 Function = (value) => "" + CadData.GetAddressBit(value)
             });
 
-            AddOrReplace("{byte_address}", new StringGenerationPlaceholderData()
+            AddOrReplace("{byte}", new StringGenerationPlaceholderData()
             {
-                Value = cadData.Address,
+                Value = cadData.CadAddress,
                 Function = (value) => "" + CadData.GetAddressByte(value)
             });
 
-            AddOrReplace("{cad_comment1}", new StringGenerationPlaceholderData()
+            AddOrReplace("{cad_address}", new StringGenerationPlaceholderData()
+            {
+                Value = cadData.CadAddress
+            });
+
+            AddOrReplace("{io_name}", new StringGenerationPlaceholderData()
+            {
+                Value = cadData.IOName
+            });
+
+            AddOrReplace("{db_name}", new StringGenerationPlaceholderData()
+            {
+                Value = cadData.DBName
+            });
+
+            AddOrReplace("{variable_name}", new StringGenerationPlaceholderData()
+            {
+                Value = cadData.VariableName
+            });
+
+            AddOrReplace("{comment1}", new StringGenerationPlaceholderData()
             {
                 Value = cadData.Comment1
             });
 
-            AddOrReplace("{cad_comment2}", new StringGenerationPlaceholderData()
+            AddOrReplace("{comment2}", new StringGenerationPlaceholderData()
             {
                 Value = cadData.Comment2
             });
 
-            AddOrReplace("{cad_comment3}", new StringGenerationPlaceholderData()
+            AddOrReplace("{comment3}", new StringGenerationPlaceholderData()
             {
                 Value = cadData.Comment3
             });
 
-            AddOrReplace("{cad_comment4}", new StringGenerationPlaceholderData()
+            AddOrReplace("{comment4}", new StringGenerationPlaceholderData()
             {
                 Value = cadData.Comment4
             });
 
-            AddOrReplace("{cad_page}", new StringGenerationPlaceholderData()
+            AddOrReplace("{mnemonic}", new StringGenerationPlaceholderData()
             {
-                Value = cadData.CadPage
+                Value = cadData.Mnemonic
             });
 
-            AddOrReplace("{cad_panel}", new StringGenerationPlaceholderData()
+            AddOrReplace("{wire_num}", new StringGenerationPlaceholderData()
             {
-                Value = cadData.CadPanel
+                Value = cadData.WireNum
             });
 
-            AddOrReplace("{cad_type}", new StringGenerationPlaceholderData()
+            AddOrReplace("{page}", new StringGenerationPlaceholderData()
             {
-                Value = cadData.CadType
+                Value = cadData.Page
             });
 
+            AddOrReplace("{panel}", new StringGenerationPlaceholderData()
+            {
+                Value = cadData.Panel
+            });
             return this;
         }
 

@@ -9,9 +9,9 @@ namespace TiaXmlReader.Generation
 {
     public class IOData
     {
-        public String IOAddress { get; set; }
-        public String IOName { get; set; }
-        public String VariableName { get; set; }
+        public string IOAddress { get; set; }
+        public string IOName { get; set; }
+        public string VariableName { get; set; }
         public string DBName {  get; set; }
         public string Comment {  get; set; }
 
