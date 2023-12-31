@@ -37,6 +37,8 @@
             this.generateInOutButton = new System.Windows.Forms.Button();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.dbDuplicationMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.generateIOMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -118,7 +120,9 @@
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.dbDuplicationMenuItem});
+            this.dbDuplicationMenuItem,
+            this.toolStripMenuItem1,
+            this.generateIOMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(1136, 29);
@@ -132,6 +136,19 @@
             this.dbDuplicationMenuItem.Size = new System.Drawing.Size(125, 25);
             this.dbDuplicationMenuItem.Text = "DB Duplication";
             this.dbDuplicationMenuItem.Click += new System.EventHandler(this.DbDuplicationMenuItem_Click);
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(12, 25);
+            // 
+            // generateIOMenuItem
+            // 
+            this.generateIOMenuItem.Font = new System.Drawing.Font("Segoe UI", 12F);
+            this.generateIOMenuItem.Name = "generateIOMenuItem";
+            this.generateIOMenuItem.Size = new System.Drawing.Size(105, 25);
+            this.generateIOMenuItem.Text = "Generate IO";
+            this.generateIOMenuItem.Click += new System.EventHandler(this.GenerateIOMenuItem_Click);
             // 
             // MainImportExportForm
             // 
@@ -167,6 +184,8 @@
         private System.Windows.Forms.Button generateInOutButton;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem dbDuplicationMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem generateIOMenuItem;
     }
 }
 

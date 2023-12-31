@@ -111,7 +111,7 @@ namespace TiaXmlReader.Generation
             AddOrReplace("{siemens_memory_type}", new StringGenerationPlaceholderData()
             {
                 Value = cadData.CadAddress,
-                Function = (value) => CadData.GetSiemensMemoryType(value).GetInitial()
+                Function = (value) => CadData.GetMemoryArea(value).GetInitial()
             });
 
             AddOrReplace("{cad_memory_type}", new StringGenerationPlaceholderData()
@@ -170,6 +170,13 @@ namespace TiaXmlReader.Generation
             AddOrReplace("{comment4}", new StringGenerationPlaceholderData()
             {
                 Value = cadData.Comment4
+            });
+
+
+            string[] joinedCommentList = { cadData.Comment1, cadData.Comment2, cadData.Comment3, cadData.Comment4 };
+            AddOrReplace("{joined_comments}", new StringGenerationPlaceholderData()
+            {
+                Value = string.Join(" ", joinedCommentList.Where(str => !string.IsNullOrWhiteSpace(str)).ToList())
             });
 
             AddOrReplace("{mnemonic}", new StringGenerationPlaceholderData()
@@ -264,6 +271,31 @@ namespace TiaXmlReader.Generation
 
             //{mnemonic} {bit_address} {byte_address} {cad_address} {cad_comment1} {cad_comment2} {cad_comment3} {cad_comment4} {cad_page} {cad_panel} {cad_type}
             return loopStr;
+        }
+
+        public bool ParseWithResult(ref string str)
+        {
+            bool anyFound = false;
+
+            foreach (KeyValuePair<string, IGenerationPlaceholderData> entry in generationPlaceholdersDict)
+            {
+                var placeholder = entry.Key;
+                var placeholderData = entry.Value;
+
+                if (string.IsNullOrEmpty(placeholder))
+                {
+                    continue;
+                }
+
+                if(str.Contains(placeholder))
+                {
+                    anyFound = true;
+                }
+
+                str = str.Replace(placeholder, placeholderData.GetSubstitution());
+            }
+
+            return anyFound;
         }
     }
 

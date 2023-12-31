@@ -129,6 +129,11 @@ namespace SpinXmlReader
             dbDuplicationForm.ShowInTaskbar = false;
             dbDuplicationForm.ShowDialog();
         }
+
+        private void GenerateIOMenuItem_Click(object sender, EventArgs e)
+        {
+            new IOGenerationForm().Show();
+        }
     }
 }
 

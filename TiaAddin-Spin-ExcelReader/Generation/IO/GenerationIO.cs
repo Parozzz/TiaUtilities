@@ -10,13 +10,14 @@ using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace;
 using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace;
 using static SpinXmlReader.Block.Section;
 using SpinXmlReader.SimaticML;
+using TiaXmlReader.Generation.IO_Cad;
 
 namespace TiaXmlReader.Generation.IO
 {
     internal class GenerationIO : IGeneration
     {
         private string fcBlockName;
-        private uint fbBlockNumber;
+        private uint fcBlockNumber;
 
         private string memoryType;
         private string groupingType;
@@ -65,7 +66,7 @@ namespace TiaXmlReader.Generation.IO
         public void ImportExcelConfig(IXLWorksheet worksheet)
         {
             fcBlockName = worksheet.Cell("C5").Value.ToString();
-            fbBlockNumber = (uint)worksheet.Cell("C6").Value.GetNumber();
+            fcBlockNumber = (uint)worksheet.Cell("C6").Value.GetNumber();
 
             memoryType = worksheet.Cell("C8").Value.ToString();
             groupingType = worksheet.Cell("C9").Value.ToString();
@@ -123,7 +124,7 @@ namespace TiaXmlReader.Generation.IO
         {
             fc = new BlockFC();
             fc.Init();
-            fc.GetBlockAttributes().SetBlockName(fcBlockName).SetBlockNumber(fbBlockNumber).SetAutoNumber(fbBlockNumber > 0);
+            fc.GetBlockAttributes().SetBlockName(fcBlockName).SetBlockNumber(fcBlockNumber).SetAutoNumber(fcBlockNumber > 0);
 
             uint tagCounter = 0;
             uint variableTagCounter = 0;
@@ -140,6 +141,12 @@ namespace TiaXmlReader.Generation.IO
             //Order list by ADRESS TYPE - BYTE - BIT 
             foreach (var ioData in ioDataList.OrderBy(x => ((int)x.GetMemoryArea()) * Math.Pow(10, 9) + x.GetAddressByte() * Math.Pow(10, 3) + x.GetAddressBit()).ToList())
             {
+                //If name of variable is \ i will ignore everything and skip to the next
+                if (ioData.VariableName == "\\" || ioData.IOName == "\\")
+                {
+                    continue;
+                }
+
                 ioData.IOName = string.IsNullOrEmpty(ioData.IOName) ? defaultIoName : ioData.IOName;
                 ioData.VariableName = string.IsNullOrEmpty(ioData.VariableName) ? defaultVariableName : ioData.VariableName;
 

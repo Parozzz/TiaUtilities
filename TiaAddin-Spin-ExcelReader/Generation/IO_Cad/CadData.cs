@@ -7,34 +7,34 @@ using TiaXmlReader.SimaticML;
 
 namespace TiaXmlReader.Generation.IO_Cad
 {
-    public enum CadDataSiemensMemoryType { INPUT = 0, SAFE_INPUT = 1, OUTPUT = 2, SAFE_OUTPUT = 3, UNDEFINED = 99 }
+    public enum CadDataMemoryArea { INPUT = 1, SAFE_INPUT = 2, OUTPUT = 3, SAFE_OUTPUT = 4, UNDEFINED = 0 } //Default = Undefined
     // Define an extension method in a non-nested static class.
-    public static class CadDataMemoryTypeExtension
+    public static class CadDataMemoryAreaExtension
     {
-        public static string GetInitial(this CadDataSiemensMemoryType type)
+        public static string GetInitial(this CadDataMemoryArea type)
         {
-            switch(type)
+            switch (type)
             {
-                case CadDataSiemensMemoryType.INPUT:
-                case CadDataSiemensMemoryType.SAFE_INPUT:
+                case CadDataMemoryArea.INPUT:
+                case CadDataMemoryArea.SAFE_INPUT:
                     return "I";
-                case CadDataSiemensMemoryType.OUTPUT:
-                case CadDataSiemensMemoryType.SAFE_OUTPUT:
+                case CadDataMemoryArea.OUTPUT:
+                case CadDataMemoryArea.SAFE_OUTPUT:
                     return "Q";
                 default:
                     return "NULL";
             }
         }
 
-        public static SimaticMemoryArea GetSimatic(this CadDataSiemensMemoryType type)
+        public static SimaticMemoryArea GetSimatic(this CadDataMemoryArea type)
         {
             switch (type)
             {
-                case CadDataSiemensMemoryType.INPUT:
-                case CadDataSiemensMemoryType.SAFE_INPUT:
+                case CadDataMemoryArea.INPUT:
+                case CadDataMemoryArea.SAFE_INPUT:
                     return SimaticMemoryArea.INPUT;
-                case CadDataSiemensMemoryType.OUTPUT:
-                case CadDataSiemensMemoryType.SAFE_OUTPUT:
+                case CadDataMemoryArea.OUTPUT:
+                case CadDataMemoryArea.SAFE_OUTPUT:
                     return SimaticMemoryArea.OUTPUT;
                 default:
                     return SimaticMemoryArea.UNDEFINED;
@@ -44,31 +44,31 @@ namespace TiaXmlReader.Generation.IO_Cad
 
     public class CadData
     {
-        public static CadDataSiemensMemoryType GetSiemensMemoryType(string address)
+        public static CadDataMemoryArea GetMemoryArea(string address)
         {
-            if(string.IsNullOrEmpty(address))
+            if (string.IsNullOrEmpty(address))
             {
-                return CadDataSiemensMemoryType.UNDEFINED;
+                return CadDataMemoryArea.UNDEFINED;
             }
 
             if (address.ToUpper().StartsWith("E") || address.ToLower().StartsWith("I"))
             {
-                return CadDataSiemensMemoryType.INPUT;
+                return CadDataMemoryArea.INPUT;
             }
-            else if(address.ToUpper().StartsWith("SI") || address.ToUpper().StartsWith("SE"))
+            else if (address.ToUpper().StartsWith("SI") || address.ToUpper().StartsWith("SE"))
             {
-                return CadDataSiemensMemoryType.SAFE_INPUT;
+                return CadDataMemoryArea.SAFE_INPUT;
             }
             else if (address.ToUpper().StartsWith("A") || address.ToUpper().StartsWith("Q"))
             {
-                return CadDataSiemensMemoryType.OUTPUT;
+                return CadDataMemoryArea.OUTPUT;
             }
             else if (address.ToUpper().StartsWith("SQ") || address.ToUpper().StartsWith("SA"))
             {
-                return CadDataSiemensMemoryType.SAFE_OUTPUT;
+                return CadDataMemoryArea.SAFE_OUTPUT;
             }
 
-            return CadDataSiemensMemoryType.UNDEFINED;
+            return CadDataMemoryArea.UNDEFINED;
         }
 
         public static string GetCadMemoryType(string address)
@@ -95,7 +95,7 @@ namespace TiaXmlReader.Generation.IO_Cad
             }
 
             int firstDigit = 0;
-            for(var x = 0; x < address.Length; x++)
+            for (var x = 0; x < address.Length; x++)
             {
                 var c = address[x];
                 if (Char.IsDigit(c))
@@ -131,22 +131,40 @@ namespace TiaXmlReader.Generation.IO_Cad
             return uint.Parse(substring.Split('.')[0]);
         }
 
-        public string IOName { get; set; }
-        public string VariableName { get; set; }
-        public string DBName { get; set; }
-        public string CadAddress { get; set; }
-        public string Comment1 { get; set; }
-        public string Comment2 { get; set; }
-        public string Comment3 { get; set; }
-        public string Comment4 { get; set; }
-        public string Mnemonic { get; set; }
-        public string WireNum { get; set; }
-        public string Page { get; set; }
-        public string Panel { get; set; }
+        public string IOName;
+        public string VariableName;
+        public string DBName;
+        public string CadAddress;
+        public string IOComment;
+        public string VariableComment;
+        public string Comment1;
+        public string Comment2;
+        public string Comment3;
+        public string Comment4;
+        public string Mnemonic;
+        public string WireNum;
+        public string Page;
+        public string Panel;
 
-        public CadDataSiemensMemoryType GetAddressType()
+        //Returns if any change has been made.
+        public bool ParsePlaceholders(GenerationPlaceholders placeholders) => placeholders.ParseWithResult(ref IOName)
+                                                                                || placeholders.ParseWithResult(ref VariableName)
+                                                                                || placeholders.ParseWithResult(ref DBName)
+                                                                                || placeholders.ParseWithResult(ref IOComment)
+                                                                                || placeholders.ParseWithResult(ref VariableComment)
+                                                                                || placeholders.ParseWithResult(ref Comment1)
+                                                                                || placeholders.ParseWithResult(ref Comment2)
+                                                                                || placeholders.ParseWithResult(ref Comment3)
+                                                                                || placeholders.ParseWithResult(ref Comment4);
+
+        public SimaticMemoryArea GetSimaticMemoryArea()
         {
-            return CadData.GetSiemensMemoryType(CadAddress);
+            return CadData.GetMemoryArea(CadAddress).GetSimatic();
+        }
+
+        public CadDataMemoryArea GetCadMemoryArea()
+        {
+            return CadData.GetMemoryArea(CadAddress);
         }
 
         public uint GetAddressBit()

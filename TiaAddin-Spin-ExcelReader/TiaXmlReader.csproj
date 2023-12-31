@@ -156,6 +156,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomControls\FlatComboBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CustomControls\FlatTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="DBDuplicationForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -170,6 +176,12 @@
     <Compile Include="Generation\IO_Cad\CadData.cs" />
     <Compile Include="Generation\UserAlarms\GenerationUserAlarms.cs" />
     <Compile Include="Generation\IGeneration.cs" />
+    <Compile Include="IOGenerationForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IOGenerationForm.Designer.cs">
+      <DependentUpon>IOGenerationForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="SaveData.cs" />
     <Compile Include="SimaticML\BlockAttributeList\BlockAttributeList.cs" />
     <Compile Include="SimaticML\Blocks\BlockFB.cs" />
@@ -213,6 +225,9 @@
     <Compile Include="Utility\XMLUtils.cs" />
     <EmbeddedResource Include="DBDuplicationForm.resx">
       <DependentUpon>DBDuplicationForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IOGenerationForm.resx">
+      <DependentUpon>IOGenerationForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainImportExportForm.resx">
       <DependentUpon>MainImportExportForm.cs</DependentUpon>

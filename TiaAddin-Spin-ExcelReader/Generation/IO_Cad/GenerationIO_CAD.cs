@@ -31,24 +31,38 @@ namespace TiaXmlReader.Generation.IO_Cad
         private string ioTableName;
         private uint ioTableSplitEvery;
 
-        private string defaultIOName;
+        private string defaultPrimaryIOName;
+        private string defaultSecondaryIOName;
         private string defaultVariableName;
-        private string defaultComment;
+        private string defaultIOComment;
+        private string defaultVariableComment;
 
         private string segmentNameBitGrouping;
         private string segmentNameByteGrouping;
+
+        private string prefixInputDB;
+        private string prefixInputMerker;
+        private string prefixOutputDB;
+        private string prefixOutputMerker;
 
         private readonly List<CadData> cadDataList;
 
         private BlockFC fc;
         private CompileUnit compileUnit;
         private BlockGlobalDB db;
+
         private XMLTagTable ioTagTable;
-        private XMLTagTable supportsTagTable;
+        private readonly List<XMLTagTable> ioTagTableList;
+
+        private XMLTagTable variableTagTable;
+        private readonly List<XMLTagTable> variableTagTableList;
 
         public GenerationIO_CAD()
         {
             cadDataList = new List<CadData>();
+
+            this.ioTagTableList = new List<XMLTagTable>();
+            this.variableTagTableList = new List<XMLTagTable>();
         }
 
         public void ImportExcelConfig(IXLWorksheet worksheet)
@@ -75,12 +89,12 @@ namespace TiaXmlReader.Generation.IO_Cad
                 cadIndex++;
 
                 //If none of the fields are text, i will stop going down the table.
-                if (!address.IsText && !comment1.IsText && !comment2.IsText && !comment3.IsText && !comment4.IsText && !mnemonic.IsText && !wireNum.IsText && !pageValue.IsText && !panelValue.IsText)
+                if (!address.IsText && !comment1.IsText && !comment2.IsText && !comment3.IsText && !comment4.IsText && !mnemonic.IsText && !wireNum.IsText && !page.IsText && !panel.IsText)
                 {
                     break;
                 }
 
-                if (address.IsText && !string.IsNullOrEmpty(address.ToString())) //If there is no address, i don't care about other data.
+                if (address.IsText && !string.IsNullOrWhiteSpace(address.ToString())) //If there is no address, i don't care about other data.
                 {
                     cadDataList.Add(new CadData()
                     {
@@ -116,12 +130,20 @@ namespace TiaXmlReader.Generation.IO_Cad
             ioTableName = worksheet.Cell("C21").Value.ToString();
             ioTableSplitEvery = (uint)worksheet.Cell("C22").Value.GetNumber();
 
-            defaultIOName = worksheet.Cell("C25").Value.ToString();
-            defaultVariableName = worksheet.Cell("C26").Value.ToString();
-            defaultComment = worksheet.Cell("C27").Value.ToString();
+            defaultPrimaryIOName = worksheet.Cell("C25").Value.ToString();
+            defaultSecondaryIOName = worksheet.Cell("C26").Value.ToString();
+            defaultVariableName = worksheet.Cell("C27").Value.ToString();
+            defaultIOComment = worksheet.Cell("C28").Value.ToString();
+            defaultVariableComment = worksheet.Cell("C29").Value.ToString();
 
-            segmentNameBitGrouping = worksheet.Cell("C30").Value.ToString();
-            segmentNameByteGrouping = worksheet.Cell("C31").Value.ToString();
+            segmentNameBitGrouping = worksheet.Cell("C32").Value.ToString();
+            segmentNameByteGrouping = worksheet.Cell("C33").Value.ToString();
+
+            prefixInputDB = worksheet.Cell("C36").Value.ToString();
+            prefixInputMerker = worksheet.Cell("C37").Value.ToString();
+            prefixOutputDB = worksheet.Cell("C38").Value.ToString();
+            prefixOutputMerker = worksheet.Cell("C39").Value.ToString();
+
         }
 
         public void GenerateBlocks()
@@ -130,93 +152,102 @@ namespace TiaXmlReader.Generation.IO_Cad
             fc.Init();
             fc.GetBlockAttributes().SetBlockName(fcBlockName).SetBlockNumber(fcBlockNumber).SetAutoNumber(fcBlockNumber > 0);
 
-            ioTagTable = new XMLTagTable();
-            ioTagTable.SetTagTableName("IOTags");
-
-            switch (memoryType)
-            {
-                case "Merker":
-                    supportsTagTable = new XMLTagTable();
-                    supportsTagTable.SetTagTableName(variableTableName);
-                    break;
-                case "GlobalDB":
-                    db = new BlockGlobalDB();
-                    db.Init();
-                    db.GetAttributes().SetBlockName(dbName).SetBlockNumber(dbNumber).SetAutoNumber(dbNumber > 0);
-                    break;
-            }
+            uint tagCounter = 0;
+            uint variableTagCounter = 0;
 
             var lastByteAddress = -1;
-            var lastMemoryType = CadDataSiemensMemoryType.UNDEFINED;
+            var lastMemoryArea = SimaticMemoryArea.INPUT;
 
             uint merkerByte = variableTableStartAddress;
             uint merkerBit = 0;
 
+            var ioAddressDict = new Dictionary<string, uint>();
+            var variableAddressDict = new Dictionary<string, uint>();
+
             //Order list by ADRESS TYPE - BYTE - BIT 
-            foreach (var cadData in cadDataList.OrderBy(x => ((int)x.GetAddressType()) * 10000 + x.GetAddressByte() * 100 + x.GetAddressBit()).ToList())
+            foreach (var cadData in cadDataList.OrderBy(x => ((int)x.GetCadMemoryArea().GetSimatic()) * Math.Pow(10, 9) + x.GetAddressByte() * Math.Pow(10, 3) + x.GetAddressBit()).ToList())
             {
-                var placeholders = new GenerationPlaceholders()
-                    .SetCadData(cadData);
-
-                var ioTag = ioTagTable.AddTag()
-                    .SetDataType(SimaticDataType.BOOLEAN)
-                    .SetTagName(placeholders.Parse(ioTagName))
-                    .SetLogicalAddress(cadData.GetAddressType().GetSimatic(), cadData.GetAddressByte(), cadData.GetAddressBit())
-                    .SetCommentText(Constants.DEFAULT_CULTURE, placeholders.Parse(ioTagComment));
-
-                string outputAddress = null;
-                switch (memoryType)
+                //If name of variable is \ i will ignore everything and skip to the next
+                if (cadData.VariableName == "\\" || cadData.IOName == "\\")
                 {
-                    case "Merker":
-                        var tag = supportsTagTable.AddTag()
-                                        .SetTagName(placeholders.Parse(variableName))
-                                        .SetCommentText(Constants.DEFAULT_CULTURE, placeholders.Parse(variableComment))
-                                        .SetBoolean(SimaticMemoryArea.MERKER, merkerByte, merkerBit);
-                        outputAddress = tag.GetTagName();
+                    continue;
+                }
 
-                        merkerBit++;
-                        if (merkerBit >= 8)
-                        {
-                            merkerByte++;
-                            merkerBit = 0;
-                        }
-                        break;
-                    case "GlobalDB":
-                        string memberAddress = placeholders.Parse(variableName);
-                        switch (structGrouping)
-                        {
-                            case "Comment1":
-                                if (!string.IsNullOrEmpty(cadData.Comment1))
-                                {
-                                    memberAddress = $"{SimaticMLUtil.WrapAddressComponent(cadData.Comment1)}.{placeholders.Parse(variableName)}";
-                                }
-                                break;
-                            case "Comment2":
-                                if (!string.IsNullOrEmpty(cadData.Comment2))
-                                {
-                                    memberAddress = $"{SimaticMLUtil.WrapAddressComponent(cadData.Comment2)}.{placeholders.Parse(variableName)}";
-                                }
-                                break;
-                            case "Comment3":
-                                if (!string.IsNullOrEmpty(cadData.Comment3))
-                                {
-                                    memberAddress = $"{SimaticMLUtil.WrapAddressComponent(cadData.Comment3)}.{placeholders.Parse(variableName)}";
-                                }
-                                break;
-                            case "Comment4":
-                                if (!string.IsNullOrEmpty(cadData.Comment4))
-                                {
-                                    memberAddress = $"{SimaticMLUtil.WrapAddressComponent(cadData.Comment4)}.{placeholders.Parse(variableName)}";
-                                }
-                                break;
-                        }
+                cadData.IOName = string.IsNullOrEmpty(cadData.IOName) ? defaultPrimaryIOName : cadData.IOName;
+                cadData.VariableName = string.IsNullOrEmpty(cadData.VariableName) ? defaultVariableName : cadData.VariableName;
+                cadData.IOComment = defaultIOComment;
+                cadData.VariableComment = defaultVariableComment;
 
-                        var member = db.GetAttributes().ComputeSection(SectionTypeEnum.STATIC)
-                            .AddMembersFromAddress(memberAddress, SimaticDataType.BOOLEAN)
-                            .SetComment(Constants.DEFAULT_CULTURE, placeholders.Parse(variableComment));
+                var placeholders = new GenerationPlaceholders().SetCadData(cadData);
 
-                        outputAddress = member.GetCompleteSymbol();
-                        break;
+                //I have a secondary value that is used if the PARSED default primary is empty.
+                cadData.IOName = string.IsNullOrEmpty(placeholders.Parse(cadData.IOName)) ? defaultSecondaryIOName : cadData.IOName;
+
+                //After parsing secondary data, i will reset all the placeholders to have updated value with secondary default to be used correctly.
+                placeholders.SetCadData(cadData);
+                while(cadData.ParsePlaceholders(placeholders)) { } //Parsing until all the placeholders has been done. Since it a placeholder can contains another placeholders, this way i am sure none remains.
+
+                if (ioTagTable == null || (ioTableSplitEvery > 0 && tagCounter % ioTableSplitEvery == 0))
+                {
+                    ioTagTable = new XMLTagTable();
+                    ioTagTable.SetTagTableName(ioTableName + "_" + tagCounter);
+                    ioTagTableList.Add(ioTagTable);
+                }
+                tagCounter++;
+
+                //Set it with default tag name. In case it has a specific one, it will be overwritten below.
+                var ioTag = ioTagTable.AddTag()
+                    .SetBoolean(cadData.GetSimaticMemoryArea(), cadData.GetAddressByte(), cadData.GetAddressBit())
+                    .SetTagName(FixDuplicateAddress(cadData.IOName, ioAddressDict))
+                    .SetCommentText(Constants.DEFAULT_CULTURE, cadData.IOComment);
+
+                string inOutAddress = null;
+                if (!string.IsNullOrEmpty(cadData.DBName) && !string.IsNullOrEmpty(cadData.VariableName))
+                {
+                    inOutAddress = $"{SimaticMLUtil.WrapAddressComponentIfRequired(cadData.DBName)}.{cadData.VariableName}";
+                }
+                else
+                {
+                    switch (memoryType)
+                    {
+                        case "Merker":
+                            if (variableTagTable == null || (variableTableSplitEvery > 0 && variableTagCounter % variableTableSplitEvery == 0))
+                            {
+                                variableTagTable = new XMLTagTable();
+                                variableTagTable.SetTagTableName(variableTableName + "_" + variableTagCounter);
+                                variableTagTableList.Add(variableTagTable);
+                            }
+                            variableTagCounter++;
+
+                            var tagAddressPrefix = cadData.GetSimaticMemoryArea() == SimaticMemoryArea.INPUT ? prefixInputMerker : prefixOutputMerker;
+                            var fullTagAddress = FixDuplicateAddress(tagAddressPrefix + cadData.VariableName, variableAddressDict);
+                            inOutAddress = variableTagTable.AddTag()
+                                            .SetTagName(fullTagAddress)
+                                            .SetBoolean(SimaticMemoryArea.MERKER, merkerByte, merkerBit)
+                                            .SetCommentText(Constants.DEFAULT_CULTURE, cadData.VariableComment)
+                                            .GetTagName();
+                            if (merkerBit++ >= 8)
+                            {
+                                merkerByte++;
+                                merkerBit = 0;
+                            }
+                            break;
+                        case "DB":
+                            if (db == null)
+                            {
+                                db = new BlockGlobalDB();
+                                db.Init();
+                                db.GetAttributes().SetBlockName(dbName).SetBlockNumber(dbNumber).SetAutoNumber(dbNumber > 0);
+                            }
+
+                            var memberAddressPrefix = cadData.GetSimaticMemoryArea() == SimaticMemoryArea.INPUT ? prefixInputDB : prefixOutputDB;
+                            var fullMemberAddress = FixDuplicateAddress(memberAddressPrefix + cadData.VariableName, variableAddressDict);
+                            inOutAddress = db.GetAttributes().ComputeSection(SectionTypeEnum.STATIC)
+                                    .AddMembersFromAddress(fullMemberAddress, SimaticDataType.BOOLEAN)
+                                    .SetComment(Constants.DEFAULT_CULTURE, cadData.VariableComment)
+                                    .GetCompleteSymbol();
+                            break;
+                    }
                 }
 
                 if (groupingType == "BitPerSegmento")
@@ -225,18 +256,36 @@ namespace TiaXmlReader.Generation.IO_Cad
                     compileUnit.Init();
                     compileUnit.ComputeBlockTitle().SetText(Constants.DEFAULT_CULTURE, placeholders.Parse(segmentNameBitGrouping));
                 }
-                else if (groupingType == "BytePerSegmento" && (cadData.GetAddressByte() != lastByteAddress || cadData.GetAddressType() != lastMemoryType || compileUnit == null))
+                else if (groupingType == "BytePerSegmento" && (cadData.GetAddressByte() != lastByteAddress || cadData.GetSimaticMemoryArea() != lastMemoryArea || compileUnit == null))
                 {
                     lastByteAddress = (int)cadData.GetAddressByte();
-                    lastMemoryType = cadData.GetAddressType();
+                    lastMemoryArea = cadData.GetSimaticMemoryArea();
 
                     compileUnit = fc.AddCompileUnit();
                     compileUnit.Init();
                     compileUnit.ComputeBlockTitle().SetText(Constants.DEFAULT_CULTURE, placeholders.Parse(segmentNameByteGrouping));
                 }
 
-                FillInOutCompileUnit(compileUnit, ioTag.GetTagName(), outputAddress);
+                switch (cadData.GetSimaticMemoryArea())
+                {
+                    case SimaticMemoryArea.INPUT:
+                        FillInOutCompileUnit(compileUnit, ioTag.GetTagName(), inOutAddress);
+                        break;
+                    case SimaticMemoryArea.OUTPUT:
+                        FillInOutCompileUnit(compileUnit, inOutAddress, ioTag.GetTagName());
+                        break;
+                }
             }
+        }
+        private string FixDuplicateAddress(string address, Dictionary<string, uint> dict)
+        {
+            if (!dict.TryGetValue(address, out uint count))
+            {
+                dict.Add(address, 0);
+            }
+
+            dict[address] = ++count;
+            return address + (count <= 1 ? "" : $"({count})");
         }
 
         private void FillInOutCompileUnit(CompileUnit compileUnit, string inputAddress, string outputAddress)
@@ -267,15 +316,18 @@ namespace TiaXmlReader.Generation.IO_Cad
             xmlDocument.DocumentElement.AppendChild(fc.Generate(xmlDocument, new IDGenerator()));
             xmlDocument.Save(exportPath + "/fcExport_" + fc.GetBlockAttributes().GetBlockName() + ".xml");
 
-            xmlDocument = SimaticMLParser.CreateDocument();
-            xmlDocument.DocumentElement.AppendChild(ioTagTable.Generate(xmlDocument, new IDGenerator()));
-            xmlDocument.Save(exportPath + "/ioTagTable.xml");
-
-            if (supportsTagTable != null)
+            foreach (var ioTagTable in ioTagTableList)
             {
                 xmlDocument = SimaticMLParser.CreateDocument();
-                xmlDocument.DocumentElement.AppendChild(supportsTagTable.Generate(xmlDocument, new IDGenerator()));
-                xmlDocument.Save(exportPath + "/tagTableExport_" + supportsTagTable.GetTagTableName() + ".xml");
+                xmlDocument.DocumentElement.AppendChild(ioTagTable.Generate(xmlDocument, new IDGenerator()));
+                xmlDocument.Save(exportPath + "/ioTagTable_" + ioTagTable.GetTagTableName() + ".xml");
+            }
+
+            foreach (var variableTagTable in variableTagTableList)
+            {
+                xmlDocument = SimaticMLParser.CreateDocument();
+                xmlDocument.DocumentElement.AppendChild(variableTagTable.Generate(xmlDocument, new IDGenerator()));
+                xmlDocument.Save(exportPath + "/tagTableExport_" + variableTagTable.GetTagTableName() + ".xml");
             }
 
             if (db != null)
