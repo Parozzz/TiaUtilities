@@ -7,10 +7,13 @@ using System.Threading.Tasks;
 
 namespace TiaXmlReader.SimaticML
 {
+
+
+
     public class SimaticAddressComponent
     {
         public string Name;
-        public List<SimaticAddressArrayIndex> ArrayIndexes {  get; private set; }
+        public List<SimaticAddressArrayIndex> ArrayIndexes { get; private set; }
 
         public SimaticAddressComponent()
         {
@@ -25,6 +28,93 @@ namespace TiaXmlReader.SimaticML
         public SimaticAddressArrayIndex()
         {
             this.Components = new List<SimaticAddressComponent>();
+        }
+    }
+
+    public class SimaticTagAddress
+    {
+        public static SimaticTagAddress FromAddress(string address)
+        {
+            if (address.StartsWith("%")) //If reading the address directly from the SimaticML file, i will remove it.
+            {
+                address = address.Substring(1);
+            }
+
+            var memoryArea = SimaticMemoryAreaUtil.GetFromAddress(address);
+            if (memoryArea == SimaticMemoryArea.UNDEFINED)
+            {
+                return null;
+            }
+
+            char lengthChar = Char.ToUpper(address[1]);
+            string offsetString = Char.IsDigit(lengthChar) ? address.Substring(1) : address.Substring(2);
+
+            uint length = 0; //0 means bit or special like timers, counters or UDT.
+            switch (lengthChar)
+            {
+                case 'B':
+                    length = 1;
+                    break;
+                case 'W':
+                    length = 2;
+                    break;
+                case 'D':
+                    length = 4;
+                    break;
+                case 'L':
+                    length = 8;
+                    break;
+            }
+
+            var splitOffsetString = offsetString.Split('.');
+            if (splitOffsetString.Length == 0 || splitOffsetString.Length > 2)
+            {
+                return null;
+            }
+
+            if (!uint.TryParse(splitOffsetString[0], out uint byteOffset))
+            {
+                return null;
+            }
+
+            uint bitOffset = 0;
+            if (splitOffsetString.Length == 2 && !uint.TryParse(splitOffsetString[1], out bitOffset))
+            {
+                return null;
+            }
+
+            return new SimaticTagAddress()
+            {
+                memoryArea = memoryArea,
+                length = length,
+                byteOffset = byteOffset,
+                bitOffset = bitOffset,
+            };
+        }
+
+        public SimaticMemoryArea memoryArea;
+        public uint length;
+        public uint byteOffset;
+        public uint bitOffset;
+
+        public long GetSortingNumber()
+        {
+            return (long) ((int)memoryArea * Math.Pow(10, 9) + byteOffset * Math.Pow(10, 3) + bitOffset);
+        }
+
+        public string GetAddress()
+        {
+            return memoryArea.GetTIAMnemonic() + SimaticMLUtil.GetLengthIdentifier(length) + byteOffset + (length == 0 ? ("." + bitOffset) : "");
+        }
+
+        public string GetSimaticMLAddress()
+        {
+            return "%" + this.GetAddress();
+        }
+
+        public override string ToString()
+        {
+            return GetAddress();
         }
     }
 
@@ -58,6 +148,52 @@ namespace TiaXmlReader.SimaticML
         public static bool ContainsSpecialChars(string str)
         {
             return str.Contains('.') || str.Contains(" ") || str.Contains(",") || str.Contains("\"") || str.Contains("\'") || str.Contains("[") || str.Contains("]");
+        }
+
+        public static uint GetBitFromTagAddress(string address)
+        {
+            address = address.Replace("%", "");
+            if (string.IsNullOrEmpty(address))
+            {
+                return 0;
+            }
+
+            int firstDigit = 0;
+            for (var x = 0; x < address.Length; x++)
+            {
+                var c = address[x];
+                if (Char.IsDigit(c))
+                {
+                    firstDigit = x;
+                    break;
+                }
+            }
+
+            var substring = address.Substring(firstDigit);
+            return uint.Parse(substring.Split('.')[1]);
+        }
+
+        public static uint GetByteFromTagAddress(string address)
+        {
+            address = address.Replace("%", "");
+            if (string.IsNullOrEmpty(address))
+            {
+                return 0;
+            }
+
+            int firstDigit = 0;
+            for (var x = 0; x < address.Length; x++)
+            {
+                var c = address[x];
+                if (Char.IsDigit(c))
+                {
+                    firstDigit = x;
+                    break;
+                }
+            }
+
+            var substring = address.Substring(firstDigit);
+            return uint.Parse(substring.Split('.')[0]);
         }
 
         public static string JoinComponentsIntoAddress(List<string> components)
@@ -166,7 +302,7 @@ namespace TiaXmlReader.SimaticML
                 if (loopComponent.waiting)
                 {
                     //In this case i don't have to join with a dot, since i am trying to find the complete address between commans for array indexes.
-                    str = loopComponent.str + str; 
+                    str = loopComponent.str + str;
                 }
 
                 var doubleQuoteCount = str.Count(t => t == '\"');
@@ -188,8 +324,6 @@ namespace TiaXmlReader.SimaticML
 
             return arrayIndexesList;
         }
-
-
 
         private class LoopComponent
         {
