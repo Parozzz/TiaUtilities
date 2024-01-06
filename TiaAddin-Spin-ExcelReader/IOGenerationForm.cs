@@ -24,6 +24,8 @@ namespace TiaXmlReader
             this.dataGridView.MultiSelect = true;
 
             this.dataGridView.EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2;
+
+            #region Sorting
             this.dataGridView.SortCompare += (sender, args) =>
             {
                 if (args.Column.Index == 0)
@@ -35,7 +37,9 @@ namespace TiaXmlReader
                     args.SortResult = cell1SortValue.CompareTo(cell2SortValue);
                 }
             };
+            #endregion
 
+            #region RowHeaderNumber
             this.dataGridView.RowPostPaint += (sender, args) =>
             {
                 var grid = sender as DataGridView;
@@ -54,7 +58,9 @@ namespace TiaXmlReader
                 var headerBounds = new Rectangle(args.RowBounds.Left, args.RowBounds.Top, grid.RowHeadersWidth, args.RowBounds.Height);
                 args.Graphics.DrawString(rowIdx, this.Font, SystemBrushes.ControlText, headerBounds, centerFormat);
             };
+            #endregion
 
+            #region KeyDown - Paste/Delete
             this.dataGridView.KeyDown += (sender, args) =>
             {
                 bool ctrlV = args.Modifiers == Keys.Control && args.KeyCode == Keys.V;
@@ -64,33 +70,11 @@ namespace TiaXmlReader
                     Paste();
 
                 if (args.KeyCode == Keys.Delete || args.KeyCode == Keys.Cancel)
-                {
-                    foreach (DataGridViewCell selectedCell in dataGridView.SelectedCells)
-                    {
-                        if (selectedCell.RowIndex == -1) //If there is no RowIndex, the cell has already been deleted!
-                        {
-                            continue;
-                        }
-
-                        bool allSelected = true;
-                        foreach (DataGridViewCell cell in dataGridView.Rows[selectedCell.RowIndex].Cells)
-                        {
-                            allSelected &= cell.Selected;
-                        }
-
-                        if (allSelected)
-                        {
-                            dataGridView.Rows.RemoveAt(selectedCell.RowIndex);
-                        }
-                        else
-                        {
-                            selectedCell.Value = "";
-                        }
-                    }
-
-                }
+                    DeleteSelectedRows();
             };
+            #endregion
 
+            #region MouseClick - RowSelection
             int lastClickedRowIndex = -1;
             this.dataGridView.MouseClick += (sender, args) =>
             {
@@ -188,6 +172,7 @@ namespace TiaXmlReader
                         break;
                 }
             };
+            #endregion
         }
 
         public void Paste()
@@ -208,9 +193,7 @@ namespace TiaXmlReader
                 foreach (string pastedRow in pastedRows)
                 {
                     string[] pastedRowCells = pastedRow.Split('\t');
-
-                    var maxColumn = Math.Min(pastedRowCells.Length, dataGridView.ColumnCount - currentCell.ColumnIndex);
-                    for (int pastedCellPointer = 0, columnPointer = currentCell.ColumnIndex; columnPointer < maxColumn; columnPointer++, pastedCellPointer++)
+                    for (int pastedCellPointer = 0, columnPointer = currentCell.ColumnIndex; columnPointer < dataGridView.ColumnCount && pastedCellPointer < pastedRowCells.Length; columnPointer++, pastedCellPointer++)
                     {
                         dataGridView.Rows[rowPointer].Cells[columnPointer].Value = pastedRowCells[pastedCellPointer];
                     }
@@ -219,15 +202,35 @@ namespace TiaXmlReader
             }
         }
 
-    }
+        public void DeleteSelectedRows()
+        {
+            foreach (DataGridViewCell selectedCell in dataGridView.SelectedCells)
+            {
+                if (selectedCell.RowIndex == -1) //If there is no RowIndex, the cell has already been deleted!
+                {
+                    continue;
+                }
 
-    public class TestDataSource
-    {
-        public string Address { get; set; }
-        public string IOName { get; set; }
-        public string DB { get; set; }
-        public string Variable { get; set; }
-        public string Comment { get; set; }
+                bool allSelected = true;
+                foreach (DataGridViewCell cell in dataGridView.Rows[selectedCell.RowIndex].Cells)
+                {
+                    allSelected &= cell.Selected;
+                }
+
+                if (allSelected)
+                {
+                    var currentRow = dataGridView.Rows[selectedCell.RowIndex];
+                    if (!currentRow.IsNewRow)
+                    {
+                        dataGridView.Rows.Remove(currentRow);
+                    }
+                }
+                else
+                {
+                    selectedCell.Value = "";
+                }
+            }
+        }
     }
 }
 
