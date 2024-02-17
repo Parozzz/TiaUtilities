@@ -12,14 +12,17 @@ namespace TiaXmlReader
 {
     public partial class IOGenerationForm : Form
     {
+        public const int TOTAL_ROW_COUNT = 9999;
+
         private readonly UndoRedoHandler undoRedoHandler;
+        private readonly ExcelDragHandler excelDragHandler;
 
         public IOGenerationForm()
         {
-            this.undoRedoHandler = new UndoRedoHandler();
-
             InitializeComponent();
 
+            this.undoRedoHandler = new UndoRedoHandler();
+            this.excelDragHandler = new ExcelDragHandler(this.dataGridView);
             Init();
         }
 
@@ -32,6 +35,33 @@ namespace TiaXmlReader
             this.dataGridView.MultiSelect = true;
 
             this.dataGridView.EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2;
+
+            this.dataGridView.AllowUserToAddRows = false;
+            this.dataGridView.RowCount = TOTAL_ROW_COUNT; //To make it easier to handle, provide a fixed amount of rows. I don't think these much rows will ever be needed!
+
+            this.dataGridView.CellPainting += (sender, args) =>
+            {
+                var currentCell = dataGridView.CurrentCell;
+                if (args.RowIndex < 0 || args.ColumnIndex < 0 || currentCell == null || excelDragHandler.IsStarted())
+                {
+                    return;
+                }
+
+                if (currentCell.RowIndex == args.RowIndex && currentCell.ColumnIndex == args.ColumnIndex)
+                {
+                    var bounds = args.CellBounds;
+                    args.PaintBackground(bounds, true);
+                    args.PaintContent(bounds);
+                    using (var pen = new Pen(Color.Green, 4))
+                    {
+                        args.Graphics.DrawRectangle(pen, new Rectangle(bounds.Right - 4, bounds.Bottom - 4, 4, 4));
+                    }
+
+                    args.Handled = true;
+                }
+            };
+
+            excelDragHandler.Init();
 
             #region Sorting
             this.dataGridView.SortCompare += (sender, args) =>
@@ -80,7 +110,7 @@ namespace TiaXmlReader
                     Paste();
 
                 if (args.KeyCode == Keys.Delete || args.KeyCode == Keys.Cancel)
-                    DeleteSelectedRows();
+                    DeleteSelectedCells();
 
                 if (ctrlZ)
                     undoRedoHandler.Undo();
@@ -92,7 +122,7 @@ namespace TiaXmlReader
 
             #region MouseClick - RowSelection
             int lastClickedRowIndex = -1;
-            this.dataGridView.MouseClick += (sender, args) =>
+            this.dataGridView.MouseDown += (sender, args) =>
             {
                 var hitTest = dataGridView.HitTest(args.X, args.Y);
                 if (hitTest.Type != DataGridViewHitTestType.RowHeader)
@@ -141,50 +171,6 @@ namespace TiaXmlReader
 
                         break;
                     case DataGridViewHitTestType.Cell:
-                        if (args.Button == MouseButtons.Right && hitTest.ColumnIndex == 0)
-                        {
-                            var dropDown = new ToolStripDropDown();
-
-                            var addByteButton = new ToolStripButton
-                            {
-                                ForeColor = Color.Black,
-                                Text = "Add byte"
-                            };
-                            addByteButton.Click += (sender1, e1) =>
-                            {
-                                var cellValue = (dataGridView.Rows[hitTest.RowIndex].Cells[0].Value ?? "").ToString();
-
-                                var tagAddress = SimaticTagAddress.FromAddress(cellValue) ?? new SimaticTagAddress()
-                                {
-                                    memoryArea = SimaticMemoryArea.INPUT,
-                                    bitOffset = 0,
-                                    byteOffset = 0,
-                                    length = 0
-                                };
-
-                                tagAddress.byteOffset += 1;
-
-                                var row = hitTest.RowIndex + 1;
-                                bool addReq = row == dataGridView.Rows.Count;
-                                for (int x = 0; x < 8; x++)
-                                {
-                                    tagAddress.bitOffset = (uint)x;
-
-                                    if (addReq)
-                                    {
-                                        dataGridView.Rows.Add(new string[] { tagAddress.GetAddress() });
-                                    }
-                                    else
-                                    {
-                                        dataGridView.Rows.Insert(row + x, new string[] { tagAddress.GetAddress() });
-                                    }
-
-                                }
-                            };
-                            dropDown.Items.AddRange(new ToolStripItem[] { addByteButton });
-
-                            dropDown.Show(new Point(Cursor.Position.X, Cursor.Position.Y));
-                        }
                         break;
                 }
             };
@@ -220,28 +206,6 @@ namespace TiaXmlReader
                 if (found != null)
                     cellEditList.Remove(found);
             };
-
-            dataGridView.RowsAdded += (sender, args) =>
-            {
-                var rowIndex = args.RowIndex;
-                var rowCount = args.RowCount;
-                undoRedoHandler.AddUndo(() =>
-                {
-                    for (int x = 0; x < rowCount; x++)
-                    {
-                        dataGridView.Rows.RemoveAt(rowIndex - 1); //I will remove the row previous to the added one! Since is the one that triggered the rows added
-                    }
-
-                    undoRedoHandler.AddRedo(() =>
-                    {
-                        for (int x = 0; x < rowCount; x++)
-                        {
-                            dataGridView.Rows.AddCopies(rowIndex, rowCount);
-                        }
-                    });
-                });
-
-            };
         }
 
         private void AddUndoCell(PastedCellValue cell)
@@ -267,129 +231,86 @@ namespace TiaXmlReader
             var clipboardDataObject = (DataObject)Clipboard.GetDataObject();
             if (clipboardDataObject.GetDataPresent(DataFormats.Text))
             {
-                string[] pastedRows = Regex.Split(clipboardDataObject.GetData(DataFormats.Text).ToString().TrimEnd("\r\n".ToCharArray()), "\r\n");
+                var pastedCellList = new List<PastedCellValue>();
 
-                var currentCell = dataGridView.CurrentCell;
-                int startRowPointer = currentCell.RowIndex; //The currentCell row index needs to be taken BEFORE adding cells otherwise it will be moved!
+                var pasteString = clipboardDataObject.GetData(DataFormats.Text).ToString();
+                if (pasteString.Contains("\r\n") || pasteString.Contains('\t'))
+                {//If contains new lines or tab it needs to handled like an excel file. New line => next row. Tab => next column.
+                    string[] pastedRows = Regex.Split(pasteString.TrimEnd("\r\n".ToCharArray()), "\r\n");
 
-                int rowsToAdd = 0;
-                if (dataGridView.Rows.Count < (currentCell.RowIndex + pastedRows.Length))
-                {
-                    rowsToAdd = currentCell.RowIndex + pastedRows.Length - dataGridView.Rows.Count + 1;  //Adding one extra to avoid remaining without rows!
-                }
+                    var currentCell = dataGridView.CurrentCell;
+                    int startRowPointer = currentCell.RowIndex; //The currentCell row index needs to be taken BEFORE adding cells otherwise it will be moved!
 
-                List<PastedCellValue> pastedCellList = new List<PastedCellValue>();
-
-                var rowPointer = startRowPointer;
-                foreach (string pastedRow in pastedRows)
-                {
-                    string[] pastedColumns = pastedRow.Split('\t');
-                    for (int pastedColumnPointer = 0, columnPointer = currentCell.ColumnIndex; columnPointer < dataGridView.ColumnCount && pastedColumnPointer < pastedColumns.Length; columnPointer++, pastedColumnPointer++)
+                    var rowPointer = startRowPointer;
+                    foreach (string pastedRow in pastedRows)
                     {
-                        var cell = dataGridView.Rows.Count > rowPointer ? dataGridView.Rows[rowPointer].Cells[columnPointer] : null;
-                        pastedCellList.Add(new PastedCellValue()
+                        string[] pastedColumns = pastedRow.Split('\t');
+                        for (int pastedColumnPointer = 0, columnPointer = currentCell.ColumnIndex; columnPointer < dataGridView.ColumnCount && pastedColumnPointer < pastedColumns.Length; columnPointer++, pastedColumnPointer++)
                         {
-                            rowIndex = rowPointer,
-                            columnIndex = columnPointer,
-                            oldValue = cell?.Value,
-                            newValue = pastedColumns[pastedColumnPointer]
-                        });
-                    }
-                    rowPointer++;
-                }
-
-                PasteNewCells(pastedCellList, rowsToAdd);
-            }
-        }
-
-        private void PasteNewCells(List<PastedCellValue> pastedCellList, int rowsToAdd)
-        {
-            undoRedoHandler.Lock(); //Lock the handler. I do not work actions here since are all handled below!
-            if (rowsToAdd > 0)
-            {
-                dataGridView.Rows.Add(rowsToAdd);
-            }
-
-            foreach (var cell in pastedCellList)
-            {
-                dataGridView.Rows[cell.rowIndex].Cells[cell.columnIndex].Value = cell.newValue;
-            }
-            undoRedoHandler.Unlock();
-
-            undoRedoHandler.AddUndo(() =>
-            {
-                foreach (var cell in pastedCellList)
-                {
-                    dataGridView.Rows[cell.rowIndex].Cells[cell.columnIndex].Value = cell.oldValue;
-                }
-
-                bool hasNewRow = dataGridView.Rows[dataGridView.Rows.Count - 1].IsNewRow;
-                for (int x = 0; x < rowsToAdd; x++)
-                {
-                    var row = dataGridView.Rows[dataGridView.Rows.Count - (hasNewRow ? 2 : 1)]; //Always remove the last one (If is not a new row. It cannot be deleted)! While removing the count will decrease.
-                    dataGridView.Rows.Remove(row);
-                }
-
-                undoRedoHandler.AddRedo(() => PasteNewCells(pastedCellList, rowsToAdd));
-            });
-        }
-
-        public void DeleteSelectedRows()
-        {
-            List<int> deletedRowList = new List<int>();
-            List<PastedCellValue> deletedCellList = new List<PastedCellValue>();
-
-            foreach (DataGridViewCell selectedCell in dataGridView.SelectedCells)
-            {
-                if (selectedCell.RowIndex == -1) //If there is no RowIndex, the cell has already been deleted!
-                {
-                    continue;
-                }
-
-                bool allSelected = true;
-                foreach (DataGridViewCell cell in dataGridView.Rows[selectedCell.RowIndex].Cells)
-                {
-                    allSelected &= cell.Selected;
-                }
-
-
-                if (allSelected)
-                {
-                    if (!deletedRowList.Contains(selectedCell.RowIndex))
-                    {
-                        deletedRowList.Add(selectedCell.RowIndex);
+                            var cell = dataGridView.Rows.Count > rowPointer ? dataGridView.Rows[rowPointer].Cells[columnPointer] : null;
+                            pastedCellList.Add(new PastedCellValue()
+                            {
+                                rowIndex = rowPointer,
+                                columnIndex = columnPointer,
+                                oldValue = cell?.Value,
+                                newValue = pastedColumns[pastedColumnPointer]
+                            });
+                        }
+                        rowPointer++;
                     }
                 }
                 else
-                {
-                    deletedCellList.Add(new PastedCellValue()
+                {//If is a normal string, i will paste in ALL the selected cells!
+                    foreach (DataGridViewCell selectedCell in dataGridView.SelectedCells)
                     {
-                        rowIndex = selectedCell.RowIndex,
-                        columnIndex = selectedCell.ColumnIndex,
-                        oldValue = selectedCell.Value,
-                    });
+                        pastedCellList.Add(new PastedCellValue()
+                        {
+                            rowIndex = selectedCell.RowIndex,
+                            columnIndex = selectedCell.ColumnIndex,
+                            oldValue = selectedCell.Value,
+                            newValue = pasteString
+                        });
+                    }
                 }
-            }
 
-            undoRedoHandler.Lock();
-            foreach(var rowIndex in deletedRowList)
+                PasteNewCells(pastedCellList);
+            }
+        }
+
+        public void DeleteSelectedCells()
+        {
+            List<PastedCellValue> deletedCellList = new List<PastedCellValue>();
+            foreach (DataGridViewCell selectedCell in dataGridView.SelectedCells)
             {
-                var row = dataGridView.Rows[rowIndex];
-                if(!row.IsNewRow)
+                deletedCellList.Add(new PastedCellValue()
                 {
-                    dataGridView.Rows.Remove(row);
-                }
+                    rowIndex = selectedCell.RowIndex,
+                    columnIndex = selectedCell.ColumnIndex,
+                    oldValue = selectedCell.Value,
+                    newValue = ""
+                });
             }
 
-            foreach(var cellValue in deletedCellList)
+            this.PasteNewCells(deletedCellList);
+        }
+
+        private void PasteNewCells(List<PastedCellValue> pastedCellList)
+        {
+            undoRedoHandler.Lock(); //Lock the handler. I do not want more actions been added by events here since are all handled below!
+            foreach (var pastedCell in pastedCellList)
             {
-                dataGridView.Rows[cellValue.rowIndex].Cells[cellValue.columnIndex].Value = "";
+                dataGridView.Rows[pastedCell.rowIndex].Cells[pastedCell.columnIndex].Value = pastedCell.newValue;
             }
             undoRedoHandler.Unlock();
 
             undoRedoHandler.AddUndo(() =>
             {
+                foreach (var pastedCell in pastedCellList)
+                {
+                    dataGridView.Rows[pastedCell.rowIndex].Cells[pastedCell.columnIndex].Value = pastedCell.oldValue;
+                }
 
+                undoRedoHandler.AddRedo(() => PasteNewCells(pastedCellList));
             });
         }
     }
@@ -400,6 +321,182 @@ namespace TiaXmlReader
         public int columnIndex;
         public object oldValue;
         public object newValue;
+    }
+
+    public class ExcelDragHandler
+    {
+        private readonly DataGridView dataGridView;
+
+        private bool started = false;
+        private int rowIndexStart = -1;
+        private int columnIndex = -1;
+
+        public ExcelDragHandler(DataGridView dataGridView)
+        {
+            this.dataGridView = dataGridView;
+        }
+
+        public bool IsStarted()
+        {
+            return started;
+        }
+
+        public void Init()
+        {
+            dataGridView.MouseMove += (sender, args) =>
+            {
+                if (started)
+                {
+                    return;
+                }
+
+                dataGridView.Cursor = Cursors.Default;
+
+                var currentCell = dataGridView.CurrentCell;
+                if (currentCell == null)
+                {
+                    return;
+                }
+
+                var bounds = dataGridView.GetCellDisplayRectangle(currentCell.ColumnIndex, currentCell.RowIndex, false);
+                if (args.X >= bounds.Right - 4 && args.X <= bounds.Right && args.Y >= bounds.Bottom - 4 && args.Y <= bounds.Bottom)
+                {
+                    dataGridView.Cursor = Cursors.Cross;
+                }
+            };
+
+            this.dataGridView.MouseDown += (sender, args) =>
+            {
+                var hitTest = dataGridView.HitTest(args.X, args.Y);
+                if (hitTest.Type == DataGridViewHitTestType.Cell && args.Button == MouseButtons.Left)
+                {
+                    var bounds = dataGridView.GetCellDisplayRectangle(hitTest.ColumnIndex, hitTest.RowIndex, false);
+                    if (args.X >= bounds.Right - 4 && args.X <= bounds.Right && args.Y >= bounds.Bottom - 4 && args.Y <= bounds.Bottom)
+                    {
+                        started = true;
+                        rowIndexStart = hitTest.RowIndex;
+                        columnIndex = hitTest.ColumnIndex;
+                    }
+                }
+            };
+
+
+            this.dataGridView.LostFocus += (sender, args) =>
+            {
+                started = false;
+            };
+
+            this.dataGridView.MouseUp += (sender, args) =>
+            {
+                if (started)
+                {
+                    started = false;
+
+                    var highestRowIndex = -1;
+                    var lowestRowIndex = -1;
+
+                    for (int x = 0; x < dataGridView.SelectedCells.Count; x++)
+                    {
+                        var selectedCell = dataGridView.SelectedCells[x];
+                        if (highestRowIndex == -1 || selectedCell.RowIndex > highestRowIndex)
+                        {
+                            highestRowIndex = selectedCell.RowIndex;
+                        }
+
+                        if (lowestRowIndex == -1 || selectedCell.RowIndex < lowestRowIndex)
+                        {
+                            lowestRowIndex = selectedCell.RowIndex;
+                        }
+                    }
+
+                    var rowIndexEnd = highestRowIndex != rowIndexStart ? highestRowIndex : lowestRowIndex;
+
+                    var rowIndexList = new List<int>();
+                    bool draggingDown = (lowestRowIndex == rowIndexStart); //false = draggingUP
+
+                    if (draggingDown)
+                    {
+                        draggingDown = true;
+                        for (int rowIndex = rowIndexStart + 1; rowIndex <= rowIndexEnd; rowIndex++)
+                        {
+                            rowIndexList.Add(rowIndex);
+                        }
+                    }
+                    else
+                    {
+                        for (int rowIndex = rowIndexStart - 1; rowIndex >= rowIndexEnd; rowIndex--)
+                        {
+                            rowIndexList.Add(rowIndex);
+                        }
+                    }
+
+                    if (columnIndex == 0)
+                    {
+                        var cellValue = (dataGridView.Rows[rowIndexStart].Cells[0].Value ?? "").ToString();
+
+                        var tagAddress = SimaticTagAddress.FromAddress(cellValue);
+                        if (tagAddress != null) //If is not a valid address, i won't care about doing any stuff.
+                        {
+                            rowIndexList.ForEach(rowIndex =>
+                            {
+                                if (draggingDown)
+                                {
+                                    tagAddress.bitOffset += 1;
+                                    if (tagAddress.bitOffset > 7)
+                                    {
+                                        tagAddress.bitOffset = 0;
+                                        tagAddress.byteOffset += 1;
+                                    }
+                                }
+                                else
+                                {
+                                    if (tagAddress.bitOffset == 0)
+                                    {
+                                        if (tagAddress.byteOffset == 0)
+                                        {
+                                            return;
+                                        }
+
+                                        tagAddress.bitOffset = 7;
+                                        tagAddress.byteOffset -= 1;
+                                    }
+                                    else
+                                    {
+                                        tagAddress.bitOffset -= 1;
+                                    }
+                                }
+
+                                dataGridView.Rows[rowIndex].Cells[0].Value = tagAddress.GetAddress();
+                            });
+
+                        }
+                    }
+
+                    dataGridView.ClearSelection();
+                    dataGridView.CurrentCell = dataGridView.Rows[rowIndexEnd].Cells[columnIndex];
+                    dataGridView.CurrentCell.Selected = true;
+                }
+
+            };
+
+
+            dataGridView.SelectionChanged += (sender, args) =>
+            {
+                if (started)
+                {
+                    for (int x = 0; x < dataGridView.SelectedCells.Count; x++)
+                    {
+                        var selectedCell = dataGridView.SelectedCells[x];
+                        if (selectedCell.ColumnIndex != columnIndex)
+                        {
+                            selectedCell.Selected = false;
+                            continue;
+                        }
+                    }
+                }
+            };
+
+        }
     }
 }
 
