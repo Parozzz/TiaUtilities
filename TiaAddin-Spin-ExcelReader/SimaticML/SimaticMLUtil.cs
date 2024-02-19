@@ -31,7 +31,7 @@ namespace TiaXmlReader.SimaticML
         }
     }
 
-    public class SimaticTagAddress
+    public class SimaticTagAddress : IComparable<SimaticTagAddress>
     {
         public static SimaticTagAddress FromAddress(string address)
         {
@@ -115,6 +115,11 @@ namespace TiaXmlReader.SimaticML
         public override string ToString()
         {
             return GetAddress();
+        }
+
+        public int CompareTo(SimaticTagAddress other)
+        {
+            return this.GetSortingNumber().CompareTo(other.GetSortingNumber());
         }
     }
 
