@@ -176,9 +176,7 @@
     <Compile Include="Generation\IO_Cad\CadData.cs" />
     <Compile Include="Generation\UserAlarms\GenerationUserAlarms.cs" />
     <Compile Include="Generation\IGeneration.cs" />
-    <Compile Include="IOGenerationForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="IOGenerationForm.cs" />
     <Compile Include="IOGenerationForm.Designer.cs">
       <DependentUpon>IOGenerationForm.cs</DependentUpon>
     </Compile>

@@ -15,3 +15,12 @@ C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\bin\Debug\Siem
 C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\bin\Debug\Siemens.Engineering.AddIn.xml
 C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\bin\Debug\Siemens.Engineering.Hmi.xml
 C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\obj\Debug\TiaAddIn-Spin.csproj.CopyComplete
+C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\TiaAddIn-Spin\bin\Debug\SpinAddIn.dll
+C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\TiaAddIn-Spin\bin\Debug\SpinAddIn.pdb
+C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\TiaAddIn-Spin\bin\Debug\Siemens.Engineering.AddIn.xml
+C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\TiaAddIn-Spin\bin\Debug\Siemens.Engineering.Hmi.xml
+C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\TiaAddIn-Spin\obj\Debug\TiaAddIn-Spin.csproj.AssemblyReference.cache
+C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\TiaAddIn-Spin\obj\Debug\TiaAddIn-Spin.csproj.CoreCompileInputs.cache
+C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\TiaAddIn-Spin\obj\Debug\TiaAddIn-Spin.csproj.CopyComplete
+C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\TiaAddIn-Spin\obj\Debug\SpinAddIn.dll
+C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\TiaAddIn-Spin\obj\Debug\SpinAddIn.pdb

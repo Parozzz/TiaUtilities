@@ -1,9 +1,6 @@
-﻿using DocumentFormat.OpenXml.Drawing.Charts;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TiaXmlReader.SimaticML
 {
@@ -35,6 +32,11 @@ namespace TiaXmlReader.SimaticML
     {
         public static SimaticTagAddress FromAddress(string address)
         {
+            if (address == null)
+            {
+                return null;
+            }
+
             if (address.StartsWith("%")) //If reading the address directly from the SimaticML file, i will remove it.
             {
                 address = address.Substring(1);
@@ -99,7 +101,7 @@ namespace TiaXmlReader.SimaticML
 
         public long GetSortingNumber()
         {
-            return (long) ((int)memoryArea * Math.Pow(10, 9) + byteOffset * Math.Pow(10, 3) + bitOffset);
+            return (long)((int)memoryArea * Math.Pow(10, 9) + byteOffset * Math.Pow(10, 3) + bitOffset);
         }
 
         public string GetAddress()
@@ -110,6 +112,61 @@ namespace TiaXmlReader.SimaticML
         public string GetSimaticMLAddress()
         {
             return "%" + this.GetAddress();
+        }
+
+        public SimaticTagAddress GetNextBit(SimaticDataType dataType)
+        {
+            uint nextByteOffset = byteOffset;
+            uint nextBitOffset = bitOffset;
+
+            var bitLength = dataType.GetSimaticLength() * 8;
+            if (nextBitOffset >= (bitLength - 1))
+            {
+                if (nextByteOffset < 0xFFFE)
+                {
+                    nextByteOffset++;
+                    nextBitOffset = 0;
+                }
+            }
+            else
+            {
+                nextBitOffset++;
+            }
+
+            return GetNewTag(nextByteOffset, nextBitOffset);
+        }
+
+        public SimaticTagAddress GetPreviousBit(SimaticDataType dataType)
+        {
+            uint nextByteOffset = byteOffset;
+            uint nextBitOffset = bitOffset;
+
+            var bitLength = dataType.GetSimaticLength() * 8;
+            if (nextBitOffset == 0)
+            {
+                if (nextByteOffset > 0)
+                {
+                    nextByteOffset--;
+                    nextBitOffset = (bitLength - 1);
+                }
+            }
+            else
+            {
+                nextBitOffset--;
+            }
+
+            return GetNewTag(nextByteOffset, nextBitOffset);
+        }
+
+        public SimaticTagAddress GetNewTag(uint newByteOffset, uint newBitOffset)
+        {
+            return new SimaticTagAddress()
+            {
+                memoryArea = memoryArea,
+                length = length,
+                byteOffset = newByteOffset,
+                bitOffset = newBitOffset
+            };
         }
 
         public override string ToString()

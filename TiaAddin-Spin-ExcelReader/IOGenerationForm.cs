@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -10,18 +11,72 @@ using TiaXmlReader.UndoRedo;
 
 namespace TiaXmlReader
 {
+    public class IOGenerationData
+    {
+        public string Address { get => address; set => address = value; }
+        private string address;
+
+        public string IOName { get => ioName; set => ioName = value; }
+        private string ioName;
+
+        public string DBName { get => dbName; set => dbName = value; }
+        private string dbName;
+
+        public string Variable { get => variable; set => variable = value; }
+        private string variable;
+
+        public string Comment { get => comment; set => comment = value; }
+        private string comment;
+        public SimaticTagAddress TagAddress { get => SimaticTagAddress.FromAddress(address); }
+
+        public IOGenerationData()
+        {
+
+        }
+
+        public IOGenerationData Clone()
+        {
+            return new IOGenerationData()
+            {
+                Address = Address,
+                IOName = IOName,
+                DBName = DBName,
+                Variable = Variable,
+                Comment = Comment
+            };
+        }
+    }
+
     public partial class IOGenerationForm : Form
     {
         public const int TOTAL_ROW_COUNT = 1999;
+        public static readonly Color SORT_ICON_COLOR = Color.Green;
+        public static readonly Color SELECTED_CELL_COLOR = Color.DarkGreen;
 
         private readonly UndoRedoHandler undoRedoHandler;
         private readonly ExcelDragHandler excelDragHandler;
 
+        private readonly List<IOGenerationData> dataList;
+        private readonly BindingList<IOGenerationData> bindingList;
+        private readonly BindingSource bindingSource;
+
         private List<DataGridViewRow> oldRowPosition;
+
+        private SortOrder sortOrder = SortOrder.None;
+        private Dictionary<IOGenerationData, int> noSortSnap;
 
         public IOGenerationForm()
         {
             InitializeComponent();
+
+            dataList = new List<IOGenerationData>();
+            for (int i = 0; i < TOTAL_ROW_COUNT; i++)
+            {
+                dataList.Add(new IOGenerationData());
+            }
+
+            bindingList = new BindingList<IOGenerationData>(dataList);
+            bindingSource = new BindingSource() { DataSource = bindingList };
 
             this.undoRedoHandler = new UndoRedoHandler();
             this.excelDragHandler = new ExcelDragHandler(this, this.dataGridView);
@@ -30,7 +85,14 @@ namespace TiaXmlReader
 
         public void Init()
         {
+            //var addressColumn = this.dataTable.Rows.Add(TOTAL_ROW_COUNT);
+
+            this.dataGridView.DataSource = bindingSource;
+
             this.dataGridView.AutoGenerateColumns = false;
+
+            this.dataGridView.Dock = DockStyle.Fill;
+            this.dataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
 
             this.dataGridView.ClipboardCopyMode = DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
             this.dataGridView.SelectionMode = DataGridViewSelectionMode.CellSelect;
@@ -39,71 +101,95 @@ namespace TiaXmlReader
             this.dataGridView.EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2;
 
             this.dataGridView.AllowUserToAddRows = false;
-            this.dataGridView.RowCount = TOTAL_ROW_COUNT; //To make it easier to handle, provide a fixed amount of rows. I don't think these much rows will ever be needed!
 
+            var addressColumn = (DataGridViewTextBoxColumn)InitColumn(dataGridView.Columns[0], "Indirizzo", 60, false);
+            addressColumn.MaxInputLength = 10;
+
+            var ioNameColumn = InitColumn(dataGridView.Columns[1], "Nome IO", 75, false);
+            var dbNameColumn = InitColumn(dataGridView.Columns[2], "DB", 75, false);
+            var variableColumn = InitColumn(dataGridView.Columns[3], "Variabile", 75, false);
+            var commentColumn = InitColumn(dataGridView.Columns[4], "Commento", 0, true);
+            var tagAddressColumn = InitColumn(dataGridView.Columns[5], "Tag", 40, false);
+
+            //this.dataGridView.RowCount = TOTAL_ROW_COUNT;
+
+            #region Cell Paiting
             this.dataGridView.CellPainting += (sender, args) =>
             {
                 var bounds = args.CellBounds;
+                var graphics = args.Graphics;
 
-                args.PaintBackground(bounds, true);
-                args.PaintContent(bounds);
-                args.Handled = true;
+                var rowIndex = args.RowIndex;
+                var columnIndex = args.ColumnIndex;
 
-                if (excelDragHandler.IsStarted())
+                var style = args.CellStyle;
+
+                if (rowIndex == -1)
                 {
-                    return;
-                }
+                    if (columnIndex == 0)
+                    {
+                        args.PaintBackground(bounds, false);
 
-                var currentCell = dataGridView.CurrentCell;
-                if (currentCell != null && currentCell.RowIndex == args.RowIndex && currentCell.ColumnIndex == args.ColumnIndex && dataGridView.SelectedCells.Count == 1)
-                {//I only want to apply the effect when the only selected cell is the current cell.
-                    args.Paint(bounds, DataGridViewPaintParts.All & ~DataGridViewPaintParts.Border);
-                    using (Pen p = new Pen(Color.Green, 2))
-                    {//Border
-                        Rectangle rect = args.CellBounds;
-                        rect.Width -= 1;
-                        rect.Height -= 1;
-                        args.Graphics.DrawRectangle(p, rect);
-                    }
+                        TextRenderer.DrawText(graphics, string.Format("{0}", args.FormattedValue), style.Font, bounds, style.ForeColor,
+                            TextFormatFlags.VerticalCenter | TextFormatFlags.Left);
 
-                    using (SolidBrush brush = new SolidBrush(Color.Green))
-                    {//Little triangle in the lower part only for current cell
-                        var point1 = new Point(bounds.Right - 1, bounds.Bottom - 10);
-                        var point2 = new Point(bounds.Right - 1, bounds.Bottom - 1);
-                        var point3 = new Point(bounds.Right - 10, bounds.Bottom - 1);
+                        var column = dataGridView.Columns[0];
+                        if (column.HeaderCell.SortGlyphDirection != SortOrder.None)
+                        {
+                            var sortIcon = column.HeaderCell.SortGlyphDirection == SortOrder.Ascending ? "▲" : "▼";
+                            TextRenderer.DrawText(graphics, sortIcon, style.Font, bounds, SORT_ICON_COLOR,
+                                TextFormatFlags.VerticalCenter | TextFormatFlags.Right);
+                        }
 
-                        Point[] pt = new Point[] { point1, point2, point3 };
-                        args.Graphics.FillPolygon(brush, pt);
+                        args.Handled = true;
                     }
                 }
+                else
+                {
+                    args.PaintBackground(bounds, true);
+                    args.PaintContent(bounds);
+                    args.Handled = true;
+
+                    if (excelDragHandler.IsStarted())
+                    {
+                        return;
+                    }
+
+                    var currentCell = dataGridView.CurrentCell;
+                    if (currentCell != null && currentCell.RowIndex == rowIndex && currentCell.ColumnIndex == columnIndex && dataGridView.SelectedCells.Count == 1)
+                    {//I only want to apply the effect when the only selected cell is the current cell.
+                        args.Paint(bounds, DataGridViewPaintParts.All & ~DataGridViewPaintParts.Border);
+                        using (Pen p = new Pen(SELECTED_CELL_COLOR, 2))
+                        {//Border
+                            Rectangle rect = args.CellBounds;
+                            rect.Width -= 1;
+                            rect.Height -= 1;
+                            graphics.DrawRectangle(p, rect);
+                        }
+
+                        using (SolidBrush brush = new SolidBrush(SELECTED_CELL_COLOR))
+                        {//Little triangle in the lower part only for current cell
+                            var point1 = new Point(bounds.Right - 1, bounds.Bottom - 10);
+                            var point2 = new Point(bounds.Right - 1, bounds.Bottom - 1);
+                            var point3 = new Point(bounds.Right - 10, bounds.Bottom - 1);
+
+                            Point[] pt = new Point[] { point1, point2, point3 };
+                            graphics.FillPolygon(brush, pt);
+                        }
+                    }
+                }
+
+
             };
 
-            excelDragHandler.Init();
+            #endregion
 
             #region Sorting
-            this.dataGridView.SortCompare += (sender, args) =>
+            this.dataGridView.ColumnHeaderMouseClick += (sender, args) =>
             {
-                if (args.Column.Index == 0)
+                if (args.ColumnIndex == 0)
                 {
-                    //This is required to avoid the values to go bottom and top when sorting. I want the empty lines always at the bottom!.
-                    var sortOrderMultiplier = dataGridView.SortOrder == SortOrder.Ascending ? -1 : 1;
-
-                    var cell1Address = args.CellValue1 == null ? null : SimaticTagAddress.FromAddress(args.CellValue1.ToString());
-                    var cell2Address = args.CellValue2 == null ? null : SimaticTagAddress.FromAddress(args.CellValue2.ToString());
-                    if (cell1Address == null)
-                    {
-                        args.SortResult = -1 * sortOrderMultiplier;
-                    }
-                    else if (cell2Address == null)
-                    {
-                        args.SortResult = 1 * sortOrderMultiplier;
-                    }
-                    else
-                    {
-                        args.SortResult = cell1Address.CompareTo(cell2Address);
-                    }
-
-                    args.Handled = true;
+                    NextAddressColumnSort();
                 }
             };
             #endregion
@@ -111,7 +197,8 @@ namespace TiaXmlReader
             #region RowHeaderNumber
             this.dataGridView.RowPostPaint += (sender, args) =>
             {
-                var grid = sender as DataGridView;
+                var style = args.InheritedRowStyle;
+
                 var rowIdx = (args.RowIndex + 1).ToString();
 
                 var centerFormat = new StringFormat()
@@ -121,10 +208,10 @@ namespace TiaXmlReader
                     LineAlignment = StringAlignment.Far
                 };
 
-                Size textSize = TextRenderer.MeasureText(rowIdx, this.Font); //get the size of the string
-                grid.RowHeadersWidth = Math.Max(grid.RowHeadersWidth, textSize.Width + 15); //if header width lower then string width then resize
+                var textSize = TextRenderer.MeasureText(rowIdx, style.Font); //get the size of the string
+                dataGridView.RowHeadersWidth = Math.Max(dataGridView.RowHeadersWidth, textSize.Width + 15); //if header width lower then string width then resize
 
-                var headerBounds = new Rectangle(args.RowBounds.Left, args.RowBounds.Top, grid.RowHeadersWidth, args.RowBounds.Height);
+                var headerBounds = new Rectangle(args.RowBounds.Left, args.RowBounds.Top, dataGridView.RowHeadersWidth, args.RowBounds.Height);
                 args.Graphics.DrawString(rowIdx, this.Font, SystemBrushes.ControlText, headerBounds, centerFormat);
             };
             #endregion
@@ -191,7 +278,7 @@ namespace TiaXmlReader
                         {
                             dataGridView.ClearSelection();
                             dataGridView.CurrentCell = dataGridView.Rows[hitTest.RowIndex].Cells[0]; //I need to set the current cell, because i use the CurrentRow as a "starting row"
-                            //Do not cancel current cell! It might select the first cell in the grid and mess up selection.
+                                                                                                     //Do not cancel current cell! It might select the first cell in the grid and mess up selection.
 
                             lastClickedRowIndex = hitTest.RowIndex;
                             foreach (DataGridViewCell cell in dataGridView.Rows[hitTest.RowIndex].Cells)
@@ -216,12 +303,12 @@ namespace TiaXmlReader
 
             dataGridView.CellEndEdit += (sender, args) =>
             {
-                if(cellEdit.cell == null)
+                if (cellEdit.cell == null)
                 {
                     return;
                 }
 
-                if(cellEdit.RowIndex == args.RowIndex && cellEdit.ColumnIndex == args.ColumnIndex)
+                if (cellEdit.RowIndex == args.RowIndex && cellEdit.ColumnIndex == args.ColumnIndex)
                 {
                     cellEdit.NewValue = dataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex].Value;
                     AddUndoCell(cellEdit);
@@ -230,6 +317,110 @@ namespace TiaXmlReader
                 }
             };
             #endregion
+
+            excelDragHandler.Init();
+        }
+
+        private void NextAddressColumnSort()
+        {
+            var column = dataGridView.Columns[0];
+
+            var oldSortOrder = sortOrder;
+            switch (sortOrder)
+            {
+                case SortOrder.None:
+                    sortOrder = SortOrder.Ascending;
+                    break;
+                case SortOrder.Ascending:
+                    sortOrder = SortOrder.Descending;
+                    break;
+                case SortOrder.Descending:
+                    sortOrder = SortOrder.None;
+                    break;
+            }
+
+            AddressColumnSort(this.sortOrder, oldSortOrder);
+        }
+
+        private void AddressColumnSort(SortOrder sortOrder, SortOrder oldSortOrder)
+        {
+            var snapDict = this.CreateDataListSnapshot();
+
+            if (sortOrder != SortOrder.None && oldSortOrder == SortOrder.None)
+            {
+                this.noSortSnap = snapDict;
+            }
+
+            dataGridView.Columns[0].HeaderCell.SortGlyphDirection = sortOrder;
+            if (sortOrder == SortOrder.None)
+            {
+                if (noSortSnap != null)
+                {
+                    this.RestoreDataListSnapshot(noSortSnap);
+                    noSortSnap = null;
+                }
+            }
+            else
+            {
+                dataList.Sort(new AddressColumnComparer(sortOrder));
+                if (sortOrder == SortOrder.Descending)
+                {
+                    dataList.Reverse();
+                }
+            }
+            dataGridView.Refresh();
+
+            undoRedoHandler.AddUndo(() =>
+            {
+                this.sortOrder = oldSortOrder;
+                dataGridView.Columns[0].HeaderCell.SortGlyphDirection = oldSortOrder;
+
+                var undoSnap = CreateDataListSnapshot();
+                RestoreDataListSnapshot(snapDict);
+                undoRedoHandler.AddRedo(() => RestoreDataListSnapshot(undoSnap));
+            });
+        }
+
+        private Dictionary<IOGenerationData, int> CreateDataListSnapshot()
+        {
+            var dict = new Dictionary<IOGenerationData, int>();
+            for (int x = 0; x < dataList.Count; x++)
+            {
+                dict.Add(dataList[x], x);
+            }
+            return dict;
+        }
+
+        private void RestoreDataListSnapshot(Dictionary<IOGenerationData, int> dict)
+        {
+            dataList.Sort((x, y) =>
+            {
+                var indexX = dict[x];
+                var indexY = dict[y];
+
+                return indexX.CompareTo(indexY);
+            });
+            dataGridView.Refresh();
+        }
+
+        private DataGridViewColumn CreateColumn(string name, int width, bool fill)
+        {
+            var column = new DataGridViewTextBoxColumn();
+            return InitColumn(column, name, width, fill);
+        }
+
+        private T InitColumn<T>(T column, string name, int width, bool fill) where T : DataGridViewColumn
+        {
+            column.Name = name;
+            column.DefaultCellStyle.SelectionBackColor = Color.LightGray;
+            column.DefaultCellStyle.BackColor = SystemColors.ControlLightLight;
+            column.DefaultCellStyle.SelectionForeColor = Color.Black;
+            column.DefaultCellStyle.ForeColor = Color.Black;
+            column.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            column.Width = 60;
+            column.AutoSizeMode = fill ? DataGridViewAutoSizeColumnMode.Fill : DataGridViewAutoSizeColumnMode.None;
+            column.SortMode = DataGridViewColumnSortMode.Programmatic;
+            return column;
         }
 
         private void AddUndoCell(CellChange cell)
@@ -272,7 +463,7 @@ namespace TiaXmlReader
                         for (int pastedColumnPointer = 0, columnPointer = currentCell.ColumnIndex; columnPointer < dataGridView.ColumnCount && pastedColumnPointer < pastedColumns.Length; columnPointer++, pastedColumnPointer++)
                         {
                             var cell = dataGridView.Rows.Count > rowPointer ? dataGridView.Rows[rowPointer].Cells[columnPointer] : null;
-                            if(cell != null)
+                            if (cell != null)
                             {
                                 pastedCellList.Add(new CellChange(cell) { NewValue = pastedColumns[pastedColumnPointer] });
                             }
@@ -311,18 +502,25 @@ namespace TiaXmlReader
             {
                 dataGridView.Rows[cellChange.RowIndex].Cells[cellChange.ColumnIndex].Value = cellChange.NewValue;
             }
+            dataGridView.Refresh(); //This is required to refresh data inside the Binding.
             undoRedoHandler.Unlock();
 
             undoRedoHandler.AddUndo(() =>
             {
+                undoRedoHandler.Lock();
                 foreach (var cellChange in cellChangeList)
                 {
                     dataGridView.Rows[cellChange.RowIndex].Cells[cellChange.ColumnIndex].Value = cellChange.OldValue;
                 }
+                dataGridView.Refresh(); //This is required to refresh data inside the Binding.
+                undoRedoHandler.Unlock();
 
                 dataGridView.ClearSelection();
                 dataGridView.CurrentCell = cellChangeList[0].cell;
-                dataGridView.FirstDisplayedCell = cellChangeList[0].cell;
+                if (!cellChangeList[0].cell.Visible)
+                {
+                    dataGridView.FirstDisplayedCell = cellChangeList[0].cell;
+                }
 
                 undoRedoHandler.AddRedo(() => ChangeCells(cellChangeList));
             });
@@ -351,7 +549,7 @@ namespace TiaXmlReader
         public CellChange(DataGridView dataGridView, int column, int row)
         {
             cell = dataGridView.Rows[row].Cells[column];
-            if(cell != null)
+            if (cell != null)
             {
                 OldValue = cell.Value;
             }
@@ -395,7 +593,6 @@ namespace TiaXmlReader
                 {
                     return;
                 }
-
 
                 if (IsInsideTriangle(args.X, args.Y, currentCell.ColumnIndex, currentCell.RowIndex))
                 {
@@ -475,36 +672,11 @@ namespace TiaXmlReader
                         if (tagAddress != null) //If is not a valid address, i won't care about doing any stuff.
                         {
                             var dragCellList = new List<CellChange>();
-
                             rowIndexList.ForEach(rowIndex =>
                             {
-                                if (draggingDown)
-                                {
-                                    tagAddress.bitOffset += 1;
-                                    if (tagAddress.bitOffset > 7)
-                                    {
-                                        tagAddress.bitOffset = 0;
-                                        tagAddress.byteOffset += 1;
-                                    }
-                                }
-                                else
-                                {
-                                    if (tagAddress.bitOffset == 0)
-                                    {
-                                        if (tagAddress.byteOffset == 0)
-                                        {
-                                            return;
-                                        }
-
-                                        tagAddress.bitOffset = 7;
-                                        tagAddress.byteOffset -= 1;
-                                    }
-                                    else
-                                    {
-                                        tagAddress.bitOffset -= 1;
-                                    }
-                                }
-
+                                tagAddress = draggingDown
+                                                    ? tagAddress.GetNextBit(SimaticDataType.BYTE)
+                                                    : tagAddress.GetPreviousBit(SimaticDataType.BYTE);
                                 dragCellList.Add(new CellChange(dataGridView, 0, rowIndex) { NewValue = tagAddress.GetAddress() });
                             });
 
@@ -515,15 +687,15 @@ namespace TiaXmlReader
                     dataGridView.ClearSelection();
                     dataGridView.CurrentCell = dataGridView.Rows[rowIndexEnd].Cells[columnIndex];
                     dataGridView.CurrentCell.Selected = true;
+                    dataGridView.Refresh();
                 }
 
             };
 
-
             dataGridView.SelectionChanged += (sender, args) =>
             {
                 if (started)
-                {
+                {//When dragging, only allow cell on the column to be selected! I don't care about other ways and want it simple.
                     for (int x = 0; x < dataGridView.SelectedCells.Count; x++)
                     {
                         var selectedCell = dataGridView.SelectedCells[x];
@@ -545,9 +717,94 @@ namespace TiaXmlReader
                 && y >= bounds.Bottom - 6 && y <= bounds.Bottom;
         }
     }
+
+    public class AddressColumnComparer : IComparer<IOGenerationData>
+    {
+        //This is required to avoid the values to go bottom and top when sorting. I want the empty lines always at the bottom!.
+        private readonly int sortOrderModifier;
+        public AddressColumnComparer(SortOrder sortOrder)
+        {
+            sortOrderModifier = (sortOrder == SortOrder.Ascending ? -1 : 1);
+        }
+
+        public int Compare(IOGenerationData x, IOGenerationData y)
+        {
+            var tagX = x?.TagAddress;
+            var tagY = y?.TagAddress;
+            if (tagX == null && tagY == null)
+            {
+                return 0;
+            }
+            else if (tagX == null)
+            {
+                return -1 * sortOrderModifier;
+            }
+            else if (tagY == null)
+            {
+                return 1 * sortOrderModifier;
+            }
+            else
+            {
+                return tagX.CompareTo(tagY);
+            }
+        }
+        /*
+        public int Compare(SimaticTagAddress x, SimaticTagAddress y)
+        {
+            if (x == null)
+            {
+                return -1 * sortOrderModifier;
+            }
+            else if (y == null)
+            {
+                return 1 * sortOrderModifier;
+            }
+            else
+            {
+                return x.CompareTo(y);
+            }
+        }
+
+
+        private SimaticTagAddress GetAddressFromRow(Object obj)
+        {
+            if (!(obj is DataGridViewRow row))
+            {
+                return null;
+            }
+
+            return SimaticTagAddress.FromAddress(row.Cells[0].Value?.ToString());
+        }*/
+    }
 }
 
 /*
+this.dataGridView.SortCompare += (sender, args) =>
+{
+    if (args.Column.Index == 0)
+    {
+        //This is required to avoid the values to go bottom and top when sorting. I want the empty lines always at the bottom!.
+        var sortOrderMultiplier = dataGridView.SortOrder == SortOrder.Ascending ? -1 : 1;
+
+        var cell1Address = SimaticTagAddress.FromAddress(args.CellValue1?.ToString());
+        var cell2Address = SimaticTagAddress.FromAddress(args.CellValue2?.ToString());
+        if (cell1Address == null)
+        {
+            args.SortResult = -1 * sortOrderMultiplier;
+        }
+        else if (cell2Address == null)
+        {
+            args.SortResult = 1 * sortOrderMultiplier;
+        }
+        else
+        {
+            args.SortResult = cell1Address.CompareTo(cell2Address);
+        }
+
+        args.Handled = true;
+    }
+};
+
 dataGridView.MouseDoubleClick += (sender, args) =>
 {
     var hitTest = dataGridView.HitTest(args.X, args.Y);
