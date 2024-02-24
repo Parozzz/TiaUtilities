@@ -114,48 +114,49 @@ namespace TiaXmlReader.SimaticML
             return "%" + this.GetAddress();
         }
 
-        public SimaticTagAddress GetNextBit(SimaticDataType dataType)
+        public SimaticTagAddress NextBit(SimaticDataType dataType, uint toAdd = 1)
         {
             uint nextByteOffset = byteOffset;
             uint nextBitOffset = bitOffset;
 
             var bitLength = dataType.GetSimaticLength() * 8;
-            if (nextBitOffset >= (bitLength - 1))
+
+            uint bitToAdd = toAdd % bitLength;
+            uint byteToAdd = toAdd / bitLength;
+
+            if ((nextBitOffset + bitToAdd) >= (bitLength))
             {
-                if (nextByteOffset < 0xFFFE)
-                {
-                    nextByteOffset++;
-                    nextBitOffset = 0;
-                }
-            }
-            else
-            {
-                nextBitOffset++;
+                byteToAdd++;
+
+                bitToAdd = (nextBitOffset + bitToAdd) % bitLength;
+                nextBitOffset = 0;
             }
 
-            return GetNewTag(nextByteOffset, nextBitOffset);
+            byteOffset = nextByteOffset + byteToAdd;
+            bitOffset = nextBitOffset + bitToAdd;
+            return this;
         }
 
-        public SimaticTagAddress GetPreviousBit(SimaticDataType dataType)
+        public SimaticTagAddress PreviousBit(SimaticDataType dataType, uint toRemove = 1)
         {
             uint nextByteOffset = byteOffset;
             uint nextBitOffset = bitOffset;
 
             var bitLength = dataType.GetSimaticLength() * 8;
-            if (nextBitOffset == 0)
+
+            uint bitToRemove = toRemove % bitLength;
+            uint byteToRemove = toRemove / bitLength;
+
+            if(nextBitOffset < bitToRemove)
             {
-                if (nextByteOffset > 0)
-                {
-                    nextByteOffset--;
-                    nextBitOffset = (bitLength - 1);
-                }
-            }
-            else
-            {
-                nextBitOffset--;
+                byteToRemove++;
+                bitToRemove = bitToRemove - nextBitOffset - 1;
+                nextBitOffset = bitLength - 1;
             }
 
-            return GetNewTag(nextByteOffset, nextBitOffset);
+            byteOffset = nextByteOffset - byteToRemove;
+            bitOffset = nextBitOffset - bitToRemove;
+            return this;
         }
 
         public SimaticTagAddress GetNewTag(uint newByteOffset, uint newBitOffset)

@@ -1,4 +1,4 @@
-﻿namespace TiaXmlReader
+﻿namespace TiaXmlReader.GenerationForms.IO
 {
     partial class IOGenerationForm
     {

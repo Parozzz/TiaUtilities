@@ -6,6 +6,7 @@ using TiaXmlReader;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.IO;
 using TiaXmlReader.Generation.IO_Cad;
+using TiaXmlReader.GenerationForms.IO;
 using TiaXmlReader.SimaticML;
 
 namespace SpinXmlReader

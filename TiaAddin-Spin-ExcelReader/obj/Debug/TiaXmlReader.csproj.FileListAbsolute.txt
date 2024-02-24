@@ -67,4 +67,4 @@ C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\TiaAddin-Spin-ExcelRe
 C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\Debug\TiaXmlReader.exe
 C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\Debug\TiaXmlReader.pdb
 C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\Debug\TiaXmlReader.IOGenerationForm.resources
-C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\Debug\TiaXmlReader.IOGenerationData.resources
+C:\Users\Jack\Documents\GitHub\TiaAddIn-Spin\TiaAddIn-Spin\TiaAddin-Spin-ExcelReader\obj\Debug\TiaXmlReader.GenerationForms.IO.IOGenerationForm.resources

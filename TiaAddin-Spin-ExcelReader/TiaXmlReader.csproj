@@ -168,6 +168,10 @@
     <Compile Include="DBDuplicationForm.Designer.cs">
       <DependentUpon>DBDuplicationForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="GenerationForms\IO\AddressColumnComparer.cs" />
+    <Compile Include="GenerationForms\IO\ExcelDragHandler.cs" />
+    <Compile Include="GenerationForms\IO\IOGenerationData.cs" />
+    <Compile Include="GenerationForms\IO\SortHandler.cs" />
     <Compile Include="Generation\IO\IOData.cs" />
     <Compile Include="Generation\IO\GenerationIO.cs" />
     <Compile Include="Generation\IO_Cad\GenerationIO_CAD.cs" />
@@ -176,8 +180,10 @@
     <Compile Include="Generation\IO_Cad\CadData.cs" />
     <Compile Include="Generation\UserAlarms\GenerationUserAlarms.cs" />
     <Compile Include="Generation\IGeneration.cs" />
-    <Compile Include="IOGenerationForm.cs" />
-    <Compile Include="IOGenerationForm.Designer.cs">
+    <Compile Include="GenerationForms\IO\IOGenerationForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GenerationForms\IO\IOGenerationForm.Designer.cs">
       <DependentUpon>IOGenerationForm.cs</DependentUpon>
     </Compile>
     <Compile Include="SaveData.cs" />
@@ -226,7 +232,7 @@
     <EmbeddedResource Include="DBDuplicationForm.resx">
       <DependentUpon>DBDuplicationForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="IOGenerationForm.resx">
+    <EmbeddedResource Include="GenerationForms\IO\IOGenerationForm.resx">
       <DependentUpon>IOGenerationForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainImportExportForm.resx">
