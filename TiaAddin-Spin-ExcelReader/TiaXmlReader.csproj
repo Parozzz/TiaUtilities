@@ -169,11 +169,16 @@
       <DependentUpon>DBDuplicationForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GenerationForms\IO\AddressColumnComparer.cs" />
+    <Compile Include="GenerationForms\IO\ConfigTableLayoutPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="GenerationForms\IO\ExcelDragHandler.cs" />
     <Compile Include="GenerationForms\IO\IOGenerationData.cs" />
     <Compile Include="GenerationForms\IO\SortHandler.cs" />
+    <Compile Include="Generation\IO\IOExcelImporter.cs" />
+    <Compile Include="Generation\IO\IOConfiguration.cs" />
     <Compile Include="Generation\IO\IOData.cs" />
-    <Compile Include="Generation\IO\GenerationIO.cs" />
+    <Compile Include="Generation\IO\IOXmlGenerator.cs" />
     <Compile Include="Generation\IO_Cad\GenerationIO_CAD.cs" />
     <Compile Include="Generation\UserAlarms\AlarmData.cs" />
     <Compile Include="Attributes\Attribute.cs" />

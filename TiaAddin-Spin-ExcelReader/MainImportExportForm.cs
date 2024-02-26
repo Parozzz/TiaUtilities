@@ -107,10 +107,12 @@ namespace SpinXmlReader
                                 generationIO_Cad.ExportXML(exportPathTextBlock.Text);
                                 break;
                             case "type3":
-                                var generationIO = new GenerationIO();
-                                generationIO.ImportExcelConfig(configWorksheet);
-                                generationIO.GenerateBlocks();
-                                generationIO.ExportXML(exportPathTextBlock.Text);
+                                var ioExcelImporter = new IOExcelImporter();
+                                ioExcelImporter.ImportExcelConfig(configWorksheet);
+
+                                var ioXmlGenerator = new IOXmlGenerator(ioExcelImporter.GetConfiguration(), ioExcelImporter.GetDataList());
+                                ioXmlGenerator.GenerateBlocks();
+                                ioXmlGenerator.ExportXML(exportPathTextBlock.Text);
                                 break;
                         }
                     }

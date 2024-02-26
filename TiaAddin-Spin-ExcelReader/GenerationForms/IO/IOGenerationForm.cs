@@ -83,7 +83,6 @@ namespace TiaXmlReader.GenerationForms.IO
                     excelDragHandler.PaintCell(args);
                 }
             };
-
             #endregion
 
             #region RowHeaderNumber
