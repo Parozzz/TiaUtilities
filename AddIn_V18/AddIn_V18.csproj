@@ -48,6 +48,9 @@
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <LangVersion>7.3</LangVersion>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'V19|AnyCPU'">
+    <OutputPath>bin\V19\</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Siemens.Engineering.AddIn, Version=17.0.0.0, Culture=neutral, PublicKeyToken=65b871d8372d6a8f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

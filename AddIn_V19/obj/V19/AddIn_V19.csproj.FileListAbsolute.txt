@@ -1,0 +1,14 @@
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\AddIn_V19\obj\V19\AddIn_V19.csproj.AssemblyReference.cache
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\AddIn_V19\obj\V19\AddIn_V19.Properties.Resources.resources
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\AddIn_V19\obj\V19\AddIn_V19.csproj.GenerateResource.cache
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\AddIn_V19\obj\V19\AddIn_V19.csproj.CoreCompileInputs.cache
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\AddIn_V19\bin\V19\AddIn_V19.dll.config
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\AddIn_V19\bin\V19\AddIn_V19.dll
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\AddIn_V19\bin\V19\Siemens.Engineering.AddIn.dll
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\AddIn_V19\bin\V19\Siemens.Engineering.AddIn.Permissions.dll
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\AddIn_V19\bin\V19\Siemens.Engineering.AddIn.Utilities.dll
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\AddIn_V19\bin\V19\Siemens.Engineering.Hmi.dll
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\AddIn_V19\bin\V19\Siemens.Engineering.AddIn.xml
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\AddIn_V19\bin\V19\Siemens.Engineering.Hmi.xml
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\AddIn_V19\obj\V19\AddIn_V19.csproj.CopyComplete
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\AddIn_V19\obj\V19\AddIn_V19.dll

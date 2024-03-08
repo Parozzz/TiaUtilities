@@ -63,6 +63,9 @@
     <Prefer32Bit>true</Prefer32Bit>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'V19|AnyCPU'">
+    <OutputPath>bin\V19\</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="ClosedXML, Version=0.102.1.0, Culture=neutral, PublicKeyToken=fd1eb21b62ae805b, processorArchitecture=MSIL">
       <HintPath>..\packages\ClosedXML.0.102.1\lib\netstandard2.0\ClosedXML.dll</HintPath>

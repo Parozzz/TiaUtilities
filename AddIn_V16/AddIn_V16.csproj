@@ -45,6 +45,9 @@
   <PropertyGroup>
     <ApplicationIcon>Logo_PNG_colori-Piccolo.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'V19|AnyCPU'">
+    <OutputPath>bin\V19\</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Siemens.Engineering.AddIn">
       <HintPath>..\SiemensAPI\V16\Siemens.Engineering.AddIn.dll</HintPath>

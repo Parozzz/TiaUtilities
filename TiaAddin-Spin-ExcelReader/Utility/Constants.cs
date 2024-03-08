@@ -20,20 +20,26 @@ namespace SpinXmlReader
 
         public const string SECTIONS_NAMESPACE_V17 = "http://www.siemens.com/automation/Openness/SW/Interface/v5";
         public const string FLG_NET_NAMESPACE_V17 = "http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v4";
+        public const string FLG_NET_NAMESPACE_V19 = "http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v5";
 
         public static string GET_SECTIONS_NAMESPACE()
-        {
+        {            
             if(VERSION >= 17)
             {
                 return SECTIONS_NAMESPACE_V17;
             }
+            
 
             return null;
         }
 
         public static string GET_FLAG_NET_NAMESPACE()
         {
-            if (VERSION >= 17)
+            if(VERSION >= 19)
+            {
+                return FLG_NET_NAMESPACE_V19;
+            }
+            else if (VERSION >= 17)
             {
                 return FLG_NET_NAMESPACE_V17;
             }
