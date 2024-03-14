@@ -10,6 +10,7 @@ namespace TiaXmlReader.SimaticML.Enums
 {
     public enum SimaticVariableScope
     {
+        UNKNOW = 0, //Default value
         LOCAL_VARIABLE,
         LOCAL_CONSTANT,
         LITERAL_CONSTANT,
@@ -17,7 +18,6 @@ namespace TiaXmlReader.SimaticML.Enums
         GLOBAL_CONSTANT,
         GLOBAL_VARIABLE,
         LABEL,
-        UNKNOW = 0 //Default value
     }
 
     public static class SimaticVariableScopeExtension
@@ -32,6 +32,7 @@ namespace TiaXmlReader.SimaticML.Enums
                 case SimaticVariableScope.TYPED_CONSTANT: return "TypedConstant";
                 case SimaticVariableScope.GLOBAL_CONSTANT: return "GlobalConstant";
                 case SimaticVariableScope.GLOBAL_VARIABLE: return "GlobalVariable";
+                case SimaticVariableScope.UNKNOW: return "Undef";
                 //case AccessScope.LABEL: return "Label";
                 default:
                     throw new Exception("VariableScope " + type.ToString() + "  not yet implemented");

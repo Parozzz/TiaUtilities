@@ -192,14 +192,16 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace
         }
 
         private readonly XmlAttributeConfiguration componentName;
-        private readonly XmlAttributeConfiguration sliceAccessModifier;
-        private readonly XmlAttributeConfiguration accessModifier;
+        private readonly XmlAttributeConfiguration simpleAccessModifier; //Periphery|QualityInformation
+        private readonly XmlAttributeConfiguration sliceAccessModifier;  //[xbwdXBWD]\d+
+        private readonly XmlAttributeConfiguration accessModifier; //Only for arrays
 
         public Component(string value = "") : base(Component.NODE_NAME, Component.CreateAccess, required: true)
         {
             //==== INIT CONFIGURATION ====
             componentName = this.AddAttribute("Name", required: true, value: value);
             sliceAccessModifier = this.AddAttribute("SliceAccessModifier");
+            simpleAccessModifier = this.AddAttribute("SliceAccessModifier");
             accessModifier = this.AddAttribute("AccessModifier");
             //==== INIT CONFIGURATION ====
         }
@@ -223,6 +225,17 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace
         public Component SetSliceAccessModifier(string sliceAccessModifier)
         {
             this.sliceAccessModifier.SetValue(sliceAccessModifier);
+            return this;
+        }
+
+        public string GetSimpleAccessModifier()
+        {
+            return simpleAccessModifier.GetValue();
+        }
+
+        public Component SetSimpleAccessModifier(string simpleAccessModifier)
+        {
+            this.simpleAccessModifier.SetValue(simpleAccessModifier);
             return this;
         }
 

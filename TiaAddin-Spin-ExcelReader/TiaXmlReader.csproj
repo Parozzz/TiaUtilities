@@ -204,6 +204,7 @@
     <Compile Include="SimaticML\Blocks\CompileUnit.cs" />
     <Compile Include="SimaticML\Blocks\BlockFC.cs" />
     <Compile Include="SimaticML\Blocks\FlagNet\nAccess\IAccessData.cs" />
+    <Compile Include="SimaticML\Blocks\FlagNet\nCall\Call.cs" />
     <Compile Include="SimaticML\Blocks\FlagNet\nPart\Instance.cs" />
     <Compile Include="SimaticML\Blocks\FlagNet\nPart\IPartData.cs" />
     <Compile Include="SimaticML\Blocks\FlagNet\nPart\Part.cs" />
@@ -211,6 +212,7 @@
     <Compile Include="SimaticML\BlockAttributeList\Section.cs" />
     <Compile Include="Generation\UserAlarms\UserData.cs" />
     <Compile Include="Generation\GenerationPlaceholders.cs" />
+    <Compile Include="SimaticML\Enums\SimaticBlockType.cs" />
     <Compile Include="SimaticML\Enums\SimaticVariableScope.cs" />
     <Compile Include="SimaticML\IGlobalObject.cs" />
     <Compile Include="SimaticML\LanguageText\MultiLanguageText.cs" />

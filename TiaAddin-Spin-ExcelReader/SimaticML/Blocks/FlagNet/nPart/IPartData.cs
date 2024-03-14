@@ -77,7 +77,6 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
                   .AddIdentCon(accessData.GetAccess(), part.GetLocalObjectData().GetUId(), "operand");
         }
     }
-
     public class ContactPartData : SimpleIdenfiablePartData
     {
         public ContactPartData(CompileUnit compileUnit) : base(compileUnit, PartType.CONTACT) { }
@@ -88,7 +87,6 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
             return this;
         }
     }
-
     public class CoilPartData : SimpleIdenfiablePartData
     {
         public CoilPartData(CompileUnit compileUnit) : base(compileUnit, PartType.COIL) { }
@@ -99,12 +97,10 @@ namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
             return this;
         }
     }
-
     public class SetCoilPartData : SimpleIdenfiablePartData
     {
         public SetCoilPartData(CompileUnit compileUnit) : base(compileUnit, PartType.SET_COIL) { }
     }
-
     public class ResetCoilPartData : SimpleIdenfiablePartData
     {
         public ResetCoilPartData(CompileUnit compileUnit) : base(compileUnit, PartType.RESET_COIL) { }

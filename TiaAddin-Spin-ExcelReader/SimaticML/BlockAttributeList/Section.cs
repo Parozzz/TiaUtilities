@@ -18,6 +18,7 @@ namespace SpinXmlReader.Block
         TEMP,
         CONSTANT,
         RETURN,
+        BASE, //???. Maybe inside TechnologyObjects???
         NONE //Used inside member to define start value in case of an array of UDT, or inside an UDT directly.1
     }
 
@@ -34,6 +35,7 @@ namespace SpinXmlReader.Block
                 case SectionTypeEnum.TEMP: return "Temp";
                 case SectionTypeEnum.CONSTANT: return "Constant";
                 case SectionTypeEnum.RETURN: return "Return";
+                case SectionTypeEnum.BASE: return "Base";
                 case SectionTypeEnum.NONE: return "None";
                 default:
                     return null;
@@ -157,6 +159,7 @@ namespace SpinXmlReader.Block
             private readonly XmlAttributeConfiguration dataType;
             private readonly XmlAttributeConfiguration version;
             private readonly XmlAttributeConfiguration remanence;
+            private readonly XmlAttributeConfiguration informative;
 
             private readonly XmlNodeConfiguration subElement;           //Not implemented yet
             private readonly XmlAttributeConfiguration subElementPath;  //Not implemented yet
@@ -176,6 +179,7 @@ namespace SpinXmlReader.Block
                 dataType = this.AddAttribute("Datatype", required: true, value: "Bool");
                 version = this.AddAttribute("Version");
                 remanence = this.AddAttribute("Remanence");
+                informative = this.AddAttribute("Informative");
 
                 subElement = this.AddNode("Subelement");
                 subElementPath = subElement.AddAttribute("Path", required: true);

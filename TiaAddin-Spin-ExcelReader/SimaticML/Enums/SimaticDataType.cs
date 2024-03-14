@@ -9,7 +9,7 @@ namespace TiaXmlReader.SimaticML
 {
     public enum SimaticDataType
     {
-        VOID,
+        VOID = 0, //Default
         BOOLEAN,
         BYTE,
         USINT,
@@ -22,6 +22,7 @@ namespace TiaXmlReader.SimaticML
         TIMER,
         COUNTER,
         STRUCTURE,
+        VARIANT,
     }
 
     public static class DataTypeExtension
@@ -43,6 +44,7 @@ namespace TiaXmlReader.SimaticML
                 case SimaticDataType.TIMER: return "Timer";
                 case SimaticDataType.COUNTER: return "Counter";
                 case SimaticDataType.STRUCTURE: return "Struct";
+                case SimaticDataType.VARIANT: return "Any";
                 default:
                     throw new Exception("SimaticML string not set for DataType " + dataType.ToString());
             }
@@ -65,6 +67,7 @@ namespace TiaXmlReader.SimaticML
                 case SimaticDataType.TIMER: return 0;
                 case SimaticDataType.COUNTER: return 0;
                 case SimaticDataType.STRUCTURE: return 0;
+                case SimaticDataType.VARIANT: return 0;
                 default:
                     throw new Exception("SimaticML string not set for DataType " + dataType.ToString());
             }
