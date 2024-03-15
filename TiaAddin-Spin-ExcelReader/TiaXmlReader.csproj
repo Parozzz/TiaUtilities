@@ -184,7 +184,7 @@
     <Compile Include="Generation\IO\IOXmlGenerator.cs" />
     <Compile Include="Generation\IO_Cad\GenerationIO_CAD.cs" />
     <Compile Include="Generation\UserAlarms\AlarmData.cs" />
-    <Compile Include="Attributes\Attribute.cs" />
+    <Compile Include="SimaticML\Attributes\Attribute.cs" />
     <Compile Include="Generation\IO_Cad\CadData.cs" />
     <Compile Include="Generation\UserAlarms\GenerationUserAlarms.cs" />
     <Compile Include="Generation\IGeneration.cs" />
@@ -195,7 +195,8 @@
       <DependentUpon>IOGenerationForm.cs</DependentUpon>
     </Compile>
     <Compile Include="SaveData.cs" />
-    <Compile Include="SimaticML\BlockAttributeList\BlockAttributeList.cs" />
+    <Compile Include="SimaticML\nBlockAttributeList\BlockAttributeList.cs" />
+    <Compile Include="SimaticML\nBlockAttributeList\Member.cs" />
     <Compile Include="SimaticML\Blocks\BlockFB.cs" />
     <Compile Include="SimaticML\Blocks\BlockInstanceDB.cs" />
     <Compile Include="SimaticML\Blocks\BlockUDT.cs" />
@@ -205,17 +206,17 @@
     <Compile Include="SimaticML\Blocks\BlockFC.cs" />
     <Compile Include="SimaticML\Blocks\FlagNet\nAccess\IAccessData.cs" />
     <Compile Include="SimaticML\Blocks\FlagNet\nCall\Call.cs" />
-    <Compile Include="SimaticML\Blocks\FlagNet\nPart\Instance.cs" />
+    <Compile Include="SimaticML\Blocks\FlagNet\nCall\Instance.cs" />
     <Compile Include="SimaticML\Blocks\FlagNet\nPart\IPartData.cs" />
     <Compile Include="SimaticML\Blocks\FlagNet\nPart\Part.cs" />
     <Compile Include="SimaticML\Blocks\FlagNet\Wire.cs" />
-    <Compile Include="SimaticML\BlockAttributeList\Section.cs" />
+    <Compile Include="SimaticML\nBlockAttributeList\Section.cs" />
     <Compile Include="Generation\UserAlarms\UserData.cs" />
     <Compile Include="Generation\GenerationPlaceholders.cs" />
     <Compile Include="SimaticML\Enums\SimaticBlockType.cs" />
     <Compile Include="SimaticML\Enums\SimaticVariableScope.cs" />
     <Compile Include="SimaticML\IGlobalObject.cs" />
-    <Compile Include="SimaticML\LanguageText\MultiLanguageText.cs" />
+    <Compile Include="SimaticML\LanguageText\Comment.cs" />
     <Compile Include="SimaticML\Enums\SimaticDataType.cs" />
     <Compile Include="SimaticML\Blocks\BlockGlobalDB.cs" />
     <Compile Include="SimaticML\Enums\SimaticMemoryArea.cs" />

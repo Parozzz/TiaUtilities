@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Xml;
 using TiaXmlReader.SimaticML;
+using TiaXmlReader.SimaticML.nBlockAttributeList;
 using TiaXmlReader.Utility;
 
 namespace SpinXmlReader.Block

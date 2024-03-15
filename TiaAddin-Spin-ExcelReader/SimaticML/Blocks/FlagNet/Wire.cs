@@ -147,6 +147,8 @@ namespace SpinXmlReader.Block
                     return new OpenCon();
                 case NameCon.NODE_NAME:
                     return new NameCon();
+                case Openbranch.NODE_NAME:
+                    return new Openbranch();
                 default:
                     throw new System.Exception("Cannot find Wire Connection with name " + node.Name);
             }
@@ -188,6 +190,13 @@ namespace SpinXmlReader.Block
     {
         public const string NODE_NAME = "OpenCon";
         public OpenCon() : base(NODE_NAME)  { }
+
+    }
+
+    public class Openbranch : Con
+    {
+        public const string NODE_NAME = "Openbranch";
+        public Openbranch() : base(NODE_NAME) { }
 
     }
 

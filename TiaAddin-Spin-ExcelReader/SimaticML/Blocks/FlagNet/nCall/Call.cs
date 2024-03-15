@@ -1,4 +1,5 @@
-﻿using SpinXmlReader.Block;
+﻿using SpinXmlReader;
+using SpinXmlReader.Block;
 using SpinXmlReader.SimaticML;
 using System;
 using System.Collections.Generic;
@@ -55,15 +56,7 @@ namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nCall
 
         public SimaticBlockType GetBlockType()
         {
-            foreach(SimaticBlockType blockType in Enum.GetValues(typeof(SimaticBlockType)))
-            {
-                if(this.blockType.GetValue() == blockType.GetSimaticMLString())
-                {
-                    return blockType;
-                }
-            }
-
-            return default;
+            return Utils.FindEnumByStringMethod<SimaticBlockType>(this.blockType.GetValue(), SimaticBlockTypeExtension.GetSimaticMLString);
         }
     }
 }

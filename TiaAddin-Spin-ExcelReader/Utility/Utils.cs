@@ -39,6 +39,21 @@ namespace SpinXmlReader
         {
             str = string.IsNullOrEmpty(str) ? or : str;
         }
+
+        public static T FindEnumByStringMethod<T>(string toMatchStr, Func<T, string> stringFunc) where T : Enum
+        {
+            foreach(T loopEnumValue in Enum.GetValues(typeof(T)))
+            {
+                var str = stringFunc.Invoke(loopEnumValue);
+                if(str == toMatchStr)
+                {
+                    return loopEnumValue;
+                }
+            }
+
+            return default;
+        }
+
     }
 
     public static class Validate

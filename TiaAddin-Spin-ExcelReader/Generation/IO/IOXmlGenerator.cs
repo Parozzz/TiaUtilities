@@ -1,5 +1,4 @@
-﻿using ClosedXML.Excel;
-using SpinXmlReader.Block;
+﻿using SpinXmlReader.Block;
 using SpinXmlReader.TagTable;
 using SpinXmlReader;
 using System;
@@ -8,9 +7,8 @@ using System.Linq;
 using TiaXmlReader.SimaticML;
 using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace;
 using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace;
-using static SpinXmlReader.Block.Section;
 using SpinXmlReader.SimaticML;
-using TiaXmlReader.Generation.IO_Cad;
+using TiaXmlReader.SimaticML.nBlockAttributeList;
 
 namespace TiaXmlReader.Generation.IO
 {
@@ -130,7 +128,7 @@ namespace TiaXmlReader.Generation.IO
                             var fullMemberAddress = FixDuplicateAddress(memberAddressPrefix + ioData.VariableName, variableAddressDict);
                             inOutAddress = db.GetAttributes().ComputeSection(SectionTypeEnum.STATIC)
                                     .AddMembersFromAddress(fullMemberAddress, SimaticDataType.BOOLEAN)
-                                    .SetComment(Constants.DEFAULT_CULTURE, ioData.Comment)
+                                    .SetCommentText(Constants.DEFAULT_CULTURE, ioData.Comment)
                                     .GetCompleteSymbol();
                             break;
                     }

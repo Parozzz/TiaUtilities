@@ -8,8 +8,8 @@ using System.Linq;
 using TiaXmlReader.SimaticML;
 using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace;
 using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace;
-using static SpinXmlReader.Block.Section;
 using SpinXmlReader.SimaticML;
+using TiaXmlReader.SimaticML.nBlockAttributeList;
 
 namespace TiaXmlReader.Generation.IO_Cad
 {
@@ -244,7 +244,7 @@ namespace TiaXmlReader.Generation.IO_Cad
                             var fullMemberAddress = FixDuplicateAddress(memberAddressPrefix + cadData.VariableName, variableAddressDict);
                             inOutAddress = db.GetAttributes().ComputeSection(SectionTypeEnum.STATIC)
                                     .AddMembersFromAddress(fullMemberAddress, SimaticDataType.BOOLEAN)
-                                    .SetComment(Constants.DEFAULT_CULTURE, cadData.VariableComment)
+                                    .SetCommentText(Constants.DEFAULT_CULTURE, cadData.VariableComment)
                                     .GetCompleteSymbol();
                             break;
                     }
