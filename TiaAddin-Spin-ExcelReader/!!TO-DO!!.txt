@@ -1,0 +1,6 @@
+1) Aggiungere se avere prima la bobina o il set.
+2) Aggiungere la possibilità di avere x allarmi vuoti (Con un FALSE su un contatto)
+3) Anti Slittamento sbaglia il primo.
+4) Aggiungere locale da selezione per generazione allarmi
+5) Aggiungere un sistema per esportare testi allarmi generati su un file .txt in modo da copia-incollare velocemente!
+6) Per l'antislittamento, invece di salta generare i blocchi con un FALSE come contatto.

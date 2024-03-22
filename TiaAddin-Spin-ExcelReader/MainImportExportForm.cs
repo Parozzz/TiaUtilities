@@ -40,9 +40,14 @@ namespace SpinXmlReader
             var fileDialog = new OpenFileDialog
             {
                 Filter = "Excel Files (*.xlsx)|*.xlsx",
-                CheckFileExists = true,
-                InitialDirectory = Path.GetDirectoryName(saveData.lastExcelFileName)
+                CheckFileExists = true
             };
+
+            try
+            {
+                fileDialog.InitialDirectory = string.IsNullOrEmpty(saveData.lastExcelFileName) ? "" : Path.GetDirectoryName(saveData.lastExcelFileName);
+            }
+            catch  {  }
 
             var result = fileDialog.ShowDialog();
             if (result == DialogResult.OK || result == DialogResult.Yes)
