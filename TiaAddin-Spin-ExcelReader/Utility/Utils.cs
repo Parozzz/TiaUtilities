@@ -54,6 +54,17 @@ namespace SpinXmlReader
             return default;
         }
 
+        public static int Mod(int n, int m)
+        {
+            return ((n % m) + m) % m;
+        }
+
+        public static uint UMod(uint n, uint m)
+        {
+            return (uint) Math.Abs( ((n % m) + m) % m );
+        }
+
+
     }
 
     public static class Validate

@@ -4,6 +4,8 @@ using SpinXmlReader.Block;
 using SpinXmlReader.SimaticML;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Windows.Forms;
 using TiaXmlReader.AlarmGeneration;
 using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace;
 using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace;
@@ -11,10 +13,24 @@ using TiaXmlReader.SimaticML.Enums;
 
 namespace TiaXmlReader.Generation
 {
+
+    public enum GroupingTypeEnum
+    {
+        ByUser,
+        ByAlarmType
+    }
+
+    public enum DivisionTypeEnum
+    {
+        OnePerSegment,
+        GroupPerSegment
+    }
+
     public class GenerationUserAlarms : IGeneration
     {
         private string fcBlockName;
         private uint fcBlockNumber;
+        private bool coilFirst;
 
         private string groupingType;
         private string divisionType;
@@ -23,7 +39,10 @@ namespace TiaXmlReader.Generation
         private string alarmNumFormat;
         private uint antiSlipNumber;
         private uint skipNumberAfterGroup;
-
+        private bool generateEmptyAlarmAntiSlip;
+        private uint emptyAlarmAtEnd;
+        private string emptyAlarmContactAddress;
+        
         private string defaultCoilAddress;
         private string defaultSetCoilAddress;
         private string defaultTimerAddress;
@@ -36,13 +55,16 @@ namespace TiaXmlReader.Generation
         private string timerAddressPrefix;
 
         private string oneEachSegmentName;
-        private string perUserSegmentName;
+        private string oneEachEmptyAlarmSegmentName;
+        private string groupSegmentName;
+        private string groupEmptyAlarmSegmentName;
 
         private readonly List<AlarmData> alarmDataList;
         private readonly List<UserData> userDataList;
 
         private BlockFC fc;
         private CompileUnit compileUnit;
+        private string fullAlarmList;
 
         public GenerationUserAlarms()
         {
@@ -54,28 +76,34 @@ namespace TiaXmlReader.Generation
         {
             fcBlockName = worksheet.Cell("C5").Value.ToString();
             fcBlockNumber = (uint)worksheet.Cell("C6").Value.GetNumber();
+            coilFirst = worksheet.Cell("C7").Value.ToString().ToLower() == "true";
 
-            groupingType = worksheet.Cell("C8").Value.ToString();
-            divisionType = worksheet.Cell("C9").Value.ToString();
+            groupingType = worksheet.Cell("C9").Value.ToString();
+            divisionType = worksheet.Cell("C10").Value.ToString();
 
-            startingAlarmNum = (uint)worksheet.Cell("C12").Value.GetNumber();
-            alarmNumFormat = worksheet.Cell("C13").Value.ToString();
-            antiSlipNumber = (uint)worksheet.Cell("C14").Value.GetNumber();
-            skipNumberAfterGroup = (uint)worksheet.Cell("C15").Value.GetNumber();
+            startingAlarmNum = (uint)worksheet.Cell("C13").Value.GetNumber();
+            alarmNumFormat = worksheet.Cell("C14").Value.ToString();
+            antiSlipNumber = (uint)worksheet.Cell("C15").Value.GetNumber();
+            skipNumberAfterGroup = (uint)worksheet.Cell("C16").Value.GetNumber();
+            generateEmptyAlarmAntiSlip = worksheet.Cell("C17").Value.ToString().ToLower() == "true";
+            emptyAlarmAtEnd = (uint)worksheet.Cell("C18").Value.GetNumber();
+            emptyAlarmContactAddress = worksheet.Cell("C19").Value.ToString();
 
-            defaultCoilAddress = worksheet.Cell("C18").Value.ToString();
-            defaultSetCoilAddress = worksheet.Cell("C19").Value.ToString();
-            defaultTimerAddress = worksheet.Cell("C20").Value.ToString();
-            defaultTimerType = worksheet.Cell("C21").Value.ToString();
-            defaultTimerValue = worksheet.Cell("C22").Value.ToString();
+            defaultCoilAddress = worksheet.Cell("C22").Value.ToString();
+            defaultSetCoilAddress = worksheet.Cell("C23").Value.ToString();
+            defaultTimerAddress = worksheet.Cell("C24").Value.ToString();
+            defaultTimerType = worksheet.Cell("C25").Value.ToString();
+            defaultTimerValue = worksheet.Cell("C26").Value.ToString();
 
-            alarmAddressPrefix = worksheet.Cell("C25").Value.ToString();
-            coilAddressPrefix = worksheet.Cell("C26").Value.ToString();
-            setCoilAddressPrefix = worksheet.Cell("C27").Value.ToString();
-            timerAddressPrefix = worksheet.Cell("C28").Value.ToString();
+            alarmAddressPrefix = worksheet.Cell("C29").Value.ToString();
+            coilAddressPrefix = worksheet.Cell("C30").Value.ToString();
+            setCoilAddressPrefix = worksheet.Cell("C31").Value.ToString();
+            timerAddressPrefix = worksheet.Cell("C32").Value.ToString();
 
-            oneEachSegmentName = worksheet.Cell("C31").Value.ToString();
-            perUserSegmentName = worksheet.Cell("C32").Value.ToString();
+            oneEachSegmentName = worksheet.Cell("C35").Value.ToString();
+            oneEachEmptyAlarmSegmentName = worksheet.Cell("C36").Value.ToString();
+            groupSegmentName = worksheet.Cell("C37").Value.ToString();
+            groupEmptyAlarmSegmentName = worksheet.Cell("C38").Value.ToString();
 
             alarmDataList.Clear();
 
@@ -106,7 +134,7 @@ namespace TiaXmlReader.Generation
                     TimerType = timerType.ToString(),
                     TimerValue = timerValue.ToString(),
                     Description = description.ToString(),
-                    Enable = bool.TryParse(enable.ToString(), out bool enableResult) ? enableResult : false,
+                    Enable = bool.TryParse(enable.ToString(), out bool enableResult) && enableResult,
                 };
                 alarmDataList.Add(alarmData);
             }
@@ -140,13 +168,44 @@ namespace TiaXmlReader.Generation
             fc.Init();
             fc.GetBlockAttributes().SetBlockName(fcBlockName).SetBlockNumber(fcBlockNumber).SetAutoNumber(fcBlockNumber > 0);
 
-            var nextAlarmNum = startingAlarmNum;
+            fullAlarmList = "";
+
+            GroupingTypeEnum groupingTypeEnum;
             switch (groupingType)
             {
                 case "PerUtenza":
+                    groupingTypeEnum = GroupingTypeEnum.ByUser;
+                    break;
+                case "PerTipoAllarme":
+                    groupingTypeEnum = GroupingTypeEnum.ByAlarmType;
+                    break;
+                default:
+                    MessageBox.Show("Tipo raggruppamento errato. Usati valori predefiniti.", "Errore dati");
+                    return;
+            }
+
+            DivisionTypeEnum divisionTypeEnum;
+            switch (divisionType)
+            {
+                case "UnoPerSegmento":
+                    divisionTypeEnum = DivisionTypeEnum.OnePerSegment;
+                    break;
+                case "GruppoPerSegmento":
+                    divisionTypeEnum = DivisionTypeEnum.GroupPerSegment;
+                    break;
+                default:
+                    MessageBox.Show("Tipo divisione errato. Usati valori predefiniti.", "Errore dati");
+                    return;
+            }
+
+
+            var nextAlarmNum = startingAlarmNum;
+            switch (groupingTypeEnum)
+            {
+                case GroupingTypeEnum.ByUser:
                     foreach (var consumerData in userDataList)
                     {
-                        if (divisionType == "GruppoPerSegmento")
+                        if (divisionTypeEnum == DivisionTypeEnum.GroupPerSegment)
                         {
                             compileUnit = fc.AddCompileUnit();
                             compileUnit.Init();
@@ -167,8 +226,9 @@ namespace TiaXmlReader.Generation
                             placeholders.SetConsumerData(consumerData)
                                 .SetAlarmData(parsedAlarmData)
                                 .SetAlarmNum(nextAlarmNum++, alarmNumFormat);
+                            fullAlarmList += placeholders.Parse(GenerationPlaceholders.ALARM_DESCRIPTION) + '\n';
 
-                            if (divisionType == "UnoPerSegmento")
+                            if (divisionTypeEnum == DivisionTypeEnum.OnePerSegment)
                             {
                                 compileUnit = fc.AddCompileUnit();
                                 compileUnit.Init();
@@ -178,21 +238,31 @@ namespace TiaXmlReader.Generation
                             FillAlarmCompileUnit(compileUnit, placeholders, parsedAlarmData);
                         }
 
-                        if (divisionType == "GruppoPerSegmento")
+                        var lastAlarmNum = nextAlarmNum - 1;
+                        var alarmCount = (lastAlarmNum - startAlarmNum) + 1;
+
+                        var slippingAlarmCount = antiSlipNumber % alarmCount;
+                        if (antiSlipNumber > 0 && slippingAlarmCount > 0)
                         {
-                            placeholders.SetStartEndAlarmNum(startAlarmNum, nextAlarmNum - 1, alarmNumFormat);
-                            compileUnit.ComputeBlockTitle().SetText(Constants.DEFAULT_CULTURE, placeholders.Parse(perUserSegmentName));
+                            nextAlarmNum += slippingAlarmCount;
+
+                            if (generateEmptyAlarmAntiSlip)
+                            {
+                                GenerateEmptyAlarms(divisionTypeEnum, groupingTypeEnum, lastAlarmNum + 1, slippingAlarmCount, compileUnit); //CompileUnit only used for group division
+                                lastAlarmNum += slippingAlarmCount;
+                            }
                         }
 
-                        if (antiSlipNumber > 0 && nextAlarmNum % antiSlipNumber != 0)
+                        if (divisionTypeEnum == DivisionTypeEnum.GroupPerSegment)
                         {
-                            nextAlarmNum = (nextAlarmNum / antiSlipNumber) * antiSlipNumber + antiSlipNumber;
+                            placeholders.SetStartEndAlarmNum(startAlarmNum, lastAlarmNum, alarmNumFormat);
+                            compileUnit.ComputeBlockTitle().SetText(Constants.DEFAULT_CULTURE, placeholders.Parse(groupSegmentName));
                         }
 
                         nextAlarmNum += skipNumberAfterGroup;
                     }
                     break;
-                case "PerTipoAllarme":
+                case GroupingTypeEnum.ByAlarmType:
                     foreach (var alarmData in alarmDataList)
                     {
                         if (!alarmData.Enable)
@@ -202,7 +272,7 @@ namespace TiaXmlReader.Generation
 
                         var parsedAlarmData = ReplaceAlarmDataWithDefaultAndPrefix(alarmData);
 
-                        if (divisionType == "GruppoPerSegmento")
+                        if (divisionTypeEnum == DivisionTypeEnum.GroupPerSegment)
                         {
                             compileUnit = fc.AddCompileUnit();
                             compileUnit.Init();
@@ -216,8 +286,9 @@ namespace TiaXmlReader.Generation
                             placeholders.SetConsumerData(consumerData)
                                     .SetAlarmData(parsedAlarmData)
                                     .SetAlarmNum(nextAlarmNum++, alarmNumFormat);
+                            fullAlarmList += placeholders.Parse(GenerationPlaceholders.ALARM_DESCRIPTION) + '\n';
 
-                            if (divisionType == "UnoPerSegmento")
+                            if (divisionTypeEnum == DivisionTypeEnum.OnePerSegment)
                             {
                                 compileUnit = fc.AddCompileUnit();
                                 compileUnit.Init();
@@ -227,20 +298,75 @@ namespace TiaXmlReader.Generation
                             FillAlarmCompileUnit(compileUnit, placeholders, parsedAlarmData);
                         }
 
-                        if (divisionType == "GruppoPerSegmento")
+                        var lastAlarmNum = nextAlarmNum - 1;
+                        var alarmCount = (lastAlarmNum - startAlarmNum) + 1;
+
+                        var slippingAlarmCount = antiSlipNumber % alarmCount;
+                        if (antiSlipNumber > 0 && slippingAlarmCount > 0)
                         {
-                            placeholders.SetStartEndAlarmNum(startAlarmNum, nextAlarmNum - 1, alarmNumFormat);
-                            compileUnit.ComputeBlockTitle().SetText(Constants.DEFAULT_CULTURE, placeholders.Parse(perUserSegmentName));
+                            nextAlarmNum += slippingAlarmCount;
+
+                            if (generateEmptyAlarmAntiSlip)
+                            {
+                                GenerateEmptyAlarms(divisionTypeEnum, groupingTypeEnum, lastAlarmNum + 1, slippingAlarmCount, compileUnit); //CompileUnit only used for group division
+                                lastAlarmNum += slippingAlarmCount;
+                            }
                         }
 
-                        if (antiSlipNumber > 0 && nextAlarmNum % antiSlipNumber != 0)
+                        if (divisionTypeEnum == DivisionTypeEnum.GroupPerSegment)
                         {
-                            nextAlarmNum = (nextAlarmNum / antiSlipNumber) * antiSlipNumber + antiSlipNumber;
+                            placeholders.SetStartEndAlarmNum(startAlarmNum, lastAlarmNum, alarmNumFormat);
+                            compileUnit.ComputeBlockTitle().SetText(Constants.DEFAULT_CULTURE, placeholders.Parse(groupSegmentName));
                         }
 
                         nextAlarmNum += skipNumberAfterGroup;
                     }
                     break;
+            }
+
+            GenerateEmptyAlarms(divisionTypeEnum, groupingTypeEnum, nextAlarmNum, emptyAlarmAtEnd);
+        }
+
+        private void GenerateEmptyAlarms(DivisionTypeEnum divisionType, GroupingTypeEnum groupingType, uint startAlarmNum, uint alarmCount, CompileUnit externalGroupCompileUnit = null)
+        {
+            var emptyAlarmData = new AlarmData()
+            {
+                AlarmAddress = emptyAlarmContactAddress,
+                CoilAddress = defaultCoilAddress,
+                SetCoilAddress = defaultSetCoilAddress,
+                TimerAddress = defaultTimerAddress,
+                TimerType = defaultTimerType,
+                TimerValue = defaultTimerValue,
+                Description = "",
+                Enable = true
+            };
+
+            var alarmNum = startAlarmNum;
+
+            CompileUnit compileUnit = externalGroupCompileUnit;
+            if (compileUnit == null && divisionType == DivisionTypeEnum.GroupPerSegment)
+            {
+                var placeholders = new GenerationPlaceholders()
+                    .SetAlarmData(emptyAlarmData)
+                    .SetStartEndAlarmNum(alarmNum, alarmNum + (alarmCount - 1), alarmNumFormat);
+
+                compileUnit = fc.AddCompileUnit();
+                compileUnit.Init();
+                compileUnit.ComputeBlockTitle().SetText(Constants.DEFAULT_CULTURE, placeholders.Parse(groupEmptyAlarmSegmentName));
+            }
+
+            for (int j = 0; j < alarmCount; j++)
+            {
+                var placeholders = new GenerationPlaceholders().SetAlarmData(emptyAlarmData).SetAlarmNum(alarmNum++, alarmNumFormat);
+
+                if (divisionType == DivisionTypeEnum.OnePerSegment)
+                {
+                    compileUnit = fc.AddCompileUnit();
+                    compileUnit.Init();
+                    compileUnit.ComputeBlockTitle().SetText(Constants.DEFAULT_CULTURE, placeholders.Parse(oneEachEmptyAlarmSegmentName));
+                }
+
+                FillAlarmCompileUnit(compileUnit, placeholders, emptyAlarmData);
             }
         }
 
@@ -262,13 +388,33 @@ namespace TiaXmlReader.Generation
 
         private void FillAlarmCompileUnit(CompileUnit compileUnit, GenerationPlaceholders placeholders, AlarmData alarmData)
         {
-            var contact = new ContactPartData(compileUnit);
-
             var parsedContactAddress = placeholders.Parse(alarmData.AlarmAddress);
-            contact.CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, parsedContactAddress));
+
+            IAccessData contactAccessData;
+            switch (parsedContactAddress.ToLower())
+            {
+                case "false":
+                    contactAccessData = LiteralConstantAccessData.Create(compileUnit, SimaticML.SimaticDataType.BOOLEAN, "FALSE");
+                    break;
+                case "0":
+                    contactAccessData = LiteralConstantAccessData.Create(compileUnit, SimaticML.SimaticDataType.BOOLEAN, "0");
+                    break;
+                case "true":
+                    contactAccessData = LiteralConstantAccessData.Create(compileUnit, SimaticML.SimaticDataType.BOOLEAN, "TRUE");
+                    break;
+                case "1":
+                    contactAccessData = LiteralConstantAccessData.Create(compileUnit, SimaticML.SimaticDataType.BOOLEAN, "1");
+                    break;
+                default:
+                    contactAccessData = GlobalVariableAccessData.Create(compileUnit, parsedContactAddress);
+                    break;
+            }
+
+            var contact = new ContactPartData(compileUnit);
+            contact.CreateIdentWire(contactAccessData);
             contact.CreatePowerrailConnection();
 
-            IPartData nextPartData = contact;
+            IPartData timer = null;
             if (!string.IsNullOrEmpty(alarmData.TimerAddress) && alarmData.TimerAddress.ToLower() != "\\")
             {
                 PartType partType;
@@ -284,29 +430,50 @@ namespace TiaXmlReader.Generation
                         throw new Exception("Unknow timer type of " + alarmData.TimerType);
                 }
 
-                var timer = new TimerPartData(compileUnit, partType);
-                timer.SetPartInstance(SimaticVariableScope.GLOBAL_VARIABLE, placeholders.Parse(alarmData.TimerAddress))
+                timer = new TimerPartData(compileUnit, partType);
+                ((TimerPartData)timer)
+                    .SetPartInstance(SimaticVariableScope.GLOBAL_VARIABLE, placeholders.Parse(alarmData.TimerAddress))
                     .SetTimeValue(alarmData.TimerValue);
-
-                contact.CreateOutputConnection(nextPartData = timer);
             }
 
+            IPartData setCoil = null;
             if (alarmData.SetCoilAddress.ToLower() != "\\")
             {
-                var setCoil = new SetCoilPartData(compileUnit);
-                setCoil.CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, placeholders.Parse(alarmData.SetCoilAddress)));
-
-                nextPartData.CreateOutputConnection(nextPartData = setCoil);
+                setCoil = new SetCoilPartData(compileUnit);
+                ((SetCoilPartData)setCoil).CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, placeholders.Parse(alarmData.SetCoilAddress)));
             }
 
+            IPartData coil = null;
             if (alarmData.CoilAddress.ToLower() != "\\")
             {
-                var coil = new CoilPartData(compileUnit);
-                coil.CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, placeholders.Parse(alarmData.CoilAddress)));
-                nextPartData.CreateOutputConnection(nextPartData = coil);
+                coil = new CoilPartData(compileUnit);
+                ((CoilPartData)coil).CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, placeholders.Parse(alarmData.CoilAddress)));
             }
 
-            if (nextPartData == contact)
+            var partDataList = new List<IPartData>
+            {
+                contact,
+                timer,
+                coilFirst ? coil : setCoil,
+                coilFirst ? setCoil : coil
+            };
+
+            IPartData previousPartData = null;
+            foreach (var partData in partDataList)
+            {
+                if (previousPartData == null)
+                {
+                    previousPartData = partData;
+                    continue;
+                }
+
+                if (partData != null)
+                {
+                    previousPartData.CreateOutputConnection(previousPartData = partData);
+                }
+            }
+
+            if (previousPartData == contact)
             {
                 contact.CreateOpenCon();
             }
@@ -327,6 +494,12 @@ namespace TiaXmlReader.Generation
             var xmlDocument = SimaticMLParser.CreateDocument();
             xmlDocument.DocumentElement.AppendChild(fc.Generate(xmlDocument, new IDGenerator()));
             xmlDocument.Save(exportPath + "/fcExport_" + fc.GetBlockAttributes().GetBlockName() + ".xml");
+
+            var alarmTextPath = exportPath + "/alarmsText.txt";
+            using (var stream = File.CreateText(alarmTextPath))
+            {
+                stream.Write(fullAlarmList);
+            }
         }
 
     }

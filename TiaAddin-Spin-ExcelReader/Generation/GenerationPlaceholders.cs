@@ -1,7 +1,9 @@
-﻿using SpinXmlReader.Block;
+﻿using DocumentFormat.OpenXml.Bibliography;
+using SpinXmlReader.Block;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -50,6 +52,13 @@ namespace TiaXmlReader.Generation
 
     public class GenerationPlaceholders
     {
+        public const string USER_NAME = "{user_name}";
+        public const string USER_DESCRIPTION = "{user_description}";
+        public const string ALARM_DESCRIPTION = "{alarm_description}";
+        public const string ALARM_NUM = "{alarm_num}";
+        public const string ALARM_NUM_START = "{alarm_num_start}";
+        public const string ALARM_NUM_END = "{alarm_num_end}";
+
         Dictionary<string, IGenerationPlaceholderData> generationPlaceholdersDict;
         public GenerationPlaceholders()
         {
@@ -58,33 +67,21 @@ namespace TiaXmlReader.Generation
 
         public GenerationPlaceholders SetConsumerData(UserData consumerData)
         {
-            AddOrReplace("{user_name}", new StringGenerationPlaceholderData()
-            {
-                Value = consumerData.Name
-            });
-
-            AddOrReplace("{user_description}", new StringGenerationPlaceholderData()
-            {
-                Value = consumerData.Description
-            });
-
+            AddOrReplace(USER_NAME, new StringGenerationPlaceholderData() { Value = consumerData.Name });
+            AddOrReplace(USER_DESCRIPTION, new StringGenerationPlaceholderData() { Value = consumerData.Description });
             return this;
         }
 
         public GenerationPlaceholders SetAlarmData(AlarmData alarmData)
         {
-            AddOrReplace("{alarm_description}", new StringGenerationPlaceholderData()
-            {
-                Value = alarmData.Description
-            });
-
+            AddOrReplace(ALARM_DESCRIPTION, new StringGenerationPlaceholderData() { Value = alarmData.Description });
             return this;
         }
 
 
         public GenerationPlaceholders SetAlarmNum(uint alarmNum, string alarmNumFormat)
         {
-            return AddOrReplace("{alarm_num}", new UIntGenerationPlaceholderData()
+            return AddOrReplace(ALARM_NUM, new UIntGenerationPlaceholderData()
             {
                 Value = alarmNum,
                 Function = (value) => value.ToString(alarmNumFormat)
@@ -93,13 +90,13 @@ namespace TiaXmlReader.Generation
 
         public GenerationPlaceholders SetStartEndAlarmNum(uint startAlarmNum, uint endAlarmNum, string alarmNumFormat)
         {
-            AddOrReplace("{alarm_num_start}", new UIntGenerationPlaceholderData()
+            AddOrReplace(ALARM_NUM_START, new UIntGenerationPlaceholderData()
             {
                 Value = startAlarmNum,
                 Function = (value) => value.ToString(alarmNumFormat)
             });
 
-            return AddOrReplace("{alarm_num_end}", new UIntGenerationPlaceholderData()
+            return AddOrReplace(ALARM_NUM_END, new UIntGenerationPlaceholderData()
             {
                 Value = endAlarmNum,
                 Function = (value) => value.ToString(alarmNumFormat)
@@ -132,46 +129,14 @@ namespace TiaXmlReader.Generation
                 Function = (value) => "" + CadData.GetAddressByte(value)
             });
 
-            AddOrReplace("{cad_address}", new StringGenerationPlaceholderData()
-            {
-                Value = cadData.CadAddress
-            });
-
-            AddOrReplace("{io_name}", new StringGenerationPlaceholderData()
-            {
-                Value = cadData.IOName
-            });
-
-            AddOrReplace("{db_name}", new StringGenerationPlaceholderData()
-            {
-                Value = cadData.DBName
-            });
-
-            AddOrReplace("{variable_name}", new StringGenerationPlaceholderData()
-            {
-                Value = cadData.VariableName
-            });
-
-            AddOrReplace("{comment1}", new StringGenerationPlaceholderData()
-            {
-                Value = cadData.Comment1
-            });
-
-            AddOrReplace("{comment2}", new StringGenerationPlaceholderData()
-            {
-                Value = cadData.Comment2
-            });
-
-            AddOrReplace("{comment3}", new StringGenerationPlaceholderData()
-            {
-                Value = cadData.Comment3
-            });
-
-            AddOrReplace("{comment4}", new StringGenerationPlaceholderData()
-            {
-                Value = cadData.Comment4
-            });
-
+            AddOrReplace("{cad_address}", new StringGenerationPlaceholderData() { Value = cadData.CadAddress });
+            AddOrReplace("{io_name}", new StringGenerationPlaceholderData() { Value = cadData.IOName });
+            AddOrReplace("{db_name}", new StringGenerationPlaceholderData() { Value = cadData.DBName });
+            AddOrReplace("{variable_name}", new StringGenerationPlaceholderData() { Value = cadData.VariableName });
+            AddOrReplace("{comment1}", new StringGenerationPlaceholderData() { Value = cadData.Comment1 });
+            AddOrReplace("{comment2}", new StringGenerationPlaceholderData() { Value = cadData.Comment2 });
+            AddOrReplace("{comment3}", new StringGenerationPlaceholderData() { Value = cadData.Comment3 });
+            AddOrReplace("{comment4}", new StringGenerationPlaceholderData() { Value = cadData.Comment4 });
 
             string[] joinedCommentList = { cadData.Comment1, cadData.Comment2, cadData.Comment3, cadData.Comment4 };
             AddOrReplace("{joined_comments}", new StringGenerationPlaceholderData()
@@ -179,68 +144,26 @@ namespace TiaXmlReader.Generation
                 Value = string.Join(" ", joinedCommentList.Where(str => !string.IsNullOrWhiteSpace(str)).ToList())
             });
 
-            AddOrReplace("{mnemonic}", new StringGenerationPlaceholderData()
-            {
-                Value = cadData.Mnemonic
-            });
+            AddOrReplace("{mnemonic}", new StringGenerationPlaceholderData() { Value = cadData.Mnemonic });
+            AddOrReplace("{wire_num}", new StringGenerationPlaceholderData() { Value = cadData.WireNum });
+            AddOrReplace("{page}", new StringGenerationPlaceholderData() { Value = cadData.Page });
+            AddOrReplace("{panel}", new StringGenerationPlaceholderData() { Value = cadData.Panel });
 
-            AddOrReplace("{wire_num}", new StringGenerationPlaceholderData()
-            {
-                Value = cadData.WireNum
-            });
-
-            AddOrReplace("{page}", new StringGenerationPlaceholderData()
-            {
-                Value = cadData.Page
-            });
-
-            AddOrReplace("{panel}", new StringGenerationPlaceholderData()
-            {
-                Value = cadData.Panel
-            });
             return this;
         }
 
         public GenerationPlaceholders SetIOData(IOData ioData)
         {
-            AddOrReplace("{memory_type}", new StringGenerationPlaceholderData()
-            {
-                Value = ioData.GetMemoryArea().GetTIAMnemonic()
-            });
-
-            AddOrReplace("{bit}", new StringGenerationPlaceholderData()
-            {
-                Value = "" + ioData.GetAddressBit()
-            });
-
-            AddOrReplace("{byte}", new StringGenerationPlaceholderData()
-            {
-                Value = "" + ioData.GetAddressByte()
-            });
-
-            AddOrReplace("{db_name}", new StringGenerationPlaceholderData()
-            {
-                Value = ioData.DBName
-            });
-
-            AddOrReplace("{variable_name}", new StringGenerationPlaceholderData()
-            {
-                Value = ioData.VariableName
-            });
-
-            AddOrReplace("{comment}", new StringGenerationPlaceholderData()
-            {
-                Value = ioData.Comment
-            });
-            //This one for last!
-            AddOrReplace("{io_name}", new StringGenerationPlaceholderData()
-            {
-                Value = this.Parse(ioData.IOName)
-            });
-
+            AddOrReplace("{memory_type}", new StringGenerationPlaceholderData() { Value = ioData.GetMemoryArea().GetTIAMnemonic() });
+            AddOrReplace("{bit}", new StringGenerationPlaceholderData() { Value = "" + ioData.GetAddressBit() });
+            AddOrReplace("{byte}", new StringGenerationPlaceholderData() { Value = "" + ioData.GetAddressByte() });
+            AddOrReplace("{db_name}", new StringGenerationPlaceholderData() { Value = ioData.DBName });
+            AddOrReplace("{variable_name}", new StringGenerationPlaceholderData() { Value = ioData.VariableName });
+            AddOrReplace("{comment}", new StringGenerationPlaceholderData() { Value = ioData.Comment });
+            AddOrReplace("{io_name}", new StringGenerationPlaceholderData() { Value = this.Parse(ioData.IOName) }); // This one for last!
             return this;
-
         }
+
         private GenerationPlaceholders AddOrReplace(string placeholder, IGenerationPlaceholderData placeholderData)
         {
             if (generationPlaceholdersDict.Keys.Contains(placeholder))
@@ -287,7 +210,7 @@ namespace TiaXmlReader.Generation
                     continue;
                 }
 
-                if(str.Contains(placeholder))
+                if (str.Contains(placeholder))
                 {
                     anyFound = true;
                 }
