@@ -22,6 +22,9 @@ namespace SpinXmlReader
         public const string FLG_NET_NAMESPACE_V17 = "http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v4";
         public const string FLG_NET_NAMESPACE_V19 = "http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v5";
 
+        public const string STRUCTURED_TEXT_NAMESPACE_V17 = "http://www.siemens.com/automation/Openness/SW/NetworkSource/StructuredText/v3";
+        public const string STRUCTURED_TEXT_NAMESPACE_V19 = "http://www.siemens.com/automation/Openness/SW/NetworkSource/StructuredText/v4";
+
         public static string GET_SECTIONS_NAMESPACE()
         {            
             if(VERSION >= 17)

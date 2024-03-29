@@ -10,7 +10,7 @@ namespace TiaXmlReader.GenerationForms.IO
 {
     public class SortHandler
     {
-        private readonly IOGenerationForm form;
+        private readonly IOGenerationDataSource dataSource;
         private readonly DataGridView dataGridView;
         private readonly UndoRedoHandler undoRedoHandler;
 
@@ -18,9 +18,9 @@ namespace TiaXmlReader.GenerationForms.IO
         private Dictionary<IOGenerationData, int> noSortSnapshot;
 
 
-        public SortHandler(IOGenerationForm form, DataGridView dataGridView, UndoRedoHandler undoRedoHandler)
+        public SortHandler(IOGenerationDataSource dataSource, DataGridView dataGridView, UndoRedoHandler undoRedoHandler)
         {
-            this.form = form;
+            this.dataSource = dataSource;
             this.dataGridView = dataGridView;
             this.undoRedoHandler = undoRedoHandler;
         }
@@ -35,39 +35,6 @@ namespace TiaXmlReader.GenerationForms.IO
                 }
             };
         }
-
-        public void PaintCell(DataGridViewCellPaintingEventArgs args)
-        {
-            var bounds = args.CellBounds;
-            var graphics = args.Graphics;
-
-            var rowIndex = args.RowIndex;
-            var columnIndex = args.ColumnIndex;
-
-            var style = args.CellStyle;
-
-            if (rowIndex == -1)
-            {
-                if (columnIndex == 0)
-                {
-                    args.PaintBackground(bounds, false);
-
-                    TextRenderer.DrawText(graphics, string.Format("{0}", args.FormattedValue), style.Font, bounds, style.ForeColor,
-                        TextFormatFlags.VerticalCenter | TextFormatFlags.Left);
-
-                    var column = dataGridView.Columns[0];
-                    if (column.HeaderCell.SortGlyphDirection != SortOrder.None)
-                    {
-                        var sortIcon = column.HeaderCell.SortGlyphDirection == SortOrder.Ascending ? "▲" : "▼";
-                        TextRenderer.DrawText(graphics, sortIcon, style.Font, bounds, IOGenerationForm.SORT_ICON_COLOR,
-                            TextFormatFlags.VerticalCenter | TextFormatFlags.Right);
-                    }
-
-                    args.Handled = true;
-                }
-            }
-        }
-
         private void NextAddressColumnSort()
         {
             var oldSortOrder = sortOrder;
@@ -89,7 +56,7 @@ namespace TiaXmlReader.GenerationForms.IO
 
         private void AddressColumnSort(SortOrder oldSortOrder)
         {
-            var snapDict = form.CreateDataListSnapshot();
+            var snapDict = dataSource.CreateDataListSnapshot();
 
             if (sortOrder != SortOrder.None && oldSortOrder == SortOrder.None)
             {
@@ -101,13 +68,13 @@ namespace TiaXmlReader.GenerationForms.IO
             {
                 if (noSortSnapshot != null)
                 {
-                    form.RestoreDataListSnapshot(noSortSnapshot);
+                    dataSource.RestoreDataListSnapshot(noSortSnapshot);
                     noSortSnapshot = null;
                 }
             }
             else
             {
-                form.Sort(new AddressColumnComparer(sortOrder), sortOrder);
+                dataSource.Sort(new AddressColumnComparer(sortOrder), sortOrder);
             }
 
             undoRedoHandler.AddUndo(() =>
@@ -115,10 +82,44 @@ namespace TiaXmlReader.GenerationForms.IO
                 this.sortOrder = oldSortOrder;
                 dataGridView.Columns[0].HeaderCell.SortGlyphDirection = oldSortOrder;
 
-                var undoSnap = form.CreateDataListSnapshot();
-                form.RestoreDataListSnapshot(snapDict);
-                undoRedoHandler.AddRedo(() => form.RestoreDataListSnapshot(undoSnap));
+                var undoSnap = dataSource.CreateDataListSnapshot();
+                dataSource.RestoreDataListSnapshot(snapDict);
+                undoRedoHandler.AddRedo(() => dataSource.RestoreDataListSnapshot(undoSnap));
             });
+        }
+
+        public void PaintCell(object sender, DataGridViewCellPaintingEventArgs args)
+        {
+            if (args.Handled)
+            {
+                return;
+            }
+
+            var bounds = args.CellBounds;
+            var graphics = args.Graphics;
+
+            var rowIndex = args.RowIndex;
+            var columnIndex = args.ColumnIndex;
+
+            var style = args.CellStyle;
+
+            if (rowIndex == -1 && columnIndex == 0)
+            {
+                args.PaintBackground(bounds, false);
+
+                TextRenderer.DrawText(graphics, string.Format("{0}", args.FormattedValue), style.Font, bounds, style.ForeColor,
+                    TextFormatFlags.VerticalCenter | TextFormatFlags.Left);
+
+                var column = dataGridView.Columns[0];
+                if (column.HeaderCell.SortGlyphDirection != SortOrder.None)
+                {
+                    var sortIcon = column.HeaderCell.SortGlyphDirection == SortOrder.Ascending ? "▲" : "▼";
+                    TextRenderer.DrawText(graphics, sortIcon, style.Font, bounds, IOGenerationForm.SORT_ICON_COLOR,
+                        TextFormatFlags.VerticalCenter | TextFormatFlags.Right);
+                }
+
+                args.Handled = true;
+            }
         }
 
     }

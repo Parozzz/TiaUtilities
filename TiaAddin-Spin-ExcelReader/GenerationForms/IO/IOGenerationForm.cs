@@ -17,30 +17,21 @@ namespace TiaXmlReader.GenerationForms.IO
         public static readonly Color SELECTED_CELL_COLOR = Color.DarkGreen;
         public static readonly Color DRAGGED_CELL_BACK_COLOR = Color.PaleGreen;
 
+        private readonly IOGenerationDataSource dataSource;
         private readonly UndoRedoHandler undoRedoHandler;
         private readonly ExcelDragHandler excelDragHandler;
         private readonly SortHandler sortHandler;
-
-        private readonly List<IOGenerationData> dataList;
-        private readonly BindingList<IOGenerationData> bindingList;
-        private readonly BindingSource bindingSource;
+        
 
         public IOGenerationForm()
         {
             InitializeComponent();
 
-            dataList = new List<IOGenerationData>();
-            for (int i = 0; i < TOTAL_ROW_COUNT; i++)
-            {
-                dataList.Add(new IOGenerationData());
-            }
-
-            bindingList = new BindingList<IOGenerationData>(dataList);
-            bindingSource = new BindingSource() { DataSource = bindingList };
-
+            this.dataSource = new IOGenerationDataSource(this.dataGridView);
             this.undoRedoHandler = new UndoRedoHandler();
-            this.sortHandler = new SortHandler(this, dataGridView, undoRedoHandler);
+            this.sortHandler = new SortHandler(dataSource, dataGridView, undoRedoHandler);
             this.excelDragHandler = new ExcelDragHandler(this, this.dataGridView);
+            
             Init();
         }
 
@@ -48,7 +39,7 @@ namespace TiaXmlReader.GenerationForms.IO
         {
             //var addressColumn = this.dataTable.Rows.Add(TOTAL_ROW_COUNT);
 
-            this.dataGridView.DataSource = bindingSource;
+            this.dataSource.Init();
 
             this.dataGridView.AutoGenerateColumns = false;
 
@@ -74,15 +65,8 @@ namespace TiaXmlReader.GenerationForms.IO
             //this.dataGridView.RowCount = TOTAL_ROW_COUNT;
 
             #region Cell Paiting
-            this.dataGridView.CellPainting += (sender, args) =>
-            {
-                sortHandler.PaintCell(args);
-
-                if(!args.Handled)
-                {
-                    excelDragHandler.PaintCell(args);
-                }
-            };
+            this.dataGridView.CellPainting += sortHandler.PaintCell;
+            this.dataGridView.CellPainting += excelDragHandler.PaintCell;
             #endregion
 
             #region RowHeaderNumber
@@ -234,43 +218,6 @@ namespace TiaXmlReader.GenerationForms.IO
             return column;
         }
 
-        public void Sort(IComparer<IOGenerationData> comparer, SortOrder sortOrder)
-        {
-            if(sortOrder != SortOrder.None)
-            {
-                dataList.Sort(comparer);
-                if (sortOrder == SortOrder.Descending)
-                {
-                    dataList.Reverse();
-                }
-
-                dataGridView.Refresh();
-            }
-        }
-
-        public Dictionary<IOGenerationData, int> CreateDataListSnapshot()
-        {
-            var dict = new Dictionary<IOGenerationData, int>();
-            for (int x = 0; x < dataList.Count; x++)
-            {
-                dict.Add(dataList[x], x);
-            }
-            return dict;
-        }
-
-        public void RestoreDataListSnapshot(Dictionary<IOGenerationData, int> dict)
-        {
-            dataList.Sort((x, y) =>
-            {
-                if(!dict.ContainsKey(x) || !dict.ContainsKey(y))
-                {
-                    return 0;
-                }
-
-                return dict[x].CompareTo(dict[y]);
-            });
-            dataGridView.Refresh();
-        }
 
         private void Paste()
         {
@@ -343,30 +290,48 @@ namespace TiaXmlReader.GenerationForms.IO
                 return;
             }
 
-            undoRedoHandler.Lock(); //Lock the handler. I do not want more actions been added by events here since are all handled below!
-            if (applyChanges)
+            try
             {
-                cellChangeList.ForEach(cellChange => cellChange.ApplyNewValue());
-                dataGridView.Refresh();
-            }
-            undoRedoHandler.Unlock();
+                dataGridView.SuspendLayout();
 
-            void undoRedoAction()
+                if (applyChanges)
+                {
+                    undoRedoHandler.Lock(); //Lock the handler. I do not want more actions been added by events here since are all handled below!
+
+                    cellChangeList.ForEach(cellChange => cellChange.ApplyNewValue());
+                    dataGridView.Refresh();
+
+                    undoRedoHandler.Unlock();
+                }
+
+                void undoRedoAction()
+                {
+                    undoRedoHandler.Lock();
+                    cellChangeList.ForEach(cellChange => cellChange.ApplyOldValue());
+                    undoRedoHandler.Unlock();
+
+                    dataGridView.ClearSelection();
+
+                    var firstCell = cellChangeList[0].cell;
+                    dataGridView.CurrentCell = firstCell; //Setting se current cell already center the grid to it.
+                    dataGridView.Refresh();
+
+                    undoRedoHandler.AddRedo(() => ChangeCells(cellChangeList));
+                }
+
+                undoRedoHandler.AddUndo(undoRedoAction);
+
+            }
+            catch (Exception ex)
             {
-                undoRedoHandler.Lock();
-                cellChangeList.ForEach(cellChange => cellChange.ApplyOldValue());
-                undoRedoHandler.Unlock();
-
-                dataGridView.ClearSelection();
-
-                var firstCell = cellChangeList[0].cell;
-                dataGridView.CurrentCell = firstCell; //Setting se current cell already center the grid to it.
-                dataGridView.Refresh();
-
-                undoRedoHandler.AddRedo(() => ChangeCells(cellChangeList));
+                MessageBox.Show(ex.ToString(), "Error while changing cells", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                dataGridView.ResumeLayout();
             }
 
-            undoRedoHandler.AddUndo(undoRedoAction);
+            
         }
     }
 

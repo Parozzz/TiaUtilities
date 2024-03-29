@@ -22,7 +22,7 @@ namespace SpinXmlReader
         {
             if (obj == null)
             {
-                outObj = default(OBJ);
+                outObj = default;
                 return false;
             }
 

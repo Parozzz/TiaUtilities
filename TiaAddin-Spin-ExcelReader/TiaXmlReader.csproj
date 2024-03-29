@@ -177,6 +177,7 @@
     </Compile>
     <Compile Include="GenerationForms\IO\ExcelDragHandler.cs" />
     <Compile Include="GenerationForms\IO\IOGenerationData.cs" />
+    <Compile Include="GenerationForms\IO\IOGenerationDataSource.cs" />
     <Compile Include="GenerationForms\IO\SortHandler.cs" />
     <Compile Include="Generation\IO\IOExcelImporter.cs" />
     <Compile Include="Generation\IO\IOConfiguration.cs" />

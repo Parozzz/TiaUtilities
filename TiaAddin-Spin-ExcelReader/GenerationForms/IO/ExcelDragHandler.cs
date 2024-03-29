@@ -161,8 +161,13 @@ namespace TiaXmlReader.GenerationForms.IO
             };
         }
 
-        public bool PaintCell(DataGridViewCellPaintingEventArgs args)
+        public void PaintCell(object sender, DataGridViewCellPaintingEventArgs args)
         {
+            if (args.Handled)
+            {
+                return;
+            }
+
             var bounds = args.CellBounds;
             var graphics = args.Graphics;
 
@@ -173,7 +178,7 @@ namespace TiaXmlReader.GenerationForms.IO
 
             if (rowIndex < 0 || columnIndex < 0)
             {
-                return false;
+                return;
             }
             else if (started)
             {
@@ -183,7 +188,7 @@ namespace TiaXmlReader.GenerationForms.IO
                 args.PaintContent(bounds);
 
                 args.Handled = true;
-                return true;
+                return;
             }
 
             args.PaintBackground(bounds, true);
@@ -213,7 +218,7 @@ namespace TiaXmlReader.GenerationForms.IO
             }
 
             args.Handled = true;
-            return true;
+            return;
         }
 
         public bool IsInsideTriangle(int x, int y, DataGridViewCell cell)
