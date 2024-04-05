@@ -8,32 +8,32 @@ namespace TiaXmlReader.Generation.IO
 {
     public class IOConfiguration
     {
-        public string FCBlockName;
-        public uint FCBlockNumber;
+        public string FCBlockName = "fcTest_IO";
+        public uint FCBlockNumber = 195;
 
-        public string MemoryType;
-        public string GroupingType;
+        public string MemoryType = "DB";
+        public string GroupingType = "BitPerSegmento";
 
-        public string DBName;
-        public uint DBNumber;
+        public string DBName = "TestIO_DB";
+        public uint DBNumber = 196;
 
-        public string VariableTableName;
-        public uint VariableTableStartAddress;
-        public uint VariableTableSplitEvery;
+        public string VariableTableName = "VariableTable";
+        public uint VariableTableStartAddress = 2890;
+        public uint VariableTableSplitEvery = 250;
 
-        public string IOTableName;
-        public uint IOTableSplitEvery;
+        public string IOTableName = "IOTags";
+        public uint IOTableSplitEvery = 250;
 
-        public string DefaultIoName;
-        public string DefaultVariableName;
+        public string DefaultIoName = "{memory_type}{byte}_{bit}";
+        public string DefaultVariableName = "{io_name}";
 
-        public string SegmentNameBitGrouping;
-        public string SegmentNameByteGrouping;
+        public string SegmentNameBitGrouping = "{memory_type}{byte}_{bit} - {comment}";
+        public string SegmentNameByteGrouping = "{memory_type}B{byte}";
 
-        public string PrefixInputDB;
-        public string PrefixInputMerker;
-        public string PrefixOutputDB;
-        public string PrefixOutputMerker;
+        public string PrefixInputDB = "IN.";
+        public string PrefixInputMerker = "MI_";
+        public string PrefixOutputDB = "OUT.";
+        public string PrefixOutputMerker = "MO_";
 
     }
 }

@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TiaXmlReader.Generation;
 using TiaXmlReader.SimaticML;
 
-namespace TiaXmlReader.GenerationForms.IO
+namespace TiaXmlReader.GenerationForms.IO.Data
 {
     public class IOGenerationData
     {
@@ -29,9 +30,26 @@ namespace TiaXmlReader.GenerationForms.IO
 
         }
 
+        public bool IsEmpty()
+        {
+            return string.IsNullOrEmpty(Address) && string.IsNullOrEmpty(IOName) && string.IsNullOrEmpty(DBName) && string.IsNullOrEmpty(Variable);
+        }
+
         public SimaticTagAddress GetTagAddress()
         {
             return SimaticTagAddress.FromAddress(address);
+        }
+
+        public IOData CreateIOData()
+        {
+            return new IOData()
+            {
+                IOAddress = address,
+                IOName = IOName,
+                VariableName = Variable,
+                DBName = DBName,
+                Comment = comment
+            };
         }
 
         public IOGenerationData Clone()

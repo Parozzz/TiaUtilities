@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TiaXmlReader.GenerationForms.IO.Data;
 
-namespace TiaXmlReader.GenerationForms.IO
+namespace TiaXmlReader.GenerationForms.IO.Sorting
 {
 
     public class AddressColumnComparer : IComparer<IOGenerationData>

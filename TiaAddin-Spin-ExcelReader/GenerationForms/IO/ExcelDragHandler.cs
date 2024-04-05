@@ -6,17 +6,18 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using TiaXmlReader.SimaticML;
+using static TiaXmlReader.GenerationForms.IO.IOGenerationCellPaintHandler;
 
 namespace TiaXmlReader.GenerationForms.IO
 {
-    public class ExcelDragHandler
+    public class ExcelDragHandler : IOGenerationCellPainter
     {
         private readonly IOGenerationForm form;
         private readonly DataGridView dataGridView;
 
         private bool started = false;
         private int rowIndexStart = -1;
-        private int columnIndex = -1;
+        private int actualDragColumnIndex = -1;
 
         private int topSelectionRowIndex = -1; //Lowest
         private int bottomSelectionRowIndex = -1; //Highest
@@ -64,7 +65,7 @@ namespace TiaXmlReader.GenerationForms.IO
                     {
                         started = true;
                         bottomSelectionRowIndex = topSelectionRowIndex = rowIndexStart = hitTest.RowIndex;
-                        columnIndex = hitTest.ColumnIndex;
+                        actualDragColumnIndex = hitTest.ColumnIndex;
                     }
                 }
             };
@@ -79,7 +80,7 @@ namespace TiaXmlReader.GenerationForms.IO
                     started = false;
 
                     var rowIndexEnumeration = Enumerable.Range(topSelectionRowIndex, (int)SelectedRows);
-                    if (columnIndex == 0)
+                    if (actualDragColumnIndex == 0)
                     {
                         var tagAddress = SimaticTagAddress.FromAddress(dataGridView.Rows[rowIndexStart]?.Cells[0].Value?.ToString());
                         if (tagAddress != null) //If is not a valid address, i won't care about doing any stuff.
@@ -122,7 +123,7 @@ namespace TiaXmlReader.GenerationForms.IO
                 //When dragging, only allow cell on the column to be selected! I don't care about other ways and want it simple.
                 foreach (DataGridViewCell selectedCell in dataGridView.SelectedCells)
                 {
-                    bool sameColumn = selectedCell.ColumnIndex == columnIndex;
+                    bool sameColumn = selectedCell.ColumnIndex == actualDragColumnIndex;
                     if (!sameColumn)
                     {
                         selectedCell.Selected = false; //Only keep the ones on the same columns of the selected!
@@ -147,7 +148,7 @@ namespace TiaXmlReader.GenerationForms.IO
                     };
                 }
 
-                if (columnIndex == 0)
+                if (actualDragColumnIndex == 0)
                 {
                     var tagAddress = SimaticTagAddress.FromAddress(dataGridView.Rows[rowIndexStart]?.Cells[0].Value?.ToString());
                     if (tagAddress != null)
@@ -160,8 +161,31 @@ namespace TiaXmlReader.GenerationForms.IO
                 }
             };
         }
+        public PaintRequest PaintCellRequest(DataGridViewCellPaintingEventArgs args)
+        {
+            var paintRequest = new PaintRequest();
 
-        public void PaintCell(object sender, DataGridViewCellPaintingEventArgs args)
+            var columnIndex = args.ColumnIndex;
+            var rowIndex = args.RowIndex;
+
+            if (columnIndex >= 0 && rowIndex >= 0)
+            {
+                if (started && this.actualDragColumnIndex == columnIndex)
+                {
+                    return paintRequest.Background();
+                }
+
+                var currentCell = dataGridView.CurrentCell;
+                if (currentCell != null && currentCell.RowIndex == rowIndex && currentCell.ColumnIndex == this.actualDragColumnIndex && dataGridView.SelectedCells.Count == 1)
+                {
+                    return paintRequest.Background();
+                }
+            }
+
+            return paintRequest;
+        }
+
+        public void PaintCell(DataGridViewCellPaintingEventArgs args, PaintRequest paintRequest, bool backgroundRequested)
         {
             if (args.Handled)
             {
@@ -185,18 +209,14 @@ namespace TiaXmlReader.GenerationForms.IO
                 style.SelectionBackColor = IOGenerationForm.DRAGGED_CELL_BACK_COLOR;
 
                 args.PaintBackground(bounds, true);
-                args.PaintContent(bounds);
-
-                args.Handled = true;
                 return;
             }
-
-            args.PaintBackground(bounds, true);
-            args.PaintContent(bounds);
 
             var currentCell = dataGridView.CurrentCell;
             if (currentCell != null && currentCell.RowIndex == rowIndex && currentCell.ColumnIndex == columnIndex && dataGridView.SelectedCells.Count == 1)
             {//I only want to apply the effect when the only selected cell is the current cell.
+                args.PaintBackground(bounds, true);
+
                 args.Paint(bounds, DataGridViewPaintParts.All & ~DataGridViewPaintParts.Border);
                 using (var pen = new Pen(IOGenerationForm.SELECTED_CELL_COLOR, 2))
                 {//Border
@@ -216,9 +236,6 @@ namespace TiaXmlReader.GenerationForms.IO
                     graphics.FillPolygon(brush, pt);
                 }
             }
-
-            args.Handled = true;
-            return;
         }
 
         public bool IsInsideTriangle(int x, int y, DataGridViewCell cell)
@@ -236,7 +253,7 @@ namespace TiaXmlReader.GenerationForms.IO
         private void Clear()
         {
             started = false;
-            rowIndexStart = columnIndex = topSelectionRowIndex = bottomSelectionRowIndex = -1;
+            rowIndexStart = actualDragColumnIndex = topSelectionRowIndex = bottomSelectionRowIndex = -1;
 
             if (dragToolTip != null)
             {

@@ -65,6 +65,11 @@ namespace TiaXmlReader.Generation
             generationPlaceholdersDict = new Dictionary<string, IGenerationPlaceholderData>();
         }
 
+        public void Clear()
+        {
+            generationPlaceholdersDict.Clear();
+        }
+
         public GenerationPlaceholders SetConsumerData(UserData consumerData)
         {
             AddOrReplace(USER_NAME, new StringGenerationPlaceholderData() { Value = consumerData.Name });
@@ -178,6 +183,11 @@ namespace TiaXmlReader.Generation
 
         public string Parse(string str)
         {
+            if (str == null)
+            {
+                return str;
+            }
+
             var loopStr = str;
             foreach (KeyValuePair<string, IGenerationPlaceholderData> entry in generationPlaceholdersDict)
             {
@@ -187,6 +197,11 @@ namespace TiaXmlReader.Generation
                 if (string.IsNullOrEmpty(placeholder))
                 {
                     continue;
+                }
+
+                if (loopStr == null)
+                {
+                    return null;
                 }
 
                 loopStr = loopStr.Replace(placeholder, placeholderData.GetSubstitution());

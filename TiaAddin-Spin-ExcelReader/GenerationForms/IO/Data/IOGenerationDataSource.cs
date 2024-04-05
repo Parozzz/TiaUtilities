@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace TiaXmlReader.GenerationForms.IO
+namespace TiaXmlReader.GenerationForms.IO.Data
 {
     public class IOGenerationDataSource
     {
@@ -31,6 +31,11 @@ namespace TiaXmlReader.GenerationForms.IO
         public void Init()
         {
             this.dataGridView.DataSource = new BindingSource() { DataSource = bindingList }; ;
+        }
+
+        public IOGenerationData GetDataAt(int rowIndex)
+        {
+            return dataList[rowIndex];
         }
 
         public void Sort(IComparer<IOGenerationData> comparer, SortOrder sortOrder)

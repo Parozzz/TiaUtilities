@@ -171,14 +171,20 @@
     <Compile Include="DBDuplicationForm.Designer.cs">
       <DependentUpon>DBDuplicationForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GenerationForms\IO\AddressColumnComparer.cs" />
-    <Compile Include="GenerationForms\IO\ConfigTableLayoutPanel.cs">
-      <SubType>Component</SubType>
+    <Compile Include="GenerationForms\IO\ConfigForm.cs">
+      <SubType>Form</SubType>
     </Compile>
+    <Compile Include="GenerationForms\IO\ConfigForm.Designer.cs">
+      <DependentUpon>ConfigForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GenerationForms\IO\IOGenerationFormConfigHandler.cs" />
+    <Compile Include="GenerationForms\IO\IOGenerationFormPreviewCellPainter.cs" />
+    <Compile Include="GenerationForms\IO\Sorting\AddressColumnComparer.cs" />
     <Compile Include="GenerationForms\IO\ExcelDragHandler.cs" />
-    <Compile Include="GenerationForms\IO\IOGenerationData.cs" />
-    <Compile Include="GenerationForms\IO\IOGenerationDataSource.cs" />
-    <Compile Include="GenerationForms\IO\SortHandler.cs" />
+    <Compile Include="GenerationForms\IO\IOGenerationCellPaintHandler.cs" />
+    <Compile Include="GenerationForms\IO\Data\IOGenerationData.cs" />
+    <Compile Include="GenerationForms\IO\Data\IOGenerationDataSource.cs" />
+    <Compile Include="GenerationForms\IO\Sorting\SortHandler.cs" />
     <Compile Include="Generation\IO\IOExcelImporter.cs" />
     <Compile Include="Generation\IO\IOConfiguration.cs" />
     <Compile Include="Generation\IO\IOData.cs" />
@@ -243,6 +249,9 @@
     <Compile Include="Utility\XMLUtils.cs" />
     <EmbeddedResource Include="DBDuplicationForm.resx">
       <DependentUpon>DBDuplicationForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GenerationForms\IO\ConfigForm.resx">
+      <DependentUpon>ConfigForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GenerationForms\IO\IOGenerationForm.resx">
       <DependentUpon>IOGenerationForm.cs</DependentUpon>

@@ -1,11 +1,14 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using TiaXmlReader.Generation.IO;
+using TiaXmlReader.GenerationForms.IO.Data;
+using TiaXmlReader.GenerationForms.IO.Sorting;
 using TiaXmlReader.UndoRedo;
 
 namespace TiaXmlReader.GenerationForms.IO
@@ -18,20 +21,28 @@ namespace TiaXmlReader.GenerationForms.IO
         public static readonly Color DRAGGED_CELL_BACK_COLOR = Color.PaleGreen;
 
         private readonly IOGenerationDataSource dataSource;
+
+        private readonly IOConfiguration config;
+        private readonly IOGenerationFormConfigHandler configHandler;
+
         private readonly UndoRedoHandler undoRedoHandler;
         private readonly ExcelDragHandler excelDragHandler;
         private readonly SortHandler sortHandler;
-        
+
 
         public IOGenerationForm()
         {
             InitializeComponent();
 
             this.dataSource = new IOGenerationDataSource(this.dataGridView);
+
+            config = new IOConfiguration();
+            configHandler = new IOGenerationFormConfigHandler(this, config);
+
             this.undoRedoHandler = new UndoRedoHandler();
             this.sortHandler = new SortHandler(dataSource, dataGridView, undoRedoHandler);
             this.excelDragHandler = new ExcelDragHandler(this, this.dataGridView);
-            
+
             Init();
         }
 
@@ -40,6 +51,9 @@ namespace TiaXmlReader.GenerationForms.IO
             //var addressColumn = this.dataTable.Rows.Add(TOTAL_ROW_COUNT);
 
             this.dataSource.Init();
+            this.configHandler.Init();
+
+            typeof(DataGridView).InvokeMember("DoubleBuffered", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty, null, this.dataGridView, new object[] { true });
 
             this.dataGridView.AutoGenerateColumns = false;
 
@@ -65,8 +79,11 @@ namespace TiaXmlReader.GenerationForms.IO
             //this.dataGridView.RowCount = TOTAL_ROW_COUNT;
 
             #region Cell Paiting
-            this.dataGridView.CellPainting += sortHandler.PaintCell;
-            this.dataGridView.CellPainting += excelDragHandler.PaintCell;
+            var paintHandler = new IOGenerationCellPaintHandler(this.dataGridView);
+            paintHandler.AddPainter(sortHandler);
+            paintHandler.AddPainter(excelDragHandler);
+            paintHandler.AddPainter(new IOGenerationFormPreviewCellPainter(this.dataGridView, this.dataSource, this.config));
+            paintHandler.Init();
             #endregion
 
             #region RowHeaderNumber
@@ -292,8 +309,6 @@ namespace TiaXmlReader.GenerationForms.IO
 
             try
             {
-                dataGridView.SuspendLayout();
-
                 if (applyChanges)
                 {
                     undoRedoHandler.Lock(); //Lock the handler. I do not want more actions been added by events here since are all handled below!
@@ -326,12 +341,7 @@ namespace TiaXmlReader.GenerationForms.IO
             {
                 MessageBox.Show(ex.ToString(), "Error while changing cells", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            finally
-            {
-                dataGridView.ResumeLayout();
-            }
 
-            
         }
     }
 
