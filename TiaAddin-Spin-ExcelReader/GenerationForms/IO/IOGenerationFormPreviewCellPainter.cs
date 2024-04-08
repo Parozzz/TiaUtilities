@@ -35,25 +35,34 @@ namespace TiaXmlReader.GenerationForms.IO
             var columnIndex = args.ColumnIndex;
             var rowIndex = args.RowIndex;
 
-            if (rowIndex < 0 || columnIndex < 1 || columnIndex > 3)
+            if (rowIndex < 0 || columnIndex < IOGenerationForm.IO_NAME_COLUMN || columnIndex > IOGenerationForm.VARIABLE_COLUMN)
             {
                 return paintRequest;
             }
 
-            var generationData = dataSource.GetDataAt(rowIndex);
-            if (generationData.IsEmpty())
+            var ioData = dataSource.GetDataAt(rowIndex);
+            if (ioData.IsEmpty() || string.IsNullOrEmpty(ioData.Address))
             {
                 return paintRequest;
             }
 
-            paintRequest.data = generationData;
-            if (columnIndex == 1)
+            paintRequest.data = ioData;
+            switch (columnIndex)
             {
-                return string.IsNullOrEmpty(generationData.IOName) ? paintRequest.Content() : paintRequest;
-            } 
-            else if(columnIndex == 3)
-            {
-                return !string.IsNullOrEmpty(generationData.Variable) ? paintRequest.Content() : paintRequest;
+                case IOGenerationForm.IO_NAME_COLUMN:
+                    if (!string.IsNullOrEmpty(ioData.IOName)) //I want to preview the io name if is not set yet!
+                    {
+                        return paintRequest;
+                    }
+
+                    return string.IsNullOrEmpty(ioData.IOName) ? paintRequest.Content() : paintRequest;
+                case IOGenerationForm.VARIABLE_COLUMN:
+                    if (string.IsNullOrEmpty(ioData.Variable) && string.IsNullOrEmpty(config.DefaultVariableName))
+                    {
+                        return paintRequest;
+                    }
+
+                    return paintRequest.Content();
             }
 
             return paintRequest;
@@ -79,54 +88,46 @@ namespace TiaXmlReader.GenerationForms.IO
 
             try
             {
-                var ioData = ((IOGenerationData)request.data).CreateIOData();
+                var ioData = ((IOData)request.data).Clone(); //I do not want to operate on the IOData that is been used in the table, otherwise things changes!
+                ioData.LoadDefaults(config);
 
                 placeholders.Clear();
                 placeholders.SetIOData(ioData);
 
-                if (columnIndex == 1)
+                if (columnIndex == IOGenerationForm.IO_NAME_COLUMN)
                 {
-                    var ioName = ioData.IOName;
-                    if (string.IsNullOrEmpty(ioName))
-                    {
-                        var defaultIOName = placeholders.Parse(config.DefaultIoName);
-                        if (!string.IsNullOrEmpty(defaultIOName))
-                        {
-                            var size = TextRenderer.MeasureText(defaultIOName, style.Font);
+                    var isIONameDefault = (ioData.IOName == config.DefaultIoName);
+                    var parsedIOName = placeholders.Parse(ioData.IOName);
 
-                            var rec = new RectangleF(bounds.Location, new Size(size.Width, bounds.Height));
-                            TextRenderer.DrawText(graphics, defaultIOName, style.Font, Rectangle.Round(rec), Color.DarkGreen, TextFormatFlags.VerticalCenter | TextFormatFlags.Right);
-                        }
-                    }
+                    var size = TextRenderer.MeasureText(parsedIOName, style.Font);
+
+                    var rec = new RectangleF(bounds.Location, new Size(size.Width, bounds.Height));
+                    TextRenderer.DrawText(graphics, parsedIOName, style.Font, Rectangle.Round(rec), isIONameDefault ? Color.DarkGreen : style.ForeColor, TextFormatFlags.VerticalCenter | TextFormatFlags.Right);
                 }
-                else if (columnIndex == 3)
+                else if (columnIndex == IOGenerationForm.VARIABLE_COLUMN)
                 {
-                    var variableName = ioData.VariableName;
-                    if (variableName == null)
-                    {
-                        return;
-                    }
-
-                    string prefix = string.Empty;
+                    string parsedPrefix = string.Empty;
                     if (config.MemoryType == "DB")
                     {
-                        prefix = ioData.GetMemoryArea() == SimaticML.SimaticMemoryArea.INPUT ? config.PrefixInputDB : config.PrefixOutputDB;
+                        parsedPrefix = ioData.GetMemoryArea() == SimaticML.SimaticMemoryArea.INPUT ? config.PrefixInputDB : config.PrefixOutputDB;
                     }
                     else if (config.MemoryType == "Merker")
                     {
-                        prefix = ioData.GetMemoryArea() == SimaticML.SimaticMemoryArea.INPUT ? config.PrefixInputMerker : config.PrefixOutputMerker;
+                        parsedPrefix = ioData.GetMemoryArea() == SimaticML.SimaticMemoryArea.INPUT ? config.PrefixInputMerker : config.PrefixOutputMerker;
                     }
-                    prefix = placeholders.Parse(prefix);
+                    parsedPrefix = placeholders.Parse(parsedPrefix);
 
-                    var prefixSize = TextRenderer.MeasureText(prefix, style.Font);
-                    var ioNameSize = TextRenderer.MeasureText(variableName, style.Font);
+                    var prefixTextSize = TextRenderer.MeasureText(parsedPrefix, style.Font);
 
-                    var rec = new RectangleF(bounds.Location, new Size(prefixSize.Width, bounds.Height));
-                    TextRenderer.DrawText(graphics, prefix, style.Font, Rectangle.Round(rec), Color.DarkGreen, TextFormatFlags.VerticalCenter | TextFormatFlags.Right);
+                    var rec = new RectangleF(bounds.Location, new Size(prefixTextSize.Width, bounds.Height));
+                    TextRenderer.DrawText(graphics, parsedPrefix, style.Font, Rectangle.Round(rec), Color.DarkGreen, TextFormatFlags.VerticalCenter | TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPadding | TextFormatFlags.TextBoxControl);
 
-                    rec = new RectangleF(new PointF(rec.Location.X + rec.Width, rec.Location.Y), new SizeF(ioNameSize.Width, bounds.Height));
-                    TextRenderer.DrawText(graphics, variableName, style.Font, Rectangle.Round(rec), style.ForeColor, TextFormatFlags.VerticalCenter | TextFormatFlags.Right);
+                    bool isVariableDefault = (ioData.Variable == config.DefaultVariableName);
+                    var parsedVariableName = placeholders.Parse(ioData.Variable);
 
+                    var variableNameTextSize = TextRenderer.MeasureText(parsedVariableName, style.Font);
+                    rec = new RectangleF(new PointF(rec.Location.X + rec.Width - 3, rec.Location.Y), new SizeF(variableNameTextSize.Width, bounds.Height));
+                    TextRenderer.DrawText(graphics, parsedVariableName, style.Font, Rectangle.Round(rec), isVariableDefault ? Color.DarkGreen : style.ForeColor, TextFormatFlags.VerticalCenter | TextFormatFlags.Left | TextFormatFlags.NoPadding | TextFormatFlags.TextBoxControl);
                 }
             }
             catch (Exception ex)

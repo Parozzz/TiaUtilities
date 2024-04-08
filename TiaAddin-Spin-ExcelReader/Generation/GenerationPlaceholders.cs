@@ -163,7 +163,7 @@ namespace TiaXmlReader.Generation
             AddOrReplace("{bit}", new StringGenerationPlaceholderData() { Value = "" + ioData.GetAddressBit() });
             AddOrReplace("{byte}", new StringGenerationPlaceholderData() { Value = "" + ioData.GetAddressByte() });
             AddOrReplace("{db_name}", new StringGenerationPlaceholderData() { Value = ioData.DBName });
-            AddOrReplace("{variable_name}", new StringGenerationPlaceholderData() { Value = ioData.VariableName });
+            AddOrReplace("{variable_name}", new StringGenerationPlaceholderData() { Value = ioData.Variable });
             AddOrReplace("{comment}", new StringGenerationPlaceholderData() { Value = ioData.Comment });
             AddOrReplace("{io_name}", new StringGenerationPlaceholderData() { Value = this.Parse(ioData.IOName) }); // This one for last!
             return this;

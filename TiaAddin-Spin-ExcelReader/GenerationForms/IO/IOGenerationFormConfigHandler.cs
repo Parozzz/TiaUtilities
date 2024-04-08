@@ -13,15 +13,29 @@ namespace TiaXmlReader.GenerationForms.IO
     {
         private readonly IOGenerationForm form;
         private readonly IOConfiguration config;
+        private readonly DataGridView dataGridView;
 
-        public IOGenerationFormConfigHandler(IOGenerationForm form, IOConfiguration config)
+        public IOGenerationFormConfigHandler(IOGenerationForm form, IOConfiguration config, DataGridView dataGridView)
         {
             this.form = form;
             this.config = config;
+            this.dataGridView = dataGridView;
         }
 
         public void Init()
         {
+            form.groupingTypeComboBox.TextChanged += (object sender, EventArgs args) =>
+            {
+                config.GroupingType = form.groupingTypeComboBox.Text;
+                this.dataGridView.Refresh();
+            };
+
+            form.memoryTypeComboBox.TextChanged += (object sender, EventArgs args) =>
+            {
+                config.MemoryType = form.memoryTypeComboBox.Text;
+                this.dataGridView.Refresh();
+            };
+
             form.fcConfigButton.Click += (object sender, EventArgs args) =>
             {
                 var configForm = new ConfigForm("FC");
@@ -32,7 +46,7 @@ namespace TiaXmlReader.GenerationForms.IO
 
                 configForm.AddConfigLine(new ConfigFormLine()
                     .Title("Numero")
-                    .TextBox("" + config.FCBlockNumber)
+                    .TextBox(config.FCBlockNumber)
                     .NumericOnly()
                     .UIntChanged(num => config.FCBlockNumber = num));
 
@@ -158,86 +172,9 @@ namespace TiaXmlReader.GenerationForms.IO
 
             configForm.Init();
             configForm.ShowDialog(form);
+
+            dataGridView.Refresh();
         }
-
-        private void RegisterTextChanged(TextBox textBox, Action<string> handler)
-        {
-            textBox.TextChanged += (object sender, EventArgs args) =>
-            {
-                handler.Invoke(textBox.Text);
-            };
-        }
-
-        private void RegisterTextChanged(ComboBox comboBox, Action<string> handler)
-        {
-            comboBox.TextChanged += (object sender, EventArgs args) =>
-            {
-                handler.Invoke(comboBox.Text);
-            };
-        }
-
-        private void RegisterUIntChanged(ComboBox comboBox, Action<uint> handler)
-        {
-            comboBox.KeyPress += (object sender, KeyPressEventArgs args) =>
-            {
-                args.Handled = Char.IsLetter(args.KeyChar);
-            };
-
-            UIntChanged(comboBox.Text, handler); //Apply immediately values!
-            comboBox.TextChanged += (object sender, EventArgs args) => { UIntChanged(comboBox.Text, handler); };
-        }
-
-        private void RegisterUIntChanged(TextBox textBox, Action<uint> handler)
-        {
-            textBox.KeyPress += (object sender, KeyPressEventArgs args) =>
-            {
-                args.Handled = Char.IsLetter(args.KeyChar);
-            };
-
-            UIntChanged(textBox.Text, handler); //Apply immediately values!
-            textBox.TextChanged += (object sender, EventArgs args) => { UIntChanged(textBox.Text, handler); };
-        }
-
-        private void UIntChanged(string str, Action<uint> handler)
-        {
-            if (uint.TryParse(str, out uint result))
-            {
-                handler.Invoke(result);
-            }
-        }
-
-
-        private void RegisterIntChanged(TextBox textBox, Action<int> handler)
-        {
-            textBox.KeyPress += (object sender, KeyPressEventArgs args) =>
-            {
-                args.Handled = Char.IsLetter(args.KeyChar);
-            };
-
-            IntChanged(textBox.Text, handler); //Apply immediately values!
-            textBox.TextChanged += (object sender, EventArgs args) => { IntChanged(textBox.Text, handler); };
-        }
-
-        private void RegisterIntChanged(ComboBox comboBox, Action<int> handler)
-        {
-            comboBox.KeyPress += (object sender, KeyPressEventArgs args) =>
-            {
-                args.Handled = Char.IsLetter(args.KeyChar);
-            };
-
-            IntChanged(comboBox.Text, handler); //Apply immediately values!
-            comboBox.TextChanged += (object sender, EventArgs args) => { IntChanged(comboBox.Text, handler); };
-        }
-
-
-        private void IntChanged(string str, Action<int> handler)
-        {
-            if (int.TryParse(str, out int result))
-            {
-                handler.Invoke(result);
-            }
-        }
-
 
     }
 }

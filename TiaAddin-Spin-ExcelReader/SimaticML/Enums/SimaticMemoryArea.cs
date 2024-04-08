@@ -51,6 +51,7 @@ namespace TiaXmlReader.SimaticML
                 case SimaticMemoryArea.MERKER: return "M";
                 case SimaticMemoryArea.TIMER: return "T";
                 case SimaticMemoryArea.COUNTER: return "C";
+                case SimaticMemoryArea.UNDEFINED: return "UND";
                 default:
                     throw new Exception("SimaticML string not set for MemoryArea " + memoryArea.ToString());
             }

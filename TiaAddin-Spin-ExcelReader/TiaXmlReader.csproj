@@ -182,7 +182,6 @@
     <Compile Include="GenerationForms\IO\Sorting\AddressColumnComparer.cs" />
     <Compile Include="GenerationForms\IO\ExcelDragHandler.cs" />
     <Compile Include="GenerationForms\IO\IOGenerationCellPaintHandler.cs" />
-    <Compile Include="GenerationForms\IO\Data\IOGenerationData.cs" />
     <Compile Include="GenerationForms\IO\Data\IOGenerationDataSource.cs" />
     <Compile Include="GenerationForms\IO\Sorting\SortHandler.cs" />
     <Compile Include="Generation\IO\IOExcelImporter.cs" />

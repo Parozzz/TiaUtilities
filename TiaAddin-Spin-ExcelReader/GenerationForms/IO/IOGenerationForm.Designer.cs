@@ -30,19 +30,21 @@
         {
             this.mainPanel = new System.Windows.Forms.TableLayoutPanel();
             this.configPanel = new System.Windows.Forms.Panel();
-            this.variableTableConfigButton = new System.Windows.Forms.Button();
-            this.dbConfigButton = new System.Windows.Forms.Button();
+            this.configButtonPanel = new System.Windows.Forms.FlowLayoutPanel();
             this.fcConfigButton = new System.Windows.Forms.Button();
-            this.label6 = new System.Windows.Forms.Label();
-            this.divisionTypeLabel = new System.Windows.Forms.Label();
-            this.memoryTypeLabel = new System.Windows.Forms.Label();
-            this.dataGridView = new System.Windows.Forms.DataGridView();
+            this.dbConfigButton = new System.Windows.Forms.Button();
+            this.variableTableConfigButton = new System.Windows.Forms.Button();
             this.ioTableConfigButton = new System.Windows.Forms.Button();
             this.segmentNameConfigButton = new System.Windows.Forms.Button();
-            this.divisionTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.groupingTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
+            this.divisionTypeLabel = new System.Windows.Forms.Label();
             this.memoryTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
+            this.memoryTypeLabel = new System.Windows.Forms.Label();
+            this.dataGridView = new System.Windows.Forms.DataGridView();
             this.mainPanel.SuspendLayout();
             this.configPanel.SuspendLayout();
+            this.configButtonPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -66,13 +68,9 @@
             // configPanel
             // 
             this.configPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.configPanel.Controls.Add(this.segmentNameConfigButton);
-            this.configPanel.Controls.Add(this.ioTableConfigButton);
-            this.configPanel.Controls.Add(this.variableTableConfigButton);
-            this.configPanel.Controls.Add(this.dbConfigButton);
-            this.configPanel.Controls.Add(this.fcConfigButton);
+            this.configPanel.Controls.Add(this.configButtonPanel);
             this.configPanel.Controls.Add(this.label6);
-            this.configPanel.Controls.Add(this.divisionTypeComboBox);
+            this.configPanel.Controls.Add(this.groupingTypeComboBox);
             this.configPanel.Controls.Add(this.divisionTypeLabel);
             this.configPanel.Controls.Add(this.memoryTypeComboBox);
             this.configPanel.Controls.Add(this.memoryTypeLabel);
@@ -82,21 +80,36 @@
             this.configPanel.Size = new System.Drawing.Size(1087, 80);
             this.configPanel.TabIndex = 3;
             // 
-            // variableTableConfigButton
+            // configButtonPanel
             // 
-            this.variableTableConfigButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.75F, System.Drawing.FontStyle.Bold);
-            this.variableTableConfigButton.Location = new System.Drawing.Point(217, 19);
-            this.variableTableConfigButton.Margin = new System.Windows.Forms.Padding(0);
-            this.variableTableConfigButton.Name = "variableTableConfigButton";
-            this.variableTableConfigButton.Size = new System.Drawing.Size(183, 30);
-            this.variableTableConfigButton.TabIndex = 12;
-            this.variableTableConfigButton.Text = "Tabella Appoggi";
-            this.variableTableConfigButton.UseVisualStyleBackColor = true;
+            this.configButtonPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.configButtonPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.configButtonPanel.Controls.Add(this.fcConfigButton);
+            this.configButtonPanel.Controls.Add(this.dbConfigButton);
+            this.configButtonPanel.Controls.Add(this.variableTableConfigButton);
+            this.configButtonPanel.Controls.Add(this.ioTableConfigButton);
+            this.configButtonPanel.Controls.Add(this.segmentNameConfigButton);
+            this.configButtonPanel.Location = new System.Drawing.Point(0, 15);
+            this.configButtonPanel.Margin = new System.Windows.Forms.Padding(0);
+            this.configButtonPanel.Name = "configButtonPanel";
+            this.configButtonPanel.Size = new System.Drawing.Size(1087, 30);
+            this.configButtonPanel.TabIndex = 15;
+            // 
+            // fcConfigButton
+            // 
+            this.fcConfigButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.75F, System.Drawing.FontStyle.Bold);
+            this.fcConfigButton.Location = new System.Drawing.Point(0, 0);
+            this.fcConfigButton.Margin = new System.Windows.Forms.Padding(0);
+            this.fcConfigButton.Name = "fcConfigButton";
+            this.fcConfigButton.Size = new System.Drawing.Size(71, 30);
+            this.fcConfigButton.TabIndex = 10;
+            this.fcConfigButton.Text = "FC";
+            this.fcConfigButton.UseVisualStyleBackColor = true;
             // 
             // dbConfigButton
             // 
             this.dbConfigButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.75F, System.Drawing.FontStyle.Bold);
-            this.dbConfigButton.Location = new System.Drawing.Point(404, 19);
+            this.dbConfigButton.Location = new System.Drawing.Point(71, 0);
             this.dbConfigButton.Margin = new System.Windows.Forms.Padding(0);
             this.dbConfigButton.Name = "dbConfigButton";
             this.dbConfigButton.Size = new System.Drawing.Size(147, 30);
@@ -104,15 +117,38 @@
             this.dbConfigButton.Text = "DB Appoggi";
             this.dbConfigButton.UseVisualStyleBackColor = true;
             // 
-            // fcConfigButton
+            // variableTableConfigButton
             // 
-            this.fcConfigButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.75F, System.Drawing.FontStyle.Bold);
-            this.fcConfigButton.Location = new System.Drawing.Point(4, 19);
-            this.fcConfigButton.Name = "fcConfigButton";
-            this.fcConfigButton.Size = new System.Drawing.Size(71, 30);
-            this.fcConfigButton.TabIndex = 10;
-            this.fcConfigButton.Text = "FC";
-            this.fcConfigButton.UseVisualStyleBackColor = true;
+            this.variableTableConfigButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.75F, System.Drawing.FontStyle.Bold);
+            this.variableTableConfigButton.Location = new System.Drawing.Point(218, 0);
+            this.variableTableConfigButton.Margin = new System.Windows.Forms.Padding(0);
+            this.variableTableConfigButton.Name = "variableTableConfigButton";
+            this.variableTableConfigButton.Size = new System.Drawing.Size(183, 30);
+            this.variableTableConfigButton.TabIndex = 12;
+            this.variableTableConfigButton.Text = "Tabella Appoggi";
+            this.variableTableConfigButton.UseVisualStyleBackColor = true;
+            // 
+            // ioTableConfigButton
+            // 
+            this.ioTableConfigButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.75F, System.Drawing.FontStyle.Bold);
+            this.ioTableConfigButton.Location = new System.Drawing.Point(401, 0);
+            this.ioTableConfigButton.Margin = new System.Windows.Forms.Padding(0);
+            this.ioTableConfigButton.Name = "ioTableConfigButton";
+            this.ioTableConfigButton.Size = new System.Drawing.Size(134, 30);
+            this.ioTableConfigButton.TabIndex = 13;
+            this.ioTableConfigButton.Text = "Tabella IO";
+            this.ioTableConfigButton.UseVisualStyleBackColor = true;
+            // 
+            // segmentNameConfigButton
+            // 
+            this.segmentNameConfigButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.75F, System.Drawing.FontStyle.Bold);
+            this.segmentNameConfigButton.Location = new System.Drawing.Point(535, 0);
+            this.segmentNameConfigButton.Margin = new System.Windows.Forms.Padding(0);
+            this.segmentNameConfigButton.Name = "segmentNameConfigButton";
+            this.segmentNameConfigButton.Size = new System.Drawing.Size(152, 30);
+            this.segmentNameConfigButton.TabIndex = 14;
+            this.segmentNameConfigButton.Text = "Nomi Segmenti";
+            this.segmentNameConfigButton.UseVisualStyleBackColor = true;
             // 
             // label6
             // 
@@ -125,21 +161,46 @@
             this.label6.Text = "Placeholders: {memory_type} {bit} {byte} {io_name} {db_name} {variable_name} {com" +
     "ment} ";
             // 
+            // groupingTypeComboBox
+            // 
+            this.groupingTypeComboBox.FormattingEnabled = true;
+            this.groupingTypeComboBox.Items.AddRange(new object[] {
+            "BitPerSegmento",
+            "BytePerSegmento"});
+            this.groupingTypeComboBox.Location = new System.Drawing.Point(332, 51);
+            this.groupingTypeComboBox.Name = "groupingTypeComboBox";
+            this.groupingTypeComboBox.Size = new System.Drawing.Size(112, 21);
+            this.groupingTypeComboBox.TabIndex = 3;
+            this.groupingTypeComboBox.Text = "BytePerSegmento";
+            // 
             // divisionTypeLabel
             // 
             this.divisionTypeLabel.AutoSize = true;
             this.divisionTypeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.divisionTypeLabel.Location = new System.Drawing.Point(184, 54);
+            this.divisionTypeLabel.Location = new System.Drawing.Point(184, 52);
             this.divisionTypeLabel.Name = "divisionTypeLabel";
-            this.divisionTypeLabel.Size = new System.Drawing.Size(98, 18);
+            this.divisionTypeLabel.Size = new System.Drawing.Size(149, 18);
             this.divisionTypeLabel.TabIndex = 2;
-            this.divisionTypeLabel.Text = "Tipo divisione";
+            this.divisionTypeLabel.Text = "Tipo raggruppamento";
+            // 
+            // memoryTypeComboBox
+            // 
+            this.memoryTypeComboBox.FormattingEnabled = true;
+            this.memoryTypeComboBox.Items.AddRange(new object[] {
+            "DB",
+            "Merker"});
+            this.memoryTypeComboBox.Location = new System.Drawing.Point(111, 51);
+            this.memoryTypeComboBox.Name = "memoryTypeComboBox";
+            this.memoryTypeComboBox.Size = new System.Drawing.Size(65, 21);
+            this.memoryTypeComboBox.TabIndex = 1;
+            this.memoryTypeComboBox.Text = "DB";
+            this.memoryTypeComboBox.TextChanged += new System.EventHandler(this.MemoryTypeComboBox_TextChanged);
             // 
             // memoryTypeLabel
             // 
             this.memoryTypeLabel.AutoSize = true;
             this.memoryTypeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.memoryTypeLabel.Location = new System.Drawing.Point(9, 54);
+            this.memoryTypeLabel.Location = new System.Drawing.Point(9, 52);
             this.memoryTypeLabel.Name = "memoryTypeLabel";
             this.memoryTypeLabel.Size = new System.Drawing.Size(100, 18);
             this.memoryTypeLabel.TabIndex = 0;
@@ -156,51 +217,6 @@
             this.dataGridView.Size = new System.Drawing.Size(1087, 531);
             this.dataGridView.TabIndex = 2;
             // 
-            // ioTableConfigButton
-            // 
-            this.ioTableConfigButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.75F, System.Drawing.FontStyle.Bold);
-            this.ioTableConfigButton.Location = new System.Drawing.Point(79, 19);
-            this.ioTableConfigButton.Name = "ioTableConfigButton";
-            this.ioTableConfigButton.Size = new System.Drawing.Size(134, 30);
-            this.ioTableConfigButton.TabIndex = 13;
-            this.ioTableConfigButton.Text = "Tabella IO";
-            this.ioTableConfigButton.UseVisualStyleBackColor = true;
-            // 
-            // segmentNameConfigButton
-            // 
-            this.segmentNameConfigButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.75F, System.Drawing.FontStyle.Bold);
-            this.segmentNameConfigButton.Location = new System.Drawing.Point(555, 19);
-            this.segmentNameConfigButton.Margin = new System.Windows.Forms.Padding(0);
-            this.segmentNameConfigButton.Name = "segmentNameConfigButton";
-            this.segmentNameConfigButton.Size = new System.Drawing.Size(152, 30);
-            this.segmentNameConfigButton.TabIndex = 14;
-            this.segmentNameConfigButton.Text = "Nomi Segmenti";
-            this.segmentNameConfigButton.UseVisualStyleBackColor = true;
-            // 
-            // divisionTypeComboBox
-            // 
-            this.divisionTypeComboBox.FormattingEnabled = true;
-            this.divisionTypeComboBox.Items.AddRange(new object[] {
-            "BitPerSegmento",
-            "BytePerSegmento"});
-            this.divisionTypeComboBox.Location = new System.Drawing.Point(284, 53);
-            this.divisionTypeComboBox.Name = "divisionTypeComboBox";
-            this.divisionTypeComboBox.Size = new System.Drawing.Size(112, 21);
-            this.divisionTypeComboBox.TabIndex = 3;
-            this.divisionTypeComboBox.Text = "BytePerSegmento";
-            // 
-            // memoryTypeComboBox
-            // 
-            this.memoryTypeComboBox.FormattingEnabled = true;
-            this.memoryTypeComboBox.Items.AddRange(new object[] {
-            "DB",
-            "Merker"});
-            this.memoryTypeComboBox.Location = new System.Drawing.Point(111, 53);
-            this.memoryTypeComboBox.Name = "memoryTypeComboBox";
-            this.memoryTypeComboBox.Size = new System.Drawing.Size(65, 21);
-            this.memoryTypeComboBox.TabIndex = 1;
-            this.memoryTypeComboBox.Text = "DB";
-            // 
             // IOGenerationForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -213,6 +229,7 @@
             this.mainPanel.ResumeLayout(false);
             this.configPanel.ResumeLayout(false);
             this.configPanel.PerformLayout();
+            this.configButtonPanel.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).EndInit();
             this.ResumeLayout(false);
 
@@ -222,7 +239,7 @@
 
         private System.Windows.Forms.TableLayoutPanel mainPanel;
         private System.Windows.Forms.Panel configPanel;
-        public CustomControls.FlatComboBox divisionTypeComboBox;
+        public CustomControls.FlatComboBox groupingTypeComboBox;
         private System.Windows.Forms.Label divisionTypeLabel;
         public CustomControls.FlatComboBox memoryTypeComboBox;
         private System.Windows.Forms.Label memoryTypeLabel;
@@ -233,5 +250,6 @@
         public System.Windows.Forms.Button variableTableConfigButton;
         public System.Windows.Forms.Button ioTableConfigButton;
         public System.Windows.Forms.Button segmentNameConfigButton;
+        private System.Windows.Forms.FlowLayoutPanel configButtonPanel;
     }
 }

@@ -176,7 +176,7 @@ namespace TiaXmlReader.GenerationForms.IO
                 }
 
                 var currentCell = dataGridView.CurrentCell;
-                if (currentCell != null && currentCell.RowIndex == rowIndex && currentCell.ColumnIndex == this.actualDragColumnIndex && dataGridView.SelectedCells.Count == 1)
+                if (currentCell != null && currentCell.RowIndex == rowIndex && currentCell.ColumnIndex == columnIndex && dataGridView.SelectedCells.Count == 1)
                 {
                     return paintRequest.Background();
                 }
@@ -217,7 +217,7 @@ namespace TiaXmlReader.GenerationForms.IO
             {//I only want to apply the effect when the only selected cell is the current cell.
                 args.PaintBackground(bounds, true);
 
-                args.Paint(bounds, DataGridViewPaintParts.All & ~DataGridViewPaintParts.Border);
+                //args.Paint(bounds, DataGridViewPaintParts.All & ~DataGridViewPaintParts.Border);
                 using (var pen = new Pen(IOGenerationForm.SELECTED_CELL_COLOR, 2))
                 {//Border
                     Rectangle rect = args.CellBounds;

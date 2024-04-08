@@ -80,10 +80,10 @@ namespace TiaXmlReader.Generation.IO
 
                 ioDataList.Add(new IOData()
                 {
-                    IOAddress = ioAddress.ToString(),
+                    Address = ioAddress.ToString(),
                     IOName = ioName.ToString(),
                     DBName = dbName.ToString(),
-                    VariableName = variableName.ToString(),
+                    Variable = variableName.ToString(),
                     Comment = comment.ToString(),
                 });
             }

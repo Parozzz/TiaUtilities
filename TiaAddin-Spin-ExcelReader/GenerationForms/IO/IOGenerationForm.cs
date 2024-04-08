@@ -20,6 +20,12 @@ namespace TiaXmlReader.GenerationForms.IO
         public static readonly Color SELECTED_CELL_COLOR = Color.DarkGreen;
         public static readonly Color DRAGGED_CELL_BACK_COLOR = Color.PaleGreen;
 
+        public const int ADDRESS_COLUMN = 0;
+        public const int IO_NAME_COLUMN = 1;
+        public const int DB_COLUMN = 2;
+        public const int VARIABLE_COLUMN = 3;
+        public const int COMMENT_COLUMN = 4;
+
         private readonly IOGenerationDataSource dataSource;
 
         private readonly IOConfiguration config;
@@ -36,8 +42,8 @@ namespace TiaXmlReader.GenerationForms.IO
 
             this.dataSource = new IOGenerationDataSource(this.dataGridView);
 
-            config = new IOConfiguration();
-            configHandler = new IOGenerationFormConfigHandler(this, config);
+            this.config = new IOConfiguration();
+            this.configHandler = new IOGenerationFormConfigHandler(this, config, this.dataGridView);
 
             this.undoRedoHandler = new UndoRedoHandler();
             this.sortHandler = new SortHandler(dataSource, dataGridView, undoRedoHandler);
@@ -68,13 +74,13 @@ namespace TiaXmlReader.GenerationForms.IO
 
             this.dataGridView.AllowUserToAddRows = false;
 
-            var addressColumn = (DataGridViewTextBoxColumn)InitColumn(dataGridView.Columns[0], "Indirizzo", 60, false);
+            var addressColumn = (DataGridViewTextBoxColumn)InitColumn(dataGridView.Columns[ADDRESS_COLUMN], "Indirizzo", 55);
             addressColumn.MaxInputLength = 10;
 
-            var ioNameColumn = InitColumn(dataGridView.Columns[1], "Nome IO", 75, false);
-            var dbNameColumn = InitColumn(dataGridView.Columns[2], "DB", 75, false);
-            var variableColumn = InitColumn(dataGridView.Columns[3], "Variabile", 75, false);
-            var commentColumn = InitColumn(dataGridView.Columns[4], "Commento", 0, true);
+            var ioNameColumn = InitColumn(dataGridView.Columns[IO_NAME_COLUMN], "Nome IO", 80);
+            var dbNameColumn = InitColumn(dataGridView.Columns[DB_COLUMN], "DB", 80);
+            var variableColumn = InitColumn(dataGridView.Columns[VARIABLE_COLUMN], "Variabile", 105);
+            var commentColumn = InitColumn(dataGridView.Columns[COMMENT_COLUMN], "Commento", 0);
 
             //this.dataGridView.RowCount = TOTAL_ROW_COUNT;
 
@@ -213,15 +219,17 @@ namespace TiaXmlReader.GenerationForms.IO
 
             excelDragHandler.Init();
             sortHandler.Init();
+
+            UpdateConfigPanel();
         }
 
-        private DataGridViewColumn CreateColumn(string name, int width, bool fill)
+        private DataGridViewColumn CreateColumn(string name, int width)
         {
             var column = new DataGridViewTextBoxColumn();
-            return InitColumn(column, name, width, fill);
+            return InitColumn(column, name, width);
         }
 
-        private T InitColumn<T>(T column, string name, int width, bool fill) where T : DataGridViewColumn
+        private T InitColumn<T>(T column, string name, int width) where T : DataGridViewColumn
         {
             column.Name = name;
             column.DefaultCellStyle.SelectionBackColor = Color.LightGray;
@@ -229,8 +237,8 @@ namespace TiaXmlReader.GenerationForms.IO
             column.DefaultCellStyle.SelectionForeColor = Color.Black;
             column.DefaultCellStyle.ForeColor = Color.Black;
             column.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            column.Width = 60;
-            column.AutoSizeMode = fill ? DataGridViewAutoSizeColumnMode.Fill : DataGridViewAutoSizeColumnMode.None;
+            column.Width = width;
+            column.AutoSizeMode = width <= 0 ? DataGridViewAutoSizeColumnMode.Fill : DataGridViewAutoSizeColumnMode.None;
             column.SortMode = DataGridViewColumnSortMode.Programmatic;
             return column;
         }
@@ -342,6 +350,32 @@ namespace TiaXmlReader.GenerationForms.IO
                 MessageBox.Show(ex.ToString(), "Error while changing cells", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
+        }
+
+        private void MemoryTypeComboBox_TextChanged(object sender, EventArgs e)
+        {
+            UpdateConfigPanel();
+        }
+
+        private void UpdateConfigPanel()
+        {
+            configButtonPanel.SuspendLayout();
+
+            configButtonPanel.Controls.Clear();
+
+            configButtonPanel.Controls.Add(fcConfigButton);
+            if (memoryTypeComboBox.Text == "DB")
+            {
+                configButtonPanel.Controls.Add(dbConfigButton);
+            }
+            else if (memoryTypeComboBox.Text == "Merker")
+            {
+                configButtonPanel.Controls.Add(variableTableConfigButton);
+            }
+            configButtonPanel.Controls.Add(ioTableConfigButton);
+            configButtonPanel.Controls.Add(segmentNameConfigButton);
+
+            configButtonPanel.ResumeLayout();
         }
     }
 

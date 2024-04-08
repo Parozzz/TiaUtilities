@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TiaXmlReader.Generation;
 
 namespace TiaXmlReader.GenerationForms.IO.Data
 {
@@ -12,20 +13,20 @@ namespace TiaXmlReader.GenerationForms.IO.Data
     {
         private readonly DataGridView dataGridView;
 
-        private readonly List<IOGenerationData> dataList;
-        private readonly BindingList<IOGenerationData> bindingList;
+        private readonly List<IOData> dataList;
+        private readonly BindingList<IOData> bindingList;
 
         public IOGenerationDataSource(DataGridView dataGridView)
         {
             this.dataGridView = dataGridView;
 
-            dataList = new List<IOGenerationData>();
+            dataList = new List<IOData>();
             for (int i = 0; i < IOGenerationForm.TOTAL_ROW_COUNT; i++)
             {
-                dataList.Add(new IOGenerationData());
+                dataList.Add(new IOData());
             }
 
-            bindingList = new BindingList<IOGenerationData>(dataList);
+            bindingList = new BindingList<IOData>(dataList);
         }
 
         public void Init()
@@ -33,12 +34,12 @@ namespace TiaXmlReader.GenerationForms.IO.Data
             this.dataGridView.DataSource = new BindingSource() { DataSource = bindingList }; ;
         }
 
-        public IOGenerationData GetDataAt(int rowIndex)
+        public IOData GetDataAt(int rowIndex)
         {
             return dataList[rowIndex];
         }
 
-        public void Sort(IComparer<IOGenerationData> comparer, SortOrder sortOrder)
+        public void Sort(IComparer<IOData> comparer, SortOrder sortOrder)
         {
             if (sortOrder != SortOrder.None)
             {
@@ -52,9 +53,9 @@ namespace TiaXmlReader.GenerationForms.IO.Data
             }
         }
 
-        public Dictionary<IOGenerationData, int> CreateDataListSnapshot()
+        public Dictionary<IOData, int> CreateDataListSnapshot()
         {
-            var dict = new Dictionary<IOGenerationData, int>();
+            var dict = new Dictionary<IOData, int>();
             for (int x = 0; x < dataList.Count; x++)
             {
                 dict.Add(dataList[x], x);
@@ -62,7 +63,7 @@ namespace TiaXmlReader.GenerationForms.IO.Data
             return dict;
         }
 
-        public void RestoreDataListSnapshot(Dictionary<IOGenerationData, int> dict)
+        public void RestoreDataListSnapshot(Dictionary<IOData, int> dict)
         {
             dataList.Sort((x, y) =>
             {

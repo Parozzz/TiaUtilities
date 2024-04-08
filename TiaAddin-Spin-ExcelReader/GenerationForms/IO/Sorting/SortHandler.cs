@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TiaXmlReader.Generation;
 using TiaXmlReader.GenerationForms.IO.Data;
 using TiaXmlReader.UndoRedo;
 using static TiaXmlReader.GenerationForms.IO.IOGenerationCellPaintHandler;
@@ -17,8 +18,7 @@ namespace TiaXmlReader.GenerationForms.IO.Sorting
         private readonly UndoRedoHandler undoRedoHandler;
 
         private SortOrder sortOrder = SortOrder.None;
-        private Dictionary<IOGenerationData, int> noSortSnapshot;
-
+        private Dictionary<IOData, int> noSortSnapshot;
 
         public SortHandler(IOGenerationDataSource dataSource, DataGridView dataGridView, UndoRedoHandler undoRedoHandler)
         {

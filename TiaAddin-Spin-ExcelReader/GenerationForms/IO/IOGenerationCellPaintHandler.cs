@@ -47,7 +47,9 @@ namespace TiaXmlReader.GenerationForms.IO
 
                     if(request.HasBackground())
                     {
-                        backgroundDone = true;
+                        backgroundDone |= request.HasBackground();
+                        contentDone |= request.HasContent();
+
                         painter.PaintCell(args, request.Executed(), true);
                     }
                 }
@@ -69,6 +71,11 @@ namespace TiaXmlReader.GenerationForms.IO
                 if(backgroundDone || contentDone)
                 {
                     args.Handled = true;
+
+                    if(!contentDone)
+                    {
+                        args.PaintContent(args.ClipBounds);
+                    }
                 }
             };
         }

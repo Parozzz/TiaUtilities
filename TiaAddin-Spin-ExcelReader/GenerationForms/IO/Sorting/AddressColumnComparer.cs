@@ -4,12 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TiaXmlReader.Generation;
 using TiaXmlReader.GenerationForms.IO.Data;
 
 namespace TiaXmlReader.GenerationForms.IO.Sorting
 {
 
-    public class AddressColumnComparer : IComparer<IOGenerationData>
+    public class AddressColumnComparer : IComparer<IOData>
     {
         //This is required to avoid the values to go bottom and top when sorting. I want the empty lines always at the bottom!.
         private readonly int sortOrderModifier;
@@ -18,7 +19,7 @@ namespace TiaXmlReader.GenerationForms.IO.Sorting
             sortOrderModifier = (sortOrder == SortOrder.Ascending ? -1 : 1);
         }
 
-        public int Compare(IOGenerationData x, IOGenerationData y)
+        public int Compare(IOData x, IOData y)
         {
             var tagX = x?.GetTagAddress();
             var tagY = y?.GetTagAddress();
