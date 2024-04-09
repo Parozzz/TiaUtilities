@@ -57,7 +57,7 @@ namespace TiaXmlReader.SimaticML.LanguageText
 
         public MultiLanguageText() : base(MultiLanguageText.NODE_NAME)
         {
-            lang = this.AddAttribute("Lang", required: true, value: Constants.DEFAULT_LANG);
+            lang = this.AddAttribute("Lang", required: true, value: SystemVariables.LANG);
         }
 
         public CultureInfo GetLang()

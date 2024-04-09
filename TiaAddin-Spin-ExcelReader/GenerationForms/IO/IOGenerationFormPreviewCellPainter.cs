@@ -107,11 +107,11 @@ namespace TiaXmlReader.GenerationForms.IO
                 else if (columnIndex == IOGenerationForm.VARIABLE_COLUMN)
                 {
                     string parsedPrefix = string.Empty;
-                    if (config.MemoryType == "DB")
+                    if (config.MemoryType == IOMemoryTypeEnum.DB)
                     {
                         parsedPrefix = ioData.GetMemoryArea() == SimaticML.SimaticMemoryArea.INPUT ? config.PrefixInputDB : config.PrefixOutputDB;
                     }
-                    else if (config.MemoryType == "Merker")
+                    else if (config.MemoryType == IOMemoryTypeEnum.MERKER)
                     {
                         parsedPrefix = ioData.GetMemoryArea() == SimaticML.SimaticMemoryArea.INPUT ? config.PrefixInputMerker : config.PrefixOutputMerker;
                     }

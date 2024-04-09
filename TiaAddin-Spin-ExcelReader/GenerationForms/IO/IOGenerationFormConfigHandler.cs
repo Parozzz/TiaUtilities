@@ -30,9 +30,9 @@ namespace TiaXmlReader.GenerationForms.IO
                 this.dataGridView.Refresh();
             };
 
-            form.memoryTypeComboBox.TextChanged += (object sender, EventArgs args) =>
+            form.memoryTypeComboBox.SelectionChangeCommitted += (object sender, EventArgs args) =>
             {
-                config.MemoryType = form.memoryTypeComboBox.Text;
+                config.MemoryType = (IOMemoryTypeEnum)form.memoryTypeComboBox.SelectedValue;
                 this.dataGridView.Refresh();
             };
 

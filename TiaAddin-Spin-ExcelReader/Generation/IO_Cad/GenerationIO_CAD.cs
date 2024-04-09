@@ -10,6 +10,7 @@ using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace;
 using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace;
 using SpinXmlReader.SimaticML;
 using TiaXmlReader.SimaticML.nBlockAttributeList;
+using TiaXmlReader.Utility;
 
 namespace TiaXmlReader.Generation.IO_Cad
 {
@@ -199,7 +200,7 @@ namespace TiaXmlReader.Generation.IO_Cad
                 var ioTag = ioTagTable.AddTag()
                     .SetBoolean(cadData.GetSimaticMemoryArea(), cadData.GetAddressByte(), cadData.GetAddressBit())
                     .SetTagName(FixDuplicateAddress(cadData.IOName, ioAddressDict))
-                    .SetCommentText(Constants.DEFAULT_CULTURE, cadData.IOComment);
+                    .SetCommentText(SystemVariables.CULTURE, cadData.IOComment);
 
                 string inOutAddress = null;
                 if (!string.IsNullOrEmpty(cadData.DBName) && !string.IsNullOrEmpty(cadData.VariableName))
@@ -224,7 +225,7 @@ namespace TiaXmlReader.Generation.IO_Cad
                             inOutAddress = variableTagTable.AddTag()
                                             .SetTagName(fullTagAddress)
                                             .SetBoolean(SimaticMemoryArea.MERKER, merkerByte, merkerBit)
-                                            .SetCommentText(Constants.DEFAULT_CULTURE, cadData.VariableComment)
+                                            .SetCommentText(SystemVariables.CULTURE, cadData.VariableComment)
                                             .GetTagName();
                             if (merkerBit++ >= 8)
                             {
@@ -244,7 +245,7 @@ namespace TiaXmlReader.Generation.IO_Cad
                             var fullMemberAddress = FixDuplicateAddress(memberAddressPrefix + cadData.VariableName, variableAddressDict);
                             inOutAddress = db.GetAttributes().ComputeSection(SectionTypeEnum.STATIC)
                                     .AddMembersFromAddress(fullMemberAddress, SimaticDataType.BOOLEAN)
-                                    .SetCommentText(Constants.DEFAULT_CULTURE, cadData.VariableComment)
+                                    .SetCommentText(SystemVariables.CULTURE, cadData.VariableComment)
                                     .GetCompleteSymbol();
                             break;
                     }
@@ -254,7 +255,7 @@ namespace TiaXmlReader.Generation.IO_Cad
                 {
                     compileUnit = fc.AddCompileUnit();
                     compileUnit.Init();
-                    compileUnit.ComputeBlockTitle().SetText(Constants.DEFAULT_CULTURE, placeholders.Parse(segmentNameBitGrouping));
+                    compileUnit.ComputeBlockTitle().SetText(SystemVariables.CULTURE, placeholders.Parse(segmentNameBitGrouping));
                 }
                 else if (groupingType == "BytePerSegmento" && (cadData.GetAddressByte() != lastByteAddress || cadData.GetSimaticMemoryArea() != lastMemoryArea || compileUnit == null))
                 {
@@ -263,7 +264,7 @@ namespace TiaXmlReader.Generation.IO_Cad
 
                     compileUnit = fc.AddCompileUnit();
                     compileUnit.Init();
-                    compileUnit.ComputeBlockTitle().SetText(Constants.DEFAULT_CULTURE, placeholders.Parse(segmentNameByteGrouping));
+                    compileUnit.ComputeBlockTitle().SetText(SystemVariables.CULTURE, placeholders.Parse(segmentNameByteGrouping));
                 }
 
                 switch (cadData.GetSimaticMemoryArea())

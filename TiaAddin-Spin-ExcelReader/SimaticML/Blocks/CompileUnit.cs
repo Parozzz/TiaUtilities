@@ -68,8 +68,8 @@ namespace SpinXmlReader.Block
 
         public void Init()
         {
-            this.ComputeBlockTitle().SetText(Constants.DEFAULT_CULTURE, "");
-            this.ComputeBlockComment().SetText(Constants.DEFAULT_CULTURE, "");
+            this.ComputeBlockTitle().SetText(SystemVariables.CULTURE, "");
+            this.ComputeBlockComment().SetText(SystemVariables.CULTURE, "");
         }
 
         public MultilingualText ComputeBlockTitle()

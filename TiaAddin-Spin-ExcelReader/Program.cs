@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TiaXmlReader.Utility;
 
 namespace SpinXmlReader
 {
@@ -14,6 +15,8 @@ namespace SpinXmlReader
         [STAThread]
         static void Main()
         {
+            SystemVariables.INIT();
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new MainImportExportForm());

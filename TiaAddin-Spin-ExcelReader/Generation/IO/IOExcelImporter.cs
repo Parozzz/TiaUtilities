@@ -9,22 +9,25 @@ using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace;
 using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace;
 using SpinXmlReader.SimaticML;
 using ClosedXML.Excel;
+using System.Windows.Forms;
+using TiaXmlReader.Localization;
 
 namespace TiaXmlReader.Generation.IO
 {
     public class IOExcelImporter
     {
-        private readonly IOConfiguration configuration;
+        private readonly IOConfiguration config;
         private readonly List<IOData> ioDataList;
 
-        public IOExcelImporter()        {
-            this.configuration = new IOConfiguration();
+        public IOExcelImporter()
+        {
+            this.config = new IOConfiguration();
             this.ioDataList = new List<IOData>();
         }
 
         public IOConfiguration GetConfiguration()
         {
-            return configuration;
+            return config;
         }
 
         public List<IOData> GetDataList()
@@ -34,32 +37,38 @@ namespace TiaXmlReader.Generation.IO
 
         public void ImportExcelConfig(IXLWorksheet worksheet)
         {
-            configuration.FCBlockName = worksheet.Cell("C5").Value.ToString();
-            configuration.FCBlockNumber = (uint)worksheet.Cell("C6").Value.GetNumber();
+            config.FCBlockName = worksheet.Cell("C5").Value.ToString();
+            config.FCBlockNumber = (uint)worksheet.Cell("C6").Value.GetNumber();
 
-            configuration.MemoryType = worksheet.Cell("C8").Value.ToString();
-            configuration.GroupingType = worksheet.Cell("C9").Value.ToString();
+            if(!LocalizationHelper.TryGetEnumByDescription(worksheet.Cell("C8").Value.ToString(), out IOMemoryTypeEnum memoryType))
+            {
+                MessageBox.Show("Memory type is invalid.", "Invalid configuration", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            config.MemoryType = memoryType;
 
-            configuration.DBName = worksheet.Cell("C12").Value.ToString();
-            configuration.DBNumber = (uint)worksheet.Cell("C13").Value.GetNumber();
+            config.GroupingType = worksheet.Cell("C9").Value.ToString();
 
-            configuration.VariableTableName = worksheet.Cell("C16").Value.ToString();
-            configuration.VariableTableStartAddress = (uint)worksheet.Cell("C17").Value.GetNumber();
-            configuration.VariableTableSplitEvery = (uint)worksheet.Cell("C18").Value.GetNumber();
+            config.DBName = worksheet.Cell("C12").Value.ToString();
+            config.DBNumber = (uint)worksheet.Cell("C13").Value.GetNumber();
 
-            configuration.IOTableName = worksheet.Cell("C21").Value.ToString();
-            configuration.IOTableSplitEvery = (uint)worksheet.Cell("C22").Value.GetNumber();
+            config.VariableTableName = worksheet.Cell("C16").Value.ToString();
+            config.VariableTableStartAddress = (uint)worksheet.Cell("C17").Value.GetNumber();
+            config.VariableTableSplitEvery = (uint)worksheet.Cell("C18").Value.GetNumber();
 
-            configuration.DefaultIoName = worksheet.Cell("C25").Value.ToString();
-            configuration.DefaultVariableName = worksheet.Cell("C26").Value.ToString();
+            config.IOTableName = worksheet.Cell("C21").Value.ToString();
+            config.IOTableSplitEvery = (uint)worksheet.Cell("C22").Value.GetNumber();
 
-            configuration.SegmentNameBitGrouping = worksheet.Cell("C29").Value.ToString();
-            configuration.SegmentNameByteGrouping = worksheet.Cell("C30").Value.ToString();
+            config.DefaultIoName = worksheet.Cell("C25").Value.ToString();
+            config.DefaultVariableName = worksheet.Cell("C26").Value.ToString();
 
-            configuration.PrefixInputDB = worksheet.Cell("C33").Value.ToString();
-            configuration.PrefixInputMerker = worksheet.Cell("C34").Value.ToString();
-            configuration.PrefixOutputDB = worksheet.Cell("C35").Value.ToString();
-            configuration.PrefixOutputMerker = worksheet.Cell("C36").Value.ToString();
+            config.SegmentNameBitGrouping = worksheet.Cell("C29").Value.ToString();
+            config.SegmentNameByteGrouping = worksheet.Cell("C30").Value.ToString();
+
+            config.PrefixInputDB = worksheet.Cell("C33").Value.ToString();
+            config.PrefixInputMerker = worksheet.Cell("C34").Value.ToString();
+            config.PrefixOutputDB = worksheet.Cell("C35").Value.ToString();
+            config.PrefixOutputMerker = worksheet.Cell("C36").Value.ToString();
 
             ioDataList.Clear();
 

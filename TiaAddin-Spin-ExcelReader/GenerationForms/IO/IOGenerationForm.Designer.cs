@@ -186,15 +186,11 @@
             // memoryTypeComboBox
             // 
             this.memoryTypeComboBox.FormattingEnabled = true;
-            this.memoryTypeComboBox.Items.AddRange(new object[] {
-            "DB",
-            "Merker"});
             this.memoryTypeComboBox.Location = new System.Drawing.Point(111, 51);
             this.memoryTypeComboBox.Name = "memoryTypeComboBox";
             this.memoryTypeComboBox.Size = new System.Drawing.Size(65, 21);
             this.memoryTypeComboBox.TabIndex = 1;
-            this.memoryTypeComboBox.Text = "DB";
-            this.memoryTypeComboBox.TextChanged += new System.EventHandler(this.MemoryTypeComboBox_TextChanged);
+            this.memoryTypeComboBox.SelectionChangeCommitted += new System.EventHandler(this.MemoryTypeComboBox_SelectionChangeCommitted);
             // 
             // memoryTypeLabel
             // 

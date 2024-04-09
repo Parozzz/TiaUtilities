@@ -1,17 +1,38 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml;
+using SpinXmlReader;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace TiaXmlReader.Generation.IO
 {
+    public enum IOMemoryTypeEnum
+    {
+        [Display(Description = "MEMORY_TYPE_DB", ResourceType = typeof(Localization.IOGrouping))]
+        DB = 0, //DEFAULT
+        [Display(Description = "MEMORY_TYPE_MERKER", ResourceType = typeof(Localization.IOGrouping))]
+        MERKER
+    }
+
+    public enum IOGroupingTypeEnum
+    {
+        [Display(Description = "GROUPING_TYPE_BIT", ResourceType = typeof(Localization.IOGrouping))]
+        PER_BIT,
+        [Display(Description = "GROUPING_TYPE_BYTE", ResourceType = typeof(Localization.IOGrouping))]
+        PER_BYTE
+    }
+
     public class IOConfiguration
     {
         public string FCBlockName = "fcTest_IO";
         public uint FCBlockNumber = 195;
 
-        public string MemoryType = "DB";
+        public IOMemoryTypeEnum MemoryType = IOMemoryTypeEnum.DB;
         public string GroupingType = "BitPerSegmento";
 
         public string DBName = "TestIO_DB";

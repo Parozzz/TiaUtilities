@@ -9,6 +9,7 @@ using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace;
 using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace;
 using SpinXmlReader.SimaticML;
 using TiaXmlReader.SimaticML.nBlockAttributeList;
+using TiaXmlReader.Utility;
 
 namespace TiaXmlReader.Generation.IO
 {
@@ -82,7 +83,7 @@ namespace TiaXmlReader.Generation.IO
                 var ioTag = ioTagTable.AddTag()
                     .SetBoolean(ioData.GetMemoryArea(), ioData.GetAddressByte(), ioData.GetAddressBit())
                     .SetTagName(FixDuplicateAddress(ioData.IOName, ioAddressDict))
-                    .SetCommentText(Constants.DEFAULT_CULTURE, ioData.Comment);
+                    .SetCommentText(SystemVariables.CULTURE, ioData.Comment);
 
                 string inOutAddress = null;
                 if (!string.IsNullOrEmpty(ioData.DBName) && !string.IsNullOrEmpty(ioData.Variable))
@@ -93,7 +94,7 @@ namespace TiaXmlReader.Generation.IO
                 {
                     switch (config.MemoryType)
                     {
-                        case "Merker":
+                        case IOMemoryTypeEnum.MERKER:
                             if (variableTagTable == null || (config.VariableTableSplitEvery > 0 && variableTagCounter % config.VariableTableSplitEvery == 0))
                             {
                                 variableTagTable = new XMLTagTable();
@@ -107,7 +108,7 @@ namespace TiaXmlReader.Generation.IO
                             inOutAddress = variableTagTable.AddTag()
                                             .SetTagName(fullTagAddress)
                                             .SetBoolean(SimaticMemoryArea.MERKER, merkerByte, merkerBit)
-                                            .SetCommentText(Constants.DEFAULT_CULTURE, ioData.Comment)
+                                            .SetCommentText(SystemVariables.CULTURE, ioData.Comment)
                                             .GetTagName();
                             if (merkerBit++ >= 8)
                             {
@@ -115,7 +116,7 @@ namespace TiaXmlReader.Generation.IO
                                 merkerBit = 0;
                             }
                             break;
-                        case "DB":
+                        case IOMemoryTypeEnum.DB:
                             if (db == null)
                             {
                                 db = new BlockGlobalDB();
@@ -127,7 +128,7 @@ namespace TiaXmlReader.Generation.IO
                             var fullMemberAddress = FixDuplicateAddress(memberAddressPrefix + ioData.Variable, variableAddressDict);
                             inOutAddress = db.GetAttributes().ComputeSection(SectionTypeEnum.STATIC)
                                     .AddMembersFromAddress(fullMemberAddress, SimaticDataType.BOOLEAN)
-                                    .SetCommentText(Constants.DEFAULT_CULTURE, ioData.Comment)
+                                    .SetCommentText(SystemVariables.CULTURE, ioData.Comment)
                                     .GetCompleteSymbol();
                             break;
                     }
@@ -137,7 +138,7 @@ namespace TiaXmlReader.Generation.IO
                 {
                     compileUnit = fc.AddCompileUnit();
                     compileUnit.Init();
-                    compileUnit.ComputeBlockTitle().SetText(Constants.DEFAULT_CULTURE, placeholders.Parse(config.SegmentNameBitGrouping));
+                    compileUnit.ComputeBlockTitle().SetText(SystemVariables.CULTURE, placeholders.Parse(config.SegmentNameBitGrouping));
                 }
                 else if (config.GroupingType == "BytePerSegmento" && (ioData.GetAddressByte() != lastByteAddress || ioData.GetMemoryArea() != lastMemoryArea || compileUnit == null))
                 {
@@ -146,7 +147,7 @@ namespace TiaXmlReader.Generation.IO
 
                     compileUnit = fc.AddCompileUnit();
                     compileUnit.Init();
-                    compileUnit.ComputeBlockTitle().SetText(Constants.DEFAULT_CULTURE, placeholders.Parse(config.SegmentNameByteGrouping));
+                    compileUnit.ComputeBlockTitle().SetText(SystemVariables.CULTURE, placeholders.Parse(config.SegmentNameByteGrouping));
                 }
 
                 switch (ioData.GetMemoryArea())

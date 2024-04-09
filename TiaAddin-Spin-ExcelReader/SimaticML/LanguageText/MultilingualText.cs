@@ -94,7 +94,7 @@ namespace SpinXmlReader
 
         public MultilingualTextItem GetByDefaultLocale()
         {
-            return GetByLocale(Constants.DEFAULT_CULTURE);
+            return GetByLocale(SystemVariables.CULTURE);
         }
 
         public MultilingualTextItem GetByLocale(CultureInfo culture)
@@ -162,7 +162,7 @@ namespace SpinXmlReader
             //==== INIT CONFIGURATION ====
         }
 
-        public MultilingualTextItem() : this(Constants.DEFAULT_CULTURE, "")
+        public MultilingualTextItem() : this(SystemVariables.CULTURE, "")
         {
 
         }

@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using TiaXmlReader.Generation.IO;
 using TiaXmlReader.GenerationForms.IO.Data;
 using TiaXmlReader.GenerationForms.IO.Sorting;
+using TiaXmlReader.Localization;
 using TiaXmlReader.UndoRedo;
 
 namespace TiaXmlReader.GenerationForms.IO
@@ -55,6 +56,16 @@ namespace TiaXmlReader.GenerationForms.IO
         public void Init()
         {
             //var addressColumn = this.dataTable.Rows.Add(TOTAL_ROW_COUNT);
+
+            this.memoryTypeComboBox.DisplayMember = "Text";
+            this.memoryTypeComboBox.ValueMember = "Value";
+            var items = new[] {
+                    new { Text = IOMemoryTypeEnum.DB.GetDescription(), Value = IOMemoryTypeEnum.DB },
+                    new { Text = IOMemoryTypeEnum.MERKER.GetDescription(), Value = IOMemoryTypeEnum.MERKER }
+                };
+            this.memoryTypeComboBox.DataSource = items;
+
+            
 
             this.dataSource.Init();
             this.configHandler.Init();
@@ -351,8 +362,7 @@ namespace TiaXmlReader.GenerationForms.IO
             }
 
         }
-
-        private void MemoryTypeComboBox_TextChanged(object sender, EventArgs e)
+        private void MemoryTypeComboBox_SelectionChangeCommitted(object sender, EventArgs e)
         {
             UpdateConfigPanel();
         }
@@ -364,11 +374,11 @@ namespace TiaXmlReader.GenerationForms.IO
             configButtonPanel.Controls.Clear();
 
             configButtonPanel.Controls.Add(fcConfigButton);
-            if (memoryTypeComboBox.Text == "DB")
+            if (IOMemoryTypeEnum.DB.Equals(memoryTypeComboBox.SelectedValue))
             {
                 configButtonPanel.Controls.Add(dbConfigButton);
             }
-            else if (memoryTypeComboBox.Text == "Merker")
+            else if (IOMemoryTypeEnum.MERKER.Equals(memoryTypeComboBox.SelectedValue))
             {
                 configButtonPanel.Controls.Add(variableTableConfigButton);
             }
