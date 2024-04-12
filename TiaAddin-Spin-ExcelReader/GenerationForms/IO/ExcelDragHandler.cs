@@ -12,25 +12,46 @@ namespace TiaXmlReader.GenerationForms.IO
 {
     public class ExcelDragHandler : IOGenerationCellPainter
     {
-        private readonly IOGenerationForm form;
+        public const int TRIANGLE_SIZE = 13;
+        public class DragData
+        {
+            public int StartingRow { get; set; }
+            public int ActualRow { get; set; }
+            public uint SelectedRowCount { get; set; }
+            public int DraggedColumn { get; set; }
+            public bool DraggingDown { get; set; }
+            public int TopSelectedRow { get; set; } //Lowest index number
+            public int BottomSelectedRow { get; set; } //Highest index number
+            public string TooltipString { get; set; } //Only used for preview
+        }
+
         private readonly DataGridView dataGridView;
+
+        private readonly Color dragSelectionColor;
+        private readonly Color singleSelectedColor;
+        private readonly Color triangleColor;
 
         private bool started = false;
         private int rowIndexStart = -1;
-        private int actualDragColumnIndex = -1;
+        private int draggedColumnIndex = -1;
 
         private int topSelectionRowIndex = -1; //Lowest
         private int bottomSelectionRowIndex = -1; //Highest
         private uint SelectedRows { get => (uint)(bottomSelectionRowIndex - topSelectionRowIndex) + 1; }
 
+        private Action<DragData> previewAction;
+        private Action<DragData> mouseUpAction;
+
         private ToolTip dragToolTip;
 
         public bool DraggingDown { get => topSelectionRowIndex == rowIndexStart; }
 
-        public ExcelDragHandler(IOGenerationForm form, DataGridView dataGridView)
+        public ExcelDragHandler(DataGridView dataGridView, Color dragSelectionColor, Color singleSelectedColor, Color triangleColor)
         {
-            this.form = form;
             this.dataGridView = dataGridView;
+            this.dragSelectionColor = dragSelectionColor;
+            this.singleSelectedColor = singleSelectedColor;
+            this.triangleColor = triangleColor;
         }
 
         public bool IsStarted()
@@ -55,6 +76,8 @@ namespace TiaXmlReader.GenerationForms.IO
                 }
             };
 
+            this.dataGridView.LostFocus += delegate { this.Clear(); };
+
             this.dataGridView.MouseDown += (sender, args) =>
             {
                 var hitTest = dataGridView.HitTest(args.X, args.Y);
@@ -65,13 +88,10 @@ namespace TiaXmlReader.GenerationForms.IO
                     {
                         started = true;
                         bottomSelectionRowIndex = topSelectionRowIndex = rowIndexStart = hitTest.RowIndex;
-                        actualDragColumnIndex = hitTest.ColumnIndex;
+                        draggedColumnIndex = hitTest.ColumnIndex;
                     }
                 }
             };
-
-
-            this.dataGridView.LostFocus += delegate { this.Clear(); };
 
             this.dataGridView.MouseUp += (sender, args) =>
             {
@@ -79,35 +99,24 @@ namespace TiaXmlReader.GenerationForms.IO
                 {
                     started = false;
 
-                    var rowIndexEnumeration = Enumerable.Range(topSelectionRowIndex, (int)SelectedRows);
-                    if (actualDragColumnIndex == 0)
+                    if (this.mouseUpAction != null)
                     {
-                        var tagAddress = SimaticTagAddress.FromAddress(dataGridView.Rows[rowIndexStart]?.Cells[0].Value?.ToString());
-                        if (tagAddress != null) //If is not a valid address, i won't care about doing any stuff.
+                        var data = new DragData()
                         {
-                            if (!DraggingDown)
-                            {//Since i always start from the top to parse the addresses, if i am dragging down i need to start from the lowest value!
-                                tagAddress.PreviousBit(SimaticDataType.BYTE, SelectedRows - 1);
-                            }
+                            StartingRow = this.rowIndexStart,
+                            SelectedRowCount = this.SelectedRows,
+                            DraggedColumn = this.draggedColumnIndex,
+                            DraggingDown = this.DraggingDown,
+                            TopSelectedRow = this.topSelectionRowIndex,
+                            BottomSelectedRow = this.bottomSelectionRowIndex,
+                            TooltipString = ""
+                        };
 
-                            var dragCellList = new List<CellChange>();
-                            foreach (var rowIndex in rowIndexEnumeration)
-                            {
-                                var cellChange = new CellChange(dataGridView, 0, rowIndex) { NewValue = tagAddress.GetAddress() };
-                                dragCellList.Add(cellChange);
-
-                                tagAddress.NextBit(SimaticDataType.BYTE); //Increase at the end. The first value is valid!
-                            }
-
-                            form.ChangeCells(dragCellList);
-                        }
+                        mouseUpAction.Invoke(data);
                     }
-
-                    dataGridView.Refresh();
 
                     this.Clear();
                 }
-
             };
 
             dataGridView.SelectionChanged += (sender, args) =>
@@ -123,7 +132,7 @@ namespace TiaXmlReader.GenerationForms.IO
                 //When dragging, only allow cell on the column to be selected! I don't care about other ways and want it simple.
                 foreach (DataGridViewCell selectedCell in dataGridView.SelectedCells)
                 {
-                    bool sameColumn = selectedCell.ColumnIndex == actualDragColumnIndex;
+                    bool sameColumn = selectedCell.ColumnIndex == draggedColumnIndex;
                     if (!sameColumn)
                     {
                         selectedCell.Selected = false; //Only keep the ones on the same columns of the selected!
@@ -148,19 +157,40 @@ namespace TiaXmlReader.GenerationForms.IO
                     };
                 }
 
-                if (actualDragColumnIndex == 0)
+                if (this.previewAction != null)
                 {
-                    var tagAddress = SimaticTagAddress.FromAddress(dataGridView.Rows[rowIndexStart]?.Cells[0].Value?.ToString());
-                    if (tagAddress != null)
+                    var data = new DragData()
                     {
-                        var _ = DraggingDown
-                                    ? tagAddress.NextBit(SimaticDataType.BYTE, SelectedRows - 1)
-                                    : tagAddress.PreviousBit(SimaticDataType.BYTE, SelectedRows - 1);
-                        dragToolTip.Show(tagAddress.GetAddress(), form, form.PointToClient(Cursor.Position));
+                        StartingRow = this.rowIndexStart,
+                        SelectedRowCount = this.SelectedRows,
+                        DraggedColumn = this.draggedColumnIndex,
+                        DraggingDown = this.DraggingDown,
+                        TopSelectedRow = this.topSelectionRowIndex,
+                        BottomSelectedRow = this.bottomSelectionRowIndex,
+                        TooltipString = ""
+                    };
+
+                    previewAction.Invoke(data);
+                    if (!string.IsNullOrEmpty(data.TooltipString))
+                    {
+                        dragToolTip.Show(data.TooltipString, dataGridView.FindForm(), dataGridView.FindForm().PointToClient(Cursor.Position));
                     }
                 }
             };
         }
+
+        public ExcelDragHandler SetPreviewAction(Action<DragData> action)
+        {
+            this.previewAction = action;
+            return this;
+        }
+
+        public ExcelDragHandler SetMouseUpAction(Action<DragData> action)
+        {
+            this.mouseUpAction = action;
+            return this;
+        }
+
         public PaintRequest PaintCellRequest(DataGridViewCellPaintingEventArgs args)
         {
             var paintRequest = new PaintRequest();
@@ -170,7 +200,7 @@ namespace TiaXmlReader.GenerationForms.IO
 
             if (columnIndex >= 0 && rowIndex >= 0)
             {
-                if (started && this.actualDragColumnIndex == columnIndex)
+                if (started && this.draggedColumnIndex == columnIndex)
                 {
                     return paintRequest.Background();
                 }
@@ -206,7 +236,7 @@ namespace TiaXmlReader.GenerationForms.IO
             }
             else if (started)
             {
-                style.SelectionBackColor = IOGenerationForm.DRAGGED_CELL_BACK_COLOR;
+                style.SelectionBackColor = this.dragSelectionColor;
 
                 args.PaintBackground(bounds, true);
                 return;
@@ -218,7 +248,7 @@ namespace TiaXmlReader.GenerationForms.IO
                 args.PaintBackground(bounds, true);
 
                 //args.Paint(bounds, DataGridViewPaintParts.All & ~DataGridViewPaintParts.Border);
-                using (var pen = new Pen(IOGenerationForm.SELECTED_CELL_COLOR, 2))
+                using (var pen = new Pen(this.singleSelectedColor, 2))
                 {//Border
                     Rectangle rect = args.CellBounds;
                     rect.Width -= 1;
@@ -226,11 +256,11 @@ namespace TiaXmlReader.GenerationForms.IO
                     graphics.DrawRectangle(pen, rect);
                 }
 
-                using (var brush = new SolidBrush(IOGenerationForm.SELECTED_CELL_COLOR))
+                using (var brush = new SolidBrush(this.triangleColor))
                 {//Little triangle in the lower part only for current cell
-                    var point1 = new Point(bounds.Right - 1, bounds.Bottom - 10);
+                    var point1 = new Point(bounds.Right - 1, bounds.Bottom - TRIANGLE_SIZE);
                     var point2 = new Point(bounds.Right - 1, bounds.Bottom - 1);
-                    var point3 = new Point(bounds.Right - 10, bounds.Bottom - 1);
+                    var point3 = new Point(bounds.Right - TRIANGLE_SIZE, bounds.Bottom - 1);
 
                     Point[] pt = new Point[] { point1, point2, point3 };
                     graphics.FillPolygon(brush, pt);
@@ -246,14 +276,14 @@ namespace TiaXmlReader.GenerationForms.IO
         public bool IsInsideTriangle(int x, int y, int columnIndex, int rowIndex)
         {
             var bounds = dataGridView.GetCellDisplayRectangle(columnIndex, rowIndex, false);
-            return x >= bounds.Right - 6 && x <= bounds.Right + 2 //Go outside a bit of the cell to avoid misclick that sometime happend
-                && y >= bounds.Bottom - 6 && y <= bounds.Bottom + 2;
+            return x >= bounds.Right - TRIANGLE_SIZE && x <= bounds.Right + 2 //Go outside a bit of the cell to avoid misclick that sometime happend
+                && y >= bounds.Bottom - TRIANGLE_SIZE && y <= bounds.Bottom + 2;
         }
 
         private void Clear()
         {
             started = false;
-            rowIndexStart = actualDragColumnIndex = topSelectionRowIndex = bottomSelectionRowIndex = -1;
+            rowIndexStart = draggedColumnIndex = topSelectionRowIndex = bottomSelectionRowIndex = -1;
 
             if (dragToolTip != null)
             {

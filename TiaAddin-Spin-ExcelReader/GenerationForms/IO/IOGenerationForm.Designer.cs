@@ -164,14 +164,10 @@
             // groupingTypeComboBox
             // 
             this.groupingTypeComboBox.FormattingEnabled = true;
-            this.groupingTypeComboBox.Items.AddRange(new object[] {
-            "BitPerSegmento",
-            "BytePerSegmento"});
             this.groupingTypeComboBox.Location = new System.Drawing.Point(332, 51);
             this.groupingTypeComboBox.Name = "groupingTypeComboBox";
             this.groupingTypeComboBox.Size = new System.Drawing.Size(112, 21);
             this.groupingTypeComboBox.TabIndex = 3;
-            this.groupingTypeComboBox.Text = "BytePerSegmento";
             // 
             // divisionTypeLabel
             // 

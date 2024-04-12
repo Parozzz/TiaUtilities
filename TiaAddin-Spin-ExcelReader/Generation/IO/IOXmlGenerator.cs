@@ -134,13 +134,13 @@ namespace TiaXmlReader.Generation.IO
                     }
                 }
 
-                if (config.GroupingType == "BitPerSegmento")
+                if (config.GroupingType == IOGroupingTypeEnum.PER_BIT)
                 {
                     compileUnit = fc.AddCompileUnit();
                     compileUnit.Init();
                     compileUnit.ComputeBlockTitle().SetText(SystemVariables.CULTURE, placeholders.Parse(config.SegmentNameBitGrouping));
                 }
-                else if (config.GroupingType == "BytePerSegmento" && (ioData.GetAddressByte() != lastByteAddress || ioData.GetMemoryArea() != lastMemoryArea || compileUnit == null))
+                else if (config.GroupingType == IOGroupingTypeEnum.PER_BYTE && (ioData.GetAddressByte() != lastByteAddress || ioData.GetMemoryArea() != lastMemoryArea || compileUnit == null))
                 {
                     lastByteAddress = (int)ioData.GetAddressByte();
                     lastMemoryArea = ioData.GetMemoryArea();

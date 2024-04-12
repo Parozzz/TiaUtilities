@@ -33,7 +33,7 @@ namespace TiaXmlReader.Generation.IO
         public uint FCBlockNumber = 195;
 
         public IOMemoryTypeEnum MemoryType = IOMemoryTypeEnum.DB;
-        public string GroupingType = "BitPerSegmento";
+        public IOGroupingTypeEnum GroupingType = IOGroupingTypeEnum.PER_BYTE;
 
         public string DBName = "TestIO_DB";
         public uint DBNumber = 196;

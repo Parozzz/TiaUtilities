@@ -39,16 +39,17 @@
             this.dbDuplicationMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.generateIOMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.label4 = new System.Windows.Forms.Label();
+            this.languageComboBox = new System.Windows.Forms.ComboBox();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // configExcelPathTextBox
             // 
             this.configExcelPathTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.configExcelPathTextBox.Location = new System.Drawing.Point(295, 57);
-            this.configExcelPathTextBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.configExcelPathTextBox.Location = new System.Drawing.Point(221, 46);
             this.configExcelPathTextBox.Name = "configExcelPathTextBox";
-            this.configExcelPathTextBox.Size = new System.Drawing.Size(1211, 24);
+            this.configExcelPathTextBox.Size = new System.Drawing.Size(909, 21);
             this.configExcelPathTextBox.TabIndex = 0;
             this.configExcelPathTextBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ConfigExcelPathTextBox_MouseClick);
             // 
@@ -56,20 +57,18 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(23, 54);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label1.Location = new System.Drawing.Point(17, 44);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(243, 31);
+            this.label1.Size = new System.Drawing.Size(198, 25);
             this.label1.TabIndex = 1;
             this.label1.Text = "File Excel Config.";
             // 
             // exportPathTextBlock
             // 
             this.exportPathTextBlock.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.exportPathTextBlock.Location = new System.Drawing.Point(295, 97);
-            this.exportPathTextBlock.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.exportPathTextBlock.Location = new System.Drawing.Point(221, 79);
             this.exportPathTextBlock.Name = "exportPathTextBlock";
-            this.exportPathTextBlock.Size = new System.Drawing.Size(1211, 24);
+            this.exportPathTextBlock.Size = new System.Drawing.Size(909, 21);
             this.exportPathTextBlock.TabIndex = 6;
             this.exportPathTextBlock.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ExportPathTextBlock_MouseClick);
             // 
@@ -77,10 +76,9 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(81, 95);
-            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label2.Location = new System.Drawing.Point(61, 77);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(189, 31);
+            this.label2.Size = new System.Drawing.Size(154, 25);
             this.label2.TabIndex = 7;
             this.label2.Text = "Export Folder";
             // 
@@ -94,10 +92,9 @@
             "17",
             "18",
             "19"});
-            this.tiaVersionComboBox.Location = new System.Drawing.Point(295, 133);
-            this.tiaVersionComboBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tiaVersionComboBox.Location = new System.Drawing.Point(221, 108);
             this.tiaVersionComboBox.Name = "tiaVersionComboBox";
-            this.tiaVersionComboBox.Size = new System.Drawing.Size(63, 37);
+            this.tiaVersionComboBox.Size = new System.Drawing.Size(48, 32);
             this.tiaVersionComboBox.TabIndex = 8;
             this.tiaVersionComboBox.Text = "17";
             this.tiaVersionComboBox.SelectedIndexChanged += new System.EventHandler(this.TiaVersionComboBox_SelectedIndexChanged);
@@ -106,20 +103,18 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(108, 138);
-            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label3.Location = new System.Drawing.Point(81, 112);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(167, 31);
+            this.label3.Size = new System.Drawing.Size(134, 25);
             this.label3.TabIndex = 9;
             this.label3.Text = "TIA Version";
             // 
             // generateInOutButton
             // 
             this.generateInOutButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.generateInOutButton.Location = new System.Drawing.Point(527, 177);
-            this.generateInOutButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.generateInOutButton.Location = new System.Drawing.Point(395, 144);
             this.generateInOutButton.Name = "generateInOutButton";
-            this.generateInOutButton.Size = new System.Drawing.Size(463, 53);
+            this.generateInOutButton.Size = new System.Drawing.Size(347, 43);
             this.generateInOutButton.TabIndex = 10;
             this.generateInOutButton.Text = "Generate XML Export Files";
             this.generateInOutButton.UseVisualStyleBackColor = true;
@@ -134,7 +129,8 @@
             this.generateIOMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1515, 36);
+            this.menuStrip1.Padding = new System.Windows.Forms.Padding(4, 2, 0, 2);
+            this.menuStrip1.Size = new System.Drawing.Size(1136, 29);
             this.menuStrip1.TabIndex = 11;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -142,28 +138,51 @@
             // 
             this.dbDuplicationMenuItem.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.dbDuplicationMenuItem.Name = "dbDuplicationMenuItem";
-            this.dbDuplicationMenuItem.Size = new System.Drawing.Size(157, 32);
+            this.dbDuplicationMenuItem.Size = new System.Drawing.Size(125, 25);
             this.dbDuplicationMenuItem.Text = "DB Duplication";
             this.dbDuplicationMenuItem.Click += new System.EventHandler(this.DbDuplicationMenuItem_Click);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(14, 32);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(12, 25);
             // 
             // generateIOMenuItem
             // 
             this.generateIOMenuItem.Font = new System.Drawing.Font("Segoe UI", 12F);
             this.generateIOMenuItem.Name = "generateIOMenuItem";
-            this.generateIOMenuItem.Size = new System.Drawing.Size(130, 32);
+            this.generateIOMenuItem.Size = new System.Drawing.Size(105, 25);
             this.generateIOMenuItem.Text = "Generate IO";
             this.generateIOMenuItem.Click += new System.EventHandler(this.GenerateIOMenuItem_Click);
             // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Location = new System.Drawing.Point(132, 144);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(83, 25);
+            this.label4.TabIndex = 13;
+            this.label4.Text = "Lingua";
+            // 
+            // languageComboBox
+            // 
+            this.languageComboBox.Cursor = System.Windows.Forms.Cursors.Arrow;
+            this.languageComboBox.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.languageComboBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.languageComboBox.FormattingEnabled = true;
+            this.languageComboBox.Location = new System.Drawing.Point(221, 141);
+            this.languageComboBox.Name = "languageComboBox";
+            this.languageComboBox.Size = new System.Drawing.Size(79, 32);
+            this.languageComboBox.TabIndex = 12;
+            // 
             // MainImportExportForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1515, 255);
+            this.ClientSize = new System.Drawing.Size(1136, 207);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.languageComboBox);
             this.Controls.Add(this.generateInOutButton);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.tiaVersionComboBox);
@@ -173,7 +192,6 @@
             this.Controls.Add(this.configExcelPathTextBox);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "MainImportExportForm";
             this.Text = "AppoggioMan";
             this.menuStrip1.ResumeLayout(false);
@@ -196,6 +214,8 @@
         private System.Windows.Forms.ToolStripMenuItem dbDuplicationMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem generateIOMenuItem;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.ComboBox languageComboBox;
     }
 }
 

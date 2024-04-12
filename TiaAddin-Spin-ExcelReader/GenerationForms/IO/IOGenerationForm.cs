@@ -10,6 +10,7 @@ using TiaXmlReader.Generation.IO;
 using TiaXmlReader.GenerationForms.IO.Data;
 using TiaXmlReader.GenerationForms.IO.Sorting;
 using TiaXmlReader.Localization;
+using TiaXmlReader.SimaticML;
 using TiaXmlReader.UndoRedo;
 
 namespace TiaXmlReader.GenerationForms.IO
@@ -47,8 +48,8 @@ namespace TiaXmlReader.GenerationForms.IO
             this.configHandler = new IOGenerationFormConfigHandler(this, config, this.dataGridView);
 
             this.undoRedoHandler = new UndoRedoHandler();
-            this.sortHandler = new SortHandler(dataSource, dataGridView, undoRedoHandler);
-            this.excelDragHandler = new ExcelDragHandler(this, this.dataGridView);
+            this.sortHandler = new SortHandler(dataSource, this.dataGridView, undoRedoHandler);
+            this.excelDragHandler = new ExcelDragHandler(this.dataGridView, DRAGGED_CELL_BACK_COLOR, SELECTED_CELL_COLOR, SELECTED_CELL_COLOR);
 
             Init();
         }
@@ -57,15 +58,28 @@ namespace TiaXmlReader.GenerationForms.IO
         {
             //var addressColumn = this.dataTable.Rows.Add(TOTAL_ROW_COUNT);
 
+            #region MemoryType ComboBox
             this.memoryTypeComboBox.DisplayMember = "Text";
             this.memoryTypeComboBox.ValueMember = "Value";
-            var items = new[] {
-                    new { Text = IOMemoryTypeEnum.DB.GetDescription(), Value = IOMemoryTypeEnum.DB },
-                    new { Text = IOMemoryTypeEnum.MERKER.GetDescription(), Value = IOMemoryTypeEnum.MERKER }
-                };
-            this.memoryTypeComboBox.DataSource = items;
 
-            
+            var memoryTypeItems = new List<object>();
+            foreach (IOMemoryTypeEnum memoryType in Enum.GetValues(typeof(IOMemoryTypeEnum)))
+            {
+                memoryTypeItems.Add(new { Text = memoryType.GetDescription(), Value = memoryType });
+            }
+            this.memoryTypeComboBox.DataSource = memoryTypeItems;
+            #endregion
+            #region GroupingType ComboBox
+            this.groupingTypeComboBox.DisplayMember = "Text";
+            this.groupingTypeComboBox.ValueMember = "Value";
+
+            var gropingTypeItems = new List<object>();
+            foreach (IOGroupingTypeEnum groupingType in Enum.GetValues(typeof(IOGroupingTypeEnum)))
+            {
+                gropingTypeItems.Add(new { Text = groupingType.GetDescription(), Value = groupingType });
+            }
+            this.groupingTypeComboBox.DataSource = gropingTypeItems;
+            #endregion
 
             this.dataSource.Init();
             this.configHandler.Init();
@@ -226,6 +240,79 @@ namespace TiaXmlReader.GenerationForms.IO
                     cellEdit = null;
                 }
             };
+            #endregion
+
+            #region Drag
+            excelDragHandler.SetPreviewAction(data =>
+            {
+                string toolTipString = "";
+                if (data.DraggedColumn == 0)
+                {
+                    var tagAddress = SimaticTagAddress.FromAddress(dataGridView.Rows[data.StartingRow]?.Cells[0].Value?.ToString());
+                    if (tagAddress != null)
+                    {
+                        toolTipString = (data.DraggingDown
+                                    ? tagAddress.NextBit(SimaticDataType.BYTE, data.SelectedRowCount - 1)
+                                    : tagAddress.PreviousBit(SimaticDataType.BYTE, data.SelectedRowCount - 1)).GetAddress();
+                    }
+                }
+                else
+                {
+                    var startString = dataGridView.Rows[data.StartingRow]?.Cells[data.DraggedColumn].Value?.ToString();
+                    if (!string.IsNullOrEmpty(startString))
+                    {
+                        var numString = "";
+                        for (int x = (startString.Length - 1); x >= 0; x--)
+                        {
+                            var c = startString[x];
+                            if (!Char.IsDigit(c))
+                            {
+                                break;
+                            }
+
+                            numString = c + numString;
+                        }
+
+                        if (numString.Length > 0 && int.TryParse(numString, out int num))
+                        {
+                            var nextNum = num + (data.SelectedRowCount - 1) * (data.DraggingDown ? 1 : -1);
+
+                            var substring = startString.Substring(0, startString.Length - numString.Length);
+                            toolTipString = substring + nextNum;
+                        }
+                    }
+                }
+                data.TooltipString = toolTipString;
+            });
+
+            excelDragHandler.SetMouseUpAction(data =>
+            {
+                var cellChangeList = new List<CellChange>();
+
+                var rowIndexEnumeration = Enumerable.Range(data.TopSelectedRow, (int)data.SelectedRowCount);
+                if (data.DraggedColumn == 0)
+                {
+                    var tagAddress = SimaticTagAddress.FromAddress(dataGridView.Rows[data.StartingRow]?.Cells[0].Value?.ToString());
+                    if (tagAddress != null) //If is not a valid address, i won't care about doing any stuff.
+                    {
+                        if (!data.DraggingDown)
+                        {//Since i always start from the top to parse the addresses, if i am dragging down i need to start from the lowest value!
+                            tagAddress.PreviousBit(SimaticDataType.BYTE, data.SelectedRowCount - 1);
+                        }
+
+
+                        foreach (var rowIndex in rowIndexEnumeration)
+                        {
+                            var cellChange = new CellChange(dataGridView, 0, rowIndex) { NewValue = tagAddress.GetAddress() };
+                            cellChangeList.Add(cellChange);
+
+                            tagAddress.NextBit(SimaticDataType.BYTE); //Increase at the end. The first value is valid!
+                        }
+                    }
+                }
+
+                this.ChangeCells(cellChangeList);
+            });
             #endregion
 
             excelDragHandler.Init();

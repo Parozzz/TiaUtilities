@@ -3,6 +3,7 @@ using Newtonsoft.Json.Converters;
 using SpinXmlReader;
 using System;
 using System.IO;
+using TiaXmlReader.Utility;
 
 namespace TiaXmlReader
 {
@@ -21,6 +22,8 @@ namespace TiaXmlReader
         [JsonProperty] public string DBDuplicationReplacementList3;
 
         [JsonProperty] public uint lastTIAVersion = Constants.VERSION;
+
+        [JsonProperty] public string ietfLanguage = SystemVariables.LANG;
 
         public static bool Exists()
         {

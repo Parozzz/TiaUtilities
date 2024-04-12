@@ -47,7 +47,12 @@ namespace TiaXmlReader.Generation.IO
             }
             config.MemoryType = memoryType;
 
-            config.GroupingType = worksheet.Cell("C9").Value.ToString();
+            if (!LocalizationHelper.TryGetEnumByDescription(worksheet.Cell("C9").Value.ToString(), out IOGroupingTypeEnum groupingType))
+            {
+                MessageBox.Show("Groping type is invalid.", "Invalid configuration", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            config.GroupingType = groupingType;
 
             config.DBName = worksheet.Cell("C12").Value.ToString();
             config.DBNumber = (uint)worksheet.Cell("C13").Value.GetNumber();

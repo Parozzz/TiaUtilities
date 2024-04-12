@@ -24,9 +24,9 @@ namespace TiaXmlReader.GenerationForms.IO
 
         public void Init()
         {
-            form.groupingTypeComboBox.TextChanged += (object sender, EventArgs args) =>
+            form.groupingTypeComboBox.SelectionChangeCommitted += (object sender, EventArgs args) =>
             {
-                config.GroupingType = form.groupingTypeComboBox.Text;
+                config.GroupingType = (IOGroupingTypeEnum) form.groupingTypeComboBox.SelectedValue;
                 this.dataGridView.Refresh();
             };
 

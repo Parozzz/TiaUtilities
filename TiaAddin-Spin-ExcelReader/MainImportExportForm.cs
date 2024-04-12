@@ -1,6 +1,8 @@
 ﻿using ClosedXML.Excel;
 using System;
+using System.Globalization;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using TiaXmlReader;
 using TiaXmlReader.Generation;
@@ -8,6 +10,7 @@ using TiaXmlReader.Generation.IO;
 using TiaXmlReader.Generation.IO_Cad;
 using TiaXmlReader.GenerationForms.IO;
 using TiaXmlReader.SimaticML;
+using TiaXmlReader.Utility;
 
 namespace SpinXmlReader
 {
@@ -19,9 +22,30 @@ namespace SpinXmlReader
             InitializeComponent();
 
             this.saveData = SaveData.Load();
+            Init();
+        }
+
+        private void Init()
+        {
             configExcelPathTextBox.Text = saveData.lastExcelFileName;
             exportPathTextBlock.Text = saveData.lastXMLExportPath;
             tiaVersionComboBox.Text = "" + saveData.lastTIAVersion;
+
+            this.languageComboBox.Items.AddRange(new string[]{ "it-IT", "en-US"});
+            this.languageComboBox.TextChanged += (object sender, EventArgs args) =>
+            {
+                try
+                {
+                    var culture = CultureInfo.GetCultureInfo(this.languageComboBox.Text);
+                    SystemVariables.LANG = saveData.ietfLanguage = culture.IetfLanguageTag;
+                    saveData.Save();
+                }
+                catch (CultureNotFoundException)
+                {
+                    this.languageComboBox.SelectedItem = this.languageComboBox.Items[0];
+                }
+            };
+            this.languageComboBox.Text = saveData.ietfLanguage; //Call this after so the text changed event changes the system lang.
         }
 
         private void TiaVersionComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -61,15 +85,21 @@ namespace SpinXmlReader
 
         private void ExportPathTextBlock_MouseClick(object sender, MouseEventArgs e)
         {
-            var fileDialog = new FolderBrowserDialog()
+            var fileDialog = new OpenFileDialog
             {
-                SelectedPath = saveData.lastXMLExportPath,
+                CheckFileExists = false
             };
+
+            try
+            {
+                fileDialog.InitialDirectory = saveData.lastXMLExportPath;
+            }
+            catch { }
 
             var result = fileDialog.ShowDialog();
             if (result == DialogResult.OK || result == DialogResult.Yes)
             {
-                saveData.lastXMLExportPath = fileDialog.SelectedPath;
+                saveData.lastXMLExportPath = Path.GetDirectoryName(fileDialog.FileName);
                 saveData.Save();
 
                 exportPathTextBlock.Text = saveData.lastXMLExportPath;
