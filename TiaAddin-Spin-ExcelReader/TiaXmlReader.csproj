@@ -79,6 +79,21 @@
     <Reference Include="Irony, Version=1.0.11.0, Culture=neutral, PublicKeyToken=ca48ace7223ead47, processorArchitecture=MSIL">
       <HintPath>..\packages\Irony.NetCore.1.0.11\lib\net461\Irony.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.Core, Version=7.0.4.0, Culture=neutral, PublicKeyToken=8afb38e9204fc0a9, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack.7.0.4\lib\net48\Microsoft.WindowsAPICodePack.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.ExtendedLinguisticServices, Version=7.0.4.0, Culture=neutral, PublicKeyToken=8afb38e9204fc0a9, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack.7.0.4\lib\net48\Microsoft.WindowsAPICodePack.ExtendedLinguisticServices.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.Sensors, Version=7.0.4.0, Culture=neutral, PublicKeyToken=8afb38e9204fc0a9, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack.7.0.4\lib\net48\Microsoft.WindowsAPICodePack.Sensors.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=7.0.4.0, Culture=neutral, PublicKeyToken=8afb38e9204fc0a9, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack.7.0.4\lib\net48\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.ShellExtensions, Version=7.0.4.0, Culture=neutral, PublicKeyToken=8afb38e9204fc0a9, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack.7.0.4\lib\net48\Microsoft.WindowsAPICodePack.ShellExtensions.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -146,15 +161,20 @@
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack.7.0.4\lib\net48\System.Windows.Forms.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
+    <Reference Include="WindowsFormsIntegration, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack.7.0.4\lib\net48\WindowsFormsIntegration.dll</HintPath>
+    </Reference>
     <Reference Include="XLParser, Version=1.5.2.0, Culture=neutral, PublicKeyToken=63397e1e46bb91b4, processorArchitecture=MSIL">
       <HintPath>..\packages\XLParser.1.5.2\lib\net461\XLParser.dll</HintPath>
     </Reference>
@@ -180,10 +200,11 @@
     </Compile>
     <Compile Include="GenerationForms\IO\IOGenerationFormConfigHandler.cs" />
     <Compile Include="GenerationForms\IO\IOGenerationFormPreviewCellPainter.cs" />
+    <Compile Include="GenerationForms\IO\IOGenerationSave.cs" />
     <Compile Include="GenerationForms\IO\Sorting\AddressColumnComparer.cs" />
     <Compile Include="GenerationForms\IO\ExcelDragHandler.cs" />
     <Compile Include="GenerationForms\IO\IOGenerationCellPaintHandler.cs" />
-    <Compile Include="GenerationForms\IO\Data\IOGenerationDataSource.cs" />
+    <Compile Include="GenerationForms\IO\IOGenerationDataSource.cs" />
     <Compile Include="GenerationForms\IO\Sorting\SortHandler.cs" />
     <Compile Include="Generation\IO\IOExcelImporter.cs" />
     <Compile Include="Generation\IO\IOConfiguration.cs" />

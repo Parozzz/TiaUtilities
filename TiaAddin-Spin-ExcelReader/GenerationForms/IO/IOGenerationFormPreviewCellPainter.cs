@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.IO;
-using TiaXmlReader.GenerationForms.IO.Data;
 using static TiaXmlReader.GenerationForms.IO.IOGenerationCellPaintHandler;
 
 namespace TiaXmlReader.GenerationForms.IO

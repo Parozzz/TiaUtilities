@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.Globalization;
 using System.IO;
@@ -61,49 +62,44 @@ namespace SpinXmlReader
 
         private void ConfigExcelPathTextBox_MouseClick(object sender, MouseEventArgs e)
         {
-            var fileDialog = new OpenFileDialog
-            {
-                Filter = "Excel Files (*.xlsx)|*.xlsx",
-                CheckFileExists = true
-            };
-
             try
             {
+                var fileDialog = new CommonOpenFileDialog
+                {
+                    EnsureFileExists = true,
+                    EnsurePathExists = true,
+                };
+                fileDialog.Filters.Add(new CommonFileDialogFilter("Excel Files (*.xlsx)", "*.xlsx"));
                 fileDialog.InitialDirectory = string.IsNullOrEmpty(saveData.lastExcelFileName) ? "" : Path.GetDirectoryName(saveData.lastExcelFileName);
+
+                if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
+                {
+                    configExcelPathTextBox.Text = saveData.lastExcelFileName = fileDialog.FileName;
+                    saveData.Save();
+                }
             }
             catch  {  }
 
-            var result = fileDialog.ShowDialog();
-            if (result == DialogResult.OK || result == DialogResult.Yes)
-            {
-                saveData.lastExcelFileName = fileDialog.FileName;
-                saveData.Save();
-
-                configExcelPathTextBox.Text = saveData.lastExcelFileName;
-            }
         }
 
         private void ExportPathTextBlock_MouseClick(object sender, MouseEventArgs e)
         {
-            var fileDialog = new OpenFileDialog
-            {
-                CheckFileExists = false
-            };
-
             try
             {
+                var fileDialog = new CommonOpenFileDialog
+                {
+                    IsFolderPicker = true,
+                    EnsurePathExists = true
+                };
                 fileDialog.InitialDirectory = saveData.lastXMLExportPath;
+                if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
+                {
+                    exportPathTextBlock.Text = saveData.lastXMLExportPath = fileDialog.FileName;
+                    saveData.Save();
+                }
             }
             catch { }
 
-            var result = fileDialog.ShowDialog();
-            if (result == DialogResult.OK || result == DialogResult.Yes)
-            {
-                saveData.lastXMLExportPath = Path.GetDirectoryName(fileDialog.FileName);
-                saveData.Save();
-
-                exportPathTextBlock.Text = saveData.lastXMLExportPath;
-            }
         }
 
         private void GenerateXMLExportFiles_MouseClick(object sender, MouseEventArgs e)

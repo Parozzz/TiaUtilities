@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace SpinXmlReader
@@ -42,10 +43,10 @@ namespace SpinXmlReader
 
         public static T FindEnumByStringMethod<T>(string toMatchStr, Func<T, string> stringFunc) where T : Enum
         {
-            foreach(T loopEnumValue in Enum.GetValues(typeof(T)))
+            foreach (T loopEnumValue in Enum.GetValues(typeof(T)))
             {
                 var str = stringFunc.Invoke(loopEnumValue);
-                if(str == toMatchStr)
+                if (str == toMatchStr)
                 {
                     return loopEnumValue;
                 }
@@ -61,9 +62,74 @@ namespace SpinXmlReader
 
         public static uint UMod(uint n, uint m)
         {
-            return (uint) Math.Abs( ((n % m) + m) % m );
+            return (uint)Math.Abs(((n % m) + m) % m);
         }
 
+        public static string IndexSubstring(this string value, int startIndex, int endIndex)
+        {
+            return value.Substring(startIndex, (endIndex - startIndex) + 1);
+        }
+
+        public static bool FindNumberFromRight(string str, out int indexStart, out int indexEnd, bool numericOnly = true)
+        {
+            indexStart = indexEnd = -1;
+
+            bool found = false;
+            for (int x = (str.Length - 1); x >= 0; x--)
+            {
+                var c = str[x];
+                if (!Char.IsDigit(c))
+                {
+                    if (found && (numericOnly || (c != '+' && c != '-' && c != '.'))) //After having found a number, i can also accept special chars!
+                    {
+                        indexStart = x + 1; //Since i loop from the end, the last one found is the start!
+                        break;
+                    }
+
+                    continue;
+                }
+
+                if (!found)
+                {
+                    found = true;
+                    indexEnd = x;
+                }
+            }
+
+            if (found && indexStart == -1)
+            {
+                indexStart = 0;
+            }
+
+            return found;
+        }
+
+        public static bool SplitStringFromNumberFromRight(string str, out string beforeString, out string numString, out string afterString, bool numericOnly = true)
+        {
+            beforeString = numString = afterString = "";
+            if (string.IsNullOrEmpty(str) || !FindNumberFromRight(str, out int indexStart, out int indexEnd, numericOnly))
+            {
+                return false;
+            }
+
+            beforeString = indexStart > 0 ? str.IndexSubstring(0, indexStart - 1) : "";
+            afterString = indexEnd < str.Length ? str.IndexSubstring(indexEnd + 1, str.Length - 1) : "";
+
+            if (indexStart == indexEnd)
+            {
+                numString = Char.ToString(str[indexStart]);
+            }
+            else if (indexStart == 0 && indexEnd == (str.Length - 1))
+            {
+                numString = str;
+            }
+            else
+            {
+                numString = str.IndexSubstring(indexStart, indexEnd);
+            }
+
+            return true;
+        }
 
     }
 

@@ -1,4 +1,6 @@
 ﻿
+using Microsoft.WindowsAPICodePack.Dialogs;
+using SpinXmlReader;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -6,8 +8,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.IO;
-using TiaXmlReader.GenerationForms.IO.Data;
 using TiaXmlReader.GenerationForms.IO.Sorting;
 using TiaXmlReader.Localization;
 using TiaXmlReader.SimaticML;
@@ -37,7 +39,6 @@ namespace TiaXmlReader.GenerationForms.IO
         private readonly ExcelDragHandler excelDragHandler;
         private readonly SortHandler sortHandler;
 
-
         public IOGenerationForm()
         {
             InitializeComponent();
@@ -52,6 +53,30 @@ namespace TiaXmlReader.GenerationForms.IO
             this.excelDragHandler = new ExcelDragHandler(this.dataGridView, DRAGGED_CELL_BACK_COLOR, SELECTED_CELL_COLOR, SELECTED_CELL_COLOR);
 
             Init();
+        }
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            switch (keyData)
+            {
+                case Keys.S | Keys.Control:
+                    var save = new IOGenerationSave();
+                    foreach (var entry in dataSource.GetNotEmptyDataDict())
+                    {
+                        save.AddIOData(entry.Key, entry.Value);
+                    }
+                    save.Save();
+                    return true;
+                case Keys.L | Keys.Control:
+                    var loadedSave = IOGenerationSave.Load();
+                    if (loadedSave != null)
+                    {
+
+                    }
+                    return true;
+            }
+
+            // Call the base class
+            return base.ProcessCmdKey(ref msg, keyData);
         }
 
         public void Init()
@@ -68,6 +93,8 @@ namespace TiaXmlReader.GenerationForms.IO
                 memoryTypeItems.Add(new { Text = memoryType.GetDescription(), Value = memoryType });
             }
             this.memoryTypeComboBox.DataSource = memoryTypeItems;
+
+            this.memoryTypeComboBox.SelectionChangeCommitted += (object sender, EventArgs args) => this.UpdateConfigPanel();
             #endregion
             #region GroupingType ComboBox
             this.groupingTypeComboBox.DisplayMember = "Text";
@@ -259,27 +286,20 @@ namespace TiaXmlReader.GenerationForms.IO
                 else
                 {
                     var startString = dataGridView.Rows[data.StartingRow]?.Cells[data.DraggedColumn].Value?.ToString();
-                    if (!string.IsNullOrEmpty(startString))
+                    if (Utils.SplitStringFromNumberFromRight(startString, out string before, out string numString, out string after) && int.TryParse(numString, out int num))
                     {
-                        var numString = "";
-                        for (int x = (startString.Length - 1); x >= 0; x--)
+                        var nextNum = num + (data.SelectedRowCount - 1) * (data.DraggingDown ? 1 : -1);
+
+                        var nextNumString = nextNum.ToString();
+                        if (numString.Length > nextNumString.Length)
                         {
-                            var c = startString[x];
-                            if (!Char.IsDigit(c))
+                            var nextNumLen = nextNumString.Length;
+                            for (var x = 0; x < (numString.Length - nextNumLen); x++)
                             {
-                                break;
+                                nextNumString = '0' + nextNumString;
                             }
-
-                            numString = c + numString;
                         }
-
-                        if (numString.Length > 0 && int.TryParse(numString, out int num))
-                        {
-                            var nextNum = num + (data.SelectedRowCount - 1) * (data.DraggingDown ? 1 : -1);
-
-                            var substring = startString.Substring(0, startString.Length - numString.Length);
-                            toolTipString = substring + nextNum;
-                        }
+                        toolTipString = before + nextNumString + after;
                     }
                 }
                 data.TooltipString = toolTipString;
@@ -290,24 +310,50 @@ namespace TiaXmlReader.GenerationForms.IO
                 var cellChangeList = new List<CellChange>();
 
                 var rowIndexEnumeration = Enumerable.Range(data.TopSelectedRow, (int)data.SelectedRowCount);
+                if (!data.DraggingDown)
+                {
+                    rowIndexEnumeration = rowIndexEnumeration.Reverse();
+                }
+
+                var startingCellValue = dataGridView.Rows[data.StartingRow]?.Cells[data.DraggedColumn].Value;
                 if (data.DraggedColumn == 0)
                 {
-                    var tagAddress = SimaticTagAddress.FromAddress(dataGridView.Rows[data.StartingRow]?.Cells[0].Value?.ToString());
+                    var tagAddress = SimaticTagAddress.FromAddress(startingCellValue?.ToString());
                     if (tagAddress != null) //If is not a valid address, i won't care about doing any stuff.
                     {
-                        if (!data.DraggingDown)
-                        {//Since i always start from the top to parse the addresses, if i am dragging down i need to start from the lowest value!
-                            tagAddress.PreviousBit(SimaticDataType.BYTE, data.SelectedRowCount - 1);
-                        }
-
-
                         foreach (var rowIndex in rowIndexEnumeration)
                         {
                             var cellChange = new CellChange(dataGridView, 0, rowIndex) { NewValue = tagAddress.GetAddress() };
                             cellChangeList.Add(cellChange);
 
-                            tagAddress.NextBit(SimaticDataType.BYTE); //Increase at the end. The first value is valid!
+                            var _ = data.DraggingDown ? tagAddress.NextBit(SimaticDataType.BYTE) : tagAddress.PreviousBit(SimaticDataType.BYTE); //Increase at the end. The first value is valid!
                         }
+                    }
+                }
+                else
+                {
+                    var startString = startingCellValue?.ToString();
+                    if (Utils.SplitStringFromNumberFromRight(startString, out string before, out string numString, out string after) && int.TryParse(numString, out int num))
+                    {
+                        var x = 0;
+                        foreach (var rowIndex in rowIndexEnumeration)
+                        {
+                            var nextNum = num + (x++ * (data.DraggingDown ? 1 : -1));
+
+                            var nextNumString = nextNum.ToString();
+                            if (numString.Length > nextNumString.Length)
+                            {
+                                var nextNumLen = nextNumString.Length;
+                                for (var z = 0; z < (numString.Length - nextNumLen); z++)
+                                {
+                                    nextNumString = '0' + nextNumString;
+                                }
+                            }
+
+                            var cellChange = new CellChange(dataGridView, data.DraggedColumn, rowIndex) { NewValue = (before + nextNumString + after) };
+                            cellChangeList.Add(cellChange);
+                        }
+
                     }
                 }
 
@@ -340,7 +386,6 @@ namespace TiaXmlReader.GenerationForms.IO
             column.SortMode = DataGridViewColumnSortMode.Programmatic;
             return column;
         }
-
 
         private void Paste()
         {
@@ -397,7 +442,7 @@ namespace TiaXmlReader.GenerationForms.IO
 
         public void DeleteSelectedCells()
         {
-            List<CellChange> deletedCellList = new List<CellChange>();
+            var deletedCellList = new List<CellChange>();
             foreach (DataGridViewCell selectedCell in dataGridView.SelectedCells)
             {
                 deletedCellList.Add(new CellChange(selectedCell) { NewValue = "" });
@@ -449,10 +494,6 @@ namespace TiaXmlReader.GenerationForms.IO
             }
 
         }
-        private void MemoryTypeComboBox_SelectionChangeCommitted(object sender, EventArgs e)
-        {
-            UpdateConfigPanel();
-        }
 
         private void UpdateConfigPanel()
         {
@@ -473,6 +514,31 @@ namespace TiaXmlReader.GenerationForms.IO
             configButtonPanel.Controls.Add(segmentNameConfigButton);
 
             configButtonPanel.ResumeLayout();
+        }
+
+        private void ExportButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var fileDialog = new CommonOpenFileDialog
+                {
+                    IsFolderPicker = true,
+                    EnsurePathExists = true
+                };
+
+                if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
+                {
+                    var ioXmlGenerator = new IOXmlGenerator(this.config, new List<IOData>(this.dataSource.GetNotEmptyDataDict().Keys));
+                    ioXmlGenerator.GenerateBlocks();
+                    ioXmlGenerator.ExportXML(fileDialog.FileName);
+                }
+            }
+            catch (Exception ex)
+            {
+                Utils.ShowExceptionMessage(ex);
+                Console.WriteLine("Exception: {0}", ex.ToString());
+            }
+
         }
     }
 

@@ -30,6 +30,7 @@
         {
             this.mainPanel = new System.Windows.Forms.TableLayoutPanel();
             this.configPanel = new System.Windows.Forms.Panel();
+            this.exportButton = new System.Windows.Forms.Button();
             this.configButtonPanel = new System.Windows.Forms.FlowLayoutPanel();
             this.fcConfigButton = new System.Windows.Forms.Button();
             this.dbConfigButton = new System.Windows.Forms.Button();
@@ -68,6 +69,7 @@
             // configPanel
             // 
             this.configPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.configPanel.Controls.Add(this.exportButton);
             this.configPanel.Controls.Add(this.configButtonPanel);
             this.configPanel.Controls.Add(this.label6);
             this.configPanel.Controls.Add(this.groupingTypeComboBox);
@@ -79,6 +81,17 @@
             this.configPanel.Name = "configPanel";
             this.configPanel.Size = new System.Drawing.Size(1087, 80);
             this.configPanel.TabIndex = 3;
+            // 
+            // exportButton
+            // 
+            this.exportButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.75F, System.Drawing.FontStyle.Bold);
+            this.exportButton.Location = new System.Drawing.Point(964, 46);
+            this.exportButton.Name = "exportButton";
+            this.exportButton.Size = new System.Drawing.Size(121, 32);
+            this.exportButton.TabIndex = 16;
+            this.exportButton.Text = "Export XML";
+            this.exportButton.UseVisualStyleBackColor = true;
+            this.exportButton.Click += new System.EventHandler(this.ExportButton_Click);
             // 
             // configButtonPanel
             // 
@@ -186,7 +199,6 @@
             this.memoryTypeComboBox.Name = "memoryTypeComboBox";
             this.memoryTypeComboBox.Size = new System.Drawing.Size(65, 21);
             this.memoryTypeComboBox.TabIndex = 1;
-            this.memoryTypeComboBox.SelectionChangeCommitted += new System.EventHandler(this.MemoryTypeComboBox_SelectionChangeCommitted);
             // 
             // memoryTypeLabel
             // 
@@ -243,5 +255,6 @@
         public System.Windows.Forms.Button ioTableConfigButton;
         public System.Windows.Forms.Button segmentNameConfigButton;
         private System.Windows.Forms.FlowLayoutPanel configButtonPanel;
+        private System.Windows.Forms.Button exportButton;
     }
 }
