@@ -26,10 +26,18 @@ namespace TiaXmlReader.GenerationForms.IO
             this.lineList = new List<ConfigFormLine>();
         }
 
-        public ConfigForm AddConfigLine(ConfigFormLine line)
+        public void StartShowingAtControl(Control control)
+        {
+            var loc = control.PointToScreen(Point.Empty);
+            //loc.X += fcConfigButton.Width;
+            loc.Y += control.Height;
+            this.StartPosition = FormStartPosition.Manual;
+            this.Location = loc;
+        }
+
+        public void AddConfigLine(ConfigFormLine line)
         {
             lineList.Add(line);
-            return this;
         }
 
         private bool formReadyToClose = false;
@@ -46,6 +54,7 @@ namespace TiaXmlReader.GenerationForms.IO
                 }
             }
         }
+
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if (keyData == Keys.Cancel || keyData == Keys.Escape)

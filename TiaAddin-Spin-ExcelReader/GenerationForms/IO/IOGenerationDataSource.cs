@@ -22,22 +22,60 @@ namespace TiaXmlReader.GenerationForms.IO
             this.dataGridView = dataGridView;
 
             dataList = new List<IOData>();
-            for (int i = 0; i < IOGenerationForm.TOTAL_ROW_COUNT; i++)
-            {
-                dataList.Add(new IOData());
-            }
-
             bindingList = new BindingList<IOData>(dataList);
+        }
+
+        public IOData this[int i]
+        {
+            get { return dataList[i]; }
+            set { dataList[i] = value; }
         }
 
         public void Init()
         {
+            this.InitializeData();
             this.dataGridView.DataSource = new BindingSource() { DataSource = bindingList }; ;
+        }
+
+        public void InitializeData()
+        {
+            this.dataList.Clear();
+            for (int i = 0; i < IOGenerationForm.TOTAL_ROW_COUNT; i++)
+            {
+                dataList.Add(new IOData());
+            }
         }
 
         public IOData GetDataAt(int rowIndex)
         {
             return dataList[rowIndex];
+        }
+
+        public void AddDataAtEnd(IOData newData)
+        {
+            AddMultipleDataAtEnd(new List<IOData>() { newData });
+        }
+
+        public void AddMultipleDataAtEnd(List<IOData> newDataCollection)
+        {
+            this.dataGridView.SuspendLayout();
+
+            var newDataAdded = 0;
+            for (int i = 0; i < IOGenerationForm.TOTAL_ROW_COUNT; i++)
+            {
+                var data = this[i];
+                if (data.IsEmpty())
+                {
+                    data.CopyFrom(newDataCollection[newDataAdded]);
+                    if(++newDataAdded >= newDataCollection.Count)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            this.dataGridView.Refresh();
+            this.dataGridView.ResumeLayout();
         }
 
         public void Sort(IComparer<IOData> comparer, SortOrder sortOrder)

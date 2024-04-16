@@ -98,6 +98,15 @@ namespace TiaXmlReader.Generation
             return SimaticTagAddress.FromAddress(Address);
         }
 
+        public void CopyFrom(IOData ioData)
+        {
+            this.Address = ioData.Address;
+            this.IOName = ioData.IOName;
+            this.DBName = ioData.DBName;
+            this.Variable = ioData.Variable;
+            this.Comment = ioData.Comment;
+        }
+
         public IOData Clone()
         {
             return new IOData()

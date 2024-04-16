@@ -153,7 +153,6 @@ namespace SpinXmlReader
             catch (Exception ex)
             {
                 Utils.ShowExceptionMessage(ex);
-                Console.WriteLine("Exception: {0}", ex.ToString());
             }
         }
 

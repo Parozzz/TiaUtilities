@@ -76,6 +76,9 @@
     <Reference Include="ExcelNumberFormat, Version=1.1.0.0, Culture=neutral, PublicKeyToken=23c6f5d73be07eca, processorArchitecture=MSIL">
       <HintPath>..\packages\ExcelNumberFormat.1.1.0\lib\net20\ExcelNumberFormat.dll</HintPath>
     </Reference>
+    <Reference Include="Flee, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Flee.2.0.0\lib\netstandard2.0\Flee.dll</HintPath>
+    </Reference>
     <Reference Include="Irony, Version=1.0.11.0, Culture=neutral, PublicKeyToken=ca48ace7223ead47, processorArchitecture=MSIL">
       <HintPath>..\packages\Irony.NetCore.1.0.11\lib\net461\Irony.dll</HintPath>
     </Reference>
@@ -97,6 +100,7 @@
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationFramework" />
     <Reference Include="SixLabors.Fonts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=d998eea7b14cab13, processorArchitecture=MSIL">
       <HintPath>..\packages\SixLabors.Fonts.1.0.0\lib\netstandard2.0\SixLabors.Fonts.dll</HintPath>
     </Reference>
@@ -127,6 +131,11 @@
     <Reference Include="System.Numerics" />
     <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reflection, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reflection.4.3.0\lib\net462\System.Reflection.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Runtime, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Runtime.4.3.0\lib\net462\System.Runtime.dll</HintPath>
@@ -198,9 +207,15 @@
     <Compile Include="GenerationForms\IO\ConfigForm.Designer.cs">
       <DependentUpon>ConfigForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="GenerationForms\IO\IOGenerationExcelImporterForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GenerationForms\IO\IOGenerationExcelImporterForm.Designer.cs">
+      <DependentUpon>IOGenerationExcelImporterForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="GenerationForms\IO\IOGenerationFormConfigHandler.cs" />
     <Compile Include="GenerationForms\IO\IOGenerationFormPreviewCellPainter.cs" />
-    <Compile Include="GenerationForms\IO\IOGenerationSave.cs" />
+    <Compile Include="GenerationForms\IO\IOGenerationSaveFile.cs" />
     <Compile Include="GenerationForms\IO\Sorting\AddressColumnComparer.cs" />
     <Compile Include="GenerationForms\IO\ExcelDragHandler.cs" />
     <Compile Include="GenerationForms\IO\IOGenerationCellPaintHandler.cs" />
@@ -288,6 +303,9 @@
     <EmbeddedResource Include="GenerationForms\IO\ConfigForm.resx">
       <DependentUpon>ConfigForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="GenerationForms\IO\IOGenerationExcelImporterForm.resx">
+      <DependentUpon>IOGenerationExcelImporterForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GenerationForms\IO\IOGenerationForm.resx">
       <DependentUpon>IOGenerationForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -343,6 +361,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="!!TO-DO!!.txt" />
+    <Content Include="Resources\DocComments.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

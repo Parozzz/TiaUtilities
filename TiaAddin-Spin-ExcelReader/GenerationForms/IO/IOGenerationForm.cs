@@ -38,6 +38,8 @@ namespace TiaXmlReader.GenerationForms.IO
         private readonly UndoRedoHandler undoRedoHandler;
         private readonly ExcelDragHandler excelDragHandler;
         private readonly SortHandler sortHandler;
+        
+        private string lastFilePath;
 
         public IOGenerationForm()
         {
@@ -54,24 +56,16 @@ namespace TiaXmlReader.GenerationForms.IO
 
             Init();
         }
+
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             switch (keyData)
             {
                 case Keys.S | Keys.Control:
-                    var save = new IOGenerationSave();
-                    foreach (var entry in dataSource.GetNotEmptyDataDict())
-                    {
-                        save.AddIOData(entry.Key, entry.Value);
-                    }
-                    save.Save();
+                    this.SaveFile();
                     return true;
                 case Keys.L | Keys.Control:
-                    var loadedSave = IOGenerationSave.Load();
-                    if (loadedSave != null)
-                    {
-
-                    }
+                    this.LoadFile();
                     return true;
             }
 
@@ -82,6 +76,58 @@ namespace TiaXmlReader.GenerationForms.IO
         public void Init()
         {
             //var addressColumn = this.dataTable.Rows.Add(TOTAL_ROW_COUNT);
+
+            #region TopMenu
+            this.saveToolStripMenuItem.Click += (object sender, EventArgs args) => { this.SaveFile(); };
+            this.saveAsToolStripMenuItem.Click += (object sender, EventArgs args) => { this.SaveFile(true); };
+            this.loadToolStripMenuItem.Click += (object sender, EventArgs args) => { this.LoadFile(); };
+            this.exportXMLToolStripMenuItem.Click += (object sender, EventArgs args) =>
+            {
+                try
+                {
+                    var fileDialog = new CommonOpenFileDialog
+                    {
+                        IsFolderPicker = true,
+                        EnsurePathExists = true,
+                        EnsureValidNames = true,
+                        InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
+                    };
+
+                    if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
+                    {
+                        var ioDataList = new List<IOData>(this.dataSource.GetNotEmptyDataDict().Keys);
+
+                        var ioXmlGenerator = new IOXmlGenerator(this.config, ioDataList);
+                        ioXmlGenerator.GenerateBlocks();
+                        ioXmlGenerator.ExportXML(fileDialog.FileName);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Utils.ShowExceptionMessage(ex);
+                }
+            };
+            this.importExcelToolStripMenuItem.Click += (object sender, EventArgs args) =>
+            {
+                var excelImporterForm = new IOGenerationExcelImporterForm();
+
+                var dialogResult = excelImporterForm.ShowDialog();
+                if (dialogResult == DialogResult.OK)
+                {
+                    var ioDataList = new List<IOData>();
+                    foreach(var importData in excelImporterForm.ImportDataEnumerable)
+                    {
+                        ioDataList.Add(new IOData()
+                        {
+                            Address = importData.Address,
+                            IOName = importData.IOName,
+                            Comment = importData.Comment
+                        });
+                    }
+                    this.dataSource.AddMultipleDataAtEnd(ioDataList);
+                }
+            };
+            #endregion
 
             #region MemoryType ComboBox
             this.memoryTypeComboBox.DisplayMember = "Text";
@@ -96,6 +142,7 @@ namespace TiaXmlReader.GenerationForms.IO
 
             this.memoryTypeComboBox.SelectionChangeCommitted += (object sender, EventArgs args) => this.UpdateConfigPanel();
             #endregion
+
             #region GroupingType ComboBox
             this.groupingTypeComboBox.DisplayMember = "Text";
             this.groupingTypeComboBox.ValueMember = "Value";
@@ -440,6 +487,42 @@ namespace TiaXmlReader.GenerationForms.IO
             }
         }
 
+        public void SaveFile(bool saveAs = false)
+        {
+            var save = new IOGenerationSaveFile();
+            foreach (var entry in dataSource.GetNotEmptyDataDict())
+            {
+                save.AddIOData(entry.Key, entry.Value);
+            }
+            save.Save(ref lastFilePath, saveAs);
+
+            this.Text = this.Name + ". File: " + lastFilePath;
+        }
+
+        public void LoadFile()
+        {
+            var loadedSave = IOGenerationSaveFile.Load(ref lastFilePath);
+            if (loadedSave != null)
+            {
+                this.dataGridView.SuspendLayout();
+                this.dataSource.InitializeData();
+
+                foreach(var saveData in loadedSave.SaveDataList)
+                {
+                    var rowIndex = saveData.RowIndex;
+                    if(rowIndex >= 0 && rowIndex <= TOTAL_ROW_COUNT)
+                    {
+                        saveData.SaveTo(this.dataSource[saveData.RowIndex]);
+                    }
+                }
+
+                this.dataGridView.Refresh();
+                this.dataGridView.ResumeLayout();
+
+                this.Text = this.Name + ". File: " + lastFilePath;
+            }
+        }
+
         public void DeleteSelectedCells()
         {
             var deletedCellList = new List<CellChange>();
@@ -514,31 +597,6 @@ namespace TiaXmlReader.GenerationForms.IO
             configButtonPanel.Controls.Add(segmentNameConfigButton);
 
             configButtonPanel.ResumeLayout();
-        }
-
-        private void ExportButton_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                var fileDialog = new CommonOpenFileDialog
-                {
-                    IsFolderPicker = true,
-                    EnsurePathExists = true
-                };
-
-                if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
-                {
-                    var ioXmlGenerator = new IOXmlGenerator(this.config, new List<IOData>(this.dataSource.GetNotEmptyDataDict().Keys));
-                    ioXmlGenerator.GenerateBlocks();
-                    ioXmlGenerator.ExportXML(fileDialog.FileName);
-                }
-            }
-            catch (Exception ex)
-            {
-                Utils.ShowExceptionMessage(ex);
-                Console.WriteLine("Exception: {0}", ex.ToString());
-            }
-
         }
     }
 

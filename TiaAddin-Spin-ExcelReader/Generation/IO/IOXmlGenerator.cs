@@ -10,6 +10,7 @@ using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace;
 using SpinXmlReader.SimaticML;
 using TiaXmlReader.SimaticML.nBlockAttributeList;
 using TiaXmlReader.Utility;
+using System.Collections;
 
 namespace TiaXmlReader.Generation.IO
 {

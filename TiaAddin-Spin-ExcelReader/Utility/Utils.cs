@@ -15,7 +15,7 @@ namespace SpinXmlReader
         {
             string message = "Message: " + ex.Message + " \r\n StackTrace: " + ex.StackTrace;
             string caption = "An exception occoured while executing Spin Addin!";
-
+            Console.WriteLine("Exception: {0}", message + caption);
             MessageBox.Show(message, caption);
         }
 
