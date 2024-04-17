@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SpinXmlReader
+namespace TiaXmlReader.Utility
 {
     public static class Constants
     {

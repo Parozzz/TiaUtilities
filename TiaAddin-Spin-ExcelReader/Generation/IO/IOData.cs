@@ -5,17 +5,67 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TiaXmlReader.Generation.IO;
+using TiaXmlReader.GenerationForms.IO;
 using TiaXmlReader.SimaticML;
+using TiaXmlReader.Generation;
+using TiaXmlReader.GenerationForms.GridHandler;
+using TiaXmlReader.SimaticML.Enums;
 
-namespace TiaXmlReader.Generation
+namespace TiaXmlReader.Generation.IO
 {
-    public class IOData
+    public class IOData : IGridData
     {
         public string Address { get; set; }
         public string IOName { get; set; }
         public string DBName { get; set; }
         public string Variable { get; set; }
         public string Comment {  get; set; }
+
+        public string this[int i]
+        {
+            get
+            {
+                switch (i)
+                {
+                    case IOGenerationForm.ADDRESS_COLUMN:
+                        return Address;
+                    case IOGenerationForm.IO_NAME_COLUMN:
+                        return IOName;
+                    case IOGenerationForm.DB_COLUMN:
+                        return DBName;
+                    case IOGenerationForm.VARIABLE_COLUMN:
+                        return Variable;
+                    case IOGenerationForm.COMMENT_COLUMN:
+                        return Comment;
+                    default:
+                        throw new InvalidOperationException("Invalid index for get square bracket operator in IOData");
+                }
+            }
+
+            set
+            {
+                switch (i)
+                {
+                    case IOGenerationForm.ADDRESS_COLUMN:
+                        Address = value;
+                        break;
+                    case IOGenerationForm.IO_NAME_COLUMN:
+                        IOName = value;
+                        break;
+                    case IOGenerationForm.DB_COLUMN:
+                        DBName = value;
+                        break;
+                    case IOGenerationForm.VARIABLE_COLUMN:
+                        Variable = value;
+                        break;
+                    case IOGenerationForm.COMMENT_COLUMN:
+                        Comment = value;
+                        break;
+                    default:
+                        throw new InvalidOperationException("Invalid index for Set square bracket operator in IOData");
+                }
+            }
+        }
 
         public void LoadDefaults(IOConfiguration config)
         {
@@ -37,6 +87,11 @@ namespace TiaXmlReader.Generation
             Variable = placeholders.Parse(Variable);
             DBName = placeholders.Parse(DBName);
             Comment = placeholders.Parse(Comment);
+        }
+
+        public void Clear()
+        {
+            this.Address = this.IOName = this.DBName = this.Variable = this.Comment = "";
         }
 
         public bool IsEmpty()
@@ -118,5 +173,6 @@ namespace TiaXmlReader.Generation
                 Comment = this.Comment
             };
         }
+
     }
 }

@@ -1,8 +1,8 @@
-﻿using SpinXmlReader;
-using SpinXmlReader.SimaticML;
-using System.Xml;
+﻿using System.Xml;
 using TiaXmlReader.SimaticML.nBlockAttributeList;
 using TiaXmlReader.Utility;
+using TiaXmlReader.SimaticML;
+using TiaXmlReader.SimaticML.LanguageText;
 
 namespace TiaXmlReader.SimaticML.Blocks
 {

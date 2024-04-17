@@ -1,9 +1,10 @@
-﻿using SpinXmlReader.Block;
-using SpinXmlReader.TagTable;
-using System.Xml;
+﻿using System.Xml;
 using TiaXmlReader.Utility;
+using TiaXmlReader.SimaticML;
+using TiaXmlReader.SimaticML.Blocks;
+using TiaXmlReader.SimaticML.TagTable;
 
-namespace SpinXmlReader.SimaticML
+namespace TiaXmlReader.SimaticML
 {
     public static class SimaticMLParser
     {

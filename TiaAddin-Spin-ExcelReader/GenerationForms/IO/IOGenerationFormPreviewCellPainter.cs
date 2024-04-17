@@ -3,20 +3,19 @@ using System.Drawing;
 using System.Windows.Forms;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.IO;
-using static TiaXmlReader.GenerationForms.IO.IOGenerationCellPaintHandler;
+using static TiaXmlReader.GenerationForms.GridHandler.GridCellPaintHandler;
+using TiaXmlReader.GenerationForms.GridHandler;
 
 namespace TiaXmlReader.GenerationForms.IO
 {
-    public class IOGenerationFormPreviewCellPainter : IOGenerationCellPainter
+    public class IOGenerationFormPreviewCellPainter : IGridCellPainter
     {
-        private readonly DataGridView dataGridView;
-        private readonly IOGenerationDataSource dataSource;
+        private readonly GridDataSource<IOData> dataSource;
         private readonly IOConfiguration config;
 
         private readonly GenerationPlaceholders placeholders;
-        public IOGenerationFormPreviewCellPainter(DataGridView dataGridView, IOGenerationDataSource dataSource, IOConfiguration config)
+        public IOGenerationFormPreviewCellPainter(GridDataSource<IOData> dataSource, IOConfiguration config)
         {
-            this.dataGridView = dataGridView;
             this.dataSource = dataSource;
             this.config = config;
 
@@ -35,7 +34,7 @@ namespace TiaXmlReader.GenerationForms.IO
                 return paintRequest;
             }
 
-            var ioData = dataSource.GetDataAt(rowIndex);
+            var ioData = dataSource[rowIndex];
             if (ioData.IsEmpty() || string.IsNullOrEmpty(ioData.Address))
             {
                 return paintRequest;
@@ -104,11 +103,11 @@ namespace TiaXmlReader.GenerationForms.IO
                     string parsedPrefix = string.Empty;
                     if (config.MemoryType == IOMemoryTypeEnum.DB)
                     {
-                        parsedPrefix = ioData.GetMemoryArea() == SimaticML.SimaticMemoryArea.INPUT ? config.PrefixInputDB : config.PrefixOutputDB;
+                        parsedPrefix = ioData.GetMemoryArea() == TiaXmlReader.SimaticML.Enums.SimaticMemoryArea.INPUT? config.PrefixInputDB : config.PrefixOutputDB;
                     }
                     else if (config.MemoryType == IOMemoryTypeEnum.MERKER)
                     {
-                        parsedPrefix = ioData.GetMemoryArea() == SimaticML.SimaticMemoryArea.INPUT ? config.PrefixInputMerker : config.PrefixOutputMerker;
+                        parsedPrefix = ioData.GetMemoryArea() == TiaXmlReader.SimaticML.Enums.SimaticMemoryArea.INPUT? config.PrefixInputMerker : config.PrefixOutputMerker;
                     }
                     parsedPrefix = placeholders.Parse(parsedPrefix);
 

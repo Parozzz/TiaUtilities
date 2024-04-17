@@ -4,33 +4,44 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static TiaXmlReader.GenerationForms.IO.IOGenerationCellPaintHandler;
+using static TiaXmlReader.GenerationForms.GridHandler.GridCellPaintHandler;
+using TiaXmlReader.GenerationForms.GridHandler;
+using TiaXmlReader.GenerationForms.IO;
 
-namespace TiaXmlReader.GenerationForms.IO
+namespace TiaXmlReader.GenerationForms.GridHandler
 {
-    public class IOGenerationCellPaintHandler
+    public class GridCellPaintHandler
     {
         private readonly DataGridView dataGridView;
-        private readonly List<IOGenerationCellPainter> painterList;
+        private readonly List<IGridCellPainter> painterList;
 
-        public IOGenerationCellPaintHandler(DataGridView dataGridView)
+        public GridCellPaintHandler(DataGridView dataGridView)
         {
             this.dataGridView = dataGridView;
-            this.painterList = new List<IOGenerationCellPainter>();
+            this.painterList = new List<IGridCellPainter>();
         }
 
-        public void AddPainter(IOGenerationCellPainter painter)
+        public void AddPainter(IGridCellPainter painter)
         {
             painterList.Add(painter);
+        }
+
+        public void AddPainterRange(ICollection<IGridCellPainter> painterCollection)
+        {
+            foreach(var painter in painterCollection)
+            {
+                this.AddPainter(painter);
+            }
         }
 
         public void Init()
         {
             this.dataGridView.CellPainting += (object sender, DataGridViewCellPaintingEventArgs args) =>
             {
+
                 bool backgroundDone = false, contentDone = false;
 
-                var resultDict = new Dictionary<IOGenerationCellPainter, PaintRequest>();
+                var resultDict = new Dictionary<IGridCellPainter, PaintRequest>();
                 foreach (var painter in painterList)
                 {
                     var request = painter.PaintCellRequest(args);
@@ -116,7 +127,7 @@ namespace TiaXmlReader.GenerationForms.IO
         }
     }
 
-    public interface IOGenerationCellPainter
+    public interface IGridCellPainter
     {
         PaintRequest PaintCellRequest(DataGridViewCellPaintingEventArgs args);
 

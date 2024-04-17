@@ -207,20 +207,26 @@
     <Compile Include="GenerationForms\IO\ConfigForm.Designer.cs">
       <DependentUpon>ConfigForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GenerationForms\IO\IOGenerationExcelImporterForm.cs">
+    <Compile Include="GenerationForms\GridHandler\GridCellChange.cs" />
+    <Compile Include="GenerationForms\GridHandler\GridDataSource.cs" />
+    <Compile Include="GenerationForms\GridHandler\GridHandler.cs" />
+    <Compile Include="GenerationForms\GridHandler\IGridRowComparer.cs" />
+    <Compile Include="GenerationForms\IO\ExcelImporter\IOGenerationExcelImportConfiguration.cs" />
+    <Compile Include="GenerationForms\IO\ExcelImporter\IOGenerationExcelImportForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GenerationForms\IO\IOGenerationExcelImporterForm.Designer.cs">
-      <DependentUpon>IOGenerationExcelImporterForm.cs</DependentUpon>
+    <Compile Include="GenerationForms\IO\ExcelImporter\IOGenerationExcelImportForm.Designer.cs">
+      <DependentUpon>IOGenerationExcelImportForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GenerationForms\IO\IOGenerationFormConfigHandler.cs" />
     <Compile Include="GenerationForms\IO\IOGenerationFormPreviewCellPainter.cs" />
-    <Compile Include="GenerationForms\IO\IOGenerationSaveFile.cs" />
-    <Compile Include="GenerationForms\IO\Sorting\AddressColumnComparer.cs" />
-    <Compile Include="GenerationForms\IO\ExcelDragHandler.cs" />
-    <Compile Include="GenerationForms\IO\IOGenerationCellPaintHandler.cs" />
-    <Compile Include="GenerationForms\IO\IOGenerationDataSource.cs" />
-    <Compile Include="GenerationForms\IO\Sorting\SortHandler.cs" />
+    <Compile Include="GenerationForms\IO\IOGenerationPreferenceSave.cs" />
+    <Compile Include="GenerationForms\IO\IOGenerationProjectSave.cs" />
+    <Compile Include="GenerationForms\IO\IOGenerationComparer.cs" />
+    <Compile Include="GenerationForms\GridHandler\GridExcelDragHandler.cs" />
+    <Compile Include="GenerationForms\GridHandler\GridCellPaintHandler.cs" />
+    <Compile Include="GenerationForms\GridHandler\GridSortHandler.cs" />
+    <Compile Include="GenerationForms\IO\IOGenerationUtils.cs" />
     <Compile Include="Generation\IO\IOExcelImporter.cs" />
     <Compile Include="Generation\IO\IOConfiguration.cs" />
     <Compile Include="Generation\IO\IOData.cs" />
@@ -303,8 +309,8 @@
     <EmbeddedResource Include="GenerationForms\IO\ConfigForm.resx">
       <DependentUpon>ConfigForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GenerationForms\IO\IOGenerationExcelImporterForm.resx">
-      <DependentUpon>IOGenerationExcelImporterForm.cs</DependentUpon>
+    <EmbeddedResource Include="GenerationForms\IO\ExcelImporter\IOGenerationExcelImportForm.resx">
+      <DependentUpon>IOGenerationExcelImportForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GenerationForms\IO\IOGenerationForm.resx">
       <DependentUpon>IOGenerationForm.cs</DependentUpon>

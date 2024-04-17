@@ -1,11 +1,13 @@
-﻿using SpinXmlReader.SimaticML;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Xml;
 using TiaXmlReader.SimaticML;
 using TiaXmlReader.SimaticML.nBlockAttributeList;
 using TiaXmlReader.Utility;
+using TiaXmlReader.SimaticML.Blocks;
+using TiaXmlReader.SimaticML.Enums;
+using TiaXmlReader.SimaticML.LanguageText;
 
-namespace SpinXmlReader.Block
+namespace TiaXmlReader.SimaticML.Blocks
 {
     public class BlockFC : XmlNodeConfiguration, IGlobalObject
     {

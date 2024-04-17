@@ -43,16 +43,14 @@ namespace TiaXmlReader.GenerationForms.IO
         private bool formReadyToClose = false;
         protected override void WndProc(ref Message m)
         {
-            base.WndProc(ref m);
-
             // if click outside dialog -> Close Dlg
-            if (formReadyToClose && m.Msg == 134) //0x86 WM_NCACTIVATE
+            if (formReadyToClose && m.Msg == 0x86 && !this.RectangleToScreen(this.DisplayRectangle).Contains(Cursor.Position)) //0x86 WM_NCACTIVATE
             {
-                if (!this.RectangleToScreen(this.DisplayRectangle).Contains(Cursor.Position))
-                {
-                    this.Close();
-                }
+                this.Close();
+                return;
             }
+
+            base.WndProc(ref m);
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)

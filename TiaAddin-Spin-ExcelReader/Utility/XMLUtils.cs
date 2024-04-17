@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Xml;
+using TiaXmlReader.Utility;
 
-namespace SpinXmlReader
+namespace TiaXmlReader.Utility
 {
     public static class XMLUtils
     {

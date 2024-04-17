@@ -4,8 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using TiaXmlReader.Utility;
+using TiaXmlReader;
 
-namespace SpinXmlReader
+namespace TiaXmlReader
 {
     internal static class Program
     {

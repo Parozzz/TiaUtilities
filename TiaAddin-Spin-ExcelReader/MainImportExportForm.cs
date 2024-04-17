@@ -12,8 +12,9 @@ using TiaXmlReader.Generation.IO_Cad;
 using TiaXmlReader.GenerationForms.IO;
 using TiaXmlReader.SimaticML;
 using TiaXmlReader.Utility;
+using TiaXmlReader.Generation.UserAlarms;
 
-namespace SpinXmlReader
+namespace TiaXmlReader
 {
     public partial class MainImportExportForm : Form
     {

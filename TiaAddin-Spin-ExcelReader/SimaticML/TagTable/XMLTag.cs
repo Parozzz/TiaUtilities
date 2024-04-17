@@ -1,12 +1,14 @@
 ﻿using DocumentFormat.OpenXml.Wordprocessing;
-using SpinXmlReader.SimaticML;
 using System.Globalization;
 using System.Xml;
 using TiaXmlReader.Generation;
 using TiaXmlReader.SimaticML;
 using TiaXmlReader.Utility;
+using TiaXmlReader.SimaticML.Enums;
+using TiaXmlReader.SimaticML.LanguageText;
+using TiaXmlReader.SimaticML.TagTable;
 
-namespace SpinXmlReader.TagTable
+namespace TiaXmlReader.SimaticML.TagTable
 {
     public class XMLTag : XmlNodeConfiguration, IGlobalObject
     {

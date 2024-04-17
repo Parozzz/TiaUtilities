@@ -1,8 +1,8 @@
-﻿using SpinXmlReader;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Xml;
 using TiaXmlReader.SimaticML;
 using TiaXmlReader.Utility;
+using TiaXmlReader.SimaticML.Enums;
 
 namespace TiaXmlReader.SimaticML.nBlockAttributeList
 {

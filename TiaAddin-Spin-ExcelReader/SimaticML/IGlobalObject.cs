@@ -6,8 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using TiaXmlReader.Utility;
+using TiaXmlReader.SimaticML;
 
-namespace SpinXmlReader.SimaticML
+namespace TiaXmlReader.SimaticML
 {
     public class IDGenerator
     {

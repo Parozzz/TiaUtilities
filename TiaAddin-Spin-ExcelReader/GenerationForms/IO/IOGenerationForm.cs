@@ -1,19 +1,18 @@
 ﻿
 using Microsoft.WindowsAPICodePack.Dialogs;
-using SpinXmlReader;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Reflection;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.IO;
-using TiaXmlReader.GenerationForms.IO.Sorting;
+using TiaXmlReader.GenerationForms.IO.ExcelImporter;
 using TiaXmlReader.Localization;
 using TiaXmlReader.SimaticML;
-using TiaXmlReader.UndoRedo;
+using TiaXmlReader.GenerationForms.GridHandler;
+using TiaXmlReader.GenerationForms.IO;
+using TiaXmlReader.Utility;
 
 namespace TiaXmlReader.GenerationForms.IO
 {
@@ -30,29 +29,24 @@ namespace TiaXmlReader.GenerationForms.IO
         public const int VARIABLE_COLUMN = 3;
         public const int COMMENT_COLUMN = 4;
 
-        private readonly IOGenerationDataSource dataSource;
+        private readonly GridHandler<IOData> gridHandler;
 
         private readonly IOConfiguration config;
+        private readonly IOGenerationExcelImportConfiguration excelImportConfig;
         private readonly IOGenerationFormConfigHandler configHandler;
 
-        private readonly UndoRedoHandler undoRedoHandler;
-        private readonly ExcelDragHandler excelDragHandler;
-        private readonly SortHandler sortHandler;
-        
         private string lastFilePath;
 
         public IOGenerationForm()
         {
             InitializeComponent();
 
-            this.dataSource = new IOGenerationDataSource(this.dataGridView);
+            this.gridHandler = new GridHandler<IOData>(this.dataGridView, () => new IOData(), (oldData, newData) => oldData.CopyFrom(newData), new IOGenerationComparer());
 
-            this.config = new IOConfiguration();
+            var preferenceSave = IOGenerationPreferenceSave.Load();
+            this.config = preferenceSave.Configuration;
+            this.excelImportConfig = preferenceSave.ExcelImportConfiguration;
             this.configHandler = new IOGenerationFormConfigHandler(this, config, this.dataGridView);
-
-            this.undoRedoHandler = new UndoRedoHandler();
-            this.sortHandler = new SortHandler(dataSource, this.dataGridView, undoRedoHandler);
-            this.excelDragHandler = new ExcelDragHandler(this.dataGridView, DRAGGED_CELL_BACK_COLOR, SELECTED_CELL_COLOR, SELECTED_CELL_COLOR);
 
             Init();
         }
@@ -62,10 +56,10 @@ namespace TiaXmlReader.GenerationForms.IO
             switch (keyData)
             {
                 case Keys.S | Keys.Control:
-                    this.SaveFile();
+                    this.ProjectSave();
                     return true;
                 case Keys.L | Keys.Control:
-                    this.LoadFile();
+                    this.ProjectLoad();
                     return true;
             }
 
@@ -78,9 +72,9 @@ namespace TiaXmlReader.GenerationForms.IO
             //var addressColumn = this.dataTable.Rows.Add(TOTAL_ROW_COUNT);
 
             #region TopMenu
-            this.saveToolStripMenuItem.Click += (object sender, EventArgs args) => { this.SaveFile(); };
-            this.saveAsToolStripMenuItem.Click += (object sender, EventArgs args) => { this.SaveFile(true); };
-            this.loadToolStripMenuItem.Click += (object sender, EventArgs args) => { this.LoadFile(); };
+            this.saveToolStripMenuItem.Click += (object sender, EventArgs args) => { this.ProjectSave(); };
+            this.saveAsToolStripMenuItem.Click += (object sender, EventArgs args) => { this.ProjectSave(true); };
+            this.loadToolStripMenuItem.Click += (object sender, EventArgs args) => { this.ProjectLoad(); };
             this.exportXMLToolStripMenuItem.Click += (object sender, EventArgs args) =>
             {
                 try
@@ -95,7 +89,7 @@ namespace TiaXmlReader.GenerationForms.IO
 
                     if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
                     {
-                        var ioDataList = new List<IOData>(this.dataSource.GetNotEmptyDataDict().Keys);
+                        var ioDataList = new List<IOData>(this.gridHandler.DataSource.GetNotEmptyDataDict().Keys);
 
                         var ioXmlGenerator = new IOXmlGenerator(this.config, ioDataList);
                         ioXmlGenerator.GenerateBlocks();
@@ -109,13 +103,13 @@ namespace TiaXmlReader.GenerationForms.IO
             };
             this.importExcelToolStripMenuItem.Click += (object sender, EventArgs args) =>
             {
-                var excelImporterForm = new IOGenerationExcelImporterForm();
+                var excelImportForm = new IOGenerationExcelImportForm(this.excelImportConfig);
 
-                var dialogResult = excelImporterForm.ShowDialog();
+                var dialogResult = excelImportForm.ShowDialog();
                 if (dialogResult == DialogResult.OK)
                 {
                     var ioDataList = new List<IOData>();
-                    foreach(var importData in excelImporterForm.ImportDataEnumerable)
+                    foreach (var importData in excelImportForm.ImportDataEnumerable)
                     {
                         ioDataList.Add(new IOData()
                         {
@@ -124,7 +118,18 @@ namespace TiaXmlReader.GenerationForms.IO
                             Comment = importData.Comment
                         });
                     }
-                    this.dataSource.AddMultipleDataAtEnd(ioDataList);
+
+                    var ioDataCounter = 0;
+                    foreach (var emptyRowIndex in this.gridHandler.DataSource.GetFirstEmptyRowIndexes(ioDataList.Count))
+                    {
+                        if (ioDataCounter >= ioDataList.Count)
+                        {
+                            break;
+                        }
+
+                        var ioData = ioDataList[ioDataCounter++];
+                        this.gridHandler.ChangeRow(emptyRowIndex, ioData);
+                    }
                 }
             };
             #endregion
@@ -155,364 +160,102 @@ namespace TiaXmlReader.GenerationForms.IO
             this.groupingTypeComboBox.DataSource = gropingTypeItems;
             #endregion
 
-            this.dataSource.Init();
+            #region CELL_PAINTERS
+            this.gridHandler.AddCellPainter(new IOGenerationFormPreviewCellPainter(this.gridHandler.DataSource, this.config));
+            #endregion
+
+            #region DRAG
+            this.gridHandler.SetDragPreviewAction(data => { IOGenerationUtils.DragPreview(data, this.gridHandler); });
+            this.gridHandler.SetDragMouseUpAction(data => { IOGenerationUtils.DragMouseUp(data, this.gridHandler); });
+            #endregion
+
+            #region DATA_ASSOCIATION
+            this.gridHandler.SetDataAssociation(ADDRESS_COLUMN, ioData => ioData.Address);
+            this.gridHandler.SetDataAssociation(IO_NAME_COLUMN, ioData => ioData.IOName);
+            this.gridHandler.SetDataAssociation(DB_COLUMN, ioData => ioData.DBName);
+            this.gridHandler.SetDataAssociation(VARIABLE_COLUMN, ioData => ioData.Variable);
+            this.gridHandler.SetDataAssociation(COMMENT_COLUMN, ioData => ioData.Comment);
+            #endregion
+
+            this.gridHandler.Init();
             this.configHandler.Init();
 
-            typeof(DataGridView).InvokeMember("DoubleBuffered", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty, null, this.dataGridView, new object[] { true });
-
-            this.dataGridView.AutoGenerateColumns = false;
-
-            this.dataGridView.Dock = DockStyle.Fill;
-            this.dataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-
-            this.dataGridView.ClipboardCopyMode = DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
-            this.dataGridView.SelectionMode = DataGridViewSelectionMode.CellSelect;
-            this.dataGridView.MultiSelect = true;
-
-            this.dataGridView.EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2;
-
-            this.dataGridView.AllowUserToAddRows = false;
-
-            var addressColumn = (DataGridViewTextBoxColumn)InitColumn(dataGridView.Columns[ADDRESS_COLUMN], "Indirizzo", 55);
+            //Column initialization after gridHandler.Init()
+            #region COLUMNS
+            var addressColumn = (DataGridViewTextBoxColumn)this.gridHandler.InitColumn(ADDRESS_COLUMN, "Indirizzo", 55);
             addressColumn.MaxInputLength = 10;
 
-            var ioNameColumn = InitColumn(dataGridView.Columns[IO_NAME_COLUMN], "Nome IO", 80);
-            var dbNameColumn = InitColumn(dataGridView.Columns[DB_COLUMN], "DB", 80);
-            var variableColumn = InitColumn(dataGridView.Columns[VARIABLE_COLUMN], "Variabile", 105);
-            var commentColumn = InitColumn(dataGridView.Columns[COMMENT_COLUMN], "Commento", 0);
-
-            //this.dataGridView.RowCount = TOTAL_ROW_COUNT;
-
-            #region Cell Paiting
-            var paintHandler = new IOGenerationCellPaintHandler(this.dataGridView);
-            paintHandler.AddPainter(sortHandler);
-            paintHandler.AddPainter(excelDragHandler);
-            paintHandler.AddPainter(new IOGenerationFormPreviewCellPainter(this.dataGridView, this.dataSource, this.config));
-            paintHandler.Init();
+            var ioNameColumn = this.gridHandler.InitColumn(IO_NAME_COLUMN, "Nome IO", 80);
+            var dbNameColumn = this.gridHandler.InitColumn(DB_COLUMN, "DB", 80);
+            var variableColumn = this.gridHandler.InitColumn(VARIABLE_COLUMN, "Variabile", 105);
+            var commentColumn = this.gridHandler.InitColumn(COMMENT_COLUMN, "Commento", 0);
             #endregion
 
-            #region RowHeaderNumber
-            this.dataGridView.RowPostPaint += (sender, args) =>
+            #region SAVE_PREFERENCES_TICK
+            var timer = new Timer { Interval = 1000 };
+            timer.Start();
+
+            var configSnapshot = Utils.CreatePublicFieldSnapshot(this.config);
+            var excelImportConfigSnapshot = Utils.CreatePublicFieldSnapshot(this.excelImportConfig);
+            timer.Tick += (sender, e) =>
             {
-                var style = args.InheritedRowStyle;
-
-                var rowIdx = (args.RowIndex + 1).ToString();
-
-                var centerFormat = new StringFormat()
+                //This is done this way because is impossible that fields are changed toghether for multiple configs. So at the first that is different, i create a snapshot and save to file!
+                var configEqual = Utils.ComparePublicFieldSnapshot(this.config, configSnapshot);
+                if(!configEqual)
                 {
-                    // right alignment might actually make more sense for numbers
-                    Alignment = StringAlignment.Far,
-                    LineAlignment = StringAlignment.Far
-                };
-
-                var textSize = TextRenderer.MeasureText(rowIdx, style.Font); //get the size of the string
-                dataGridView.RowHeadersWidth = Math.Max(dataGridView.RowHeadersWidth, textSize.Width + 15); //if header width lower then string width then resize
-
-                var headerBounds = new Rectangle(args.RowBounds.Left, args.RowBounds.Top, dataGridView.RowHeadersWidth, args.RowBounds.Height);
-                args.Graphics.DrawString(rowIdx, this.Font, SystemBrushes.ControlText, headerBounds, centerFormat);
-            };
-            #endregion
-
-            #region KeyDown - Paste/Delete
-            this.dataGridView.KeyDown += (sender, args) =>
-            {
-                bool ctrlZ = args.Modifiers == Keys.Control && args.KeyCode == Keys.Z;
-                bool ctrlY = args.Modifiers == Keys.Control && args.KeyCode == Keys.Y;
-                bool ctrlV = args.Modifiers == Keys.Control && args.KeyCode == Keys.V;
-                bool shiftIns = args.Modifiers == Keys.Shift && args.KeyCode == Keys.Insert;
-
-                if (ctrlV || shiftIns)
-                    Paste();
-
-                if (args.KeyCode == Keys.Delete || args.KeyCode == Keys.Cancel)
-                    DeleteSelectedCells();
-
-                if (ctrlZ)
-                    undoRedoHandler.Undo();
-
-                if (ctrlY)
-                    undoRedoHandler.Redo();
-            };
-            #endregion
-
-            #region MouseClick - RowSelection
-            int lastClickedRowIndex = -1;
-            this.dataGridView.MouseDown += (sender, args) =>
-            {
-                var hitTest = dataGridView.HitTest(args.X, args.Y);
-                if (hitTest.Type != DataGridViewHitTestType.RowHeader)
-                {
-                    lastClickedRowIndex = -1;
-                }
-
-                switch (hitTest.Type)
-                {
-                    case DataGridViewHitTestType.None: //I want that to clear the selection, you do a simple click in an empty area!
-                        dataGridView.ClearSelection();
-                        dataGridView.CurrentCell = null; //This avoid the situation where if you click the old cell again, it start editing immediately! 
-                        break;
-                    case DataGridViewHitTestType.RowHeader: //If i click a row head, i want the whole row to be selected!
-                        if (Control.ModifierKeys == Keys.Shift && dataGridView.CurrentRow != null)
-                        {
-                            var biggestIndex = Math.Max(lastClickedRowIndex, hitTest.RowIndex);
-                            var lowestIndex = Math.Min(lastClickedRowIndex, hitTest.RowIndex);
-                            for (int x = lowestIndex + 1; x < biggestIndex + 1; x++)
-                            {
-                                if (x == dataGridView.CurrentRow.Index)
-                                {
-                                    continue;
-                                }
-
-                                foreach (DataGridViewCell cell in dataGridView.Rows[x].Cells)
-                                {
-                                    cell.Selected = !cell.Selected;
-                                }
-                            }
-
-                            lastClickedRowIndex = hitTest.RowIndex;
-                        }
-                        else
-                        {
-                            dataGridView.ClearSelection();
-                            dataGridView.CurrentCell = dataGridView.Rows[hitTest.RowIndex].Cells[0]; //I need to set the current cell, because i use the CurrentRow as a "starting row"
-                                                                                                     //Do not cancel current cell! It might select the first cell in the grid and mess up selection.
-
-                            lastClickedRowIndex = hitTest.RowIndex;
-                            foreach (DataGridViewCell cell in dataGridView.Rows[hitTest.RowIndex].Cells)
-                            {
-                                cell.Selected = true;
-                            }
-                        }
-
-                        break;
-                    case DataGridViewHitTestType.Cell:
-                        break;
-                }
-            };
-            #endregion
-
-            #region CellEdit Begin-End
-            CellChange cellEdit = null;
-            dataGridView.CellBeginEdit += (sender, args) =>
-            {
-                cellEdit = new CellChange(dataGridView, args.ColumnIndex, args.RowIndex);
-            };
-
-            dataGridView.CellEndEdit += (sender, args) =>
-            {
-                if (cellEdit.cell == null)
-                {
+                    configSnapshot = Utils.CreatePublicFieldSnapshot(this.config);
+                    this.PreferencesSave();
                     return;
                 }
 
-                if (cellEdit.RowIndex == args.RowIndex && cellEdit.ColumnIndex == args.ColumnIndex)
+                var excelImportConfigEqual = Utils.ComparePublicFieldSnapshot(this.excelImportConfig, excelImportConfigSnapshot);
+                if (!excelImportConfigEqual)
                 {
-                    cellEdit.NewValue = dataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex].Value;
-
-                    ChangeCells(new List<CellChange> { cellEdit }, applyChanges: false);
-
-                    cellEdit = null;
+                    excelImportConfigSnapshot = Utils.CreatePublicFieldSnapshot(this.excelImportConfig);
+                    this.PreferencesSave();
+                    return;
                 }
             };
             #endregion
-
-            #region Drag
-            excelDragHandler.SetPreviewAction(data =>
-            {
-                string toolTipString = "";
-                if (data.DraggedColumn == 0)
-                {
-                    var tagAddress = SimaticTagAddress.FromAddress(dataGridView.Rows[data.StartingRow]?.Cells[0].Value?.ToString());
-                    if (tagAddress != null)
-                    {
-                        toolTipString = (data.DraggingDown
-                                    ? tagAddress.NextBit(SimaticDataType.BYTE, data.SelectedRowCount - 1)
-                                    : tagAddress.PreviousBit(SimaticDataType.BYTE, data.SelectedRowCount - 1)).GetAddress();
-                    }
-                }
-                else
-                {
-                    var startString = dataGridView.Rows[data.StartingRow]?.Cells[data.DraggedColumn].Value?.ToString();
-                    if (Utils.SplitStringFromNumberFromRight(startString, out string before, out string numString, out string after) && int.TryParse(numString, out int num))
-                    {
-                        var nextNum = num + (data.SelectedRowCount - 1) * (data.DraggingDown ? 1 : -1);
-
-                        var nextNumString = nextNum.ToString();
-                        if (numString.Length > nextNumString.Length)
-                        {
-                            var nextNumLen = nextNumString.Length;
-                            for (var x = 0; x < (numString.Length - nextNumLen); x++)
-                            {
-                                nextNumString = '0' + nextNumString;
-                            }
-                        }
-                        toolTipString = before + nextNumString + after;
-                    }
-                }
-                data.TooltipString = toolTipString;
-            });
-
-            excelDragHandler.SetMouseUpAction(data =>
-            {
-                var cellChangeList = new List<CellChange>();
-
-                var rowIndexEnumeration = Enumerable.Range(data.TopSelectedRow, (int)data.SelectedRowCount);
-                if (!data.DraggingDown)
-                {
-                    rowIndexEnumeration = rowIndexEnumeration.Reverse();
-                }
-
-                var startingCellValue = dataGridView.Rows[data.StartingRow]?.Cells[data.DraggedColumn].Value;
-                if (data.DraggedColumn == 0)
-                {
-                    var tagAddress = SimaticTagAddress.FromAddress(startingCellValue?.ToString());
-                    if (tagAddress != null) //If is not a valid address, i won't care about doing any stuff.
-                    {
-                        foreach (var rowIndex in rowIndexEnumeration)
-                        {
-                            var cellChange = new CellChange(dataGridView, 0, rowIndex) { NewValue = tagAddress.GetAddress() };
-                            cellChangeList.Add(cellChange);
-
-                            var _ = data.DraggingDown ? tagAddress.NextBit(SimaticDataType.BYTE) : tagAddress.PreviousBit(SimaticDataType.BYTE); //Increase at the end. The first value is valid!
-                        }
-                    }
-                }
-                else
-                {
-                    var startString = startingCellValue?.ToString();
-                    if (Utils.SplitStringFromNumberFromRight(startString, out string before, out string numString, out string after) && int.TryParse(numString, out int num))
-                    {
-                        var x = 0;
-                        foreach (var rowIndex in rowIndexEnumeration)
-                        {
-                            var nextNum = num + (x++ * (data.DraggingDown ? 1 : -1));
-
-                            var nextNumString = nextNum.ToString();
-                            if (numString.Length > nextNumString.Length)
-                            {
-                                var nextNumLen = nextNumString.Length;
-                                for (var z = 0; z < (numString.Length - nextNumLen); z++)
-                                {
-                                    nextNumString = '0' + nextNumString;
-                                }
-                            }
-
-                            var cellChange = new CellChange(dataGridView, data.DraggedColumn, rowIndex) { NewValue = (before + nextNumString + after) };
-                            cellChangeList.Add(cellChange);
-                        }
-
-                    }
-                }
-
-                this.ChangeCells(cellChangeList);
-            });
-            #endregion
-
-            excelDragHandler.Init();
-            sortHandler.Init();
 
             UpdateConfigPanel();
         }
 
-        private DataGridViewColumn CreateColumn(string name, int width)
+        public void ProjectSave(bool saveAs = false)
         {
-            var column = new DataGridViewTextBoxColumn();
-            return InitColumn(column, name, width);
-        }
-
-        private T InitColumn<T>(T column, string name, int width) where T : DataGridViewColumn
-        {
-            column.Name = name;
-            column.DefaultCellStyle.SelectionBackColor = Color.LightGray;
-            column.DefaultCellStyle.BackColor = SystemColors.ControlLightLight;
-            column.DefaultCellStyle.SelectionForeColor = Color.Black;
-            column.DefaultCellStyle.ForeColor = Color.Black;
-            column.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            column.Width = width;
-            column.AutoSizeMode = width <= 0 ? DataGridViewAutoSizeColumnMode.Fill : DataGridViewAutoSizeColumnMode.None;
-            column.SortMode = DataGridViewColumnSortMode.Programmatic;
-            return column;
-        }
-
-        private void Paste()
-        {
-            var clipboardDataObject = (DataObject)Clipboard.GetDataObject();
-            if (clipboardDataObject.GetDataPresent(DataFormats.Text))
+            var projectSave = new IOGenerationProjectSave();
+            foreach (var entry in gridHandler.DataSource.GetNotEmptyDataDict())
             {
-                var pastedCellList = new List<CellChange>();
-
-                var pasteString = clipboardDataObject.GetData(DataFormats.Text).ToString();
-                if (pasteString.Contains("\r\n") || pasteString.Contains('\t'))
-                {//If contains new lines or tab it needs to handled like an excel file. New line => next row. Tab => next column.
-                    string[] pastedRows = Regex.Split(pasteString.TrimEnd("\r\n".ToCharArray()), "\r\n");
-
-                    int startRowPointer = dataGridView.CurrentCell.RowIndex; //The currentCell row index needs to be taken BEFORE adding cells otherwise it will be moved!
-                    int startColumnPointer = dataGridView.CurrentCell.ColumnIndex;
-
-                    int rowPointer = startRowPointer;
-                    for (int pastedRowIndex = startRowPointer; pastedRowIndex < pastedRows.Length; rowPointer++, pastedRowIndex++)
-                    {
-                        if (rowPointer >= dataGridView.RowCount)
-                        {
-                            break;
-                        }
-
-                        string[] pastedColumns = pastedRows[pastedRowIndex].Split('\t');
-
-                        int columnPointer = startColumnPointer;
-                        for (int pastedColumnPointer = 0; pastedColumnPointer < pastedColumns.Length; columnPointer++, pastedColumnPointer++)
-                        {
-                            if (columnPointer >= dataGridView.ColumnCount)
-                            {
-                                break;
-                            }
-
-                            var cell = dataGridView.Rows[rowPointer]?.Cells[columnPointer];
-                            if (cell != null)
-                            {
-                                pastedCellList.Add(new CellChange(cell) { NewValue = pastedColumns[pastedColumnPointer] });
-                            }
-                        }
-                    }
-                }
-                else
-                {//If is a normal string, i will paste in ALL the selected cells!
-                    foreach (DataGridViewCell selectedCell in dataGridView.SelectedCells)
-                    {
-                        pastedCellList.Add(new CellChange(selectedCell) { NewValue = pasteString });
-                    }
-                }
-
-                ChangeCells(pastedCellList);
+                projectSave.AddIOData(entry.Key, entry.Value);
             }
-        }
-
-        public void SaveFile(bool saveAs = false)
-        {
-            var save = new IOGenerationSaveFile();
-            foreach (var entry in dataSource.GetNotEmptyDataDict())
-            {
-                save.AddIOData(entry.Key, entry.Value);
-            }
-            save.Save(ref lastFilePath, saveAs);
+            projectSave.Save(ref lastFilePath, saveAs);
 
             this.Text = this.Name + ". File: " + lastFilePath;
         }
 
-        public void LoadFile()
+        public void PreferencesSave()
         {
-            var loadedSave = IOGenerationSaveFile.Load(ref lastFilePath);
-            if (loadedSave != null)
+            new IOGenerationPreferenceSave
+            {
+                Configuration = this.config,
+                ExcelImportConfiguration = this.excelImportConfig
+            }.Save();
+        }
+
+        public void ProjectLoad()
+        {
+            var loadedProjectSave = IOGenerationProjectSave.Load(ref lastFilePath);
+            if (loadedProjectSave != null)
             {
                 this.dataGridView.SuspendLayout();
-                this.dataSource.InitializeData();
+                this.gridHandler.DataSource.InitializeData(this.gridHandler.RowCount);
 
-                foreach(var saveData in loadedSave.SaveDataList)
+                foreach (var saveData in loadedProjectSave.SaveDataList)
                 {
                     var rowIndex = saveData.RowIndex;
-                    if(rowIndex >= 0 && rowIndex <= TOTAL_ROW_COUNT)
+                    if (rowIndex >= 0 && rowIndex <= TOTAL_ROW_COUNT)
                     {
-                        saveData.SaveTo(this.dataSource[saveData.RowIndex]);
+                        saveData.SaveTo(this.gridHandler.DataSource[saveData.RowIndex]);
                     }
                 }
 
@@ -522,62 +265,6 @@ namespace TiaXmlReader.GenerationForms.IO
                 this.Text = this.Name + ". File: " + lastFilePath;
             }
         }
-
-        public void DeleteSelectedCells()
-        {
-            var deletedCellList = new List<CellChange>();
-            foreach (DataGridViewCell selectedCell in dataGridView.SelectedCells)
-            {
-                deletedCellList.Add(new CellChange(selectedCell) { NewValue = "" });
-            }
-
-            this.ChangeCells(deletedCellList);
-        }
-
-        public void ChangeCells(List<CellChange> cellChangeList, bool applyChanges = true)
-        {
-            if (cellChangeList.Count == 0)
-            {
-                return;
-            }
-
-            try
-            {
-                if (applyChanges)
-                {
-                    undoRedoHandler.Lock(); //Lock the handler. I do not want more actions been added by events here since are all handled below!
-
-                    cellChangeList.ForEach(cellChange => cellChange.ApplyNewValue());
-                    dataGridView.Refresh();
-
-                    undoRedoHandler.Unlock();
-                }
-
-                void undoRedoAction()
-                {
-                    undoRedoHandler.Lock();
-                    cellChangeList.ForEach(cellChange => cellChange.ApplyOldValue());
-                    undoRedoHandler.Unlock();
-
-                    dataGridView.ClearSelection();
-
-                    var firstCell = cellChangeList[0].cell;
-                    dataGridView.CurrentCell = firstCell; //Setting se current cell already center the grid to it.
-                    dataGridView.Refresh();
-
-                    undoRedoHandler.AddRedo(() => ChangeCells(cellChangeList));
-                }
-
-                undoRedoHandler.AddUndo(undoRedoAction);
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString(), "Error while changing cells", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
-        }
-
         private void UpdateConfigPanel()
         {
             configButtonPanel.SuspendLayout();
@@ -599,50 +286,6 @@ namespace TiaXmlReader.GenerationForms.IO
             configButtonPanel.ResumeLayout();
         }
     }
-
-    public class CellChange
-    {
-        public DataGridViewCell cell;
-        public object OldValue;
-        public object NewValue;
-        public int RowIndex => cell.RowIndex;
-        public int ColumnIndex => cell.ColumnIndex;
-
-        public CellChange(DataGridView dataGridView, int column, int row) : this(dataGridView.Rows[row].Cells[column])
-        {
-        }
-
-        public CellChange(DataGridViewCell cell)
-        {
-            this.cell = cell;
-            OldValue = cell?.Value;
-        }
-
-        public void ReverseValues()
-        {
-            var savedOldValue = this.OldValue;
-            OldValue = NewValue;
-            NewValue = savedOldValue;
-        }
-
-        public void ApplyNewValue()
-        {
-            if (cell != null)
-            {
-                cell.Value = this.NewValue;
-            }
-        }
-
-        public void ApplyOldValue()
-        {
-            if (cell != null)
-            {
-                cell.Value = this.OldValue;
-            }
-        }
-    }
-
-
 }
 
 /*

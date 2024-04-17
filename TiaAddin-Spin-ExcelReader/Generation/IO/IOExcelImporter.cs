@@ -1,16 +1,11 @@
-﻿using SpinXmlReader.Block;
-using SpinXmlReader.TagTable;
-using SpinXmlReader;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using TiaXmlReader.SimaticML;
-using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace;
-using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace;
-using SpinXmlReader.SimaticML;
 using ClosedXML.Excel;
 using System.Windows.Forms;
 using TiaXmlReader.Localization;
+using TiaXmlReader.Generation.IO;
 
 namespace TiaXmlReader.Generation.IO
 {

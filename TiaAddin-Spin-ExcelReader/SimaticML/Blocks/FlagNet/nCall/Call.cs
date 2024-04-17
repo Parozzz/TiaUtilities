@@ -1,14 +1,12 @@
-﻿using SpinXmlReader;
-using SpinXmlReader.Block;
-using SpinXmlReader.SimaticML;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace;
 using TiaXmlReader.SimaticML.Enums;
 using TiaXmlReader.Utility;
+using TiaXmlReader.SimaticML;
+using TiaXmlReader.SimaticML.Blocks;
 
 namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nCall
 {

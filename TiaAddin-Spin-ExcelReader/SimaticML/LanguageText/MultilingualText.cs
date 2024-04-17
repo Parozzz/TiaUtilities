@@ -1,5 +1,4 @@
-﻿using SpinXmlReader.SimaticML;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -8,8 +7,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using TiaXmlReader.Utility;
+using TiaXmlReader.SimaticML;
+using TiaXmlReader.SimaticML.LanguageText;
 
-namespace SpinXmlReader
+namespace TiaXmlReader.SimaticML.LanguageText
 {
     public enum MultilingualTextType
     {

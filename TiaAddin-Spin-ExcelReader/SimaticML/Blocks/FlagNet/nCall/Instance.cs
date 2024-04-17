@@ -1,16 +1,17 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Charts;
-using SpinXmlReader.Block;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace;
 using TiaXmlReader.SimaticML.Enums;
 using TiaXmlReader.Utility;
+using TiaXmlReader.SimaticML.Blocks;
+using TiaXmlReader.SimaticML.Blocks.FlagNet.nAccess;
+using TiaXmlReader.SimaticML.Blocks.FlagNet.nCall;
 
-namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nPart
+namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nCall
 {
     public class Instance : XmlNodeListConfiguration<Component>
     {

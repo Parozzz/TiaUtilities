@@ -1,8 +1,9 @@
-﻿using SpinXmlReader.SimaticML;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using TiaXmlReader.Utility;
+using TiaXmlReader.SimaticML;
+using TiaXmlReader.SimaticML.TagTable;
 
-namespace SpinXmlReader.TagTable
+namespace TiaXmlReader.SimaticML.TagTable
 {
     public class XMLTagTable : XmlNodeConfiguration, IGlobalObject
     {

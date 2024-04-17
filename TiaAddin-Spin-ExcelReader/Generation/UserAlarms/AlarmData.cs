@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TiaXmlReader.AlarmGeneration
+namespace TiaXmlReader.Generation.UserAlarms
 {
     public class AlarmData
     {

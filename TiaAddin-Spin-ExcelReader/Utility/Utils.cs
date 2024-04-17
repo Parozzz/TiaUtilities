@@ -1,8 +1,11 @@
 ﻿using System;
-using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
+using TiaXmlReader.Utility;
 
-namespace SpinXmlReader
+namespace TiaXmlReader.Utility
 {
     public static class Utils
     {
@@ -11,12 +14,63 @@ namespace SpinXmlReader
             return Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         }
 
+        public static ICollection<T> SingletonCollection<T>(T data)
+        {
+            return new System.Collections.ObjectModel.ReadOnlyCollection<T>(new T[] { data });
+        }
+
         public static void ShowExceptionMessage(Exception ex)
         {
             string message = "Message: " + ex.Message + " \r\n StackTrace: " + ex.StackTrace;
             string caption = "An exception occoured while executing Spin Addin!";
             Console.WriteLine("Exception: {0}", message + caption);
             MessageBox.Show(message, caption);
+        }
+
+        public static Dictionary<string, object> CreatePublicFieldSnapshot<T>(T obj)
+        {
+            var snapshotDict = new Dictionary<string, object>();
+            foreach (var field in typeof(T).GetFields().Where(field => field.IsPublic))
+            {
+                snapshotDict.Add(field.Name, field.GetValue(obj));
+            }
+            return snapshotDict;
+        }
+
+        public static bool ComparePublicFieldSnapshot<T>(T obj, Dictionary<string, object> snapshotDict) //TRUE IF ALL EQUALS
+        {
+            var fields = typeof(T).GetFields();
+            foreach (var field in fields.Where(f => f.IsPublic))
+            {
+                if (!snapshotDict.ContainsKey(field.Name))
+                {
+                    return false;
+                }
+
+                var snapshotValue = snapshotDict[field.Name];
+                var value = field.GetValue(obj);
+                if ((snapshotValue == null && value != null) || (snapshotValue != null && value == null) || (snapshotValue != null && !snapshotValue.Equals(value)))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public static bool ArePublicFieldDifferent<T>(T obj1, T obj2)
+        {
+            foreach (var field in typeof(T).GetFields().Where(field => field.IsPublic))
+            {
+                var oldValue = field.GetValue(obj1);
+                var newValue = field.GetValue(obj2);
+                if ((oldValue != null && newValue == null) || (oldValue == null && newValue != null) || (oldValue != null && !oldValue.Equals(newValue)))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public static bool TryNotNull<OBJ>(OBJ obj, out OBJ outObj)

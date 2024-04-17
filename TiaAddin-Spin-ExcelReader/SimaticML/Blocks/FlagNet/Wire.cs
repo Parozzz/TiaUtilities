@@ -1,11 +1,13 @@
-﻿using SpinXmlReader.SimaticML;
-using System.Linq;
+﻿using System.Linq;
 using System.Xml;
-using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace;
-using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace;
 using TiaXmlReader.Utility;
+using TiaXmlReader.SimaticML;
+using TiaXmlReader.SimaticML.Blocks;
+using TiaXmlReader.SimaticML.Blocks.FlagNet;
+using TiaXmlReader.SimaticML.Blocks.FlagNet.nAccess;
+using TiaXmlReader.SimaticML.Blocks.FlagNet.nPart;
 
-namespace SpinXmlReader.Block
+namespace TiaXmlReader.SimaticML.Blocks.FlagNet
 {
     public enum WirePartType
     {

@@ -1,14 +1,13 @@
 ﻿using DocumentFormat.OpenXml.Bibliography;
-using SpinXmlReader;
-using SpinXmlReader.Block;
-using SpinXmlReader.SimaticML;
 using System;
 using System.Linq;
 using System.Xml;
-using TiaXmlReader.SimaticML.Blocks.FlagNet.nPart;
 using TiaXmlReader.Utility;
+using TiaXmlReader.SimaticML;
+using TiaXmlReader.SimaticML.Blocks;
+using TiaXmlReader.SimaticML.Blocks.FlagNet.nCall;
 
-namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
+namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nPart
 {
     public enum PartType
     {

@@ -3,16 +3,14 @@ using Flee.PublicTypes;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data.Common;
-using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using TiaXmlReader.GenerationForms.GridHandler;
 
-namespace TiaXmlReader.GenerationForms.IO
+namespace TiaXmlReader.GenerationForms.IO.ExcelImporter
 {
-    public partial class IOGenerationExcelImporterForm : Form
+    public partial class IOGenerationExcelImportForm : Form
     {
         public const string ROW_SPECIAL_CHAR = "$";
         public const string EXPRESSION_OPERATORS = "Operators: Bool[<>, =, >, <, >=, <=, AND, OR, XOR, NAND].\nString[.Contains(str), .StartsWith(str), .EndsWith(str)].";
@@ -21,27 +19,41 @@ namespace TiaXmlReader.GenerationForms.IO
         public const int IONAME_COLUMN = 1;
         public const int COMMENT_COLUMN = 2;
 
-        public class ExcelImportData
+        public class ExcelImportData : IGridData
         {
             public string Address { get; set; }
             public string IOName { get; set; }
             public string Comment { get; set; }
+
+            public void Clear()
+            {
+                this.Address = this.IOName = this.Comment = "";
+            }
+
+            public void CopyFrom(ExcelImportData excelImport)
+            {
+                this.Address = excelImport.Address;
+                this.IOName = excelImport.IOName;
+                this.Comment = excelImport.Comment;
+            }
+
+            public bool IsEmpty()
+            {
+                return string.IsNullOrEmpty(Address) && string.IsNullOrEmpty(IOName) && string.IsNullOrEmpty(Comment);
+            }
         }
 
-        private string addressCellConfig = "$A";
-        private string ioNameCellConfig = "$A";
-        private string commentCellConfig = "$E $F $G $H (P$K - $O)";
-        private uint startingRow = 2;
-        private string ignoreRowExpressionConfig = "$A <> \"\"";
+        private readonly IOGenerationExcelImportConfiguration config;
+        private readonly GridHandler<ExcelImportData> gridHandler;
 
-        private readonly BindingList<ExcelImportData> bindingList;
-        public IEnumerable<ExcelImportData> ImportDataEnumerable { get => bindingList; }
+        public IEnumerable<ExcelImportData> ImportDataEnumerable { get => gridHandler.DataSource.GetNotEmptyDataDict().Keys; }
 
-        public IOGenerationExcelImporterForm()
+        public IOGenerationExcelImportForm(IOGenerationExcelImportConfiguration config)
         {
             InitializeComponent();
 
-            this.bindingList = new BindingList<ExcelImportData>(new List<ExcelImportData>());
+            this.config = config;
+            this.gridHandler = new GridHandler<ExcelImportData>(this.dataGridView, () => new ExcelImportData(), (oldData, newData) => oldData.CopyFrom(newData));
 
             Init();
         }
@@ -50,7 +62,7 @@ namespace TiaXmlReader.GenerationForms.IO
         {
             if (keyData == Keys.Cancel || keyData == Keys.Escape)
             {
-                this.Close();
+                this.CancelButton.PerformClick();
                 return true;    // indicate that you handled this keystroke
             }
 
@@ -73,66 +85,63 @@ namespace TiaXmlReader.GenerationForms.IO
             };
             #endregion
 
-            this.dataGridView.DataSource = new BindingSource() { DataSource = bindingList };
-            this.dataGridView.AutoGenerateColumns = false;
+            #region DRAG
+            this.gridHandler.SetDragPreviewAction(data => { IOGenerationUtils.DragPreview(data, this.gridHandler); });
+            this.gridHandler.SetDragMouseUpAction(data => { IOGenerationUtils.DragMouseUp(data, this.gridHandler); });
+            #endregion
 
-            this.dataGridView.Dock = DockStyle.Fill;
-            this.dataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            this.dataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCellsExceptHeaders;
-            this.dataGridView.AutoSize = false;
+            #region DATA_ASSOCIATION
+            this.gridHandler.SetDataAssociation(ADDRESS_COLUMN, importData => importData.Address);
+            this.gridHandler.SetDataAssociation(IONAME_COLUMN, importData => importData.IOName);
+            this.gridHandler.SetDataAssociation(COMMENT_COLUMN, importData => importData.Comment);
+            #endregion
 
-            this.dataGridView.ClipboardCopyMode = DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
-            this.dataGridView.SelectionMode = DataGridViewSelectionMode.CellSelect;
-            this.dataGridView.MultiSelect = true;
+            gridHandler.Init();
 
-            this.dataGridView.EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2;
-
-            this.dataGridView.AllowUserToAddRows = false;
-
-            var addressColumn = InitColumn(dataGridView.Columns[ADDRESS_COLUMN], "Indirizzo", 80);
-            var nameIOColumn = InitColumn(dataGridView.Columns[IONAME_COLUMN], "Nome IO", 110);
-            var commentColumn = InitColumn(dataGridView.Columns[COMMENT_COLUMN], "Commento", 0);
+            #region COLUMNS
+            var addressColumn = this.gridHandler.InitColumn(ADDRESS_COLUMN, "Indirizzo", 80);
+            var nameIOColumn = this.gridHandler.InitColumn(IONAME_COLUMN, "Nome IO", 110);
+            var commentColumn = this.gridHandler.InitColumn(COMMENT_COLUMN, "Commento", 0);
+            #endregion
 
             this.ConfigButton.Click += (object sender, EventArgs args) =>
             {
                 var configForm = new ConfigForm("Configurazione");
                 configForm.AddConfigLine(new ConfigFormLine()
                     .Title("Indirizzo")
-                    .TextBox(addressCellConfig)
-                    .TextChanged(str => addressCellConfig = str));
+                    .TextBox(config.AddressCellConfig)
+                    .TextChanged(str => config.AddressCellConfig = str));
 
                 configForm.AddConfigLine(new ConfigFormLine()
                     .Title("Nome IO")
-                    .TextBox(ioNameCellConfig)
-                    .TextChanged(str => ioNameCellConfig = str));
+                    .TextBox(config.IONameCellConfig)
+                    .TextChanged(str => config.IONameCellConfig = str));
 
                 configForm.AddConfigLine(new ConfigFormLine()
                     .Title("Commento")
-                    .TextBox(commentCellConfig)
-                    .TextChanged(str => commentCellConfig = str));
+                    .TextBox(config.CommentCellConfig)
+                    .TextChanged(str => config.CommentCellConfig = str));
 
                 configForm.AddConfigLine(new ConfigFormLine()
                     .Title("Riga di partenza")
-                    .TextBox(startingRow)
+                    .TextBox(config.StartingRow)
                     .NumericOnly()
-                    .UIntChanged(num => startingRow = num));
+                    .UIntChanged(num => config.StartingRow = num));
 
                 configForm.AddConfigLine(new ConfigFormLine()
                     .Title("Espressione validità riga")
-                    .TextBox(ignoreRowExpressionConfig)
-                    .TextChanged(str => ignoreRowExpressionConfig = str));
+                    .TextBox(config.IgnoreRowExpressionConfig)
+                    .TextChanged(str => config.IgnoreRowExpressionConfig = str));
 
                 configForm.StartShowingAtControl(this.ConfigButton);
                 configForm.Init();
-                configForm.ShowDialog(this);
+                configForm.Show(this);
 
                 dataGridView.Refresh();
             };
 
             this.ImportExcelButton.Click += (object sender, EventArgs args) =>
             {
-
                 var fileDialog = new CommonOpenFileDialog
                 {
                     EnsurePathExists = true,
@@ -148,32 +157,21 @@ namespace TiaXmlReader.GenerationForms.IO
             };
         }
 
-        private T InitColumn<T>(T column, string name, int width) where T : DataGridViewColumn
-        {
-            column.Name = name;
-            column.DefaultCellStyle.SelectionBackColor = Color.LightGray;
-            column.DefaultCellStyle.BackColor = SystemColors.ControlLightLight;
-            column.DefaultCellStyle.SelectionForeColor = Color.Black;
-            column.DefaultCellStyle.ForeColor = Color.Black;
-            column.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            column.Width = width;
-            column.AutoSizeMode = width <= 0 ? DataGridViewAutoSizeColumnMode.Fill : DataGridViewAutoSizeColumnMode.None;
-            column.SortMode = DataGridViewColumnSortMode.Programmatic;
-            return column;
-        }
-
         private void ImportExcel(string filePath)
         {
-            this.bindingList.Clear();
+            this.gridHandler.DataSource.Clear();
+
             using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 using (var configWorkbook = new XLWorkbook(stream))
                 {
                     var worksheet = configWorkbook.Worksheets.Worksheet(1);
 
-                    var excelCellLetterList = AddMatchExpression(new string[] { addressCellConfig, commentCellConfig, ioNameCellConfig, ignoreRowExpressionConfig });
+                    var excelCellLetterList = AddMatchExpression(new string[] {
+                        config.AddressCellConfig, config.CommentCellConfig, config.IONameCellConfig, config.IgnoreRowExpressionConfig
+                    });
 
-                    uint index = this.startingRow;
+                    uint rowIndex = config.StartingRow;
                     while (true)
                     {
                         var excelCellValueDict = new Dictionary<string, string>();
@@ -181,12 +179,12 @@ namespace TiaXmlReader.GenerationForms.IO
                         bool allEmpty = true;
                         foreach (var cellLetter in excelCellLetterList)
                         {
-                            var cellValue = worksheet.Cell(cellLetter + index).Value.ToString();
+                            var cellValue = worksheet.Cell(cellLetter + rowIndex).Value.ToString();
                             excelCellValueDict.Add(cellLetter, cellValue); //There should not be two equals cellLetter. If there are, somethign wrong in AddMatchExpression.
 
                             allEmpty &= string.IsNullOrEmpty(cellValue);
                         }
-                        index++;
+                        rowIndex++;
 
                         if (allEmpty)
                         {
@@ -202,9 +200,9 @@ namespace TiaXmlReader.GenerationForms.IO
                             continue;
                         }
 
-                        var address = this.addressCellConfig;
-                        var ioName = this.ioNameCellConfig;
-                        var comment = this.commentCellConfig;
+                        var address = config.AddressCellConfig;
+                        var ioName = config.IONameCellConfig;
+                        var comment = config.CommentCellConfig;
                         foreach (var entry in excelCellValueDict)
                         {
                             address = address.Replace(ROW_SPECIAL_CHAR + entry.Key, entry.Value);
@@ -212,14 +210,18 @@ namespace TiaXmlReader.GenerationForms.IO
                             comment = comment.Replace(ROW_SPECIAL_CHAR + entry.Key, entry.Value);
                         }
 
-                        bindingList.Add(new ExcelImportData()
+                        var freeIndexList = this.gridHandler.DataSource.GetFirstEmptyRowIndexes(1);
+                        if (freeIndexList.Count == 1)
                         {
-                            Address = address,
-                            IOName = ioName,
-                            Comment = comment,
-                        });
+                            var freeRowIndex = freeIndexList[0];
+                            this.gridHandler.ChangeRow(freeRowIndex, new ExcelImportData()
+                            {
+                                Address = address,
+                                IOName = ioName,
+                                Comment = comment,
+                            });
+                        }
                     }
-
                 }
             }
         }
@@ -239,7 +241,7 @@ namespace TiaXmlReader.GenerationForms.IO
                     context.Variables.Add(entry.Key, entry.Value);
                 }
 
-                var dynExp = context.CompileDynamic(ignoreRowExpressionConfig.Replace(ROW_SPECIAL_CHAR, ""));
+                var dynExp = context.CompileDynamic(config.IgnoreRowExpressionConfig.Replace(ROW_SPECIAL_CHAR, ""));
                 if (!(dynExp.Evaluate() is bool eval))
                 {
                     MessageBox.Show("Return must be boolean.\n" + EXPRESSION_OPERATORS, "Invalid ignore row operation");

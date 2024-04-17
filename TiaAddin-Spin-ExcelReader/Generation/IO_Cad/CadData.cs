@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TiaXmlReader.SimaticML;
+using TiaXmlReader.SimaticML.Enums;
 
 namespace TiaXmlReader.Generation.IO_Cad
 {

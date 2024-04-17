@@ -1,9 +1,9 @@
-﻿using SpinXmlReader.Block;
-using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace;
-using TiaXmlReader.SimaticML.Blocks.FlagNet.nPart;
-using TiaXmlReader.SimaticML.Enums;
+﻿using TiaXmlReader.SimaticML.Enums;
+using TiaXmlReader.SimaticML.Blocks;
+using TiaXmlReader.SimaticML.Blocks.FlagNet;
+using TiaXmlReader.SimaticML.Blocks.FlagNet.nAccess;
 
-namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace
+namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nPart
 {
     public abstract class IPartData
     {

@@ -1,18 +1,18 @@
 ﻿using ClosedXML.Excel;
-using SpinXmlReader;
-using SpinXmlReader.Block;
-using SpinXmlReader.SimaticML;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
-using TiaXmlReader.AlarmGeneration;
-using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace;
-using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace;
 using TiaXmlReader.SimaticML.Enums;
 using TiaXmlReader.Utility;
+using TiaXmlReader.Generation.UserAlarms;
+using TiaXmlReader.Generation;
+using TiaXmlReader.SimaticML;
+using TiaXmlReader.SimaticML.Blocks;
+using TiaXmlReader.SimaticML.Blocks.FlagNet.nAccess;
+using TiaXmlReader.SimaticML.Blocks.FlagNet.nPart;
 
-namespace TiaXmlReader.Generation
+namespace TiaXmlReader.Generation.UserAlarms
 {
 
     public enum GroupingTypeEnum
@@ -395,16 +395,16 @@ namespace TiaXmlReader.Generation
             switch (parsedContactAddress.ToLower())
             {
                 case "false":
-                    contactAccessData = LiteralConstantAccessData.Create(compileUnit, SimaticML.SimaticDataType.BOOLEAN, "FALSE");
+                    contactAccessData = LiteralConstantAccessData.Create(compileUnit, TiaXmlReader.SimaticML.Enums.SimaticDataType.BOOLEAN, "FALSE");
                     break;
                 case "0":
-                    contactAccessData = LiteralConstantAccessData.Create(compileUnit, SimaticML.SimaticDataType.BOOLEAN, "0");
+                    contactAccessData = LiteralConstantAccessData.Create(compileUnit, TiaXmlReader.SimaticML.Enums.SimaticDataType.BOOLEAN, "0");
                     break;
                 case "true":
-                    contactAccessData = LiteralConstantAccessData.Create(compileUnit, SimaticML.SimaticDataType.BOOLEAN, "TRUE");
+                    contactAccessData = LiteralConstantAccessData.Create(compileUnit, TiaXmlReader.SimaticML.Enums.SimaticDataType.BOOLEAN, "TRUE");
                     break;
                 case "1":
-                    contactAccessData = LiteralConstantAccessData.Create(compileUnit, SimaticML.SimaticDataType.BOOLEAN, "1");
+                    contactAccessData = LiteralConstantAccessData.Create(compileUnit, TiaXmlReader.SimaticML.Enums.SimaticDataType.BOOLEAN, "1");
                     break;
                 default:
                     contactAccessData = GlobalVariableAccessData.Create(compileUnit, parsedContactAddress);

@@ -1,5 +1,5 @@
 ﻿using DocumentFormat.OpenXml;
-using SpinXmlReader;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -29,32 +29,32 @@ namespace TiaXmlReader.Generation.IO
 
     public class IOConfiguration
     {
-        public string FCBlockName = "fcTest_IO";
-        public uint FCBlockNumber = 195;
+        [JsonProperty] public string FCBlockName = "fcTest_IO";
+        [JsonProperty] public uint FCBlockNumber = 195;
 
-        public IOMemoryTypeEnum MemoryType = IOMemoryTypeEnum.DB;
-        public IOGroupingTypeEnum GroupingType = IOGroupingTypeEnum.PER_BYTE;
+        [JsonProperty] public IOMemoryTypeEnum MemoryType = IOMemoryTypeEnum.DB;
+        [JsonProperty] public IOGroupingTypeEnum GroupingType = IOGroupingTypeEnum.PER_BYTE;
 
-        public string DBName = "TestIO_DB";
-        public uint DBNumber = 196;
+        [JsonProperty] public string DBName = "TestIO_DB";
+        [JsonProperty] public uint DBNumber = 196;
 
-        public string VariableTableName = "VariableTable";
-        public uint VariableTableStartAddress = 2890;
-        public uint VariableTableSplitEvery = 250;
+        [JsonProperty] public string VariableTableName = "VariableTable";
+        [JsonProperty] public uint VariableTableStartAddress = 2890;
+        [JsonProperty] public uint VariableTableSplitEvery = 250;
 
-        public string IOTableName = "IOTags";
-        public uint IOTableSplitEvery = 250;
+        [JsonProperty] public string IOTableName = "IOTags";
+        [JsonProperty] public uint IOTableSplitEvery = 250;
 
-        public string DefaultIoName = "{memory_type}{byte}_{bit}";
-        public string DefaultVariableName = "{io_name}";
+        [JsonProperty] public string DefaultIoName = "{memory_type}{byte}_{bit}";
+        [JsonProperty] public string DefaultVariableName = "{io_name}";
 
-        public string SegmentNameBitGrouping = "{memory_type}{byte}_{bit} - {comment}";
-        public string SegmentNameByteGrouping = "{memory_type}B{byte}";
+        [JsonProperty] public string SegmentNameBitGrouping = "{memory_type}{byte}_{bit} - {comment}";
+        [JsonProperty] public string SegmentNameByteGrouping = "{memory_type}B{byte}";
 
-        public string PrefixInputDB = "IN.";
-        public string PrefixInputMerker = "MI_";
-        public string PrefixOutputDB = "OUT.";
-        public string PrefixOutputMerker = "MO_";
+        [JsonProperty] public string PrefixInputDB = "IN.";
+        [JsonProperty] public string PrefixInputMerker = "MI_";
+        [JsonProperty] public string PrefixOutputDB = "OUT.";
+        [JsonProperty] public string PrefixOutputMerker = "MO_";
 
     }
 }

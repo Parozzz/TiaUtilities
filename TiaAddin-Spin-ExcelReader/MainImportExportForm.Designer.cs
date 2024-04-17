@@ -1,4 +1,4 @@
-﻿namespace SpinXmlReader
+﻿namespace TiaXmlReader
 {
     partial class MainImportExportForm
     {

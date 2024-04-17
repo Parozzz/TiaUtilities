@@ -1,16 +1,15 @@
 ﻿using DocumentFormat.OpenXml.Office2010.ExcelAc;
 using DocumentFormat.OpenXml.Office2019.Excel.RichData2;
-using SpinXmlReader;
-using SpinXmlReader.Block;
-using SpinXmlReader.SimaticML;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using TiaXmlReader.SimaticML.Enums;
 using TiaXmlReader.Utility;
+using TiaXmlReader.SimaticML.Blocks;
+using TiaXmlReader.SimaticML.Blocks.FlagNet.nAccess;
 
-namespace TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace
+namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nAccess
 {
     public class Access : XmlNodeConfiguration
     {

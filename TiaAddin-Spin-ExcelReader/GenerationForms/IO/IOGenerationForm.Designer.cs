@@ -46,11 +46,11 @@
             this.variableTableConfigButton = new System.Windows.Forms.Button();
             this.ioTableConfigButton = new System.Windows.Forms.Button();
             this.segmentNameConfigButton = new System.Windows.Forms.Button();
+            this.groupingTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
             this.divisionTypeLabel = new System.Windows.Forms.Label();
+            this.memoryTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
             this.memoryTypeLabel = new System.Windows.Forms.Label();
             this.dataGridView = new System.Windows.Forms.DataGridView();
-            this.groupingTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
-            this.memoryTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
             this.mainPanel.SuspendLayout();
             this.TopTableLayoutPanel.SuspendLayout();
             this.TopMenuStrip.SuspendLayout();
@@ -122,19 +122,19 @@
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveToolStripMenuItem.Text = "Save";
             // 
             // saveAsToolStripMenuItem
             // 
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveAsToolStripMenuItem.Text = "SaveAs";
             // 
             // loadToolStripMenuItem
             // 
             this.loadToolStripMenuItem.Name = "loadToolStripMenuItem";
-            this.loadToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
+            this.loadToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.loadToolStripMenuItem.Text = "Load";
             // 
             // importExportToolStripMenuItem
@@ -253,6 +253,14 @@
             this.segmentNameConfigButton.Text = "Nomi Segmenti";
             this.segmentNameConfigButton.UseVisualStyleBackColor = true;
             // 
+            // groupingTypeComboBox
+            // 
+            this.groupingTypeComboBox.FormattingEnabled = true;
+            this.groupingTypeComboBox.Location = new System.Drawing.Point(332, 39);
+            this.groupingTypeComboBox.Name = "groupingTypeComboBox";
+            this.groupingTypeComboBox.Size = new System.Drawing.Size(112, 21);
+            this.groupingTypeComboBox.TabIndex = 3;
+            // 
             // divisionTypeLabel
             // 
             this.divisionTypeLabel.AutoSize = true;
@@ -262,6 +270,14 @@
             this.divisionTypeLabel.Size = new System.Drawing.Size(149, 18);
             this.divisionTypeLabel.TabIndex = 2;
             this.divisionTypeLabel.Text = "Tipo raggruppamento";
+            // 
+            // memoryTypeComboBox
+            // 
+            this.memoryTypeComboBox.FormattingEnabled = true;
+            this.memoryTypeComboBox.Location = new System.Drawing.Point(111, 39);
+            this.memoryTypeComboBox.Name = "memoryTypeComboBox";
+            this.memoryTypeComboBox.Size = new System.Drawing.Size(65, 21);
+            this.memoryTypeComboBox.TabIndex = 1;
             // 
             // memoryTypeLabel
             // 
@@ -283,22 +299,6 @@
             this.dataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this.dataGridView.Size = new System.Drawing.Size(1093, 409);
             this.dataGridView.TabIndex = 2;
-            // 
-            // groupingTypeComboBox
-            // 
-            this.groupingTypeComboBox.FormattingEnabled = true;
-            this.groupingTypeComboBox.Location = new System.Drawing.Point(332, 39);
-            this.groupingTypeComboBox.Name = "groupingTypeComboBox";
-            this.groupingTypeComboBox.Size = new System.Drawing.Size(112, 21);
-            this.groupingTypeComboBox.TabIndex = 3;
-            // 
-            // memoryTypeComboBox
-            // 
-            this.memoryTypeComboBox.FormattingEnabled = true;
-            this.memoryTypeComboBox.Location = new System.Drawing.Point(111, 39);
-            this.memoryTypeComboBox.Name = "memoryTypeComboBox";
-            this.memoryTypeComboBox.Size = new System.Drawing.Size(65, 21);
-            this.memoryTypeComboBox.TabIndex = 1;
             // 
             // IOGenerationForm
             // 

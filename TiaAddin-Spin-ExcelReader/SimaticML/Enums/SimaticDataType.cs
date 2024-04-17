@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TiaXmlReader.SimaticML.Enums;
+using TiaXmlReader.SimaticML;
 
-namespace TiaXmlReader.SimaticML
+namespace TiaXmlReader.SimaticML.Enums
 {
     public enum SimaticDataType
     {

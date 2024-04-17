@@ -1,7 +1,6 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using SpinXmlReader;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,11 +10,12 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.IO;
-using static TiaXmlReader.GenerationForms.IO.IOGenerationSaveFile;
+using static TiaXmlReader.GenerationForms.IO.IOGenerationProjectSave;
+using TiaXmlReader.Utility;
 
 namespace TiaXmlReader.GenerationForms.IO
 {
-    public class IOGenerationSaveFile
+    public class IOGenerationProjectSave
     {
         public const string EXTENSION = "json";
         public static string DEFAULT_FILE_PATH = Directory.GetCurrentDirectory() + @"\tempIOSave." + EXTENSION;
@@ -52,7 +52,7 @@ namespace TiaXmlReader.GenerationForms.IO
 
         [JsonProperty] public List<SaveData> SaveDataList { get; set; }
 
-        public IOGenerationSaveFile()
+        public IOGenerationProjectSave()
         {
 
         }
@@ -75,7 +75,7 @@ namespace TiaXmlReader.GenerationForms.IO
             SaveDataList.Add(saveData);
         }
 
-        public static IOGenerationSaveFile Load(ref string filePath)
+        public static IOGenerationProjectSave Load(ref string filePath)
         {
             try
             {
@@ -92,7 +92,7 @@ namespace TiaXmlReader.GenerationForms.IO
                     {
                         using (var reader = new JsonTextReader(sr))
                         {
-                            return serializer.Deserialize<IOGenerationSaveFile>(reader);
+                            return serializer.Deserialize<IOGenerationProjectSave>(reader);
                         }
                     }
                 }

@@ -24,12 +24,15 @@ namespace TiaXmlReader.GenerationForms.IO
 
         public void Init()
         {
+
+            form.groupingTypeComboBox.SelectedValue = config.GroupingType;
             form.groupingTypeComboBox.SelectionChangeCommitted += (object sender, EventArgs args) =>
             {
                 config.GroupingType = (IOGroupingTypeEnum) form.groupingTypeComboBox.SelectedValue;
                 this.dataGridView.Refresh();
             };
 
+            form.memoryTypeComboBox.SelectedValue = config.MemoryType;
             form.memoryTypeComboBox.SelectionChangeCommitted += (object sender, EventArgs args) =>
             {
                 config.MemoryType = (IOMemoryTypeEnum)form.memoryTypeComboBox.SelectedValue;
@@ -164,14 +167,9 @@ namespace TiaXmlReader.GenerationForms.IO
 
         private void SetupConfigForm(Control button, ConfigForm configForm)
         {
-            var loc = button.PointToScreen(Point.Empty);
-            //loc.X += fcConfigButton.Width;
-            loc.Y += button.Height;
-            configForm.StartPosition = FormStartPosition.Manual;
-            configForm.Location = loc;
-
+            configForm.StartShowingAtControl(button);
             configForm.Init();
-            configForm.ShowDialog(form);
+            configForm.Show(form);
 
             dataGridView.Refresh();
         }

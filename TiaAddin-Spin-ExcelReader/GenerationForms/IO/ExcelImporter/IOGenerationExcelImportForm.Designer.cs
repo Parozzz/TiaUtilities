@@ -1,6 +1,6 @@
-﻿namespace TiaXmlReader.GenerationForms.IO
+﻿namespace TiaXmlReader.GenerationForms.IO.ExcelImporter
 {
-    partial class IOGenerationExcelImporterForm
+    partial class IOGenerationExcelImportForm
     {
         /// <summary>
         /// Required designer variable.

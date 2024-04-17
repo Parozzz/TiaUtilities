@@ -6,15 +6,18 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using TiaXmlReader.SimaticML;
-using static TiaXmlReader.GenerationForms.IO.IOGenerationCellPaintHandler;
+using static TiaXmlReader.GenerationForms.GridHandler.GridCellPaintHandler;
+using TiaXmlReader.GenerationForms.GridHandler;
+using TiaXmlReader.GenerationForms.IO;
 
-namespace TiaXmlReader.GenerationForms.IO
+namespace TiaXmlReader.GenerationForms.GridHandler
 {
-    public class ExcelDragHandler : IOGenerationCellPainter
+    public class GridExcelDragHandler : IGridCellPainter
     {
         public const int TRIANGLE_SIZE = 13;
         public class DragData
         {
+            public DataGridView DataGridView { get; set; }
             public int StartingRow { get; set; }
             public int ActualRow { get; set; }
             public uint SelectedRowCount { get; set; }
@@ -27,9 +30,9 @@ namespace TiaXmlReader.GenerationForms.IO
 
         private readonly DataGridView dataGridView;
 
-        private readonly Color dragSelectionColor;
-        private readonly Color singleSelectedColor;
-        private readonly Color triangleColor;
+        private Color dragSelectionColor;
+        private Color singleSelectedColor;
+        private Color triangleColor;
 
         private bool started = false;
         private int rowIndexStart = -1;
@@ -46,12 +49,9 @@ namespace TiaXmlReader.GenerationForms.IO
 
         public bool DraggingDown { get => topSelectionRowIndex == rowIndexStart; }
 
-        public ExcelDragHandler(DataGridView dataGridView, Color dragSelectionColor, Color singleSelectedColor, Color triangleColor)
+        public GridExcelDragHandler(DataGridView dataGridView)
         {
             this.dataGridView = dataGridView;
-            this.dragSelectionColor = dragSelectionColor;
-            this.singleSelectedColor = singleSelectedColor;
-            this.triangleColor = triangleColor;
         }
 
         public bool IsStarted()
@@ -59,8 +59,12 @@ namespace TiaXmlReader.GenerationForms.IO
             return started;
         }
 
-        public void Init()
+        public void Init(Color dragSelectionColor, Color singleSelectedColor, Color triangleColor)
         {
+            this.dragSelectionColor = dragSelectionColor;
+            this.singleSelectedColor = singleSelectedColor;
+            this.triangleColor = triangleColor;
+
             dataGridView.MouseMove += (sender, args) =>
             {
                 if (started)
@@ -101,17 +105,7 @@ namespace TiaXmlReader.GenerationForms.IO
 
                     if (this.mouseUpAction != null)
                     {
-                        var data = new DragData()
-                        {
-                            StartingRow = this.rowIndexStart,
-                            SelectedRowCount = this.SelectedRows,
-                            DraggedColumn = this.draggedColumnIndex,
-                            DraggingDown = this.DraggingDown,
-                            TopSelectedRow = this.topSelectionRowIndex,
-                            BottomSelectedRow = this.bottomSelectionRowIndex,
-                            TooltipString = ""
-                        };
-
+                        var data = CreateDragData();
                         mouseUpAction.Invoke(data);
                     }
 
@@ -159,17 +153,7 @@ namespace TiaXmlReader.GenerationForms.IO
 
                 if (this.previewAction != null)
                 {
-                    var data = new DragData()
-                    {
-                        StartingRow = this.rowIndexStart,
-                        SelectedRowCount = this.SelectedRows,
-                        DraggedColumn = this.draggedColumnIndex,
-                        DraggingDown = this.DraggingDown,
-                        TopSelectedRow = this.topSelectionRowIndex,
-                        BottomSelectedRow = this.bottomSelectionRowIndex,
-                        TooltipString = ""
-                    };
-
+                    var data = CreateDragData();
                     previewAction.Invoke(data);
                     if (!string.IsNullOrEmpty(data.TooltipString))
                     {
@@ -179,13 +163,28 @@ namespace TiaXmlReader.GenerationForms.IO
             };
         }
 
-        public ExcelDragHandler SetPreviewAction(Action<DragData> action)
+        private DragData CreateDragData()
+        {
+            return new DragData()
+            {
+                DataGridView = this.dataGridView,
+                StartingRow = this.rowIndexStart,
+                SelectedRowCount = this.SelectedRows,
+                DraggedColumn = this.draggedColumnIndex,
+                DraggingDown = this.DraggingDown,
+                TopSelectedRow = this.topSelectionRowIndex,
+                BottomSelectedRow = this.bottomSelectionRowIndex,
+                TooltipString = ""
+            };
+        }
+
+        public GridExcelDragHandler SetPreviewAction(Action<DragData> action)
         {
             this.previewAction = action;
             return this;
         }
 
-        public ExcelDragHandler SetMouseUpAction(Action<DragData> action)
+        public GridExcelDragHandler SetMouseUpAction(Action<DragData> action)
         {
             this.mouseUpAction = action;
             return this;

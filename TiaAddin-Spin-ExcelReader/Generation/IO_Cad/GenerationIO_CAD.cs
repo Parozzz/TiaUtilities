@@ -1,16 +1,15 @@
 ﻿using ClosedXML.Excel;
-using SpinXmlReader.Block;
-using SpinXmlReader.TagTable;
-using SpinXmlReader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using TiaXmlReader.SimaticML;
-using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.PartNamespace;
-using TiaXmlReader.SimaticML.BlockFCFB.FlagNet.AccessNamespace;
-using SpinXmlReader.SimaticML;
 using TiaXmlReader.SimaticML.nBlockAttributeList;
 using TiaXmlReader.Utility;
+using TiaXmlReader.SimaticML.Blocks;
+using TiaXmlReader.SimaticML.Blocks.FlagNet.nAccess;
+using TiaXmlReader.SimaticML.Enums;
+using TiaXmlReader.SimaticML.TagTable;
+using TiaXmlReader.SimaticML.Blocks.FlagNet.nPart;
 
 namespace TiaXmlReader.Generation.IO_Cad
 {
