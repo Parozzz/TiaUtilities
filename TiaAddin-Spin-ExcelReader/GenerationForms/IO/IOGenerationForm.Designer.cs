@@ -38,6 +38,7 @@
             this.importExportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportXMLToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importExcelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.preferencesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.PlaceholdersLabel = new System.Windows.Forms.Label();
             this.configPanel = new System.Windows.Forms.Panel();
             this.configButtonPanel = new System.Windows.Forms.FlowLayoutPanel();
@@ -46,11 +47,11 @@
             this.variableTableConfigButton = new System.Windows.Forms.Button();
             this.ioTableConfigButton = new System.Windows.Forms.Button();
             this.segmentNameConfigButton = new System.Windows.Forms.Button();
-            this.groupingTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
             this.divisionTypeLabel = new System.Windows.Forms.Label();
-            this.memoryTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
             this.memoryTypeLabel = new System.Windows.Forms.Label();
             this.dataGridView = new System.Windows.Forms.DataGridView();
+            this.groupingTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
+            this.memoryTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
             this.mainPanel.SuspendLayout();
             this.TopTableLayoutPanel.SuspendLayout();
             this.TopMenuStrip.SuspendLayout();
@@ -69,6 +70,7 @@
             this.mainPanel.Controls.Add(this.dataGridView, 0, 1);
             this.mainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.mainPanel.Location = new System.Drawing.Point(0, 0);
+            this.mainPanel.Margin = new System.Windows.Forms.Padding(0);
             this.mainPanel.Name = "mainPanel";
             this.mainPanel.RowCount = 2;
             this.mainPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -87,13 +89,14 @@
             this.TopTableLayoutPanel.Controls.Add(this.configPanel, 0, 2);
             this.TopTableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.TopTableLayoutPanel.Location = new System.Drawing.Point(3, 3);
+            this.TopTableLayoutPanel.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
             this.TopTableLayoutPanel.Name = "TopTableLayoutPanel";
             this.TopTableLayoutPanel.RowCount = 2;
             this.TopTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.TopTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.TopTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.TopTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.TopTableLayoutPanel.Size = new System.Drawing.Size(1093, 116);
+            this.TopTableLayoutPanel.Size = new System.Drawing.Size(1093, 106);
             this.TopTableLayoutPanel.TabIndex = 18;
             // 
             // TopMenuStrip
@@ -102,7 +105,8 @@
             this.TopMenuStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Visible;
             this.TopMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
-            this.importExportToolStripMenuItem});
+            this.importExportToolStripMenuItem,
+            this.preferencesToolStripMenuItem});
             this.TopMenuStrip.Location = new System.Drawing.Point(0, 0);
             this.TopMenuStrip.Name = "TopMenuStrip";
             this.TopMenuStrip.Size = new System.Drawing.Size(1093, 24);
@@ -122,19 +126,19 @@
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
             this.saveToolStripMenuItem.Text = "Save";
             // 
             // saveAsToolStripMenuItem
             // 
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
             this.saveAsToolStripMenuItem.Text = "SaveAs";
             // 
             // loadToolStripMenuItem
             // 
             this.loadToolStripMenuItem.Name = "loadToolStripMenuItem";
-            this.loadToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.loadToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
             this.loadToolStripMenuItem.Text = "Load";
             // 
             // importExportToolStripMenuItem
@@ -158,6 +162,12 @@
             this.importExcelToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.importExcelToolStripMenuItem.Text = "Import Excel";
             // 
+            // preferencesToolStripMenuItem
+            // 
+            this.preferencesToolStripMenuItem.Name = "preferencesToolStripMenuItem";
+            this.preferencesToolStripMenuItem.Size = new System.Drawing.Size(80, 20);
+            this.preferencesToolStripMenuItem.Text = "Preferences";
+            // 
             // PlaceholdersLabel
             // 
             this.PlaceholdersLabel.Dock = System.Windows.Forms.DockStyle.Top;
@@ -180,7 +190,7 @@
             this.configPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.configPanel.Location = new System.Drawing.Point(3, 43);
             this.configPanel.Name = "configPanel";
-            this.configPanel.Size = new System.Drawing.Size(1087, 70);
+            this.configPanel.Size = new System.Drawing.Size(1087, 60);
             this.configPanel.TabIndex = 3;
             // 
             // configButtonPanel
@@ -192,7 +202,7 @@
             this.configButtonPanel.Controls.Add(this.variableTableConfigButton);
             this.configButtonPanel.Controls.Add(this.ioTableConfigButton);
             this.configButtonPanel.Controls.Add(this.segmentNameConfigButton);
-            this.configButtonPanel.Location = new System.Drawing.Point(0, 1);
+            this.configButtonPanel.Location = new System.Drawing.Point(0, -1);
             this.configButtonPanel.Margin = new System.Windows.Forms.Padding(0);
             this.configButtonPanel.Name = "configButtonPanel";
             this.configButtonPanel.Size = new System.Drawing.Size(1087, 30);
@@ -253,37 +263,21 @@
             this.segmentNameConfigButton.Text = "Nomi Segmenti";
             this.segmentNameConfigButton.UseVisualStyleBackColor = true;
             // 
-            // groupingTypeComboBox
-            // 
-            this.groupingTypeComboBox.FormattingEnabled = true;
-            this.groupingTypeComboBox.Location = new System.Drawing.Point(332, 39);
-            this.groupingTypeComboBox.Name = "groupingTypeComboBox";
-            this.groupingTypeComboBox.Size = new System.Drawing.Size(112, 21);
-            this.groupingTypeComboBox.TabIndex = 3;
-            // 
             // divisionTypeLabel
             // 
             this.divisionTypeLabel.AutoSize = true;
             this.divisionTypeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.divisionTypeLabel.Location = new System.Drawing.Point(184, 40);
+            this.divisionTypeLabel.Location = new System.Drawing.Point(184, 34);
             this.divisionTypeLabel.Name = "divisionTypeLabel";
             this.divisionTypeLabel.Size = new System.Drawing.Size(149, 18);
             this.divisionTypeLabel.TabIndex = 2;
             this.divisionTypeLabel.Text = "Tipo raggruppamento";
             // 
-            // memoryTypeComboBox
-            // 
-            this.memoryTypeComboBox.FormattingEnabled = true;
-            this.memoryTypeComboBox.Location = new System.Drawing.Point(111, 39);
-            this.memoryTypeComboBox.Name = "memoryTypeComboBox";
-            this.memoryTypeComboBox.Size = new System.Drawing.Size(65, 21);
-            this.memoryTypeComboBox.TabIndex = 1;
-            // 
             // memoryTypeLabel
             // 
             this.memoryTypeLabel.AutoSize = true;
             this.memoryTypeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.memoryTypeLabel.Location = new System.Drawing.Point(9, 40);
+            this.memoryTypeLabel.Location = new System.Drawing.Point(9, 34);
             this.memoryTypeLabel.Name = "memoryTypeLabel";
             this.memoryTypeLabel.Size = new System.Drawing.Size(100, 18);
             this.memoryTypeLabel.TabIndex = 0;
@@ -294,11 +288,28 @@
             this.dataGridView.BackgroundColor = System.Drawing.SystemColors.Control;
             this.dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGridView.Location = new System.Drawing.Point(3, 125);
+            this.dataGridView.Location = new System.Drawing.Point(3, 109);
+            this.dataGridView.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
             this.dataGridView.Name = "dataGridView";
             this.dataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.dataGridView.Size = new System.Drawing.Size(1093, 409);
+            this.dataGridView.Size = new System.Drawing.Size(1093, 425);
             this.dataGridView.TabIndex = 2;
+            // 
+            // groupingTypeComboBox
+            // 
+            this.groupingTypeComboBox.FormattingEnabled = true;
+            this.groupingTypeComboBox.Location = new System.Drawing.Point(332, 33);
+            this.groupingTypeComboBox.Name = "groupingTypeComboBox";
+            this.groupingTypeComboBox.Size = new System.Drawing.Size(112, 21);
+            this.groupingTypeComboBox.TabIndex = 3;
+            // 
+            // memoryTypeComboBox
+            // 
+            this.memoryTypeComboBox.FormattingEnabled = true;
+            this.memoryTypeComboBox.Location = new System.Drawing.Point(111, 33);
+            this.memoryTypeComboBox.Name = "memoryTypeComboBox";
+            this.memoryTypeComboBox.Size = new System.Drawing.Size(65, 21);
+            this.memoryTypeComboBox.TabIndex = 1;
             // 
             // IOGenerationForm
             // 
@@ -350,5 +361,6 @@
         private System.Windows.Forms.ToolStripMenuItem importExportToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exportXMLToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem importExcelToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem preferencesToolStripMenuItem;
     }
 }

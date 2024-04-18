@@ -19,29 +19,30 @@ namespace TiaXmlReader.GenerationForms.GridHandler
     public class GridHandler<T> where T : IGridData
     {
         private readonly DataGridView dataGridView;
+        private readonly GridSettings settings;
         public GridDataSource<T> DataSource { get; private set; }
         private readonly UndoRedoHandler undoRedoHandler;
         private readonly GridExcelDragHandler excelDragHandler;
         private readonly GridSortHandler<T> sortHandler;
         private readonly GridCellChangeAssociator<T> associator;
+       
 
         private readonly List<IGridCellPainter> cellPainterList;
 
         public uint RowCount { get; set; } = 1999;
-        public bool AddCountToRowHeader { get; set; } = true;
+        public bool AddRowIndexToRowHeader { get; set; } = true;
         public bool EnablePasteFromExcel { get; set; } = true;
         public bool EnableRowSelectionFromRowHeaderClick { get; set; } = true;
-        public Color DragSelectedCellBorderColor {  get; set; } = Color.DarkGreen;
-        public Color SingleSelectedCellBorderColor {  get; set; } = Color.PaleGreen;
-        public Color SelectedCellTriangleColor {  get; set; } = Color.Green;
 
-        public GridHandler(DataGridView dataGridView, Func<T> newObjectFunction, Action<T, T> trasferDataAction, IGridRowComparer<T> comparer = null)
+
+        public GridHandler(DataGridView dataGridView, GridSettings settings, Func<T> newObjectFunction, Action<T, T> trasferDataAction, IGridRowComparer<T> comparer = null)
         {
             this.dataGridView = dataGridView;
 
+            this.settings = settings;
             this.DataSource = new GridDataSource<T>(this.dataGridView, newObjectFunction, trasferDataAction);
             this.undoRedoHandler = new UndoRedoHandler();
-            this.excelDragHandler = new GridExcelDragHandler(this.dataGridView);
+            this.excelDragHandler = new GridExcelDragHandler(this.dataGridView, settings);
             this.sortHandler = new GridSortHandler<T>(this.dataGridView, this.DataSource, this.undoRedoHandler, comparer);
             this.associator = new GridCellChangeAssociator<T>(this.dataGridView);
 
@@ -96,7 +97,7 @@ namespace TiaXmlReader.GenerationForms.GridHandler
             #endregion
 
             #region RowHeaderNumber
-            if (AddCountToRowHeader)
+            if (AddRowIndexToRowHeader)
             {
                 this.dataGridView.RowPostPaint += (sender, args) =>
                 {
@@ -234,7 +235,7 @@ namespace TiaXmlReader.GenerationForms.GridHandler
             };
             #endregion
 
-            excelDragHandler.Init(DragSelectedCellBorderColor, SingleSelectedCellBorderColor, SelectedCellTriangleColor);
+            excelDragHandler.Init();
             sortHandler.Init();
         }
 

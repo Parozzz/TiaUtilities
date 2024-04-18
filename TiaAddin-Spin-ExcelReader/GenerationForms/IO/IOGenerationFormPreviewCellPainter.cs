@@ -12,12 +12,14 @@ namespace TiaXmlReader.GenerationForms.IO
     {
         private readonly GridDataSource<IOData> dataSource;
         private readonly IOConfiguration config;
+        private readonly IOGenerationPreferences preferences;
 
         private readonly GenerationPlaceholders placeholders;
-        public IOGenerationFormPreviewCellPainter(GridDataSource<IOData> dataSource, IOConfiguration config)
+        public IOGenerationFormPreviewCellPainter(GridDataSource<IOData> dataSource, IOConfiguration config, IOGenerationPreferences preferences)
         {
             this.dataSource = dataSource;
             this.config = config;
+            this.preferences = preferences;
 
             this.placeholders = new GenerationPlaceholders();
         }
@@ -96,14 +98,16 @@ namespace TiaXmlReader.GenerationForms.IO
                     var size = TextRenderer.MeasureText(parsedIOName, style.Font);
 
                     var rec = new RectangleF(bounds.Location, new Size(size.Width, bounds.Height));
-                    TextRenderer.DrawText(graphics, parsedIOName, style.Font, Rectangle.Round(rec), isIONameDefault ? Color.DarkGreen : style.ForeColor, TextFormatFlags.VerticalCenter | TextFormatFlags.Right);
+
+                    var color = isIONameDefault ? preferences.PreviewColor : style.ForeColor;
+                    TextRenderer.DrawText(graphics, parsedIOName, style.Font, Rectangle.Round(rec), color, TextFormatFlags.VerticalCenter | TextFormatFlags.Right);
                 }
                 else if (columnIndex == IOGenerationForm.VARIABLE_COLUMN)
                 {
                     string parsedPrefix = string.Empty;
                     if (config.MemoryType == IOMemoryTypeEnum.DB)
                     {
-                        parsedPrefix = ioData.GetMemoryArea() == TiaXmlReader.SimaticML.Enums.SimaticMemoryArea.INPUT? config.PrefixInputDB : config.PrefixOutputDB;
+                        parsedPrefix = ioData.GetMemoryArea() == TiaXmlReader.SimaticML.Enums.SimaticMemoryArea.INPUT ? config.PrefixInputDB : config.PrefixOutputDB;
                     }
                     else if (config.MemoryType == IOMemoryTypeEnum.MERKER)
                     {
@@ -114,14 +118,16 @@ namespace TiaXmlReader.GenerationForms.IO
                     var prefixTextSize = TextRenderer.MeasureText(parsedPrefix, style.Font);
 
                     var rec = new RectangleF(bounds.Location, new Size(prefixTextSize.Width, bounds.Height));
-                    TextRenderer.DrawText(graphics, parsedPrefix, style.Font, Rectangle.Round(rec), Color.DarkGreen, TextFormatFlags.VerticalCenter | TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPadding | TextFormatFlags.TextBoxControl);
+                    TextRenderer.DrawText(graphics, parsedPrefix, style.Font, Rectangle.Round(rec), preferences.PreviewColor, TextFormatFlags.VerticalCenter | TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPadding | TextFormatFlags.TextBoxControl);
 
                     bool isVariableDefault = (ioData.Variable == config.DefaultVariableName);
                     var parsedVariableName = placeholders.Parse(ioData.Variable);
 
                     var variableNameTextSize = TextRenderer.MeasureText(parsedVariableName, style.Font);
                     rec = new RectangleF(new PointF(rec.Location.X + rec.Width - 3, rec.Location.Y), new SizeF(variableNameTextSize.Width, bounds.Height));
-                    TextRenderer.DrawText(graphics, parsedVariableName, style.Font, Rectangle.Round(rec), isVariableDefault ? Color.DarkGreen : style.ForeColor, TextFormatFlags.VerticalCenter | TextFormatFlags.Left | TextFormatFlags.NoPadding | TextFormatFlags.TextBoxControl);
+
+                    var color = isVariableDefault ? preferences.PreviewColor : style.ForeColor;
+                    TextRenderer.DrawText(graphics, parsedVariableName, style.Font, Rectangle.Round(rec), color, TextFormatFlags.VerticalCenter | TextFormatFlags.Left | TextFormatFlags.NoPadding | TextFormatFlags.TextBoxControl);
                 }
             }
             catch (Exception ex)

@@ -29,10 +29,7 @@ namespace TiaXmlReader.GenerationForms.GridHandler
         }
 
         private readonly DataGridView dataGridView;
-
-        private Color dragSelectionColor;
-        private Color singleSelectedColor;
-        private Color triangleColor;
+        private readonly GridSettings settings;
 
         private bool started = false;
         private int rowIndexStart = -1;
@@ -49,9 +46,10 @@ namespace TiaXmlReader.GenerationForms.GridHandler
 
         public bool DraggingDown { get => topSelectionRowIndex == rowIndexStart; }
 
-        public GridExcelDragHandler(DataGridView dataGridView)
+        public GridExcelDragHandler(DataGridView dataGridView, GridSettings settings)
         {
             this.dataGridView = dataGridView;
+            this.settings = settings;
         }
 
         public bool IsStarted()
@@ -59,12 +57,8 @@ namespace TiaXmlReader.GenerationForms.GridHandler
             return started;
         }
 
-        public void Init(Color dragSelectionColor, Color singleSelectedColor, Color triangleColor)
+        public void Init()
         {
-            this.dragSelectionColor = dragSelectionColor;
-            this.singleSelectedColor = singleSelectedColor;
-            this.triangleColor = triangleColor;
-
             dataGridView.MouseMove += (sender, args) =>
             {
                 if (started)
@@ -235,7 +229,7 @@ namespace TiaXmlReader.GenerationForms.GridHandler
             }
             else if (started)
             {
-                style.SelectionBackColor = this.dragSelectionColor;
+                style.SelectionBackColor = this.settings.DragSelectedCellBorderColor;
 
                 args.PaintBackground(bounds, true);
                 return;
@@ -247,7 +241,7 @@ namespace TiaXmlReader.GenerationForms.GridHandler
                 args.PaintBackground(bounds, true);
 
                 //args.Paint(bounds, DataGridViewPaintParts.All & ~DataGridViewPaintParts.Border);
-                using (var pen = new Pen(this.singleSelectedColor, 2))
+                using (var pen = new Pen(this.settings.SingleSelectedCellBorderColor, 2))
                 {//Border
                     Rectangle rect = args.CellBounds;
                     rect.Width -= 1;
@@ -255,7 +249,7 @@ namespace TiaXmlReader.GenerationForms.GridHandler
                     graphics.DrawRectangle(pen, rect);
                 }
 
-                using (var brush = new SolidBrush(this.triangleColor))
+                using (var brush = new SolidBrush(this.settings.SelectedCellTriangleColor))
                 {//Little triangle in the lower part only for current cell
                     var point1 = new Point(bounds.Right - 1, bounds.Bottom - TRIANGLE_SIZE);
                     var point2 = new Point(bounds.Right - 1, bounds.Bottom - 1);

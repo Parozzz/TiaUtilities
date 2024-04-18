@@ -7,6 +7,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using TiaXmlReader.GenerationForms.GridHandler;
+using TiaXmlReader.GenerationForms.IO.Config;
 
 namespace TiaXmlReader.GenerationForms.IO.ExcelImporter
 {
@@ -48,12 +49,12 @@ namespace TiaXmlReader.GenerationForms.IO.ExcelImporter
 
         public IEnumerable<ExcelImportData> ImportDataEnumerable { get => gridHandler.DataSource.GetNotEmptyDataDict().Keys; }
 
-        public IOGenerationExcelImportForm(IOGenerationExcelImportConfiguration config)
+        public IOGenerationExcelImportForm(IOGenerationExcelImportConfiguration config, GridSettings gridSettings)
         {
             InitializeComponent();
 
             this.config = config;
-            this.gridHandler = new GridHandler<ExcelImportData>(this.dataGridView, () => new ExcelImportData(), (oldData, newData) => oldData.CopyFrom(newData));
+            this.gridHandler = new GridHandler<ExcelImportData>(this.dataGridView, gridSettings, () => new ExcelImportData(), (oldData, newData) => oldData.CopyFrom(newData));
 
             Init();
         }
@@ -106,32 +107,30 @@ namespace TiaXmlReader.GenerationForms.IO.ExcelImporter
 
             this.ConfigButton.Click += (object sender, EventArgs args) =>
             {
-                var configForm = new ConfigForm("Configurazione");
-                configForm.AddConfigLine(new ConfigFormLine()
-                    .Title("Indirizzo")
-                    .TextBox(config.AddressCellConfig)
-                    .TextChanged(str => config.AddressCellConfig = str));
+                var configForm = new ConfigForm("Configurazione")
+                {
+                    ControlWidth = 500
+                };
 
-                configForm.AddConfigLine(new ConfigFormLine()
-                    .Title("Nome IO")
-                    .TextBox(config.IONameCellConfig)
-                    .TextChanged(str => config.IONameCellConfig = str));
+                configForm.AddTextBoxLine("Indirizzo")
+                    .ControlText(config.AddressCellConfig)
+                    .TextChanged(str => config.AddressCellConfig = str);
 
-                configForm.AddConfigLine(new ConfigFormLine()
-                    .Title("Commento")
-                    .TextBox(config.CommentCellConfig)
-                    .TextChanged(str => config.CommentCellConfig = str));
+                configForm.AddTextBoxLine("Nome IO")
+                    .ControlText(config.IONameCellConfig)
+                    .TextChanged(str => config.IONameCellConfig = str);
 
-                configForm.AddConfigLine(new ConfigFormLine()
-                    .Title("Riga di partenza")
-                    .TextBox(config.StartingRow)
-                    .NumericOnly()
-                    .UIntChanged(num => config.StartingRow = num));
+                configForm.AddTextBoxLine("Commento")
+                    .ControlText(config.CommentCellConfig)
+                    .TextChanged(str => config.CommentCellConfig = str);
 
-                configForm.AddConfigLine(new ConfigFormLine()
-                    .Title("Espressione validità riga")
-                    .TextBox(config.IgnoreRowExpressionConfig)
-                    .TextChanged(str => config.IgnoreRowExpressionConfig = str));
+                configForm.AddTextBoxLine("Riga di partenza")
+                    .ControlText(config.StartingRow)
+                    .UIntChanged(num => config.StartingRow = num);
+
+                configForm.AddTextBoxLine("Espressione validità riga")
+                    .ControlText(config.IgnoreRowExpressionConfig)
+                    .TextChanged(str => config.IgnoreRowExpressionConfig = str);
 
                 configForm.StartShowingAtControl(this.ConfigButton);
                 configForm.Init();

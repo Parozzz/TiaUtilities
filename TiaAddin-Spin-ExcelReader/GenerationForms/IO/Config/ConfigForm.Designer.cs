@@ -1,4 +1,4 @@
-﻿namespace TiaXmlReader.GenerationForms.IO
+﻿namespace TiaXmlReader.GenerationForms.IO.Config
 {
     partial class ConfigForm
     {

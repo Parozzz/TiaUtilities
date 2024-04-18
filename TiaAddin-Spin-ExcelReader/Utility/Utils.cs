@@ -29,6 +29,8 @@ namespace TiaXmlReader.Utility
 
         public static Dictionary<string, object> CreatePublicFieldSnapshot<T>(T obj)
         {
+            Validate.NotNull(obj);
+
             var snapshotDict = new Dictionary<string, object>();
             foreach (var field in typeof(T).GetFields().Where(field => field.IsPublic))
             {
@@ -39,6 +41,9 @@ namespace TiaXmlReader.Utility
 
         public static bool ComparePublicFieldSnapshot<T>(T obj, Dictionary<string, object> snapshotDict) //TRUE IF ALL EQUALS
         {
+            Validate.NotNull(obj);
+            Validate.NotNull(snapshotDict);
+
             var fields = typeof(T).GetFields();
             foreach (var field in fields.Where(f => f.IsPublic))
             {

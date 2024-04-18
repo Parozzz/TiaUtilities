@@ -201,16 +201,21 @@
     <Compile Include="DBDuplicationForm.Designer.cs">
       <DependentUpon>DBDuplicationForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GenerationForms\IO\ConfigForm.cs">
+    <Compile Include="GenerationForms\GridHandler\GridSettings.cs" />
+    <Compile Include="GenerationForms\IO\Config\ConfigForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GenerationForms\IO\ConfigForm.Designer.cs">
+    <Compile Include="GenerationForms\IO\Config\ConfigForm.Designer.cs">
       <DependentUpon>ConfigForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GenerationForms\GridHandler\GridCellChange.cs" />
     <Compile Include="GenerationForms\GridHandler\GridDataSource.cs" />
     <Compile Include="GenerationForms\GridHandler\GridHandler.cs" />
     <Compile Include="GenerationForms\GridHandler\IGridRowComparer.cs" />
+    <Compile Include="GenerationForms\IO\Config\ConfigFormColorPickerButtonLine.cs" />
+    <Compile Include="GenerationForms\IO\Config\ConfigFormComboBoxLine.cs" />
+    <Compile Include="GenerationForms\IO\Config\ConfigFormTextBoxLine.cs" />
+    <Compile Include="GenerationForms\IO\Config\IConfigFormLine.cs" />
     <Compile Include="GenerationForms\IO\ExcelImporter\IOGenerationExcelImportConfiguration.cs" />
     <Compile Include="GenerationForms\IO\ExcelImporter\IOGenerationExcelImportForm.cs">
       <SubType>Form</SubType>
@@ -220,7 +225,8 @@
     </Compile>
     <Compile Include="GenerationForms\IO\IOGenerationFormConfigHandler.cs" />
     <Compile Include="GenerationForms\IO\IOGenerationFormPreviewCellPainter.cs" />
-    <Compile Include="GenerationForms\IO\IOGenerationPreferenceSave.cs" />
+    <Compile Include="GenerationForms\IO\IOGenerationPreferences.cs" />
+    <Compile Include="GenerationForms\IO\IOGenerationSettings.cs" />
     <Compile Include="GenerationForms\IO\IOGenerationProjectSave.cs" />
     <Compile Include="GenerationForms\IO\IOGenerationComparer.cs" />
     <Compile Include="GenerationForms\GridHandler\GridExcelDragHandler.cs" />
@@ -297,6 +303,7 @@
     <Compile Include="SimaticML\TagTable\XMLTag.cs" />
     <Compile Include="SimaticML\TagTable\XMLTagTable.cs" />
     <Compile Include="UndoRedo\UndoRedoHandler.cs" />
+    <Compile Include="Utility\ColorConverterExtension.cs" />
     <Compile Include="Utility\Constants.cs" />
     <Compile Include="Utility\SystemVariables.cs" />
     <Compile Include="Utility\Truple.cs" />
@@ -306,7 +313,7 @@
     <EmbeddedResource Include="DBDuplicationForm.resx">
       <DependentUpon>DBDuplicationForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GenerationForms\IO\ConfigForm.resx">
+    <EmbeddedResource Include="GenerationForms\IO\Config\ConfigForm.resx">
       <DependentUpon>ConfigForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GenerationForms\IO\ExcelImporter\IOGenerationExcelImportForm.resx">

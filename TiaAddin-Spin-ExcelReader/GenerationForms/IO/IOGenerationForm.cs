@@ -13,15 +13,13 @@ using TiaXmlReader.SimaticML;
 using TiaXmlReader.GenerationForms.GridHandler;
 using TiaXmlReader.GenerationForms.IO;
 using TiaXmlReader.Utility;
+using TiaXmlReader.GenerationForms.IO.Config;
 
 namespace TiaXmlReader.GenerationForms.IO
 {
     public partial class IOGenerationForm : Form
     {
         public const int TOTAL_ROW_COUNT = 1999;
-        public static readonly Color SORT_ICON_COLOR = Color.Green;
-        public static readonly Color SELECTED_CELL_COLOR = Color.DarkGreen;
-        public static readonly Color DRAGGED_CELL_BACK_COLOR = Color.PaleGreen;
 
         public const int ADDRESS_COLUMN = 0;
         public const int IO_NAME_COLUMN = 1;
@@ -31,9 +29,12 @@ namespace TiaXmlReader.GenerationForms.IO
 
         private readonly GridHandler<IOData> gridHandler;
 
-        private readonly IOConfiguration config;
-        private readonly IOGenerationExcelImportConfiguration excelImportConfig;
+        private readonly IOGenerationSettings settings;
         private readonly IOGenerationFormConfigHandler configHandler;
+
+        private IOGenerationExcelImportConfiguration ExcelImportConfig { get => settings.ExcelImportConfiguration; }
+        private IOConfiguration IOConfig { get => settings.IOConfiguration; }
+        private IOGenerationPreferences Preferences { get => settings.Preferences; }
 
         private string lastFilePath;
 
@@ -41,12 +42,11 @@ namespace TiaXmlReader.GenerationForms.IO
         {
             InitializeComponent();
 
-            this.gridHandler = new GridHandler<IOData>(this.dataGridView, () => new IOData(), (oldData, newData) => oldData.CopyFrom(newData), new IOGenerationComparer());
+            settings = IOGenerationSettings.Load();
+            settings.Save(); //This could be avoided but is to be sure that all the classes that are created new will be saved to file!
 
-            var preferenceSave = IOGenerationPreferenceSave.Load();
-            this.config = preferenceSave.Configuration;
-            this.excelImportConfig = preferenceSave.ExcelImportConfiguration;
-            this.configHandler = new IOGenerationFormConfigHandler(this, config, this.dataGridView);
+            this.gridHandler = new GridHandler<IOData>(this.dataGridView, settings.GridSettings, () => new IOData(), (oldData, newData) => oldData.CopyFrom(newData), new IOGenerationComparer());
+            this.configHandler = new IOGenerationFormConfigHandler(this, IOConfig, this.dataGridView);
 
             Init();
         }
@@ -91,7 +91,7 @@ namespace TiaXmlReader.GenerationForms.IO
                     {
                         var ioDataList = new List<IOData>(this.gridHandler.DataSource.GetNotEmptyDataDict().Keys);
 
-                        var ioXmlGenerator = new IOXmlGenerator(this.config, ioDataList);
+                        var ioXmlGenerator = new IOXmlGenerator(this.IOConfig, ioDataList);
                         ioXmlGenerator.GenerateBlocks();
                         ioXmlGenerator.ExportXML(fileDialog.FileName);
                     }
@@ -103,7 +103,7 @@ namespace TiaXmlReader.GenerationForms.IO
             };
             this.importExcelToolStripMenuItem.Click += (object sender, EventArgs args) =>
             {
-                var excelImportForm = new IOGenerationExcelImportForm(this.excelImportConfig);
+                var excelImportForm = new IOGenerationExcelImportForm(this.ExcelImportConfig, this.settings.GridSettings);
 
                 var dialogResult = excelImportForm.ShowDialog();
                 if (dialogResult == DialogResult.OK)
@@ -131,6 +131,31 @@ namespace TiaXmlReader.GenerationForms.IO
                         this.gridHandler.ChangeRow(emptyRowIndex, ioData);
                     }
                 }
+            };
+            this.preferencesToolStripMenuItem.Click += (object sender, EventArgs args) =>
+            {
+                var configForm = new ConfigForm("Preferenze");
+                configForm.AddColorPickerLine("Bordo cella selezionata")
+                    .ApplyColor(settings.GridSettings.SingleSelectedCellBorderColor)
+                    .ColorChanged(color => settings.GridSettings.SingleSelectedCellBorderColor = color);
+
+                configForm.AddColorPickerLine("Sfondo cella trascinata")
+                    .ApplyColor(settings.GridSettings.DragSelectedCellBorderColor)
+                    .ColorChanged(color => settings.GridSettings.DragSelectedCellBorderColor = color);
+
+                configForm.AddColorPickerLine("Triangolo trascinamento")
+                    .ApplyColor(settings.GridSettings.SelectedCellTriangleColor)
+                    .ColorChanged(color => settings.GridSettings.SelectedCellTriangleColor = color);
+
+                configForm.AddColorPickerLine("Anteprima")
+                    .ApplyColor(this.Preferences.PreviewColor)
+                    .ColorChanged(color => this.Preferences.PreviewColor = color);
+
+                configForm.StartShowingAtLocation(Cursor.Position);
+                configForm.Init();
+                configForm.Show(this);
+
+                dataGridView.Refresh();
             };
             #endregion
 
@@ -161,7 +186,7 @@ namespace TiaXmlReader.GenerationForms.IO
             #endregion
 
             #region CELL_PAINTERS
-            this.gridHandler.AddCellPainter(new IOGenerationFormPreviewCellPainter(this.gridHandler.DataSource, this.config));
+            this.gridHandler.AddCellPainter(new IOGenerationFormPreviewCellPainter(this.gridHandler.DataSource, this.IOConfig, this.Preferences));
             #endregion
 
             #region DRAG
@@ -175,6 +200,9 @@ namespace TiaXmlReader.GenerationForms.IO
             this.gridHandler.SetDataAssociation(DB_COLUMN, ioData => ioData.DBName);
             this.gridHandler.SetDataAssociation(VARIABLE_COLUMN, ioData => ioData.Variable);
             this.gridHandler.SetDataAssociation(COMMENT_COLUMN, ioData => ioData.Comment);
+            #endregion
+
+            #region PREFERENCES
             #endregion
 
             this.gridHandler.Init();
@@ -191,28 +219,46 @@ namespace TiaXmlReader.GenerationForms.IO
             var commentColumn = this.gridHandler.InitColumn(COMMENT_COLUMN, "Commento", 0);
             #endregion
 
-            #region SAVE_PREFERENCES_TICK
+            #region PROGRAM_SAVE_TICK
             var timer = new Timer { Interval = 1000 };
             timer.Start();
 
-            var configSnapshot = Utils.CreatePublicFieldSnapshot(this.config);
-            var excelImportConfigSnapshot = Utils.CreatePublicFieldSnapshot(this.excelImportConfig);
+            var configSnapshot = Utils.CreatePublicFieldSnapshot(this.IOConfig);
+            var excelImportConfigSnapshot = Utils.CreatePublicFieldSnapshot(this.ExcelImportConfig);
+            var preferencesSnapshot = Utils.CreatePublicFieldSnapshot(this.Preferences);
+            var gridSettingsSnapshot = Utils.CreatePublicFieldSnapshot(this.settings.GridSettings);
             timer.Tick += (sender, e) =>
             {
                 //This is done this way because is impossible that fields are changed toghether for multiple configs. So at the first that is different, i create a snapshot and save to file!
-                var configEqual = Utils.ComparePublicFieldSnapshot(this.config, configSnapshot);
+                var configEqual = Utils.ComparePublicFieldSnapshot(this.IOConfig, configSnapshot);
                 if(!configEqual)
                 {
-                    configSnapshot = Utils.CreatePublicFieldSnapshot(this.config);
-                    this.PreferencesSave();
+                    configSnapshot = Utils.CreatePublicFieldSnapshot(this.IOConfig);
+                    this.settings.Save();
                     return;
                 }
 
-                var excelImportConfigEqual = Utils.ComparePublicFieldSnapshot(this.excelImportConfig, excelImportConfigSnapshot);
+                var excelImportConfigEqual = Utils.ComparePublicFieldSnapshot(this.ExcelImportConfig, excelImportConfigSnapshot);
                 if (!excelImportConfigEqual)
                 {
-                    excelImportConfigSnapshot = Utils.CreatePublicFieldSnapshot(this.excelImportConfig);
-                    this.PreferencesSave();
+                    excelImportConfigSnapshot = Utils.CreatePublicFieldSnapshot(this.ExcelImportConfig);
+                    this.settings.Save();
+                    return;
+                }
+
+                var preferencesEqual = Utils.ComparePublicFieldSnapshot(this.Preferences, preferencesSnapshot);
+                if(!preferencesEqual)
+                {
+                    preferencesSnapshot = Utils.CreatePublicFieldSnapshot(this.Preferences);
+                    this.settings.Save();
+                    return;
+                }
+
+                var gridSettingsEqual = Utils.ComparePublicFieldSnapshot(this.settings.GridSettings, gridSettingsSnapshot);
+                if (!gridSettingsEqual)
+                {
+                    gridSettingsSnapshot = Utils.CreatePublicFieldSnapshot(this.settings.GridSettings);
+                    this.settings.Save();
                     return;
                 }
             };
@@ -231,15 +277,6 @@ namespace TiaXmlReader.GenerationForms.IO
             projectSave.Save(ref lastFilePath, saveAs);
 
             this.Text = this.Name + ". File: " + lastFilePath;
-        }
-
-        public void PreferencesSave()
-        {
-            new IOGenerationPreferenceSave
-            {
-                Configuration = this.config,
-                ExcelImportConfiguration = this.excelImportConfig
-            }.Save();
         }
 
         public void ProjectLoad()
