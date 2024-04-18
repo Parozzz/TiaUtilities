@@ -85,7 +85,7 @@ namespace TiaXmlReader.GenerationForms.GridHandler
             this.dataGridView.MultiSelect = true;
 
             this.dataGridView.EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2;
-
+            this.dataGridView.Font = settings.GridFont;
             this.dataGridView.AllowUserToAddRows = false;
 
             #region Cell Paiting

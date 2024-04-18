@@ -3,28 +3,28 @@
   "WorkspaceRootPath": "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}|TiaAddin-Spin-ExcelReader\\TiaXmlReader.csproj|c:\\users\\paronetto g\\documents\\github\\tiaaddin-spin\\tiaaddin-spin-excelreader\\generationforms\\io\\excelimporter\\iogenerationexcelimportform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}|TiaAddin-Spin-ExcelReader\\TiaXmlReader.csproj|solutionrelative:tiaaddin-spin-excelreader\\generationforms\\io\\excelimporter\\iogenerationexcelimportform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}|TiaAddin-Spin-ExcelReader\\TiaXmlReader.csproj|c:\\users\\paronetto g\\documents\\github\\tiaaddin-spin\\tiaaddin-spin-excelreader\\generationforms\\gridhandler\\gridhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}|TiaAddin-Spin-ExcelReader\\TiaXmlReader.csproj|solutionrelative:tiaaddin-spin-excelreader\\generationforms\\gridhandler\\gridhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}|TiaAddin-Spin-ExcelReader\\TiaXmlReader.csproj|c:\\users\\paronetto g\\documents\\github\\tiaaddin-spin\\tiaaddin-spin-excelreader\\generationforms\\gridhandler\\gridsettings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}|TiaAddin-Spin-ExcelReader\\TiaXmlReader.csproj|solutionrelative:tiaaddin-spin-excelreader\\generationforms\\gridhandler\\gridsettings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}|TiaAddin-Spin-ExcelReader\\TiaXmlReader.csproj|c:\\users\\paronetto g\\documents\\github\\tiaaddin-spin\\tiaaddin-spin-excelreader\\generationforms\\io\\config\\configform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}|TiaAddin-Spin-ExcelReader\\TiaXmlReader.csproj|solutionrelative:tiaaddin-spin-excelreader\\generationforms\\io\\config\\configform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}|TiaAddin-Spin-ExcelReader\\TiaXmlReader.csproj|c:\\users\\paronetto g\\documents\\github\\tiaaddin-spin\\tiaaddin-spin-excelreader\\generationforms\\io\\excelimporter\\iogenerationexcelimportform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}|TiaAddin-Spin-ExcelReader\\TiaXmlReader.csproj|solutionrelative:tiaaddin-spin-excelreader\\generationforms\\io\\excelimporter\\iogenerationexcelimportform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}|TiaAddin-Spin-ExcelReader\\TiaXmlReader.csproj|c:\\users\\paronetto g\\documents\\github\\tiaaddin-spin\\tiaaddin-spin-excelreader\\generationforms\\io\\iogenerationcomparer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}|TiaAddin-Spin-ExcelReader\\TiaXmlReader.csproj|solutionrelative:tiaaddin-spin-excelreader\\generationforms\\io\\iogenerationcomparer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}|TiaAddin-Spin-ExcelReader\\TiaXmlReader.csproj|c:\\users\\paronetto g\\documents\\github\\tiaaddin-spin\\tiaaddin-spin-excelreader\\generationforms\\io\\config\\configform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}|TiaAddin-Spin-ExcelReader\\TiaXmlReader.csproj|solutionrelative:tiaaddin-spin-excelreader\\generationforms\\io\\config\\configform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}|TiaAddin-Spin-ExcelReader\\TiaXmlReader.csproj|c:\\users\\paronetto g\\documents\\github\\tiaaddin-spin\\tiaaddin-spin-excelreader\\generationforms\\io\\iogenerationform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}|TiaAddin-Spin-ExcelReader\\TiaXmlReader.csproj|solutionrelative:tiaaddin-spin-excelreader\\generationforms\\io\\iogenerationform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}|TiaAddin-Spin-ExcelReader\\TiaXmlReader.csproj|c:\\users\\paronetto g\\documents\\github\\tiaaddin-spin\\tiaaddin-spin-excelreader\\generationforms\\io\\iogenerationformconfighandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}|TiaAddin-Spin-ExcelReader\\TiaXmlReader.csproj|solutionrelative:tiaaddin-spin-excelreader\\generationforms\\io\\iogenerationformconfighandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}|TiaAddin-Spin-ExcelReader\\TiaXmlReader.csproj|c:\\users\\paronetto g\\documents\\github\\tiaaddin-spin\\tiaaddin-spin-excelreader\\generationforms\\io\\iogenerationcomparer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}|TiaAddin-Spin-ExcelReader\\TiaXmlReader.csproj|solutionrelative:tiaaddin-spin-excelreader\\generationforms\\io\\iogenerationcomparer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}|TiaAddin-Spin-ExcelReader\\TiaXmlReader.csproj|c:\\users\\paronetto g\\documents\\github\\tiaaddin-spin\\tiaaddin-spin-excelreader\\generationforms\\io\\iogenerationformpreviewcellpainter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -33,6 +33,10 @@
     {
       "AbsoluteMoniker": "D:0:0:{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}|TiaAddin-Spin-ExcelReader\\TiaXmlReader.csproj|c:\\users\\paronetto g\\documents\\github\\tiaaddin-spin\\tiaaddin-spin-excelreader\\generationforms\\io\\iogenerationpreferences.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}|TiaAddin-Spin-ExcelReader\\TiaXmlReader.csproj|solutionrelative:tiaaddin-spin-excelreader\\generationforms\\io\\iogenerationpreferences.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}|TiaAddin-Spin-ExcelReader\\TiaXmlReader.csproj|c:\\users\\paronetto g\\documents\\github\\tiaaddin-spin\\tiaaddin-spin-excelreader\\generationforms\\io\\iogenerationform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}|TiaAddin-Spin-ExcelReader\\TiaXmlReader.csproj|solutionrelative:tiaaddin-spin-excelreader\\generationforms\\io\\iogenerationform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     }
   ],
   "DocumentGroupContainers": [
@@ -51,31 +55,70 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "IOGenerationExcelImportForm.cs",
-              "DocumentMoniker": "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\ExcelImporter\\IOGenerationExcelImportForm.cs",
-              "RelativeDocumentMoniker": "TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\ExcelImporter\\IOGenerationExcelImportForm.cs",
-              "ToolTip": "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\ExcelImporter\\IOGenerationExcelImportForm.cs",
-              "RelativeToolTip": "TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\ExcelImporter\\IOGenerationExcelImportForm.cs",
-              "ViewState": "AQIAAGwAAAAAAAAAAAAswGsAAAAwAAAA",
+              "Title": "GridHandler.cs",
+              "DocumentMoniker": "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddin-Spin-ExcelReader\\GenerationForms\\GridHandler\\GridHandler.cs",
+              "RelativeDocumentMoniker": "TiaAddin-Spin-ExcelReader\\GenerationForms\\GridHandler\\GridHandler.cs",
+              "ToolTip": "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddin-Spin-ExcelReader\\GenerationForms\\GridHandler\\GridHandler.cs",
+              "RelativeToolTip": "TiaAddin-Spin-ExcelReader\\GenerationForms\\GridHandler\\GridHandler.cs",
+              "ViewState": "AQIAAEUAAAAAAAAAAAAkwFcAAAA3AAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-18T12:18:40.116Z",
+              "WhenOpened": "2024-04-18T12:31:43.047Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "GridSettings.cs",
+              "DocumentMoniker": "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddin-Spin-ExcelReader\\GenerationForms\\GridHandler\\GridSettings.cs",
+              "RelativeDocumentMoniker": "TiaAddin-Spin-ExcelReader\\GenerationForms\\GridHandler\\GridSettings.cs",
+              "ToolTip": "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddin-Spin-ExcelReader\\GenerationForms\\GridHandler\\GridSettings.cs",
+              "RelativeToolTip": "TiaAddin-Spin-ExcelReader\\GenerationForms\\GridHandler\\GridSettings.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAoAAABGAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-18T12:30:37.644Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "IOGenerationExcelImportForm.cs [Progettazione]",
-              "DocumentMoniker": "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\ExcelImporter\\IOGenerationExcelImportForm.cs",
-              "RelativeDocumentMoniker": "TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\ExcelImporter\\IOGenerationExcelImportForm.cs",
-              "ToolTip": "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\ExcelImporter\\IOGenerationExcelImportForm.cs [Progettazione]",
-              "RelativeToolTip": "TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\ExcelImporter\\IOGenerationExcelImportForm.cs [Progettazione]",
+              "Title": "ConfigForm.cs",
+              "DocumentMoniker": "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\Config\\ConfigForm.cs",
+              "RelativeDocumentMoniker": "TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\Config\\ConfigForm.cs",
+              "ToolTip": "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\Config\\ConfigForm.cs",
+              "RelativeToolTip": "TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\Config\\ConfigForm.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-18T12:18:39.279Z",
-              "EditorCaption": " [Progettazione]"
+              "WhenOpened": "2024-04-18T12:30:19.996Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
+              "Title": "ConfigForm.cs [Progettazione]",
+              "DocumentMoniker": "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\Config\\ConfigForm.cs",
+              "RelativeDocumentMoniker": "TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\Config\\ConfigForm.cs",
+              "ToolTip": "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\Config\\ConfigForm.cs [Progettazione]",
+              "RelativeToolTip": "TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\Config\\ConfigForm.cs [Progettazione]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-18T12:30:19.154Z",
+              "EditorCaption": " [Progettazione]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "IOGenerationFormConfigHandler.cs",
+              "DocumentMoniker": "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\IOGenerationFormConfigHandler.cs",
+              "RelativeDocumentMoniker": "TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\IOGenerationFormConfigHandler.cs",
+              "ToolTip": "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\IOGenerationFormConfigHandler.cs",
+              "RelativeToolTip": "TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\IOGenerationFormConfigHandler.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-18T12:30:11.849Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
               "Title": "IOGenerationComparer.cs",
               "DocumentMoniker": "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\IOGenerationComparer.cs",
               "RelativeDocumentMoniker": "TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\IOGenerationComparer.cs",
@@ -83,32 +126,20 @@
               "RelativeToolTip": "TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\IOGenerationComparer.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-18T12:18:31.788Z",
+              "WhenOpened": "2024-04-18T12:30:10.012Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "ConfigForm.cs [Progettazione]",
-              "DocumentMoniker": "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\Config\\ConfigForm.cs",
-              "RelativeDocumentMoniker": "TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\Config\\ConfigForm.cs",
-              "ToolTip": "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\Config\\ConfigForm.cs [Progettazione]",
-              "RelativeToolTip": "TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\Config\\ConfigForm.cs [Progettazione]",
+              "DocumentIndex": 6,
+              "Title": "IOGenerationFormPreviewCellPainter.cs",
+              "DocumentMoniker": "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\IOGenerationFormPreviewCellPainter.cs",
+              "RelativeDocumentMoniker": "TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\IOGenerationFormPreviewCellPainter.cs",
+              "ToolTip": "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\IOGenerationFormPreviewCellPainter.cs",
+              "RelativeToolTip": "TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\IOGenerationFormPreviewCellPainter.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-18T12:16:33.486Z",
-              "EditorCaption": " [Progettazione]"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "ConfigForm.cs",
-              "DocumentMoniker": "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\Config\\ConfigForm.cs",
-              "RelativeDocumentMoniker": "TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\Config\\ConfigForm.cs",
-              "ToolTip": "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\Config\\ConfigForm.cs",
-              "RelativeToolTip": "TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\Config\\ConfigForm.cs",
-              "ViewState": "AQIAAAUAAAAAAAAAAAAowBUAAAAZAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-18T12:05:03.701Z",
+              "WhenOpened": "2024-04-18T12:30:06.688Z",
               "EditorCaption": ""
             },
             {
@@ -121,34 +152,20 @@
               "RelativeToolTip": "TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\IOGenerationPreferences.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAwAAABDAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-18T12:00:20.092Z",
+              "WhenOpened": "2024-04-18T12:30:01.585Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "IOGenerationFormPreviewCellPainter.cs",
-              "DocumentMoniker": "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\IOGenerationFormPreviewCellPainter.cs",
-              "RelativeDocumentMoniker": "TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\IOGenerationFormPreviewCellPainter.cs",
-              "ToolTip": "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\IOGenerationFormPreviewCellPainter.cs",
-              "RelativeToolTip": "TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\IOGenerationFormPreviewCellPainter.cs",
-              "ViewState": "AQIAAFsAAAAAAAAAAAAAwIAAAAAxAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-18T11:04:15.693Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "IOGenerationForm.cs",
+              "DocumentIndex": 8,
+              "Title": "IOGenerationForm.cs [Progettazione]",
               "DocumentMoniker": "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\IOGenerationForm.cs",
               "RelativeDocumentMoniker": "TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\IOGenerationForm.cs",
-              "ToolTip": "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\IOGenerationForm.cs",
-              "RelativeToolTip": "TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\IOGenerationForm.cs",
-              "ViewState": "AQIAAHwAAAAAAAAAAAAAwJkAAABBAAAA",
+              "ToolTip": "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\IOGenerationForm.cs [Progettazione]",
+              "RelativeToolTip": "TiaAddin-Spin-ExcelReader\\GenerationForms\\IO\\IOGenerationForm.cs [Progettazione]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-18T11:04:00.845Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-04-18T12:28:56.874Z",
+              "EditorCaption": " [Progettazione]"
             }
           ]
         }
