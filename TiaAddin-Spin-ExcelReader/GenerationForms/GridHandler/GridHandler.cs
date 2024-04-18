@@ -26,14 +26,12 @@ namespace TiaXmlReader.GenerationForms.GridHandler
         private readonly GridSortHandler<T> sortHandler;
         private readonly GridCellChangeAssociator<T> associator;
        
-
         private readonly List<IGridCellPainter> cellPainterList;
 
         public uint RowCount { get; set; } = 1999;
         public bool AddRowIndexToRowHeader { get; set; } = true;
         public bool EnablePasteFromExcel { get; set; } = true;
         public bool EnableRowSelectionFromRowHeaderClick { get; set; } = true;
-
 
         public GridHandler(DataGridView dataGridView, GridSettings settings, Func<T> newObjectFunction, Action<T, T> trasferDataAction, IGridRowComparer<T> comparer = null)
         {

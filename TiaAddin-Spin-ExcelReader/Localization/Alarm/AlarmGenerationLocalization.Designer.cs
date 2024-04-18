@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace TiaXmlReader.Localization {
+namespace TiaXmlReader.Localization.Alarm {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace TiaXmlReader.Localization {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class IOGrouping {
+    public class AlarmGenerationLocalization {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal IOGrouping() {
+        internal AlarmGenerationLocalization() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace TiaXmlReader.Localization {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("TiaXmlReader.Localization.IOGrouping", typeof(IOGrouping).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("TiaXmlReader.Localization.Alarm.AlarmGenerationLocalization", typeof(AlarmGenerationLocalization).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,38 +61,38 @@ namespace TiaXmlReader.Localization {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a GroupEachBit.
+        ///   Cerca una stringa localizzata simile a GroupPerSegment.
         /// </summary>
-        public static string GROUPING_TYPE_BIT {
+        public static string GROUPING_TYPE_GROUP {
             get {
-                return ResourceManager.GetString("GROUPING_TYPE_BIT", resourceCulture);
+                return ResourceManager.GetString("GROUPING_TYPE_GROUP", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a GroupEachByte.
+        ///   Cerca una stringa localizzata simile a OnePerSegment.
         /// </summary>
-        public static string GROUPING_TYPE_BYTE {
+        public static string GROUPING_TYPE_ONE {
             get {
-                return ResourceManager.GetString("GROUPING_TYPE_BYTE", resourceCulture);
+                return ResourceManager.GetString("GROUPING_TYPE_ONE", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a DB.
+        ///   Cerca una stringa localizzata simile a AlarmType.
         /// </summary>
-        public static string MEMORY_TYPE_DB {
+        public static string PARITITION_TYPE_ALARM_TYPE {
             get {
-                return ResourceManager.GetString("MEMORY_TYPE_DB", resourceCulture);
+                return ResourceManager.GetString("PARITITION_TYPE_ALARM_TYPE", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Merker.
+        ///   Cerca una stringa localizzata simile a Device.
         /// </summary>
-        public static string MEMORY_TYPE_MERKER {
+        public static string PARITITION_TYPE_DEVICE {
             get {
-                return ResourceManager.GetString("MEMORY_TYPE_MERKER", resourceCulture);
+                return ResourceManager.GetString("PARITITION_TYPE_DEVICE", resourceCulture);
             }
         }
     }

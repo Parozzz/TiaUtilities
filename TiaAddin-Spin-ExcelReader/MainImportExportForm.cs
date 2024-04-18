@@ -127,7 +127,7 @@ namespace TiaXmlReader
                         switch (configTypeValue.GetText().ToLower())
                         {
                             case "type1":
-                                var importConsumerAlarms = new GenerationUserAlarms();
+                                var importConsumerAlarms = new AlarmXmlGeneration();
                                 importConsumerAlarms.ImportExcelConfig(configWorksheet);
                                 importConsumerAlarms.GenerateBlocks();
                                 importConsumerAlarms.ExportXML(exportPathTextBlock.Text);

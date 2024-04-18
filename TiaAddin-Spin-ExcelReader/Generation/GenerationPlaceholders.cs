@@ -71,7 +71,7 @@ namespace TiaXmlReader.Generation
             generationPlaceholdersDict.Clear();
         }
 
-        public GenerationPlaceholders SetConsumerData(UserData consumerData)
+        public GenerationPlaceholders SetConsumerData(DeviceData consumerData)
         {
             AddOrReplace(USER_NAME, new StringGenerationPlaceholderData() { Value = consumerData.Name });
             AddOrReplace(USER_DESCRIPTION, new StringGenerationPlaceholderData() { Value = consumerData.Description });

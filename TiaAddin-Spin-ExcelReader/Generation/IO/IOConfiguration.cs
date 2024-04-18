@@ -13,17 +13,17 @@ namespace TiaXmlReader.Generation.IO
 {
     public enum IOMemoryTypeEnum
     {
-        [Display(Description = "MEMORY_TYPE_DB", ResourceType = typeof(Localization.IOGrouping))]
+        [Display(Description = "MEMORY_TYPE_DB", ResourceType = typeof(Localization.IO.IOGenerationLocalization))]
         DB = 0, //DEFAULT
-        [Display(Description = "MEMORY_TYPE_MERKER", ResourceType = typeof(Localization.IOGrouping))]
+        [Display(Description = "MEMORY_TYPE_MERKER", ResourceType = typeof(Localization.IO.IOGenerationLocalization))]
         MERKER
     }
 
     public enum IOGroupingTypeEnum
     {
-        [Display(Description = "GROUPING_TYPE_BIT", ResourceType = typeof(Localization.IOGrouping))]
+        [Display(Description = "GROUPING_TYPE_BIT", ResourceType = typeof(Localization.IO.IOGenerationLocalization))]
         PER_BIT,
-        [Display(Description = "GROUPING_TYPE_BYTE", ResourceType = typeof(Localization.IOGrouping))]
+        [Display(Description = "GROUPING_TYPE_BYTE", ResourceType = typeof(Localization.IO.IOGenerationLocalization))]
         PER_BYTE
     }
 

@@ -201,6 +201,15 @@
     <Compile Include="DBDuplicationForm.Designer.cs">
       <DependentUpon>DBDuplicationForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="GenerationForms\Alarms\AlarmGenerationForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GenerationForms\Alarms\AlarmGenerationForm.Designer.cs">
+      <DependentUpon>AlarmGenerationForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GenerationForms\Alarms\AlarmGenerationFormConfigHandler.cs" />
+    <Compile Include="GenerationForms\Alarms\AlarmGenerationProjectSave.cs" />
+    <Compile Include="GenerationForms\Alarms\AlarmGenerationSettings.cs" />
     <Compile Include="GenerationForms\GridHandler\GridSettings.cs" />
     <Compile Include="GenerationForms\IO\Config\ConfigForm.cs">
       <SubType>Form</SubType>
@@ -239,22 +248,36 @@
     <Compile Include="Generation\IO\IOXmlGenerator.cs" />
     <Compile Include="Generation\IO_Cad\GenerationIO_CAD.cs" />
     <Compile Include="Generation\UserAlarms\AlarmData.cs" />
-    <Compile Include="Localization\IOGrouping.it.Designer.cs">
-      <DependentUpon>IOGrouping.it.resx</DependentUpon>
+    <Compile Include="Generation\UserAlarms\AlarmConfiguration.cs" />
+    <Compile Include="Generation\UserAlarms\AlarmExcelImporter.cs" />
+    <Compile Include="Localization\Alarm\AlarmGenerationLocalization.Designer.cs">
+      <DependentUpon>AlarmGenerationLocalization.resx</DependentUpon>
       <AutoGen>True</AutoGen>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="Localization\IOGrouping.Designer.cs">
+    <Compile Include="Localization\Alarm\AlarmGenerationLocalization.it.Designer.cs">
+      <DependentUpon>AlarmGenerationLocalization.it.resx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Localization\IO\IOGenerationLocalization.it.Designer.cs">
+      <DependentUpon>IOGenerationLocalization.it.resx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Localization\IO\IOGenerationLocalization.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>IOGrouping.resx</DependentUpon>
+      <DependentUpon>IOGenerationLocalization.resx</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Localization\LocalizationHelper.cs" />
     <Compile Include="SimaticML\Attributes\Attribute.cs" />
     <Compile Include="Generation\IO_Cad\CadData.cs" />
-    <Compile Include="Generation\UserAlarms\GenerationUserAlarms.cs" />
+    <Compile Include="Generation\UserAlarms\AlarmXmlGeneration.cs" />
     <Compile Include="Generation\IGeneration.cs" />
     <Compile Include="GenerationForms\IO\IOGenerationForm.cs">
       <SubType>Form</SubType>
@@ -279,7 +302,7 @@
     <Compile Include="SimaticML\Blocks\FlagNet\nPart\Part.cs" />
     <Compile Include="SimaticML\Blocks\FlagNet\Wire.cs" />
     <Compile Include="SimaticML\nBlockAttributeList\Section.cs" />
-    <Compile Include="Generation\UserAlarms\UserData.cs" />
+    <Compile Include="Generation\UserAlarms\DeviceData.cs" />
     <Compile Include="Generation\GenerationPlaceholders.cs" />
     <Compile Include="SimaticML\Enums\SimaticBlockType.cs" />
     <Compile Include="SimaticML\Enums\SimaticVariableScope.cs" />
@@ -313,6 +336,9 @@
     <EmbeddedResource Include="DBDuplicationForm.resx">
       <DependentUpon>DBDuplicationForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="GenerationForms\Alarms\AlarmGenerationForm.resx">
+      <DependentUpon>AlarmGenerationForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GenerationForms\IO\Config\ConfigForm.resx">
       <DependentUpon>ConfigForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -322,14 +348,24 @@
     <EmbeddedResource Include="GenerationForms\IO\IOGenerationForm.resx">
       <DependentUpon>IOGenerationForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Localization\IOGrouping.it.resx">
+    <EmbeddedResource Include="Localization\Alarm\AlarmGenerationLocalization.it.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>IOGrouping.it.Designer.cs</LastGenOutput>
+      <LastGenOutput>AlarmGenerationLocalization.it.Designer.cs</LastGenOutput>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Localization\IOGrouping.resx">
+    <EmbeddedResource Include="Localization\Alarm\AlarmGenerationLocalization.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>IOGrouping.Designer.cs</LastGenOutput>
+      <LastGenOutput>AlarmGenerationLocalization.Designer.cs</LastGenOutput>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Localization\IO\IOGenerationLocalization.it.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>IOGenerationLocalization.it.Designer.cs</LastGenOutput>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Localization\IO\IOGenerationLocalization.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>IOGenerationLocalization.Designer.cs</LastGenOutput>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="MainImportExportForm.resx">

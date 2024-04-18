@@ -20,8 +20,6 @@ namespace TiaXmlReader.GenerationForms.IO
         public const string EXTENSION = "json";
         public static string DEFAULT_FILE_PATH = Directory.GetCurrentDirectory() + @"\tempIOSave." + EXTENSION;
 
-
-
         public class SaveData
         {
             [JsonProperty] public string Address { get; set; }
