@@ -5,6 +5,7 @@ using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.IO;
 using static TiaXmlReader.GenerationForms.GridHandler.GridCellPaintHandler;
 using TiaXmlReader.GenerationForms.GridHandler;
+using TiaXmlReader.SimaticML.Enums;
 
 namespace TiaXmlReader.GenerationForms.IO
 {
@@ -107,11 +108,11 @@ namespace TiaXmlReader.GenerationForms.IO
                     string parsedPrefix = string.Empty;
                     if (config.MemoryType == IOMemoryTypeEnum.DB)
                     {
-                        parsedPrefix = ioData.GetMemoryArea() == TiaXmlReader.SimaticML.Enums.SimaticMemoryArea.INPUT ? config.PrefixInputDB : config.PrefixOutputDB;
+                        parsedPrefix = ioData.GetMemoryArea() == SimaticMemoryArea.INPUT ? config.PrefixInputDB : config.PrefixOutputDB;
                     }
                     else if (config.MemoryType == IOMemoryTypeEnum.MERKER)
                     {
-                        parsedPrefix = ioData.GetMemoryArea() == TiaXmlReader.SimaticML.Enums.SimaticMemoryArea.INPUT? config.PrefixInputMerker : config.PrefixOutputMerker;
+                        parsedPrefix = ioData.GetMemoryArea() == SimaticMemoryArea.INPUT? config.PrefixInputMerker : config.PrefixOutputMerker;
                     }
                     parsedPrefix = placeholders.Parse(parsedPrefix);
 

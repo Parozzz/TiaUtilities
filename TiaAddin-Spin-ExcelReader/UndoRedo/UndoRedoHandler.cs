@@ -37,8 +37,9 @@ namespace TiaXmlReader.UndoRedo
                 return;
             }
 
-            var func = undoActionList[undoActionList.Count - 1];
-            undoActionList.Remove(func);
+            var index = undoActionList.Count - 1;
+            var func = undoActionList[index];
+            undoActionList.RemoveAt(index);
 
             func.Invoke();
         }
@@ -60,8 +61,9 @@ namespace TiaXmlReader.UndoRedo
                 return;
             }
 
-            var func = redoActionList[redoActionList.Count - 1];
-            redoActionList.Remove(func);
+            var index = redoActionList.Count - 1;
+            var func = redoActionList[index];
+            redoActionList.RemoveAt(index);
 
             func.Invoke();
         }

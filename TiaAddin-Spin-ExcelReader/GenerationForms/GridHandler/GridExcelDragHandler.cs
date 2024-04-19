@@ -1,14 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using TiaXmlReader.SimaticML;
 using static TiaXmlReader.GenerationForms.GridHandler.GridCellPaintHandler;
-using TiaXmlReader.GenerationForms.GridHandler;
-using TiaXmlReader.GenerationForms.IO;
 
 namespace TiaXmlReader.GenerationForms.GridHandler
 {
@@ -249,26 +242,29 @@ namespace TiaXmlReader.GenerationForms.GridHandler
                     graphics.DrawRectangle(pen, rect);
                 }
 
-                using (var brush = new SolidBrush(this.settings.SelectedCellTriangleColor))
-                {//Little triangle in the lower part only for current cell
-                    var point1 = new Point(bounds.Right - 1, bounds.Bottom - TRIANGLE_SIZE);
-                    var point2 = new Point(bounds.Right - 1, bounds.Bottom - 1);
-                    var point3 = new Point(bounds.Right - TRIANGLE_SIZE, bounds.Bottom - 1);
+                if (currentCell is DataGridViewTextBoxCell)
+                {
+                    using (var brush = new SolidBrush(this.settings.SelectedCellTriangleColor))
+                    {//Little triangle in the lower part only for current cell
+                        var point1 = new Point(bounds.Right - 1, bounds.Bottom - TRIANGLE_SIZE);
+                        var point2 = new Point(bounds.Right - 1, bounds.Bottom - 1);
+                        var point3 = new Point(bounds.Right - TRIANGLE_SIZE, bounds.Bottom - 1);
 
-                    Point[] pt = new Point[] { point1, point2, point3 };
-                    graphics.FillPolygon(brush, pt);
+                        Point[] pt = new Point[] { point1, point2, point3 };
+                        graphics.FillPolygon(brush, pt);
+                    }
                 }
             }
         }
 
         public bool IsInsideTriangle(int x, int y, DataGridViewCell cell)
         {
-            return cell != null && IsInsideTriangle(x, y, cell.ColumnIndex, cell.RowIndex);
-        }
+            if (cell == null || !(cell is DataGridViewTextBoxCell))
+            {
+                return false;
+            }
 
-        public bool IsInsideTriangle(int x, int y, int columnIndex, int rowIndex)
-        {
-            var bounds = dataGridView.GetCellDisplayRectangle(columnIndex, rowIndex, false);
+            var bounds = dataGridView.GetCellDisplayRectangle(cell.ColumnIndex, cell.RowIndex, false);
             return x >= bounds.Right - TRIANGLE_SIZE && x <= bounds.Right + 2 //Go outside a bit of the cell to avoid misclick that sometime happend
                 && y >= bounds.Bottom - TRIANGLE_SIZE && y <= bounds.Bottom + 2;
         }

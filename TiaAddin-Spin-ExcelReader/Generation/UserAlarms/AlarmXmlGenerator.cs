@@ -11,7 +11,7 @@ using TiaXmlReader.SimaticML.Blocks.FlagNet.nPart;
 namespace TiaXmlReader.Generation.UserAlarms
 {
 
-    public class AlarmXmlGeneration
+    public class AlarmXmlGenerator
     {
         private readonly AlarmConfiguration config;
         private readonly List<AlarmData> alarmDataList;
@@ -21,7 +21,7 @@ namespace TiaXmlReader.Generation.UserAlarms
         private CompileUnit compileUnit;
         private string fullAlarmList;
 
-        public AlarmXmlGeneration(AlarmConfiguration config, List<AlarmData> alarmDataList, List<DeviceData> deviceDataList)
+        public AlarmXmlGenerator(AlarmConfiguration config, List<AlarmData> alarmDataList, List<DeviceData> deviceDataList)
         {
             this.config = config;
             this.alarmDataList = alarmDataList;
@@ -168,7 +168,7 @@ namespace TiaXmlReader.Generation.UserAlarms
         {
             var emptyAlarmData = new AlarmData()
             {
-                AlarmAddress = config.EmptyAlarmContactAddress,
+                AlarmVariable = config.EmptyAlarmContactAddress,
                 CoilAddress = config.DefaultCoilAddress,
                 SetCoilAddress = config.DefaultSetCoilAddress,
                 TimerAddress = config.DefaultTimerAddress,
@@ -211,7 +211,7 @@ namespace TiaXmlReader.Generation.UserAlarms
         {
             return new AlarmData()
             {
-                AlarmAddress = config.AlarmAddressPrefix + alarmData.AlarmAddress,
+                AlarmVariable = config.AlarmAddressPrefix + alarmData.AlarmVariable,
                 CoilAddress = string.IsNullOrEmpty(alarmData.CoilAddress) ? config.DefaultCoilAddress : (config.CoilAddressPrefix + alarmData.CoilAddress),
                 SetCoilAddress = string.IsNullOrEmpty(alarmData.SetCoilAddress) ? config.DefaultSetCoilAddress : (config.SetCoilAddressPrefix + alarmData.SetCoilAddress),
                 TimerAddress = string.IsNullOrEmpty(alarmData.TimerAddress) ? config.DefaultTimerAddress : (config.TimerAddressPrefix + alarmData.TimerAddress),
@@ -225,7 +225,7 @@ namespace TiaXmlReader.Generation.UserAlarms
 
         private void FillAlarmCompileUnit(CompileUnit compileUnit, GenerationPlaceholders placeholders, AlarmData alarmData)
         {
-            var parsedContactAddress = placeholders.Parse(alarmData.AlarmAddress);
+            var parsedContactAddress = placeholders.Parse(alarmData.AlarmVariable);
 
             IAccessData contactAccessData;
             switch (parsedContactAddress.ToLower())

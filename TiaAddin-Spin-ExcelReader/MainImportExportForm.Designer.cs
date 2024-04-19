@@ -41,6 +41,7 @@
             this.generateIOMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.label4 = new System.Windows.Forms.Label();
             this.languageComboBox = new System.Windows.Forms.ComboBox();
+            this.generateAlarmsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -126,7 +127,8 @@
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.dbDuplicationMenuItem,
             this.toolStripMenuItem1,
-            this.generateIOMenuItem});
+            this.generateIOMenuItem,
+            this.generateAlarmsToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(4, 2, 0, 2);
@@ -176,6 +178,14 @@
             this.languageComboBox.Size = new System.Drawing.Size(79, 32);
             this.languageComboBox.TabIndex = 12;
             // 
+            // generateAlarmsToolStripMenuItem
+            // 
+            this.generateAlarmsToolStripMenuItem.Font = new System.Drawing.Font("Segoe UI", 12F);
+            this.generateAlarmsToolStripMenuItem.Name = "generateAlarmsToolStripMenuItem";
+            this.generateAlarmsToolStripMenuItem.Size = new System.Drawing.Size(138, 25);
+            this.generateAlarmsToolStripMenuItem.Text = "Generate Alarms";
+            this.generateAlarmsToolStripMenuItem.Click += new System.EventHandler(this.GenerateAlarmsToolStripMenuItem_Click);
+            // 
             // MainImportExportForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -216,6 +226,7 @@
         private System.Windows.Forms.ToolStripMenuItem generateIOMenuItem;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.ComboBox languageComboBox;
+        private System.Windows.Forms.ToolStripMenuItem generateAlarmsToolStripMenuItem;
     }
 }
 

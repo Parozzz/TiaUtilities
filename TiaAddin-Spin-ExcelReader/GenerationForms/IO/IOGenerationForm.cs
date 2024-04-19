@@ -210,13 +210,15 @@ namespace TiaXmlReader.GenerationForms.IO
 
             //Column initialization after gridHandler.Init()
             #region COLUMNS
-            var addressColumn = (DataGridViewTextBoxColumn)this.gridHandler.InitColumn(ADDRESS_COLUMN, "Indirizzo", 55);
-            addressColumn.MaxInputLength = 10;
+            var properties = typeof(IOData).GetProperties();
 
-            var ioNameColumn = this.gridHandler.InitColumn(IO_NAME_COLUMN, "Nome IO", 80);
-            var dbNameColumn = this.gridHandler.InitColumn(DB_COLUMN, "DB", 80);
-            var variableColumn = this.gridHandler.InitColumn(VARIABLE_COLUMN, "Variabile", 105);
-            var commentColumn = this.gridHandler.InitColumn(COMMENT_COLUMN, "Commento", 0);
+            var addressColumn = this.gridHandler.AddTextBoxColumn("Indirizzo", 55, properties[ADDRESS_COLUMN].Name);
+            addressColumn.MaxInputLength = 10;
+            
+            var ioNameColumn = this.gridHandler.AddTextBoxColumn("Nome IO", 80, properties[IO_NAME_COLUMN].Name);
+            var dbNameColumn = this.gridHandler.AddTextBoxColumn("DB", 80, properties[DB_COLUMN].Name);
+            var variableColumn = this.gridHandler.AddTextBoxColumn("Variabile", 105, properties[VARIABLE_COLUMN].Name);
+            var commentColumn = this.gridHandler.AddTextBoxColumn("Commento", 0, properties[COMMENT_COLUMN].Name);
             #endregion
 
             #region PROGRAM_SAVE_TICK
@@ -231,7 +233,7 @@ namespace TiaXmlReader.GenerationForms.IO
             {
                 //This is done this way because is impossible that fields are changed toghether for multiple configs. So at the first that is different, i create a snapshot and save to file!
                 var configEqual = Utils.ComparePublicFieldSnapshot(this.IOConfig, configSnapshot);
-                if(!configEqual)
+                if (!configEqual)
                 {
                     configSnapshot = Utils.CreatePublicFieldSnapshot(this.IOConfig);
                     this.settings.Save();
@@ -247,7 +249,7 @@ namespace TiaXmlReader.GenerationForms.IO
                 }
 
                 var preferencesEqual = Utils.ComparePublicFieldSnapshot(this.Preferences, preferencesSnapshot);
-                if(!preferencesEqual)
+                if (!preferencesEqual)
                 {
                     preferencesSnapshot = Utils.CreatePublicFieldSnapshot(this.Preferences);
                     this.settings.Save();

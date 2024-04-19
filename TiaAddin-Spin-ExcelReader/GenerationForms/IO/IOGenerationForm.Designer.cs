@@ -47,11 +47,11 @@
             this.variableTableConfigButton = new System.Windows.Forms.Button();
             this.ioTableConfigButton = new System.Windows.Forms.Button();
             this.segmentNameConfigButton = new System.Windows.Forms.Button();
+            this.groupingTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
             this.divisionTypeLabel = new System.Windows.Forms.Label();
+            this.memoryTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
             this.memoryTypeLabel = new System.Windows.Forms.Label();
             this.dataGridView = new System.Windows.Forms.DataGridView();
-            this.groupingTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
-            this.memoryTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
             this.mainPanel.SuspendLayout();
             this.TopTableLayoutPanel.SuspendLayout();
             this.TopMenuStrip.SuspendLayout();
@@ -65,16 +65,17 @@
             this.mainPanel.AutoSize = true;
             this.mainPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.mainPanel.ColumnCount = 1;
-            this.mainPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.mainPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.mainPanel.Controls.Add(this.TopTableLayoutPanel, 0, 0);
             this.mainPanel.Controls.Add(this.dataGridView, 0, 1);
             this.mainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.mainPanel.Location = new System.Drawing.Point(0, 0);
             this.mainPanel.Margin = new System.Windows.Forms.Padding(0);
             this.mainPanel.Name = "mainPanel";
-            this.mainPanel.RowCount = 2;
+            this.mainPanel.RowCount = 3;
             this.mainPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.mainPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.mainPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.mainPanel.Size = new System.Drawing.Size(1093, 537);
             this.mainPanel.TabIndex = 1;
             // 
@@ -96,7 +97,7 @@
             this.TopTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.TopTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.TopTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.TopTableLayoutPanel.Size = new System.Drawing.Size(1093, 106);
+            this.TopTableLayoutPanel.Size = new System.Drawing.Size(1087, 106);
             this.TopTableLayoutPanel.TabIndex = 18;
             // 
             // TopMenuStrip
@@ -109,7 +110,7 @@
             this.preferencesToolStripMenuItem});
             this.TopMenuStrip.Location = new System.Drawing.Point(0, 0);
             this.TopMenuStrip.Name = "TopMenuStrip";
-            this.TopMenuStrip.Size = new System.Drawing.Size(1093, 24);
+            this.TopMenuStrip.Size = new System.Drawing.Size(1087, 24);
             this.TopMenuStrip.TabIndex = 17;
             this.TopMenuStrip.Text = "menuStrip1";
             // 
@@ -174,7 +175,7 @@
             this.PlaceholdersLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.PlaceholdersLabel.Location = new System.Drawing.Point(3, 24);
             this.PlaceholdersLabel.Name = "PlaceholdersLabel";
-            this.PlaceholdersLabel.Size = new System.Drawing.Size(1087, 16);
+            this.PlaceholdersLabel.Size = new System.Drawing.Size(1081, 16);
             this.PlaceholdersLabel.TabIndex = 9;
             this.PlaceholdersLabel.Text = "Placeholders: {memory_type} {bit} {byte} {io_name} {db_name} {variable_name} {com" +
     "ment} ";
@@ -190,7 +191,7 @@
             this.configPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.configPanel.Location = new System.Drawing.Point(3, 43);
             this.configPanel.Name = "configPanel";
-            this.configPanel.Size = new System.Drawing.Size(1087, 60);
+            this.configPanel.Size = new System.Drawing.Size(1081, 60);
             this.configPanel.TabIndex = 3;
             // 
             // configButtonPanel
@@ -205,7 +206,7 @@
             this.configButtonPanel.Location = new System.Drawing.Point(0, -1);
             this.configButtonPanel.Margin = new System.Windows.Forms.Padding(0);
             this.configButtonPanel.Name = "configButtonPanel";
-            this.configButtonPanel.Size = new System.Drawing.Size(1087, 30);
+            this.configButtonPanel.Size = new System.Drawing.Size(1081, 30);
             this.configButtonPanel.TabIndex = 15;
             // 
             // fcConfigButton
@@ -263,6 +264,14 @@
             this.segmentNameConfigButton.Text = "Nomi Segmenti";
             this.segmentNameConfigButton.UseVisualStyleBackColor = true;
             // 
+            // groupingTypeComboBox
+            // 
+            this.groupingTypeComboBox.FormattingEnabled = true;
+            this.groupingTypeComboBox.Location = new System.Drawing.Point(332, 33);
+            this.groupingTypeComboBox.Name = "groupingTypeComboBox";
+            this.groupingTypeComboBox.Size = new System.Drawing.Size(112, 21);
+            this.groupingTypeComboBox.TabIndex = 3;
+            // 
             // divisionTypeLabel
             // 
             this.divisionTypeLabel.AutoSize = true;
@@ -272,6 +281,14 @@
             this.divisionTypeLabel.Size = new System.Drawing.Size(149, 18);
             this.divisionTypeLabel.TabIndex = 2;
             this.divisionTypeLabel.Text = "Tipo raggruppamento";
+            // 
+            // memoryTypeComboBox
+            // 
+            this.memoryTypeComboBox.FormattingEnabled = true;
+            this.memoryTypeComboBox.Location = new System.Drawing.Point(111, 33);
+            this.memoryTypeComboBox.Name = "memoryTypeComboBox";
+            this.memoryTypeComboBox.Size = new System.Drawing.Size(65, 21);
+            this.memoryTypeComboBox.TabIndex = 1;
             // 
             // memoryTypeLabel
             // 
@@ -292,24 +309,8 @@
             this.dataGridView.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
             this.dataGridView.Name = "dataGridView";
             this.dataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.dataGridView.Size = new System.Drawing.Size(1093, 425);
+            this.dataGridView.Size = new System.Drawing.Size(1087, 405);
             this.dataGridView.TabIndex = 2;
-            // 
-            // groupingTypeComboBox
-            // 
-            this.groupingTypeComboBox.FormattingEnabled = true;
-            this.groupingTypeComboBox.Location = new System.Drawing.Point(332, 33);
-            this.groupingTypeComboBox.Name = "groupingTypeComboBox";
-            this.groupingTypeComboBox.Size = new System.Drawing.Size(112, 21);
-            this.groupingTypeComboBox.TabIndex = 3;
-            // 
-            // memoryTypeComboBox
-            // 
-            this.memoryTypeComboBox.FormattingEnabled = true;
-            this.memoryTypeComboBox.Location = new System.Drawing.Point(111, 33);
-            this.memoryTypeComboBox.Name = "memoryTypeComboBox";
-            this.memoryTypeComboBox.Size = new System.Drawing.Size(65, 21);
-            this.memoryTypeComboBox.TabIndex = 1;
             // 
             // IOGenerationForm
             // 

@@ -13,6 +13,8 @@ using TiaXmlReader.UndoRedo;
 using static TiaXmlReader.GenerationForms.GridHandler.GridExcelDragHandler;
 using TiaXmlReader.GenerationForms.GridHandler;
 using TiaXmlReader.GenerationForms.IO;
+using TiaXmlReader.Generation.IO;
+using TiaXmlReader.Utility;
 
 namespace TiaXmlReader.GenerationForms.GridHandler
 {
@@ -25,7 +27,7 @@ namespace TiaXmlReader.GenerationForms.GridHandler
         private readonly GridExcelDragHandler excelDragHandler;
         private readonly GridSortHandler<T> sortHandler;
         private readonly GridCellChangeAssociator<T> associator;
-       
+
         private readonly List<IGridCellPainter> cellPainterList;
 
         public uint RowCount { get; set; } = 1999;
@@ -69,8 +71,6 @@ namespace TiaXmlReader.GenerationForms.GridHandler
 
         public void Init()
         {
-            this.DataSource.InitializeData(this.RowCount);
-
             typeof(DataGridView).InvokeMember("DoubleBuffered", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty, null, this.dataGridView, new object[] { true });
 
             this.dataGridView.AutoGenerateColumns = false;
@@ -85,6 +85,10 @@ namespace TiaXmlReader.GenerationForms.GridHandler
             this.dataGridView.EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2;
             this.dataGridView.Font = settings.GridFont;
             this.dataGridView.AllowUserToAddRows = false;
+
+            this.dataGridView.DataError += DataErrorEventHandler;
+
+            this.DataSource.InitializeData(this.RowCount);
 
             #region Cell Paiting
             var paintHandler = new GridCellPaintHandler(this.dataGridView);
@@ -209,26 +213,43 @@ namespace TiaXmlReader.GenerationForms.GridHandler
             #endregion
 
             #region CellEdit Begin-End
-            GridCellChange cellEdit = null;
+            GridCellChange textBoxCellEdit = null;
             dataGridView.CellBeginEdit += (sender, args) =>
             {
-                cellEdit = new GridCellChange(dataGridView, args.ColumnIndex, args.RowIndex);
+                textBoxCellEdit = null;
+
+                var cell = this.dataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex];
+                if (cell is DataGridViewTextBoxCell || cell is DataGridViewComboBoxCell)
+                {
+                    textBoxCellEdit = new GridCellChange(cell);
+                }
             };
 
             dataGridView.CellEndEdit += (sender, args) =>
             {
-                if (cellEdit.cell == null)
+                if (textBoxCellEdit?.cell == null)
                 {
                     return;
                 }
 
-                if (cellEdit.RowIndex == args.RowIndex && cellEdit.ColumnIndex == args.ColumnIndex)
+                var cell = this.dataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex];
+                if (cell == textBoxCellEdit.cell)
                 {
-                    cellEdit.NewValue = dataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex].Value;
+                    textBoxCellEdit.NewValue = dataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex].Value;
+                    ChangeCell(textBoxCellEdit, applyChanges: false);
 
-                    ChangeCells(new List<GridCellChange> { cellEdit }, applyChanges: false);
+                    textBoxCellEdit = null;
+                }
+            };
 
-                    cellEdit = null;
+            dataGridView.CellContentClick += (sender, args) =>
+            {
+                var cell = this.dataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex];
+                if (cell is DataGridViewCheckBoxCell checkBoxCell)
+                {
+                    var oldValue = (bool)(checkBoxCell.Value ?? false); //In this case the value is still the old one. For checkBox, been boolean value, i can predict the next!
+                    var newValue = !oldValue;
+                    ChangeCell(new GridCellChange(checkBoxCell) { OldValue = oldValue, NewValue = newValue }, applyChanges: false);
                 }
             };
             #endregion
@@ -237,9 +258,46 @@ namespace TiaXmlReader.GenerationForms.GridHandler
             sortHandler.Init();
         }
 
-        public DataGridViewColumn InitColumn(int columnIndex, string name, int width)
+        private void DataErrorEventHandler(object sender, DataGridViewDataErrorEventArgs args)
         {
-            var column = this.dataGridView.Columns[columnIndex];
+            var cell = this.dataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex];
+            if (cell is DataGridViewComboBoxCell comboBoxCell)
+            {
+                comboBoxCell.Value = "";
+            }
+        }
+
+        public DataGridViewTextBoxColumn AddTextBoxColumn(string name, int width, string dataPropertyName = "")
+        {
+            var column = new DataGridViewTextBoxColumn()
+            {
+                DataPropertyName = dataPropertyName
+            };
+            return this.InitColumn(column, name, width);
+        }
+
+        public DataGridViewCheckBoxColumn AddCheckBoxColumn(string name, int width, string dataPropertyName = "")
+        {
+            var column = new DataGridViewCheckBoxColumn()
+            {
+                DataPropertyName = dataPropertyName
+            };
+            return this.InitColumn(column, name, width);
+        }
+
+        public DataGridViewComboBoxColumn AddComboBoxColumn(string name, int width, string[] items, string dataPropertyName = "")
+        {
+            var column = new DataGridViewComboBoxColumn()
+            {
+                DataPropertyName = dataPropertyName
+            };
+            column.Items.AddRange(items);
+            column.FlatStyle = FlatStyle.Flat;
+            return this.InitColumn(column, name, width);
+        }
+
+        private C InitColumn<C>(C column, string name, int width) where C : DataGridViewColumn
+        {
             column.Name = name;
             column.DefaultCellStyle.SelectionBackColor = Color.LightGray;
             column.DefaultCellStyle.BackColor = SystemColors.ControlLightLight;
@@ -249,6 +307,12 @@ namespace TiaXmlReader.GenerationForms.GridHandler
             column.Width = width;
             column.AutoSizeMode = width <= 0 ? DataGridViewAutoSizeColumnMode.Fill : DataGridViewAutoSizeColumnMode.None;
             column.SortMode = DataGridViewColumnSortMode.Programmatic;
+
+            column.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            column.HeaderCell.Style.Padding = new Padding(0);
+
+            this.dataGridView.Columns.Add(column);
+
             return column;
         }
 
@@ -326,6 +390,11 @@ namespace TiaXmlReader.GenerationForms.GridHandler
             this.ChangeCells(this.associator.CreateCellChanges(rowIndex, dataCollection));
         }
 
+        public void ChangeCell(GridCellChange cell, bool applyChanges = true)
+        {
+            ChangeCells(Utils.SingletonList(cell), applyChanges);
+        }
+
         public void ChangeCells(List<GridCellChange> cellChangeList, bool applyChanges = true)
         {
             if (cellChangeList.Count == 0)
@@ -351,13 +420,12 @@ namespace TiaXmlReader.GenerationForms.GridHandler
                     cellChangeList.ForEach(cellChange => cellChange.ApplyOldValue());
                     undoRedoHandler.Unlock();
 
-                    dataGridView.ClearSelection();
-
-                    var firstCell = cellChangeList[0].cell;
-                    dataGridView.CurrentCell = firstCell; //Setting se current cell already center the grid to it.
-                    dataGridView.Refresh();
-
-                    undoRedoHandler.AddRedo(() => ChangeCells(cellChangeList));
+                    ShowCell(cellChangeList[cellChangeList.Count - 1].cell);  //Setting se current cell already center the grid to it.
+                    undoRedoHandler.AddRedo(() =>
+                    {
+                        ChangeCells(cellChangeList);
+                        ShowCell(cellChangeList[0].cell);  //Setting se current cell already center the grid to it.
+                    });
                 }
 
                 undoRedoHandler.AddUndo(undoRedoAction);
@@ -367,6 +435,15 @@ namespace TiaXmlReader.GenerationForms.GridHandler
             {
                 MessageBox.Show(ex.ToString(), "Error while changing cells", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void ShowCell(DataGridViewCell cell)
+        {
+            dataGridView.RefreshEdit(); //This is required to refresh checkbox otherwise, if the undo is in a selected cell, it will not update visually (DATA IS CHANGED!)
+            dataGridView.Refresh();
+
+            dataGridView.CurrentCell = cell; //Setting se current cell already center the grid to it.
+            dataGridView.Refresh();
         }
 
     }

@@ -19,6 +19,11 @@ namespace TiaXmlReader.Utility
             return new System.Collections.ObjectModel.ReadOnlyCollection<T>(new T[] { data });
         }
 
+        public static List<T> SingletonList<T>(T data)
+        {
+            return new List<T>(new T[] { data });
+        }
+
         public static void ShowExceptionMessage(Exception ex)
         {
             string message = "Message: " + ex.Message + " \r\n StackTrace: " + ex.StackTrace;

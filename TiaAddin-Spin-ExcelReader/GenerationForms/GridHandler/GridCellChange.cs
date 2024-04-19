@@ -24,21 +24,21 @@ namespace TiaXmlReader.GenerationForms.GridHandler
         public GridCellChange(DataGridViewCell cell)
         {
             this.cell = cell;
-            OldValue = cell?.Value;
+            this.OldValue = cell?.Value;
         }
 
         public void ReverseValues()
         {
             var savedOldValue = this.OldValue;
-            OldValue = NewValue;
-            NewValue = savedOldValue;
+            this.OldValue = NewValue;
+            this.NewValue = savedOldValue;
         }
 
         public void ApplyNewValue()
         {
             if (cell != null)
             {
-                cell.Value = this.NewValue;
+                this.cell.Value = this.NewValue;
             }
         }
 
@@ -46,7 +46,7 @@ namespace TiaXmlReader.GenerationForms.GridHandler
         {
             if (cell != null)
             {
-                cell.Value = this.OldValue;
+                this.cell.Value = this.OldValue;
             }
         }
     }

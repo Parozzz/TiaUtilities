@@ -127,10 +127,12 @@ namespace TiaXmlReader
                         switch (configTypeValue.GetText().ToLower())
                         {
                             case "type1":
-                                var importConsumerAlarms = new AlarmXmlGeneration();
-                                importConsumerAlarms.ImportExcelConfig(configWorksheet);
-                                importConsumerAlarms.GenerateBlocks();
-                                importConsumerAlarms.ExportXML(exportPathTextBlock.Text);
+                                var alarmExcelImporter = new AlarmExcelImporter();
+                                alarmExcelImporter.ImportExcelConfig(configWorksheet);
+
+                                var alarmXmlGenerator = new AlarmXmlGenerator(alarmExcelImporter.GetConfiguration(), alarmExcelImporter.GetAlarmDataList(), alarmExcelImporter.GetDeviceDataList());
+                                alarmXmlGenerator.GenerateBlocks();
+                                alarmXmlGenerator.ExportXML(exportPathTextBlock.Text);
                                 break;
                             case "type2":
                                 var generationIO_Cad = new GenerationIO_CAD();
@@ -167,6 +169,11 @@ namespace TiaXmlReader
         private void GenerateIOMenuItem_Click(object sender, EventArgs e)
         {
             new IOGenerationForm().Show();
+        }
+
+        private void GenerateAlarmsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            new AlarmGenerationForm().Show();
         }
     }
 }

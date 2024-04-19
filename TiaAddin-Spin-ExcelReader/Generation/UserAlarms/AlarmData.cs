@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,18 +10,19 @@ namespace TiaXmlReader.Generation.UserAlarms
 {
     public class AlarmData : IGridData
     {
-        public string AlarmAddress { get; set; }
-        public string CoilAddress { get; set; }
-        public string SetCoilAddress { get; set; }
-        public string TimerAddress { get; set; }
-        public string TimerType {  get; set; }
-        public string TimerValue {  get; set; }
-        public string Description { get; set; }
-        public bool Enable { get; set; }
+        [JsonProperty] public bool Enable {  get; set; }
+        [JsonProperty] public string AlarmVariable { get; set; }
+        [JsonProperty] public string CoilAddress { get; set; }
+        [JsonProperty] public string SetCoilAddress { get; set; }
+        [JsonProperty] public string TimerAddress { get; set; }
+        [JsonProperty] public string TimerType { get; set; }
+        [JsonProperty] public string TimerValue { get; set; }
+        [JsonProperty] public string Description { get; set; }
+
 
         public void CopyFrom(AlarmData data)
         {
-            this.AlarmAddress = data.AlarmAddress;
+            this.AlarmVariable = data.AlarmVariable;
             this.CoilAddress = data.CoilAddress;
             this.SetCoilAddress = data.SetCoilAddress;
             this.TimerAddress = data.TimerAddress;
@@ -32,13 +34,13 @@ namespace TiaXmlReader.Generation.UserAlarms
 
         public void Clear()
         {
-            this.AlarmAddress = this.CoilAddress = this.SetCoilAddress = this.TimerAddress = this.TimerType = this.TimerValue = this.Description = "";
+            this.AlarmVariable = this.CoilAddress = this.SetCoilAddress = this.TimerAddress = this.TimerType = this.TimerValue = this.Description = "";
             this.Enable = true;
         }
 
         public bool IsEmpty()
         {
-            return string.IsNullOrEmpty(this.AlarmAddress) && string.IsNullOrEmpty(this.CoilAddress) && string.IsNullOrEmpty(this.SetCoilAddress) &&
+            return string.IsNullOrEmpty(this.AlarmVariable) && string.IsNullOrEmpty(this.CoilAddress) && string.IsNullOrEmpty(this.SetCoilAddress) &&
                 string.IsNullOrEmpty(this.TimerAddress) && string.IsNullOrEmpty(this.TimerType) && string.IsNullOrEmpty(this.TimerValue) &&
                 string.IsNullOrEmpty(this.Description);
         }

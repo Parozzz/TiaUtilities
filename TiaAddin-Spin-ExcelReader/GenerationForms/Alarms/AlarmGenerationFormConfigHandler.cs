@@ -24,7 +24,7 @@ namespace TiaXmlReader.GenerationForms.Alarms
         }
 
         public void Init()
-        {
+        {/*
             form.groupingTypeComboBox.SelectedValue = config.GroupingType;
             form.groupingTypeComboBox.SelectionChangeCommitted += (object sender, EventArgs args) =>
             {
@@ -139,7 +139,7 @@ namespace TiaXmlReader.GenerationForms.Alarms
                     .TextChanged(str => config.SegmentNameByteGrouping = str);
 
                 SetupConfigForm(form.segmentNameConfigButton, configForm);
-            };
+            };*/
         }
 
         private void SetupConfigForm(Control button, ConfigForm configForm)

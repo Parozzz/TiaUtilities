@@ -37,7 +37,6 @@
             this.loadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importExportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportXMLToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.importExcelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.preferencesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.PlaceholdersLabel = new System.Windows.Forms.Label();
             this.configPanel = new System.Windows.Forms.Panel();
@@ -51,7 +50,7 @@
             this.divisionTypeLabel = new System.Windows.Forms.Label();
             this.partitionTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
             this.memoryTypeLabel = new System.Windows.Forms.Label();
-            this.GridsLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+            this.GridsSplitPanel = new System.Windows.Forms.SplitContainer();
             this.DeviceDataGridView = new System.Windows.Forms.DataGridView();
             this.AlarmDataGridView = new System.Windows.Forms.DataGridView();
             this.mainPanel.SuspendLayout();
@@ -59,7 +58,10 @@
             this.TopMenuStrip.SuspendLayout();
             this.configPanel.SuspendLayout();
             this.configButtonPanel.SuspendLayout();
-            this.GridsLayoutPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.GridsSplitPanel)).BeginInit();
+            this.GridsSplitPanel.Panel1.SuspendLayout();
+            this.GridsSplitPanel.Panel2.SuspendLayout();
+            this.GridsSplitPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DeviceDataGridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.AlarmDataGridView)).BeginInit();
             this.SuspendLayout();
@@ -69,9 +71,9 @@
             this.mainPanel.AutoSize = true;
             this.mainPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.mainPanel.ColumnCount = 1;
-            this.mainPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.mainPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.mainPanel.Controls.Add(this.TopTableLayoutPanel, 0, 0);
-            this.mainPanel.Controls.Add(this.GridsLayoutPanel, 0, 1);
+            this.mainPanel.Controls.Add(this.GridsSplitPanel, 0, 1);
             this.mainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.mainPanel.Location = new System.Drawing.Point(0, 0);
             this.mainPanel.Margin = new System.Windows.Forms.Padding(0);
@@ -79,7 +81,7 @@
             this.mainPanel.RowCount = 2;
             this.mainPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.mainPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.mainPanel.Size = new System.Drawing.Size(1093, 537);
+            this.mainPanel.Size = new System.Drawing.Size(1294, 537);
             this.mainPanel.TabIndex = 1;
             // 
             // TopTableLayoutPanel
@@ -87,7 +89,7 @@
             this.TopTableLayoutPanel.AutoSize = true;
             this.TopTableLayoutPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.TopTableLayoutPanel.ColumnCount = 1;
-            this.TopTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.TopTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.TopTableLayoutPanel.Controls.Add(this.TopMenuStrip, 0, 0);
             this.TopTableLayoutPanel.Controls.Add(this.PlaceholdersLabel, 0, 1);
             this.TopTableLayoutPanel.Controls.Add(this.configPanel, 0, 2);
@@ -100,7 +102,7 @@
             this.TopTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.TopTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.TopTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.TopTableLayoutPanel.Size = new System.Drawing.Size(3664, 106);
+            this.TopTableLayoutPanel.Size = new System.Drawing.Size(1288, 106);
             this.TopTableLayoutPanel.TabIndex = 18;
             // 
             // TopMenuStrip
@@ -148,8 +150,7 @@
             // importExportToolStripMenuItem
             // 
             this.importExportToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.exportXMLToolStripMenuItem,
-            this.importExcelToolStripMenuItem});
+            this.exportXMLToolStripMenuItem});
             this.importExportToolStripMenuItem.Name = "importExportToolStripMenuItem";
             this.importExportToolStripMenuItem.Size = new System.Drawing.Size(94, 20);
             this.importExportToolStripMenuItem.Text = "Import/Export";
@@ -157,14 +158,8 @@
             // exportXMLToolStripMenuItem
             // 
             this.exportXMLToolStripMenuItem.Name = "exportXMLToolStripMenuItem";
-            this.exportXMLToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
+            this.exportXMLToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exportXMLToolStripMenuItem.Text = "Export XML";
-            // 
-            // importExcelToolStripMenuItem
-            // 
-            this.importExcelToolStripMenuItem.Name = "importExcelToolStripMenuItem";
-            this.importExcelToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
-            this.importExcelToolStripMenuItem.Text = "Import Excel";
             // 
             // preferencesToolStripMenuItem
             // 
@@ -303,33 +298,34 @@
             this.memoryTypeLabel.TabIndex = 0;
             this.memoryTypeLabel.Text = "Tipo ripartizione";
             // 
-            // GridsLayoutPanel
+            // GridsSplitPanel
             // 
-            this.GridsLayoutPanel.AutoSize = true;
-            this.GridsLayoutPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.GridsLayoutPanel.ColumnCount = 2;
-            this.GridsLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 30F));
-            this.GridsLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 70F));
-            this.GridsLayoutPanel.Controls.Add(this.DeviceDataGridView, 0, 0);
-            this.GridsLayoutPanel.Controls.Add(this.AlarmDataGridView, 1, 0);
-            this.GridsLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.GridsLayoutPanel.Location = new System.Drawing.Point(3, 112);
-            this.GridsLayoutPanel.Name = "GridsLayoutPanel";
-            this.GridsLayoutPanel.RowCount = 1;
-            this.GridsLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.GridsLayoutPanel.Size = new System.Drawing.Size(3664, 422);
-            this.GridsLayoutPanel.TabIndex = 19;
+            this.GridsSplitPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.GridsSplitPanel.Location = new System.Drawing.Point(3, 112);
+            this.GridsSplitPanel.Name = "GridsSplitPanel";
+            // 
+            // GridsSplitPanel.Panel1
+            // 
+            this.GridsSplitPanel.Panel1.Controls.Add(this.DeviceDataGridView);
+            // 
+            // GridsSplitPanel.Panel2
+            // 
+            this.GridsSplitPanel.Panel2.Controls.Add(this.AlarmDataGridView);
+            this.GridsSplitPanel.Size = new System.Drawing.Size(1288, 422);
+            this.GridsSplitPanel.SplitterDistance = 248;
+            this.GridsSplitPanel.SplitterWidth = 12;
+            this.GridsSplitPanel.TabIndex = 19;
             // 
             // DeviceDataGridView
             // 
             this.DeviceDataGridView.BackgroundColor = System.Drawing.SystemColors.Control;
             this.DeviceDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.DeviceDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.DeviceDataGridView.Location = new System.Drawing.Point(3, 0);
+            this.DeviceDataGridView.Location = new System.Drawing.Point(0, 0);
             this.DeviceDataGridView.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
             this.DeviceDataGridView.Name = "DeviceDataGridView";
             this.DeviceDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.DeviceDataGridView.Size = new System.Drawing.Size(1093, 419);
+            this.DeviceDataGridView.Size = new System.Drawing.Size(248, 422);
             this.DeviceDataGridView.TabIndex = 2;
             // 
             // AlarmDataGridView
@@ -337,18 +333,18 @@
             this.AlarmDataGridView.BackgroundColor = System.Drawing.SystemColors.Control;
             this.AlarmDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.AlarmDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AlarmDataGridView.Location = new System.Drawing.Point(1102, 0);
+            this.AlarmDataGridView.Location = new System.Drawing.Point(0, 0);
             this.AlarmDataGridView.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
             this.AlarmDataGridView.Name = "AlarmDataGridView";
             this.AlarmDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.AlarmDataGridView.Size = new System.Drawing.Size(2559, 419);
+            this.AlarmDataGridView.Size = new System.Drawing.Size(1028, 422);
             this.AlarmDataGridView.TabIndex = 3;
             // 
             // AlarmGenerationForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(1093, 537);
+            this.ClientSize = new System.Drawing.Size(1294, 537);
             this.Controls.Add(this.mainPanel);
             this.DoubleBuffered = true;
             this.MainMenuStrip = this.TopMenuStrip;
@@ -363,7 +359,10 @@
             this.configPanel.ResumeLayout(false);
             this.configPanel.PerformLayout();
             this.configButtonPanel.ResumeLayout(false);
-            this.GridsLayoutPanel.ResumeLayout(false);
+            this.GridsSplitPanel.Panel1.ResumeLayout(false);
+            this.GridsSplitPanel.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.GridsSplitPanel)).EndInit();
+            this.GridsSplitPanel.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.DeviceDataGridView)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.AlarmDataGridView)).EndInit();
             this.ResumeLayout(false);
@@ -395,9 +394,8 @@
         private System.Windows.Forms.TableLayoutPanel TopTableLayoutPanel;
         private System.Windows.Forms.ToolStripMenuItem importExportToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exportXMLToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem importExcelToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem preferencesToolStripMenuItem;
-        private System.Windows.Forms.TableLayoutPanel GridsLayoutPanel;
         private System.Windows.Forms.DataGridView AlarmDataGridView;
+        private System.Windows.Forms.SplitContainer GridsSplitPanel;
     }
 }

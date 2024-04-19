@@ -103,7 +103,7 @@ namespace TiaXmlReader.Generation.UserAlarms
 
                 var alarmData = new AlarmData()
                 {
-                    AlarmAddress = userAddress.ToString(),
+                    AlarmVariable = userAddress.ToString(),
                     CoilAddress = coilAddress.ToString(),
                     SetCoilAddress = setCoilAddress.ToString(),
                     TimerAddress = timerAddress.ToString(),
@@ -131,7 +131,7 @@ namespace TiaXmlReader.Generation.UserAlarms
 
                 var consumerData = new DeviceData()
                 {
-                    Name = userName.ToString(),
+                    Address = userName.ToString(),
                     Description = userDescription.ToString(),
                 };
                 userDataList.Add(consumerData);

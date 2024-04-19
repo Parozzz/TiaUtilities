@@ -16,6 +16,7 @@ using TiaXmlReader.Utility;
 using TiaXmlReader.GenerationForms.IO.Config;
 using TiaXmlReader.GenerationForms.Alarms;
 using TiaXmlReader.Generation.UserAlarms;
+using TiaXmlReader.SimaticML.Blocks.FlagNet.nPart;
 
 namespace TiaXmlReader.GenerationForms.IO
 {
@@ -23,15 +24,29 @@ namespace TiaXmlReader.GenerationForms.IO
     {
         public const int TOTAL_ROW_COUNT = 1999;
 
+        public const int DEVICE_ADDRESS_COLUMN = 0;
+        public const int DEVICE_DESCRIPTION_COLUMN = 1;
+
+        public const int ALARM_ENABLE_COLUMN = 0;
+        public const int ALARM_VARIABLE_COLUMN = 1;
+        public const int ALARM_COIL_COLUMN = 2;
+        public const int ALARM_SET_COIL_COLUMN = 3;
+        public const int ALARM_TIMER_COLUMN = 4;
+        public const int ALARM_TIMER_TYPE_COLUMN = 5;
+        public const int ALARM_TIMER_VALUE_COLUMN = 6;
+        public const int ALARM_DESCRIPTION_COLUMN = 7;
+
+
+        /*
         public const int ADDRESS_COLUMN = 0;
         public const int IO_NAME_COLUMN = 1;
         public const int DB_COLUMN = 2;
         public const int VARIABLE_COLUMN = 3;
         public const int COMMENT_COLUMN = 4;
-
+        */
         private readonly GridHandler<AlarmData> alarmGridHandler;
         private readonly GridHandler<DeviceData> deviceGridHandler;
-        
+
 
         private readonly AlarmGenerationSettings settings;
         private readonly IOGenerationFormConfigHandler configHandler = null;
@@ -46,8 +61,15 @@ namespace TiaXmlReader.GenerationForms.IO
             settings = AlarmGenerationSettings.Load();
             settings.Save(); //This could be avoided but is to be sure that all the classes that are created new will be saved to file!
 
-            this.alarmGridHandler = new GridHandler<AlarmData>(this.AlarmDataGridView, settings.GridSettings, () => new AlarmData(), (oldData, newData) => oldData.CopyFrom(newData), null);
-            this.deviceGridHandler = new GridHandler<DeviceData>(this.DeviceDataGridView, settings.GridSettings, () => new DeviceData(), (oldData, newData) => oldData.CopyFrom(newData), null);
+            this.alarmGridHandler = new GridHandler<AlarmData>(this.AlarmDataGridView, settings.GridSettings, () => new AlarmData(), (oldData, newData) => oldData.CopyFrom(newData), null)
+            {
+                RowCount = 29
+            };
+
+            this.deviceGridHandler = new GridHandler<DeviceData>(this.DeviceDataGridView, settings.GridSettings, () => new DeviceData(), (oldData, newData) => oldData.CopyFrom(newData), null)
+            {
+                RowCount = 499
+            };
             //this.configHandler = new IOGenerationFormConfigHandler(this, IOConfig, this.dataGridView);
 
             Init();
@@ -91,9 +113,10 @@ namespace TiaXmlReader.GenerationForms.IO
 
                     if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
                     {
-                        var ioDataList = new List<IOData>(this.deviceGridHandler.DataSource.GetNotEmptyDataDict().Keys);
+                        var alarmDataList = new List<AlarmData>(this.alarmGridHandler.DataSource.GetNotEmptyDataDict().Keys);
+                        var deviceDataList = new List<DeviceData>(this.deviceGridHandler.DataSource.GetNotEmptyDataDict().Keys);
 
-                        var ioXmlGenerator = new IOXmlGenerator(this.IOConfig, ioDataList);
+                        var ioXmlGenerator = new AlarmXmlGenerator(this.AlarmConfig, alarmDataList, deviceDataList);
                         ioXmlGenerator.GenerateBlocks();
                         ioXmlGenerator.ExportXML(fileDialog.FileName);
                     }
@@ -103,37 +126,7 @@ namespace TiaXmlReader.GenerationForms.IO
                     Utils.ShowExceptionMessage(ex);
                 }
             };
-            this.importExcelToolStripMenuItem.Click += (object sender, EventArgs args) =>
-            {
-                var excelImportForm = new IOGenerationExcelImportForm(this.ExcelImportConfig, this.settings.GridSettings);
 
-                var dialogResult = excelImportForm.ShowDialog();
-                if (dialogResult == DialogResult.OK)
-                {
-                    var ioDataList = new List<IOData>();
-                    foreach (var importData in excelImportForm.ImportDataEnumerable)
-                    {
-                        ioDataList.Add(new IOData()
-                        {
-                            Address = importData.Address,
-                            IOName = importData.IOName,
-                            Comment = importData.Comment
-                        });
-                    }
-
-                    var ioDataCounter = 0;
-                    foreach (var emptyRowIndex in this.deviceGridHandler.DataSource.GetFirstEmptyRowIndexes(ioDataList.Count))
-                    {
-                        if (ioDataCounter >= ioDataList.Count)
-                        {
-                            break;
-                        }
-
-                        var ioData = ioDataList[ioDataCounter++];
-                        this.deviceGridHandler.ChangeRow(emptyRowIndex, ioData);
-                    }
-                }
-            };
             this.preferencesToolStripMenuItem.Click += (object sender, EventArgs args) =>
             {
                 var configForm = new ConfigForm("Preferenze");
@@ -148,11 +141,11 @@ namespace TiaXmlReader.GenerationForms.IO
                 configForm.AddColorPickerLine("Triangolo trascinamento")
                     .ApplyColor(settings.GridSettings.SelectedCellTriangleColor)
                     .ColorChanged(color => settings.GridSettings.SelectedCellTriangleColor = color);
-
+                /*
                 configForm.AddColorPickerLine("Anteprima")
                     .ApplyColor(this.Preferences.PreviewColor)
                     .ColorChanged(color => this.Preferences.PreviewColor = color);
-
+                */
                 configForm.StartShowingAtLocation(Cursor.Position);
                 configForm.Init();
                 configForm.Show(this);
@@ -164,7 +157,7 @@ namespace TiaXmlReader.GenerationForms.IO
             #region PartitionType ComboBox
             this.partitionTypeComboBox.DisplayMember = "Text";
             this.partitionTypeComboBox.ValueMember = "Value";
-            
+
             var partitionTypeItems = new List<object>();
             foreach (AlarmPartitionType partitionType in Enum.GetValues(typeof(AlarmPartitionType)))
             {
@@ -186,7 +179,7 @@ namespace TiaXmlReader.GenerationForms.IO
             #endregion
 
             #region CELL_PAINTERS
-            this.deviceGridHandler.AddCellPainter(new IOGenerationFormPreviewCellPainter(this.deviceGridHandler.DataSource, this.IOConfig, this.Preferences));
+            //this.deviceGridHandler.AddCellPainter(new IOGenerationFormPreviewCellPainter(this.deviceGridHandler.DataSource, this.IOConfig, this.Preferences));
             #endregion
 
             #region DRAG
@@ -195,29 +188,44 @@ namespace TiaXmlReader.GenerationForms.IO
             #endregion 
 
             #region DATA_ASSOCIATION
-            this.deviceGridHandler.SetDataAssociation(ADDRESS_COLUMN, ioData => ioData.Address);
-            this.deviceGridHandler.SetDataAssociation(IO_NAME_COLUMN, ioData => ioData.IOName);
-            this.deviceGridHandler.SetDataAssociation(DB_COLUMN, ioData => ioData.DBName);
-            this.deviceGridHandler.SetDataAssociation(VARIABLE_COLUMN, ioData => ioData.Variable);
-            this.deviceGridHandler.SetDataAssociation(COMMENT_COLUMN, ioData => ioData.Comment);
+            this.deviceGridHandler.SetDataAssociation(DEVICE_ADDRESS_COLUMN, deviceData => deviceData.Address);
+            this.deviceGridHandler.SetDataAssociation(DEVICE_DESCRIPTION_COLUMN, deviceData => deviceData.Description);
+
+            this.alarmGridHandler.SetDataAssociation(ALARM_VARIABLE_COLUMN, alarmData => alarmData.AlarmVariable);
+            this.alarmGridHandler.SetDataAssociation(ALARM_COIL_COLUMN, alarmData => alarmData.CoilAddress);
+            this.alarmGridHandler.SetDataAssociation(ALARM_SET_COIL_COLUMN, alarmData => alarmData.SetCoilAddress);
+            this.alarmGridHandler.SetDataAssociation(ALARM_TIMER_COLUMN, alarmData => alarmData.TimerAddress);
+            this.alarmGridHandler.SetDataAssociation(ALARM_TIMER_TYPE_COLUMN, alarmData => alarmData.TimerType);
+            this.alarmGridHandler.SetDataAssociation(ALARM_TIMER_VALUE_COLUMN, alarmData => alarmData.TimerValue);
+            this.alarmGridHandler.SetDataAssociation(ALARM_DESCRIPTION_COLUMN, alarmData => alarmData.Description);
+            this.alarmGridHandler.SetDataAssociation(ALARM_ENABLE_COLUMN, alarmData => alarmData.Enable);
             #endregion
 
             #region PREFERENCES
             #endregion
 
-            this.deviceGridHandler.Init();
-            this.configHandler.Init();
+
 
             //Column initialization after gridHandler.Init()
             #region COLUMNS
-            var addressColumn = (DataGridViewTextBoxColumn)this.deviceGridHandler.InitColumn(ADDRESS_COLUMN, "Indirizzo", 55);
-            addressColumn.MaxInputLength = 10;
+            var properties = typeof(DeviceData).GetProperties();
+            var deviceAddressColumn = this.deviceGridHandler.AddTextBoxColumn("Indirizzo", 85, properties[DEVICE_ADDRESS_COLUMN].Name);
+            var deviceDescriptionColumn = this.deviceGridHandler.AddTextBoxColumn("Descrizione", 0, properties[DEVICE_DESCRIPTION_COLUMN].Name);
 
-            var ioNameColumn = this.deviceGridHandler.InitColumn(IO_NAME_COLUMN, "Nome IO", 80);
-            var dbNameColumn = this.deviceGridHandler.InitColumn(DB_COLUMN, "DB", 80);
-            var variableColumn = this.deviceGridHandler.InitColumn(VARIABLE_COLUMN, "Variabile", 105);
-            var commentColumn = this.deviceGridHandler.InitColumn(COMMENT_COLUMN, "Commento", 0);
+            properties = typeof(AlarmData).GetProperties();
+            var alarmEnableColumn = this.alarmGridHandler.AddCheckBoxColumn("Abilita", 40, properties[ALARM_ENABLE_COLUMN].Name);
+            var alarmVariableColum = this.alarmGridHandler.AddTextBoxColumn("Variabile", 80, properties[ALARM_VARIABLE_COLUMN].Name);
+            var alarmCoilVariable = this.alarmGridHandler.AddTextBoxColumn("Indirizzo Bobina", 80, properties[ALARM_COIL_COLUMN].Name);
+            var alarmSetCoilColumn = this.alarmGridHandler.AddTextBoxColumn("Indirizzo Set", 80, properties[ALARM_SET_COIL_COLUMN].Name);
+            var alarmTimerColumn = this.alarmGridHandler.AddTextBoxColumn("Indirizzo Timer", 80, properties[ALARM_TIMER_COLUMN].Name);
+            var alarmTimerTypeColumn = this.alarmGridHandler.AddComboBoxColumn("Type", 60, new string[] { "TON", "TOF" }, properties[ALARM_TIMER_TYPE_COLUMN].Name);
+            var alarmTimerValueColumn = this.alarmGridHandler.AddTextBoxColumn("Valore Timer", 60, properties[ALARM_TIMER_VALUE_COLUMN].Name);
+            var alarmDescriptionColumn = this.alarmGridHandler.AddTextBoxColumn("Descrizione", 0, properties[ALARM_DESCRIPTION_COLUMN].Name);
             #endregion
+
+            this.deviceGridHandler?.Init();
+            this.alarmGridHandler?.Init();
+            this.configHandler?.Init();
 
             #region PROGRAM_SAVE_TICK
             var timer = new Timer { Interval = 1000 };
@@ -229,7 +237,7 @@ namespace TiaXmlReader.GenerationForms.IO
             {
                 //This is done this way because is impossible that fields are changed toghether for multiple configs. So at the first that is different, i create a snapshot and save to file!
                 var configEqual = Utils.ComparePublicFieldSnapshot(this.AlarmConfig, alarmConfigSnapshot);
-                if(!configEqual)
+                if (!configEqual)
                 {
                     alarmConfigSnapshot = Utils.CreatePublicFieldSnapshot(this.AlarmConfig);
                     this.settings.Save();
@@ -249,40 +257,57 @@ namespace TiaXmlReader.GenerationForms.IO
 
         public void ProjectSave(bool saveAs = false)
         {
-            /*
-            var projectSave = new IOGenerationProjectSave();
-            foreach (var entry in deviceGridHandler.DataSource.GetNotEmptyDataDict())
+            var projectSave = new AlarmGenerationProjectSave();
+            foreach (var entry in this.deviceGridHandler.DataSource.GetNotEmptyDataDict())
             {
-                projectSave.AddIOData(entry.Key, entry.Value);
+                projectSave.AddDeviceData(entry.Key, entry.Value);
+            }
+
+            foreach (var entry in this.alarmGridHandler.DataSource.GetNotEmptyDataDict())
+            {
+                projectSave.AddAlarmData(entry.Key, entry.Value);
             }
             projectSave.Save(ref lastFilePath, saveAs);
 
-            this.Text = this.Name + ". File: " + lastFilePath;*/
+            this.Text = this.Name + ". File: " + lastFilePath;
         }
 
         public void ProjectLoad()
         {
-            /*
-            var loadedProjectSave = IOGenerationProjectSave.Load(ref lastFilePath);
+            var loadedProjectSave = AlarmGenerationProjectSave.Load(ref lastFilePath);
             if (loadedProjectSave != null)
             {
+                this.AlarmDataGridView.SuspendLayout();
                 this.DeviceDataGridView.SuspendLayout();
+
+                this.alarmGridHandler.DataSource.InitializeData(this.alarmGridHandler.RowCount);
                 this.deviceGridHandler.DataSource.InitializeData(this.deviceGridHandler.RowCount);
 
-                foreach (var saveData in loadedProjectSave.SaveDataList)
+                foreach (var entry in loadedProjectSave.SaveData.DeviceDataDict)
                 {
-                    var rowIndex = saveData.RowIndex;
-                    if (rowIndex >= 0 && rowIndex <= TOTAL_ROW_COUNT)
+                    var rowIndex = entry.Key;
+                    if (rowIndex >= 0 && rowIndex <= this.deviceGridHandler.RowCount)
                     {
-                        saveData.SaveTo(this.deviceGridHandler.DataSource[saveData.RowIndex]);
+                        this.deviceGridHandler.DataSource[rowIndex].CopyFrom(entry.Value);
                     }
                 }
 
+                foreach (var entry in loadedProjectSave.SaveData.AlarmDataDict)
+                {
+                    var rowIndex = entry.Key;
+                    if (rowIndex >= 0 && rowIndex <= this.alarmGridHandler.RowCount)
+                    {
+                        this.alarmGridHandler.DataSource[rowIndex].CopyFrom(entry.Value);
+                    }
+                }
+
+                this.AlarmDataGridView.Refresh();
                 this.DeviceDataGridView.Refresh();
+                this.AlarmDataGridView.ResumeLayout();
                 this.DeviceDataGridView.ResumeLayout();
 
                 this.Text = this.Name + ". File: " + lastFilePath;
-            }*/
+            }
         }
     }
 }

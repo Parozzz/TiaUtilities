@@ -277,7 +277,7 @@
     <Compile Include="Localization\LocalizationHelper.cs" />
     <Compile Include="SimaticML\Attributes\Attribute.cs" />
     <Compile Include="Generation\IO_Cad\CadData.cs" />
-    <Compile Include="Generation\UserAlarms\AlarmXmlGeneration.cs" />
+    <Compile Include="Generation\UserAlarms\AlarmXmlGenerator.cs" />
     <Compile Include="Generation\IGeneration.cs" />
     <Compile Include="GenerationForms\IO\IOGenerationForm.cs">
       <SubType>Form</SubType>

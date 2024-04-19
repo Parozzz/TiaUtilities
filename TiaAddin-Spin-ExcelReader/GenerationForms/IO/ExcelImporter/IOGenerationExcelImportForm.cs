@@ -100,9 +100,9 @@ namespace TiaXmlReader.GenerationForms.IO.ExcelImporter
             gridHandler.Init();
 
             #region COLUMNS
-            var addressColumn = this.gridHandler.InitColumn(ADDRESS_COLUMN, "Indirizzo", 80);
-            var nameIOColumn = this.gridHandler.InitColumn(IONAME_COLUMN, "Nome IO", 110);
-            var commentColumn = this.gridHandler.InitColumn(COMMENT_COLUMN, "Commento", 0);
+            var addressColumn = this.gridHandler.AddTextBoxColumn("Indirizzo", 80);
+            var nameIOColumn = this.gridHandler.AddTextBoxColumn("Nome IO", 110);
+            var commentColumn = this.gridHandler.AddTextBoxColumn("Commento", 0);
             #endregion
 
             this.ConfigButton.Click += (object sender, EventArgs args) =>

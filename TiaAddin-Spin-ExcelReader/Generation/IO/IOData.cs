@@ -15,11 +15,11 @@ namespace TiaXmlReader.Generation.IO
 {
     public class IOData : IGridData
     {
-        public string Address { get; set; }
-        public string IOName { get; set; }
-        public string DBName { get; set; }
-        public string Variable { get; set; }
-        public string Comment {  get; set; }
+        [JsonProperty] public string Address {  get; set; }
+        [JsonProperty] public string IOName {  get; set; }
+        [JsonProperty] public string DBName {  get; set; }
+        [JsonProperty] public string Variable {  get; set; }
+        [JsonProperty] public string Comment { get; set; }
 
         public string this[int i]
         {
