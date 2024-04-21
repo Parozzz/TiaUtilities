@@ -10,7 +10,18 @@ namespace TiaXmlReader.Localization
 {
     public static class LocalizationHelper
     {
-        public static string GetDescription(this Enum enumValue)
+        public static string GetDescription(this MemberInfo memberInfo)
+        {
+            var displayAttribute = memberInfo.GetCustomAttribute<DisplayAttribute>();
+            if (displayAttribute == null)
+            {
+                return memberInfo.Name;
+            }
+
+            return displayAttribute.GetDescription() ?? "unknown";
+        }
+
+        public static string GetEnumDescription(this Enum enumValue)
         {
             return enumValue.GetType().GetMember(enumValue.ToString())
                 .FirstOrDefault()?
@@ -23,8 +34,8 @@ namespace TiaXmlReader.Localization
             enumValue = default(T);
             foreach (T loopEnumValue in Enum.GetValues(typeof(T)))
             {
-                var description = loopEnumValue.GetDescription();
-                if(displayString.ToLower() == description.ToLower())
+                var description = loopEnumValue.GetEnumDescription();
+                if (displayString.ToLower() == description.ToLower())
                 {
                     enumValue = loopEnumValue;
                     return true;

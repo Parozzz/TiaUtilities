@@ -51,6 +51,12 @@ namespace TiaXmlReader.GenerationForms.IO.Config
             return this;
         }
 
+        public ConfigFormComboBoxLine Items(object[] items)
+        {
+            this.control.Items.AddRange(items);
+            return this;
+        }
+
         public ConfigFormComboBoxLine TextChanged(Action<string> action)
         {
             this.textChangedAction = action;

@@ -1,50 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using TiaXmlReader.Generation;
 using TiaXmlReader.UndoRedo;
 using static TiaXmlReader.GenerationForms.GridHandler.GridExcelDragHandler;
-using TiaXmlReader.GenerationForms.GridHandler;
-using TiaXmlReader.GenerationForms.IO;
-using TiaXmlReader.Generation.IO;
 using TiaXmlReader.Utility;
+using TiaXmlReader.GenerationForms.GridHandler.Data;
 
 namespace TiaXmlReader.GenerationForms.GridHandler
 {
     public class GridHandler<T> where T : IGridData
     {
+        private class ColumnInfo
+        {
+            public DataGridViewColumn Column { get; set; }
+            public string Name { get; set; }
+            public int Width { get; set; }
+            public string DataPropertyName { get; set; } = "";
+            public int ColumnIndex { get; set; } = 1;
+        }
+
         private readonly DataGridView dataGridView;
         private readonly GridSettings settings;
+        public GridDataHandler<T> Associator { get; private set; }
         public GridDataSource<T> DataSource { get; private set; }
         private readonly UndoRedoHandler undoRedoHandler;
         private readonly GridExcelDragHandler excelDragHandler;
         private readonly GridSortHandler<T> sortHandler;
-        private readonly GridCellChangeAssociator<T> associator;
+        
+        private readonly List<ColumnInfo> columnInfoList = new List<ColumnInfo>();
 
         private readonly List<IGridCellPainter> cellPainterList;
 
-        public uint RowCount { get; set; } = 1999;
+        public uint RowCount { get; set; } = 9;
         public bool AddRowIndexToRowHeader { get; set; } = true;
         public bool EnablePasteFromExcel { get; set; } = true;
         public bool EnableRowSelectionFromRowHeaderClick { get; set; } = true;
 
-        public GridHandler(DataGridView dataGridView, GridSettings settings, Func<T> newObjectFunction, Action<T, T> trasferDataAction, IGridRowComparer<T> comparer = null)
+        public GridHandler(DataGridView dataGridView, GridSettings settings, List<GridDataColumn> dataColumnList, IGridRowComparer<T> comparer = null)
         {
             this.dataGridView = dataGridView;
 
             this.settings = settings;
-            this.DataSource = new GridDataSource<T>(this.dataGridView, newObjectFunction, trasferDataAction);
+            this.Associator = new GridDataHandler<T>(this.dataGridView, dataColumnList);
+            this.DataSource = new GridDataSource<T>(this.dataGridView, this.Associator);
             this.undoRedoHandler = new UndoRedoHandler();
             this.excelDragHandler = new GridExcelDragHandler(this.dataGridView, settings);
             this.sortHandler = new GridSortHandler<T>(this.dataGridView, this.DataSource, this.undoRedoHandler, comparer);
-            this.associator = new GridCellChangeAssociator<T>(this.dataGridView);
+           
 
             this.cellPainterList = new List<IGridCellPainter>();
         }
@@ -64,9 +70,10 @@ namespace TiaXmlReader.GenerationForms.GridHandler
             this.excelDragHandler.SetMouseUpAction(action);
         }
 
-        public void SetDataAssociation(int columnIndex, Func<T, object> func)
+        public void Refresh()
         {
-            associator.SetAssociation(columnIndex, func);
+            this.dataGridView.RefreshEdit();
+            this.dataGridView.Refresh();
         }
 
         public void Init()
@@ -89,6 +96,32 @@ namespace TiaXmlReader.GenerationForms.GridHandler
             this.dataGridView.DataError += DataErrorEventHandler;
 
             this.DataSource.InitializeData(this.RowCount);
+
+            #region COLUMNS
+
+            columnInfoList.Sort((one, two) => one.ColumnIndex.CompareTo(two.ColumnIndex));
+            foreach (var columnInfo in columnInfoList)
+            {
+                var column = columnInfo.Column;
+                column.Name = columnInfo.Name;
+                column.DataPropertyName = columnInfo.DataPropertyName;
+                column.DefaultCellStyle.SelectionBackColor = Color.LightGray;
+                column.DefaultCellStyle.BackColor = SystemColors.ControlLightLight;
+                column.DefaultCellStyle.SelectionForeColor = Color.Black;
+                column.DefaultCellStyle.ForeColor = Color.Black;
+                column.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+                column.Width = columnInfo.Width;
+                column.AutoSizeMode = columnInfo.Width <= 0 ? DataGridViewAutoSizeColumnMode.Fill : DataGridViewAutoSizeColumnMode.None;
+                column.SortMode = DataGridViewColumnSortMode.Programmatic;
+
+                column.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                column.HeaderCell.Style.Padding = new Padding(0);
+                column.HeaderCell.Style.WrapMode = DataGridViewTriState.True;
+
+                this.dataGridView.Columns.Add(column);
+            }
+
+            #endregion
 
             #region Cell Paiting
             var paintHandler = new GridCellPaintHandler(this.dataGridView);
@@ -267,52 +300,49 @@ namespace TiaXmlReader.GenerationForms.GridHandler
             }
         }
 
-        public DataGridViewTextBoxColumn AddTextBoxColumn(string name, int width, string dataPropertyName = "")
+        public DataGridViewTextBoxColumn AddTextBoxColumn(GridDataColumn column, int width)
         {
-            var column = new DataGridViewTextBoxColumn()
-            {
-                DataPropertyName = dataPropertyName
-            };
-            return this.InitColumn(column, name, width);
+            return this.AddTextBoxColumn(column.Name, width, column.DataPropertyName, column.ColumnIndex);
         }
 
-        public DataGridViewCheckBoxColumn AddCheckBoxColumn(string name, int width, string dataPropertyName = "")
+        public DataGridViewTextBoxColumn AddTextBoxColumn(string name, int width, string dataPropertyName = "", int columnIndex = 1)
         {
-            var column = new DataGridViewCheckBoxColumn()
-            {
-                DataPropertyName = dataPropertyName
-            };
-            return this.InitColumn(column, name, width);
+            return AddColumn(new DataGridViewTextBoxColumn(), name, width, columnIndex, dataPropertyName);
         }
 
-        public DataGridViewComboBoxColumn AddComboBoxColumn(string name, int width, string[] items, string dataPropertyName = "")
+        public DataGridViewCheckBoxColumn AddCheckBoxColumn(GridDataColumn column, int width)
         {
-            var column = new DataGridViewComboBoxColumn()
-            {
-                DataPropertyName = dataPropertyName
-            };
+            return AddColumn(new DataGridViewCheckBoxColumn(), column.Name, width, column.ColumnIndex, column.DataPropertyName);
+        }
+
+        public DataGridViewCheckBoxColumn AddCheckBoxColumn(string name, int width, string dataPropertyName = "", int columnIndex = 1)
+        {
+            return AddColumn(new DataGridViewCheckBoxColumn(), name, width, columnIndex, dataPropertyName);
+        }
+
+        public DataGridViewComboBoxColumn AddComboBoxColumn(GridDataColumn column, int width, string[] items)
+        {
+            return AddComboBoxColumn(column.Name, width, items, column.DataPropertyName, column.ColumnIndex);
+        }
+
+        public DataGridViewComboBoxColumn AddComboBoxColumn(string name, int width, string[] items, string dataPropertyName = "", int columnIndex = 1)
+        {
+            var column = AddColumn(new DataGridViewComboBoxColumn(), name, width, columnIndex, dataPropertyName);
             column.Items.AddRange(items);
             column.FlatStyle = FlatStyle.Flat;
-            return this.InitColumn(column, name, width);
+            return column;
         }
 
-        private C InitColumn<C>(C column, string name, int width) where C : DataGridViewColumn
+        private C AddColumn<C>(C column, string name, int width, int columnIndex = 1, string dataPropertyName = "") where C : DataGridViewColumn
         {
-            column.Name = name;
-            column.DefaultCellStyle.SelectionBackColor = Color.LightGray;
-            column.DefaultCellStyle.BackColor = SystemColors.ControlLightLight;
-            column.DefaultCellStyle.SelectionForeColor = Color.Black;
-            column.DefaultCellStyle.ForeColor = Color.Black;
-            column.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            column.Width = width;
-            column.AutoSizeMode = width <= 0 ? DataGridViewAutoSizeColumnMode.Fill : DataGridViewAutoSizeColumnMode.None;
-            column.SortMode = DataGridViewColumnSortMode.Programmatic;
-
-            column.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            column.HeaderCell.Style.Padding = new Padding(0);
-
-            this.dataGridView.Columns.Add(column);
-
+            this.columnInfoList.Add(new ColumnInfo()
+            {
+                Column = column,
+                Name = name,
+                Width = width,
+                DataPropertyName = dataPropertyName,
+                ColumnIndex = columnIndex
+            });
             return column;
         }
 
@@ -374,7 +404,7 @@ namespace TiaXmlReader.GenerationForms.GridHandler
             var deletedCellList = new List<GridCellChange>();
             foreach (DataGridViewCell selectedCell in dataGridView.SelectedCells)
             {
-                deletedCellList.Add(new GridCellChange(selectedCell) { NewValue = "" });
+                deletedCellList.Add(new GridCellChange(selectedCell) { NewValue = null }); //Set value to null so it will clear also checkboxes
             }
 
             this.ChangeCells(deletedCellList);
@@ -382,12 +412,12 @@ namespace TiaXmlReader.GenerationForms.GridHandler
 
         public void ChangeRow(int rowIndex, T data)
         {
-            this.ChangeCells(this.associator.CreateCellChanges(rowIndex, data));
+            this.ChangeCells(this.Associator.CreateCellChanges(rowIndex, data));
         }
 
         public void ChangeRow(int rowIndex, ICollection<T> dataCollection)
         {
-            this.ChangeCells(this.associator.CreateCellChanges(rowIndex, dataCollection));
+            this.ChangeCells(this.Associator.CreateCellChanges(rowIndex, dataCollection));
         }
 
         public void ChangeCell(GridCellChange cell, bool applyChanges = true)

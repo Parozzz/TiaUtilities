@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using TiaXmlReader.CustomControls;
+using TiaXmlReader.GenerationForms.Config;
 
 namespace TiaXmlReader.GenerationForms.IO.Config
 {
@@ -44,6 +45,13 @@ namespace TiaXmlReader.GenerationForms.IO.Config
         public ConfigFormTextBoxLine AddTextBoxLine(string labelText)
         {
             var line = new ConfigFormTextBoxLine(labelText);
+            this.AddConfigLine(line);
+            return line;
+        }
+
+        public ConfigFormCheckBoxLine AddCheckBoxLine(string labelText)
+        {
+            var line = new ConfigFormCheckBoxLine(labelText);
             this.AddConfigLine(line);
             return line;
         }

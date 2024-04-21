@@ -22,34 +22,11 @@ namespace TiaXmlReader.GenerationForms.IO
 {
     public partial class AlarmGenerationForm : Form
     {
-        public const int TOTAL_ROW_COUNT = 1999;
-
-        public const int DEVICE_ADDRESS_COLUMN = 0;
-        public const int DEVICE_DESCRIPTION_COLUMN = 1;
-
-        public const int ALARM_ENABLE_COLUMN = 0;
-        public const int ALARM_VARIABLE_COLUMN = 1;
-        public const int ALARM_COIL_COLUMN = 2;
-        public const int ALARM_SET_COIL_COLUMN = 3;
-        public const int ALARM_TIMER_COLUMN = 4;
-        public const int ALARM_TIMER_TYPE_COLUMN = 5;
-        public const int ALARM_TIMER_VALUE_COLUMN = 6;
-        public const int ALARM_DESCRIPTION_COLUMN = 7;
-
-
-        /*
-        public const int ADDRESS_COLUMN = 0;
-        public const int IO_NAME_COLUMN = 1;
-        public const int DB_COLUMN = 2;
-        public const int VARIABLE_COLUMN = 3;
-        public const int COMMENT_COLUMN = 4;
-        */
-        private readonly GridHandler<AlarmData> alarmGridHandler;
         private readonly GridHandler<DeviceData> deviceGridHandler;
-
+        private readonly GridHandler<AlarmData> alarmGridHandler;
 
         private readonly AlarmGenerationSettings settings;
-        private readonly IOGenerationFormConfigHandler configHandler = null;
+        private readonly AlarmGenerationFormConfigHandler configHandler = null;
         private AlarmConfiguration AlarmConfig { get => settings.Configuration; }
 
         private string lastFilePath;
@@ -61,16 +38,17 @@ namespace TiaXmlReader.GenerationForms.IO
             settings = AlarmGenerationSettings.Load();
             settings.Save(); //This could be avoided but is to be sure that all the classes that are created new will be saved to file!
 
-            this.alarmGridHandler = new GridHandler<AlarmData>(this.AlarmDataGridView, settings.GridSettings, () => new AlarmData(), (oldData, newData) => oldData.CopyFrom(newData), null)
+            this.deviceGridHandler = new GridHandler<DeviceData>(this.DeviceDataGridView, settings.GridSettings, DeviceData.COLUMN_LIST, null)
+            {
+                RowCount = 499
+            };
+
+            this.alarmGridHandler = new GridHandler<AlarmData>(this.AlarmDataGridView, settings.GridSettings, AlarmData.COLUMN_LIST, null)
             {
                 RowCount = 29
             };
 
-            this.deviceGridHandler = new GridHandler<DeviceData>(this.DeviceDataGridView, settings.GridSettings, () => new DeviceData(), (oldData, newData) => oldData.CopyFrom(newData), null)
-            {
-                RowCount = 499
-            };
-            //this.configHandler = new IOGenerationFormConfigHandler(this, IOConfig, this.dataGridView);
+            this.configHandler = new AlarmGenerationFormConfigHandler(this, this.AlarmConfig, this.deviceGridHandler, this.alarmGridHandler);
 
             Init();
         }
@@ -161,7 +139,7 @@ namespace TiaXmlReader.GenerationForms.IO
             var partitionTypeItems = new List<object>();
             foreach (AlarmPartitionType partitionType in Enum.GetValues(typeof(AlarmPartitionType)))
             {
-                partitionTypeItems.Add(new { Text = partitionType.GetDescription(), Value = partitionType });
+                partitionTypeItems.Add(new { Text = partitionType.GetEnumDescription(), Value = partitionType });
             }
             this.partitionTypeComboBox.DataSource = partitionTypeItems;
             #endregion
@@ -173,7 +151,7 @@ namespace TiaXmlReader.GenerationForms.IO
             var gropingTypeItems = new List<object>();
             foreach (AlarmGroupingType groupingType in Enum.GetValues(typeof(AlarmGroupingType)))
             {
-                gropingTypeItems.Add(new { Text = groupingType.GetDescription(), Value = groupingType });
+                gropingTypeItems.Add(new { Text = groupingType.GetEnumDescription(), Value = groupingType });
             }
             this.groupingTypeComboBox.DataSource = gropingTypeItems;
             #endregion
@@ -183,44 +161,28 @@ namespace TiaXmlReader.GenerationForms.IO
             #endregion
 
             #region DRAG
-            this.deviceGridHandler.SetDragPreviewAction(data => { IOGenerationUtils.DragPreview(data, this.deviceGridHandler); });
-            this.deviceGridHandler.SetDragMouseUpAction(data => { IOGenerationUtils.DragMouseUp(data, this.deviceGridHandler); });
+            this.deviceGridHandler.SetDragPreviewAction(data => { GenerationUtils.DragPreview(data, this.deviceGridHandler); });
+            this.deviceGridHandler.SetDragMouseUpAction(data => { GenerationUtils.DragMouseUp(data, this.deviceGridHandler); });
+
+            this.alarmGridHandler.SetDragPreviewAction(data => { GenerationUtils.DragPreview(data, this.alarmGridHandler); });
+            this.alarmGridHandler.SetDragMouseUpAction(data => { GenerationUtils.DragMouseUp(data, this.alarmGridHandler); });
             #endregion 
-
-            #region DATA_ASSOCIATION
-            this.deviceGridHandler.SetDataAssociation(DEVICE_ADDRESS_COLUMN, deviceData => deviceData.Address);
-            this.deviceGridHandler.SetDataAssociation(DEVICE_DESCRIPTION_COLUMN, deviceData => deviceData.Description);
-
-            this.alarmGridHandler.SetDataAssociation(ALARM_VARIABLE_COLUMN, alarmData => alarmData.AlarmVariable);
-            this.alarmGridHandler.SetDataAssociation(ALARM_COIL_COLUMN, alarmData => alarmData.CoilAddress);
-            this.alarmGridHandler.SetDataAssociation(ALARM_SET_COIL_COLUMN, alarmData => alarmData.SetCoilAddress);
-            this.alarmGridHandler.SetDataAssociation(ALARM_TIMER_COLUMN, alarmData => alarmData.TimerAddress);
-            this.alarmGridHandler.SetDataAssociation(ALARM_TIMER_TYPE_COLUMN, alarmData => alarmData.TimerType);
-            this.alarmGridHandler.SetDataAssociation(ALARM_TIMER_VALUE_COLUMN, alarmData => alarmData.TimerValue);
-            this.alarmGridHandler.SetDataAssociation(ALARM_DESCRIPTION_COLUMN, alarmData => alarmData.Description);
-            this.alarmGridHandler.SetDataAssociation(ALARM_ENABLE_COLUMN, alarmData => alarmData.Enable);
-            #endregion
 
             #region PREFERENCES
             #endregion
+            //Column initialization before gridHandler.Init()
+            #region COLUMNS;
+            this.deviceGridHandler.AddTextBoxColumn(DeviceData.ADDRESS, 85);
+            this.deviceGridHandler.AddTextBoxColumn(DeviceData.DESCRIPTION, 0);
 
-
-
-            //Column initialization after gridHandler.Init()
-            #region COLUMNS
-            var properties = typeof(DeviceData).GetProperties();
-            var deviceAddressColumn = this.deviceGridHandler.AddTextBoxColumn("Indirizzo", 85, properties[DEVICE_ADDRESS_COLUMN].Name);
-            var deviceDescriptionColumn = this.deviceGridHandler.AddTextBoxColumn("Descrizione", 0, properties[DEVICE_DESCRIPTION_COLUMN].Name);
-
-            properties = typeof(AlarmData).GetProperties();
-            var alarmEnableColumn = this.alarmGridHandler.AddCheckBoxColumn("Abilita", 40, properties[ALARM_ENABLE_COLUMN].Name);
-            var alarmVariableColum = this.alarmGridHandler.AddTextBoxColumn("Variabile", 80, properties[ALARM_VARIABLE_COLUMN].Name);
-            var alarmCoilVariable = this.alarmGridHandler.AddTextBoxColumn("Indirizzo Bobina", 80, properties[ALARM_COIL_COLUMN].Name);
-            var alarmSetCoilColumn = this.alarmGridHandler.AddTextBoxColumn("Indirizzo Set", 80, properties[ALARM_SET_COIL_COLUMN].Name);
-            var alarmTimerColumn = this.alarmGridHandler.AddTextBoxColumn("Indirizzo Timer", 80, properties[ALARM_TIMER_COLUMN].Name);
-            var alarmTimerTypeColumn = this.alarmGridHandler.AddComboBoxColumn("Type", 60, new string[] { "TON", "TOF" }, properties[ALARM_TIMER_TYPE_COLUMN].Name);
-            var alarmTimerValueColumn = this.alarmGridHandler.AddTextBoxColumn("Valore Timer", 60, properties[ALARM_TIMER_VALUE_COLUMN].Name);
-            var alarmDescriptionColumn = this.alarmGridHandler.AddTextBoxColumn("Descrizione", 0, properties[ALARM_DESCRIPTION_COLUMN].Name);
+            this.alarmGridHandler.AddCheckBoxColumn(AlarmData.ENABLE, 40);
+            this.alarmGridHandler.AddTextBoxColumn(AlarmData.ALARM_VARIABLE, 80);
+            this.alarmGridHandler.AddTextBoxColumn(AlarmData.COIL_ADDRESS, 80);
+            this.alarmGridHandler.AddTextBoxColumn(AlarmData.SET_COIL_ADDRESS, 80);
+            this.alarmGridHandler.AddTextBoxColumn(AlarmData.TIMER_ADDRESS, 80);
+            this.alarmGridHandler.AddComboBoxColumn(AlarmData.TIMER_TYPE, 60, new string[] { "TON", "TOF" });
+            this.alarmGridHandler.AddTextBoxColumn(AlarmData.TIMER_VALUE, 60);
+            this.alarmGridHandler.AddTextBoxColumn(AlarmData.DESCRIPTION, 0);
             #endregion
 
             this.deviceGridHandler?.Init();
@@ -288,7 +250,8 @@ namespace TiaXmlReader.GenerationForms.IO
                     var rowIndex = entry.Key;
                     if (rowIndex >= 0 && rowIndex <= this.deviceGridHandler.RowCount)
                     {
-                        this.deviceGridHandler.DataSource[rowIndex].CopyFrom(entry.Value);
+                        var data = this.deviceGridHandler.DataSource[rowIndex];
+                        this.deviceGridHandler.Associator.MoveValues(entry.Value, data);
                     }
                 }
 
@@ -297,7 +260,8 @@ namespace TiaXmlReader.GenerationForms.IO
                     var rowIndex = entry.Key;
                     if (rowIndex >= 0 && rowIndex <= this.alarmGridHandler.RowCount)
                     {
-                        this.alarmGridHandler.DataSource[rowIndex].CopyFrom(entry.Value);
+                        var data = this.alarmGridHandler.DataSource[rowIndex];
+                        this.alarmGridHandler.Associator.MoveValues(entry.Value, data);
                     }
                 }
 

@@ -1,24 +1,49 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TiaXmlReader.Generation;
+using TiaXmlReader.Generation.IO;
 using TiaXmlReader.GenerationForms.GridHandler;
+using TiaXmlReader.GenerationForms.GridHandler.Data;
 
 namespace TiaXmlReader.Generation.UserAlarms
 {
     public class DeviceData : IGridData
     {
-        [JsonProperty] public string Address { get; set; }
-        [JsonProperty] public string Description { get; set; }
+        public static int COLUMN_COUNT = 0;
+        //THESE IS THE ORDER IN WHICH THEY APPEAR!
+        public static readonly GridDataColumn ADDRESS;
+        public static readonly GridDataColumn DESCRIPTION;
+        public static readonly List<GridDataColumn> COLUMN_LIST;
 
-        public void CopyFrom(DeviceData data)
+        static DeviceData()
         {
-            this.Address = data.Address;
-            this.Description = data.Description;
+            var type = typeof(DeviceData);
+            ADDRESS = GridDataColumn.GetFromReflection(COLUMN_COUNT++, type.GetProperty("Address"));
+            DESCRIPTION = GridDataColumn.GetFromReflection(COLUMN_COUNT++, type.GetProperty("Description"));
+
+            COLUMN_LIST = new List<GridDataColumn>();
+            foreach (var field in type.GetFields())
+            {
+                if (field.IsStatic && field.FieldType == typeof(GridDataColumn))
+                {
+                    COLUMN_LIST.Add((GridDataColumn)field.GetValue(null));
+                }
+            }
+            COLUMN_LIST.Sort((x, y) => x.ColumnIndex.CompareTo(y.ColumnIndex));
         }
+
+        [JsonProperty]
+        [Display(Description = "DEVICE_DATA_ADDRESS", ResourceType = typeof(Localization.Alarm.AlarmGenerationLocalization))]
+        public string Address { get; set; }
+
+        [JsonProperty]
+        [Display(Description = "DEVICE_DATA_DESCRIPTION", ResourceType = typeof(Localization.Alarm.AlarmGenerationLocalization))]
+        public string Description { get; set; }
 
         public void Clear()
         {

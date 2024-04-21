@@ -7,139 +7,163 @@ using System.Windows.Forms;
 using TiaXmlReader.Generation.IO;
 using TiaXmlReader.GenerationForms.IO.Config;
 using TiaXmlReader.GenerationForms.IO;
+using TiaXmlReader.Generation.UserAlarms;
+using TiaXmlReader.GenerationForms.GridHandler;
 
 namespace TiaXmlReader.GenerationForms.Alarms
 {
     public class AlarmGenerationFormConfigHandler
     {
         private readonly AlarmGenerationForm form;
-        private readonly IOConfiguration config;
-        private readonly DataGridView dataGridView;
+        private readonly AlarmConfiguration config;
+        private readonly GridHandler<DeviceData> deviceDataGridHandler;
+        private readonly GridHandler<AlarmData> alarmDataGridHandler;
 
-        public AlarmGenerationFormConfigHandler(AlarmGenerationForm form, IOConfiguration config, DataGridView dataGridView)
+        public AlarmGenerationFormConfigHandler(AlarmGenerationForm form, AlarmConfiguration config, 
+                                                    GridHandler<DeviceData> deviceDataGridHandler, GridHandler<AlarmData> alarmDataGridHandler)
         {
             this.form = form;
             this.config = config;
-            this.dataGridView = dataGridView;
+            this.deviceDataGridHandler = deviceDataGridHandler;
+            this.alarmDataGridHandler = alarmDataGridHandler;
         }
 
         public void Init()
-        {/*
-            form.groupingTypeComboBox.SelectedValue = config.GroupingType;
-            form.groupingTypeComboBox.SelectionChangeCommitted += (object sender, EventArgs args) =>
-            {
-                config.GroupingType = (IOGroupingTypeEnum)form.groupingTypeComboBox.SelectedValue;
-                this.dataGridView.Refresh();
-            };
+        {
+            var comboBox = form.partitionTypeComboBox;
+            comboBox.SelectedValue = config.PartitionType;
+            comboBox.SelectionChangeCommitted += (sender, args) => { config.PartitionType = (AlarmPartitionType)form.groupingTypeComboBox.SelectedValue; };
 
-            form.partitionTypeComboBox.SelectedValue = config.MemoryType;
-            form.partitionTypeComboBox.SelectionChangeCommitted += (object sender, EventArgs args) =>
-            {
-                config.MemoryType = (IOMemoryTypeEnum)form.partitionTypeComboBox.SelectedValue;
-                this.dataGridView.Refresh();
-            };
+            comboBox = form.groupingTypeComboBox;
+            comboBox.SelectedValue = config.GroupingType;
+            comboBox.SelectionChangeCommitted += (sender, args) => { config.GroupingType = (AlarmGroupingType)form.partitionTypeComboBox.SelectedValue; };
 
             form.fcConfigButton.Click += (object sender, EventArgs args) =>
             {
                 var configForm = new ConfigForm("FC");
                 configForm.AddTextBoxLine("Nome")
                     .ControlText(config.FCBlockName)
-                    .TextChanged(str => config.FCBlockName = str);
+                    .TextChanged(v => config.FCBlockName = v);
 
                 configForm.AddTextBoxLine("Numero")
                     .ControlText(config.FCBlockNumber)
-                    .UIntChanged(num => config.FCBlockNumber = num);
+                    .UIntChanged(v => config.FCBlockNumber = v);
+
+                configForm.AddCheckBoxLine("Genera prima bobina")
+                    .Value(config.CoilFirst)
+                    .CheckedChanged(v => config.CoilFirst = v);
 
                 SetupConfigForm(form.fcConfigButton, configForm);
             };
 
-            form.dbConfigButton.Click += (object sender, EventArgs args) =>
+            form.alarmGenerationConfigButton.Click += (object sender, EventArgs args) =>
             {
-                var configForm = new ConfigForm("DB Appoggi");
-                configForm.AddTextBoxLine("Nome")
-                    .ControlText(config.DBName)
-                    .TextChanged(str => config.DBName = str);
+                var configForm = new ConfigForm("Generazione Allarmi");
+                configForm.AddTextBoxLine("Num. Partenza")
+                    .ControlText(config.StartingAlarmNum)
+                    .UIntChanged(v => config.StartingAlarmNum = v);
 
-                configForm.AddTextBoxLine("Numero")
-                    .ControlText(config.DBNumber)
-                    .UIntChanged(num => config.DBNumber = num);
+                configForm.AddTextBoxLine("Formato")
+                    .ControlText(config.AlarmNumFormat)
+                    .TextChanged(v => config.AlarmNumFormat = v);
 
-                configForm.AddTextBoxLine("Prefisso In")
-                    .ControlText(config.PrefixInputDB)
-                    .TextChanged(str => config.PrefixInputDB = str);
+                configForm.AddTextBoxLine("Anti slittamento")
+                    .ControlText(config.AntiSlipNumber)
+                    .UIntChanged(v => config.AntiSlipNumber = v);
 
-                configForm.AddTextBoxLine("Prefisso Out")
-                    .ControlText(config.PrefixOutputDB)
-                    .TextChanged(str => config.PrefixOutputDB = str);
+                configForm.AddTextBoxLine("Salta a fine gruppo")
+                    .ControlText(config.SkipNumberAfterGroup)
+                    .UIntChanged(v => config.SkipNumberAfterGroup = v);
 
-                configForm.AddTextBoxLine("Nome variabile default")
-                    .ControlText(config.DefaultVariableName)
-                    .TextChanged(str => config.DefaultVariableName = str);
+                configForm.AddCheckBoxLine("Genera vuoti alla fine")
+                    .Value(config.GenerateEmptyAlarmAntiSlip)
+                    .CheckedChanged(v => config.GenerateEmptyAlarmAntiSlip = v);
 
-                SetupConfigForm(form.dbConfigButton, configForm);
+                configForm.AddTextBoxLine("Vuoti alla fine")
+                    .ControlText(config.EmptyAlarmAtEnd)
+                    .UIntChanged(v => config.EmptyAlarmAtEnd = v);
+
+                configForm.AddTextBoxLine("Indirizzo vuoti")
+                    .ControlText(config.EmptyAlarmContactAddress)
+                    .TextChanged(v => config.EmptyAlarmContactAddress = v);
+
+                SetupConfigForm(form.alarmGenerationConfigButton, configForm);
             };
 
-            form.variableTableConfigButton.Click += (object sender, EventArgs args) =>
+            form.fieldDefaultValueConfigButton.Click += (object sender, EventArgs args) =>
             {
-                var configForm = new ConfigForm("Tabella Appoggi");
-                configForm.AddTextBoxLine("Nome")
-                    .ControlText(config.VariableTableName)
-                    .TextChanged(str => config.VariableTableName = str);
+                var configForm = new ConfigForm("Valori default campi");
+                configForm.AddTextBoxLine("Bobina")
+                    .ControlText(config.DefaultCoilAddress)
+                    .TextChanged(v => config.DefaultCoilAddress = v);
 
-                configForm.AddTextBoxLine("Indirizzo Start")
-                    .ControlText(config.VariableTableStartAddress)
-                    .UIntChanged(num => config.VariableTableStartAddress = num);
+                configForm.AddTextBoxLine("Set")
+                    .ControlText(config.DefaultSetCoilAddress)
+                    .TextChanged(v => config.DefaultSetCoilAddress = v);
 
-                configForm.AddTextBoxLine("Nuova ogni n° bit")
-                    .ControlText(config.VariableTableSplitEvery)
-                    .UIntChanged(num => config.VariableTableSplitEvery = num);
+                configForm.AddTextBoxLine("Timer")
+                    .ControlText(config.DefaultTimerAddress)
+                    .TextChanged(v => config.DefaultTimerAddress = v);
 
-                configForm.AddTextBoxLine("Prefisso In")
-                    .ControlText(config.PrefixInputMerker)
-                    .TextChanged(str => config.PrefixInputMerker = str);
+                configForm.AddComboBoxLine("Timer tipo")
+                    .ControlText(config.DefaultTimerType)
+                    .Items(new string[] { "TON", "TOF" })
+                    .TextChanged(v => config.DefaultTimerType = v);
 
-                configForm.AddTextBoxLine("Prefisso Out")
-                    .ControlText(config.PrefixOutputMerker)
-                    .TextChanged(str => config.PrefixOutputMerker = str);
+                configForm.AddTextBoxLine("Timer valore")
+                    .ControlText(config.DefaultTimerValue)
+                    .TextChanged(v => config.DefaultTimerValue = v);
 
-                configForm.AddTextBoxLine("Nome variabile default")
-                    .ControlText(config.DefaultVariableName)
-                    .TextChanged(str => config.DefaultVariableName = str);
-
-                SetupConfigForm(form.variableTableConfigButton, configForm);
+                SetupConfigForm(form.fieldDefaultValueConfigButton, configForm);
             };
 
-            form.ioTableConfigButton.Click += (object sender, EventArgs args) =>
+            form.fieldPrefixConfigButton.Click += (object sender, EventArgs args) =>
             {
-                var configForm = new ConfigForm("Tabella IN/OUT");
-                configForm.AddTextBoxLine("Nome")
-                    .ControlText(config.IOTableName)
-                    .TextChanged(str => config.IOTableName = str);
+                var configForm = new ConfigForm("Prefissi campi");
+                configForm.AddTextBoxLine("Indirizzo allarme")
+                    .ControlText(config.AlarmAddressPrefix)
+                    .TextChanged(v => config.AlarmAddressPrefix = v);
 
-                configForm.AddTextBoxLine("Nuova ogni n° bit")
-                    .ControlText(config.IOTableSplitEvery)
-                    .UIntChanged(num => config.IOTableSplitEvery = num);
+                configForm.AddTextBoxLine("Indirizzo bobina")
+                    .ControlText(config.CoilAddressPrefix)
+                    .TextChanged(v => config.CoilAddressPrefix = v);
 
-                configForm.AddTextBoxLine("Nome tag default")
-                    .ControlText(config.DefaultIoName)
-                    .TextChanged(str => config.DefaultIoName = str);
+                configForm.AddTextBoxLine("Indirizzo set")
+                    .ControlText(config.SetCoilAddressPrefix)
+                    .TextChanged(v => config.SetCoilAddressPrefix = v);
 
-                SetupConfigForm(form.ioTableConfigButton, configForm);
+                configForm.AddTextBoxLine("Indirizzo timer")
+                    .ControlText(config.TimerAddressPrefix)
+                    .TextChanged(v => config.TimerAddressPrefix = v);
+
+                SetupConfigForm(form.fieldPrefixConfigButton, configForm);
             };
 
             form.segmentNameConfigButton.Click += (object sender, EventArgs args) =>
             {
-                var configForm = new ConfigForm("Nomi segmenti generati");
-                configForm.AddTextBoxLine("Divisione per bit")
-                    .ControlText(config.SegmentNameBitGrouping)
-                    .TextChanged(str => config.SegmentNameBitGrouping = str);
+                var configForm = new ConfigForm("Nomi segmenti generati")
+                {
+                    ControlWidth = 500
+                };
 
-                configForm.AddTextBoxLine("Divisione per byte")
-                    .ControlText(config.SegmentNameByteGrouping)
-                    .TextChanged(str => config.SegmentNameByteGrouping = str);
+                configForm.AddTextBoxLine("Uno per segmento")
+                    .ControlText(config.OneEachSegmentName)
+                    .TextChanged(v => config.OneEachSegmentName = v);
+
+                configForm.AddTextBoxLine("Uno per segmento (Vuoti)")
+                    .ControlText(config.OneEachEmptyAlarmSegmentName)
+                    .TextChanged(v => config.OneEachEmptyAlarmSegmentName = v);
+
+                configForm.AddTextBoxLine("Gruppo per segmento")
+                    .ControlText(config.GroupSegmentName)
+                    .TextChanged(v => config.GroupSegmentName = v);
+
+                configForm.AddTextBoxLine("Gruppo per segmento (Vuoti)")
+                    .ControlText(config.GroupEmptyAlarmSegmentName)
+                    .TextChanged(v => config.GroupEmptyAlarmSegmentName = v);
 
                 SetupConfigForm(form.segmentNameConfigButton, configForm);
-            };*/
+            }; 
         }
 
         private void SetupConfigForm(Control button, ConfigForm configForm)
@@ -148,7 +172,8 @@ namespace TiaXmlReader.GenerationForms.Alarms
             configForm.Init();
             configForm.Show(form);
 
-            dataGridView.Refresh();
+            this.deviceDataGridHandler.Refresh();
+            this.alarmDataGridHandler.Refresh();
         }
 
     }

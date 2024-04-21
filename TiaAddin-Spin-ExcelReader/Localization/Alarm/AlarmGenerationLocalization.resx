@@ -117,6 +117,36 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ALARM_DATA_ALARM_VARIABLE" xml:space="preserve">
+    <value>Alarm Variable</value>
+  </data>
+  <data name="ALARM_DATA_COIL_ADDRESS" xml:space="preserve">
+    <value>Coil Address</value>
+  </data>
+  <data name="ALARM_DATA_DESCRIPTION" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="ALARM_DATA_ENABLE" xml:space="preserve">
+    <value>Enable</value>
+  </data>
+  <data name="ALARM_DATA_SET_COIL_ADDRESS" xml:space="preserve">
+    <value>Set Coil Address</value>
+  </data>
+  <data name="ALARM_DATA_TIMER_ADDRESS" xml:space="preserve">
+    <value>Timer Address</value>
+  </data>
+  <data name="ALARM_DATA_TIMER_TYPE" xml:space="preserve">
+    <value>Timer Type</value>
+  </data>
+  <data name="ALARM_DATA_TIMER_VALUE" xml:space="preserve">
+    <value>Timer Value</value>
+  </data>
+  <data name="DEVICE_DATA_ADDRESS" xml:space="preserve">
+    <value>Address</value>
+  </data>
+  <data name="DEVICE_DATA_DESCRIPTION" xml:space="preserve">
+    <value>Description</value>
+  </data>
   <data name="GROUPING_TYPE_GROUP" xml:space="preserve">
     <value>GroupPerSegment</value>
   </data>

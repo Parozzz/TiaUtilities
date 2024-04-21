@@ -61,6 +61,51 @@ namespace TiaXmlReader.Localization.IO {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Address.
+        /// </summary>
+        public static string DATA_ADDRESS {
+            get {
+                return ResourceManager.GetString("DATA_ADDRESS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Comment.
+        /// </summary>
+        public static string DATA_COMMENT {
+            get {
+                return ResourceManager.GetString("DATA_COMMENT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Name DB.
+        /// </summary>
+        public static string DATA_DBNAME {
+            get {
+                return ResourceManager.GetString("DATA_DBNAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a IO Tag.
+        /// </summary>
+        public static string DATA_IONAME {
+            get {
+                return ResourceManager.GetString("DATA_IONAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Variable.
+        /// </summary>
+        public static string DATA_VARIABLE {
+            get {
+                return ResourceManager.GetString("DATA_VARIABLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a GroupEachBit.
         /// </summary>
         public static string GROUPING_TYPE_BIT {

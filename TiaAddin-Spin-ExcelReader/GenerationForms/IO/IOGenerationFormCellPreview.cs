@@ -9,14 +9,14 @@ using TiaXmlReader.SimaticML.Enums;
 
 namespace TiaXmlReader.GenerationForms.IO
 {
-    public class IOGenerationFormPreviewCellPainter : IGridCellPainter
+    public class IOGenerationFormCellPreview : IGridCellPainter
     {
         private readonly GridDataSource<IOData> dataSource;
         private readonly IOConfiguration config;
         private readonly IOGenerationPreferences preferences;
 
         private readonly GenerationPlaceholders placeholders;
-        public IOGenerationFormPreviewCellPainter(GridDataSource<IOData> dataSource, IOConfiguration config, IOGenerationPreferences preferences)
+        public IOGenerationFormCellPreview(GridDataSource<IOData> dataSource, IOConfiguration config, IOGenerationPreferences preferences)
         {
             this.dataSource = dataSource;
             this.config = config;
@@ -32,7 +32,7 @@ namespace TiaXmlReader.GenerationForms.IO
             var columnIndex = args.ColumnIndex;
             var rowIndex = args.RowIndex;
 
-            if (rowIndex < 0 || columnIndex < IOGenerationForm.IO_NAME_COLUMN || columnIndex > IOGenerationForm.VARIABLE_COLUMN)
+            if (rowIndex < 0 || columnIndex < IOData.IO_NAME || columnIndex > IOData.VARIABLE)
             {
                 return paintRequest;
             }
@@ -44,22 +44,23 @@ namespace TiaXmlReader.GenerationForms.IO
             }
 
             paintRequest.data = ioData;
-            switch (columnIndex)
+            if(columnIndex == IOData.IO_NAME)
             {
-                case IOGenerationForm.IO_NAME_COLUMN:
-                    if (!string.IsNullOrEmpty(ioData.IOName)) //I want to preview the io name if is not set yet!
-                    {
-                        return paintRequest;
-                    }
+                if (!string.IsNullOrEmpty(ioData.IOName)) //I want to preview the io name if is not set yet!
+                {
+                    return paintRequest;
+                }
 
-                    return string.IsNullOrEmpty(ioData.IOName) ? paintRequest.Content() : paintRequest;
-                case IOGenerationForm.VARIABLE_COLUMN:
-                    if (string.IsNullOrEmpty(ioData.Variable) && string.IsNullOrEmpty(config.DefaultVariableName))
-                    {
-                        return paintRequest;
-                    }
+                return string.IsNullOrEmpty(ioData.IOName) ? paintRequest.Content() : paintRequest;
+            }
+            else if(columnIndex == IOData.VARIABLE)
+            {
+                if (string.IsNullOrEmpty(ioData.Variable) && string.IsNullOrEmpty(config.DefaultVariableName))
+                {
+                    return paintRequest;
+                }
 
-                    return paintRequest.Content();
+                return paintRequest.Content();
             }
 
             return paintRequest;
@@ -91,7 +92,7 @@ namespace TiaXmlReader.GenerationForms.IO
                 placeholders.Clear();
                 placeholders.SetIOData(ioData);
 
-                if (columnIndex == IOGenerationForm.IO_NAME_COLUMN)
+                if (columnIndex == IOData.IO_NAME)
                 {
                     var isIONameDefault = (ioData.IOName == config.DefaultIoName);
                     var parsedIOName = placeholders.Parse(ioData.IOName);
@@ -103,7 +104,7 @@ namespace TiaXmlReader.GenerationForms.IO
                     var color = isIONameDefault ? preferences.PreviewColor : style.ForeColor;
                     TextRenderer.DrawText(graphics, parsedIOName, style.Font, Rectangle.Round(rec), color, TextFormatFlags.VerticalCenter | TextFormatFlags.Right);
                 }
-                else if (columnIndex == IOGenerationForm.VARIABLE_COLUMN)
+                else if (columnIndex == IOData.VARIABLE)
                 {
                     string parsedPrefix = string.Empty;
                     if (config.MemoryType == IOMemoryTypeEnum.DB)

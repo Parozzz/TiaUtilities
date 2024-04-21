@@ -14,19 +14,12 @@ using TiaXmlReader.GenerationForms.GridHandler;
 using TiaXmlReader.GenerationForms.IO;
 using TiaXmlReader.Utility;
 using TiaXmlReader.GenerationForms.IO.Config;
+using System.Data.Common;
 
 namespace TiaXmlReader.GenerationForms.IO
 {
     public partial class IOGenerationForm : Form
     {
-        public const int TOTAL_ROW_COUNT = 1999;
-
-        public const int ADDRESS_COLUMN = 0;
-        public const int IO_NAME_COLUMN = 1;
-        public const int DB_COLUMN = 2;
-        public const int VARIABLE_COLUMN = 3;
-        public const int COMMENT_COLUMN = 4;
-
         private readonly GridHandler<IOData> gridHandler;
 
         private readonly IOGenerationSettings settings;
@@ -45,7 +38,10 @@ namespace TiaXmlReader.GenerationForms.IO
             settings = IOGenerationSettings.Load();
             settings.Save(); //This could be avoided but is to be sure that all the classes that are created new will be saved to file!
 
-            this.gridHandler = new GridHandler<IOData>(this.dataGridView, settings.GridSettings, () => new IOData(), (oldData, newData) => oldData.CopyFrom(newData), new IOGenerationComparer());
+            this.gridHandler = new GridHandler<IOData>(this.dataGridView, settings.GridSettings, IOData.COLUMN_LIST, new IOGenerationComparer())
+            {
+                RowCount = 2999
+            };
             this.configHandler = new IOGenerationFormConfigHandler(this, IOConfig, this.dataGridView);
 
             Init();
@@ -166,7 +162,7 @@ namespace TiaXmlReader.GenerationForms.IO
             var memoryTypeItems = new List<object>();
             foreach (IOMemoryTypeEnum memoryType in Enum.GetValues(typeof(IOMemoryTypeEnum)))
             {
-                memoryTypeItems.Add(new { Text = memoryType.GetDescription(), Value = memoryType });
+                memoryTypeItems.Add(new { Text = memoryType.GetEnumDescription(), Value = memoryType });
             }
             this.memoryTypeComboBox.DataSource = memoryTypeItems;
 
@@ -180,46 +176,32 @@ namespace TiaXmlReader.GenerationForms.IO
             var gropingTypeItems = new List<object>();
             foreach (IOGroupingTypeEnum groupingType in Enum.GetValues(typeof(IOGroupingTypeEnum)))
             {
-                gropingTypeItems.Add(new { Text = groupingType.GetDescription(), Value = groupingType });
+                gropingTypeItems.Add(new { Text = groupingType.GetEnumDescription(), Value = groupingType });
             }
             this.groupingTypeComboBox.DataSource = gropingTypeItems;
             #endregion
 
             #region CELL_PAINTERS
-            this.gridHandler.AddCellPainter(new IOGenerationFormPreviewCellPainter(this.gridHandler.DataSource, this.IOConfig, this.Preferences));
+            this.gridHandler.AddCellPainter(new IOGenerationFormCellPreview(this.gridHandler.DataSource, this.IOConfig, this.Preferences));
             #endregion
 
             #region DRAG
             this.gridHandler.SetDragPreviewAction(data => { IOGenerationUtils.DragPreview(data, this.gridHandler); });
             this.gridHandler.SetDragMouseUpAction(data => { IOGenerationUtils.DragMouseUp(data, this.gridHandler); });
             #endregion
-
-            #region DATA_ASSOCIATION
-            this.gridHandler.SetDataAssociation(ADDRESS_COLUMN, ioData => ioData.Address);
-            this.gridHandler.SetDataAssociation(IO_NAME_COLUMN, ioData => ioData.IOName);
-            this.gridHandler.SetDataAssociation(DB_COLUMN, ioData => ioData.DBName);
-            this.gridHandler.SetDataAssociation(VARIABLE_COLUMN, ioData => ioData.Variable);
-            this.gridHandler.SetDataAssociation(COMMENT_COLUMN, ioData => ioData.Comment);
-            #endregion
-
-            #region PREFERENCES
-            #endregion
-
-            this.gridHandler.Init();
-            this.configHandler.Init();
-
-            //Column initialization after gridHandler.Init()
+            //Column initialization before gridHandler.Init()
             #region COLUMNS
-            var properties = typeof(IOData).GetProperties();
-
-            var addressColumn = this.gridHandler.AddTextBoxColumn("Indirizzo", 55, properties[ADDRESS_COLUMN].Name);
+            var addressColumn = this.gridHandler.AddTextBoxColumn(IOData.ADDRESS, 55);
             addressColumn.MaxInputLength = 10;
-            
-            var ioNameColumn = this.gridHandler.AddTextBoxColumn("Nome IO", 80, properties[IO_NAME_COLUMN].Name);
-            var dbNameColumn = this.gridHandler.AddTextBoxColumn("DB", 80, properties[DB_COLUMN].Name);
-            var variableColumn = this.gridHandler.AddTextBoxColumn("Variabile", 105, properties[VARIABLE_COLUMN].Name);
-            var commentColumn = this.gridHandler.AddTextBoxColumn("Commento", 0, properties[COMMENT_COLUMN].Name);
+
+            this.gridHandler.AddTextBoxColumn(IOData.IO_NAME, 80);
+            this.gridHandler.AddTextBoxColumn(IOData.DB_NAME, 80);
+            this.gridHandler.AddTextBoxColumn(IOData.VARIABLE, 105);
+            this.gridHandler.AddTextBoxColumn(IOData.COMMENT, 0);
             #endregion
+
+            this.gridHandler?.Init();
+            this.configHandler?.Init();
 
             #region PROGRAM_SAVE_TICK
             var timer = new Timer { Interval = 1000 };
@@ -292,7 +274,7 @@ namespace TiaXmlReader.GenerationForms.IO
                 foreach (var saveData in loadedProjectSave.SaveDataList)
                 {
                     var rowIndex = saveData.RowIndex;
-                    if (rowIndex >= 0 && rowIndex <= TOTAL_ROW_COUNT)
+                    if (rowIndex >= 0 && rowIndex <= this.gridHandler.RowCount)
                     {
                         saveData.SaveTo(this.gridHandler.DataSource[saveData.RowIndex]);
                     }

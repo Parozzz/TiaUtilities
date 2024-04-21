@@ -43,7 +43,7 @@ namespace TiaXmlReader.GenerationForms.IO
 
         public int Compare(IOData x, IOData y)
         {
-            if (sortedColumn == IOGenerationForm.ADDRESS_COLUMN)
+            if (sortedColumn == IOData.ADDRESS.ColumnIndex)
             {
                 var tagX = x?.GetTagAddress();
                 var tagY = y?.GetTagAddress();
@@ -66,23 +66,27 @@ namespace TiaXmlReader.GenerationForms.IO
             }
             else
             {
-                var stringX = x[sortedColumn];
-                var stringY = y[sortedColumn];
-                if (stringX == null && stringY == null)
+                var xValue = x[sortedColumn];
+                var yValue = y[sortedColumn];
+
+                var xIsString = xValue is string;
+                var yIsString = yValue is string;
+
+                if (!xIsString && !yIsString)
                 {
                     return 0;
                 }
-                else if (stringX == null)
+                else if (xValue == null || !xIsString)
                 {
                     return -1 * this.GetModifier();
                 }
-                else if (stringY == null)
+                else if (yValue == null || !yIsString)
                 {
                     return 1 * this.GetModifier(); ;
                 }
                 else
                 {
-                    return stringX.CompareTo(stringY);
+                    return xValue.ToString().CompareTo(yValue.ToString());
                 }
             }
         }

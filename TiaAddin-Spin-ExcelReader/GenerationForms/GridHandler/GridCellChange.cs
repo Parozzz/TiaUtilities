@@ -51,48 +51,4 @@ namespace TiaXmlReader.GenerationForms.GridHandler
         }
     }
 
-    public class GridCellChangeAssociator<T> where T : IGridData
-    {
-        private readonly DataGridView dataGridView;
-        private readonly Dictionary<int, Func<T, object>> associationDict;
-        public GridCellChangeAssociator(DataGridView dataGridView)
-        {
-            this.dataGridView = dataGridView;
-            this.associationDict = new Dictionary<int, Func<T, object>>();
-        }
-
-        public void SetAssociation(int columnIndex, Func<T, object> func)
-        {
-            if (!associationDict.ContainsKey(columnIndex))
-            {
-                associationDict.Add(columnIndex, func);
-            }
-            else
-            {
-                associationDict[columnIndex] = func;
-            }
-        }
-
-        public List<GridCellChange> CreateCellChanges(int rowIndex, T data)
-        {
-            return CreateCellChanges(rowIndex, Utils.SingletonCollection<T>(data));
-        }
-
-        public List<GridCellChange> CreateCellChanges(int rowIndex, ICollection<T> dataCollection)
-        {
-            var cellChangeList = new List<GridCellChange>();
-
-            foreach (var data in dataCollection)
-            {
-                foreach (var entry in associationDict)
-                {
-                    var columnIndex = entry.Key;
-                    var func = entry.Value;
-                    cellChangeList.Add(new GridCellChange(dataGridView, columnIndex, rowIndex) { NewValue = func.Invoke(data) });
-                }
-            }
-
-            return cellChangeList;
-        }
-    }
 }

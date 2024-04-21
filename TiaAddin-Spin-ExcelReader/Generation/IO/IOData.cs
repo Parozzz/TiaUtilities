@@ -10,71 +10,120 @@ using TiaXmlReader.SimaticML;
 using TiaXmlReader.Generation;
 using TiaXmlReader.GenerationForms.GridHandler;
 using TiaXmlReader.SimaticML.Enums;
+using System.ComponentModel.DataAnnotations;
+using TiaXmlReader.Localization;
+using TiaXmlReader.GenerationForms.GridHandler.Data;
+using System.Drawing;
+using System.Windows.Forms;
 
 namespace TiaXmlReader.Generation.IO
 {
     public class IOData : IGridData
     {
-        [JsonProperty] public string Address {  get; set; }
-        [JsonProperty] public string IOName {  get; set; }
-        [JsonProperty] public string DBName {  get; set; }
-        [JsonProperty] public string Variable {  get; set; }
-        [JsonProperty] public string Comment { get; set; }
+        public static int COLUMN_COUNT = 0;
+        //THESE IS THE ORDER IN WHICH THEY APPEAR!
+        public static readonly GridDataColumn ADDRESS;
+        public static readonly GridDataColumn IO_NAME;
+        public static readonly GridDataColumn DB_NAME;
+        public static readonly GridDataColumn VARIABLE;
+        public static readonly GridDataColumn COMMENT;
+        public static readonly List<GridDataColumn> COLUMN_LIST;
 
-        public string this[int i]
+        static IOData()
+        {
+            var type = typeof(IOData);
+            ADDRESS = GridDataColumn.GetFromReflection(COLUMN_COUNT++, type.GetProperty("Address"));
+            IO_NAME = GridDataColumn.GetFromReflection(COLUMN_COUNT++, type.GetProperty("IOName"));
+            DB_NAME = GridDataColumn.GetFromReflection(COLUMN_COUNT++, type.GetProperty("DBName"));
+            VARIABLE = GridDataColumn.GetFromReflection(COLUMN_COUNT++, type.GetProperty("Variable"));
+            COMMENT = GridDataColumn.GetFromReflection(COLUMN_COUNT++, type.GetProperty("Comment"));
+
+            COLUMN_LIST = new List<GridDataColumn>();
+            foreach (var field in type.GetFields())
+            {
+                if (field.IsStatic && field.FieldType == typeof(GridDataColumn))
+                {
+                    COLUMN_LIST.Add((GridDataColumn)field.GetValue(null));
+                }
+            }
+            COLUMN_LIST.Sort((x, y) => x.ColumnIndex.CompareTo(y.ColumnIndex));
+        }
+
+        [JsonProperty]
+        [Display(Description = "DATA_ADDRESS", ResourceType = typeof(Localization.IO.IOGenerationLocalization))]
+        public string Address { get; set; }
+
+        [JsonProperty]
+        [Display(Description = "DATA_IONAME", ResourceType = typeof(Localization.IO.IOGenerationLocalization))]
+        public string IOName { get; set; }
+
+        [JsonProperty]
+        [Display(Description = "DATA_DBNAME", ResourceType = typeof(Localization.IO.IOGenerationLocalization))]
+        public string DBName { get; set; }
+
+        [JsonProperty]
+        [Display(Description = "DATA_VARIABLE", ResourceType = typeof(Localization.IO.IOGenerationLocalization))]
+        public string Variable { get; set; }
+
+        [JsonProperty]
+        [Display(Description = "DATA_COMMENT", ResourceType = typeof(Localization.IO.IOGenerationLocalization))]
+        public string Comment { get; set; }
+
+        public object this[int i]
         {
             get
             {
-                switch (i)
+                if (i < 0 || i >= COLUMN_LIST.Count)
                 {
-                    case IOGenerationForm.ADDRESS_COLUMN:
-                        return Address;
-                    case IOGenerationForm.IO_NAME_COLUMN:
-                        return IOName;
-                    case IOGenerationForm.DB_COLUMN:
-                        return DBName;
-                    case IOGenerationForm.VARIABLE_COLUMN:
-                        return Variable;
-                    case IOGenerationForm.COMMENT_COLUMN:
-                        return Comment;
-                    default:
-                        throw new InvalidOperationException("Invalid index for get square bracket operator in IOData");
+                    throw new InvalidOperationException("Invalid index for get square bracket operator in IOData");
                 }
+
+                return COLUMN_LIST[i].PropertyInfo.GetValue(this);
+            }
+        }
+
+        public GridDataPreview GetPreview(int column, IOConfiguration config)
+        {
+            if (column == IO_NAME)
+            {
+                return new GridDataPreview()
+                {
+                    DefaultValue = config.DefaultIoName,
+                    Value = this.IOName
+                };
+            }
+            else if (column == VARIABLE)
+            {
+                var prefix = "";
+                if (config.MemoryType == IOMemoryTypeEnum.DB)
+                {
+                    prefix = this.GetMemoryArea() == SimaticMemoryArea.INPUT ? config.PrefixInputDB : config.PrefixOutputDB;
+                }
+                else if (config.MemoryType == IOMemoryTypeEnum.MERKER)
+                {
+                    prefix = this.GetMemoryArea() == SimaticMemoryArea.INPUT ? config.PrefixInputMerker : config.PrefixOutputMerker;
+                }
+
+                return new GridDataPreview()
+                {
+                    Prefix = prefix,
+                    DefaultValue = config.DefaultVariableName,
+                    Value = this.Variable
+                };
             }
 
-            set
-            {
-                switch (i)
-                {
-                    case IOGenerationForm.ADDRESS_COLUMN:
-                        Address = value;
-                        break;
-                    case IOGenerationForm.IO_NAME_COLUMN:
-                        IOName = value;
-                        break;
-                    case IOGenerationForm.DB_COLUMN:
-                        DBName = value;
-                        break;
-                    case IOGenerationForm.VARIABLE_COLUMN:
-                        Variable = value;
-                        break;
-                    case IOGenerationForm.COMMENT_COLUMN:
-                        Comment = value;
-                        break;
-                    default:
-                        throw new InvalidOperationException("Invalid index for Set square bracket operator in IOData");
-                }
-            }
+
+            return null;
         }
 
         public void LoadDefaults(IOConfiguration config)
         {
-            if(string.IsNullOrEmpty(IOName))
+            if (string.IsNullOrEmpty(IOName))
             {
                 IOName = config.DefaultIoName;
             }
 
-            if(string.IsNullOrEmpty(Variable))
+            if (string.IsNullOrEmpty(Variable))
             {
                 Variable = config.DefaultVariableName;
             }

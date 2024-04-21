@@ -6,7 +6,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using TiaXmlReader.Generation.IO;
 using TiaXmlReader.GenerationForms.GridHandler;
+using TiaXmlReader.GenerationForms.GridHandler.Data;
 using TiaXmlReader.GenerationForms.IO.Config;
 
 namespace TiaXmlReader.GenerationForms.IO.ExcelImporter
@@ -20,41 +22,17 @@ namespace TiaXmlReader.GenerationForms.IO.ExcelImporter
         public const int IONAME_COLUMN = 1;
         public const int COMMENT_COLUMN = 2;
 
-        public class ExcelImportData : IGridData
-        {
-            public string Address { get; set; }
-            public string IOName { get; set; }
-            public string Comment { get; set; }
-
-            public void Clear()
-            {
-                this.Address = this.IOName = this.Comment = "";
-            }
-
-            public void CopyFrom(ExcelImportData excelImport)
-            {
-                this.Address = excelImport.Address;
-                this.IOName = excelImport.IOName;
-                this.Comment = excelImport.Comment;
-            }
-
-            public bool IsEmpty()
-            {
-                return string.IsNullOrEmpty(Address) && string.IsNullOrEmpty(IOName) && string.IsNullOrEmpty(Comment);
-            }
-        }
-
         private readonly IOGenerationExcelImportConfiguration config;
-        private readonly GridHandler<ExcelImportData> gridHandler;
+        private readonly GridHandler<IOGenerationExcelImportData> gridHandler;
 
-        public IEnumerable<ExcelImportData> ImportDataEnumerable { get => gridHandler.DataSource.GetNotEmptyDataDict().Keys; }
+        public IEnumerable<IOGenerationExcelImportData> ImportDataEnumerable { get => gridHandler.DataSource.GetNotEmptyDataDict().Keys; }
 
         public IOGenerationExcelImportForm(IOGenerationExcelImportConfiguration config, GridSettings gridSettings)
         {
             InitializeComponent();
 
             this.config = config;
-            this.gridHandler = new GridHandler<ExcelImportData>(this.dataGridView, gridSettings, () => new ExcelImportData(), (oldData, newData) => oldData.CopyFrom(newData));
+            this.gridHandler = new GridHandler<IOGenerationExcelImportData>(this.dataGridView, gridSettings, IOGenerationExcelImportData.COLUMN_LIST);
 
             Init();
         }
@@ -91,19 +69,14 @@ namespace TiaXmlReader.GenerationForms.IO.ExcelImporter
             this.gridHandler.SetDragMouseUpAction(data => { IOGenerationUtils.DragMouseUp(data, this.gridHandler); });
             #endregion
 
-            #region DATA_ASSOCIATION
-            this.gridHandler.SetDataAssociation(ADDRESS_COLUMN, importData => importData.Address);
-            this.gridHandler.SetDataAssociation(IONAME_COLUMN, importData => importData.IOName);
-            this.gridHandler.SetDataAssociation(COMMENT_COLUMN, importData => importData.Comment);
-            #endregion
-
-            gridHandler.Init();
-
             #region COLUMNS
-            var addressColumn = this.gridHandler.AddTextBoxColumn("Indirizzo", 80);
-            var nameIOColumn = this.gridHandler.AddTextBoxColumn("Nome IO", 110);
-            var commentColumn = this.gridHandler.AddTextBoxColumn("Commento", 0);
+            this.gridHandler.AddTextBoxColumn(IOGenerationExcelImportData.ADDRESS, 80);
+            this.gridHandler.AddTextBoxColumn(IOGenerationExcelImportData.IO_NAME, 110);
+            this.gridHandler.AddTextBoxColumn(IOGenerationExcelImportData.COMMENT, 0);
             #endregion
+
+            gridHandler?.Init();
+
 
             this.ConfigButton.Click += (object sender, EventArgs args) =>
             {
@@ -213,7 +186,7 @@ namespace TiaXmlReader.GenerationForms.IO.ExcelImporter
                         if (freeIndexList.Count == 1)
                         {
                             var freeRowIndex = freeIndexList[0];
-                            this.gridHandler.ChangeRow(freeRowIndex, new ExcelImportData()
+                            this.gridHandler.ChangeRow(freeRowIndex, new IOGenerationExcelImportData()
                             {
                                 Address = address,
                                 IOName = ioName,

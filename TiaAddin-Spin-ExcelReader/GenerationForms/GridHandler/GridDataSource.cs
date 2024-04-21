@@ -6,23 +6,22 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using TiaXmlReader.GenerationForms.GridHandler;
+using TiaXmlReader.GenerationForms.GridHandler.Data;
 
 namespace TiaXmlReader.GenerationForms.GridHandler
 {
     public class GridDataSource<T> where T : IGridData
     {
         private readonly DataGridView dataGridView;
-        private readonly Func<T> newObjectFunction;
-        private readonly Action<T, T> trasferDataAction; //-> 1° = old 2° = new
+        private readonly GridDataHandler<T> associator;
 
         private readonly List<T> dataList;
         private readonly BindingList<T> bindingList;
 
-        public GridDataSource(DataGridView dataGridView, Func<T> newObjectFunction, Action<T, T> trasferDataAction)
+        public GridDataSource(DataGridView dataGridView, GridDataHandler<T> associator)
         {
             this.dataGridView = dataGridView;
-            this.newObjectFunction = newObjectFunction;
-            this.trasferDataAction = trasferDataAction;
+            this.associator = associator;
 
             dataList = new List<T>();
             bindingList = new BindingList<T>(dataList);
@@ -47,7 +46,7 @@ namespace TiaXmlReader.GenerationForms.GridHandler
             this.dataList.Clear();
             for (int i = 0; i < dataAmount; i++)
             {
-                dataList.Add(newObjectFunction.Invoke());
+                dataList.Add(associator.CreateInstance());
             }
 
             this.dataGridView.DataSource = new BindingSource() { DataSource = bindingList };
@@ -127,12 +126,6 @@ namespace TiaXmlReader.GenerationForms.GridHandler
             return notEmptyDict;
         }
 
-    }
-
-    public interface IGridData
-    {
-        void Clear();
-        bool IsEmpty();
     }
 
 }
