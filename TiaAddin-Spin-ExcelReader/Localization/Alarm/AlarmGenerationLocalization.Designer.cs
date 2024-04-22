@@ -151,6 +151,15 @@ namespace TiaXmlReader.Localization.Alarm {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Name &gt; {device_name}.
+        /// </summary>
+        public static string DEVICE_DATA_NAME {
+            get {
+                return ResourceManager.GetString("DEVICE_DATA_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a GroupPerSegment.
         /// </summary>
         public static string GROUPING_TYPE_GROUP {

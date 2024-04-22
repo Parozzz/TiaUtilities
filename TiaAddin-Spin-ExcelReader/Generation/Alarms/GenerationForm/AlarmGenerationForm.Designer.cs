@@ -35,6 +35,9 @@
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripTextBox1 = new System.Windows.Forms.ToolStripTextBox();
+            this.autoSaveComboBox = new System.Windows.Forms.ToolStripComboBox();
             this.importExportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportXMLToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.preferencesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -43,9 +46,11 @@
             this.configButtonPanel = new System.Windows.Forms.FlowLayoutPanel();
             this.fcConfigButton = new System.Windows.Forms.Button();
             this.alarmGenerationConfigButton = new System.Windows.Forms.Button();
+            this.emptyAlarmGenerationConfigButton = new System.Windows.Forms.Button();
             this.fieldDefaultValueConfigButton = new System.Windows.Forms.Button();
             this.fieldPrefixConfigButton = new System.Windows.Forms.Button();
             this.segmentNameConfigButton = new System.Windows.Forms.Button();
+            this.textListConfigButton = new System.Windows.Forms.Button();
             this.divisionTypeLabel = new System.Windows.Forms.Label();
             this.memoryTypeLabel = new System.Windows.Forms.Label();
             this.GridsSplitPanel = new System.Windows.Forms.SplitContainer();
@@ -124,7 +129,10 @@
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.saveToolStripMenuItem,
             this.saveAsToolStripMenuItem,
-            this.loadToolStripMenuItem});
+            this.loadToolStripMenuItem,
+            this.toolStripSeparator1,
+            this.toolStripTextBox1,
+            this.autoSaveComboBox});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
@@ -132,20 +140,45 @@
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
             this.saveToolStripMenuItem.Text = "Save";
             // 
             // saveAsToolStripMenuItem
             // 
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
             this.saveAsToolStripMenuItem.Text = "SaveAs";
             // 
             // loadToolStripMenuItem
             // 
             this.loadToolStripMenuItem.Name = "loadToolStripMenuItem";
-            this.loadToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
+            this.loadToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
             this.loadToolStripMenuItem.Text = "Load";
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(178, 6);
+            // 
+            // toolStripTextBox1
+            // 
+            this.toolStripTextBox1.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.toolStripTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.toolStripTextBox1.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.toolStripTextBox1.HideSelection = false;
+            this.toolStripTextBox1.Margin = new System.Windows.Forms.Padding(0);
+            this.toolStripTextBox1.Name = "toolStripTextBox1";
+            this.toolStripTextBox1.ReadOnly = true;
+            this.toolStripTextBox1.Size = new System.Drawing.Size(100, 16);
+            this.toolStripTextBox1.Text = "Auto Save";
+            this.toolStripTextBox1.TextBoxTextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // autoSaveComboBox
+            // 
+            this.autoSaveComboBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.autoSaveComboBox.Margin = new System.Windows.Forms.Padding(0);
+            this.autoSaveComboBox.Name = "autoSaveComboBox";
+            this.autoSaveComboBox.Size = new System.Drawing.Size(121, 23);
             // 
             // importExportToolStripMenuItem
             // 
@@ -175,8 +208,8 @@
             this.PlaceholdersLabel.Name = "PlaceholdersLabel";
             this.PlaceholdersLabel.Size = new System.Drawing.Size(3658, 16);
             this.PlaceholdersLabel.TabIndex = 9;
-            this.PlaceholdersLabel.Text = "Placeholders: {device_address} {device_description} {alarm_num_start} {alarm_num_" +
-    "end} {alarm_num} {alarm_description}";
+            this.PlaceholdersLabel.Text = "Placeholders: {device_name} {device_address} {device_description} {alarm_num_star" +
+    "t} {alarm_num_end} {alarm_num} {alarm_description}";
             // 
             // configPanel
             // 
@@ -198,9 +231,11 @@
             this.configButtonPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.configButtonPanel.Controls.Add(this.fcConfigButton);
             this.configButtonPanel.Controls.Add(this.alarmGenerationConfigButton);
+            this.configButtonPanel.Controls.Add(this.emptyAlarmGenerationConfigButton);
             this.configButtonPanel.Controls.Add(this.fieldDefaultValueConfigButton);
             this.configButtonPanel.Controls.Add(this.fieldPrefixConfigButton);
             this.configButtonPanel.Controls.Add(this.segmentNameConfigButton);
+            this.configButtonPanel.Controls.Add(this.textListConfigButton);
             this.configButtonPanel.Location = new System.Drawing.Point(0, -1);
             this.configButtonPanel.Margin = new System.Windows.Forms.Padding(0);
             this.configButtonPanel.Name = "configButtonPanel";
@@ -229,10 +264,21 @@
             this.alarmGenerationConfigButton.Text = "Generazione Allarmi";
             this.alarmGenerationConfigButton.UseVisualStyleBackColor = true;
             // 
+            // emptyAlarmGenerationConfigButton
+            // 
+            this.emptyAlarmGenerationConfigButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.75F, System.Drawing.FontStyle.Bold);
+            this.emptyAlarmGenerationConfigButton.Location = new System.Drawing.Point(287, 0);
+            this.emptyAlarmGenerationConfigButton.Margin = new System.Windows.Forms.Padding(0);
+            this.emptyAlarmGenerationConfigButton.Name = "emptyAlarmGenerationConfigButton";
+            this.emptyAlarmGenerationConfigButton.Size = new System.Drawing.Size(265, 30);
+            this.emptyAlarmGenerationConfigButton.TabIndex = 15;
+            this.emptyAlarmGenerationConfigButton.Text = "Generazione Allarmi Vuoti";
+            this.emptyAlarmGenerationConfigButton.UseVisualStyleBackColor = true;
+            // 
             // fieldDefaultValueConfigButton
             // 
             this.fieldDefaultValueConfigButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.75F, System.Drawing.FontStyle.Bold);
-            this.fieldDefaultValueConfigButton.Location = new System.Drawing.Point(287, 0);
+            this.fieldDefaultValueConfigButton.Location = new System.Drawing.Point(552, 0);
             this.fieldDefaultValueConfigButton.Margin = new System.Windows.Forms.Padding(0);
             this.fieldDefaultValueConfigButton.Name = "fieldDefaultValueConfigButton";
             this.fieldDefaultValueConfigButton.Size = new System.Drawing.Size(210, 30);
@@ -243,7 +289,7 @@
             // fieldPrefixConfigButton
             // 
             this.fieldPrefixConfigButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.75F, System.Drawing.FontStyle.Bold);
-            this.fieldPrefixConfigButton.Location = new System.Drawing.Point(497, 0);
+            this.fieldPrefixConfigButton.Location = new System.Drawing.Point(762, 0);
             this.fieldPrefixConfigButton.Margin = new System.Windows.Forms.Padding(0);
             this.fieldPrefixConfigButton.Name = "fieldPrefixConfigButton";
             this.fieldPrefixConfigButton.Size = new System.Drawing.Size(156, 30);
@@ -254,13 +300,24 @@
             // segmentNameConfigButton
             // 
             this.segmentNameConfigButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.75F, System.Drawing.FontStyle.Bold);
-            this.segmentNameConfigButton.Location = new System.Drawing.Point(653, 0);
+            this.segmentNameConfigButton.Location = new System.Drawing.Point(918, 0);
             this.segmentNameConfigButton.Margin = new System.Windows.Forms.Padding(0);
             this.segmentNameConfigButton.Name = "segmentNameConfigButton";
             this.segmentNameConfigButton.Size = new System.Drawing.Size(152, 30);
             this.segmentNameConfigButton.TabIndex = 14;
             this.segmentNameConfigButton.Text = "Nomi Segmenti";
             this.segmentNameConfigButton.UseVisualStyleBackColor = true;
+            // 
+            // textListConfigButton
+            // 
+            this.textListConfigButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.75F, System.Drawing.FontStyle.Bold);
+            this.textListConfigButton.Location = new System.Drawing.Point(1070, 0);
+            this.textListConfigButton.Margin = new System.Windows.Forms.Padding(0);
+            this.textListConfigButton.Name = "textListConfigButton";
+            this.textListConfigButton.Size = new System.Drawing.Size(122, 30);
+            this.textListConfigButton.TabIndex = 16;
+            this.textListConfigButton.Text = "Lista testi";
+            this.textListConfigButton.UseVisualStyleBackColor = true;
             // 
             // divisionTypeLabel
             // 
@@ -296,7 +353,7 @@
             // 
             this.GridsSplitPanel.Panel2.Controls.Add(this.AlarmDataGridView);
             this.GridsSplitPanel.Size = new System.Drawing.Size(1378, 696);
-            this.GridsSplitPanel.SplitterDistance = 400;
+            this.GridsSplitPanel.SplitterDistance = 500;
             this.GridsSplitPanel.SplitterWidth = 12;
             this.GridsSplitPanel.TabIndex = 19;
             // 
@@ -309,7 +366,7 @@
             this.DeviceDataGridView.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
             this.DeviceDataGridView.Name = "DeviceDataGridView";
             this.DeviceDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.DeviceDataGridView.Size = new System.Drawing.Size(400, 696);
+            this.DeviceDataGridView.Size = new System.Drawing.Size(500, 696);
             this.DeviceDataGridView.TabIndex = 2;
             // 
             // AlarmDataGridView
@@ -321,7 +378,7 @@
             this.AlarmDataGridView.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
             this.AlarmDataGridView.Name = "AlarmDataGridView";
             this.AlarmDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.AlarmDataGridView.Size = new System.Drawing.Size(966, 696);
+            this.AlarmDataGridView.Size = new System.Drawing.Size(866, 696);
             this.AlarmDataGridView.TabIndex = 3;
             // 
             // groupingTypeComboBox
@@ -397,5 +454,10 @@
         private System.Windows.Forms.ToolStripMenuItem preferencesToolStripMenuItem;
         private System.Windows.Forms.DataGridView AlarmDataGridView;
         private System.Windows.Forms.SplitContainer GridsSplitPanel;
+        public System.Windows.Forms.Button emptyAlarmGenerationConfigButton;
+        public System.Windows.Forms.Button textListConfigButton;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripTextBox toolStripTextBox1;
+        private System.Windows.Forms.ToolStripComboBox autoSaveComboBox;
     }
 }

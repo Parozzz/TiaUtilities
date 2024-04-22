@@ -16,6 +16,7 @@ namespace TiaXmlReader.Generation.Alarms
     {
         public static int COLUMN_COUNT = 0;
         //THESE IS THE ORDER IN WHICH THEY APPEAR!
+        public static readonly GridDataColumn NAME;
         public static readonly GridDataColumn ADDRESS;
         public static readonly GridDataColumn DESCRIPTION;
         public static readonly List<GridDataColumn> COLUMN_LIST;
@@ -23,6 +24,7 @@ namespace TiaXmlReader.Generation.Alarms
         static DeviceData()
         {
             var type = typeof(DeviceData);
+            NAME = GridDataColumn.GetFromReflection(COLUMN_COUNT++, type.GetProperty("Name"));
             ADDRESS = GridDataColumn.GetFromReflection(COLUMN_COUNT++, type.GetProperty("Address"));
             DESCRIPTION = GridDataColumn.GetFromReflection(COLUMN_COUNT++, type.GetProperty("Description"));
 
@@ -36,6 +38,10 @@ namespace TiaXmlReader.Generation.Alarms
             }
             COLUMN_LIST.Sort((x, y) => x.ColumnIndex.CompareTo(y.ColumnIndex));
         }
+
+        [JsonProperty]
+        [Display(Description = "DEVICE_DATA_NAME", ResourceType = typeof(Localization.Alarm.AlarmGenerationLocalization))]
+        public string Name { get; set; }
 
         [JsonProperty]
         [Display(Description = "DEVICE_DATA_ADDRESS", ResourceType = typeof(Localization.Alarm.AlarmGenerationLocalization))]

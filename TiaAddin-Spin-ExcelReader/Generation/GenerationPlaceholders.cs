@@ -48,6 +48,7 @@ namespace TiaXmlReader.Generation
 
     public class GenerationPlaceholders
     {
+        public const string DEVICE_NAME = "{device_name}";
         public const string DEVICE_ADDRESS = "{device_address}";
         public const string DEVICE_DESCRIPTION = "{device_description}";
         public const string ALARM_DESCRIPTION = "{alarm_description}";
@@ -86,6 +87,7 @@ namespace TiaXmlReader.Generation
 
         public GenerationPlaceholders SetDeviceData(DeviceData consumerData)
         {
+            AddOrReplace(DEVICE_NAME, new StringGenerationPlaceholderData() { Value = consumerData.Name });
             AddOrReplace(DEVICE_ADDRESS, new StringGenerationPlaceholderData() { Value = consumerData.Address });
             AddOrReplace(DEVICE_DESCRIPTION, new StringGenerationPlaceholderData() { Value = consumerData.Description });
             return this;

@@ -16,7 +16,7 @@ namespace TiaXmlReader.Generation.IO
 {
     internal class IOXmlGenerator
     {
-        private IOConfiguration config;
+        private readonly IOConfiguration config;
         private readonly List<IOData> ioDataList;
 
         private BlockFC fc;

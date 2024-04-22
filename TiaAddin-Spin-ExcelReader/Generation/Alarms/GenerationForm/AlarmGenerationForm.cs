@@ -8,6 +8,7 @@ using TiaXmlReader.Utility;
 using TiaXmlReader.GenerationForms;
 using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Generation.GridHandler;
+using System.Linq;
 
 namespace TiaXmlReader.Generation.Alarms.GenerationForm
 {
@@ -63,6 +64,44 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
         public void Init()
         {
             #region TopMenu
+            foreach (GenerationAutoSaveEnum autoSaveEnum in Enum.GetValues(typeof(GenerationAutoSaveEnum)))
+            {
+                var enumName = Enum.GetName(typeof(GenerationAutoSaveEnum), autoSaveEnum);
+                this.autoSaveComboBox.Items.Add(enumName);
+            }
+            this.autoSaveComboBox.Text = Enum.GetName(typeof(GenerationAutoSaveEnum), settings.GridSettings.AutoSave);
+
+            var autoSaveTimer = new Timer();
+            autoSaveTimer.Interval = ((int)settings.GridSettings.AutoSave) * 1000;
+            if (autoSaveTimer.Interval > 0)
+            {
+                autoSaveTimer.Start();
+            }
+
+            this.autoSaveComboBox.ComboBox.SelectedValueChanged += (sender, args) => 
+            {
+                autoSaveTimer.Stop();
+                if(Enum.TryParse(this.autoSaveComboBox.ComboBox.Text, out GenerationAutoSaveEnum autoSave))
+                {
+                    settings.GridSettings.AutoSave = autoSave;
+
+                    autoSaveTimer.Interval = ((int)settings.GridSettings.AutoSave) * 1000;
+                    if (autoSaveTimer.Interval > 0)
+                    {
+                        autoSaveTimer.Start();
+                    }
+                }
+            };
+
+            autoSaveTimer.Tick += (sender, args) =>
+            {
+                if (!string.IsNullOrEmpty(this.lastFilePath))
+                {
+                    this.ProjectSave();
+                }
+            };
+
+
             this.saveToolStripMenuItem.Click += (object sender, EventArgs args) => { this.ProjectSave(); };
             this.saveAsToolStripMenuItem.Click += (object sender, EventArgs args) => { this.ProjectSave(true); };
             this.loadToolStripMenuItem.Click += (object sender, EventArgs args) => { this.ProjectLoad(); };
@@ -108,11 +147,11 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
                 configForm.AddColorPickerLine("Triangolo trascinamento")
                     .ApplyColor(settings.GridSettings.SelectedCellTriangleColor)
                     .ColorChanged(color => settings.GridSettings.SelectedCellTriangleColor = color);
-                /*
+                
                 configForm.AddColorPickerLine("Anteprima")
-                    .ApplyColor(this.Preferences.PreviewColor)
-                    .ColorChanged(color => this.Preferences.PreviewColor = color);
-                */
+                    .ApplyColor(settings.GridSettings.PreviewColor)
+                    .ColorChanged(color => settings.GridSettings.PreviewColor = color);
+                
                 configForm.StartShowingAtLocation(Cursor.Position);
                 configForm.Init();
                 configForm.Show(this);
@@ -153,11 +192,10 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             this.alarmGridHandler.SetDragMouseUpAction(data => { GenerationUtils.DragMouseUp(data, this.alarmGridHandler); });
             #endregion 
 
-            #region PREFERENCES
-            #endregion
             //Column initialization before gridHandler.Init()
             #region COLUMNS;
-            this.deviceGridHandler.AddTextBoxColumn(DeviceData.ADDRESS, 145);
+            this.deviceGridHandler.AddTextBoxColumn(DeviceData.NAME, 80);
+            this.deviceGridHandler.AddTextBoxColumn(DeviceData.ADDRESS, 160);
             this.deviceGridHandler.AddTextBoxColumn(DeviceData.DESCRIPTION, 0);
 
             this.alarmGridHandler.AddCheckBoxColumn(AlarmData.ENABLE, 40);
@@ -178,28 +216,39 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             var timer = new Timer { Interval = 1000 };
             timer.Start();
 
-            var alarmConfigSnapshot = Utils.CreatePublicFieldSnapshot(this.AlarmConfig);
-            var gridSettingsSnapshot = Utils.CreatePublicFieldSnapshot(this.settings.GridSettings);
+            var objectSnapshotDict = new Dictionary<object, Dictionary<string, object>>()
+            {
+                {this.AlarmConfig, null },
+                {this.settings.GridSettings, null }
+            };
+
+            ParseSnapshotDict(objectSnapshotDict, forceRefreshSnapshot: true, skipSave: true);
             timer.Tick += (sender, e) =>
             {
-                //This is done this way because is impossible that fields are changed toghether for multiple configs. So at the first that is different, i create a snapshot and save to file!
-                var configEqual = Utils.ComparePublicFieldSnapshot(this.AlarmConfig, alarmConfigSnapshot);
-                if (!configEqual)
-                {
-                    alarmConfigSnapshot = Utils.CreatePublicFieldSnapshot(this.AlarmConfig);
-                    this.settings.Save();
-                    return;
-                }
-
-                var gridSettingsEqual = Utils.ComparePublicFieldSnapshot(this.settings.GridSettings, gridSettingsSnapshot);
-                if (!gridSettingsEqual)
-                {
-                    gridSettingsSnapshot = Utils.CreatePublicFieldSnapshot(this.settings.GridSettings);
-                    this.settings.Save();
-                    return;
-                }
+                ParseSnapshotDict(objectSnapshotDict, forceRefreshSnapshot: false, skipSave: false);
             };
             #endregion
+        }
+        private void ParseSnapshotDict(Dictionary<object, Dictionary<string, object>> objectSnapshotDict, bool forceRefreshSnapshot = false, bool skipSave = false)
+        {
+            bool saveNecessary = false;
+            foreach (var entry in objectSnapshotDict.ToList()) //To list neede to make a copy so i can change the dict below!
+            {
+                var obj = entry.Key;
+                var oldSnapshotDict = entry.Value;
+                if (oldSnapshotDict == null || !Utils.ComparePublicFieldSnapshot(obj, oldSnapshotDict) || forceRefreshSnapshot)
+                {
+                    saveNecessary = true;
+
+                    var snap = Utils.CreatePublicFieldSnapshot(obj);
+                    objectSnapshotDict[obj] = snap;
+                }
+            }
+
+            if (saveNecessary && !skipSave)
+            {
+                this.settings.Save();
+            }
         }
 
         public void ProjectSave(bool saveAs = false)

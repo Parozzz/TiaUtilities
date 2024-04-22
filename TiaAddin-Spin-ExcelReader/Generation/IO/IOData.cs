@@ -108,9 +108,13 @@ namespace TiaXmlReader.Generation.IO
                 }
 
                 var prefix = "";
-                if (config.MemoryType == IOMemoryTypeEnum.DB)
+                if (!string.IsNullOrEmpty(this.DBName))
                 {
-                    prefix = this.DBName + "." + (this.GetMemoryArea() == SimaticMemoryArea.INPUT ? config.PrefixInputDB : config.PrefixOutputDB);
+                    prefix = this.DBName + ".";
+                }
+                else if (config.MemoryType == IOMemoryTypeEnum.DB)
+                {
+                    prefix = config.DBName + "." + (this.GetMemoryArea() == SimaticMemoryArea.INPUT ? config.PrefixInputDB : config.PrefixOutputDB);
                 }
                 else if (config.MemoryType == IOMemoryTypeEnum.MERKER)
                 {

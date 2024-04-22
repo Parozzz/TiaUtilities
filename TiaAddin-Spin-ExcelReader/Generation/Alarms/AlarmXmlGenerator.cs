@@ -64,7 +64,7 @@ namespace TiaXmlReader.Generation.Alarms
                             placeholders.SetDeviceData(deviceData)
                                 .SetAlarmData(parsedAlarmData)
                                 .SetAlarmNum(nextAlarmNum++, config.AlarmNumFormat);
-                            fullAlarmList += placeholders.Parse(GenerationPlaceholders.ALARM_DESCRIPTION) + '\n';
+                            fullAlarmList += placeholders.Parse(this.config.AlarmTextInList) + '\n';
 
                             if (config.GroupingType == AlarmGroupingType.ONE)
                             {
@@ -89,6 +89,11 @@ namespace TiaXmlReader.Generation.Alarms
                                 GenerateEmptyAlarms(config.GroupingType, config.PartitionType, lastAlarmNum + 1, slippingAlarmCount, compileUnit); //CompileUnit only used for group division
                                 lastAlarmNum += slippingAlarmCount;
                             }
+
+                            for (var x = 0; x < slippingAlarmCount; x++)
+                            {
+                                fullAlarmList += placeholders.Parse(this.config.EmptyAlarmTextInList) + '\n';
+                            }
                         }
 
                         if (config.GroupingType == AlarmGroupingType.GROUP)
@@ -98,6 +103,10 @@ namespace TiaXmlReader.Generation.Alarms
                         }
 
                         nextAlarmNum += config.SkipNumberAfterGroup;
+                        for (var x = 0; x < config.SkipNumberAfterGroup; x++)
+                        {
+                            fullAlarmList += '\n';
+                        }
                     }
                     break;
                 case AlarmPartitionType.ALARM_TYPE:
@@ -124,7 +133,7 @@ namespace TiaXmlReader.Generation.Alarms
                             placeholders.SetDeviceData(deviceData)
                                     .SetAlarmData(parsedAlarmData)
                                     .SetAlarmNum(nextAlarmNum++, config.AlarmNumFormat);
-                            fullAlarmList += placeholders.Parse(GenerationPlaceholders.ALARM_DESCRIPTION) + '\n';
+                            fullAlarmList += placeholders.Parse(this.config.AlarmTextInList) + '\n';
 
                             if (config.GroupingType == AlarmGroupingType.ONE)
                             {
@@ -149,6 +158,11 @@ namespace TiaXmlReader.Generation.Alarms
                                 GenerateEmptyAlarms(config.GroupingType, config.PartitionType, lastAlarmNum + 1, slippingAlarmCount, compileUnit); //CompileUnit only used for group division
                                 lastAlarmNum += slippingAlarmCount;
                             }
+
+                            for (var x = 0; x < slippingAlarmCount; x++)
+                            {
+                                fullAlarmList += placeholders.Parse(this.config.EmptyAlarmTextInList) + '\n';
+                            }
                         }
 
                         if (config.GroupingType == AlarmGroupingType.GROUP)
@@ -158,6 +172,10 @@ namespace TiaXmlReader.Generation.Alarms
                         }
 
                         nextAlarmNum += config.SkipNumberAfterGroup;
+                        for (var x = 0; x < config.SkipNumberAfterGroup; x++)
+                        {
+                            fullAlarmList += '\n';
+                        }
                     }
                     break;
             }
@@ -172,9 +190,9 @@ namespace TiaXmlReader.Generation.Alarms
                 AlarmVariable = config.EmptyAlarmContactAddress,
                 CoilAddress = config.DefaultCoilAddress,
                 SetCoilAddress = config.DefaultSetCoilAddress,
-                TimerAddress = config.DefaultTimerAddress,
-                TimerType = config.DefaultTimerType,
-                TimerValue = config.DefaultTimerValue,
+                TimerAddress = config.EmptyAlarmTimerAddress,
+                TimerType = config.EmptyAlarmTimerType,
+                TimerValue = config.EmptyAlarmTimerValue,
                 Description = "",
                 Enable = true
             };

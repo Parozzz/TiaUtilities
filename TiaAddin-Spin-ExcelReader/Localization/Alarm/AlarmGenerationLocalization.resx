@@ -147,6 +147,9 @@
   <data name="DEVICE_DATA_DESCRIPTION" xml:space="preserve">
     <value>Description &gt; {device_description}</value>
   </data>
+  <data name="DEVICE_DATA_NAME" xml:space="preserve">
+    <value>Name &gt; {device_name}</value>
+  </data>
   <data name="GROUPING_TYPE_GROUP" xml:space="preserve">
     <value>GroupPerSegment</value>
   </data>

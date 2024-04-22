@@ -35,9 +35,13 @@ namespace TiaXmlReader.Generation.Alarms
         [JsonProperty] public string AlarmNumFormat = "000.###";
         [JsonProperty] public uint AntiSlipNumber = 0;
         [JsonProperty] public uint SkipNumberAfterGroup = 0;
+
         [JsonProperty] public bool GenerateEmptyAlarmAntiSlip = false;
         [JsonProperty] public uint EmptyAlarmAtEnd = 0;
         [JsonProperty] public string EmptyAlarmContactAddress = "FALSE";
+        [JsonProperty] public string EmptyAlarmTimerAddress = "\\";
+        [JsonProperty] public string EmptyAlarmTimerType = "TON";
+        [JsonProperty] public string EmptyAlarmTimerValue = "T#0s";
 
         [JsonProperty] public string DefaultCoilAddress = "Alm.Act.Alm{alarm_num}";
         [JsonProperty] public string DefaultSetCoilAddress = "Alm.Mem.Alm{alarm_num}";
@@ -54,5 +58,8 @@ namespace TiaXmlReader.Generation.Alarms
         [JsonProperty] public string OneEachEmptyAlarmSegmentName = "Alm{alarm_num} - SPARE";
         [JsonProperty] public string GroupSegmentName = "Alm{alarm_num_start} ~ {alarm_num_end} - {device_description}";
         [JsonProperty] public string GroupEmptyAlarmSegmentName = "Alm{alarm_num_start} ~ {alarm_num_end} - SPARE";
+
+        [JsonProperty] public string AlarmTextInList = "{device_name} - {alarm_description}";
+        [JsonProperty] public string EmptyAlarmTextInList = "{device_name} - SPARE";
     }
 }

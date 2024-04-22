@@ -53,6 +53,8 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
                     JsonSerializer serializer = new JsonSerializer();
                     serializer.Converters.Add(new JavaScriptDateTimeConverter());
                     serializer.NullValueHandling = NullValueHandling.Ignore;
+                    serializer.DefaultValueHandling = DefaultValueHandling.Include;
+
                     using (var sr = new StreamReader(filePath))
                     {
                         using (var reader = new JsonTextReader(sr))
@@ -87,6 +89,8 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Converters.Add(new JavaScriptDateTimeConverter());
                 serializer.NullValueHandling = NullValueHandling.Ignore;
+                serializer.DefaultValueHandling = DefaultValueHandling.Include;
+
                 using (var sw = new StreamWriter(filePath))
                 {
                     using (var writer = new JsonTextWriter(sw))

@@ -83,6 +83,8 @@ namespace TiaXmlReader.Generation.GridHandler
         {
             typeof(DataGridView).InvokeMember("DoubleBuffered", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty, null, this.dataGridView, new object[] { true });
 
+            this.dataGridView.SuspendLayout();
+
             this.dataGridView.AutoGenerateColumns = false;
 
             this.dataGridView.Dock = DockStyle.Fill;
@@ -300,6 +302,8 @@ namespace TiaXmlReader.Generation.GridHandler
 
             excelDragHandler.Init();
             sortHandler.Init();
+
+            this.dataGridView.ResumeLayout();
         }
 
         private void DataErrorEventHandler(object sender, DataGridViewDataErrorEventArgs args)

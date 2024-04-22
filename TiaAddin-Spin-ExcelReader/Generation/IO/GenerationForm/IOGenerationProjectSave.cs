@@ -21,35 +21,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
         public const string EXTENSION = "json";
         public static string DEFAULT_FILE_PATH = Directory.GetCurrentDirectory() + @"\tempIOSave." + EXTENSION;
 
-        public class SaveData
-        {
-            [JsonProperty] public string Address { get; set; }
-            [JsonProperty] public string IOName { get; set; }
-            [JsonProperty] public string DBName { get; set; }
-            [JsonProperty] public string Variable { get; set; }
-            [JsonProperty] public string Comment { get; set; }
-            [JsonProperty] public int RowIndex { get; set; }
-
-            public void CopyFrom(IOData ioData)
-            {
-                this.Address = ioData.Address;
-                this.IOName = ioData.IOName;
-                this.DBName = ioData.DBName;
-                this.Variable = ioData.Variable;
-                this.Comment = ioData.Comment;
-            }
-
-            public void SaveTo(IOData ioData)
-            {
-                ioData.Address = this.Address;
-                ioData.IOName = this.IOName;
-                ioData.DBName = this.DBName;
-                ioData.Variable = this.Variable;
-                ioData.Comment = this.Comment;
-            }
-        }
-
-        [JsonProperty] public List<SaveData> SaveDataList { get; set; }
+        [JsonProperty] public Dictionary<int, IOData> RowDict { get; set; } = new Dictionary<int, IOData>();
 
         public IOGenerationProjectSave()
         {
@@ -59,19 +31,6 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
         public static bool Exists(string path)
         {
             return !string.IsNullOrEmpty(path) && File.Exists(path);
-        }
-
-        public void AddIOData(IOData data, int rowIndex)
-        {
-            if (SaveDataList == null)
-            {
-                SaveDataList = new List<SaveData>();
-            }
-
-            var saveData = new SaveData();
-            saveData.CopyFrom(data);
-            saveData.RowIndex = rowIndex;
-            SaveDataList.Add(saveData);
         }
 
         public static IOGenerationProjectSave Load(ref string filePath)

@@ -12,8 +12,8 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
         private readonly GridHandler<AlarmConfiguration, DeviceData> deviceDataGridHandler;
         private readonly GridHandler<AlarmConfiguration, AlarmData> alarmDataGridHandler;
 
-        public AlarmGenerationFormConfigHandler(AlarmGenerationForm form, AlarmConfiguration config, 
-                                                    GridHandler<AlarmConfiguration, DeviceData> deviceDataGridHandler, 
+        public AlarmGenerationFormConfigHandler(AlarmGenerationForm form, AlarmConfiguration config,
+                                                    GridHandler<AlarmConfiguration, DeviceData> deviceDataGridHandler,
                                                     GridHandler<AlarmConfiguration, AlarmData> alarmDataGridHandler)
         {
             this.form = form;
@@ -26,11 +26,11 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
         {
             var comboBox = form.partitionTypeComboBox;
             comboBox.SelectedValue = config.PartitionType;
-            comboBox.SelectionChangeCommitted += (sender, args) => { config.PartitionType = (AlarmPartitionType)form.groupingTypeComboBox.SelectedValue; };
+            comboBox.SelectionChangeCommitted += (sender, args) => { config.PartitionType = (AlarmPartitionType)form.partitionTypeComboBox.SelectedValue; };
 
             comboBox = form.groupingTypeComboBox;
             comboBox.SelectedValue = config.GroupingType;
-            comboBox.SelectionChangeCommitted += (sender, args) => { config.GroupingType = (AlarmGroupingType)form.partitionTypeComboBox.SelectedValue; };
+            comboBox.SelectionChangeCommitted += (sender, args) => { config.GroupingType = (AlarmGroupingType)form.groupingTypeComboBox.SelectedValue; };
 
             form.fcConfigButton.Click += (object sender, EventArgs args) =>
             {
@@ -61,7 +61,7 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
                     .ControlText(config.AlarmNumFormat)
                     .TextChanged(v => config.AlarmNumFormat = v);
 
-                configForm.AddTextBoxLine("Anti slittamento")
+                configForm.AddTextBoxLine("Anti-Slittamento")
                     .ControlText(config.AntiSlipNumber)
                     .UIntChanged(v => config.AntiSlipNumber = v);
 
@@ -69,17 +69,36 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
                     .ControlText(config.SkipNumberAfterGroup)
                     .UIntChanged(v => config.SkipNumberAfterGroup = v);
 
-                configForm.AddCheckBoxLine("Genera vuoti alla fine")
+                SetupConfigForm(form.alarmGenerationConfigButton, configForm);
+            };
+
+            form.emptyAlarmGenerationConfigButton.Click += (sender, args) =>
+            {
+                var configForm = new ConfigForm("Generazione Allarmi Vuoti");
+                configForm.AddCheckBoxLine("Genera in anti-slittamento")
                     .Value(config.GenerateEmptyAlarmAntiSlip)
                     .CheckedChanged(v => config.GenerateEmptyAlarmAntiSlip = v);
 
-                configForm.AddTextBoxLine("Vuoti alla fine")
+                configForm.AddTextBoxLine("Num. alla fine")
                     .ControlText(config.EmptyAlarmAtEnd)
                     .UIntChanged(v => config.EmptyAlarmAtEnd = v);
 
-                configForm.AddTextBoxLine("Indirizzo vuoti")
+                configForm.AddTextBoxLine("Indirizzo allarme")
                     .ControlText(config.EmptyAlarmContactAddress)
                     .TextChanged(v => config.EmptyAlarmContactAddress = v);
+
+                configForm.AddTextBoxLine("Indirizzo timer")
+                    .ControlText(config.EmptyAlarmTimerAddress)
+                    .TextChanged(v => config.EmptyAlarmTimerAddress = v);
+
+                configForm.AddComboBoxLine("Tipo timer")
+                    .Items(new string[] { "TON", "TOF" })
+                    .ControlText(config.EmptyAlarmTimerType)
+                    .TextChanged(v => config.EmptyAlarmTimerType = v);
+
+                configForm.AddTextBoxLine("Valore timer")
+                    .ControlText(config.EmptyAlarmTimerValue)
+                    .TextChanged(v => config.EmptyAlarmTimerValue = v);
 
                 SetupConfigForm(form.alarmGenerationConfigButton, configForm);
             };
@@ -157,7 +176,21 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
                     .TextChanged(v => config.GroupEmptyAlarmSegmentName = v);
 
                 SetupConfigForm(form.segmentNameConfigButton, configForm);
-            }; 
+            };
+
+            form.textListConfigButton.Click += (sender, args) =>
+            {
+                var configForm = new ConfigForm("Lista testi allarmi");
+                configForm.AddTextBoxLine("Testo allarme")
+                    .ControlText(config.AlarmTextInList)
+                    .TextChanged(v => config.AlarmTextInList = v);
+
+                configForm.AddTextBoxLine("Testo allarme vuoto")
+                    .ControlText(config.EmptyAlarmTextInList)
+                    .TextChanged(v => config.EmptyAlarmTextInList = v);
+
+                SetupConfigForm(form.textListConfigButton, configForm);
+            };
         }
 
         private void SetupConfigForm(Control button, ConfigForm configForm)

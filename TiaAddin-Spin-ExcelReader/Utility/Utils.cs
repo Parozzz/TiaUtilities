@@ -32,40 +32,78 @@ namespace TiaXmlReader.Utility
             MessageBox.Show(message, caption);
         }
 
-        public static Dictionary<string, object> CreatePublicFieldSnapshot<T>(T obj)
+        public static Dictionary<string, object> CreatePublicFieldSnapshot(object obj)
         {
             Validate.NotNull(obj);
 
             var snapshotDict = new Dictionary<string, object>();
-            foreach (var field in typeof(T).GetFields().Where(field => field.IsPublic))
+
+            var type = obj.GetType();
+
+            var fields = type.GetFields();
+            foreach (var field in fields.Where(field => field.IsPublic))
             {
-                snapshotDict.Add(field.Name, field.GetValue(obj));
+                var fieldName = "FIELD_" + field.Name;
+                snapshotDict.Add(fieldName, field.GetValue(obj));
             }
+
+            var properties = type.GetProperties();
+            foreach(var property in properties.Where(property => property.CanRead))
+            {
+                var propertyName = "PROPERTY_" + property.Name;
+                snapshotDict.Add(propertyName, property.GetValue(obj));
+            }
+
             return snapshotDict;
         }
 
-        public static bool ComparePublicFieldSnapshot<T>(T obj, Dictionary<string, object> snapshotDict) //TRUE IF ALL EQUALS
+        public static bool ComparePublicFieldSnapshot(object obj, Dictionary<string, object> snapshotDict) //TRUE IF ALL EQUALS
         {
             Validate.NotNull(obj);
             Validate.NotNull(snapshotDict);
 
-            var fields = typeof(T).GetFields();
+            var type = obj.GetType();
+
+            var fields = type.GetFields();
             foreach (var field in fields.Where(f => f.IsPublic))
             {
-                if (!snapshotDict.ContainsKey(field.Name))
+                var fieldName = "FIELD_" + field.Name;
+                if (!snapshotDict.ContainsKey(fieldName))
                 {
                     return false;
                 }
 
-                var snapshotValue = snapshotDict[field.Name];
+                var snapshotValue = snapshotDict[fieldName];
                 var value = field.GetValue(obj);
-                if ((snapshotValue == null && value != null) || (snapshotValue != null && value == null) || (snapshotValue != null && !snapshotValue.Equals(value)))
+                if (AreValuesDifferent(snapshotValue, value))
+                {
+                    return false;
+                }
+            }
+
+            var properties = type.GetProperties();
+            foreach (var property in properties.Where(p => p.CanRead))
+            {
+                var propertyName = "PROPERTY_" + property.Name;
+                if (!snapshotDict.ContainsKey(propertyName))
+                {
+                    return false;
+                }
+
+                var snapshotValue = snapshotDict[propertyName];
+                var value = property.GetValue(obj);
+                if (AreValuesDifferent(snapshotValue, value))
                 {
                     return false;
                 }
             }
 
             return true;
+        }
+
+        private static bool AreValuesDifferent(object valueOne, object valueTwo)
+        {
+            return (valueOne == null && valueTwo != null) || (valueOne != null && valueTwo == null) || (valueOne != null && !valueOne.Equals(valueTwo));
         }
 
         public static bool ArePublicFieldDifferent<T>(T obj1, T obj2)

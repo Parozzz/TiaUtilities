@@ -34,7 +34,10 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
 
             this.config = config;
             this.gridHandler = new GridHandler<IOGenerationExcelImportConfiguration, IOGenerationExcelImportData>
-                (this.dataGridView, gridSettings, config, IOGenerationExcelImportData.COLUMN_LIST);
+                (this.dataGridView, gridSettings, config, IOGenerationExcelImportData.COLUMN_LIST)
+            {
+                RowCount = 1999
+            };
 
             Init();
         }

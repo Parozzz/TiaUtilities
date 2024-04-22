@@ -27,7 +27,6 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
 
         private IOGenerationExcelImportConfiguration ExcelImportConfig { get => settings.ExcelImportConfiguration; }
         private IOConfiguration IOConfig { get => settings.IOConfiguration; }
-        private IOGenerationPreferences Preferences { get => settings.Preferences; }
 
         private string lastFilePath;
 
@@ -144,8 +143,8 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                     .ColorChanged(color => settings.GridSettings.SelectedCellTriangleColor = color);
 
                 configForm.AddColorPickerLine("Anteprima")
-                    .ApplyColor(this.Preferences.PreviewColor)
-                    .ColorChanged(color => this.Preferences.PreviewColor = color);
+                    .ApplyColor(settings.GridSettings.PreviewColor)
+                    .ColorChanged(color => settings.GridSettings.PreviewColor = color);
 
                 configForm.StartShowingAtLocation(Cursor.Position);
                 configForm.Init();
@@ -207,48 +206,43 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             var timer = new Timer { Interval = 1000 };
             timer.Start();
 
-            var configSnapshot = Utils.CreatePublicFieldSnapshot(this.IOConfig);
-            var excelImportConfigSnapshot = Utils.CreatePublicFieldSnapshot(this.ExcelImportConfig);
-            var preferencesSnapshot = Utils.CreatePublicFieldSnapshot(this.Preferences);
-            var gridSettingsSnapshot = Utils.CreatePublicFieldSnapshot(this.settings.GridSettings);
+            var objectSnapshotDict = new Dictionary<object, Dictionary<string, object>>()
+            {
+                {this.IOConfig, null },
+                {this.ExcelImportConfig, null },
+                {this.settings.GridSettings, null }
+            };
+
+            ParseSnapshotDict(objectSnapshotDict, forceRefreshSnapshot: true, skipSave: true);
             timer.Tick += (sender, e) =>
             {
-                //This is done this way because is impossible that fields are changed toghether for multiple configs. So at the first that is different, i create a snapshot and save to file!
-                var configEqual = Utils.ComparePublicFieldSnapshot(this.IOConfig, configSnapshot);
-                if (!configEqual)
-                {
-                    configSnapshot = Utils.CreatePublicFieldSnapshot(this.IOConfig);
-                    this.settings.Save();
-                    return;
-                }
-
-                var excelImportConfigEqual = Utils.ComparePublicFieldSnapshot(this.ExcelImportConfig, excelImportConfigSnapshot);
-                if (!excelImportConfigEqual)
-                {
-                    excelImportConfigSnapshot = Utils.CreatePublicFieldSnapshot(this.ExcelImportConfig);
-                    this.settings.Save();
-                    return;
-                }
-
-                var preferencesEqual = Utils.ComparePublicFieldSnapshot(this.Preferences, preferencesSnapshot);
-                if (!preferencesEqual)
-                {
-                    preferencesSnapshot = Utils.CreatePublicFieldSnapshot(this.Preferences);
-                    this.settings.Save();
-                    return;
-                }
-
-                var gridSettingsEqual = Utils.ComparePublicFieldSnapshot(this.settings.GridSettings, gridSettingsSnapshot);
-                if (!gridSettingsEqual)
-                {
-                    gridSettingsSnapshot = Utils.CreatePublicFieldSnapshot(this.settings.GridSettings);
-                    this.settings.Save();
-                    return;
-                }
+                ParseSnapshotDict(objectSnapshotDict, forceRefreshSnapshot: false, skipSave: false);
             };
             #endregion
 
             UpdateConfigPanel();
+        }
+
+        private void ParseSnapshotDict(Dictionary<object, Dictionary<string, object>> objectSnapshotDict, bool forceRefreshSnapshot = false, bool skipSave = false)
+        {
+            bool saveNecessary = false;
+            foreach(var entry in objectSnapshotDict.ToList()) //To list neede to make a copy so i can change the dict below!
+            {
+                var obj = entry.Key;
+                var oldSnapshotDict = entry.Value;
+                if(oldSnapshotDict == null || !Utils.ComparePublicFieldSnapshot(obj, oldSnapshotDict) || forceRefreshSnapshot)
+                {
+                    saveNecessary = true;
+
+                    var snap = Utils.CreatePublicFieldSnapshot(obj);
+                    objectSnapshotDict[obj] = snap;
+                }
+            }
+
+            if(saveNecessary && !skipSave)
+            {
+                this.settings.Save();
+            }
         }
 
         public void ProjectSave(bool saveAs = false)
@@ -256,7 +250,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             var projectSave = new IOGenerationProjectSave();
             foreach (var entry in gridHandler.DataSource.GetNotEmptyDataDict())
             {
-                projectSave.AddIOData(entry.Key, entry.Value);
+                projectSave.RowDict.Add(entry.Value, entry.Key);
             }
             projectSave.Save(ref lastFilePath, saveAs);
 
@@ -271,12 +265,13 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                 this.dataGridView.SuspendLayout();
                 this.gridHandler.DataSource.InitializeData(this.gridHandler.RowCount);
 
-                foreach (var saveData in loadedProjectSave.SaveDataList)
+                foreach (var entry in loadedProjectSave.RowDict)
                 {
-                    var rowIndex = saveData.RowIndex;
+                    var rowIndex = entry.Key;
+                    var data = entry.Value;
                     if (rowIndex >= 0 && rowIndex <= this.gridHandler.RowCount)
                     {
-                        saveData.SaveTo(this.gridHandler.DataSource[saveData.RowIndex]);
+                        this.gridHandler.DataHandler.MoveValues(data, this.gridHandler.DataSource[rowIndex]);
                     }
                 }
 

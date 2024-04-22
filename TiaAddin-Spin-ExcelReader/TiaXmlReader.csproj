@@ -211,6 +211,7 @@
     <Compile Include="Generation\Alarms\GenerationForm\AlarmGenerationProjectSave.cs" />
     <Compile Include="Generation\Alarms\GenerationForm\AlarmGenerationSettings.cs" />
     <Compile Include="Generation\Configuration\ConfigFormCheckBoxLine.cs" />
+    <Compile Include="Generation\GenerationAutoSaveEnum.cs" />
     <Compile Include="Generation\GenerationUtils.cs" />
     <Compile Include="Generation\GridHandler\Data\GridDataHandler.cs" />
     <Compile Include="Generation\GridHandler\Data\GridDataColumn.cs" />
@@ -242,7 +243,6 @@
     </Compile>
     <Compile Include="Generation\IO\GenerationForm\IOGenerationFormConfigHandler.cs" />
     <Compile Include="Generation\GridHandler\GridCellPreview.cs" />
-    <Compile Include="Generation\IO\GenerationForm\IOGenerationPreferences.cs" />
     <Compile Include="Generation\IO\GenerationForm\IOGenerationSettings.cs" />
     <Compile Include="Generation\IO\GenerationForm\IOGenerationProjectSave.cs" />
     <Compile Include="Generation\IO\GenerationForm\IOGenerationComparer.cs" />

@@ -102,7 +102,7 @@ namespace TiaXmlReader.Generation.GridHandler
 
                 var valueMeasuredText = TextRenderer.MeasureText(value, style.Font);
                 rec = hasPrefix
-                    ? new RectangleF(new PointF(rec.Location.X + rec.Width - 3, rec.Location.Y), new SizeF(valueMeasuredText.Width, bounds.Height))
+                    ? new RectangleF(new PointF(rec.Location.X + rec.Width - 7, rec.Location.Y), new SizeF(valueMeasuredText.Width, bounds.Height))
                     : new RectangleF(bounds.Location, new Size(valueMeasuredText.Width, bounds.Height));
 
                 var color = isValueDefault ? settings.PreviewColor : style.ForeColor;
