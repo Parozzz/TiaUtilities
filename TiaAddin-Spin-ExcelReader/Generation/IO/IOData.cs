@@ -5,16 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TiaXmlReader.Generation.IO;
-using TiaXmlReader.GenerationForms.IO;
 using TiaXmlReader.SimaticML;
 using TiaXmlReader.Generation;
-using TiaXmlReader.GenerationForms.GridHandler;
 using TiaXmlReader.SimaticML.Enums;
 using System.ComponentModel.DataAnnotations;
 using TiaXmlReader.Localization;
-using TiaXmlReader.GenerationForms.GridHandler.Data;
 using System.Drawing;
 using System.Windows.Forms;
+using TiaXmlReader.Generation.GridHandler.Data;
 
 namespace TiaXmlReader.Generation.IO
 {

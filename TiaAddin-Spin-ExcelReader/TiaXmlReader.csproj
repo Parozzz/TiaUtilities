@@ -201,63 +201,62 @@
     <Compile Include="DBDuplicationForm.Designer.cs">
       <DependentUpon>DBDuplicationForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GenerationForms\Alarms\AlarmGenerationForm.cs">
+    <Compile Include="Generation\Alarms\GenerationForm\AlarmGenerationForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GenerationForms\Alarms\AlarmGenerationForm.Designer.cs">
+    <Compile Include="Generation\Alarms\GenerationForm\AlarmGenerationForm.Designer.cs">
       <DependentUpon>AlarmGenerationForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GenerationForms\Alarms\AlarmGenerationFormConfigHandler.cs" />
-    <Compile Include="GenerationForms\Alarms\AlarmGenerationProjectSave.cs" />
-    <Compile Include="GenerationForms\Alarms\AlarmGenerationSettings.cs" />
-    <Compile Include="GenerationForms\Config\ConfigFormCheckBoxLine.cs" />
-    <Compile Include="GenerationForms\GenerationUtils.cs" />
-    <Compile Include="GenerationForms\GridHandler\Data\GridDataHandler.cs" />
-    <Compile Include="GenerationForms\GridHandler\Data\GridDataColumn.cs" />
-    <Compile Include="GenerationForms\GridHandler\Data\GridDataPreview.cs" />
-    <Compile Include="GenerationForms\GridHandler\GridSettings.cs" />
-    <Compile Include="GenerationForms\Config\ConfigForm.cs">
+    <Compile Include="Generation\Alarms\GenerationForm\AlarmGenerationFormConfigHandler.cs" />
+    <Compile Include="Generation\Alarms\GenerationForm\AlarmGenerationProjectSave.cs" />
+    <Compile Include="Generation\Alarms\GenerationForm\AlarmGenerationSettings.cs" />
+    <Compile Include="Generation\Configuration\ConfigFormCheckBoxLine.cs" />
+    <Compile Include="Generation\GenerationUtils.cs" />
+    <Compile Include="Generation\GridHandler\Data\GridDataHandler.cs" />
+    <Compile Include="Generation\GridHandler\Data\GridDataColumn.cs" />
+    <Compile Include="Generation\GridHandler\Data\GridDataPreview.cs" />
+    <Compile Include="Generation\GridHandler\GridSettings.cs" />
+    <Compile Include="Generation\Configuration\ConfigForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GenerationForms\Config\ConfigForm.Designer.cs">
+    <Compile Include="Generation\Configuration\ConfigForm.Designer.cs">
       <DependentUpon>ConfigForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GenerationForms\GridHandler\GridCellChange.cs" />
-    <Compile Include="GenerationForms\GridHandler\GridDataSource.cs" />
-    <Compile Include="GenerationForms\GridHandler\GridHandler.cs" />
-    <Compile Include="GenerationForms\GridHandler\Data\IGridData.cs" />
-    <Compile Include="GenerationForms\GridHandler\IGridRowComparer.cs" />
-    <Compile Include="GenerationForms\Config\ConfigFormColorPickerButtonLine.cs" />
-    <Compile Include="GenerationForms\Config\ConfigFormComboBoxLine.cs" />
-    <Compile Include="GenerationForms\Config\ConfigFormTextBoxLine.cs" />
-    <Compile Include="GenerationForms\Config\IConfigFormLine.cs" />
-    <Compile Include="GenerationForms\IGenerationConfiguration.cs" />
-    <Compile Include="GenerationForms\IO\ExcelImporter\IOGenerationExcelImportConfiguration.cs" />
-    <Compile Include="GenerationForms\IO\ExcelImporter\IOGenerationExcelImportData.cs" />
-    <Compile Include="GenerationForms\IO\ExcelImporter\IOGenerationExcelImportForm.cs">
+    <Compile Include="Generation\GridHandler\GridCellChange.cs" />
+    <Compile Include="Generation\GridHandler\GridDataSource.cs" />
+    <Compile Include="Generation\GridHandler\GridHandler.cs" />
+    <Compile Include="Generation\GridHandler\Data\IGridData.cs" />
+    <Compile Include="Generation\GridHandler\IGridRowComparer.cs" />
+    <Compile Include="Generation\Configuration\ConfigFormColorPickerButtonLine.cs" />
+    <Compile Include="Generation\Configuration\ConfigFormComboBoxLine.cs" />
+    <Compile Include="Generation\Configuration\ConfigFormTextBoxLine.cs" />
+    <Compile Include="Generation\Configuration\IConfigFormLine.cs" />
+    <Compile Include="Generation\IGenerationConfiguration.cs" />
+    <Compile Include="Generation\IO\GenerationForm\ExcelImporter\IOGenerationExcelImportConfiguration.cs" />
+    <Compile Include="Generation\IO\GenerationForm\ExcelImporter\IOGenerationExcelImportData.cs" />
+    <Compile Include="Generation\IO\GenerationForm\ExcelImporter\IOGenerationExcelImportForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GenerationForms\IO\ExcelImporter\IOGenerationExcelImportForm.Designer.cs">
+    <Compile Include="Generation\IO\GenerationForm\ExcelImporter\IOGenerationExcelImportForm.Designer.cs">
       <DependentUpon>IOGenerationExcelImportForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GenerationForms\IO\IOGenerationFormConfigHandler.cs" />
-    <Compile Include="GenerationForms\GridHandler\GridCellPreview.cs" />
-    <Compile Include="GenerationForms\IO\IOGenerationPreferences.cs" />
-    <Compile Include="GenerationForms\IO\IOGenerationSettings.cs" />
-    <Compile Include="GenerationForms\IO\IOGenerationProjectSave.cs" />
-    <Compile Include="GenerationForms\IO\IOGenerationComparer.cs" />
-    <Compile Include="GenerationForms\GridHandler\GridExcelDragHandler.cs" />
-    <Compile Include="GenerationForms\GridHandler\GridCellPaintHandler.cs" />
-    <Compile Include="GenerationForms\GridHandler\GridSortHandler.cs" />
-    <Compile Include="GenerationForms\IO\IOGenerationUtils.cs" />
+    <Compile Include="Generation\IO\GenerationForm\IOGenerationFormConfigHandler.cs" />
+    <Compile Include="Generation\GridHandler\GridCellPreview.cs" />
+    <Compile Include="Generation\IO\GenerationForm\IOGenerationPreferences.cs" />
+    <Compile Include="Generation\IO\GenerationForm\IOGenerationSettings.cs" />
+    <Compile Include="Generation\IO\GenerationForm\IOGenerationProjectSave.cs" />
+    <Compile Include="Generation\IO\GenerationForm\IOGenerationComparer.cs" />
+    <Compile Include="Generation\GridHandler\GridExcelDragHandler.cs" />
+    <Compile Include="Generation\GridHandler\GridCellPaintHandler.cs" />
+    <Compile Include="Generation\GridHandler\GridSortHandler.cs" />
+    <Compile Include="Generation\IO\GenerationForm\IOGenerationUtils.cs" />
     <Compile Include="Generation\IO\IOExcelImporter.cs" />
     <Compile Include="Generation\IO\IOConfiguration.cs" />
     <Compile Include="Generation\IO\IOData.cs" />
     <Compile Include="Generation\IO\IOXmlGenerator.cs" />
-    <Compile Include="Generation\IO_Cad\GenerationIO_CAD.cs" />
-    <Compile Include="Generation\UserAlarms\AlarmData.cs" />
-    <Compile Include="Generation\UserAlarms\AlarmConfiguration.cs" />
-    <Compile Include="Generation\UserAlarms\AlarmExcelImporter.cs" />
+    <Compile Include="Generation\Alarms\AlarmData.cs" />
+    <Compile Include="Generation\Alarms\AlarmConfiguration.cs" />
+    <Compile Include="Generation\Alarms\AlarmExcelImporter.cs" />
     <Compile Include="Localization\Alarm\AlarmGenerationLocalization.Designer.cs">
       <DependentUpon>AlarmGenerationLocalization.resx</DependentUpon>
       <AutoGen>True</AutoGen>
@@ -284,13 +283,12 @@
     </Compile>
     <Compile Include="Localization\LocalizationHelper.cs" />
     <Compile Include="SimaticML\Attributes\Attribute.cs" />
-    <Compile Include="Generation\IO_Cad\CadData.cs" />
-    <Compile Include="Generation\UserAlarms\AlarmXmlGenerator.cs" />
+    <Compile Include="Generation\Alarms\AlarmXmlGenerator.cs" />
     <Compile Include="Generation\IGeneration.cs" />
-    <Compile Include="GenerationForms\IO\IOGenerationForm.cs">
+    <Compile Include="Generation\IO\GenerationForm\IOGenerationForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GenerationForms\IO\IOGenerationForm.Designer.cs">
+    <Compile Include="Generation\IO\GenerationForm\IOGenerationForm.Designer.cs">
       <DependentUpon>IOGenerationForm.cs</DependentUpon>
     </Compile>
     <Compile Include="SaveData.cs" />
@@ -310,7 +308,7 @@
     <Compile Include="SimaticML\Blocks\FlagNet\nPart\Part.cs" />
     <Compile Include="SimaticML\Blocks\FlagNet\Wire.cs" />
     <Compile Include="SimaticML\nBlockAttributeList\Section.cs" />
-    <Compile Include="Generation\UserAlarms\DeviceData.cs" />
+    <Compile Include="Generation\Alarms\DeviceData.cs" />
     <Compile Include="Generation\GenerationPlaceholders.cs" />
     <Compile Include="SimaticML\Enums\SimaticBlockType.cs" />
     <Compile Include="SimaticML\Enums\SimaticVariableScope.cs" />
@@ -344,16 +342,16 @@
     <EmbeddedResource Include="DBDuplicationForm.resx">
       <DependentUpon>DBDuplicationForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GenerationForms\Alarms\AlarmGenerationForm.resx">
+    <EmbeddedResource Include="Generation\Alarms\GenerationForm\AlarmGenerationForm.resx">
       <DependentUpon>AlarmGenerationForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GenerationForms\Config\ConfigForm.resx">
+    <EmbeddedResource Include="Generation\Configuration\ConfigForm.resx">
       <DependentUpon>ConfigForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GenerationForms\IO\ExcelImporter\IOGenerationExcelImportForm.resx">
+    <EmbeddedResource Include="Generation\IO\GenerationForm\ExcelImporter\IOGenerationExcelImportForm.resx">
       <DependentUpon>IOGenerationExcelImportForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GenerationForms\IO\IOGenerationForm.resx">
+    <EmbeddedResource Include="Generation\IO\GenerationForm\IOGenerationForm.resx">
       <DependentUpon>IOGenerationForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Localization\Alarm\AlarmGenerationLocalization.it.resx">
@@ -420,5 +418,6 @@
     <Content Include="!!TO-DO!!.txt" />
     <Content Include="Resources\DocComments.xml" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

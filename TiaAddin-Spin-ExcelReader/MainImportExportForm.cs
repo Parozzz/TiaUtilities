@@ -3,16 +3,12 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.Globalization;
 using System.IO;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using TiaXmlReader;
-using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.IO;
-using TiaXmlReader.Generation.IO_Cad;
-using TiaXmlReader.GenerationForms.IO;
-using TiaXmlReader.SimaticML;
 using TiaXmlReader.Utility;
-using TiaXmlReader.Generation.UserAlarms;
+using TiaXmlReader.Generation.Alarms;
+using TiaXmlReader.Generation.Alarms.GenerationForm;
+using TiaXmlReader.Generation.IO.GenerationForm;
 
 namespace TiaXmlReader
 {
@@ -133,12 +129,6 @@ namespace TiaXmlReader
                                 var alarmXmlGenerator = new AlarmXmlGenerator(alarmExcelImporter.GetConfiguration(), alarmExcelImporter.GetAlarmDataList(), alarmExcelImporter.GetDeviceDataList());
                                 alarmXmlGenerator.GenerateBlocks();
                                 alarmXmlGenerator.ExportXML(exportPathTextBlock.Text);
-                                break;
-                            case "type2":
-                                var generationIO_Cad = new GenerationIO_CAD();
-                                generationIO_Cad.ImportExcelConfig(configWorksheet);
-                                generationIO_Cad.GenerateBlocks();
-                                generationIO_Cad.ExportXML(exportPathTextBlock.Text);
                                 break;
                             case "type3":
                                 var ioExcelImporter = new IOExcelImporter();

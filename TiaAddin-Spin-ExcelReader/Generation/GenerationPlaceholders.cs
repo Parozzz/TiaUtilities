@@ -1,18 +1,11 @@
-﻿using DocumentFormat.OpenXml.Bibliography;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using TiaXmlReader.Generation.IO_Cad;
-using TiaXmlReader.SimaticML;
 using TiaXmlReader.Generation.IO;
-using TiaXmlReader.Generation.UserAlarms;
 using TiaXmlReader.SimaticML.Enums;
-using TiaXmlReader.GenerationForms.GridHandler;
 using TiaXmlReader.GenerationForms;
+using TiaXmlReader.Generation.Alarms;
+using TiaXmlReader.Generation.GridHandler.Data;
 
 namespace TiaXmlReader.Generation
 {
@@ -128,56 +121,6 @@ namespace TiaXmlReader.Generation
                 Function = (value) => value.ToString(alarmNumFormat)
             });
         }
-
-        public GenerationPlaceholders SetCadData(CadData cadData)
-        {
-            AddOrReplace("{siemens_memory_type}", new StringGenerationPlaceholderData()
-            {
-                Value = cadData.CadAddress,
-                Function = (value) => CadData.GetMemoryArea(value).GetInitial()
-            });
-
-            AddOrReplace("{cad_memory_type}", new StringGenerationPlaceholderData()
-            {
-                Value = cadData.CadAddress,
-                Function = (value) => CadData.GetCadMemoryType(value)
-            });
-
-            AddOrReplace("{bit}", new StringGenerationPlaceholderData()
-            {
-                Value = cadData.CadAddress,
-                Function = (value) => "" + CadData.GetAddressBit(value)
-            });
-
-            AddOrReplace("{byte}", new StringGenerationPlaceholderData()
-            {
-                Value = cadData.CadAddress,
-                Function = (value) => "" + CadData.GetAddressByte(value)
-            });
-
-            AddOrReplace("{cad_address}", new StringGenerationPlaceholderData() { Value = cadData.CadAddress });
-            AddOrReplace("{io_name}", new StringGenerationPlaceholderData() { Value = cadData.IOName });
-            AddOrReplace("{db_name}", new StringGenerationPlaceholderData() { Value = cadData.DBName });
-            AddOrReplace("{variable_name}", new StringGenerationPlaceholderData() { Value = cadData.VariableName });
-            AddOrReplace("{comment1}", new StringGenerationPlaceholderData() { Value = cadData.Comment1 });
-            AddOrReplace("{comment2}", new StringGenerationPlaceholderData() { Value = cadData.Comment2 });
-            AddOrReplace("{comment3}", new StringGenerationPlaceholderData() { Value = cadData.Comment3 });
-            AddOrReplace("{comment4}", new StringGenerationPlaceholderData() { Value = cadData.Comment4 });
-
-            string[] joinedCommentList = { cadData.Comment1, cadData.Comment2, cadData.Comment3, cadData.Comment4 };
-            AddOrReplace("{joined_comments}", new StringGenerationPlaceholderData()
-            {
-                Value = string.Join(" ", joinedCommentList.Where(str => !string.IsNullOrWhiteSpace(str)).ToList())
-            });
-
-            AddOrReplace("{mnemonic}", new StringGenerationPlaceholderData() { Value = cadData.Mnemonic });
-            AddOrReplace("{wire_num}", new StringGenerationPlaceholderData() { Value = cadData.WireNum });
-            AddOrReplace("{page}", new StringGenerationPlaceholderData() { Value = cadData.Page });
-            AddOrReplace("{panel}", new StringGenerationPlaceholderData() { Value = cadData.Panel });
-
-            return this;
-        }
-
         public GenerationPlaceholders SetIOData(IOData ioData, IOConfiguration config = null)
         {
             AddOrReplace("{memory_type}", new StringGenerationPlaceholderData() { Value = ioData.GetMemoryArea().GetTIAMnemonic() });
