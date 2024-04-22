@@ -20,7 +20,7 @@ namespace TiaXmlReader.GenerationForms.IO
 {
     public partial class IOGenerationForm : Form
     {
-        private readonly GridHandler<IOData> gridHandler;
+        private readonly GridHandler<IOConfiguration, IOData> gridHandler;
 
         private readonly IOGenerationSettings settings;
         private readonly IOGenerationFormConfigHandler configHandler;
@@ -38,7 +38,7 @@ namespace TiaXmlReader.GenerationForms.IO
             settings = IOGenerationSettings.Load();
             settings.Save(); //This could be avoided but is to be sure that all the classes that are created new will be saved to file!
 
-            this.gridHandler = new GridHandler<IOData>(this.dataGridView, settings.GridSettings, IOData.COLUMN_LIST, new IOGenerationComparer())
+            this.gridHandler = new GridHandler<IOConfiguration, IOData>(this.dataGridView, settings.GridSettings, IOConfig, IOData.COLUMN_LIST, new IOGenerationComparer())
             {
                 RowCount = 2999
             };
@@ -182,7 +182,7 @@ namespace TiaXmlReader.GenerationForms.IO
             #endregion
 
             #region CELL_PAINTERS
-            this.gridHandler.AddCellPainter(new IOGenerationFormCellPreview(this.gridHandler.DataSource, this.IOConfig, this.Preferences));
+            
             #endregion
 
             #region DRAG
@@ -191,12 +191,12 @@ namespace TiaXmlReader.GenerationForms.IO
             #endregion
             //Column initialization before gridHandler.Init()
             #region COLUMNS
-            var addressColumn = this.gridHandler.AddTextBoxColumn(IOData.ADDRESS, 55);
+            var addressColumn = this.gridHandler.AddTextBoxColumn(IOData.ADDRESS, 65);
             addressColumn.MaxInputLength = 10;
 
-            this.gridHandler.AddTextBoxColumn(IOData.IO_NAME, 80);
-            this.gridHandler.AddTextBoxColumn(IOData.DB_NAME, 80);
-            this.gridHandler.AddTextBoxColumn(IOData.VARIABLE, 105);
+            this.gridHandler.AddTextBoxColumn(IOData.IO_NAME, 110);
+            this.gridHandler.AddTextBoxColumn(IOData.DB_NAME, 110);
+            this.gridHandler.AddTextBoxColumn(IOData.VARIABLE, 140);
             this.gridHandler.AddTextBoxColumn(IOData.COMMENT, 0);
             #endregion
 

@@ -9,7 +9,7 @@ using TiaXmlReader.Utility;
 
 namespace TiaXmlReader.GenerationForms.GridHandler.Data
 {
-    public class GridDataHandler<T> where T : IGridData
+    public class GridDataHandler<C, T> where C : IGenerationConfiguration where T : IGridData<C>
     {
         private readonly DataGridView dataGridView;
         private readonly List<GridDataColumn> dataColumns;

@@ -6,19 +6,19 @@ using static TiaXmlReader.GenerationForms.GridHandler.GridCellPaintHandler;
 
 namespace TiaXmlReader.GenerationForms.GridHandler
 {
-    public class GridSortHandler<T> : IGridCellPainter where T : IGridData
+    public class GridSortHandler<C, T> : IGridCellPainter where C : IGenerationConfiguration where T : IGridData<C>
     {
-        private readonly GridDataSource<T> dataSource;
+        private readonly GridDataSource<C, T> dataSource;
         private readonly DataGridView dataGridView;
         private readonly UndoRedoHandler undoRedoHandler;
-        private readonly IGridRowComparer<T> comparer;
+        private readonly IGridRowComparer<C, T> comparer;
 
         private SortOrder sortOrder = SortOrder.None;
         private Dictionary<T, int> noSortIndexSnapshot;
 
         public Color SortIconColor { get; set; } = Color.Green;
 
-        public GridSortHandler(DataGridView dataGridView, GridDataSource<T> dataSource, UndoRedoHandler undoRedoHandler, IGridRowComparer<T> comparer)
+        public GridSortHandler(DataGridView dataGridView, GridDataSource<C, T> dataSource, UndoRedoHandler undoRedoHandler, IGridRowComparer<C, T> comparer)
         {
             this.dataGridView = dataGridView;
             this.dataSource = dataSource;

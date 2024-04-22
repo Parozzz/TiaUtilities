@@ -23,7 +23,7 @@ namespace TiaXmlReader.GenerationForms.IO.ExcelImporter
         public const int COMMENT_COLUMN = 2;
 
         private readonly IOGenerationExcelImportConfiguration config;
-        private readonly GridHandler<IOGenerationExcelImportData> gridHandler;
+        private readonly GridHandler<IOGenerationExcelImportConfiguration, IOGenerationExcelImportData> gridHandler;
 
         public IEnumerable<IOGenerationExcelImportData> ImportDataEnumerable { get => gridHandler.DataSource.GetNotEmptyDataDict().Keys; }
 
@@ -32,7 +32,8 @@ namespace TiaXmlReader.GenerationForms.IO.ExcelImporter
             InitializeComponent();
 
             this.config = config;
-            this.gridHandler = new GridHandler<IOGenerationExcelImportData>(this.dataGridView, gridSettings, IOGenerationExcelImportData.COLUMN_LIST);
+            this.gridHandler = new GridHandler<IOGenerationExcelImportConfiguration, IOGenerationExcelImportData>
+                (this.dataGridView, gridSettings, config, IOGenerationExcelImportData.COLUMN_LIST);
 
             Init();
         }

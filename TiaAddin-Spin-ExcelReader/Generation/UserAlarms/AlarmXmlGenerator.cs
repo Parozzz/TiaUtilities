@@ -60,7 +60,7 @@ namespace TiaXmlReader.Generation.UserAlarms
 
                             var parsedAlarmData = ReplaceAlarmDataWithDefaultAndPrefix(alarmData);
 
-                            placeholders.SetConsumerData(deviceData)
+                            placeholders.SetDeviceData(deviceData)
                                 .SetAlarmData(parsedAlarmData)
                                 .SetAlarmNum(nextAlarmNum++, config.AlarmNumFormat);
                             fullAlarmList += placeholders.Parse(GenerationPlaceholders.ALARM_DESCRIPTION) + '\n';
@@ -120,7 +120,7 @@ namespace TiaXmlReader.Generation.UserAlarms
                         var startAlarmNum = nextAlarmNum;
                         foreach (var deviceData in deviceDataList)
                         {
-                            placeholders.SetConsumerData(deviceData)
+                            placeholders.SetDeviceData(deviceData)
                                     .SetAlarmData(parsedAlarmData)
                                     .SetAlarmNum(nextAlarmNum++, config.AlarmNumFormat);
                             fullAlarmList += placeholders.Parse(GenerationPlaceholders.ALARM_DESCRIPTION) + '\n';

@@ -8,9 +8,10 @@ using TiaXmlReader.GenerationForms.GridHandler;
 
 namespace TiaXmlReader.GenerationForms.GridHandler
 {
-    public interface IGridRowComparer<T> : IComparer<T> where T : IGridData
+    public interface IGridRowComparer<C, T> : IComparer<T> where C : IGenerationConfiguration where T : IGridData<C>
     {
         void SetSortOrder(SortOrder sortOrder);
+
         SortOrder GetSortOrder();
 
         bool CanSortColumn(int column);

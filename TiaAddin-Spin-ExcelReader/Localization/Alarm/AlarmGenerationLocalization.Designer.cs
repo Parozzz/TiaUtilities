@@ -79,7 +79,7 @@ namespace TiaXmlReader.Localization.Alarm {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Description.
+        ///   Cerca una stringa localizzata simile a Description &gt;  {alarm_description}.
         /// </summary>
         public static string ALARM_DATA_DESCRIPTION {
             get {
@@ -133,7 +133,7 @@ namespace TiaXmlReader.Localization.Alarm {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Address.
+        ///   Cerca una stringa localizzata simile a Address &gt; {device_address}.
         /// </summary>
         public static string DEVICE_DATA_ADDRESS {
             get {
@@ -142,7 +142,7 @@ namespace TiaXmlReader.Localization.Alarm {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Description.
+        ///   Cerca una stringa localizzata simile a Description &gt; {device_description}.
         /// </summary>
         public static string DEVICE_DATA_DESCRIPTION {
             get {

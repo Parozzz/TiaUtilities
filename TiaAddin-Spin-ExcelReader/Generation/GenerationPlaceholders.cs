@@ -11,6 +11,8 @@ using TiaXmlReader.SimaticML;
 using TiaXmlReader.Generation.IO;
 using TiaXmlReader.Generation.UserAlarms;
 using TiaXmlReader.SimaticML.Enums;
+using TiaXmlReader.GenerationForms.GridHandler;
+using TiaXmlReader.GenerationForms;
 
 namespace TiaXmlReader.Generation
 {
@@ -53,8 +55,8 @@ namespace TiaXmlReader.Generation
 
     public class GenerationPlaceholders
     {
-        public const string USER_NAME = "{user_name}";
-        public const string USER_DESCRIPTION = "{user_description}";
+        public const string DEVICE_ADDRESS = "{device_address}";
+        public const string DEVICE_DESCRIPTION = "{device_description}";
         public const string ALARM_DESCRIPTION = "{alarm_description}";
         public const string ALARM_NUM = "{alarm_num}";
         public const string ALARM_NUM_START = "{alarm_num_start}";
@@ -71,10 +73,28 @@ namespace TiaXmlReader.Generation
             generationPlaceholdersDict.Clear();
         }
 
-        public GenerationPlaceholders SetConsumerData(DeviceData consumerData)
+        public GenerationPlaceholders SetGridData<C>(IGridData<C> gridData, C configuration) where C : IGenerationConfiguration
         {
-            AddOrReplace(USER_NAME, new StringGenerationPlaceholderData() { Value = consumerData.Address });
-            AddOrReplace(USER_DESCRIPTION, new StringGenerationPlaceholderData() { Value = consumerData.Description });
+            if (gridData is DeviceData deviceData)
+            {
+                return this.SetDeviceData(deviceData);
+            }
+            else if (gridData is AlarmData alarmData)
+            {
+                return this.SetAlarmData(alarmData);
+            }
+            else if (gridData is IOData ioData)
+            {
+                return configuration is IOConfiguration ioConfig ? this.SetIOData(ioData, ioConfig) : this.SetIOData(ioData);
+            }
+
+            return this;
+        }
+
+        public GenerationPlaceholders SetDeviceData(DeviceData consumerData)
+        {
+            AddOrReplace(DEVICE_ADDRESS, new StringGenerationPlaceholderData() { Value = consumerData.Address });
+            AddOrReplace(DEVICE_DESCRIPTION, new StringGenerationPlaceholderData() { Value = consumerData.Description });
             return this;
         }
 
@@ -158,15 +178,19 @@ namespace TiaXmlReader.Generation
             return this;
         }
 
-        public GenerationPlaceholders SetIOData(IOData ioData)
+        public GenerationPlaceholders SetIOData(IOData ioData, IOConfiguration config = null)
         {
             AddOrReplace("{memory_type}", new StringGenerationPlaceholderData() { Value = ioData.GetMemoryArea().GetTIAMnemonic() });
             AddOrReplace("{bit}", new StringGenerationPlaceholderData() { Value = "" + ioData.GetAddressBit() });
             AddOrReplace("{byte}", new StringGenerationPlaceholderData() { Value = "" + ioData.GetAddressByte() });
             AddOrReplace("{db_name}", new StringGenerationPlaceholderData() { Value = ioData.DBName });
-            AddOrReplace("{variable_name}", new StringGenerationPlaceholderData() { Value = ioData.Variable });
+
+            var variable = string.IsNullOrEmpty(ioData.Variable) && config != null ? config.DefaultVariableName : ioData.Variable;
+            var ioName = string.IsNullOrEmpty(ioData.IOName) && config != null ? config.DefaultIoName : ioData.IOName;
+            AddOrReplace("{variable_name}", new StringGenerationPlaceholderData() { Value = variable });
+            AddOrReplace("{io_name}", new StringGenerationPlaceholderData() { Value = this.Parse(ioName) }); // This one the last (Comment is not useful here!). The io name can contains other placeholders!
+
             AddOrReplace("{comment}", new StringGenerationPlaceholderData() { Value = ioData.Comment });
-            AddOrReplace("{io_name}", new StringGenerationPlaceholderData() { Value = this.Parse(ioData.IOName) }); // This one for last!
             return this;
         }
 

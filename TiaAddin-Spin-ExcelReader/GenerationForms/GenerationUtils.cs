@@ -15,7 +15,7 @@ namespace TiaXmlReader.GenerationForms
 {
     public static class GenerationUtils
     {
-        public static void DragPreview<T>(DragData data, GridHandler<T> gridHandler) where T : IGridData
+        public static void DragPreview<C, T>(DragData data, GridHandler<C, T> gridHandler) where C : IGenerationConfiguration where T : IGridData<C>
         {
             var startCell = data.DataGridView.Rows[data.StartingRow]?.Cells[data.DraggedColumn];
             if(!(startCell is DataGridViewTextBoxCell))
@@ -45,7 +45,7 @@ namespace TiaXmlReader.GenerationForms
             }
         }
 
-        public static void DragMouseUp<T>(DragData data, GridHandler<T> gridHandler) where T : IGridData
+        public static void DragMouseUp<C, T>(DragData data, GridHandler<C, T> gridHandler) where C : IGenerationConfiguration where T : IGridData<C>
         {
             var startCell = data.DataGridView.Rows[data.StartingRow]?.Cells[data.DraggedColumn];
             if (!(startCell is DataGridViewTextBoxCell))

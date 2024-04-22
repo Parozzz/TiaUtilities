@@ -12,7 +12,7 @@ using TiaXmlReader.GenerationForms.GridHandler.Data;
 
 namespace TiaXmlReader.Generation.UserAlarms
 {
-    public class DeviceData : IGridData
+    public class DeviceData : IGridData<AlarmConfiguration>
     {
         public static int COLUMN_COUNT = 0;
         //THESE IS THE ORDER IN WHICH THEY APPEAR!
@@ -44,6 +44,11 @@ namespace TiaXmlReader.Generation.UserAlarms
         [JsonProperty]
         [Display(Description = "DEVICE_DATA_DESCRIPTION", ResourceType = typeof(Localization.Alarm.AlarmGenerationLocalization))]
         public string Description { get; set; }
+
+        public GridDataPreview GetPreview(int column, AlarmConfiguration config)
+        {
+            return null;
+        }
 
         public void Clear()
         {

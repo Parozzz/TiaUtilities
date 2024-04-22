@@ -10,18 +10,20 @@ using TiaXmlReader.GenerationForms.GridHandler.Data;
 
 namespace TiaXmlReader.GenerationForms.GridHandler
 {
-    public class GridDataSource<T> where T : IGridData
+    public class GridDataSource<C, T> where C : IGenerationConfiguration where T : IGridData<C>
     {
         private readonly DataGridView dataGridView;
-        private readonly GridDataHandler<T> associator;
+        private readonly GridDataHandler<C, T> dataHandler;
 
         private readonly List<T> dataList;
         private readonly BindingList<T> bindingList;
 
-        public GridDataSource(DataGridView dataGridView, GridDataHandler<T> associator)
+        public int Count { get => dataList.Count(); }
+
+        public GridDataSource(DataGridView dataGridView, GridDataHandler<C, T> dataHandler)
         {
             this.dataGridView = dataGridView;
-            this.associator = associator;
+            this.dataHandler = dataHandler;
 
             dataList = new List<T>();
             bindingList = new BindingList<T>(dataList);
@@ -46,7 +48,7 @@ namespace TiaXmlReader.GenerationForms.GridHandler
             this.dataList.Clear();
             for (int i = 0; i < dataAmount; i++)
             {
-                dataList.Add(associator.CreateInstance());
+                dataList.Add(dataHandler.CreateInstance());
             }
 
             this.dataGridView.DataSource = new BindingSource() { DataSource = bindingList };

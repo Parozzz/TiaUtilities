@@ -16,11 +16,12 @@ namespace TiaXmlReader.GenerationForms.Alarms
     {
         private readonly AlarmGenerationForm form;
         private readonly AlarmConfiguration config;
-        private readonly GridHandler<DeviceData> deviceDataGridHandler;
-        private readonly GridHandler<AlarmData> alarmDataGridHandler;
+        private readonly GridHandler<AlarmConfiguration, DeviceData> deviceDataGridHandler;
+        private readonly GridHandler<AlarmConfiguration, AlarmData> alarmDataGridHandler;
 
         public AlarmGenerationFormConfigHandler(AlarmGenerationForm form, AlarmConfiguration config, 
-                                                    GridHandler<DeviceData> deviceDataGridHandler, GridHandler<AlarmData> alarmDataGridHandler)
+                                                    GridHandler<AlarmConfiguration, DeviceData> deviceDataGridHandler, 
+                                                    GridHandler<AlarmConfiguration, AlarmData> alarmDataGridHandler)
         {
             this.form = form;
             this.config = config;

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
+using TiaXmlReader.GenerationForms;
 
 namespace TiaXmlReader.Generation.UserAlarms
 {
@@ -20,7 +21,7 @@ namespace TiaXmlReader.Generation.UserAlarms
         ONE
     }
 
-    public class AlarmConfiguration
+    public class AlarmConfiguration : IGenerationConfiguration
     {
         [JsonProperty] public string FCBlockName = "fcAlarmGeneration";
         [JsonProperty] public uint FCBlockNumber = 100;
@@ -43,14 +44,14 @@ namespace TiaXmlReader.Generation.UserAlarms
         [JsonProperty] public string DefaultTimerType = "TON";
         [JsonProperty] public string DefaultTimerValue = "T#0s";
 
-        [JsonProperty] public string AlarmAddressPrefix = "{user_name}.";
+        [JsonProperty] public string AlarmAddressPrefix = "{device_address}.";
         [JsonProperty] public string CoilAddressPrefix = "";
         [JsonProperty] public string SetCoilAddressPrefix = "";
         [JsonProperty] public string TimerAddressPrefix = "";
 
-        [JsonProperty] public string OneEachSegmentName = "Alm{alarm_num} - {user_description} {alarm_description}";
+        [JsonProperty] public string OneEachSegmentName = "Alm{alarm_num} - {device_description} {alarm_description}";
         [JsonProperty] public string OneEachEmptyAlarmSegmentName = "Alm{alarm_num} - SPARE";
-        [JsonProperty] public string GroupSegmentName = "Alm{alarm_num_start} ~ {alarm_num_end} - {user_description}";
+        [JsonProperty] public string GroupSegmentName = "Alm{alarm_num_start} ~ {alarm_num_end} - {device_description}";
         [JsonProperty] public string GroupEmptyAlarmSegmentName = "Alm{alarm_num_start} ~ {alarm_num_end} - SPARE";
     }
 }

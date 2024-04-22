@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using static TiaXmlReader.GenerationForms.GridHandler.GridCellPaintHandler;
 using TiaXmlReader.GenerationForms.GridHandler;
 using TiaXmlReader.GenerationForms.IO;
+using TiaXmlReader.GenerationForms.GridHandler.Data;
 
 namespace TiaXmlReader.GenerationForms.GridHandler
 {
@@ -97,6 +98,7 @@ namespace TiaXmlReader.GenerationForms.GridHandler
             private bool content;
             private bool executed;
             public object data;
+            public GridDataPreview dataPreview;
 
             public PaintRequest Background()
             {

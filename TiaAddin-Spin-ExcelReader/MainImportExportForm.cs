@@ -168,12 +168,12 @@ namespace TiaXmlReader
 
         private void GenerateIOMenuItem_Click(object sender, EventArgs e)
         {
-            new IOGenerationForm().Show();
+            new IOGenerationForm().Show(this);
         }
 
         private void GenerateAlarmsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            new AlarmGenerationForm().Show();
+            new AlarmGenerationForm().Show(this);
         }
     }
 }

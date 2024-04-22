@@ -46,13 +46,13 @@
             this.fieldDefaultValueConfigButton = new System.Windows.Forms.Button();
             this.fieldPrefixConfigButton = new System.Windows.Forms.Button();
             this.segmentNameConfigButton = new System.Windows.Forms.Button();
-            this.groupingTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
             this.divisionTypeLabel = new System.Windows.Forms.Label();
-            this.partitionTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
             this.memoryTypeLabel = new System.Windows.Forms.Label();
             this.GridsSplitPanel = new System.Windows.Forms.SplitContainer();
             this.DeviceDataGridView = new System.Windows.Forms.DataGridView();
             this.AlarmDataGridView = new System.Windows.Forms.DataGridView();
+            this.groupingTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
+            this.partitionTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
             this.mainPanel.SuspendLayout();
             this.TopTableLayoutPanel.SuspendLayout();
             this.TopMenuStrip.SuspendLayout();
@@ -81,7 +81,7 @@
             this.mainPanel.RowCount = 2;
             this.mainPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.mainPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.mainPanel.Size = new System.Drawing.Size(1294, 537);
+            this.mainPanel.Size = new System.Drawing.Size(1384, 811);
             this.mainPanel.TabIndex = 1;
             // 
             // TopTableLayoutPanel
@@ -102,7 +102,7 @@
             this.TopTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.TopTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.TopTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.TopTableLayoutPanel.Size = new System.Drawing.Size(1288, 106);
+            this.TopTableLayoutPanel.Size = new System.Drawing.Size(1378, 106);
             this.TopTableLayoutPanel.TabIndex = 18;
             // 
             // TopMenuStrip
@@ -158,7 +158,7 @@
             // exportXMLToolStripMenuItem
             // 
             this.exportXMLToolStripMenuItem.Name = "exportXMLToolStripMenuItem";
-            this.exportXMLToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exportXMLToolStripMenuItem.Size = new System.Drawing.Size(135, 22);
             this.exportXMLToolStripMenuItem.Text = "Export XML";
             // 
             // preferencesToolStripMenuItem
@@ -175,8 +175,8 @@
             this.PlaceholdersLabel.Name = "PlaceholdersLabel";
             this.PlaceholdersLabel.Size = new System.Drawing.Size(3658, 16);
             this.PlaceholdersLabel.TabIndex = 9;
-            this.PlaceholdersLabel.Text = "Placeholders: {user_name} {user_description} {alarm_num_start} {alarm_num_end} {a" +
-    "larm_num} {alarm_description}";
+            this.PlaceholdersLabel.Text = "Placeholders: {device_address} {device_description} {alarm_num_start} {alarm_num_" +
+    "end} {alarm_num} {alarm_description}";
             // 
             // configPanel
             // 
@@ -262,14 +262,6 @@
             this.segmentNameConfigButton.Text = "Nomi Segmenti";
             this.segmentNameConfigButton.UseVisualStyleBackColor = true;
             // 
-            // groupingTypeComboBox
-            // 
-            this.groupingTypeComboBox.FormattingEnabled = true;
-            this.groupingTypeComboBox.Location = new System.Drawing.Point(377, 33);
-            this.groupingTypeComboBox.Name = "groupingTypeComboBox";
-            this.groupingTypeComboBox.Size = new System.Drawing.Size(112, 21);
-            this.groupingTypeComboBox.TabIndex = 3;
-            // 
             // divisionTypeLabel
             // 
             this.divisionTypeLabel.AutoSize = true;
@@ -279,14 +271,6 @@
             this.divisionTypeLabel.Size = new System.Drawing.Size(149, 18);
             this.divisionTypeLabel.TabIndex = 2;
             this.divisionTypeLabel.Text = "Tipo raggruppamento";
-            // 
-            // partitionTypeComboBox
-            // 
-            this.partitionTypeComboBox.FormattingEnabled = true;
-            this.partitionTypeComboBox.Location = new System.Drawing.Point(123, 33);
-            this.partitionTypeComboBox.Name = "partitionTypeComboBox";
-            this.partitionTypeComboBox.Size = new System.Drawing.Size(100, 21);
-            this.partitionTypeComboBox.TabIndex = 1;
             // 
             // memoryTypeLabel
             // 
@@ -311,8 +295,8 @@
             // GridsSplitPanel.Panel2
             // 
             this.GridsSplitPanel.Panel2.Controls.Add(this.AlarmDataGridView);
-            this.GridsSplitPanel.Size = new System.Drawing.Size(1288, 422);
-            this.GridsSplitPanel.SplitterDistance = 248;
+            this.GridsSplitPanel.Size = new System.Drawing.Size(1378, 696);
+            this.GridsSplitPanel.SplitterDistance = 400;
             this.GridsSplitPanel.SplitterWidth = 12;
             this.GridsSplitPanel.TabIndex = 19;
             // 
@@ -325,7 +309,7 @@
             this.DeviceDataGridView.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
             this.DeviceDataGridView.Name = "DeviceDataGridView";
             this.DeviceDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.DeviceDataGridView.Size = new System.Drawing.Size(248, 422);
+            this.DeviceDataGridView.Size = new System.Drawing.Size(400, 696);
             this.DeviceDataGridView.TabIndex = 2;
             // 
             // AlarmDataGridView
@@ -337,14 +321,30 @@
             this.AlarmDataGridView.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
             this.AlarmDataGridView.Name = "AlarmDataGridView";
             this.AlarmDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.AlarmDataGridView.Size = new System.Drawing.Size(1028, 422);
+            this.AlarmDataGridView.Size = new System.Drawing.Size(966, 696);
             this.AlarmDataGridView.TabIndex = 3;
+            // 
+            // groupingTypeComboBox
+            // 
+            this.groupingTypeComboBox.FormattingEnabled = true;
+            this.groupingTypeComboBox.Location = new System.Drawing.Point(377, 33);
+            this.groupingTypeComboBox.Name = "groupingTypeComboBox";
+            this.groupingTypeComboBox.Size = new System.Drawing.Size(133, 21);
+            this.groupingTypeComboBox.TabIndex = 3;
+            // 
+            // partitionTypeComboBox
+            // 
+            this.partitionTypeComboBox.FormattingEnabled = true;
+            this.partitionTypeComboBox.Location = new System.Drawing.Point(123, 33);
+            this.partitionTypeComboBox.Name = "partitionTypeComboBox";
+            this.partitionTypeComboBox.Size = new System.Drawing.Size(100, 21);
+            this.partitionTypeComboBox.TabIndex = 1;
             // 
             // AlarmGenerationForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(1294, 537);
+            this.ClientSize = new System.Drawing.Size(1384, 811);
             this.Controls.Add(this.mainPanel);
             this.DoubleBuffered = true;
             this.MainMenuStrip = this.TopMenuStrip;

@@ -22,8 +22,8 @@ namespace TiaXmlReader.GenerationForms.IO
 {
     public partial class AlarmGenerationForm : Form
     {
-        private readonly GridHandler<DeviceData> deviceGridHandler;
-        private readonly GridHandler<AlarmData> alarmGridHandler;
+        private readonly GridHandler<AlarmConfiguration, DeviceData> deviceGridHandler;
+        private readonly GridHandler<AlarmConfiguration, AlarmData> alarmGridHandler;
 
         private readonly AlarmGenerationSettings settings;
         private readonly AlarmGenerationFormConfigHandler configHandler = null;
@@ -38,12 +38,12 @@ namespace TiaXmlReader.GenerationForms.IO
             settings = AlarmGenerationSettings.Load();
             settings.Save(); //This could be avoided but is to be sure that all the classes that are created new will be saved to file!
 
-            this.deviceGridHandler = new GridHandler<DeviceData>(this.DeviceDataGridView, settings.GridSettings, DeviceData.COLUMN_LIST, null)
+            this.deviceGridHandler = new GridHandler<AlarmConfiguration, DeviceData>(this.DeviceDataGridView, settings.GridSettings, AlarmConfig, DeviceData.COLUMN_LIST, null)
             {
                 RowCount = 499
             };
 
-            this.alarmGridHandler = new GridHandler<AlarmData>(this.AlarmDataGridView, settings.GridSettings, AlarmData.COLUMN_LIST, null)
+            this.alarmGridHandler = new GridHandler<AlarmConfiguration, AlarmData>(this.AlarmDataGridView, settings.GridSettings, AlarmConfig, AlarmData.COLUMN_LIST, null)
             {
                 RowCount = 29
             };
@@ -71,8 +71,6 @@ namespace TiaXmlReader.GenerationForms.IO
 
         public void Init()
         {
-            //var addressColumn = this.dataTable.Rows.Add(TOTAL_ROW_COUNT);
-
             #region TopMenu
             this.saveToolStripMenuItem.Click += (object sender, EventArgs args) => { this.ProjectSave(); };
             this.saveAsToolStripMenuItem.Click += (object sender, EventArgs args) => { this.ProjectSave(true); };
@@ -156,10 +154,6 @@ namespace TiaXmlReader.GenerationForms.IO
             this.groupingTypeComboBox.DataSource = gropingTypeItems;
             #endregion
 
-            #region CELL_PAINTERS
-            //this.deviceGridHandler.AddCellPainter(new IOGenerationFormPreviewCellPainter(this.deviceGridHandler.DataSource, this.IOConfig, this.Preferences));
-            #endregion
-
             #region DRAG
             this.deviceGridHandler.SetDragPreviewAction(data => { GenerationUtils.DragPreview(data, this.deviceGridHandler); });
             this.deviceGridHandler.SetDragMouseUpAction(data => { GenerationUtils.DragMouseUp(data, this.deviceGridHandler); });
@@ -172,7 +166,7 @@ namespace TiaXmlReader.GenerationForms.IO
             #endregion
             //Column initialization before gridHandler.Init()
             #region COLUMNS;
-            this.deviceGridHandler.AddTextBoxColumn(DeviceData.ADDRESS, 85);
+            this.deviceGridHandler.AddTextBoxColumn(DeviceData.ADDRESS, 145);
             this.deviceGridHandler.AddTextBoxColumn(DeviceData.DESCRIPTION, 0);
 
             this.alarmGridHandler.AddCheckBoxColumn(AlarmData.ENABLE, 40);
@@ -251,7 +245,7 @@ namespace TiaXmlReader.GenerationForms.IO
                     if (rowIndex >= 0 && rowIndex <= this.deviceGridHandler.RowCount)
                     {
                         var data = this.deviceGridHandler.DataSource[rowIndex];
-                        this.deviceGridHandler.Associator.MoveValues(entry.Value, data);
+                        this.deviceGridHandler.DataHandler.MoveValues(entry.Value, data);
                     }
                 }
 
@@ -261,7 +255,7 @@ namespace TiaXmlReader.GenerationForms.IO
                     if (rowIndex >= 0 && rowIndex <= this.alarmGridHandler.RowCount)
                     {
                         var data = this.alarmGridHandler.DataSource[rowIndex];
-                        this.alarmGridHandler.Associator.MoveValues(entry.Value, data);
+                        this.alarmGridHandler.DataHandler.MoveValues(entry.Value, data);
                     }
                 }
 

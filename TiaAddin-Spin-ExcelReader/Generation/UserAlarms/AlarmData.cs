@@ -11,7 +11,7 @@ using TiaXmlReader.GenerationForms.GridHandler.Data;
 
 namespace TiaXmlReader.Generation.UserAlarms
 {
-    public class AlarmData : IGridData
+    public class AlarmData : IGridData<AlarmConfiguration>
     {
         public static int COLUMN_COUNT = 0;
         //THESE IS THE ORDER IN WHICH THEY APPEAR!
@@ -91,6 +91,60 @@ namespace TiaXmlReader.Generation.UserAlarms
 
                 return COLUMN_LIST[i].PropertyInfo.GetValue(this);
             }
+        }
+
+        public GridDataPreview GetPreview(int column, AlarmConfiguration config)
+        {
+            if(string.IsNullOrEmpty(AlarmVariable) || this.IsEmpty())
+            {
+                return null;
+            }
+
+            if(column == COIL_ADDRESS)
+            {
+                return new GridDataPreview()
+                {
+                    Prefix = config.CoilAddressPrefix,
+                    DefaultValue = config.DefaultCoilAddress,
+                    Value = this.CoilAddress
+                };
+            }
+            else if(column == SET_COIL_ADDRESS)
+            {
+                return new GridDataPreview()
+                {
+                    Prefix = config.SetCoilAddressPrefix,
+                    DefaultValue = config.DefaultSetCoilAddress,
+                    Value = this.SetCoilAddress
+                };
+            }
+            else if(column == TIMER_ADDRESS)
+            {
+                return new GridDataPreview()
+                {
+                    Prefix = config.TimerAddressPrefix,
+                    DefaultValue = config.DefaultTimerAddress,
+                    Value = this.TimerAddress
+                };
+            }
+            else if (column == TIMER_TYPE)
+            {
+                return new GridDataPreview()
+                {
+                    DefaultValue = config.DefaultTimerType,
+                    Value = this.TimerType
+                };
+            }
+            else if (column == TIMER_VALUE)
+            {
+                return new GridDataPreview()
+                {
+                    DefaultValue = config.DefaultTimerValue,
+                    Value = this.TimerValue
+                };
+            }
+
+            return null;
         }
 
         public void Clear()

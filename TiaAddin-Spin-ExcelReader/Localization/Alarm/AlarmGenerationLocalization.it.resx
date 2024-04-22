@@ -124,7 +124,7 @@
     <value>Indirizzo bobina</value>
   </data>
   <data name="ALARM_DATA_DESCRIPTION" xml:space="preserve">
-    <value>Descrizione</value>
+    <value>Descrizione &gt;  {alarm_description}</value>
   </data>
   <data name="ALARM_DATA_ENABLE" xml:space="preserve">
     <value>Abilita</value>
@@ -142,10 +142,10 @@
     <value>Valore timer</value>
   </data>
   <data name="DEVICE_DATA_ADDRESS" xml:space="preserve">
-    <value>Indirizzo</value>
+    <value>Indirizzo &gt; {device_address}</value>
   </data>
   <data name="DEVICE_DATA_DESCRIPTION" xml:space="preserve">
-    <value>Descrizione</value>
+    <value>Descrizione &gt; {device_description}</value>
   </data>
   <data name="GROUPING_TYPE_GROUP" xml:space="preserve">
     <value>GruppoPerSegmento</value>

@@ -18,7 +18,7 @@ using System.Windows.Forms;
 
 namespace TiaXmlReader.Generation.IO
 {
-    public class IOData : IGridData
+    public class IOData : IGridData<IOConfiguration>
     {
         public static int COLUMN_COUNT = 0;
         //THESE IS THE ORDER IN WHICH THEY APPEAR!
@@ -84,8 +84,18 @@ namespace TiaXmlReader.Generation.IO
 
         public GridDataPreview GetPreview(int column, IOConfiguration config)
         {
+            if (string.IsNullOrEmpty(this.Address) || this.IsEmpty())
+            {
+                return null;
+            }
+
             if (column == IO_NAME)
             {
+                if (string.IsNullOrEmpty(config.DefaultIoName) && string.IsNullOrEmpty(this.IOName))
+                {
+                    return null;
+                }
+
                 return new GridDataPreview()
                 {
                     DefaultValue = config.DefaultIoName,
@@ -94,10 +104,15 @@ namespace TiaXmlReader.Generation.IO
             }
             else if (column == VARIABLE)
             {
+                if (string.IsNullOrEmpty(config.DefaultVariableName) && string.IsNullOrEmpty(this.Variable))
+                {
+                    return null;
+                }
+
                 var prefix = "";
                 if (config.MemoryType == IOMemoryTypeEnum.DB)
                 {
-                    prefix = this.GetMemoryArea() == SimaticMemoryArea.INPUT ? config.PrefixInputDB : config.PrefixOutputDB;
+                    prefix = this.DBName + "." + (this.GetMemoryArea() == SimaticMemoryArea.INPUT ? config.PrefixInputDB : config.PrefixOutputDB);
                 }
                 else if (config.MemoryType == IOMemoryTypeEnum.MERKER)
                 {
@@ -202,15 +217,6 @@ namespace TiaXmlReader.Generation.IO
             return SimaticTagAddress.FromAddress(Address);
         }
 
-        public void CopyFrom(IOData ioData)
-        {
-            this.Address = ioData.Address;
-            this.IOName = ioData.IOName;
-            this.DBName = ioData.DBName;
-            this.Variable = ioData.Variable;
-            this.Comment = ioData.Comment;
-        }
-
         public IOData Clone()
         {
             return new IOData()
@@ -222,6 +228,5 @@ namespace TiaXmlReader.Generation.IO
                 Comment = this.Comment
             };
         }
-
     }
 }

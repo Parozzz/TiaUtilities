@@ -121,16 +121,16 @@
     <value>Indirizzo</value>
   </data>
   <data name="DATA_COMMENT" xml:space="preserve">
-    <value>Commento</value>
+    <value>Commento &gt; {comment}</value>
   </data>
   <data name="DATA_DBNAME" xml:space="preserve">
-    <value>DB</value>
+    <value>DB &gt; {db_name}</value>
   </data>
   <data name="DATA_IONAME" xml:space="preserve">
-    <value>Nome IO</value>
+    <value>Nome IO &gt; {io_name}</value>
   </data>
   <data name="DATA_VARIABLE" xml:space="preserve">
-    <value>Variabile</value>
+    <value>Variabile &gt; {variable_name}</value>
   </data>
   <data name="GROUPING_TYPE_BIT" xml:space="preserve">
     <value>BitPerSegmento</value>

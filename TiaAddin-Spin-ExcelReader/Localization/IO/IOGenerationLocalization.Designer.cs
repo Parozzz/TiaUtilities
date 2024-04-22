@@ -70,7 +70,7 @@ namespace TiaXmlReader.Localization.IO {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Comment.
+        ///   Cerca una stringa localizzata simile a Comment &gt; {comment}.
         /// </summary>
         public static string DATA_COMMENT {
             get {
@@ -79,7 +79,7 @@ namespace TiaXmlReader.Localization.IO {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Name DB.
+        ///   Cerca una stringa localizzata simile a DB Name &gt; {db_name}.
         /// </summary>
         public static string DATA_DBNAME {
             get {
@@ -88,7 +88,7 @@ namespace TiaXmlReader.Localization.IO {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a IO Tag.
+        ///   Cerca una stringa localizzata simile a IO Tag &gt; {io_name}.
         /// </summary>
         public static string DATA_IONAME {
             get {
@@ -97,7 +97,7 @@ namespace TiaXmlReader.Localization.IO {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Variable.
+        ///   Cerca una stringa localizzata simile a Variable &gt; {variable_name}.
         /// </summary>
         public static string DATA_VARIABLE {
             get {

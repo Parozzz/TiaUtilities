@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TiaXmlReader.GenerationForms.IO.ExcelImporter
 {
-    public class IOGenerationExcelImportConfiguration
+    public class IOGenerationExcelImportConfiguration : IGenerationConfiguration
     {
         [JsonProperty] public string AddressCellConfig = "$A";
         [JsonProperty] public string IONameCellConfig = "$A";

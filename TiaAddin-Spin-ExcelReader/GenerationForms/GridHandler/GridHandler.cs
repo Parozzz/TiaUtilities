@@ -9,10 +9,11 @@ using TiaXmlReader.UndoRedo;
 using static TiaXmlReader.GenerationForms.GridHandler.GridExcelDragHandler;
 using TiaXmlReader.Utility;
 using TiaXmlReader.GenerationForms.GridHandler.Data;
+using TiaXmlReader.GenerationForms.IO;
 
 namespace TiaXmlReader.GenerationForms.GridHandler
 {
-    public class GridHandler<T> where T : IGridData
+    public class GridHandler<C, T> where C : IGenerationConfiguration where T : IGridData<C>
     {
         private class ColumnInfo
         {
@@ -25,14 +26,14 @@ namespace TiaXmlReader.GenerationForms.GridHandler
 
         private readonly DataGridView dataGridView;
         private readonly GridSettings settings;
-        public GridDataHandler<T> Associator { get; private set; }
-        public GridDataSource<T> DataSource { get; private set; }
+        private readonly C configuration;
+        public GridDataHandler<C, T> DataHandler { get; private set; }
+        public GridDataSource<C, T> DataSource { get; private set; }
         private readonly UndoRedoHandler undoRedoHandler;
         private readonly GridExcelDragHandler excelDragHandler;
-        private readonly GridSortHandler<T> sortHandler;
+        private readonly GridSortHandler<C, T> sortHandler;
         
-        private readonly List<ColumnInfo> columnInfoList = new List<ColumnInfo>();
-
+        private readonly List<ColumnInfo> columnInfoList;
         private readonly List<IGridCellPainter> cellPainterList;
 
         public uint RowCount { get; set; } = 9;
@@ -40,18 +41,19 @@ namespace TiaXmlReader.GenerationForms.GridHandler
         public bool EnablePasteFromExcel { get; set; } = true;
         public bool EnableRowSelectionFromRowHeaderClick { get; set; } = true;
 
-        public GridHandler(DataGridView dataGridView, GridSettings settings, List<GridDataColumn> dataColumnList, IGridRowComparer<T> comparer = null)
+        public GridHandler(DataGridView dataGridView, GridSettings settings, C configuration, List<GridDataColumn> dataColumnList, IGridRowComparer<C, T> comparer = null)
         {
             this.dataGridView = dataGridView;
 
             this.settings = settings;
-            this.Associator = new GridDataHandler<T>(this.dataGridView, dataColumnList);
-            this.DataSource = new GridDataSource<T>(this.dataGridView, this.Associator);
+            this.configuration = configuration;
+            this.DataHandler = new GridDataHandler<C, T>(this.dataGridView, dataColumnList);
+            this.DataSource = new GridDataSource<C, T>(this.dataGridView, this.DataHandler);
             this.undoRedoHandler = new UndoRedoHandler();
             this.excelDragHandler = new GridExcelDragHandler(this.dataGridView, settings);
-            this.sortHandler = new GridSortHandler<T>(this.dataGridView, this.DataSource, this.undoRedoHandler, comparer);
-           
+            this.sortHandler = new GridSortHandler<C, T>(this.dataGridView, this.DataSource, this.undoRedoHandler, comparer);
 
+            this.columnInfoList = new List<ColumnInfo>();
             this.cellPainterList = new List<IGridCellPainter>();
         }
 
@@ -127,6 +129,7 @@ namespace TiaXmlReader.GenerationForms.GridHandler
             var paintHandler = new GridCellPaintHandler(this.dataGridView);
             paintHandler.AddPainter(this.sortHandler); //ORDER IS IMPORTANT!
             paintHandler.AddPainter(this.excelDragHandler);
+            paintHandler.AddPainter(new GridCellPreview<C,T>(this.DataSource, this.configuration, this.settings));
             paintHandler.AddPainterRange(cellPainterList);
             paintHandler.Init();
             #endregion
@@ -277,7 +280,14 @@ namespace TiaXmlReader.GenerationForms.GridHandler
 
             dataGridView.CellContentClick += (sender, args) =>
             {
-                var cell = this.dataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex];
+                var rowIndex = args.RowIndex;
+                var columnIndex = args.ColumnIndex;
+                if(rowIndex < 0 || rowIndex >= this.dataGridView.RowCount || columnIndex < 0 || columnIndex >= this.dataGridView.ColumnCount)
+                {
+                    return;
+                }
+
+                var cell = this.dataGridView.Rows[rowIndex].Cells[columnIndex];
                 if (cell is DataGridViewCheckBoxCell checkBoxCell)
                 {
                     var oldValue = (bool)(checkBoxCell.Value ?? false); //In this case the value is still the old one. For checkBox, been boolean value, i can predict the next!
@@ -333,7 +343,7 @@ namespace TiaXmlReader.GenerationForms.GridHandler
             return column;
         }
 
-        private C AddColumn<C>(C column, string name, int width, int columnIndex = 1, string dataPropertyName = "") where C : DataGridViewColumn
+        private CL AddColumn<CL>(CL column, string name, int width, int columnIndex = 1, string dataPropertyName = "") where CL : DataGridViewColumn
         {
             this.columnInfoList.Add(new ColumnInfo()
             {
@@ -412,12 +422,12 @@ namespace TiaXmlReader.GenerationForms.GridHandler
 
         public void ChangeRow(int rowIndex, T data)
         {
-            this.ChangeCells(this.Associator.CreateCellChanges(rowIndex, data));
+            this.ChangeCells(this.DataHandler.CreateCellChanges(rowIndex, data));
         }
 
         public void ChangeRow(int rowIndex, ICollection<T> dataCollection)
         {
-            this.ChangeCells(this.Associator.CreateCellChanges(rowIndex, dataCollection));
+            this.ChangeCells(this.DataHandler.CreateCellChanges(rowIndex, dataCollection));
         }
 
         public void ChangeCell(GridCellChange cell, bool applyChanges = true)

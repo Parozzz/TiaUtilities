@@ -6,21 +6,23 @@ using TiaXmlReader.Generation.IO;
 using static TiaXmlReader.GenerationForms.GridHandler.GridCellPaintHandler;
 using TiaXmlReader.GenerationForms.GridHandler;
 using TiaXmlReader.SimaticML.Enums;
+using TiaXmlReader.Utility;
 
 namespace TiaXmlReader.GenerationForms.IO
 {
-    public class IOGenerationFormCellPreview : IGridCellPainter
+    public class GridCellPreview<C, T> : IGridCellPainter where C : IGenerationConfiguration where T : IGridData<C>
     {
-        private readonly GridDataSource<IOData> dataSource;
-        private readonly IOConfiguration config;
-        private readonly IOGenerationPreferences preferences;
+        private readonly GridDataSource<C, T> dataSource;
+        private readonly C config;
+        private readonly GridSettings settings;
 
         private readonly GenerationPlaceholders placeholders;
-        public IOGenerationFormCellPreview(GridDataSource<IOData> dataSource, IOConfiguration config, IOGenerationPreferences preferences)
+
+        public GridCellPreview(GridDataSource<C, T> dataSource, C config, GridSettings settings)
         {
             this.dataSource = dataSource;
             this.config = config;
-            this.preferences = preferences;
+            this.settings = settings;
 
             this.placeholders = new GenerationPlaceholders();
         }
@@ -29,38 +31,31 @@ namespace TiaXmlReader.GenerationForms.IO
         {
             var paintRequest = new PaintRequest();
 
-            var columnIndex = args.ColumnIndex;
-            var rowIndex = args.RowIndex;
-
-            if (rowIndex < 0 || columnIndex < IOData.IO_NAME || columnIndex > IOData.VARIABLE)
+            try
             {
-                return paintRequest;
-            }
+                var columnIndex = args.ColumnIndex;
+                var rowIndex = args.RowIndex;
 
-            var ioData = dataSource[rowIndex];
-            if (ioData.IsEmpty() || string.IsNullOrEmpty(ioData.Address))
-            {
-                return paintRequest;
-            }
-
-            paintRequest.data = ioData;
-            if(columnIndex == IOData.IO_NAME)
-            {
-                if (!string.IsNullOrEmpty(ioData.IOName)) //I want to preview the io name if is not set yet!
+                if (rowIndex < 0 || rowIndex >= dataSource.Count)
                 {
                     return paintRequest;
                 }
 
-                return string.IsNullOrEmpty(ioData.IOName) ? paintRequest.Content() : paintRequest;
-            }
-            else if(columnIndex == IOData.VARIABLE)
-            {
-                if (string.IsNullOrEmpty(ioData.Variable) && string.IsNullOrEmpty(config.DefaultVariableName))
+                var gridData = dataSource[rowIndex];
+
+                var preview = gridData.GetPreview(columnIndex, this.config);
+                if (preview == null)
                 {
                     return paintRequest;
                 }
 
+                paintRequest.dataPreview = preview;
+                paintRequest.data = gridData;
                 return paintRequest.Content();
+            }
+            catch(Exception ex)
+            {
+                Utils.ShowExceptionMessage(ex);
             }
 
             return paintRequest;
@@ -78,20 +73,43 @@ namespace TiaXmlReader.GenerationForms.IO
                 args.PaintBackground(args.ClipBounds, true);
             }
 
-            var columnIndex = args.ColumnIndex;
-            var rowIndex = args.RowIndex;
             var bounds = args.CellBounds;
             var graphics = args.Graphics;
             var style = args.CellStyle;
 
             try
             {
-                var ioData = ((IOData)request.data).Clone(); //I do not want to operate on the IOData that is been used in the table, otherwise things changes!
-                ioData.LoadDefaults(config);
+                //var ioData = ((IOData)request.data).Clone(); //I do not want to operate on the IOData that is been used in the table, otherwise things changes!
+                var gridData = (T)request.data;
+                var previewData = request.dataPreview;
 
-                placeholders.Clear();
-                placeholders.SetIOData(ioData);
+                //ioData.LoadDefaults(config);
 
+                placeholders.SetGridData(gridData, this.config);
+
+                var isValueDefault = string.IsNullOrEmpty(previewData.Value);
+                var value = placeholders.Parse(isValueDefault ? previewData.DefaultValue : previewData.Value);
+
+                RectangleF rec = new RectangleF();
+
+                var hasPrefix = !string.IsNullOrEmpty(previewData.Prefix);
+                if (hasPrefix)
+                {
+                    var parsedPrefix = placeholders.Parse(previewData.Prefix);
+                    var prefixMeasuredText = TextRenderer.MeasureText(parsedPrefix, style.Font);
+
+                    rec = new RectangleF(bounds.Location, new Size(prefixMeasuredText.Width, bounds.Height));
+                    TextRenderer.DrawText(graphics, parsedPrefix, style.Font, Rectangle.Round(rec), settings.PreviewColor, TextFormatFlags.VerticalCenter | TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPadding | TextFormatFlags.TextBoxControl);
+                }
+
+                var valueMeasuredText = TextRenderer.MeasureText(value, style.Font);
+                rec = hasPrefix
+                    ? new RectangleF(new PointF(rec.Location.X + rec.Width - 3, rec.Location.Y), new SizeF(valueMeasuredText.Width, bounds.Height))
+                    : new RectangleF(bounds.Location, new Size(valueMeasuredText.Width, bounds.Height));
+
+                var color = isValueDefault ? settings.PreviewColor : style.ForeColor;
+                TextRenderer.DrawText(graphics, value, style.Font, Rectangle.Round(rec), color, TextFormatFlags.VerticalCenter | TextFormatFlags.Right);
+                /*
                 if (columnIndex == IOData.IO_NAME)
                 {
                     var isIONameDefault = (ioData.IOName == config.DefaultIoName);
@@ -130,11 +148,11 @@ namespace TiaXmlReader.GenerationForms.IO
 
                     var color = isVariableDefault ? preferences.PreviewColor : style.ForeColor;
                     TextRenderer.DrawText(graphics, parsedVariableName, style.Font, Rectangle.Round(rec), color, TextFormatFlags.VerticalCenter | TextFormatFlags.Left | TextFormatFlags.NoPadding | TextFormatFlags.TextBoxControl);
-                }
+                }*/
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message + '\n' + ex.StackTrace);
+                Utils.ShowExceptionMessage(ex);
             }
 
 

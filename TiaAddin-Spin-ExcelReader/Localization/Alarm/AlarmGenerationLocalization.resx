@@ -124,7 +124,7 @@
     <value>Coil Address</value>
   </data>
   <data name="ALARM_DATA_DESCRIPTION" xml:space="preserve">
-    <value>Description</value>
+    <value>Description &gt;  {alarm_description}</value>
   </data>
   <data name="ALARM_DATA_ENABLE" xml:space="preserve">
     <value>Enable</value>
@@ -142,10 +142,10 @@
     <value>Timer Value</value>
   </data>
   <data name="DEVICE_DATA_ADDRESS" xml:space="preserve">
-    <value>Address</value>
+    <value>Address &gt; {device_address}</value>
   </data>
   <data name="DEVICE_DATA_DESCRIPTION" xml:space="preserve">
-    <value>Description</value>
+    <value>Description &gt; {device_description}</value>
   </data>
   <data name="GROUPING_TYPE_GROUP" xml:space="preserve">
     <value>GroupPerSegment</value>

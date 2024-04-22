@@ -15,7 +15,7 @@ namespace TiaXmlReader.GenerationForms.IO
 {
     public static class IOGenerationUtils
     {
-        public static void DragPreview<T>(DragData data, GridHandler<T> gridHandler) where T : IGridData
+        public static void DragPreview<C, T>(DragData data, GridHandler<C, T> gridHandler) where C : IGenerationConfiguration where T : IGridData<C>
         {
             var dataGridView = data.DataGridView;
 
@@ -36,7 +36,7 @@ namespace TiaXmlReader.GenerationForms.IO
             }
         }
 
-        public static void DragMouseUp<T>(DragData data, GridHandler<T> gridHandler) where T : IGridData
+        public static void DragMouseUp<C, T>(DragData data, GridHandler<C, T> gridHandler) where C : IGenerationConfiguration where T : IGridData<C>
         {
             var dataGridView = data.DataGridView;
             if (data.DraggedColumn == IOData.ADDRESS)

@@ -8,7 +8,7 @@ using TiaXmlReader.GenerationForms.GridHandler;
 namespace TiaXmlReader.GenerationForms.IO
 {
 
-    public class IOGenerationComparer : IGridRowComparer<IOData>
+    public class IOGenerationComparer : IGridRowComparer<IOConfiguration, IOData>
     {
         private SortOrder sortOrder;
         private int sortedColumn;
