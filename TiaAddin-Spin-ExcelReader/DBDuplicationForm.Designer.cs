@@ -275,7 +275,6 @@
             this.Controls.Add(this.dbXMLPathTextBox);
             this.Name = "DBDuplicationForm";
             this.Text = "DBA Cloning";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.DBDuplicationForm_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 

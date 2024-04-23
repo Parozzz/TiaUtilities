@@ -9,25 +9,35 @@ using TiaXmlReader.Utility;
 using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation.Alarms.GenerationForm;
 using TiaXmlReader.Generation.IO.GenerationForm;
+using TiaXmlReader.Generation;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace TiaXmlReader
 {
     public partial class MainImportExportForm : Form
     {
-        private readonly SaveData saveData;
+        private readonly ProgramSettings programSettings;
+        private readonly AutoSaveHandler autoSaveHandler;
+
         public MainImportExportForm()
         {
             InitializeComponent();
 
-            this.saveData = SaveData.Load();
+            this.programSettings = ProgramSettings.Load();
+            this.programSettings.Save(); //To create file if not exist!
+
+            this.autoSaveHandler = new AutoSaveHandler(programSettings, this.autoSaveComboBox.ComboBox);
+
             Init();
         }
 
         private void Init()
         {
-            configExcelPathTextBox.Text = saveData.lastExcelFileName;
-            exportPathTextBlock.Text = saveData.lastXMLExportPath;
-            tiaVersionComboBox.Text = "" + saveData.lastTIAVersion;
+
+            configExcelPathTextBox.Text = programSettings.lastExcelFileName;
+            exportPathTextBlock.Text = programSettings.lastXMLExportPath;
+            tiaVersionComboBox.Text = "" + programSettings.lastTIAVersion;
 
             this.languageComboBox.Items.AddRange(new string[]{ "it-IT", "en-US"});
             this.languageComboBox.TextChanged += (object sender, EventArgs args) =>
@@ -35,25 +45,61 @@ namespace TiaXmlReader
                 try
                 {
                     var culture = CultureInfo.GetCultureInfo(this.languageComboBox.Text);
-                    SystemVariables.LANG = saveData.ietfLanguage = culture.IetfLanguageTag;
-                    saveData.Save();
+                    SystemVariables.LANG = programSettings.ietfLanguage = culture.IetfLanguageTag;
                 }
                 catch (CultureNotFoundException)
                 {
                     this.languageComboBox.SelectedItem = this.languageComboBox.Items[0];
                 }
             };
-            this.languageComboBox.Text = saveData.ietfLanguage; //Call this after so the text changed event changes the system lang.
+            this.languageComboBox.Text = programSettings.ietfLanguage; //Call this after so the text changed event changes the system lang.
+
+            #region SETTINGS_SAVE_TICK + AUTO_SAVE
+            this.autoSaveHandler.Start();
+
+            var timer = new Timer { Interval = 1000 };
+            timer.Start();
+
+            var objectSnapshotDict = new Dictionary<object, Dictionary<string, object>>()
+            {
+                {this.programSettings, null }
+            };
+
+            ParseSnapshotDict(objectSnapshotDict, forceRefreshSnapshot: true, skipSave: true);
+            timer.Tick += (sender, e) =>
+            {
+                ParseSnapshotDict(objectSnapshotDict, forceRefreshSnapshot: false, skipSave: false);
+            };
+            #endregion
+        }
+
+        private void ParseSnapshotDict(Dictionary<object, Dictionary<string, object>> objectSnapshotDict, bool forceRefreshSnapshot = false, bool skipSave = false)
+        {
+            bool saveNecessary = false;
+            foreach (var entry in objectSnapshotDict.ToList()) //To list neede to make a copy so i can change the dict below!
+            {
+                var obj = entry.Key;
+                var oldSnapshotDict = entry.Value;
+                if (oldSnapshotDict == null || !Utils.ComparePublicFieldSnapshot(obj, oldSnapshotDict) || forceRefreshSnapshot)
+                {
+                    saveNecessary = true;
+
+                    var snap = Utils.CreatePublicFieldSnapshot(obj);
+                    objectSnapshotDict[obj] = snap;
+                }
+            }
+
+            if (saveNecessary && !skipSave)
+            {
+                this.programSettings.Save();
+            }
         }
 
         private void TiaVersionComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (uint.TryParse(tiaVersionComboBox.Text, out var version))
             {
-                saveData.lastTIAVersion = version;
-                saveData.Save();
-
-                Constants.VERSION = saveData.lastTIAVersion;
+                Constants.VERSION = programSettings.lastTIAVersion = version;
             }
         }
 
@@ -67,12 +113,11 @@ namespace TiaXmlReader
                     EnsurePathExists = true,
                 };
                 fileDialog.Filters.Add(new CommonFileDialogFilter("Excel Files (*.xlsx)", "*.xlsx"));
-                fileDialog.InitialDirectory = string.IsNullOrEmpty(saveData.lastExcelFileName) ? "" : Path.GetDirectoryName(saveData.lastExcelFileName);
+                fileDialog.InitialDirectory = string.IsNullOrEmpty(programSettings.lastExcelFileName) ? "" : Path.GetDirectoryName(programSettings.lastExcelFileName);
 
                 if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
                 {
-                    configExcelPathTextBox.Text = saveData.lastExcelFileName = fileDialog.FileName;
-                    saveData.Save();
+                    configExcelPathTextBox.Text = programSettings.lastExcelFileName = fileDialog.FileName;
                 }
             }
             catch  {  }
@@ -88,11 +133,10 @@ namespace TiaXmlReader
                     IsFolderPicker = true,
                     EnsurePathExists = true
                 };
-                fileDialog.InitialDirectory = saveData.lastXMLExportPath;
+                fileDialog.InitialDirectory = programSettings.lastXMLExportPath;
                 if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
                 {
-                    exportPathTextBlock.Text = saveData.lastXMLExportPath = fileDialog.FileName;
-                    saveData.Save();
+                    exportPathTextBlock.Text = programSettings.lastXMLExportPath = fileDialog.FileName;
                 }
             }
             catch { }
@@ -151,19 +195,19 @@ namespace TiaXmlReader
 
         private void DbDuplicationMenuItem_Click(object sender, EventArgs e)
         {
-            var dbDuplicationForm = new DBDuplicationForm(saveData);
+            var dbDuplicationForm = new DBDuplicationForm(programSettings);
             dbDuplicationForm.ShowInTaskbar = false;
             dbDuplicationForm.ShowDialog();
         }
 
         private void GenerateIOMenuItem_Click(object sender, EventArgs e)
         {
-            new IOGenerationForm().Show(this);
+            new IOGenerationForm(this.autoSaveHandler).Show(this);
         }
 
         private void GenerateAlarmsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            new AlarmGenerationForm().Show(this);
+            new AlarmGenerationForm(this.autoSaveHandler).Show(this);
         }
     }
 }

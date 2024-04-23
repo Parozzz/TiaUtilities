@@ -26,11 +26,11 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
         {
             var comboBox = form.partitionTypeComboBox;
             comboBox.SelectedValue = config.PartitionType;
-            comboBox.SelectionChangeCommitted += (sender, args) => { config.PartitionType = (AlarmPartitionType)form.partitionTypeComboBox.SelectedValue; };
+            comboBox.SelectionChangeCommitted += (sender, args) => config.PartitionType = (AlarmPartitionType)form.partitionTypeComboBox.SelectedValue;
 
             comboBox = form.groupingTypeComboBox;
             comboBox.SelectedValue = config.GroupingType;
-            comboBox.SelectionChangeCommitted += (sender, args) => { config.GroupingType = (AlarmGroupingType)form.groupingTypeComboBox.SelectedValue; };
+            comboBox.SelectionChangeCommitted += (sender, args) => config.GroupingType = (AlarmGroupingType)form.groupingTypeComboBox.SelectedValue;
 
             form.fcConfigButton.Click += (object sender, EventArgs args) =>
             {

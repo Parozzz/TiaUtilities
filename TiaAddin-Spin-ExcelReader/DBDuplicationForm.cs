@@ -6,19 +6,19 @@ using System.Xml;
 using TiaXmlReader.SimaticML.nBlockAttributeList;
 using TiaXmlReader.SimaticML;
 using TiaXmlReader.SimaticML.Blocks;
+using TiaXmlReader.Generation;
 
 namespace TiaXmlReader
 {
     public partial class DBDuplicationForm : Form
     {
-        private readonly SaveData saveData;
+        private readonly ProgramSettings programSettings;
         private readonly Dictionary<string, uint> memberWordDict;
 
-        public DBDuplicationForm(SaveData saveData)
+        public DBDuplicationForm(ProgramSettings saveData)
         {
             InitializeComponent();
-
-            this.saveData = saveData;
+            this.programSettings = saveData;
             this.dbXMLPathTextBox.Text = saveData.lastDBDuplicationFileName;
             this.replaceDBNameCheckBox.Checked = saveData.DBDuplicationReplaceDBName;
             this.startingDBNumberTextBox.Text = "" + saveData.DBDuplicationStartingNum;
@@ -37,16 +37,13 @@ namespace TiaXmlReader
             {
                 Filter = "XML Files (*.xml)|*.xml",
                 CheckFileExists = true,
-                FileName = saveData.lastDBDuplicationFileName
+                FileName = programSettings.lastDBDuplicationFileName
             };
 
             var result = fileDialog.ShowDialog();
             if (result == DialogResult.OK || result == DialogResult.Yes)
             {
-                saveData.lastDBDuplicationFileName = fileDialog.FileName;
-                saveData.Save();
-
-                dbXMLPathTextBox.Text = saveData.lastDBDuplicationFileName;
+                dbXMLPathTextBox.Text = programSettings.lastDBDuplicationFileName = fileDialog.FileName;
             }
         }
 
@@ -153,11 +150,11 @@ namespace TiaXmlReader
 
                 attributeList.SetBlockNumber(startingDBNumber++);
 
-                if(!string.IsNullOrEmpty(saveData.lastXMLExportPath))
+                if(!string.IsNullOrEmpty(programSettings.lastXMLExportPath))
                 {
                     var xmlDocument = SimaticMLParser.CreateDocument();
                     xmlDocument.DocumentElement.AppendChild(attributeList.GetParentConfiguration().Generate(xmlDocument, new IDGenerator()));
-                    xmlDocument.Save(saveData.lastXMLExportPath + "/DB" + attributeList.GetBlockNumber() + "_" + attributeList.GetBlockName() + ".xml");
+                    xmlDocument.Save(programSettings.lastXMLExportPath + "/DB" + attributeList.GetBlockNumber() + "_" + attributeList.GetBlockName() + ".xml");
                 }
             }
         }
@@ -176,44 +173,39 @@ namespace TiaXmlReader
 
         private void ReplaceDBNameCheckBox_CheckedChanged(object sender, System.EventArgs e)
         {
-            saveData.DBDuplicationReplaceDBName = replaceDBNameCheckBox.Checked;
+            programSettings.DBDuplicationReplaceDBName = replaceDBNameCheckBox.Checked;
         }
 
         private void StartingDBNumberTextBox_TextChanged(object sender, System.EventArgs e)
         {
             if(uint.TryParse(startingDBNumberTextBox.Text, out uint num))
             {
-                saveData.DBDuplicationStartingNum = num;
+                programSettings.DBDuplicationStartingNum = num;
             }
         }
 
         private void NewDBNameTextBox_TextChanged(object sender, System.EventArgs e)
         {
-            saveData.DBDuplicationNewDBName = newDBNameTextBox.Text;
+            programSettings.DBDuplicationNewDBName = newDBNameTextBox.Text;
         }
 
         private void NewNameTextBox_TextChanged(object sender, System.EventArgs e)
         {
-            saveData.DBDuplicationNewMemberName = newNameTextBox.Text;
+            programSettings.DBDuplicationNewMemberName = newNameTextBox.Text;
         }
 
         private void ReplacementList1TextBox_TextChanged(object sender, System.EventArgs e)
         {
-            saveData.DBDuplicationReplacementList1 = replacementList1TextBox.Text;
+            programSettings.DBDuplicationReplacementList1 = replacementList1TextBox.Text;
         }
 
         private void ReplacementList2TextBox_TextChanged(object sender, System.EventArgs e)
         {
-            saveData.DBDuplicationReplacementList2 = replacementList2TextBox.Text;
+            programSettings.DBDuplicationReplacementList2 = replacementList2TextBox.Text;
         }
         private void ReplacementList3TextBox_TextChanged(object sender, System.EventArgs e)
         {
-            saveData.DBDuplicationReplacementList3 = replacementList3TextBox.Text;
-        }
-
-        private void DBDuplicationForm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            saveData.Save();
+            programSettings.DBDuplicationReplacementList3 = replacementList3TextBox.Text;
         }
     }
 }

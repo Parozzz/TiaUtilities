@@ -34,7 +34,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             }
             else
             {
-                GenerationUtils.DragPreview(data, gridHandler);
+                GridUtils.DragPreview(data, gridHandler);
             }
         }
 
@@ -75,7 +75,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             }
             else
             {
-                GenerationUtils.DragMouseUp(data, gridHandler);
+                GridUtils.DragMouseUp(data, gridHandler);
             }
 
             

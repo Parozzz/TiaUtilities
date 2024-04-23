@@ -15,7 +15,8 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
 {
     public class IOGenerationSettings
     {
-        public const string FILE_NAME = "IOGenerationPreferences.json";
+        public const string EXTENSION = "json";
+        public const string FILE_NAME = "settings/IOGenerationPreferences." + EXTENSION;
 
         [JsonProperty] public IOConfiguration IOConfiguration { get; set; } = new IOConfiguration();
         [JsonProperty] public IOGenerationExcelImportConfiguration ExcelImportConfiguration { get; set; } = new IOGenerationExcelImportConfiguration();
@@ -29,49 +30,16 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             return Directory.GetCurrentDirectory() + @"\" + FILE_NAME;
         }
 
-        public static bool Exists()
-        {
-            return File.Exists(GetFilePath());
-        }
-
         public static IOGenerationSettings Load()
         {
-            if (!Exists())
-            {
-                return new IOGenerationSettings();
-            }
-
-            JsonSerializer serializer = new JsonSerializer();
-            serializer.Converters.Add(new JavaScriptDateTimeConverter());
-            serializer.NullValueHandling = NullValueHandling.Ignore;
-            serializer.DefaultValueHandling = DefaultValueHandling.Ignore;
-            serializer.Formatting = Formatting.Indented;
-
-            using (var sr = new StreamReader(GetFilePath()))
-            {
-                using (var reader = new JsonTextReader(sr))
-                {
-                    return serializer.Deserialize<IOGenerationSettings>(reader);
-                }
-            }
+            var filePath = IOGenerationSettings.GetFilePath();
+            return GenerationUtils.Load(ref filePath, EXTENSION, out IOGenerationSettings settings, showFileDialog: false) ? settings : new IOGenerationSettings();
         }
 
         public void Save()
         {
-            JsonSerializer serializer = new JsonSerializer();
-            serializer.Converters.Add(new JavaScriptDateTimeConverter());
-            serializer.NullValueHandling = NullValueHandling.Ignore;
-            serializer.DefaultValueHandling = DefaultValueHandling.Ignore;
-            serializer.Formatting = Formatting.Indented;
-
-            using (StreamWriter sw = new StreamWriter(GetFilePath()))
-            {
-                using (JsonWriter writer = new JsonTextWriter(sw))
-                {
-                    serializer.Serialize(writer, this);
-                    writer.Flush();
-                }
-            }
+            var filePath = IOGenerationSettings.GetFilePath();
+            GenerationUtils.Save(this, ref filePath, EXTENSION, showFileDialog: false);
         }
     }
 }

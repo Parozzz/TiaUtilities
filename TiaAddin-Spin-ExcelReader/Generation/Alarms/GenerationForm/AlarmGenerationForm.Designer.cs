@@ -35,9 +35,6 @@
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripTextBox1 = new System.Windows.Forms.ToolStripTextBox();
-            this.autoSaveComboBox = new System.Windows.Forms.ToolStripComboBox();
             this.importExportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportXMLToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.preferencesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -51,13 +48,13 @@
             this.fieldPrefixConfigButton = new System.Windows.Forms.Button();
             this.segmentNameConfigButton = new System.Windows.Forms.Button();
             this.textListConfigButton = new System.Windows.Forms.Button();
+            this.groupingTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
             this.divisionTypeLabel = new System.Windows.Forms.Label();
+            this.partitionTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
             this.memoryTypeLabel = new System.Windows.Forms.Label();
             this.GridsSplitPanel = new System.Windows.Forms.SplitContainer();
             this.DeviceDataGridView = new System.Windows.Forms.DataGridView();
             this.AlarmDataGridView = new System.Windows.Forms.DataGridView();
-            this.groupingTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
-            this.partitionTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
             this.mainPanel.SuspendLayout();
             this.TopTableLayoutPanel.SuspendLayout();
             this.TopMenuStrip.SuspendLayout();
@@ -129,10 +126,7 @@
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.saveToolStripMenuItem,
             this.saveAsToolStripMenuItem,
-            this.loadToolStripMenuItem,
-            this.toolStripSeparator1,
-            this.toolStripTextBox1,
-            this.autoSaveComboBox});
+            this.loadToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
@@ -140,45 +134,20 @@
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveToolStripMenuItem.Text = "Save";
             // 
             // saveAsToolStripMenuItem
             // 
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveAsToolStripMenuItem.Text = "SaveAs";
             // 
             // loadToolStripMenuItem
             // 
             this.loadToolStripMenuItem.Name = "loadToolStripMenuItem";
-            this.loadToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.loadToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.loadToolStripMenuItem.Text = "Load";
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(178, 6);
-            // 
-            // toolStripTextBox1
-            // 
-            this.toolStripTextBox1.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.toolStripTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.toolStripTextBox1.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.toolStripTextBox1.HideSelection = false;
-            this.toolStripTextBox1.Margin = new System.Windows.Forms.Padding(0);
-            this.toolStripTextBox1.Name = "toolStripTextBox1";
-            this.toolStripTextBox1.ReadOnly = true;
-            this.toolStripTextBox1.Size = new System.Drawing.Size(100, 16);
-            this.toolStripTextBox1.Text = "Auto Save";
-            this.toolStripTextBox1.TextBoxTextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // autoSaveComboBox
-            // 
-            this.autoSaveComboBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.autoSaveComboBox.Margin = new System.Windows.Forms.Padding(0);
-            this.autoSaveComboBox.Name = "autoSaveComboBox";
-            this.autoSaveComboBox.Size = new System.Drawing.Size(121, 23);
             // 
             // importExportToolStripMenuItem
             // 
@@ -319,6 +288,14 @@
             this.textListConfigButton.Text = "Lista testi";
             this.textListConfigButton.UseVisualStyleBackColor = true;
             // 
+            // groupingTypeComboBox
+            // 
+            this.groupingTypeComboBox.FormattingEnabled = true;
+            this.groupingTypeComboBox.Location = new System.Drawing.Point(377, 33);
+            this.groupingTypeComboBox.Name = "groupingTypeComboBox";
+            this.groupingTypeComboBox.Size = new System.Drawing.Size(133, 21);
+            this.groupingTypeComboBox.TabIndex = 3;
+            // 
             // divisionTypeLabel
             // 
             this.divisionTypeLabel.AutoSize = true;
@@ -328,6 +305,14 @@
             this.divisionTypeLabel.Size = new System.Drawing.Size(149, 18);
             this.divisionTypeLabel.TabIndex = 2;
             this.divisionTypeLabel.Text = "Tipo raggruppamento";
+            // 
+            // partitionTypeComboBox
+            // 
+            this.partitionTypeComboBox.FormattingEnabled = true;
+            this.partitionTypeComboBox.Location = new System.Drawing.Point(123, 33);
+            this.partitionTypeComboBox.Name = "partitionTypeComboBox";
+            this.partitionTypeComboBox.Size = new System.Drawing.Size(100, 21);
+            this.partitionTypeComboBox.TabIndex = 1;
             // 
             // memoryTypeLabel
             // 
@@ -380,22 +365,6 @@
             this.AlarmDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this.AlarmDataGridView.Size = new System.Drawing.Size(866, 696);
             this.AlarmDataGridView.TabIndex = 3;
-            // 
-            // groupingTypeComboBox
-            // 
-            this.groupingTypeComboBox.FormattingEnabled = true;
-            this.groupingTypeComboBox.Location = new System.Drawing.Point(377, 33);
-            this.groupingTypeComboBox.Name = "groupingTypeComboBox";
-            this.groupingTypeComboBox.Size = new System.Drawing.Size(133, 21);
-            this.groupingTypeComboBox.TabIndex = 3;
-            // 
-            // partitionTypeComboBox
-            // 
-            this.partitionTypeComboBox.FormattingEnabled = true;
-            this.partitionTypeComboBox.Location = new System.Drawing.Point(123, 33);
-            this.partitionTypeComboBox.Name = "partitionTypeComboBox";
-            this.partitionTypeComboBox.Size = new System.Drawing.Size(100, 21);
-            this.partitionTypeComboBox.TabIndex = 1;
             // 
             // AlarmGenerationForm
             // 
@@ -456,8 +425,5 @@
         private System.Windows.Forms.SplitContainer GridsSplitPanel;
         public System.Windows.Forms.Button emptyAlarmGenerationConfigButton;
         public System.Windows.Forms.Button textListConfigButton;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.ToolStripTextBox toolStripTextBox1;
-        private System.Windows.Forms.ToolStripComboBox autoSaveComboBox;
     }
 }

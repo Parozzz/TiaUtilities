@@ -211,8 +211,9 @@
     <Compile Include="Generation\Alarms\GenerationForm\AlarmGenerationProjectSave.cs" />
     <Compile Include="Generation\Alarms\GenerationForm\AlarmGenerationSettings.cs" />
     <Compile Include="Generation\Configuration\ConfigFormCheckBoxLine.cs" />
-    <Compile Include="Generation\GenerationAutoSaveEnum.cs" />
+    <Compile Include="AutoSaveHandler.cs" />
     <Compile Include="Generation\GenerationUtils.cs" />
+    <Compile Include="Generation\GridHandler\GridUtils.cs" />
     <Compile Include="Generation\GridHandler\Data\GridDataHandler.cs" />
     <Compile Include="Generation\GridHandler\Data\GridDataColumn.cs" />
     <Compile Include="Generation\GridHandler\Data\GridDataPreview.cs" />
@@ -291,7 +292,7 @@
     <Compile Include="Generation\IO\GenerationForm\IOGenerationForm.Designer.cs">
       <DependentUpon>IOGenerationForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="SaveData.cs" />
+    <Compile Include="ProgramSettings.cs" />
     <Compile Include="SimaticML\nBlockAttributeList\BlockAttributeList.cs" />
     <Compile Include="SimaticML\nBlockAttributeList\Member.cs" />
     <Compile Include="SimaticML\Blocks\BlockFB.cs" />

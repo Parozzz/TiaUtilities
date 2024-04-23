@@ -9,12 +9,14 @@ using System.Threading.Tasks;
 using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation.Alarms.GenerationForm;
 using TiaXmlReader.Generation.GridHandler;
+using TiaXmlReader.Generation.IO.GenerationForm;
 
 namespace TiaXmlReader.Generation.Alarms.GenerationForm
 {
     public class AlarmGenerationSettings
     {
-        public const string FILE_NAME = "AlarmGenerationPreferences.json";
+        public const string EXTENSION = "json";
+        public const string FILE_NAME = "settings/AlarmGenerationPreferences.json";
 
         [JsonProperty] public AlarmConfiguration Configuration {  get; set; } = new AlarmConfiguration();
         [JsonProperty] public GridSettings GridSettings { get; set; } = new GridSettings();
@@ -26,49 +28,16 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             return Directory.GetCurrentDirectory() + @"\" + FILE_NAME;
         }
 
-        public static bool Exists()
-        {
-            return File.Exists(GetFilePath());
-        }
-
         public static AlarmGenerationSettings Load()
         {
-            if (!Exists())
-            {
-                return new AlarmGenerationSettings();
-            }
-
-            JsonSerializer serializer = new JsonSerializer();
-            serializer.Converters.Add(new JavaScriptDateTimeConverter());
-            serializer.NullValueHandling = NullValueHandling.Ignore;
-            serializer.DefaultValueHandling = DefaultValueHandling.Ignore;
-            serializer.Formatting = Formatting.Indented;
-
-            using (var sr = new StreamReader(GetFilePath()))
-            {
-                using (var reader = new JsonTextReader(sr))
-                {
-                    return serializer.Deserialize<AlarmGenerationSettings>(reader);
-                }
-            }
+            var filePath = AlarmGenerationSettings.GetFilePath();
+            return GenerationUtils.Load(ref filePath, EXTENSION, out AlarmGenerationSettings settings, showFileDialog: false) ? settings : new AlarmGenerationSettings();
         }
 
         public void Save()
         {
-            JsonSerializer serializer = new JsonSerializer();
-            serializer.Converters.Add(new JavaScriptDateTimeConverter());
-            serializer.NullValueHandling = NullValueHandling.Ignore;
-            serializer.DefaultValueHandling = DefaultValueHandling.Ignore;
-            serializer.Formatting = Formatting.Indented;
-
-            using (StreamWriter sw = new StreamWriter(GetFilePath()))
-            {
-                using (JsonWriter writer = new JsonTextWriter(sw))
-                {
-                    serializer.Serialize(writer, this);
-                    writer.Flush();
-                }
-            }
+            var filePath = AlarmGenerationSettings.GetFilePath();
+            GenerationUtils.Save(this, ref filePath, EXTENSION, showFileDialog: false);
         }
     }
 }

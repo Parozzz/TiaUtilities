@@ -10,6 +10,5 @@ namespace TiaXmlReader.Generation.GridHandler
         [JsonProperty] public Color SelectedCellTriangleColor = Color.Green;
         [JsonProperty] public Color PreviewColor = Color.MediumPurple;
         [JsonProperty] public Font GridFont = SystemFonts.DefaultFont;
-        [JsonProperty] public GenerationAutoSaveEnum AutoSave = GenerationAutoSaveEnum.MIN_2;
     }
 }

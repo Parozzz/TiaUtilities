@@ -1,100 +1,136 @@
-﻿using System;
+﻿using Microsoft.WindowsAPICodePack.Dialogs;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static TiaXmlReader.Generation.GridHandler.GridExcelDragHandler;
-using TiaXmlReader.SimaticML.Enums;
-using TiaXmlReader.SimaticML;
 using TiaXmlReader.Utility;
-using System.Windows.Forms;
-using TiaXmlReader.Generation.GridHandler;
-using TiaXmlReader.Generation.GridHandler.Data;
+using TiaXmlReader.Generation.Alarms.GenerationForm;
 
-namespace TiaXmlReader.GenerationForms
+namespace TiaXmlReader.Generation
 {
     public static class GenerationUtils
     {
-        public static void DragPreview<C, T>(DragData data, GridHandler<C, T> gridHandler) where C : IGenerationConfiguration where T : IGridData<C>
+        private static CommonOpenFileDialog CreateFileDialog(bool ensureFileExists, string filePath, string extension)
         {
-            var startCell = data.DataGridView.Rows[data.StartingRow]?.Cells[data.DraggedColumn];
-            if(!(startCell is DataGridViewTextBoxCell))
+            return new CommonOpenFileDialog
             {
-                return;
-            }
-
-            var startString = startCell.Value?.ToString();
-            if (Utils.SplitStringFromNumberFromRight(startString, out string before, out string numString, out string after) && int.TryParse(numString, out int num))
+                EnsurePathExists = true,
+                EnsureFileExists = ensureFileExists,
+                DefaultExtension = "." + extension,
+                Filters = { new CommonFileDialogFilter(extension + " Files", "*." + extension) },
+                InitialDirectory = File.Exists(filePath) ? Path.GetDirectoryName(filePath) : Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
+            };
+        }
+        private static void FixExtesion(ref string filePath, string extension)
+        {
+            var filePathExtension = Path.GetExtension(filePath);
+            if (string.IsNullOrEmpty(filePathExtension))
             {
-                var nextNum = num + (data.SelectedRowCount - 1) * (data.DraggingDown ? 1 : -1);
-
-                var nextNumString = nextNum.ToString();
-                if (numString.Length > nextNumString.Length)
-                {
-                    var nextNumLen = nextNumString.Length;
-                    for (var x = 0; x < (numString.Length - nextNumLen); x++)
-                    {
-                        nextNumString = '0' + nextNumString;
-                    }
-                }
-                data.TooltipString = before + nextNumString + after;
-            }
-            else
-            {
-                data.TooltipString = startString; //If it does not contains number, i simply copy the starting value!
+                filePath += "." + extension;
             }
         }
 
-        public static void DragMouseUp<C, T>(DragData data, GridHandler<C, T> gridHandler) where C : IGenerationConfiguration where T : IGridData<C>
+        public static void Save(object obj, ref string filePath, string extension, bool showFileDialog = false)
         {
-            var startCell = data.DataGridView.Rows[data.StartingRow]?.Cells[data.DraggedColumn];
-            if (!(startCell is DataGridViewTextBoxCell))
+            try
             {
-                return;
-            }
-
-            var rowIndexEnumeration = Enumerable.Range(data.TopSelectedRow, (int)data.SelectedRowCount);
-            if (!data.DraggingDown)
-            {
-                rowIndexEnumeration = rowIndexEnumeration.Reverse();
-            }
-
-            var cellChangeList = new List<GridCellChange>();
-
-            var startString = startCell.Value?.ToString();
-            if (Utils.SplitStringFromNumberFromRight(startString, out string before, out string numString, out string after) && int.TryParse(numString, out int num))
-            {
-                var x = 0;
-                foreach (var rowIndex in rowIndexEnumeration)
+                if(!showFileDialog)
                 {
-                    var nextNum = num + (x++ * (data.DraggingDown ? 1 : -1));
-
-                    var nextNumString = nextNum.ToString();
-                    if (numString.Length > nextNumString.Length)
+                    if (string.IsNullOrEmpty(filePath))
                     {
-                        var nextNumLen = nextNumString.Length;
-                        for (var z = 0; z < (numString.Length - nextNumLen); z++)
+                        throw new ArgumentException("File path invalid while saving without opening file dialog.");
+                    }
+
+                    FixExtesion(ref filePath, extension);
+                    Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+                    File.Create(filePath).Close(); //This is just to throw an exception in case the path is wrong!
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
+                    {
+                        var fileDialog = CreateFileDialog(false, filePath, extension);
+                        if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
                         {
-                            nextNumString = '0' + nextNumString;
+                            filePath = fileDialog.FileName;
                         }
                     }
 
-                    var cellChange = new GridCellChange(data.DataGridView, data.DraggedColumn, rowIndex) { NewValue = (before + nextNumString + after) };
-                    cellChangeList.Add(cellChange);
+                    FixExtesion(ref filePath, extension);
+                    Directory.CreateDirectory(Path.GetDirectoryName(filePath));
                 }
-            }
-            else
-            {
-                foreach (var rowIndex in rowIndexEnumeration)
-                {
-                    var cellChange = new GridCellChange(data.DataGridView, data.DraggedColumn, rowIndex) { NewValue = startString };
-                    cellChangeList.Add(cellChange);
-                }
-            }
 
-            gridHandler.ChangeCells(cellChangeList);
+                JsonSerializer serializer = new JsonSerializer();
+                serializer.Converters.Add(new JavaScriptDateTimeConverter());
+                serializer.NullValueHandling = NullValueHandling.Ignore;
+                serializer.DefaultValueHandling = DefaultValueHandling.Include;
+                serializer.Formatting = Formatting.Indented;
+
+                using (var sw = new StreamWriter(filePath))
+                {
+                    using (var writer = new JsonTextWriter(sw))
+                    {
+                        serializer.Serialize(writer, obj);
+                        writer.Flush();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Utils.ShowExceptionMessage(ex);
+            }
         }
 
+        public static bool Load<C>(ref string filePath, string extension, out C loaded, bool showFileDialog = true)
+        {
+            loaded = default;
+
+            if (!File.Exists(filePath))
+            {
+                return false;
+            }
+
+            try
+            {
+                if (showFileDialog)
+                {
+                    var fileDialog = CreateFileDialog(true, filePath, extension);
+                    if (fileDialog.ShowDialog() != CommonFileDialogResult.Ok)
+                    {
+                        return false;
+                    }
+
+                    filePath = fileDialog.FileName;
+                }
+
+                FixExtesion(ref filePath, extension);
+
+                JsonSerializer serializer = new JsonSerializer();
+                serializer.Converters.Add(new JavaScriptDateTimeConverter());
+                serializer.NullValueHandling = NullValueHandling.Ignore;
+                serializer.DefaultValueHandling = DefaultValueHandling.Include;
+                serializer.Formatting = Formatting.Indented;
+
+                using (var sr = new StreamReader(filePath))
+                {
+                    using (var reader = new JsonTextReader(sr))
+                    {
+                        loaded = serializer.Deserialize<C>(reader);
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Utils.ShowExceptionMessage(ex);
+            }
+
+            return false;
+        }
 
     }
 }

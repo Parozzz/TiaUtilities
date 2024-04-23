@@ -20,9 +20,9 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
 {
     public partial class IOGenerationForm : Form
     {
-        private readonly GridHandler<IOConfiguration, IOData> gridHandler;
-
+        private AutoSaveHandler autoSaveHandler;
         private readonly IOGenerationSettings settings;
+        private readonly GridHandler<IOConfiguration, IOData> gridHandler;
         private readonly IOGenerationFormConfigHandler configHandler;
 
         private IOGenerationExcelImportConfiguration ExcelImportConfig { get => settings.ExcelImportConfiguration; }
@@ -30,18 +30,21 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
 
         private string lastFilePath;
 
-        public IOGenerationForm()
+        public IOGenerationForm(AutoSaveHandler autoSaveHandler)
         {
             InitializeComponent();
 
-            settings = IOGenerationSettings.Load();
-            settings.Save(); //This could be avoided but is to be sure that all the classes that are created new will be saved to file!
+            this.autoSaveHandler = autoSaveHandler;
+            this.settings = IOGenerationSettings.Load();
+            this.settings.Save(); //This could be avoided but is to be sure that all the classes that are created new will be saved to file!
 
             this.gridHandler = new GridHandler<IOConfiguration, IOData>(this.dataGridView, settings.GridSettings, IOConfig, IOData.COLUMN_LIST, new IOGenerationComparer())
             {
                 RowCount = 2999
             };
-            this.configHandler = new IOGenerationFormConfigHandler(this, IOConfig, this.dataGridView);
+
+            this.configHandler = new IOGenerationFormConfigHandler(this, IOConfig, this.gridHandler);
+
 
             Init();
         }
@@ -202,7 +205,17 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             this.gridHandler?.Init();
             this.configHandler?.Init();
 
-            #region PROGRAM_SAVE_TICK
+            #region PROGRAM_SAVE_TICK + AUTO_SAVE
+            void eventHandler(object sender, EventArgs args)
+            {
+                if (!string.IsNullOrEmpty(this.lastFilePath))
+                {
+                    this.ProjectSave();
+                }
+            }
+            this.Shown += (sender, args) => autoSaveHandler.AddTickEventHandler(eventHandler);
+            this.FormClosed += (sender, args) => autoSaveHandler.RemoveTickEventHandler(eventHandler);
+
             var timer = new Timer { Interval = 1000 };
             timer.Start();
 

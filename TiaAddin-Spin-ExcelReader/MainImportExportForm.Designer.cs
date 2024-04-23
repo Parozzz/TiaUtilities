@@ -39,9 +39,13 @@
             this.dbDuplicationMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.generateIOMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.generateAlarmsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.label4 = new System.Windows.Forms.Label();
             this.languageComboBox = new System.Windows.Forms.ComboBox();
-            this.generateAlarmsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.AutoSaveMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.autoSaveComboBox = new System.Windows.Forms.ToolStripComboBox();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -125,6 +129,7 @@
             // 
             this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fileToolStripMenuItem,
             this.dbDuplicationMenuItem,
             this.toolStripMenuItem1,
             this.generateIOMenuItem,
@@ -157,6 +162,14 @@
             this.generateIOMenuItem.Text = "Generate IO";
             this.generateIOMenuItem.Click += new System.EventHandler(this.GenerateIOMenuItem_Click);
             // 
+            // generateAlarmsToolStripMenuItem
+            // 
+            this.generateAlarmsToolStripMenuItem.Font = new System.Drawing.Font("Segoe UI", 12F);
+            this.generateAlarmsToolStripMenuItem.Name = "generateAlarmsToolStripMenuItem";
+            this.generateAlarmsToolStripMenuItem.Size = new System.Drawing.Size(138, 25);
+            this.generateAlarmsToolStripMenuItem.Text = "Generate Alarms";
+            this.generateAlarmsToolStripMenuItem.Click += new System.EventHandler(this.GenerateAlarmsToolStripMenuItem_Click);
+            // 
             // label4
             // 
             this.label4.AutoSize = true;
@@ -178,13 +191,35 @@
             this.languageComboBox.Size = new System.Drawing.Size(79, 32);
             this.languageComboBox.TabIndex = 12;
             // 
-            // generateAlarmsToolStripMenuItem
+            // fileToolStripMenuItem
             // 
-            this.generateAlarmsToolStripMenuItem.Font = new System.Drawing.Font("Segoe UI", 12F);
-            this.generateAlarmsToolStripMenuItem.Name = "generateAlarmsToolStripMenuItem";
-            this.generateAlarmsToolStripMenuItem.Size = new System.Drawing.Size(138, 25);
-            this.generateAlarmsToolStripMenuItem.Text = "Generate Alarms";
-            this.generateAlarmsToolStripMenuItem.Click += new System.EventHandler(this.GenerateAlarmsToolStripMenuItem_Click);
+            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripSeparator2,
+            this.AutoSaveMenuItem});
+            this.fileToolStripMenuItem.Font = new System.Drawing.Font("Segoe UI", 12F);
+            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(46, 25);
+            this.fileToolStripMenuItem.Text = "File";
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(177, 6);
+            // 
+            // AutoSaveMenuItem
+            // 
+            this.AutoSaveMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.autoSaveComboBox});
+            this.AutoSaveMenuItem.Font = new System.Drawing.Font("Segoe UI", 12F);
+            this.AutoSaveMenuItem.Name = "AutoSaveMenuItem";
+            this.AutoSaveMenuItem.Size = new System.Drawing.Size(180, 26);
+            this.AutoSaveMenuItem.Text = "Auto Save";
+            // 
+            // autoSaveComboBox
+            // 
+            this.autoSaveComboBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.autoSaveComboBox.Name = "autoSaveComboBox";
+            this.autoSaveComboBox.Size = new System.Drawing.Size(121, 23);
             // 
             // MainImportExportForm
             // 
@@ -227,6 +262,10 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.ComboBox languageComboBox;
         private System.Windows.Forms.ToolStripMenuItem generateAlarmsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripMenuItem AutoSaveMenuItem;
+        private System.Windows.Forms.ToolStripComboBox autoSaveComboBox;
     }
 }
 

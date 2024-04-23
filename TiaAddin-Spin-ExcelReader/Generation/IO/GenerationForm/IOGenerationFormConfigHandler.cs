@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using TiaXmlReader.Generation.IO;
 using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Generation.IO.GenerationForm;
+using TiaXmlReader.Generation.GridHandler;
 
 namespace TiaXmlReader.Generation.IO.GenerationForm
 {
@@ -15,31 +16,22 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
     {
         private readonly IOGenerationForm form;
         private readonly IOConfiguration config;
-        private readonly DataGridView dataGridView;
+        private readonly GridHandler<IOConfiguration, IOData> gridHandler;
 
-        public IOGenerationFormConfigHandler(IOGenerationForm form, IOConfiguration config, DataGridView dataGridView)
+        public IOGenerationFormConfigHandler(IOGenerationForm form, IOConfiguration config, GridHandler<IOConfiguration, IOData> gridHandler)
         {
             this.form = form;
             this.config = config;
-            this.dataGridView = dataGridView;
+            this.gridHandler = gridHandler;
         }
 
         public void Init()
         {
-
             form.groupingTypeComboBox.SelectedValue = config.GroupingType;
-            form.groupingTypeComboBox.SelectionChangeCommitted += (object sender, EventArgs args) =>
-            {
-                config.GroupingType = (IOGroupingTypeEnum)form.groupingTypeComboBox.SelectedValue;
-                this.dataGridView.Refresh();
-            };
+            form.groupingTypeComboBox.SelectionChangeCommitted += (sender, args) => config.GroupingType = (IOGroupingTypeEnum)form.groupingTypeComboBox.SelectedValue;
 
             form.memoryTypeComboBox.SelectedValue = config.MemoryType;
-            form.memoryTypeComboBox.SelectionChangeCommitted += (object sender, EventArgs args) =>
-            {
-                config.MemoryType = (IOMemoryTypeEnum)form.memoryTypeComboBox.SelectedValue;
-                this.dataGridView.Refresh();
-            };
+            form.memoryTypeComboBox.SelectionChangeCommitted += (sender, args) => config.MemoryType = (IOMemoryTypeEnum)form.memoryTypeComboBox.SelectedValue;
 
             form.fcConfigButton.Click += (object sender, EventArgs args) =>
             {
@@ -150,7 +142,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             configForm.Init();
             configForm.Show(form);
 
-            dataGridView.Refresh();
+            gridHandler.Refresh();
         }
 
     }

@@ -14,21 +14,23 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
 {
     public partial class AlarmGenerationForm : Form
     {
+        private readonly AutoSaveHandler autoSaveHandler;
+        private readonly AlarmGenerationSettings settings;
         private readonly GridHandler<AlarmConfiguration, DeviceData> deviceGridHandler;
         private readonly GridHandler<AlarmConfiguration, AlarmData> alarmGridHandler;
+        private readonly AlarmGenerationFormConfigHandler configHandler;
 
-        private readonly AlarmGenerationSettings settings;
-        private readonly AlarmGenerationFormConfigHandler configHandler = null;
+
         private AlarmConfiguration AlarmConfig { get => settings.Configuration; }
 
         private string lastFilePath;
 
-        public AlarmGenerationForm()
+        public AlarmGenerationForm(AutoSaveHandler autoSaveHandler)
         {
             InitializeComponent();
-
-            settings = AlarmGenerationSettings.Load();
-            settings.Save(); //This could be avoided but is to be sure that all the classes that are created new will be saved to file!
+            this.autoSaveHandler = autoSaveHandler;
+            this.settings = AlarmGenerationSettings.Load();
+            this.settings.Save(); //This could be avoided but is to be sure that all the classes that are created new will be saved to file!
 
             this.deviceGridHandler = new GridHandler<AlarmConfiguration, DeviceData>(this.DeviceDataGridView, settings.GridSettings, AlarmConfig, DeviceData.COLUMN_LIST, null)
             {
@@ -41,6 +43,7 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             };
 
             this.configHandler = new AlarmGenerationFormConfigHandler(this, this.AlarmConfig, this.deviceGridHandler, this.alarmGridHandler);
+
 
             Init();
         }
@@ -64,44 +67,6 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
         public void Init()
         {
             #region TopMenu
-            foreach (GenerationAutoSaveEnum autoSaveEnum in Enum.GetValues(typeof(GenerationAutoSaveEnum)))
-            {
-                var enumName = Enum.GetName(typeof(GenerationAutoSaveEnum), autoSaveEnum);
-                this.autoSaveComboBox.Items.Add(enumName);
-            }
-            this.autoSaveComboBox.Text = Enum.GetName(typeof(GenerationAutoSaveEnum), settings.GridSettings.AutoSave);
-
-            var autoSaveTimer = new Timer();
-            autoSaveTimer.Interval = ((int)settings.GridSettings.AutoSave) * 1000;
-            if (autoSaveTimer.Interval > 0)
-            {
-                autoSaveTimer.Start();
-            }
-
-            this.autoSaveComboBox.ComboBox.SelectedValueChanged += (sender, args) => 
-            {
-                autoSaveTimer.Stop();
-                if(Enum.TryParse(this.autoSaveComboBox.ComboBox.Text, out GenerationAutoSaveEnum autoSave))
-                {
-                    settings.GridSettings.AutoSave = autoSave;
-
-                    autoSaveTimer.Interval = ((int)settings.GridSettings.AutoSave) * 1000;
-                    if (autoSaveTimer.Interval > 0)
-                    {
-                        autoSaveTimer.Start();
-                    }
-                }
-            };
-
-            autoSaveTimer.Tick += (sender, args) =>
-            {
-                if (!string.IsNullOrEmpty(this.lastFilePath))
-                {
-                    this.ProjectSave();
-                }
-            };
-
-
             this.saveToolStripMenuItem.Click += (object sender, EventArgs args) => { this.ProjectSave(); };
             this.saveAsToolStripMenuItem.Click += (object sender, EventArgs args) => { this.ProjectSave(true); };
             this.loadToolStripMenuItem.Click += (object sender, EventArgs args) => { this.ProjectLoad(); };
@@ -185,11 +150,11 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             #endregion
 
             #region DRAG
-            this.deviceGridHandler.SetDragPreviewAction(data => { GenerationUtils.DragPreview(data, this.deviceGridHandler); });
-            this.deviceGridHandler.SetDragMouseUpAction(data => { GenerationUtils.DragMouseUp(data, this.deviceGridHandler); });
+            this.deviceGridHandler.SetDragPreviewAction(data => { GridUtils.DragPreview(data, this.deviceGridHandler); });
+            this.deviceGridHandler.SetDragMouseUpAction(data => { GridUtils.DragMouseUp(data, this.deviceGridHandler); });
 
-            this.alarmGridHandler.SetDragPreviewAction(data => { GenerationUtils.DragPreview(data, this.alarmGridHandler); });
-            this.alarmGridHandler.SetDragMouseUpAction(data => { GenerationUtils.DragMouseUp(data, this.alarmGridHandler); });
+            this.alarmGridHandler.SetDragPreviewAction(data => { GridUtils.DragPreview(data, this.alarmGridHandler); });
+            this.alarmGridHandler.SetDragMouseUpAction(data => { GridUtils.DragMouseUp(data, this.alarmGridHandler); });
             #endregion 
 
             //Column initialization before gridHandler.Init()
@@ -212,7 +177,17 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             this.alarmGridHandler?.Init();
             this.configHandler?.Init();
 
-            #region PROGRAM_SAVE_TICK
+            #region PROGRAM_SAVE_TICK + AUTO_SAVE
+            void eventHandler(object sender, EventArgs args)
+            {
+                if (!string.IsNullOrEmpty(this.lastFilePath))
+                {
+                    this.ProjectSave();
+                }
+            }
+            this.Shown += (sender, args) => autoSaveHandler.AddTickEventHandler(eventHandler);
+            this.FormClosed += (sender, args) => autoSaveHandler.RemoveTickEventHandler(eventHandler);
+
             var timer = new Timer { Interval = 1000 };
             timer.Start();
 
