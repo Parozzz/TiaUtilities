@@ -12,14 +12,14 @@ namespace TiaXmlReader.AutoSave
     class AutoSaveSettingsWrapper
     {
         private readonly ISettingsAutoSave obj;
-        private readonly Dictionary<AutoSaveWrapperReflectionHelper, object> snapshotDict;
+        private readonly Dictionary<IAutoSaveWrapperReflectionHelper, object> snapshotDict;
         private readonly List<AutoSaveSettingsWrapper> subWrapperList;
 
         public AutoSaveSettingsWrapper(ISettingsAutoSave @object) 
         {
             this.obj = @object;
 
-            this.snapshotDict = new Dictionary<AutoSaveWrapperReflectionHelper, object>();
+            this.snapshotDict = new Dictionary<IAutoSaveWrapperReflectionHelper, object>();
             this.subWrapperList = new List<AutoSaveSettingsWrapper>();
         }
 
@@ -33,12 +33,7 @@ namespace TiaXmlReader.AutoSave
             foreach(var helper in GetAllPublicValues())
             {
                 var type = helper.GetReflectedType();
-                if (IsTypeValue(type))
-                {
-                    var value = helper.GetReflectedValue(this.obj);
-                    snapshotDict.Add(helper, value); //Fill with starting values!
-                }
-                else if(type.GetInterfaces().Contains(settingsAutoSaveType))
+                if(type.GetInterfaces().Contains(settingsAutoSaveType))
                 {
                     var value = helper.GetReflectedValue(obj);
                     if (value is ISettingsAutoSave subObject)
@@ -47,6 +42,11 @@ namespace TiaXmlReader.AutoSave
                         subWrapper.Scan();
                         subWrapperList.Add(subWrapper);
                     }
+                }
+                else
+                {
+                    var value = helper.GetReflectedValue(this.obj);
+                    snapshotDict.Add(helper, value); //Fill with starting values!
                 }
             }
         }
@@ -93,14 +93,9 @@ namespace TiaXmlReader.AutoSave
             }
         }
 
-        private bool IsTypeValue(Type type)
+        private List<IAutoSaveWrapperReflectionHelper> GetAllPublicValues()
         {
-            return type.IsPrimitive || type.IsEnum || type == typeof(string);
-        }
-
-        private List<AutoSaveWrapperReflectionHelper> GetAllPublicValues()
-        {
-            var reflectionGetterValue = new List<AutoSaveWrapperReflectionHelper>();
+            var reflectionGetterValue = new List<IAutoSaveWrapperReflectionHelper>();
 
             var type = obj.GetType();
             foreach (var field in type.GetFields().Where(f => f.IsPublic && !f.IsStatic))
@@ -118,14 +113,14 @@ namespace TiaXmlReader.AutoSave
     }
 
 
-    interface AutoSaveWrapperReflectionHelper
+    interface IAutoSaveWrapperReflectionHelper
     {
         string GetReflectedName();
         Type GetReflectedType();
         object GetReflectedValue(object obj);
     }
 
-    class FieldReflectionHelper : AutoSaveWrapperReflectionHelper
+    class FieldReflectionHelper : IAutoSaveWrapperReflectionHelper
     {
         private readonly FieldInfo fieldInfo;
         public FieldReflectionHelper(FieldInfo fieldInfo) 
@@ -149,7 +144,7 @@ namespace TiaXmlReader.AutoSave
         }
     }
 
-    class PropertyReflectionHelper : AutoSaveWrapperReflectionHelper
+    class PropertyReflectionHelper : IAutoSaveWrapperReflectionHelper
     {
         private readonly PropertyInfo propertyInfo;
         public PropertyReflectionHelper(PropertyInfo propertyInfo)
