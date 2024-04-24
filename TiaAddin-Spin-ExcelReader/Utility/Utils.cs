@@ -101,7 +101,7 @@ namespace TiaXmlReader.Utility
             return true;
         }
 
-        private static bool AreValuesDifferent(object valueOne, object valueTwo)
+        public static bool AreValuesDifferent(object valueOne, object valueTwo)
         {
             return (valueOne == null && valueTwo != null) || (valueOne != null && valueTwo == null) || (valueOne != null && !valueOne.Equals(valueTwo));
         }

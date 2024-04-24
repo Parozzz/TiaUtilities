@@ -8,6 +8,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TiaXmlReader.AutoSave;
 using TiaXmlReader.GenerationForms;
 
 namespace TiaXmlReader.Generation.IO
@@ -28,7 +29,7 @@ namespace TiaXmlReader.Generation.IO
         PER_BYTE
     }
 
-    public class IOConfiguration : IGenerationConfiguration
+    public class IOConfiguration : IGenerationConfiguration, ISettingsAutoSave
     {
         [JsonProperty] public string FCBlockName = "fcTest_IO";
         [JsonProperty] public uint FCBlockNumber = 195;

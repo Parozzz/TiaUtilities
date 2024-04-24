@@ -2,26 +2,22 @@
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using TiaXmlReader.Generation;
-using TiaXmlReader.Generation.IO;
 using TiaXmlReader.Localization;
-using TiaXmlReader.SimaticML;
 using TiaXmlReader.Utility;
-using System.Data.Common;
 using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Generation.GridHandler;
-using TiaXmlReader.Generation.IO.GenerationForm;
 using TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter;
+using TiaXmlReader.AutoSave;
 
 namespace TiaXmlReader.Generation.IO.GenerationForm
 {
     public partial class IOGenerationForm : Form
     {
-        private AutoSaveHandler autoSaveHandler;
+        private TimedSaveHandler autoSaveHandler;
         private readonly IOGenerationSettings settings;
+        private readonly GridSettings gridSettings;
         private readonly GridHandler<IOConfiguration, IOData> gridHandler;
         private readonly IOGenerationFormConfigHandler configHandler;
 
@@ -30,15 +26,15 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
 
         private string lastFilePath;
 
-        public IOGenerationForm(AutoSaveHandler autoSaveHandler)
+        public IOGenerationForm(TimedSaveHandler autoSaveHandler, IOGenerationSettings settings, GridSettings gridSettings)
         {
             InitializeComponent();
 
             this.autoSaveHandler = autoSaveHandler;
-            this.settings = IOGenerationSettings.Load();
-            this.settings.Save(); //This could be avoided but is to be sure that all the classes that are created new will be saved to file!
+            this.settings = settings;
+            this.gridSettings = gridSettings;
 
-            this.gridHandler = new GridHandler<IOConfiguration, IOData>(this.dataGridView, settings.GridSettings, IOConfig, IOData.COLUMN_LIST, new IOGenerationComparer())
+            this.gridHandler = new GridHandler<IOConfiguration, IOData>(this.dataGridView, gridSettings, IOConfig, IOData.COLUMN_LIST, new IOGenerationComparer())
             {
                 RowCount = 2999
             };
@@ -101,7 +97,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             };
             this.importExcelToolStripMenuItem.Click += (object sender, EventArgs args) =>
             {
-                var excelImportForm = new IOGenerationExcelImportForm(this.ExcelImportConfig, this.settings.GridSettings);
+                var excelImportForm = new IOGenerationExcelImportForm(this.ExcelImportConfig, this.gridSettings);
 
                 var dialogResult = excelImportForm.ShowDialog();
                 if (dialogResult == DialogResult.OK)
@@ -130,31 +126,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                     }
                 }
             };
-            this.preferencesToolStripMenuItem.Click += (object sender, EventArgs args) =>
-            {
-                var configForm = new ConfigForm("Preferenze");
-                configForm.AddColorPickerLine("Bordo cella selezionata")
-                    .ApplyColor(settings.GridSettings.SingleSelectedCellBorderColor)
-                    .ColorChanged(color => settings.GridSettings.SingleSelectedCellBorderColor = color);
-
-                configForm.AddColorPickerLine("Sfondo cella trascinata")
-                    .ApplyColor(settings.GridSettings.DragSelectedCellBorderColor)
-                    .ColorChanged(color => settings.GridSettings.DragSelectedCellBorderColor = color);
-
-                configForm.AddColorPickerLine("Triangolo trascinamento")
-                    .ApplyColor(settings.GridSettings.SelectedCellTriangleColor)
-                    .ColorChanged(color => settings.GridSettings.SelectedCellTriangleColor = color);
-
-                configForm.AddColorPickerLine("Anteprima")
-                    .ApplyColor(settings.GridSettings.PreviewColor)
-                    .ColorChanged(color => settings.GridSettings.PreviewColor = color);
-
-                configForm.StartShowingAtLocation(Cursor.Position);
-                configForm.Init();
-                configForm.Show(this);
-
-                dataGridView.Refresh();
-            };
+            this.preferencesToolStripMenuItem.Click += (object sender, EventArgs args) => this.gridSettings.ShowConfigForm(this);
             #endregion
 
             #region MemoryType ComboBox
@@ -205,7 +177,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             this.gridHandler?.Init();
             this.configHandler?.Init();
 
-            #region PROGRAM_SAVE_TICK + AUTO_SAVE
+            #region AUTO_SAVE
             void eventHandler(object sender, EventArgs args)
             {
                 if (!string.IsNullOrEmpty(this.lastFilePath))
@@ -215,47 +187,9 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             }
             this.Shown += (sender, args) => autoSaveHandler.AddTickEventHandler(eventHandler);
             this.FormClosed += (sender, args) => autoSaveHandler.RemoveTickEventHandler(eventHandler);
-
-            var timer = new Timer { Interval = 1000 };
-            timer.Start();
-
-            var objectSnapshotDict = new Dictionary<object, Dictionary<string, object>>()
-            {
-                {this.IOConfig, null },
-                {this.ExcelImportConfig, null },
-                {this.settings.GridSettings, null }
-            };
-
-            ParseSnapshotDict(objectSnapshotDict, forceRefreshSnapshot: true, skipSave: true);
-            timer.Tick += (sender, e) =>
-            {
-                ParseSnapshotDict(objectSnapshotDict, forceRefreshSnapshot: false, skipSave: false);
-            };
             #endregion
 
             UpdateConfigPanel();
-        }
-
-        private void ParseSnapshotDict(Dictionary<object, Dictionary<string, object>> objectSnapshotDict, bool forceRefreshSnapshot = false, bool skipSave = false)
-        {
-            bool saveNecessary = false;
-            foreach(var entry in objectSnapshotDict.ToList()) //To list neede to make a copy so i can change the dict below!
-            {
-                var obj = entry.Key;
-                var oldSnapshotDict = entry.Value;
-                if(oldSnapshotDict == null || !Utils.ComparePublicFieldSnapshot(obj, oldSnapshotDict) || forceRefreshSnapshot)
-                {
-                    saveNecessary = true;
-
-                    var snap = Utils.CreatePublicFieldSnapshot(obj);
-                    objectSnapshotDict[obj] = snap;
-                }
-            }
-
-            if(saveNecessary && !skipSave)
-            {
-                this.settings.Save();
-            }
         }
 
         public void ProjectSave(bool saveAs = false)

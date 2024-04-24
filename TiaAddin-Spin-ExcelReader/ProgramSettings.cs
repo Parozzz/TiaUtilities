@@ -1,14 +1,15 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using System;
 using System.IO;
-using TiaXmlReader.Generation.IO.GenerationForm;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Utility;
+using TiaXmlReader.AutoSave;
+using TiaXmlReader.Generation.IO.GenerationForm;
+using TiaXmlReader.Generation.Alarms.GenerationForm;
+using TiaXmlReader.Generation.GridHandler;
 
 namespace TiaXmlReader
 {
-    public class ProgramSettings
+    public class ProgramSettings : ISettingsAutoSave
     {
         public const string EXTENSION = "json";
         public const string FILE_NAME = "settings/ProgramSettings." + EXTENSION;
@@ -25,9 +26,14 @@ namespace TiaXmlReader
         [JsonProperty] public string DBDuplicationReplacementList2;
         [JsonProperty] public string DBDuplicationReplacementList3;
 
-        [JsonProperty] public AutoSaveHandler.AutoSaveTimeEnum AutoSaveTime = AutoSaveHandler.AutoSaveTimeEnum.MIN_2;
+        [JsonProperty] public TimedSaveHandler.TimeEnum TimedSaveTime = TimedSaveHandler.TimeEnum.MIN_2;
         [JsonProperty] public uint lastTIAVersion = Constants.VERSION;
         [JsonProperty] public string ietfLanguage = SystemVariables.LANG;
+
+        [JsonProperty] public GridSettings GridSettings { get; set; } = new GridSettings();
+        [JsonProperty] public IOGenerationSettings IOSettings { get; set; } = new IOGenerationSettings();
+        [JsonProperty] public AlarmGenerationSettings AlarmSettings { get; set; } = new AlarmGenerationSettings();
+
         public static string GetFilePath()
         {
             return Directory.GetCurrentDirectory() + @"\" + FILE_NAME;

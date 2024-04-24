@@ -9,16 +9,16 @@ using TiaXmlReader.Utility;
 using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation.Alarms.GenerationForm;
 using TiaXmlReader.Generation.IO.GenerationForm;
-using TiaXmlReader.Generation;
 using System.Collections.Generic;
 using System.Linq;
+using TiaXmlReader.AutoSave;
 
 namespace TiaXmlReader
 {
     public partial class MainImportExportForm : Form
     {
         private readonly ProgramSettings programSettings;
-        private readonly AutoSaveHandler autoSaveHandler;
+        private readonly TimedSaveHandler autoSaveHandler;
 
         public MainImportExportForm()
         {
@@ -27,7 +27,7 @@ namespace TiaXmlReader
             this.programSettings = ProgramSettings.Load();
             this.programSettings.Save(); //To create file if not exist!
 
-            this.autoSaveHandler = new AutoSaveHandler(programSettings, this.autoSaveComboBox.ComboBox);
+            this.autoSaveHandler = new TimedSaveHandler(programSettings, this.autoSaveComboBox.ComboBox);
 
             Init();
         }
@@ -57,18 +57,17 @@ namespace TiaXmlReader
             #region SETTINGS_SAVE_TICK + AUTO_SAVE
             this.autoSaveHandler.Start();
 
+            var settingsWrapper = new AutoSaveSettingsWrapper(this.programSettings);
+            settingsWrapper.Scan();
+
             var timer = new Timer { Interval = 1000 };
             timer.Start();
-
-            var objectSnapshotDict = new Dictionary<object, Dictionary<string, object>>()
-            {
-                {this.programSettings, null }
-            };
-
-            ParseSnapshotDict(objectSnapshotDict, forceRefreshSnapshot: true, skipSave: true);
             timer.Tick += (sender, e) =>
             {
-                ParseSnapshotDict(objectSnapshotDict, forceRefreshSnapshot: false, skipSave: false);
+                if(!settingsWrapper.CompareSnapshot())
+                {
+                    this.programSettings.Save();
+                }
             };
             #endregion
         }
@@ -202,12 +201,12 @@ namespace TiaXmlReader
 
         private void GenerateIOMenuItem_Click(object sender, EventArgs e)
         {
-            new IOGenerationForm(this.autoSaveHandler).Show(this);
+            new IOGenerationForm(this.autoSaveHandler, this.programSettings.IOSettings, this.programSettings.GridSettings).Show(this);
         }
 
         private void GenerateAlarmsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            new AlarmGenerationForm(this.autoSaveHandler).Show(this);
+            new AlarmGenerationForm(this.autoSaveHandler, this.programSettings.AlarmSettings, this.programSettings.GridSettings).Show(this);
         }
     }
 }

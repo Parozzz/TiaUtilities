@@ -189,6 +189,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutoSave\ISettingsAutoSave.cs" />
+    <Compile Include="AutoSave\AutoSaveSettingsWrapper.cs" />
     <Compile Include="CustomControls\FlatComboBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -211,7 +213,7 @@
     <Compile Include="Generation\Alarms\GenerationForm\AlarmGenerationProjectSave.cs" />
     <Compile Include="Generation\Alarms\GenerationForm\AlarmGenerationSettings.cs" />
     <Compile Include="Generation\Configuration\ConfigFormCheckBoxLine.cs" />
-    <Compile Include="AutoSaveHandler.cs" />
+    <Compile Include="AutoSave\TimedSaveHandler.cs" />
     <Compile Include="Generation\GenerationUtils.cs" />
     <Compile Include="Generation\GridHandler\GridUtils.cs" />
     <Compile Include="Generation\GridHandler\Data\GridDataHandler.cs" />

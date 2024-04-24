@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
+using TiaXmlReader.Utility;
 
-namespace TiaXmlReader.Generation
+namespace TiaXmlReader.AutoSave
 {
-    public class AutoSaveHandler
+    public class TimedSaveHandler
     {
-        public enum AutoSaveTimeEnum
+        public enum TimeEnum
         {
             OFF = 0,
             SEC_30 = 30,
@@ -19,7 +22,9 @@ namespace TiaXmlReader.Generation
         private readonly ComboBox comboBox;
         private readonly Timer timer;
 
-        public AutoSaveHandler(ProgramSettings settings, ComboBox comboBox)
+
+
+        public TimedSaveHandler(ProgramSettings settings, ComboBox comboBox)
         {
             this.programSettings = settings;
             this.comboBox = comboBox;
@@ -40,27 +45,27 @@ namespace TiaXmlReader.Generation
         {
             this.comboBox.Items.Clear();
 
-            var timeEnumType = typeof(AutoSaveTimeEnum);
-            foreach (AutoSaveTimeEnum autoSaveEnum in Enum.GetValues(timeEnumType))
+            var timeEnumType = typeof(TimeEnum);
+            foreach (TimeEnum autoSaveEnum in Enum.GetValues(timeEnumType))
             {
                 var enumName = Enum.GetName(timeEnumType, autoSaveEnum);
                 this.comboBox.Items.Add(enumName);
             }
-            this.comboBox.Text = Enum.GetName(timeEnumType, programSettings.AutoSaveTime);
+            this.comboBox.Text = Enum.GetName(timeEnumType, programSettings.TimedSaveTime);
 
-            SetIntervalAndStart(programSettings.AutoSaveTime);
+            SetIntervalAndStart(programSettings.TimedSaveTime);
             this.comboBox.SelectedValueChanged += (sender, args) =>
             {
                 timer.Stop();
-                if (Enum.TryParse(this.comboBox.Text, out AutoSaveTimeEnum autoSave))
+                if (Enum.TryParse(this.comboBox.Text, out TimeEnum autoSave))
                 {
-                    programSettings.AutoSaveTime = autoSave;
+                    programSettings.TimedSaveTime = autoSave;
                     SetIntervalAndStart(autoSave);
                 }
             };
         }
 
-        private void SetIntervalAndStart(AutoSaveTimeEnum timeEnum)
+        private void SetIntervalAndStart(TimeEnum timeEnum)
         {
             timer.Interval = ((int)timeEnum) * 1000;
             if (timer.Interval > 0)
@@ -68,5 +73,6 @@ namespace TiaXmlReader.Generation
                 timer.Start();
             }
         }
+
     }
 }

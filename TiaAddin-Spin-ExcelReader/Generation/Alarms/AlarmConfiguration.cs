@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using TiaXmlReader.GenerationForms;
 using TiaXmlReader.Generation.Alarms;
+using TiaXmlReader.AutoSave;
 
 namespace TiaXmlReader.Generation.Alarms
 {
@@ -22,7 +23,7 @@ namespace TiaXmlReader.Generation.Alarms
         ONE
     }
 
-    public class AlarmConfiguration : IGenerationConfiguration
+    public class AlarmConfiguration : IGenerationConfiguration, ISettingsAutoSave
     {
         [JsonProperty] public string FCBlockName = "fcAlarmGeneration";
         [JsonProperty] public uint FCBlockNumber = 100;
