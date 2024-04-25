@@ -21,7 +21,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
         private readonly GridHandler<IOConfiguration, IOData> gridHandler;
         private readonly IOGenerationFormConfigHandler configHandler;
 
-        private IOGenerationExcelImportConfiguration ExcelImportConfig { get => settings.ExcelImportConfiguration; }
+        private IOGenerationExcelImportSettings ExcelImportConfig { get => settings.ExcelImportConfiguration; }
         private IOConfiguration IOConfig { get => settings.IOConfiguration; }
 
         private string lastFilePath;
@@ -111,17 +111,14 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                         });
                     }
 
-                    var ioDataCounter = 0;
-                    foreach (var emptyRowIndex in this.gridHandler.DataSource.GetFirstEmptyRowIndexes(ioDataList.Count))
-                    {
-                        if (ioDataCounter >= ioDataList.Count)
-                        {
-                            break;
-                        }
+                    var firstEmptyIndexList = this.gridHandler.DataSource.GetFirstEmptyRowIndexes(ioDataList.Count);
 
-                        var ioData = ioDataList[ioDataCounter++];
-                        this.gridHandler.ChangeRow(emptyRowIndex, ioData);
+                    var dataDict = new Dictionary<int, IOData>();
+                    for (int i = 0; i < firstEmptyIndexList.Count; i++)
+                    {
+                        dataDict.Add(firstEmptyIndexList[i], ioDataList[i]);
                     }
+                    this.gridHandler.ChangeMultipleRows(dataDict);
                 }
             };
             this.preferencesToolStripMenuItem.Click += (object sender, EventArgs args) => this.gridSettings.ShowConfigForm(this);
@@ -193,7 +190,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             {
                 projectSave.RowDict.Add(entry.Value, entry.Key);
             }
-            projectSave.Save(ref lastFilePath, saveAs);
+            projectSave.Save(ref lastFilePath, saveAs || string.IsNullOrEmpty(lastFilePath));
 
             this.Text = this.Name + ". File: " + lastFilePath;
         }

@@ -9,17 +9,14 @@ using TiaXmlReader.Generation.Configuration;
 
 namespace TiaXmlReader.Generation.Configuration
 {
-    public class ConfigFormCheckBoxLine : IConfigFormLine
+    public class ConfigFormCheckBoxLine : ConfigFormLine
     {
-        private readonly string labelText;
         private readonly CheckBox control;
 
         private Action<bool> checkedChangedAction;
 
-        public ConfigFormCheckBoxLine(string labelText)
+        public ConfigFormCheckBoxLine(string labelText) : base(labelText)
         {
-            this.labelText = labelText;
-
             this.control = new CheckBox
             {
                 FlatStyle = FlatStyle.Flat,
@@ -45,14 +42,9 @@ namespace TiaXmlReader.Generation.Configuration
             return this;
         }
 
-        public Control GetControl()
+        public override Control GetControl()
         {
             return control;
-        }
-
-        public string GetLabelText()
-        {
-            return labelText;
         }
     }
 }

@@ -89,11 +89,6 @@ namespace TiaXmlReader.Generation
         {
             loaded = default;
 
-            if (!File.Exists(filePath))
-            {
-                return false;
-            }
-
             try
             {
                 if (showFileDialog)
@@ -105,6 +100,10 @@ namespace TiaXmlReader.Generation
                     }
 
                     filePath = fileDialog.FileName;
+                }
+                else if(!File.Exists(filePath))
+                {
+                    return false;
                 }
 
                 FixExtesion(ref filePath, extension);

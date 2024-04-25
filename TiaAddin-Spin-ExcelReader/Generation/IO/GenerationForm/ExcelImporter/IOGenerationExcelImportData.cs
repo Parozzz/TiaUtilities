@@ -9,7 +9,7 @@ using TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter;
 
 namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
 {
-    public class IOGenerationExcelImportData : IGridData<IOGenerationExcelImportConfiguration>
+    public class IOGenerationExcelImportData : IGridData<IOGenerationExcelImportSettings>
     {
         public static int COLUMN_COUNT = 0;
         //THESE IS THE ORDER IN WHICH THEY APPEAR!
@@ -33,7 +33,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
         public string IOName { get; set; }
         public string Comment { get; set; }
 
-        public GridDataPreview GetPreview(int column, IOGenerationExcelImportConfiguration config)
+        public GridDataPreview GetPreview(int column, IOGenerationExcelImportSettings config)
         {
             return null;
         }

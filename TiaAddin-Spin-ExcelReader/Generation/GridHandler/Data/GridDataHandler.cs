@@ -54,15 +54,18 @@ namespace TiaXmlReader.Generation.GridHandler.Data
 
         public List<GridCellChange> CreateCellChanges(int rowIndex, T data)
         {
-            return CreateCellChanges(rowIndex, Utils.SingletonCollection<T>(data));
+            return CreateCellChanges(new Dictionary<int, T> { { rowIndex, data } });
         }
 
-        public List<GridCellChange> CreateCellChanges(int rowIndex, ICollection<T> dataCollection)
+        public List<GridCellChange> CreateCellChanges(Dictionary<int, T> dataDict)
         {
             var cellChangeList = new List<GridCellChange>();
 
-            foreach (var data in dataCollection)
+            foreach (var entry in dataDict)
             {
+                var rowIndex = entry.Key;
+                var data = entry.Value;
+
                 foreach (var dataColumn in dataColumns)
                 {
                     var value = dataColumn.GetValueFrom<object>(data);

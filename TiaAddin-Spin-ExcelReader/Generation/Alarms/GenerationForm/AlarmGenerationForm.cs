@@ -178,7 +178,7 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             {
                 projectSave.AddAlarmData(entry.Key, entry.Value);
             }
-            projectSave.Save(ref lastFilePath, saveAs);
+            projectSave.Save(ref lastFilePath, saveAs || string.IsNullOrEmpty(lastFilePath));
 
             this.Text = this.Name + ". File: " + lastFilePath;
         }

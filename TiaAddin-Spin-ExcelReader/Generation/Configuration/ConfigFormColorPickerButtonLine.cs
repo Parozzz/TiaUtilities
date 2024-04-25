@@ -11,9 +11,8 @@ using TiaXmlReader.Generation.Configuration;
 
 namespace TiaXmlReader.Generation.Configuration
 {
-    public class ConfigFormColorPickerButtonLine : IConfigFormLine
+    public class ConfigFormColorPickerButtonLine : ConfigFormLine
     {
-        private readonly string labelText;
         private readonly TableLayoutPanel panel;
         private readonly TextBox colorTextBox;
         private readonly Button colorPickerButton;
@@ -22,10 +21,8 @@ namespace TiaXmlReader.Generation.Configuration
         private Action<Color> colorAction;
         private Color lastColor = Color.White;
 
-        public ConfigFormColorPickerButtonLine(string labelText)
+        public ConfigFormColorPickerButtonLine(string labelText) : base(labelText)
         {
-            this.labelText = labelText;
-
             this.panel = new TableLayoutPanel()
             {
                 Dock = DockStyle.Fill,
@@ -111,14 +108,9 @@ namespace TiaXmlReader.Generation.Configuration
             return this;
         }
 
-        public Control GetControl()
+        public override Control GetControl()
         {
             return panel;
-        }
-
-        public string GetLabelText()
-        {
-            return labelText;
         }
     }
 }

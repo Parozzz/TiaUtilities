@@ -1,40 +1,37 @@
-﻿using ClosedXML.Excel;
-using Flee.PublicTypes;
-using Microsoft.WindowsAPICodePack.Dialogs;
+﻿using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using TiaXmlReader.Generation.IO;
 using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Generation.GridHandler;
-using TiaXmlReader.Generation.IO.GenerationForm;
-using TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter;
+using Jint;
+using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Drawing.Charts;
 
 namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
 {
     public partial class IOGenerationExcelImportForm : Form
     {
         public const string ROW_SPECIAL_CHAR = "$";
-        public const string EXPRESSION_OPERATORS = "Operators: Bool[<>, =, >, <, >=, <=, AND, OR, XOR, NAND].\nString[.Contains(str), .StartsWith(str), .EndsWith(str)].";
 
         public const int ADDRESS_COLUMN = 0;
         public const int IONAME_COLUMN = 1;
         public const int COMMENT_COLUMN = 2;
 
-        private readonly IOGenerationExcelImportConfiguration config;
-        private readonly GridHandler<IOGenerationExcelImportConfiguration, IOGenerationExcelImportData> gridHandler;
+        private readonly IOGenerationExcelImportSettings importSettings;
+        private readonly GridHandler<IOGenerationExcelImportSettings, IOGenerationExcelImportData> gridHandler;
 
         public IEnumerable<IOGenerationExcelImportData> ImportDataEnumerable { get => gridHandler.DataSource.GetNotEmptyDataDict().Keys; }
 
-        public IOGenerationExcelImportForm(IOGenerationExcelImportConfiguration config, GridSettings gridSettings)
+        public IOGenerationExcelImportForm(IOGenerationExcelImportSettings importSettings, GridSettings gridSettings)
         {
             InitializeComponent();
 
-            this.config = config;
-            this.gridHandler = new GridHandler<IOGenerationExcelImportConfiguration, IOGenerationExcelImportData>
-                (this.dataGridView, gridSettings, config, IOGenerationExcelImportData.COLUMN_LIST)
+            this.importSettings = importSettings;
+            this.gridHandler = new GridHandler<IOGenerationExcelImportSettings, IOGenerationExcelImportData>
+                (this.dataGridView, gridSettings, importSettings, IOGenerationExcelImportData.COLUMN_LIST)
             {
                 RowCount = 1999
             };
@@ -91,24 +88,24 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
                 };
 
                 configForm.AddTextBoxLine("Indirizzo")
-                    .ControlText(config.AddressCellConfig)
-                    .TextChanged(str => config.AddressCellConfig = str);
+                    .ControlText(importSettings.AddressCellConfig)
+                    .TextChanged(str => importSettings.AddressCellConfig = str);
 
                 configForm.AddTextBoxLine("Nome IO")
-                    .ControlText(config.IONameCellConfig)
-                    .TextChanged(str => config.IONameCellConfig = str);
+                    .ControlText(importSettings.IONameCellConfig)
+                    .TextChanged(str => importSettings.IONameCellConfig = str);
 
                 configForm.AddTextBoxLine("Commento")
-                    .ControlText(config.CommentCellConfig)
-                    .TextChanged(str => config.CommentCellConfig = str);
+                    .ControlText(importSettings.CommentCellConfig)
+                    .TextChanged(str => importSettings.CommentCellConfig = str);
 
                 configForm.AddTextBoxLine("Riga di partenza")
-                    .ControlText(config.StartingRow)
-                    .UIntChanged(num => config.StartingRow = num);
+                    .ControlText(importSettings.StartingRow)
+                    .UIntChanged(num => importSettings.StartingRow = num);
 
-                configForm.AddTextBoxLine("Espressione validità riga")
-                    .ControlText(config.IgnoreRowExpressionConfig)
-                    .TextChanged(str => config.IgnoreRowExpressionConfig = str);
+                configForm.AddJavascriptTextBoxLine("Espressione validità riga")
+                    .ControlText(importSettings.IgnoreRowExpressionConfig)
+                    .TextChanged(str => importSettings.IgnoreRowExpressionConfig = str);
 
                 configForm.StartShowingAtControl(this.ConfigButton);
                 configForm.Init();
@@ -144,11 +141,15 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
                 {
                     var worksheet = configWorkbook.Worksheets.Worksheet(1);
 
+                    var t1 = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+
                     var excelCellLetterList = AddMatchExpression(new string[] {
-                        config.AddressCellConfig, config.CommentCellConfig, config.IONameCellConfig, config.IgnoreRowExpressionConfig
+                        importSettings.AddressCellConfig, importSettings.CommentCellConfig, importSettings.IONameCellConfig, importSettings.IgnoreRowExpressionConfig
                     });
 
-                    uint rowIndex = config.StartingRow;
+                    var importDataList = new List<IOGenerationExcelImportData>();
+
+                    uint rowIndex = importSettings.StartingRow;
                     while (true)
                     {
                         var excelCellValueDict = new Dictionary<string, string>();
@@ -177,28 +178,35 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
                             continue;
                         }
 
-                        var address = config.AddressCellConfig;
-                        var ioName = config.IONameCellConfig;
-                        var comment = config.CommentCellConfig;
+                        var address = importSettings.AddressCellConfig;
+                        var ioName = importSettings.IONameCellConfig;
+                        var comment = importSettings.CommentCellConfig;
                         foreach (var entry in excelCellValueDict)
                         {
-                            address = address.Replace(ROW_SPECIAL_CHAR + entry.Key, entry.Value);
-                            ioName = ioName.Replace(ROW_SPECIAL_CHAR + entry.Key, entry.Value);
-                            comment = comment.Replace(ROW_SPECIAL_CHAR + entry.Key, entry.Value);
+                            address = address.Replace(entry.Key, entry.Value);
+                            ioName = ioName.Replace(entry.Key, entry.Value);
+                            comment = comment.Replace(entry.Key, entry.Value);
                         }
 
-                        var freeIndexList = this.gridHandler.DataSource.GetFirstEmptyRowIndexes(1);
-                        if (freeIndexList.Count == 1)
+                        importDataList.Add(new IOGenerationExcelImportData()
                         {
-                            var freeRowIndex = freeIndexList[0];
-                            this.gridHandler.ChangeRow(freeRowIndex, new IOGenerationExcelImportData()
-                            {
-                                Address = address,
-                                IOName = ioName,
-                                Comment = comment,
-                            });
-                        }
+                            Address = address,
+                            IOName = ioName,
+                            Comment = comment,
+                        });
                     }
+                    //Splitted this way to increase performance. Changing cell one at the time for 20-30 values takes 400ms, this way 10ms
+                    var freeIndexList = this.gridHandler.DataSource.GetFirstEmptyRowIndexes(importDataList.Count);
+
+                    var dataDict = new Dictionary<int, IOGenerationExcelImportData>();
+                    for(int i = 0; i < freeIndexList.Count; i++)
+                    {
+                        dataDict.Add(freeIndexList[i], importDataList[i]);
+                    }
+                    this.gridHandler.ChangeMultipleRows(dataDict);
+
+                    var t2 = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+                    Console.WriteLine("Time: " + (t2 - t1) + " ms");
                 }
             }
         }
@@ -209,31 +217,32 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
 
             try
             {
-                ExpressionContext context = new ExpressionContext();
-                context.Options.StringComparison = StringComparison.OrdinalIgnoreCase;
-                context.ParserOptions.DecimalSeparator = '.';
-                context.ParserOptions.FunctionArgumentSeparator = ','; //Seperator 
-                foreach (var entry in dict)
+                using(var engine = new Engine())
                 {
-                    context.Variables.Add(entry.Key, entry.Value);
+                    foreach (var entry in dict)
+                    {
+                        engine.SetValue(entry.Key, entry.Value);
+                    }
+
+                    var eval = engine.Evaluate(importSettings.IgnoreRowExpressionConfig);
+                    if (!eval.IsBoolean())
+                    {
+                        MessageBox.Show("Return must be boolean.", "Invalid ignore row operation");
+                        return false;
+                    }
+
+                    result = eval.AsBoolean();
                 }
 
-                var dynExp = context.CompileDynamic(config.IgnoreRowExpressionConfig.Replace(ROW_SPECIAL_CHAR, ""));
-                if (!(dynExp.Evaluate() is bool eval))
-                {
-                    MessageBox.Show("Return must be boolean.\n" + EXPRESSION_OPERATORS, "Invalid ignore row operation");
-                    return false;
-                }
-
-                result = eval;
                 return true;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
-                MessageBox.Show("Error while compiling.\n" + EXPRESSION_OPERATORS + "\n" + ex.Message, "Invalid ignore row operation");
+                MessageBox.Show("Error while compiling javascript.\n" + ex.Message, "Invalid ignore row operation");
                 return false;
             }
+
         }
 
         private List<string> AddMatchExpression(string[] strArray)
@@ -246,7 +255,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
                 {
                     if (match.Success)
                     {
-                        var matchString = match.Value.Replace(ROW_SPECIAL_CHAR, "").ToUpper();
+                        var matchString = match.Value.ToUpper();
                         if (!matchCollection.Contains(matchString))
                         {
                             matchCollection.Add(matchString);

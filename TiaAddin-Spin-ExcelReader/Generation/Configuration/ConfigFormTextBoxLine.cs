@@ -9,19 +9,16 @@ using TiaXmlReader.Generation.Configuration;
 
 namespace TiaXmlReader.Generation.Configuration
 {
-    public class ConfigFormTextBoxLine : IConfigFormLine
+    public class ConfigFormTextBoxLine : ConfigFormLine
     {
-        private readonly string labelText;
         private readonly TextBox control;
 
         private bool numericOnly;
         private Action<string> textChangedAction;
         private Action<uint> uintChangedAction;
 
-        public ConfigFormTextBoxLine(string labelText)
+        public ConfigFormTextBoxLine(string labelText) : base(labelText)
         {
-            this.labelText = labelText;
-
             this.control = new FlatTextBox();
             this.control.TextChanged += TextChangedEventHandler;
             this.control.KeyPress += KeyPressEventHandler;
@@ -65,14 +62,9 @@ namespace TiaXmlReader.Generation.Configuration
             return this;
         }
 
-        public Control GetControl()
+        public override Control GetControl()
         {
             return control;
-        }
-
-        public string GetLabelText()
-        {
-            return labelText;
         }
     }
 }

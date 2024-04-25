@@ -36,6 +36,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             form.fcConfigButton.Click += (object sender, EventArgs args) =>
             {
                 var configForm = new ConfigForm("FC");
+
                 configForm.AddTextBoxLine("Nome")
                     .ControlText(config.FCBlockName)
                     .TextChanged(str => config.FCBlockName = str);

@@ -9,19 +9,16 @@ using TiaXmlReader.Generation.Configuration;
 
 namespace TiaXmlReader.Generation.Configuration
 {
-    public class ConfigFormComboBoxLine : IConfigFormLine
+    public class ConfigFormComboBoxLine : ConfigFormLine
     {
-        private readonly string labelText;
         private readonly ComboBox control;
 
         private bool numericOnly;
         private Action<string> textChangedAction;
         private Action<uint> uintChangedAction;
 
-        public ConfigFormComboBoxLine(string labelText)
+        public ConfigFormComboBoxLine(string labelText) : base(labelText)
         {
-            this.labelText = labelText;
-
             this.control = new FlatComboBox();
             this.control.TextChanged += TextChangedEventHandler;
             this.control.KeyPress += KeyPressEventHandler;
@@ -76,14 +73,9 @@ namespace TiaXmlReader.Generation.Configuration
             return this;
         }
 
-        public Control GetControl()
+        public override Control GetControl()
         {
             return control;
-        }
-
-        public string GetLabelText()
-        {
-            return labelText;
         }
     }
 }

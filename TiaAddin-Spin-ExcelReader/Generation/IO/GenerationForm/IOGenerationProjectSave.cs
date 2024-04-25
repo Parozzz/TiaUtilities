@@ -33,9 +33,9 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             return GenerationUtils.Load(ref filePath, EXTENSION, out IOGenerationProjectSave projectSave) ? projectSave : new IOGenerationProjectSave();
         }
 
-        public void Save(ref string filePath, bool saveAs = false)
+        public void Save(ref string filePath, bool showFileDialog = false)
         {
-            GenerationUtils.Save(this, ref filePath, EXTENSION, saveAs);
+            GenerationUtils.Save(this, ref filePath, EXTENSION, showFileDialog);
         }
     }
 }

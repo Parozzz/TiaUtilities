@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using TiaXmlReader.CustomControls;
-using TiaXmlReader.Generation.Configuration;
 
 namespace TiaXmlReader.Generation.Configuration
 {
@@ -13,19 +11,19 @@ namespace TiaXmlReader.Generation.Configuration
         private static readonly Font CONTROL_FONT = new Font("Microsoft Sans Serif", 9f);
 
         private readonly string title;
-        private readonly List<IConfigFormLine> lineList;
+        private readonly List<ConfigFormLine> lineList;
 
         public Font LabelFont { get; set; } = LABEL_FONT;
         public Font ControlFont { get; set; } = CONTROL_FONT;
         public int ControlWidth { get; set; } = 300;
         public int ControlHeight { get; set; } = 30;
-        
+
         public ConfigForm(string title)
         {
             InitializeComponent();
 
             this.title = title;
-            this.lineList = new List<IConfigFormLine>();
+            this.lineList = new List<ConfigFormLine>();
         }
 
         public void StartShowingAtControl(Control control)
@@ -42,9 +40,23 @@ namespace TiaXmlReader.Generation.Configuration
             this.Location = loc;
         }
 
+        public ConfigFormLine AddLine(string labelText)
+        {
+            var line = new ConfigFormLine(labelText);
+            this.AddConfigLine(line);
+            return line;
+        }
+
         public ConfigFormTextBoxLine AddTextBoxLine(string labelText)
         {
             var line = new ConfigFormTextBoxLine(labelText);
+            this.AddConfigLine(line);
+            return line;
+        }
+
+        public ConfigFormJavascriptTextBoxLine AddJavascriptTextBoxLine(string labelText)
+        {
+            var line = new ConfigFormJavascriptTextBoxLine(labelText);
             this.AddConfigLine(line);
             return line;
         }
@@ -70,7 +82,7 @@ namespace TiaXmlReader.Generation.Configuration
             return line;
         }
 
-        public void AddConfigLine(IConfigFormLine line)
+        public void AddConfigLine(ConfigFormLine line)
         {
             lineList.Add(line);
         }
@@ -105,8 +117,8 @@ namespace TiaXmlReader.Generation.Configuration
         {
             this.Shown += (object sender, EventArgs args) => { formReadyToClose = true; };
             this.FormClosed += (object sender, FormClosedEventArgs args) => { this.Dispose(); };
-                
-            List<TableLayoutPanel> linesTables = new List<TableLayoutPanel>();
+
+            var linePanelList = new List<TableLayoutPanel>();
 
             var biggestTitleLength = 0;
 
@@ -119,12 +131,11 @@ namespace TiaXmlReader.Generation.Configuration
                     AutoSize = true,
                     Margin = new Padding(2),
                     Padding = new Padding(0),
-                    ColumnCount = 2,
-                    ColumnStyles = { new ColumnStyle(SizeType.AutoSize), new ColumnStyle(SizeType.AutoSize) },
                     RowCount = 1,
-                    RowStyles = { new RowStyle(SizeType.Percent, 50f) }
+                    RowStyles = { new RowStyle(SizeType.Percent, 50f) },
+                    ColumnStyles = { new ColumnStyle(SizeType.AutoSize) },
                 };
-                linesTables.Add(panel);
+                linePanelList.Add(panel);
 
                 var label = new Label
                 {
@@ -138,27 +149,33 @@ namespace TiaXmlReader.Generation.Configuration
                 };
                 panel.Controls.Add(label);
 
+                var control = line.GetControl();
+                if (control != null)
+                {
+                    panel.ColumnCount = 2;
+                    panel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+
+                    control.Width = this.ControlWidth;
+                    control.Height = line.GetHeight() == 0 ? this.ControlHeight : line.GetHeight();
+                    control.Dock = DockStyle.Fill;
+                    control.Font = this.ControlFont;
+                    control.Padding = new Padding(0);
+                    control.Margin = new Padding(2);
+                    panel.Controls.Add(control);
+                }
+
+                this.mainPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+                this.mainPanel.Controls.Add(panel);
+
                 var size = TextRenderer.MeasureText(label.Text, this.LabelFont);
                 size.Width += 4; //Padding
                 if (size.Width > biggestTitleLength)
                 {
                     biggestTitleLength = size.Width;
                 }
-
-                var control = line.GetControl();
-                control.Width = this.ControlWidth;
-                control.Height = this.ControlHeight;
-                control.Dock = DockStyle.Fill;
-                control.Font = this.ControlFont;
-                control.Padding = new Padding(0);
-                control.Margin = new Padding(2);
-                panel.Controls.Add(control);
-
-                this.mainPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-                this.mainPanel.Controls.Add(panel);
             }
 
-            foreach (var panel in linesTables)
+            foreach (var panel in linePanelList)
             {
                 panel.ColumnStyles[0].SizeType = SizeType.Absolute;
                 panel.ColumnStyles[0].Width = biggestTitleLength;

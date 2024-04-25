@@ -431,9 +431,9 @@ namespace TiaXmlReader.Generation.GridHandler
             this.ChangeCells(this.DataHandler.CreateCellChanges(rowIndex, data));
         }
 
-        public void ChangeRow(int rowIndex, ICollection<T> dataCollection)
+        public void ChangeMultipleRows(Dictionary<int, T> dataDict)
         {
-            this.ChangeCells(this.DataHandler.CreateCellChanges(rowIndex, dataCollection));
+            this.ChangeCells(this.DataHandler.CreateCellChanges(dataDict));
         }
 
         public void ChangeCell(GridCellChange cell, bool applyChanges = true)

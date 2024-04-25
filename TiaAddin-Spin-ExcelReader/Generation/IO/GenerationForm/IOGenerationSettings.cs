@@ -17,7 +17,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
     public class IOGenerationSettings : ISettingsAutoSave
     {
         [JsonProperty] public IOConfiguration IOConfiguration { get; set; } = new IOConfiguration();
-        [JsonProperty] public IOGenerationExcelImportConfiguration ExcelImportConfiguration { get; set; } = new IOGenerationExcelImportConfiguration();
+        [JsonProperty] public IOGenerationExcelImportSettings ExcelImportConfiguration { get; set; } = new IOGenerationExcelImportSettings();
 
         public IOGenerationSettings() { }
     }
