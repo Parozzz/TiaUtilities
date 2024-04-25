@@ -28,23 +28,16 @@ namespace TiaXmlReader.Generation.Alarms
         static AlarmData()
         {
             var type = typeof(AlarmData);
-            ENABLE = GridDataColumn.GetFromReflection(COLUMN_COUNT++, type.GetProperty("Enable"));
-            ALARM_VARIABLE = GridDataColumn.GetFromReflection(COLUMN_COUNT++, type.GetProperty("AlarmVariable"));
-            COIL_ADDRESS = GridDataColumn.GetFromReflection(COLUMN_COUNT++, type.GetProperty("CoilAddress"));
-            SET_COIL_ADDRESS = GridDataColumn.GetFromReflection(COLUMN_COUNT++, type.GetProperty("SetCoilAddress"));
-            TIMER_ADDRESS = GridDataColumn.GetFromReflection(COLUMN_COUNT++, type.GetProperty("TimerAddress"));
-            TIMER_TYPE = GridDataColumn.GetFromReflection(COLUMN_COUNT++, type.GetProperty("TimerType"));
-            TIMER_VALUE = GridDataColumn.GetFromReflection(COLUMN_COUNT++, type.GetProperty("TimerValue"));
-            DESCRIPTION = GridDataColumn.GetFromReflection(COLUMN_COUNT++, type.GetProperty("Description"));
+            ENABLE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.Enable));
+            ALARM_VARIABLE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.AlarmVariable));
+            COIL_ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.CoilAddress));
+            SET_COIL_ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.SetCoilAddress));
+            TIMER_ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.TimerAddress));
+            TIMER_TYPE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.TimerType));
+            TIMER_VALUE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.TimerValue));
+            DESCRIPTION = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.Description));
 
-            COLUMN_LIST = new List<GridDataColumn>();
-            foreach (var field in type.GetFields())
-            {
-                if (field.IsStatic && field.FieldType == typeof(GridDataColumn))
-                {
-                    COLUMN_LIST.Add((GridDataColumn) field.GetValue(null));
-                }
-            }
+            COLUMN_LIST = GridDataColumn.GetStaticColumnList(type);
             COLUMN_LIST.Sort((x, y) => x.ColumnIndex.CompareTo(y.ColumnIndex));
         }
 

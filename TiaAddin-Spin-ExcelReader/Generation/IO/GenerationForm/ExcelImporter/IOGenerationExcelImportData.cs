@@ -21,22 +21,17 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
         static IOGenerationExcelImportData()
         {
             var type = typeof(IOGenerationExcelImportData);
-            ADDRESS = GridDataColumn.GetFromReflection(COLUMN_COUNT++, type.GetProperty("Address"));
-            IO_NAME = GridDataColumn.GetFromReflection(COLUMN_COUNT++, type.GetProperty("IOName"));
-            COMMENT = GridDataColumn.GetFromReflection(COLUMN_COUNT++, type.GetProperty("Comment"));
+            ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOGenerationExcelImportData.Address));
+            IO_NAME = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOGenerationExcelImportData.IOName));
+            COMMENT = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOGenerationExcelImportData.Comment));
 
-            COLUMN_LIST = new List<GridDataColumn>() { ADDRESS, IO_NAME, COMMENT };
+            COLUMN_LIST = GridDataColumn.GetStaticColumnList(type);
             COLUMN_LIST.Sort((x, y) => x.ColumnIndex.CompareTo(y.ColumnIndex));
         }
 
         public string Address { get; set; }
         public string IOName { get; set; }
         public string Comment { get; set; }
-
-        public bool HasPreview(int column, IOGenerationExcelImportConfiguration config)
-        {
-            return false;
-        }
 
         public GridDataPreview GetPreview(int column, IOGenerationExcelImportConfiguration config)
         {

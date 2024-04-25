@@ -30,20 +30,13 @@ namespace TiaXmlReader.Generation.IO
         static IOData()
         {
             var type = typeof(IOData);
-            ADDRESS = GridDataColumn.GetFromReflection(COLUMN_COUNT++, type.GetProperty("Address"));
-            IO_NAME = GridDataColumn.GetFromReflection(COLUMN_COUNT++, type.GetProperty("IOName"));
-            DB_NAME = GridDataColumn.GetFromReflection(COLUMN_COUNT++, type.GetProperty("DBName"));
-            VARIABLE = GridDataColumn.GetFromReflection(COLUMN_COUNT++, type.GetProperty("Variable"));
-            COMMENT = GridDataColumn.GetFromReflection(COLUMN_COUNT++, type.GetProperty("Comment"));
+            ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.Address));
+            IO_NAME = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.IOName));
+            DB_NAME = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.DBName));
+            VARIABLE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.Variable));
+            COMMENT = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.Comment));
 
-            COLUMN_LIST = new List<GridDataColumn>();
-            foreach (var field in type.GetFields())
-            {
-                if (field.IsStatic && field.FieldType == typeof(GridDataColumn))
-                {
-                    COLUMN_LIST.Add((GridDataColumn)field.GetValue(null));
-                }
-            }
+            COLUMN_LIST = GridDataColumn.GetStaticColumnList(type);
             COLUMN_LIST.Sort((x, y) => x.ColumnIndex.CompareTo(y.ColumnIndex));
         }
 

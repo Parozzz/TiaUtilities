@@ -24,18 +24,11 @@ namespace TiaXmlReader.Generation.Alarms
         static DeviceData()
         {
             var type = typeof(DeviceData);
-            NAME = GridDataColumn.GetFromReflection(COLUMN_COUNT++, type.GetProperty("Name"));
-            ADDRESS = GridDataColumn.GetFromReflection(COLUMN_COUNT++, type.GetProperty("Address"));
-            DESCRIPTION = GridDataColumn.GetFromReflection(COLUMN_COUNT++, type.GetProperty("Description"));
+            NAME = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(DeviceData.Name));
+            ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(DeviceData.Address));
+            DESCRIPTION = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(DeviceData.Description));
 
-            COLUMN_LIST = new List<GridDataColumn>();
-            foreach (var field in type.GetFields())
-            {
-                if (field.IsStatic && field.FieldType == typeof(GridDataColumn))
-                {
-                    COLUMN_LIST.Add((GridDataColumn)field.GetValue(null));
-                }
-            }
+            COLUMN_LIST = GridDataColumn.GetStaticColumnList(type);
             COLUMN_LIST.Sort((x, y) => x.ColumnIndex.CompareTo(y.ColumnIndex));
         }
 
