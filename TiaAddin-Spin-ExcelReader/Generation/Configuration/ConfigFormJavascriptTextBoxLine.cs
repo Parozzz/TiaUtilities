@@ -14,12 +14,14 @@ namespace TiaXmlReader.Generation.Configuration
         {
             this.control = new FastColoredTextBox();
             this.control.TextChanged += TextChangedEventHandler;
-            this.control.Height = 200;
             this.control.LeftBracket = '(';
             this.control.RightBracket = ')';
             this.control.LeftBracket2 = '{';
             this.control.RightBracket2 = '}';
             this.control.AutoIndent = true;
+            this.control.AutoIndentExistingLines = true;
+            this.control.AutoIndentChars = true;
+            this.control.TabLength = 2;
             this.control.Language = Language.JS;
             this.control.HighlightingRangeType = HighlightingRangeType.AllTextRange;
         }
@@ -32,7 +34,7 @@ namespace TiaXmlReader.Generation.Configuration
 
         public ConfigFormJavascriptTextBoxLine ControlText(IConvertible value)
         {
-            this.control.Text = value.ToString();
+            this.control.Text = (value ?? "").ToString();
             return this;
         }
 

@@ -84,30 +84,19 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
             {
                 var configForm = new ConfigForm("Configurazione")
                 {
-                    ControlWidth = 500
+                    ControlWidth = 600
                 };
 
-                configForm.AddTextBoxLine("Indirizzo")
-                    .ControlText(importSettings.AddressCellConfig)
-                    .TextChanged(str => importSettings.AddressCellConfig = str);
-
-                configForm.AddTextBoxLine("Nome IO")
-                    .ControlText(importSettings.IONameCellConfig)
-                    .TextChanged(str => importSettings.IONameCellConfig = str);
-
-                configForm.AddTextBoxLine("Commento")
-                    .ControlText(importSettings.CommentCellConfig)
-                    .TextChanged(str => importSettings.CommentCellConfig = str);
-
-                configForm.AddTextBoxLine("Riga di partenza")
-                    .ControlText(importSettings.StartingRow)
-                    .UIntChanged(num => importSettings.StartingRow = num);
-
-                configForm.AddJavascriptTextBoxLine("Espressione validità riga", height: 300)
+                configForm.AddJavascriptTextBoxLine("JS", height: 500)
                     .ControlText(importSettings.IgnoreRowExpressionConfig)
                     .TextChanged(str => importSettings.IgnoreRowExpressionConfig = str);
 
-                configForm.StartShowingAtControl(this.ConfigButton);
+                configForm.FormClosed += (s, e) =>
+                {
+
+                };
+
+                configForm.StartShowingAtCursor();
                 configForm.Init();
                 configForm.Show(this);
 
@@ -141,7 +130,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
                 {
                     var worksheet = configWorkbook.Worksheets.Worksheet(1);
 
-                    var t1 = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+                    //var t1 = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
 
                     var excelCellLetterList = AddMatchExpression(new string[] {
                         importSettings.AddressCellConfig, importSettings.CommentCellConfig, importSettings.IONameCellConfig, importSettings.IgnoreRowExpressionConfig
@@ -205,8 +194,8 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
                     }
                     this.gridHandler.ChangeMultipleRows(dataDict);
 
-                    var t2 = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
-                    Console.WriteLine("Time: " + (t2 - t1) + " ms");
+                    //var t2 = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+                    //Console.WriteLine("Time: " + (t2 - t1) + " ms");
                 }
             }
         }

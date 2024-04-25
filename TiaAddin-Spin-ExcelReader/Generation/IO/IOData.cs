@@ -75,7 +75,7 @@ namespace TiaXmlReader.Generation.IO
 
         public GridDataPreview GetPreview(int column, IOConfiguration config)
         {
-            if (string.IsNullOrEmpty(this.Address) || this.IsEmpty())
+            if (string.IsNullOrEmpty(this.Address) || this.IsEmpty() || SimaticTagAddress.FromAddress(this.Address) == null)
             {
                 return null;
             }
@@ -165,46 +165,14 @@ namespace TiaXmlReader.Generation.IO
 
         public uint GetAddressBit()
         {
-            if (string.IsNullOrEmpty(Address))
-            {
-                return 0;
-            }
-
-            int firstDigit = 0;
-            for (var x = 0; x < Address.Length; x++)
-            {
-                var c = Address[x];
-                if (Char.IsDigit(c))
-                {
-                    firstDigit = x;
-                    break;
-                }
-            }
-
-            var substring = Address.Substring(firstDigit);
-            return uint.Parse(substring.Split('.')[1]);
+            var tag = GetTagAddress();
+            return tag == null ? 0 : tag.bitOffset;
         }
 
         public uint GetAddressByte()
         {
-            if (string.IsNullOrEmpty(Address))
-            {
-                return 0;
-            }
-
-            int firstDigit = 0;
-            for (var x = 0; x < Address.Length; x++)
-            {
-                var c = Address[x];
-                if (Char.IsDigit(c))
-                {
-                    firstDigit = x;
-                    break;
-                }
-            }
-
-            var substring = Address.Substring(firstDigit);
-            return uint.Parse(substring.Split('.')[0]);
+            var tag = GetTagAddress();
+            return tag == null ? 0 : tag.byteOffset;
         }
 
         public SimaticTagAddress GetTagAddress()

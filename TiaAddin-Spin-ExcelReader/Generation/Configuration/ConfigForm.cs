@@ -17,13 +17,18 @@ namespace TiaXmlReader.Generation.Configuration
         public Font ControlFont { get; set; } = CONTROL_FONT;
         public int ControlWidth { get; set; } = 300;
         public int ControlHeight { get; set; } = 30;
-
+        public bool CloseOnOutsideClick { get; set; } = true;
         public ConfigForm(string title)
         {
             InitializeComponent();
 
             this.title = title;
             this.lineList = new List<ConfigFormLine>();
+        }
+
+        public void StartShowingAtCursor()
+        {
+            this.StartShowingAtLocation(Cursor.Position);
         }
 
         public void StartShowingAtControl(Control control)
@@ -43,6 +48,12 @@ namespace TiaXmlReader.Generation.Configuration
         public ConfigFormLine AddLine(string labelText, int height = 0)
         {
             var line = new ConfigFormLine(labelText, height);
+            return this.AddConfigLine(line);
+        }
+
+        public ConfigFormButtonPanelLine AddButtonPanelLine(string labelText, int height = 0)
+        {
+            var line = new ConfigFormButtonPanelLine(labelText, height);
             return this.AddConfigLine(line);
         }
 
@@ -87,7 +98,7 @@ namespace TiaXmlReader.Generation.Configuration
         {
             // if click outside dialog -> Close Dlg
             //CanFocus is false if there is a modal window open to avoid closing for cliking it (Like color dialog or file dialog)
-            if (formReadyToClose && m.Msg == 0x86 && this.CanFocus && !this.RectangleToScreen(this.DisplayRectangle).Contains(Cursor.Position)) //0x86 WM_NCACTIVATE
+            if (CloseOnOutsideClick && formReadyToClose && m.Msg == 0x86 && this.CanFocus && !this.RectangleToScreen(this.DisplayRectangle).Contains(Cursor.Position)) //0x86 WM_NCACTIVATE
             {
                 this.Close();
                 return;

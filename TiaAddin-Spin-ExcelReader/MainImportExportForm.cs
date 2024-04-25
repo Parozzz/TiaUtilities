@@ -15,6 +15,9 @@ using TiaXmlReader.AutoSave;
 using TiaXmlReader.SimaticML;
 using System.Xml;
 using TiaXmlReader.SimaticML.Enums;
+using TiaXmlReader.Generation.Configuration;
+using Jint;
+using MS.WindowsAPICodePack.Internal;
 
 namespace TiaXmlReader
 {
@@ -42,7 +45,7 @@ namespace TiaXmlReader
             exportPathTextBlock.Text = programSettings.lastXMLExportPath;
             tiaVersionComboBox.Text = "" + programSettings.lastTIAVersion;
 
-            this.languageComboBox.Items.AddRange(new string[]{ "it-IT", "en-US"});
+            this.languageComboBox.Items.AddRange(new string[] { "it-IT", "en-US" });
             this.languageComboBox.TextChanged += (object sender, EventArgs args) =>
             {
                 try
@@ -67,7 +70,7 @@ namespace TiaXmlReader
             timer.Start();
             timer.Tick += (sender, e) =>
             {
-                if(!settingsWrapper.CompareSnapshot())
+                if (!settingsWrapper.CompareSnapshot())
                 {
                     this.programSettings.Save();
                 }
@@ -101,7 +104,7 @@ namespace TiaXmlReader
                     configExcelPathTextBox.Text = programSettings.lastExcelFileName = fileDialog.FileName;
                 }
             }
-            catch  {  }
+            catch { }
 
         }
 
@@ -224,7 +227,7 @@ namespace TiaXmlReader
                     Filters = { new CommonFileDialogFilter("XML Files (*.xml)", "*.xml") }
                 };
 
-                if(fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
+                if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
                 {
                     var __ = SimaticDataType.BOOLEAN;
 
@@ -234,6 +237,49 @@ namespace TiaXmlReader
                 }
                 var _debug = "" + "";
             }
+        }
+
+        private string JS;
+        private void JSToolStripMenuItem_Click(object sender, EventArgs args)
+        {
+            var configForm = new ConfigForm("TEST JS")
+            {
+                ControlWidth = 500
+            };
+
+            configForm.AddJavascriptTextBoxLine("Espressione", height: 300)
+                .ControlText(JS)
+                .TextChanged(str => JS = str);
+
+            configForm.FormClosed += (s, e) =>
+            {
+                try
+                {
+                    if(JS == null)
+                    {
+                        return;
+                    }
+
+                    using (var engine = new Engine())
+                    {
+                        engine.SetValue("nome", "cacca");
+
+                        var eval = engine.Evaluate(JS);
+
+                        var nome = engine.GetValue("nome");
+                        var _ = "";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Utils.ShowExceptionMessage(ex);
+                }
+            };
+
+            configForm.StartShowingAtCursor();
+            configForm.Init();
+            configForm.Show(this);
+
         }
     }
 }

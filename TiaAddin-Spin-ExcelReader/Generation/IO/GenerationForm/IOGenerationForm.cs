@@ -20,9 +20,11 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
         private readonly GridSettings gridSettings;
         private readonly GridHandler<IOConfiguration, IOData> gridHandler;
         private readonly IOGenerationFormConfigHandler configHandler;
+        private readonly IOGenerationTableScript tableScript;
 
         private IOGenerationExcelImportSettings ExcelImportConfig { get => settings.ExcelImportConfiguration; }
         private IOConfiguration IOConfig { get => settings.IOConfiguration; }
+
 
         private string lastFilePath;
 
@@ -39,8 +41,8 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                 RowCount = 2999
             };
 
-            this.configHandler = new IOGenerationFormConfigHandler(this, IOConfig, this.gridHandler);
-
+            this.configHandler = new IOGenerationFormConfigHandler(this, this.IOConfig, this.gridHandler);
+            this.tableScript = new IOGenerationTableScript(this.gridHandler, this.settings);
 
             Init();
         }
@@ -179,6 +181,21 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             this.Shown += (sender, args) => autoSaveHandler.AddTickEventHandler(eventHandler);
             this.FormClosed += (sender, args) => autoSaveHandler.RemoveTickEventHandler(eventHandler);
             #endregion
+
+            this.dataGridView.CellMouseClick += (sender, args) =>
+            {
+                if(args.RowIndex == -1 && args.ColumnIndex == -1 && args.Button == MouseButtons.Right)
+                {
+                    var menuItem = new MenuItem();
+                    menuItem.Text = "Execute Javascript";
+                    menuItem.Click += (s, a) => this.tableScript.ShowConfigForm(this);
+
+                    var contextMenu = new ContextMenu();
+                    contextMenu.MenuItems.Add(menuItem);
+
+                    contextMenu.Show(this.dataGridView, this.dataGridView.PointToClient(Cursor.Position));
+                }
+            };
 
             UpdateConfigPanel();
         }

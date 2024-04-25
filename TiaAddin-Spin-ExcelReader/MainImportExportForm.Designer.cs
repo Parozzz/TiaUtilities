@@ -44,10 +44,11 @@
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.generateIOMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.generateAlarmsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.label4 = new System.Windows.Forms.Label();
-            this.languageComboBox = new System.Windows.Forms.ComboBox();
             this.testToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importXMLToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.label4 = new System.Windows.Forms.Label();
+            this.languageComboBox = new System.Windows.Forms.ComboBox();
+            this.jSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -203,6 +204,23 @@
             this.generateAlarmsToolStripMenuItem.Text = "Generate Alarms";
             this.generateAlarmsToolStripMenuItem.Click += new System.EventHandler(this.GenerateAlarmsToolStripMenuItem_Click);
             // 
+            // testToolStripMenuItem
+            // 
+            this.testToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.importXMLToolStripMenuItem,
+            this.jSToolStripMenuItem});
+            this.testToolStripMenuItem.Font = new System.Drawing.Font("Segoe UI", 12F);
+            this.testToolStripMenuItem.Name = "testToolStripMenuItem";
+            this.testToolStripMenuItem.Size = new System.Drawing.Size(48, 25);
+            this.testToolStripMenuItem.Text = "Test";
+            // 
+            // importXMLToolStripMenuItem
+            // 
+            this.importXMLToolStripMenuItem.Name = "importXMLToolStripMenuItem";
+            this.importXMLToolStripMenuItem.Size = new System.Drawing.Size(180, 26);
+            this.importXMLToolStripMenuItem.Text = "Import XML";
+            this.importXMLToolStripMenuItem.Click += new System.EventHandler(this.ImportXMLToolStripMenuItem_Click);
+            // 
             // label4
             // 
             this.label4.AutoSize = true;
@@ -224,20 +242,12 @@
             this.languageComboBox.Size = new System.Drawing.Size(79, 32);
             this.languageComboBox.TabIndex = 12;
             // 
-            // testToolStripMenuItem
+            // jSToolStripMenuItem
             // 
-            this.testToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.importXMLToolStripMenuItem});
-            this.testToolStripMenuItem.Name = "testToolStripMenuItem";
-            this.testToolStripMenuItem.Size = new System.Drawing.Size(39, 25);
-            this.testToolStripMenuItem.Text = "Test";
-            // 
-            // importXMLToolStripMenuItem
-            // 
-            this.importXMLToolStripMenuItem.Name = "importXMLToolStripMenuItem";
-            this.importXMLToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.importXMLToolStripMenuItem.Text = "Import XML";
-            this.importXMLToolStripMenuItem.Click += new System.EventHandler(this.ImportXMLToolStripMenuItem_Click);
+            this.jSToolStripMenuItem.Name = "jSToolStripMenuItem";
+            this.jSToolStripMenuItem.Size = new System.Drawing.Size(180, 26);
+            this.jSToolStripMenuItem.Text = "JS";
+            this.jSToolStripMenuItem.Click += new System.EventHandler(this.JSToolStripMenuItem_Click);
             // 
             // MainImportExportForm
             // 
@@ -286,6 +296,7 @@
         private System.Windows.Forms.ToolStripComboBox autoSaveComboBox;
         private System.Windows.Forms.ToolStripMenuItem testToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem importXMLToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem jSToolStripMenuItem;
     }
 }
 

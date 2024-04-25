@@ -26,9 +26,10 @@ namespace TiaXmlReader.Utility
 
         public static void ShowExceptionMessage(Exception ex)
         {
-            string message = "Message: " + ex.Message + " \r\n StackTrace: " + ex.StackTrace;
-            string caption = "An exception occoured while executing Spin Addin!";
-            Console.WriteLine("Exception: {0}", message + caption);
+            
+            string message = "Message => " + ex.Message + "\r\nCause => " + ex.Source + "\r\nStackTrace:\r\n" + ex.StackTrace + "\r\n";
+            string caption = "An exception occoured while executing!";
+            Console.WriteLine("Exception:\r\n{0}", message + caption);
             MessageBox.Show(message, caption);
         }
 

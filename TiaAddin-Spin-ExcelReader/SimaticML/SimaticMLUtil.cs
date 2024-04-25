@@ -33,7 +33,7 @@ namespace TiaXmlReader.SimaticML
     {
         public static SimaticTagAddress FromAddress(string address)
         {
-            if (address == null)
+            if (address == null || address.Length < 3) //Min is IB0 or IW0, so 3 chars
             {
                 return null;
             }
@@ -49,24 +49,37 @@ namespace TiaXmlReader.SimaticML
                 return null;
             }
 
-            char lengthChar = Char.ToUpper(address[1]);
-            string offsetString = Char.IsDigit(lengthChar) ? address.Substring(1) : address.Substring(2);
-
+            string offsetString;
             uint length = 0; //0 means bit or special like timers, counters or UDT.
-            switch (lengthChar)
+
+            char lengthChar = Char.ToUpper(address[1]);
+            if(Char.IsDigit(lengthChar)) 
             {
-                case 'B':
-                    length = 1;
-                    break;
-                case 'W':
-                    length = 2;
-                    break;
-                case 'D':
-                    length = 4;
-                    break;
-                case 'L':
-                    length = 8;
-                    break;
+                if(!address.Contains('.')) //If second char is number, must contain a dot! Like I0.0
+                {
+                    return null;
+                }
+
+                offsetString = address.Substring(1);
+            }
+            else
+            {
+                offsetString = address.Substring(2);
+                switch (lengthChar)
+                {
+                    case 'B':
+                        length = 1;
+                        break;
+                    case 'W':
+                        length = 2;
+                        break;
+                    case 'D':
+                        length = 4;
+                        break;
+                    case 'L':
+                        length = 8;
+                        break;
+                }
             }
 
             var splitOffsetString = offsetString.Split('.');
