@@ -10,7 +10,7 @@ namespace TiaXmlReader.Generation.Configuration
 
         private Action<string> textChangedAction;
 
-        public ConfigFormJavascriptTextBoxLine(string labelText) : base(labelText, height: 200)
+        public ConfigFormJavascriptTextBoxLine(string labelText, int height = 0) : base(labelText, height)
         {
             this.control = new FastColoredTextBox();
             this.control.TextChanged += TextChangedEventHandler;

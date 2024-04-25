@@ -103,7 +103,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
                     .ControlText(importSettings.StartingRow)
                     .UIntChanged(num => importSettings.StartingRow = num);
 
-                configForm.AddJavascriptTextBoxLine("Espressione validità riga")
+                configForm.AddJavascriptTextBoxLine("Espressione validità riga", height: 300)
                     .ControlText(importSettings.IgnoreRowExpressionConfig)
                     .TextChanged(str => importSettings.IgnoreRowExpressionConfig = str);
 

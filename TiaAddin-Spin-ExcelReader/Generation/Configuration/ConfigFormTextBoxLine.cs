@@ -17,7 +17,7 @@ namespace TiaXmlReader.Generation.Configuration
         private Action<string> textChangedAction;
         private Action<uint> uintChangedAction;
 
-        public ConfigFormTextBoxLine(string labelText) : base(labelText)
+        public ConfigFormTextBoxLine(string labelText, int height = 0) : base(labelText, height)
         {
             this.control = new FlatTextBox();
             this.control.TextChanged += TextChangedEventHandler;

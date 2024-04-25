@@ -15,7 +15,7 @@ namespace TiaXmlReader.Generation.Configuration
 
         private Action<bool> checkedChangedAction;
 
-        public ConfigFormCheckBoxLine(string labelText) : base(labelText)
+        public ConfigFormCheckBoxLine(string labelText, int height = 0) : base(labelText, height)
         {
             this.control = new CheckBox
             {

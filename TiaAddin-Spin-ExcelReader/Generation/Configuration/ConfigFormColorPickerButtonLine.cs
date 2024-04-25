@@ -21,7 +21,7 @@ namespace TiaXmlReader.Generation.Configuration
         private Action<Color> colorAction;
         private Color lastColor = Color.White;
 
-        public ConfigFormColorPickerButtonLine(string labelText) : base(labelText)
+        public ConfigFormColorPickerButtonLine(string labelText, int height = 0) : base(labelText, height)
         {
             this.panel = new TableLayoutPanel()
             {

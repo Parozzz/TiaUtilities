@@ -33,7 +33,7 @@ namespace TiaXmlReader.Generation.GridHandler
         {
             this.dataGridView.ColumnHeaderMouseClick += (sender, args) =>
             {
-                if (this.comparer == null)
+                if (this.comparer == null || args.Button == MouseButtons.Right)
                 {
                     return;
                 }

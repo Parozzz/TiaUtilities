@@ -17,7 +17,7 @@ namespace TiaXmlReader.Generation.Configuration
         private Action<string> textChangedAction;
         private Action<uint> uintChangedAction;
 
-        public ConfigFormComboBoxLine(string labelText) : base(labelText)
+        public ConfigFormComboBoxLine(string labelText, int height = 0) : base(labelText, height)
         {
             this.control = new FlatComboBox();
             this.control.TextChanged += TextChangedEventHandler;

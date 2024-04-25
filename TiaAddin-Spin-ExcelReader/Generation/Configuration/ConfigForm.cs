@@ -40,51 +40,46 @@ namespace TiaXmlReader.Generation.Configuration
             this.Location = loc;
         }
 
-        public ConfigFormLine AddLine(string labelText)
+        public ConfigFormLine AddLine(string labelText, int height = 0)
         {
-            var line = new ConfigFormLine(labelText);
-            this.AddConfigLine(line);
-            return line;
+            var line = new ConfigFormLine(labelText, height);
+            return this.AddConfigLine(line);
         }
 
-        public ConfigFormTextBoxLine AddTextBoxLine(string labelText)
+        public ConfigFormTextBoxLine AddTextBoxLine(string labelText, int height = 0)
         {
-            var line = new ConfigFormTextBoxLine(labelText);
-            this.AddConfigLine(line);
-            return line;
+            var line = new ConfigFormTextBoxLine(labelText, height);
+            return this.AddConfigLine(line);
         }
 
-        public ConfigFormJavascriptTextBoxLine AddJavascriptTextBoxLine(string labelText)
+        public ConfigFormJavascriptTextBoxLine AddJavascriptTextBoxLine(string labelText, int height = 0)
         {
-            var line = new ConfigFormJavascriptTextBoxLine(labelText);
-            this.AddConfigLine(line);
-            return line;
+            var line = new ConfigFormJavascriptTextBoxLine(labelText, height);
+            return this.AddConfigLine(line);
         }
 
-        public ConfigFormCheckBoxLine AddCheckBoxLine(string labelText)
+        public ConfigFormCheckBoxLine AddCheckBoxLine(string labelText, int height = 0)
         {
-            var line = new ConfigFormCheckBoxLine(labelText);
-            this.AddConfigLine(line);
-            return line;
+            var line = new ConfigFormCheckBoxLine(labelText, height);
+            return this.AddConfigLine(line);
         }
 
-        public ConfigFormComboBoxLine AddComboBoxLine(string labelText)
+        public ConfigFormComboBoxLine AddComboBoxLine(string labelText, int height = 0)
         {
-            var line = new ConfigFormComboBoxLine(labelText);
-            this.AddConfigLine(line);
-            return line;
+            var line = new ConfigFormComboBoxLine(labelText, height);
+            return this.AddConfigLine(line);
         }
 
-        public ConfigFormColorPickerButtonLine AddColorPickerLine(string labelText)
+        public ConfigFormColorPickerButtonLine AddColorPickerLine(string labelText, int height = 0)
         {
-            var line = new ConfigFormColorPickerButtonLine(labelText);
-            this.AddConfigLine(line);
-            return line;
+            var line = new ConfigFormColorPickerButtonLine(labelText, height);
+            return this.AddConfigLine(line);
         }
 
-        public void AddConfigLine(ConfigFormLine line)
+        public L AddConfigLine<L>(L line) where L : ConfigFormLine
         {
             lineList.Add(line);
+            return line;
         }
 
         private bool formReadyToClose = false;
@@ -133,26 +128,41 @@ namespace TiaXmlReader.Generation.Configuration
                     Padding = new Padding(0),
                     RowCount = 1,
                     RowStyles = { new RowStyle(SizeType.Percent, 50f) },
+                    ColumnCount = 0,
                     ColumnStyles = { new ColumnStyle(SizeType.AutoSize) },
                 };
                 linePanelList.Add(panel);
 
-                var label = new Label
+                var labelText = line.GetLabelText();
+                if(labelText != null)
                 {
-                    Font = this.LabelFont,
-                    TextAlign = ContentAlignment.MiddleCenter,
-                    Dock = DockStyle.Fill,
-                    Text = line.GetLabelText(),
-                    AutoSize = true,
-                    Padding = new Padding(0),
-                    Margin = new Padding(2)
-                };
-                panel.Controls.Add(label);
+                    panel.ColumnCount++;
+                    panel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+
+                    var label = new Label
+                    {
+                        Font = this.LabelFont,
+                        TextAlign = ContentAlignment.MiddleCenter,
+                        Dock = DockStyle.Fill,
+                        Text = line.GetLabelText(),
+                        AutoSize = true,
+                        Padding = new Padding(0),
+                        Margin = new Padding(2)
+                    };
+                    panel.Controls.Add(label);
+
+                    var size = TextRenderer.MeasureText(label.Text, this.LabelFont);
+                    size.Width += 4; //Padding
+                    if (size.Width > biggestTitleLength)
+                    {
+                        biggestTitleLength = size.Width;
+                    }
+                }
 
                 var control = line.GetControl();
                 if (control != null)
                 {
-                    panel.ColumnCount = 2;
+                    panel.ColumnCount++;
                     panel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
 
                     control.Width = this.ControlWidth;
@@ -166,19 +176,15 @@ namespace TiaXmlReader.Generation.Configuration
 
                 this.mainPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
                 this.mainPanel.Controls.Add(panel);
-
-                var size = TextRenderer.MeasureText(label.Text, this.LabelFont);
-                size.Width += 4; //Padding
-                if (size.Width > biggestTitleLength)
-                {
-                    biggestTitleLength = size.Width;
-                }
             }
 
             foreach (var panel in linePanelList)
             {
-                panel.ColumnStyles[0].SizeType = SizeType.Absolute;
-                panel.ColumnStyles[0].Width = biggestTitleLength;
+                if(panel.ColumnCount == 2) //Only if there are both label AND control.
+                {
+                    panel.ColumnStyles[0].SizeType = SizeType.Absolute;
+                    panel.ColumnStyles[0].Width = biggestTitleLength;
+                }
             }
         }
     }
