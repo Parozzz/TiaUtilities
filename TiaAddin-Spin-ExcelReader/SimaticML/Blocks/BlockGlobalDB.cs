@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Xml;
-using TiaXmlReader.SimaticML;
+﻿using System.Xml;
 using TiaXmlReader.SimaticML.nBlockAttributeList;
 using TiaXmlReader.Utility;
-using TiaXmlReader.SimaticML.Blocks;
 using TiaXmlReader.SimaticML.Enums;
 using TiaXmlReader.SimaticML.LanguageText;
+using TiaXmlReader.XMLClasses;
 
 namespace TiaXmlReader.SimaticML.Blocks
 {

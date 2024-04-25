@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using TiaXmlReader.Utility;
-using TiaXmlReader.SimaticML;
-using TiaXmlReader.SimaticML.TagTable;
+using TiaXmlReader.XMLClasses;
 
 namespace TiaXmlReader.SimaticML.TagTable
 {

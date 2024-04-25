@@ -347,8 +347,10 @@ namespace TiaXmlReader.Generation.Alarms
                 throw new ArgumentNullException("Blocks has not been generated");
             }
 
+            fc.UpdateID_UId(new IDGenerator());
+
             var xmlDocument = SimaticMLParser.CreateDocument();
-            xmlDocument.DocumentElement.AppendChild(fc.Generate(xmlDocument, new IDGenerator()));
+            xmlDocument.DocumentElement.AppendChild(fc.Generate(xmlDocument));
             xmlDocument.Save(exportPath + "/fcExport_" + fc.GetBlockAttributes().GetBlockName() + ".xml");
 
             var alarmTextPath = exportPath + "/alarmsText.txt";

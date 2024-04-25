@@ -63,8 +63,6 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
 
         public void Init()
         {
-            //var addressColumn = this.dataTable.Rows.Add(TOTAL_ROW_COUNT);
-
             #region TopMenu
             this.saveToolStripMenuItem.Click += (object sender, EventArgs args) => { this.ProjectSave(); };
             this.saveAsToolStripMenuItem.Click += (object sender, EventArgs args) => { this.ProjectSave(true); };
@@ -153,10 +151,6 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                 gropingTypeItems.Add(new { Text = groupingType.GetEnumDescription(), Value = groupingType });
             }
             this.groupingTypeComboBox.DataSource = gropingTypeItems;
-            #endregion
-
-            #region CELL_PAINTERS
-            
             #endregion
 
             #region DRAG

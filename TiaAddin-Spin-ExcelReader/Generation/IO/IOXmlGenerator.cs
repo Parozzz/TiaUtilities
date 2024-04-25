@@ -185,6 +185,7 @@ namespace TiaXmlReader.Generation.IO
             contact.CreatePowerrailConnection()
                 .CreateOutputConnection(coil);
         }
+
         public void ExportXML(string exportPath)
         {
             if (string.IsNullOrEmpty(exportPath))
@@ -197,28 +198,36 @@ namespace TiaXmlReader.Generation.IO
                 throw new ArgumentNullException("Blocks has not been generated");
             }
 
+            fc.UpdateID_UId(new IDGenerator());
+
             var xmlDocument = SimaticMLParser.CreateDocument();
-            xmlDocument.DocumentElement.AppendChild(fc.Generate(xmlDocument, new IDGenerator()));
+            xmlDocument.DocumentElement.AppendChild(fc.Generate(xmlDocument));
             xmlDocument.Save(exportPath + "/fcExport_" + fc.GetBlockAttributes().GetBlockName() + ".xml");
 
             foreach(var ioTagTable in ioTagTableList)
             {
+                ioTagTable.UpdateID_UId(new IDGenerator());
+
                 xmlDocument = SimaticMLParser.CreateDocument();
-                xmlDocument.DocumentElement.AppendChild(ioTagTable.Generate(xmlDocument, new IDGenerator()));
+                xmlDocument.DocumentElement.AppendChild(ioTagTable.Generate(xmlDocument));
                 xmlDocument.Save(exportPath + "/ioTagTable_" + ioTagTable.GetTagTableName() + ".xml");
             }
 
             foreach(var variableTagTable in variableTagTableList)
             {
+                variableTagTable.UpdateID_UId(new IDGenerator());
+
                 xmlDocument = SimaticMLParser.CreateDocument();
-                xmlDocument.DocumentElement.AppendChild(variableTagTable.Generate(xmlDocument, new IDGenerator()));
+                xmlDocument.DocumentElement.AppendChild(variableTagTable.Generate(xmlDocument));
                 xmlDocument.Save(exportPath + "/tagTableExport_" + variableTagTable.GetTagTableName() + ".xml");
             }
 
             if (db != null)
             {
+                db.UpdateID_UId(new IDGenerator());
+
                 xmlDocument = SimaticMLParser.CreateDocument();
-                xmlDocument.DocumentElement.AppendChild(db.Generate(xmlDocument, new IDGenerator()));
+                xmlDocument.DocumentElement.AppendChild(db.Generate(xmlDocument));
                 xmlDocument.Save(exportPath + "/dbExport_" + db.GetAttributes().GetBlockName() + ".xml");
             }
         }

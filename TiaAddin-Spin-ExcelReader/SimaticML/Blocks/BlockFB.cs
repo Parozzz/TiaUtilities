@@ -6,6 +6,7 @@ using TiaXmlReader.Utility;
 using TiaXmlReader.SimaticML.Blocks;
 using TiaXmlReader.SimaticML.Enums;
 using TiaXmlReader.SimaticML.LanguageText;
+using TiaXmlReader.XMLClasses;
 
 namespace TiaXmlReader.SimaticML.Blocks
 {

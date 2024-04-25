@@ -6,99 +6,88 @@ using System.Text;
 using System.Threading.Tasks;
 using TiaXmlReader.SimaticML.Enums;
 using TiaXmlReader.SimaticML;
+using TiaXmlReader.Generation.GridHandler.Data;
 
 namespace TiaXmlReader.SimaticML.Enums
 {
-    public enum SimaticDataType
+    public class SimaticDataType
     {
-        VOID = 0, //Default
-        BOOLEAN,
-        BYTE,
-        USINT,
-        INT,
-        UINT,
-        DINT,
-        UDINT,
-        REAL,
-        LREAL,
-        TIMER,
-        COUNTER,
-        STRUCTURE,
-        VARIANT,
-    }
+        public static SimaticDataType VOID = new SimaticDataType("Void", 0);
+        public static SimaticDataType BOOLEAN = new SimaticDataType("Bool", 0);
+        public static SimaticDataType BYTE = new SimaticDataType("Byte", 1);
+        public static SimaticDataType USINT = new SimaticDataType("USInt", 1);
+        public static SimaticDataType WORD = new SimaticDataType("Word", 2);
+        public static SimaticDataType INT = new SimaticDataType("Int", 2);
+        public static SimaticDataType UINT = new SimaticDataType("UInt", 2);
+        public static SimaticDataType DWORD = new SimaticDataType("DWord", 4);
+        public static SimaticDataType DINT = new SimaticDataType("DInt", 4);
+        public static SimaticDataType UDINT = new SimaticDataType("UDInt", 4);
+        public static SimaticDataType LWORD = new SimaticDataType("LWord", 8);
+        public static SimaticDataType REAL = new SimaticDataType("Real", 8);
+        public static SimaticDataType LREAL = new SimaticDataType("LReal", 8);
+        public static SimaticDataType TIMER = new SimaticDataType("Timer", 0);
+        public static SimaticDataType COUNTER = new SimaticDataType("Counter", 0);
+        public static SimaticDataType STRUCTURE = new SimaticDataType("Struct", 0);
+        public static SimaticDataType VARIANT = new SimaticDataType("Any", 0);
 
-    public static class DataTypeExtension
-    {
-        public static string GetSimaticMLString(this SimaticDataType dataType)
+        private static Dictionary<string, SimaticDataType> TYPE_DICT;
+        static SimaticDataType()
         {
-            switch (dataType)
+            TYPE_DICT = new Dictionary<string, SimaticDataType>();
+            foreach (var field in typeof(SimaticDataType).GetFields().Where(f => f.IsStatic && f.FieldType == typeof(SimaticDataType)))
             {
-                case SimaticDataType.VOID: return "Void";
-                case SimaticDataType.BOOLEAN: return "Bool";
-                case SimaticDataType.BYTE: return "Byte";
-                case SimaticDataType.USINT: return "USInt";
-                case SimaticDataType.INT: return "Int";
-                case SimaticDataType.UINT: return "UInt";
-                case SimaticDataType.DINT: return "DInt";
-                case SimaticDataType.UDINT: return "UDInt";
-                case SimaticDataType.REAL: return "Real";
-                case SimaticDataType.LREAL: return "LReal";
-                case SimaticDataType.TIMER: return "Timer";
-                case SimaticDataType.COUNTER: return "Counter";
-                case SimaticDataType.STRUCTURE: return "Struct";
-                case SimaticDataType.VARIANT: return "Any";
-                default:
-                    throw new Exception("SimaticML string not set for DataType " + dataType.ToString());
+                var dataType = (SimaticDataType)field.GetValue(null);
+                SimaticDataType.AddDataType(dataType);
             }
         }
 
-        public static uint GetSimaticLength(this SimaticDataType dataType)
+        public static SimaticDataType FromSimaticMLString(string simaticString, bool throwException = false)
         {
-            switch (dataType)
+            if (!SimaticDataType.TYPE_DICT.ContainsKey(simaticString))
             {
-                case SimaticDataType.VOID: return 0;
-                case SimaticDataType.BOOLEAN: return 0;
-                case SimaticDataType.BYTE: return 1;
-                case SimaticDataType.USINT: return 1;
-                case SimaticDataType.INT: return 2;
-                case SimaticDataType.UINT: return 2;
-                case SimaticDataType.DINT: return 4;
-                case SimaticDataType.UDINT: return 4;
-                case SimaticDataType.REAL: return 4;
-                case SimaticDataType.LREAL: return 8;
-                case SimaticDataType.TIMER: return 0;
-                case SimaticDataType.COUNTER: return 0;
-                case SimaticDataType.STRUCTURE: return 0;
-                case SimaticDataType.VARIANT: return 0;
-                default:
-                    throw new Exception("SimaticML string not set for DataType " + dataType.ToString());
-            }
-        }
-
-        public static string GetSimaticLengthIdentifier(this SimaticDataType dataType)
-        {
-            return SimaticMLUtil.GetLengthIdentifier(dataType.GetSimaticLength());
-        }
-    }
-
-    public static class SimaticDataTypeUtil
-    {
-        public static SimaticDataType GetFromSimaticMLString(string str, bool throwException = false)
-        {
-            foreach(SimaticDataType dataType in Enum.GetValues(typeof(SimaticDataType)))
-            {
-                if(str.StartsWith(dataType.GetSimaticMLString())) //For arrays there will be other stuff after the type.
+                if(throwException)
                 {
-                    return dataType;
+                    throw new ArgumentException("SimaticDataType " + simaticString + " has not been implemented yet.");
                 }
+
+                return SimaticDataType.VOID;
             }
 
-            if(throwException)
+            return SimaticDataType.TYPE_DICT[simaticString];
+        }
+
+        public static void AddDataType(SimaticDataType type)
+        {
+            var simaticString = type.GetSimaticMLString();
+            if (TYPE_DICT.ContainsKey(simaticString))
             {
-                throw new ArgumentException("SimaticDataType " + str + " has not been implemented yet.");
+                throw new ArgumentException("SimaticDataType already exists inside TYPE_DICT");
             }
 
-            return SimaticDataType.VOID;
+            TYPE_DICT.Add(simaticString, type);
+        }
+
+        private readonly string simaticMLString;
+        private readonly uint simaticMLLength;
+        public SimaticDataType(string simaticMLString, uint simaticLength)
+        {
+            this.simaticMLString = simaticMLString;
+            this.simaticMLLength = simaticLength;
+        }
+
+        public string GetSimaticMLString()
+        {
+            return simaticMLString;
+        }
+
+        public uint GetSimaticLength()
+        {
+            return simaticMLLength;
+        }
+
+        public string GetSimaticLengthIdentifier()
+        {
+            return SimaticMLUtil.GetLengthIdentifier(simaticMLLength);
         }
     }
 }

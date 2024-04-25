@@ -1,27 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using TiaXmlReader.Utility;
-using TiaXmlReader.SimaticML;
+﻿using System.Globalization;
+using TiaXmlReader.XMLClasses;
 
 namespace TiaXmlReader.SimaticML
 {
     public class IDGenerator
     {
+        private readonly uint startValue;
         private uint counter;
 
-        public IDGenerator(uint counter = 0)
+        public IDGenerator(uint startValue = 0)
         {
-            this.counter = counter;
+            this.startValue = startValue;
+            this.counter = startValue;
         }
 
         public void Reset()
         {
-            counter = 0;
+            counter = startValue;
         }
 
         public uint GetNext()
@@ -67,10 +62,10 @@ namespace TiaXmlReader.SimaticML
 
         public uint GetId()
         {
-            return uint.Parse(base.value);
+            return uint.Parse(base.value, NumberStyles.HexNumber);
         }
     }
-
+    /*
     public interface ILocalObject
     {
         LocalObjectData GetLocalObjectData();
@@ -87,6 +82,6 @@ namespace TiaXmlReader.SimaticML
         {
             return uint.Parse(base.value);
         }
-    }
+    }*/
 
 }

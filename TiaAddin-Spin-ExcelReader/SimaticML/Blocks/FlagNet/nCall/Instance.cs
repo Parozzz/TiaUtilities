@@ -1,19 +1,14 @@
-﻿using DocumentFormat.OpenXml.Drawing.Charts;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using TiaXmlReader.SimaticML.Enums;
-using TiaXmlReader.Utility;
-using TiaXmlReader.SimaticML.Blocks;
 using TiaXmlReader.SimaticML.Blocks.FlagNet.nAccess;
-using TiaXmlReader.SimaticML.Blocks.FlagNet.nCall;
+using TiaXmlReader.XMLClasses;
+using System.Data;
 
 namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nCall
 {
-    public class Instance : XmlNodeListConfiguration<Component>
+    public class Instance : XmlNodeListConfiguration<Component>, ILocalObject
     {
         public const string NODE_NAME = "Instance";
         private static Component CreateComponent(XmlNode xmlNode)
@@ -21,19 +16,25 @@ namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nCall
             return xmlNode.Name == Component.NODE_NAME ? new Component() : null;
         }
 
-        private readonly CompileUnit compileUnit;
-
         private readonly XmlAttributeConfiguration scope;
         private readonly XmlAttributeConfiguration uid;
 
-        public Instance(CompileUnit compileUnit) : base(NODE_NAME, Instance.CreateComponent)
+        public Instance() : base(Instance.NODE_NAME, Instance.CreateComponent)
         {
-            this.compileUnit = compileUnit;
-
             //==== INIT CONFIGURATION ====
             scope = this.AddAttribute("Scope", required: true);
             uid = this.AddAttribute("UId", required: true);
             //==== INIT CONFIGURATION ====
+        }
+
+        public void UpdateLocalUId(IDGenerator localIDGeneration)
+        {
+            this.SetUId(localIDGeneration.GetNext());
+        }
+
+        public void SetUId(uint uid)
+        {
+            this.uid.SetValue("" + uid);
         }
 
         public uint GetUId()
@@ -41,18 +42,8 @@ namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nCall
             return uint.TryParse(this.uid.GetValue(), out uint uid) ? uid : 0;
         }
 
-        private void SetUId()
-        {
-            if (string.IsNullOrEmpty(uid.GetValue()))
-            {//Set the uid only if a value has been added, otherwise it will not be empty anymore and will be added even if not needed.
-                uid.SetValue("" + compileUnit.LocalIDGenerator.GetNextString());
-            }
-        }
-
         public Instance SetVariableScope(SimaticVariableScope scope)
         {
-            SetUId();
-
             this.scope.SetValue(scope.GetSimaticMLString());
             return this;
         }
@@ -80,10 +71,8 @@ namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nCall
 
         public Instance SetAddress(string address)
         {
-            SetUId();
-
             this.GetItems().Clear();
-            
+
             var addressComponentList = SimaticMLUtil.SplitFullAddressIntoComponents(address);
             foreach (var component in Access.ParseAddressComponents(addressComponentList))
             {

@@ -45,7 +45,8 @@ namespace TiaXmlReader.Generation.GridHandler
         public GridHandler(DataGridView dataGridView, GridSettings settings, C configuration, List<GridDataColumn> dataColumnList, IGridRowComparer<C, T> comparer = null)
         {
             this.dataGridView = dataGridView;
-
+            // BUG => System.InvalidOperationException: 'L'operazione non può essere eseguita mentre è in corso il ridimensionamento di una colonna con riempimento automatico.'
+            // FIX = https://stackoverflow.com/questions/34344499/invalidoperationexception-this-operation-cannot-be-performed-while-an-auto-fill
             this.settings = settings;
             this.configuration = configuration;
             this.DataHandler = new GridDataHandler<C, T>(this.dataGridView, dataColumnList);

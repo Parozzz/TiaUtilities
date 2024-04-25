@@ -12,6 +12,9 @@ using TiaXmlReader.Generation.IO.GenerationForm;
 using System.Collections.Generic;
 using System.Linq;
 using TiaXmlReader.AutoSave;
+using TiaXmlReader.SimaticML;
+using System.Xml;
+using TiaXmlReader.SimaticML.Enums;
 
 namespace TiaXmlReader
 {
@@ -72,28 +75,6 @@ namespace TiaXmlReader
             #endregion
         }
 
-        private void ParseSnapshotDict(Dictionary<object, Dictionary<string, object>> objectSnapshotDict, bool forceRefreshSnapshot = false, bool skipSave = false)
-        {
-            bool saveNecessary = false;
-            foreach (var entry in objectSnapshotDict.ToList()) //To list neede to make a copy so i can change the dict below!
-            {
-                var obj = entry.Key;
-                var oldSnapshotDict = entry.Value;
-                if (oldSnapshotDict == null || !Utils.ComparePublicFieldSnapshot(obj, oldSnapshotDict) || forceRefreshSnapshot)
-                {
-                    saveNecessary = true;
-
-                    var snap = Utils.CreatePublicFieldSnapshot(obj);
-                    objectSnapshotDict[obj] = snap;
-                }
-            }
-
-            if (saveNecessary && !skipSave)
-            {
-                this.programSettings.Save();
-            }
-        }
-
         private void TiaVersionComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (uint.TryParse(tiaVersionComboBox.Text, out var version))
@@ -110,8 +91,9 @@ namespace TiaXmlReader
                 {
                     EnsureFileExists = true,
                     EnsurePathExists = true,
+                    DefaultExtension = ".xlsx",
+                    Filters = { new CommonFileDialogFilter("Excel Files (*.xlsx)", "*.xlsx") }
                 };
-                fileDialog.Filters.Add(new CommonFileDialogFilter("Excel Files (*.xlsx)", "*.xlsx"));
                 fileDialog.InitialDirectory = string.IsNullOrEmpty(programSettings.lastExcelFileName) ? "" : Path.GetDirectoryName(programSettings.lastExcelFileName);
 
                 if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
@@ -207,6 +189,51 @@ namespace TiaXmlReader
         private void GenerateAlarmsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             new AlarmGenerationForm(this.autoSaveHandler, this.programSettings.AlarmSettings, this.programSettings.GridSettings).Show(this);
+        }
+
+        private void ImportXMLToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var fileDialog = new CommonOpenFileDialog
+            {
+                IsFolderPicker = false,
+                EnsurePathExists = true,
+                EnsureFileExists = true,
+                DefaultExtension = ".xml",
+                Filters = { new CommonFileDialogFilter("XML Files (*.xml)", "*.xml") }
+            };
+
+            if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                var filePath = fileDialog.FileName;
+
+                var xmlDocument = new XmlDocument();
+                xmlDocument.Load(filePath);
+                var xmlNodeConfiguration = SimaticMLParser.ParseXML(xmlDocument);
+
+
+                xmlNodeConfiguration.UpdateID_UId(new IDGenerator());
+                var document = SimaticMLParser.CreateDocument();
+                var generatedXML = xmlNodeConfiguration.Generate(document);
+
+                fileDialog = new CommonOpenFileDialog
+                {
+                    IsFolderPicker = false,
+                    EnsurePathExists = true,
+                    EnsureFileExists = false,
+                    DefaultExtension = ".xml",
+                    Filters = { new CommonFileDialogFilter("XML Files (*.xml)", "*.xml") }
+                };
+
+                if(fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
+                {
+                    var __ = SimaticDataType.BOOLEAN;
+
+                    filePath = fileDialog.FileName;
+                    document.DocumentElement.AppendChild(generatedXML);
+                    document.Save(filePath);
+                }
+                var _debug = "" + "";
+            }
         }
     }
 }

@@ -1,60 +1,59 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Xml;
 using TiaXmlReader.SimaticML.Enums;
+using TiaXmlReader.SimaticML.LanguageText;
 using TiaXmlReader.Utility;
-using TiaXmlReader.SimaticML;
-using TiaXmlReader.SimaticML.Blocks;
+using TiaXmlReader.XMLClasses;
 
 namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nCall
 {
 
     public class Call : XmlNodeConfiguration, ILocalObject
-    { 
+    {
         public const string NODE_NAME = "Call";
 
-        private readonly LocalObjectData localObjectData;
+        private readonly XmlAttributeConfiguration uid;
+        private readonly CallInfo callInfo;
+        private readonly Comment comment;
 
-        private readonly XmlAttributeConfiguration callName;
-        private readonly XmlAttributeConfiguration blockType;
-
-        public Call(CompileUnit compileUnit) : base(Call.NODE_NAME)
+        public Call() : base(Call.NODE_NAME)
         {
             //==== INIT CONFIGURATION ====
-            localObjectData = this.AddAttribute(new LocalObjectData(compileUnit.LocalIDGenerator));
+            uid = this.AddAttribute("UId", required: true);
 
-            callName = this.AddAttribute("Name");
-            blockType = this.AddAttribute("BlockType", required: true);
+            callInfo = this.AddNode(new CallInfo());
+            comment = this.AddNode(new Comment());
             //==== INIT CONFIGURATION ====
         }
 
-        public LocalObjectData GetLocalObjectData()
+        public CallInfo GetCallInfo()
         {
-            return localObjectData;
+            return callInfo;
         }
 
-        public Call SetCallName(string callName)
+        public Comment GetComment()
         {
-            this.callName.SetValue(callName);
-            return this;
+            return comment;
         }
 
-        public string GetCallName()
+        public void UpdateLocalUId(IDGenerator localIDGeneration)
         {
-            return this.callName.GetValue();
+            this.SetUId(localIDGeneration.GetNext());
+
+            var instance = callInfo.GetInstance();
+            if (!instance.IsEmpty())
+            {
+                instance.UpdateLocalUId(localIDGeneration);
+            }
         }
 
-        public Call SetBlockType(SimaticBlockType blockType)
+        public void SetUId(uint uid)
         {
-            this.blockType.SetValue(blockType.GetSimaticMLString());
-            return this;
+            this.uid.SetValue("" + uid);
         }
 
-        public SimaticBlockType GetBlockType()
+        public uint GetUId()
         {
-            return Utils.FindEnumByStringMethod<SimaticBlockType>(this.blockType.GetValue(), SimaticBlockTypeExtension.GetSimaticMLString);
+            return uint.TryParse(this.uid.GetValue(), out uint uid) ? uid : 0;
         }
     }
 }

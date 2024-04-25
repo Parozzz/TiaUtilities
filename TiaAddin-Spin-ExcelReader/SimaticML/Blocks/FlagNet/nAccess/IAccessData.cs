@@ -14,7 +14,7 @@ namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nAccess
         protected readonly Access access;
         public IAccessData(CompileUnit compileUnit = null)
         {
-            access = new Access(compileUnit).SetVariableScope(this.GetScope());
+            access = compileUnit.CreateAccess().SetVariableScope(this.GetScope());
         }
 
         public Access GetAccess()

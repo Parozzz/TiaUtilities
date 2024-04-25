@@ -152,8 +152,10 @@ namespace TiaXmlReader
 
                 if(!string.IsNullOrEmpty(programSettings.lastXMLExportPath))
                 {
+                    attributeList.GetParentConfiguration().UpdateID_UId(new IDGenerator());
+
                     var xmlDocument = SimaticMLParser.CreateDocument();
-                    xmlDocument.DocumentElement.AppendChild(attributeList.GetParentConfiguration().Generate(xmlDocument, new IDGenerator()));
+                    xmlDocument.DocumentElement.AppendChild(attributeList.GetParentConfiguration().Generate(xmlDocument));
                     xmlDocument.Save(programSettings.lastXMLExportPath + "/DB" + attributeList.GetBlockNumber() + "_" + attributeList.GetBlockName() + ".xml");
                 }
             }

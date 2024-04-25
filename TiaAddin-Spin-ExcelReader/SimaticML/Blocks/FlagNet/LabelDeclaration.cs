@@ -1,39 +1,45 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
-using TiaXmlReader.Utility;
-using TiaXmlReader.SimaticML;
+using TiaXmlReader.XMLClasses;
 
 namespace TiaXmlReader.SimaticML.Blocks.FlagNet
 {
     public class LabelDeclaration : XmlNodeConfiguration, ILocalObject
     {
         public const string NODE_NAME = "LabelDeclaration";
-        public static LabelDeclaration CreateLabelDeclaration(XmlNode node, IDGenerator idGenerator)
+        public static LabelDeclaration CreateLabelDeclaration(XmlNode node)
         {
-            return node.Name == LabelDeclaration.NODE_NAME ? new LabelDeclaration(idGenerator) : null;
+            return node.Name == LabelDeclaration.NODE_NAME ? new LabelDeclaration() : null;
         }
 
-        private readonly LocalObjectData localObjectData;
+        private readonly XmlAttributeConfiguration uid;
 
         private readonly XmlNodeConfiguration label;
         private readonly XmlAttributeConfiguration labelName;
 
-        public LabelDeclaration(IDGenerator idGenerator) : base(NODE_NAME) 
+        public LabelDeclaration() : base(NODE_NAME) 
         {
             //==== INIT CONFIGURATION ====
-            localObjectData = this.AddAttribute(new LocalObjectData(idGenerator));
+            uid = this.AddAttribute("UId", required: true);
 
             label = this.AddNode("Label", required: true);
             labelName = label.AddAttribute("Name", required: true);
             //==== INIT CONFIGURATION ====
         }
-        public LocalObjectData GetLocalObjectData()
+
+        public void UpdateLocalUId(IDGenerator localIDGeneration)
         {
-            throw new NotImplementedException();
+            this.SetUId(localIDGeneration.GetNext());
+        }
+
+        public void SetUId(uint uid)
+        {
+            this.uid.SetValue("" + uid);
+        }
+
+        public uint GetUId()
+        {
+            return uint.TryParse(this.uid.GetValue(), out uint uid) ? uid : 0;
         }
 
         public string GetLabelName()

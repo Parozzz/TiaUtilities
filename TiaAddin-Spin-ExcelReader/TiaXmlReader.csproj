@@ -295,6 +295,10 @@
       <DependentUpon>IOGenerationForm.cs</DependentUpon>
     </Compile>
     <Compile Include="ProgramSettings.cs" />
+    <Compile Include="SimaticML\Blocks\FlagNet\nCall\CallInfo.cs" />
+    <Compile Include="SimaticML\Blocks\FlagNet\nCall\CallParameter.cs" />
+    <Compile Include="SimaticML\ILocalObject.cs" />
+    <Compile Include="SimaticML\ILocalObjectMaster.cs" />
     <Compile Include="SimaticML\nBlockAttributeList\BlockAttributeList.cs" />
     <Compile Include="SimaticML\nBlockAttributeList\Member.cs" />
     <Compile Include="SimaticML\Blocks\BlockFB.cs" />
@@ -337,11 +341,16 @@
     <Compile Include="UndoRedo\UndoRedoHandler.cs" />
     <Compile Include="Utility\ColorConverterExtension.cs" />
     <Compile Include="Utility\Constants.cs" />
+    <Compile Include="Utility\DictionaryUtils.cs" />
     <Compile Include="Utility\SystemVariables.cs" />
     <Compile Include="Utility\Truple.cs" />
-    <Compile Include="Utility\XmlConfigurator.cs" />
+    <Compile Include="XMLClasses\UnknownXmlGlobalObject.cs" />
+    <Compile Include="XMLClasses\XmlAttributeConfiguration.cs" />
+    <Compile Include="XMLClasses\XmlConfigurator.cs" />
     <Compile Include="Utility\Utils.cs" />
     <Compile Include="Utility\XMLUtils.cs" />
+    <Compile Include="XMLClasses\XmlNodeConfiguration.cs" />
+    <Compile Include="XMLClasses\XmlNodeListConfiguration.cs" />
     <EmbeddedResource Include="DBDuplicationForm.resx">
       <DependentUpon>DBDuplicationForm.cs</DependentUpon>
     </EmbeddedResource>

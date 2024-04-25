@@ -1,8 +1,8 @@
 ﻿using System.Xml;
 using TiaXmlReader.Utility;
-using TiaXmlReader.SimaticML;
 using TiaXmlReader.SimaticML.Blocks;
 using TiaXmlReader.SimaticML.TagTable;
+using TiaXmlReader.XMLClasses;
 
 namespace TiaXmlReader.SimaticML
 {
@@ -15,7 +15,7 @@ namespace TiaXmlReader.SimaticML
             if (tagTableNode != null)
             {
                 var tagTable = new XMLTagTable();
-                tagTable.Parse(tagTableNode, new IDGenerator());
+                tagTable.Load(tagTableNode);
                 return tagTable;
             }
 
@@ -23,7 +23,7 @@ namespace TiaXmlReader.SimaticML
             if (blockFCNode != null)
             {
                 var blockFC  = new BlockFC();
-                blockFC.Parse(blockFCNode, new IDGenerator());
+                blockFC.Load(blockFCNode);
                 return blockFC;
             }
 
@@ -31,7 +31,7 @@ namespace TiaXmlReader.SimaticML
             if (blockFBNode != null)
             {
                 var blockFB = new BlockFB();
-                blockFB.Parse(blockFBNode, new IDGenerator());
+                blockFB.Load(blockFBNode);
                 return blockFB;
             }
 
@@ -39,7 +39,7 @@ namespace TiaXmlReader.SimaticML
             if (globalDBNode != null)
             {
                 var blockGlobalDB = new BlockGlobalDB();
-                blockGlobalDB.Parse(globalDBNode, new IDGenerator());
+                blockGlobalDB.Load(globalDBNode);
                 return blockGlobalDB;
             }
 
@@ -47,24 +47,9 @@ namespace TiaXmlReader.SimaticML
             if (instanceDBNode != null)
             {
                 var blockInstanceDB = new BlockInstanceDB();
-                blockInstanceDB.Parse(instanceDBNode, new IDGenerator());
+                blockInstanceDB.Load(instanceDBNode);
                 return blockInstanceDB;
             }
-
-            /*
-            var fcNode = XmlUtil.GetFirstChild(document, "SW.Blocks.FC");
-            if (fcNode != null)
-            {
-                var fcData = new FCData(document);
-                fcData.ParseXMLDocument();
-                return;
-            }
-
-            var fbNode = XmlUtil.GetFirstChild(document, "SW.Blocks.FB");
-            if (fcNode != null)
-            {
-                return;
-            }*/
 
             return null;
         }

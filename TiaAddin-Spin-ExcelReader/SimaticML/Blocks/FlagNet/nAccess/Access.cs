@@ -1,17 +1,13 @@
-﻿using DocumentFormat.OpenXml.Office2010.ExcelAc;
-using DocumentFormat.OpenXml.Office2019.Excel.RichData2;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using TiaXmlReader.SimaticML.Enums;
-using TiaXmlReader.Utility;
-using TiaXmlReader.SimaticML.Blocks;
-using TiaXmlReader.SimaticML.Blocks.FlagNet.nAccess;
+using TiaXmlReader.XMLClasses;
 
 namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nAccess
 {
-    public class Access : XmlNodeConfiguration
+    public class Access : XmlNodeConfiguration, ILocalObject
     {
         public const string NODE_NAME = "Access";
 
@@ -28,20 +24,11 @@ namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nAccess
         private readonly XmlNodeConfiguration label;          //Not implemented
         private readonly XmlAttributeConfiguration labelName; //Not implemented
 
-        public Access(CompileUnit compileUnit = null) : base(Access.NODE_NAME)
+        public Access() : base(Access.NODE_NAME)
         {
-            if (compileUnit != null)
-            {
-                compileUnit.AddAccess(this);
-            }
-
             //==== INIT CONFIGURATION ====
             scope = this.AddAttribute("Scope", required: true);
             uid = this.AddAttribute("UId"); //In case the access is innested inside a Component (For array access modifier) UId is not required.         
-            if (compileUnit != null) //If a compile unit has been added, it means it needs an UId to be associated with a Wire.
-            {
-                this.uid.SetValue("" + compileUnit.LocalIDGenerator.GetNext());
-            }
 
             symbol = this.AddNodeList("Symbol", Component.CreateComponent);
 
@@ -53,6 +40,16 @@ namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nAccess
             label = this.AddNode("Label");
             labelName = this.label.AddAttribute("Name");
             //==== INIT CONFIGURATION ====
+        }
+
+        public void UpdateLocalUId(IDGenerator localIDGeneration)
+        {
+            this.SetUId(localIDGeneration.GetNext());
+        }
+
+        public void SetUId(uint uid)
+        {
+            this.uid.SetValue("" + uid);
         }
 
         public uint GetUId()
@@ -155,7 +152,7 @@ namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nAccess
 
         public SimaticDataType GetConstantType()
         {
-            return SimaticDataTypeUtil.GetFromSimaticMLString(this.constantType.GetInnerText());
+            return SimaticDataType.FromSimaticMLString(this.constantType.GetInnerText());
         }
 
         public Access SetConstantType(SimaticDataType dataType)

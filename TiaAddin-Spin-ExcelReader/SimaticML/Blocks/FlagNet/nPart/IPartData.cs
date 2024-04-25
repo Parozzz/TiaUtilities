@@ -12,7 +12,7 @@ namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nPart
         public IPartData(CompileUnit compileUnit, PartType partType)
         {
             this.compileUnit = compileUnit;
-            this.part = new Part(compileUnit).SetPartType(partType);
+            this.part = compileUnit.CreatePart().SetPartType(partType);
         }
 
         public Part GetPart() => part;
@@ -28,29 +28,29 @@ namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nPart
 
         public IPartData CreatePowerrailConnection()
         {
-            this.compileUnit.AddPowerrailSingleConnection(this.part, this.GetInputConName());
+            this.compileUnit.AddPowerrailConnections(this.part, this.GetInputConName());
             return this;
         }
 
         public T CreateInputConnection<T>(T inputPartData) where T : IPartData
         {
-            new Wire(this.compileUnit)
-                .AddNameCon(inputPartData.GetPart(), inputPartData.GetOuputConName())
-                .AddNameCon(this.part, this.GetInputConName());
+            this.compileUnit.CreateWire()
+                .CreateNameCon(inputPartData.GetPart(), inputPartData.GetOuputConName())
+                .CreateNameCon(this.part, this.GetInputConName());
             return inputPartData;
         }
 
         public T CreateOutputConnection<T>(T outputPartData) where T : IPartData
         {
-            new Wire(this.compileUnit)
-                .AddNameCon(this.part, this.GetOuputConName())
-                .AddNameCon(outputPartData.GetPart(), outputPartData.GetInputConName());
+            this.compileUnit.CreateWire()
+                .CreateNameCon(this.part, this.GetOuputConName())
+                .CreateNameCon(outputPartData.GetPart(), outputPartData.GetInputConName());
             return outputPartData;
         }
 
         public IPartData CreateOpenCon()
         {
-            new Wire(this.compileUnit).AddOpenCon();
+            this.compileUnit.CreateWire().CreateOpenCon();
             return this;
         }
     }
@@ -73,8 +73,7 @@ namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nPart
 
         public Wire CreateIdentWire(IAccessData accessData)
         {
-            return new Wire(compileUnit)
-                  .AddIdentCon(accessData.GetAccess(), part.GetLocalObjectData().GetUId(), "operand");
+            return this.compileUnit.CreateWire().CreateIdentCon(accessData.GetAccess(), part, "operand");
         }
     }
     public class ContactPartData : SimpleIdenfiablePartData
@@ -127,15 +126,15 @@ namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nPart
                 .SetTemplateValueType("Type");
 
             SetTimeValue("T#0s");
-            new Wire(this.compileUnit).AddNameCon(part, "ET").AddOpenCon();
-            new Wire(this.compileUnit).AddIdentCon(timeValueAccess, part.GetLocalObjectData().GetUId(), "PT");
+            this.compileUnit.CreateWire().CreateNameCon(part, "ET").CreateOpenCon();
+            this.compileUnit.CreateWire().CreateIdentCon(timeValueAccess, part, "PT");
 
             return this;
         }
 
         public TimerPartData SetTimeValue(string timeValue)
         {
-            timeValueAccess = (timeValueAccess ?? new Access(compileUnit))
+            timeValueAccess = (timeValueAccess ?? compileUnit.CreateAccess())
                 .SetVariableScope(SimaticVariableScope.TYPED_CONSTANT)
                 .SetConstantValue(timeValue);
             return this;

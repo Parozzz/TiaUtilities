@@ -3,6 +3,7 @@ using TiaXmlReader.SimaticML.nBlockAttributeList;
 using TiaXmlReader.Utility;
 using TiaXmlReader.SimaticML;
 using TiaXmlReader.SimaticML.LanguageText;
+using TiaXmlReader.XMLClasses;
 
 namespace TiaXmlReader.SimaticML.Blocks
 {

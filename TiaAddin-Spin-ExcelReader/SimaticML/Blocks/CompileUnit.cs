@@ -10,10 +10,12 @@ using TiaXmlReader.SimaticML.Blocks.FlagNet.nAccess;
 using TiaXmlReader.SimaticML.Enums;
 using TiaXmlReader.SimaticML.LanguageText;
 using TiaXmlReader.SimaticML.Blocks.FlagNet.nPart;
+using TiaXmlReader.XMLClasses;
+using TiaXmlReader.SimaticML.Blocks.FlagNet.nCall;
 
 namespace TiaXmlReader.SimaticML.Blocks
 {
-    public class CompileUnit : XmlNodeConfiguration, IGlobalObject
+    public class CompileUnit : XmlNodeConfiguration, ILocalObjectMaster, IGlobalObject
     {
         public const string NODE_NAME = "SW.Blocks.CompileUnit";
         private static XmlNodeConfiguration CreatePart(CompileUnit compileUnit, XmlNode node)
@@ -21,15 +23,19 @@ namespace TiaXmlReader.SimaticML.Blocks
             switch (node.Name)
             {
                 case Access.NODE_NAME:
-                    return new Access(compileUnit);
+                    return new Access();
                 case Part.NODE_NAME:
-                    return new Part(compileUnit);
+                    return new Part();
+                case Call.NODE_NAME:
+                    return new Call();
             }
 
             return null;
         }
 
-        public IDGenerator LocalIDGenerator { get; private set; } = new IDGenerator(20);
+        //Start from a high number in case there are nodes not included! Since siemens starts from 20, i SHOULD avoid most conflicts.
+        //Is not nice but works ¯\_(ツ)_/¯
+        public IDGenerator LocalIDGenerator { get; private set; } = new IDGenerator(10000); 
 
         private readonly GlobalObjectData globalObjectData;
 
@@ -53,9 +59,10 @@ namespace TiaXmlReader.SimaticML.Blocks
             var attributeList = AddNode(Constants.ATTRIBUTE_LIST_KEY, required: true);
             networkSource = attributeList.AddNode("NetworkSource", required: true);
             flgNet = networkSource.AddNode("FlgNet", namespaceURI: Constants.GET_FLAG_NET_NAMESPACE());
+            labels = flgNet.AddNodeList("Labels", xmlNode => LabelDeclaration.CreateLabelDeclaration(xmlNode)); //FIRST! It will not work otherwise.
             parts = flgNet.AddNodeList("Parts", xmlNode => CompileUnit.CreatePart(this, xmlNode));
-            wires = flgNet.AddNodeList("Wires", xmlNode => Wire.CreateWire(this, xmlNode));
-            labels = flgNet.AddNodeList("Labels", xmlNode => LabelDeclaration.CreateLabelDeclaration(xmlNode, LocalIDGenerator));
+            wires = flgNet.AddNodeList("Wires", xmlNode => Wire.CreateWire(xmlNode));
+            
 
             objectList = this.AddNodeList(Constants.OBJECT_LIST_KEY, MultilingualText.CreateMultilingualText, required: true);
 
@@ -66,6 +73,71 @@ namespace TiaXmlReader.SimaticML.Blocks
         public GlobalObjectData GetGlobalObjectData()
         {
             return globalObjectData;
+        }
+
+        public override void Load(XmlNode xmlNode, bool parseUnknown = true)
+        {
+            base.Load(xmlNode, parseUnknown);
+
+            foreach (Wire wire in this.wires.GetItems())
+            {
+                var identCon = wire.GetIdentCon();
+                if (identCon != null)
+                {
+                    var uid = identCon.GetLocalObjectUId();
+                    identCon.SetLocalObject(FindPartsLocalObjectByUId(uid));
+                }
+
+                foreach (var nameCon in wire.GetNameCons())
+                {
+                    var uid = nameCon.GetLocalObjectUId();
+                    nameCon.SetLocalObject(FindPartsLocalObjectByUId(uid));
+                }
+            }
+        }
+
+        public ILocalObject FindPartsLocalObjectByUId(uint uid)
+        {
+            return this.parts.GetItems().Where(o => o is ILocalObject).Cast<ILocalObject>().Where(o => o.GetUId() == uid).FirstOrDefault();
+        }
+
+        public Part FindPartByUId(uint uid)
+        {
+            return this.parts.GetItems().Where(o => o is Part).Cast<Part>().Where(p => p.GetUId() == uid).FirstOrDefault();
+        }
+
+        public Access FindAccessByUId(uint uid)
+        {
+            return this.parts.GetItems().Where(o => o is Access).Cast<Access>().Where(a => a.GetUId() == uid).FirstOrDefault();
+        }
+
+
+        public void UpdateLocalObjects()
+        {
+            this.LocalIDGenerator.Reset();
+
+            var objectList = new List<object>();
+            objectList.AddRange(base.childrenConfigurationDict.Values);
+            objectList.AddRange(this.labels.GetItems());
+            objectList.AddRange(this.parts.GetItems());
+            objectList.AddRange(this.wires.GetItems()); //UPDATE WIRES AFTER PARTS! OTHERWISE PART LOCAL UID ARE NOT UPDATED AND IT WON'T WORK!
+            foreach (XmlNodeConfiguration nodeConfig in objectList)
+            {
+                if (nodeConfig == null)
+                {
+                    continue;
+                }
+
+                if (nodeConfig is ILocalObject localObject)
+                {
+                    localObject.UpdateLocalUId(this.LocalIDGenerator);
+                }
+            }
+        }
+
+        public IDGenerator GetLocalIDGenerator()
+        {
+            return this.LocalIDGenerator;
         }
 
         public void Init()
@@ -114,35 +186,24 @@ namespace TiaXmlReader.SimaticML.Blocks
             this.programmingLanguage.SetInnerText(programmingLanguage.GetSimaticMLString());
             return this;
         }
-        public Access AddAccess(Access access)
-        {
-            if (parts.GetItems().Contains(access))
-            {
-                throw new Exception("An Access has been added twice to the same CompileUnit.");
-            }
 
-            parts.AddNode(access);
+        public Access CreateAccess()
+        {
+            var access = new Access();
+            parts.GetItems().Add(access);
             return access;
         }
 
-        public Part AddPart(Part part)
+        public Part CreatePart()
         {
-            if (parts.GetItems().Contains(part))
-            {
-                throw new Exception("A Part has been added twice to the same CompileUnit.");
-            }
-
+            var part = new Part();
             parts.GetItems().Add(part);
             return part;
         }
 
-        public Wire AddWire(Wire wire)
+        public Wire CreateWire()
         {
-            if (wires.GetItems().Contains(wire))
-            {
-                throw new Exception("A wire has been added twice to the same CompileUnit.");
-            }
-
+            var wire = new Wire();
             wires.GetItems().Add(wire);
             return wire;
         }
@@ -152,24 +213,21 @@ namespace TiaXmlReader.SimaticML.Blocks
             var powerrail = this.wires.GetItems().SingleOrDefault(wire => wire.IsPowerrail());
             if (powerrail == null)
             {
-                powerrail = new Wire(this);
-                powerrail.SetPowerrail();
+                powerrail = this.CreateWire().SetPowerrail();
             }
 
-            foreach (KeyValuePair<Part, string> entry in partConnectionDict)
+            foreach (var entry in partConnectionDict)
             {
-                powerrail.AddPowerrailCon(entry.Key, entry.Value);
+                powerrail.CreateNameCon(entry.Key, entry.Value);
             }
 
             return this;
         }
 
-        public CompileUnit AddPowerrailSingleConnection(Part part, string partConnection)
+        public CompileUnit AddPowerrailConnections(Part part, string partConnection)
         {
-            return AddPowerrailConnections(new Dictionary<Part, string>()
-            {
-                { part, partConnection }
-            });
+            var dict = new Dictionary<Part, string>() { { part, partConnection } };
+            return AddPowerrailConnections(dict);
         }
     }
 }

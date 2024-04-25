@@ -1,12 +1,9 @@
-﻿using DocumentFormat.OpenXml.Wordprocessing;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Xml;
-using TiaXmlReader.Generation;
-using TiaXmlReader.SimaticML;
 using TiaXmlReader.Utility;
 using TiaXmlReader.SimaticML.Enums;
 using TiaXmlReader.SimaticML.LanguageText;
-using TiaXmlReader.SimaticML.TagTable;
+using TiaXmlReader.XMLClasses;
 
 namespace TiaXmlReader.SimaticML.TagTable
 {
@@ -62,7 +59,7 @@ namespace TiaXmlReader.SimaticML.TagTable
 
         public SimaticDataType GetDataType()
         {
-            return SimaticDataTypeUtil.GetFromSimaticMLString(dataTypeName.GetInnerText());
+            return SimaticDataType.FromSimaticMLString(dataTypeName.GetInnerText());
         }
 
         public XMLTag SetDataType(SimaticDataType dataType)

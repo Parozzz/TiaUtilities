@@ -1,11 +1,8 @@
-﻿using DocumentFormat.OpenXml.Bibliography;
-using System;
+﻿using System;
 using System.Linq;
-using System.Xml;
-using TiaXmlReader.Utility;
-using TiaXmlReader.SimaticML;
-using TiaXmlReader.SimaticML.Blocks;
 using TiaXmlReader.SimaticML.Blocks.FlagNet.nCall;
+using TiaXmlReader.SimaticML.LanguageText;
+using TiaXmlReader.XMLClasses;
 
 namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nPart
 {
@@ -44,13 +41,8 @@ namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nPart
     public class Part : XmlNodeConfiguration, ILocalObject
     {
         public const string NODE_NAME = "Part";
-        public static Part CreatePart(CompileUnit compileUnit, XmlNode node)
-        {
-            return node.Name == Part.NODE_NAME ? new Part(compileUnit) : null;
-        }
 
-        private readonly LocalObjectData localObjectData;
-
+        private readonly XmlAttributeConfiguration uid;
         private readonly XmlAttributeConfiguration partName;
         private readonly XmlAttributeConfiguration disabledENO;
         private readonly XmlAttributeConfiguration version; //This is not required. If omitted, it should use the project version.
@@ -67,13 +59,12 @@ namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nPart
 
         private readonly Instance instance;
 
-        public Part(CompileUnit compileUnit) : base(Part.NODE_NAME)
+        private readonly Comment comment;
+
+        public Part() : base(Part.NODE_NAME)
         {
-            compileUnit.AddPart(this);
-
             //==== INIT CONFIGURATION ====
-            localObjectData = this.AddAttribute(new LocalObjectData(compileUnit.LocalIDGenerator));
-
+            uid = this.AddAttribute("UId", required: true);
             partName = this.AddAttribute("Name", required: true);
             disabledENO = this.AddAttribute("DisabledENO");
             version = this.AddAttribute("Version");
@@ -85,18 +76,42 @@ namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nPart
             automaticTypedName = automaticTyped.AddAttribute("Name", required: true);
 
             //L'ORDINE TRA INSTANCE E TEMPLATE VALUE è IMPORTANTE! NON MUOVERE.
-            instance = this.AddNode(new Instance(compileUnit));
+            instance = this.AddNode(new Instance());
+
+            comment = this.AddNode(new Comment()); //A part can have a comment in the little resizable square.
 
             templateValue = this.AddNode("TemplateValue");
             templateValueName = templateValue.AddAttribute("Name");
-            //Cardinality means how many connections that block have. For O for example, it means how many input connections it has. For move, how many outputs.
             templateValueType = templateValue.AddAttribute("Type");
+            //Type=Cardinality means how many connections that block have. For O (OR), it means how many input connections it has. For move, how many outputs.
+
             //==== INIT CONFIGURATION ====
         }
+
+        public void UpdateLocalUId(IDGenerator localIDGeneration)
+        {
+            this.SetUId(localIDGeneration.GetNext());
+            if(!this.instance.IsEmpty())
+            {
+                this.instance.UpdateLocalUId(localIDGeneration);
+            }
+        }
+
+        public void SetUId(uint uid)
+        {
+            this.uid.SetValue("" + uid);
+        }
+
+        public uint GetUId()
+        {
+            return uint.TryParse(this.uid.GetValue(), out uint uid) ? uid : 0;
+        }
+
+        /*
         public LocalObjectData GetLocalObjectData()
         {
             return localObjectData;
-        }
+        }*/
 
         public Part SetPartType(PartType type)
         {
@@ -181,7 +196,7 @@ namespace TiaXmlReader.SimaticML.Blocks.FlagNet.nPart
             return templateValueName.GetValue();
         }
 
-        public Part SetTemplateValueName(string templateValueName) 
+        public Part SetTemplateValueName(string templateValueName)
         {
             this.templateValueName.SetValue(templateValueName);
             return this;
