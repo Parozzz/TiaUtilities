@@ -1,12 +1,13 @@
-﻿using Jint;
+﻿using DocumentFormat.OpenXml.Vml.Office;
+using Jint;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics;
+using System.Threading;
 using System.Windows.Forms;
 using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Generation.GridHandler;
+using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.Utility;
 
 namespace TiaXmlReader.Generation.IO.GenerationForm
@@ -28,6 +29,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             {
                 ControlWidth = 950,
                 CloseOnOutsideClick = false,
+                ShowControlBox = true,
             };
 
             configForm.AddLine("Variables: address, ioName, dbName, variable, comment");
@@ -39,11 +41,10 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             configForm.AddButtonPanelLine(null)
                 .AddButton("Conferma", () =>
                 {
-                    if(this.ParseJS())
+                    if (this.ParseJS())
                     {
                         configForm.Close();
                     }
-                    
                 })
                 .AddButton("Annulla", () => configForm.Close());
 
@@ -54,58 +55,45 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
 
         private bool ParseJS()
         {
+            if (string.IsNullOrEmpty(settings.JSTableScript))
+            {
+                return false;
+            }
+
             try
             {
-                if (string.IsNullOrEmpty(settings.JSTableScript))
-                {
-                    return false;
-                }
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
 
-                var changedDataDict = new Dictionary<int, IOData>();
-                foreach (var entry in gridHandler.DataSource.GetNotEmptyDataDict())
+                using (var engine = new Engine(options =>
                 {
-                    var rowIndex = entry.Value;
-                    var data = entry.Key;
-                    using (var engine = new Engine())
+                    options.LimitMemory(20_000_000); // Limit memory allocations to MB
+                    options.TimeoutInterval(TimeSpan.FromMilliseconds(500)); // Set a timeout to 4 seconds.
+                    options.MaxStatements(int.MaxValue); // Set limit of 1000 executed statements.
+                    options.LimitRecursion(1);
+                }))
+                {
+                    ExecuteJS(engine, new IOData()); //Execute on empty just to execute it once in case the data is empty.
+
+                    var changedDataDict = new Dictionary<int, IOData>();
+                    foreach (var entry in gridHandler.DataSource.GetNotEmptyDataDict())
                     {
-                        engine.SetValue("address", data.Address ?? "");
-                        engine.SetValue("ioName", data.IOName ?? "");
-                        engine.SetValue("dbName", data.DBName ?? "");
-                        engine.SetValue("variable", data.Variable ?? "");
-                        engine.SetValue("comment", data.Comment ?? "");
+                        var rowIndex = entry.Value;
+                        var data = entry.Key;
 
-                        var eval = engine.Evaluate(settings.JSTableScript);
-
-                        var addressJSValue = engine.GetValue("address");
-                        var address = addressJSValue.IsString() ? addressJSValue.AsString() : data.Address;
-
-                        var ioNameJSValue = engine.GetValue("ioName");
-                        var ioName = ioNameJSValue.IsString() ? ioNameJSValue.AsString() : data.IOName;
-
-                        var dbNameJSValue = engine.GetValue("dbName");
-                        var dbName = dbNameJSValue.IsString() ? dbNameJSValue.AsString() : data.DBName;
-
-                        var variableJSValue = engine.GetValue("variable");
-                        var variable = variableJSValue.IsString() ? variableJSValue.AsString() : data.Variable;
-
-                        var commentJSValue = engine.GetValue("comment");
-                        var comment = commentJSValue.IsString() ? commentJSValue.AsString() : data.Comment;
-
-                        if (address != data.Address || ioName != data.IOName || dbName != data.DBName || variable != data.Variable || comment != data.Comment)
+                        var newIOData = ExecuteJS(engine, data);
+                        if (newIOData != null)
                         {
-                            changedDataDict.Add(rowIndex, new IOData()
-                            {
-                                Address = address,
-                                IOName = ioName,
-                                DBName = dbName,
-                                Variable = variable,
-                                Comment = comment,
-                            });
+                            changedDataDict.Add(rowIndex, newIOData);
                         }
                     }
+
+                    this.gridHandler.ChangeMultipleRows(changedDataDict);
                 }
 
-                this.gridHandler.ChangeMultipleRows(changedDataDict);
+                sw.Stop();
+
+                Console.WriteLine("Time[ms]: " + sw.ElapsedMilliseconds + ", Time[Ticks]: " + sw.ElapsedTicks);
 
                 return true;
             }
@@ -115,6 +103,60 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             }
 
             return false;
+        }
+
+        private IOData ExecuteJS(Engine engine, IOData data)
+        {
+            var dataValuesDict = new Dictionary<string, IOJSVariable>()
+                {
+                    { "address", new IOJSVariable() { OldValue = data.Address ?? "", Column = IOData.ADDRESS } },
+                    { "ioName", new IOJSVariable() { OldValue = data.IOName ?? "", Column = IOData.IO_NAME } },
+                    { "dbName", new IOJSVariable() { OldValue = data.DBName ?? "", Column = IOData.DB_NAME } },
+                    { "variable", new IOJSVariable() { OldValue = data.Variable ?? "", Column = IOData.VARIABLE } },
+                    { "comment", new IOJSVariable() { OldValue = data.Comment ?? "", Column = IOData.COMMENT } }
+                };
+
+            foreach (var entry in dataValuesDict)
+            {
+                var ioJSVariable = entry.Value;
+                engine.SetValue(entry.Key, ioJSVariable.OldValue);
+            }
+
+            var eval = engine.Evaluate(settings.JSTableScript);
+            if (eval.IsBoolean() && !eval.AsBoolean())
+            {
+                return null;
+            }
+
+            var changed = false;
+            foreach (var entry in dataValuesDict)
+            {
+                var ioJSVariable = entry.Value;
+
+                var jsValue = engine.GetValue(entry.Key);
+                ioJSVariable.NewValue = (jsValue != null && jsValue.IsString()) ? jsValue.AsString() : ioJSVariable.OldValue;
+
+                changed |= Utils.AreStringDifferent(ioJSVariable.OldValue, ioJSVariable.NewValue);
+            }
+
+            if (changed)
+            {
+                var newIOData = new IOData();
+                foreach (var ioJSVariable in dataValuesDict.Values)
+                {
+                    ioJSVariable.Column.SetValueTo(newIOData, ioJSVariable.NewValue);
+                }
+                return newIOData;
+            }
+
+            return null;
+        }
+
+        private class IOJSVariable
+        {
+            public string OldValue { get; set; }
+            public string NewValue { get; set; }
+            public GridDataColumn Column { get; set; }
         }
     }
 }

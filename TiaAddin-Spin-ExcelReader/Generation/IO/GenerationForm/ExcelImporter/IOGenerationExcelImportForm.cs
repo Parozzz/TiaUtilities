@@ -79,28 +79,36 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
 
             gridHandler?.Init();
 
-
             this.ConfigButton.Click += (object sender, EventArgs args) =>
             {
                 var configForm = new ConfigForm("Configurazione")
                 {
-                    ControlWidth = 600
+                    ControlWidth = 500
                 };
 
-                configForm.AddJavascriptTextBoxLine("JS", height: 500)
+                configForm.AddTextBoxLine("Indirizzo")
+                    .ControlText(importSettings.AddressCellConfig)
+                    .TextChanged(str => importSettings.AddressCellConfig = str);
+
+                configForm.AddTextBoxLine("Nome IO")
+                    .ControlText(importSettings.IONameCellConfig)
+                    .TextChanged(str => importSettings.IONameCellConfig = str);
+
+                configForm.AddTextBoxLine("Commento")
+                    .ControlText(importSettings.CommentCellConfig)
+                    .TextChanged(str => importSettings.CommentCellConfig = str);
+
+                configForm.AddTextBoxLine("Riga di partenza")
+                    .ControlText(importSettings.StartingRow)
+                    .UIntChanged(num => importSettings.StartingRow = num);
+
+                configForm.AddJavascriptTextBoxLine("Espressione validità riga", height: 200)
                     .ControlText(importSettings.IgnoreRowExpressionConfig)
                     .TextChanged(str => importSettings.IgnoreRowExpressionConfig = str);
 
-                configForm.FormClosed += (s, e) =>
-                {
-
-                };
-
-                configForm.StartShowingAtCursor();
+                configForm.StartShowingAtControl(this.ConfigButton);
                 configForm.Init();
                 configForm.Show(this);
-
-                dataGridView.Refresh();
             };
 
             this.ImportExcelButton.Click += (object sender, EventArgs args) =>

@@ -18,6 +18,7 @@ namespace TiaXmlReader.Generation.Configuration
         public int ControlWidth { get; set; } = 300;
         public int ControlHeight { get; set; } = 30;
         public bool CloseOnOutsideClick { get; set; } = true;
+        public bool ShowControlBox { get; set; } = false;
         public ConfigForm(string title)
         {
             InitializeComponent();
@@ -121,6 +122,10 @@ namespace TiaXmlReader.Generation.Configuration
 
         public void Init()
         {
+            this.ControlBox = this.ShowControlBox;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+
             this.Shown += (object sender, EventArgs args) => { formReadyToClose = true; };
             this.FormClosed += (object sender, FormClosedEventArgs args) => { this.Dispose(); };
 

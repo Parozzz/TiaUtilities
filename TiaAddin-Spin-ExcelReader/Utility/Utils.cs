@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using InfoBox;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -26,11 +28,12 @@ namespace TiaXmlReader.Utility
 
         public static void ShowExceptionMessage(Exception ex)
         {
-            
             string message = "Message => " + ex.Message + "\r\nCause => " + ex.Source + "\r\nStackTrace:\r\n" + ex.StackTrace + "\r\n";
             string caption = "An exception occoured while executing!";
-            Console.WriteLine("Exception:\r\n{0}", message + caption);
-            MessageBox.Show(message, caption);
+            Console.WriteLine("Exception:\r\n{0}", message);
+
+            InformationBox.Show(message, caption,  icon: InformationBoxIcon.Warning, order: InformationBoxOrder.TopMost, sound: InformationBoxSound.None);
+            //MessageBox.Show(message, caption);
         }
 
         public static Dictionary<string, object> CreatePublicFieldSnapshot(object obj)
@@ -100,6 +103,13 @@ namespace TiaXmlReader.Utility
             }
 
             return true;
+        }
+
+        public static bool AreStringDifferent(string strOne, string strTwo)
+        {
+            var oneEmpty = string.IsNullOrEmpty(strOne);
+            var twoEmpty = string.IsNullOrEmpty(strTwo);
+            return (oneEmpty && !twoEmpty) || (!oneEmpty && twoEmpty) || (strOne != strTwo);
         }
 
         public static bool AreValuesDifferent(object valueOne, object valueTwo)
