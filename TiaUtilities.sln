@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31717.71
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TiaAddIn-Spin", "TiaAddIn-Spin\TiaAddIn-Spin.csproj", "{00C536D1-31ED-4430-937F-336672A3B4C6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TiaXmlReader", "TiaAddin-Spin-ExcelReader\TiaXmlReader.csproj", "{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TiaUtilities", "TiaUtilities\TiaUtilities.csproj", "{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddIn_V16", "AddIn_V16\AddIn_V16.csproj", "{8FE36490-894B-47CD-9EFB-313A4FEFDDFA}"
 EndProject
