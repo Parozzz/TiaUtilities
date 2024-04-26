@@ -20,7 +20,6 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
         private readonly GridSettings gridSettings;
         private readonly GridHandler<IOConfiguration, IOData> gridHandler;
         private readonly IOGenerationFormConfigHandler configHandler;
-        private readonly IOGenerationTableScript tableScript;
 
         private IOGenerationExcelImportSettings ExcelImportConfig { get => settings.ExcelImportConfiguration; }
         private IOConfiguration IOConfig { get => settings.IOConfiguration; }
@@ -42,8 +41,6 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             };
 
             this.configHandler = new IOGenerationFormConfigHandler(this, this.IOConfig, this.gridHandler);
-            this.tableScript = new IOGenerationTableScript(this.gridHandler, this.settings);
-
             Init();
         }
 
@@ -182,20 +179,10 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             this.FormClosed += (sender, args) => autoSaveHandler.RemoveTickEventHandler(eventHandler);
             #endregion
 
-            this.dataGridView.CellMouseClick += (sender, args) =>
-            {
-                if(args.RowIndex == -1 && args.ColumnIndex == -1 && args.Button == MouseButtons.Right)
-                {
-                    var menuItem = new MenuItem();
-                    menuItem.Text = "Execute Javascript";
-                    menuItem.Click += (s, a) => this.tableScript.ShowConfigForm(this);
-
-                    var contextMenu = new ContextMenu();
-                    contextMenu.MenuItems.Add(menuItem);
-
-                    contextMenu.Show(this.dataGridView, this.dataGridView.PointToClient(Cursor.Position));
-                }
-            };
+            #region JS_SCRIPT
+            this.gridHandler.TableScript.SetReadScriptFunc(() => settings.JSTableScript);
+            this.gridHandler.TableScript.SetWriteScriptAction((str) => settings.JSTableScript = str);
+            #endregion
 
             UpdateConfigPanel();
         }

@@ -268,7 +268,7 @@
     <Compile Include="Generation\GridHandler\GridExcelDragHandler.cs" />
     <Compile Include="Generation\GridHandler\GridCellPaintHandler.cs" />
     <Compile Include="Generation\GridHandler\GridSortHandler.cs" />
-    <Compile Include="Generation\IO\GenerationForm\IOGenerationTableScript.cs" />
+    <Compile Include="Generation\GridHandler\GridTableScript.cs" />
     <Compile Include="Generation\IO\GenerationForm\IOGenerationUtils.cs" />
     <Compile Include="Generation\IO\IOExcelImporter.cs" />
     <Compile Include="Generation\IO\IOConfiguration.cs" />

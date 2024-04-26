@@ -153,6 +153,14 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             this.alarmGridHandler?.Init();
             this.configHandler?.Init();
 
+            #region JS_SCRIPT
+            this.deviceGridHandler.TableScript.SetReadScriptFunc(() => settings.DeviceJSScript);
+            this.deviceGridHandler.TableScript.SetWriteScriptAction((str) => settings.DeviceJSScript = str);
+
+            this.alarmGridHandler.TableScript.SetReadScriptFunc(() => settings.AlarmJSScript);
+            this.alarmGridHandler.TableScript.SetWriteScriptAction((str) => settings.AlarmJSScript = str);
+            #endregion
+
             #region AUTO_SAVE
             void eventHandler(object sender, EventArgs args)
             {

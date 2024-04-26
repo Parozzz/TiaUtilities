@@ -16,6 +16,6 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
         [JsonProperty] public string CommentCellConfig = "$E $F $G $H (P$K - $O)";
         [JsonProperty] public uint StartingRow = 2;
         [JsonProperty] public string IgnoreRowExpressionConfig = "$A != \"\"";
-
+        [JsonProperty] public string JSScript = "";
     }
 }

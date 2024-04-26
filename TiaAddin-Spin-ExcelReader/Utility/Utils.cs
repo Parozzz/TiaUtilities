@@ -109,11 +109,16 @@ namespace TiaXmlReader.Utility
         {
             var oneEmpty = string.IsNullOrEmpty(strOne);
             var twoEmpty = string.IsNullOrEmpty(strTwo);
-            return (oneEmpty && !twoEmpty) || (!oneEmpty && twoEmpty) || (strOne != strTwo);
+            return (oneEmpty && !twoEmpty) || (!oneEmpty && twoEmpty) || (strOne != null && strOne.Equals(strTwo));
         }
 
         public static bool AreValuesDifferent(object valueOne, object valueTwo)
         {
+            if(valueOne is string strOne && valueOne is string strTwo)
+            {
+                return AreStringDifferent(strOne, strTwo);
+            }
+
             return (valueOne == null && valueTwo != null) || (valueOne != null && valueTwo == null) || (valueOne != null && !valueOne.Equals(valueTwo));
         }
 

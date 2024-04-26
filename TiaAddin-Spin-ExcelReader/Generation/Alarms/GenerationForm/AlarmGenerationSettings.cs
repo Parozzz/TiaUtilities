@@ -17,6 +17,8 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
     public class AlarmGenerationSettings : ISettingsAutoSave
     {
         [JsonProperty] public AlarmConfiguration Configuration {  get; set; } = new AlarmConfiguration();
+        [JsonProperty] public string DeviceJSScript { get; set; } = "";
+        [JsonProperty] public string AlarmJSScript { get; set; } = "";
 
         public AlarmGenerationSettings() { }
     }

@@ -33,7 +33,8 @@ namespace TiaXmlReader.Generation.GridHandler
         private readonly UndoRedoHandler undoRedoHandler;
         private readonly GridExcelDragHandler excelDragHandler;
         private readonly GridSortHandler<C, T> sortHandler;
-        
+        public GridTableScript<C, T> TableScript { get; private set; }
+
         private readonly List<ColumnInfo> columnInfoList;
         private readonly List<IGridCellPainter> cellPainterList;
 
@@ -41,6 +42,7 @@ namespace TiaXmlReader.Generation.GridHandler
         public bool AddRowIndexToRowHeader { get; set; } = true;
         public bool EnablePasteFromExcel { get; set; } = true;
         public bool EnableRowSelectionFromRowHeaderClick { get; set; } = true;
+        public bool ShowJSContextMenuTopLeft {  get; set; } = true;
 
         public GridHandler(DataGridView dataGridView, GridSettings settings, C configuration, List<GridDataColumn> dataColumnList, IGridRowComparer<C, T> comparer = null)
         {
@@ -54,6 +56,7 @@ namespace TiaXmlReader.Generation.GridHandler
             this.undoRedoHandler = new UndoRedoHandler();
             this.excelDragHandler = new GridExcelDragHandler(this.dataGridView, settings);
             this.sortHandler = new GridSortHandler<C, T>(this.dataGridView, this.DataSource, this.undoRedoHandler, comparer);
+            this.TableScript = new GridTableScript<C, T>(this);
 
             this.columnInfoList = new List<ColumnInfo>();
             this.cellPainterList = new List<IGridCellPainter>();
@@ -297,6 +300,23 @@ namespace TiaXmlReader.Generation.GridHandler
                     var oldValue = (bool)(checkBoxCell.Value ?? false); //In this case the value is still the old one. For checkBox, been boolean value, i can predict the next!
                     var newValue = !oldValue;
                     ChangeCell(new GridCellChange(checkBoxCell) { OldValue = oldValue, NewValue = newValue }, applyChanges: false);
+                }
+            };
+            #endregion
+
+            #region SHOW_JS_CONTEXT_MENU
+            this.dataGridView.CellMouseClick += (sender, args) =>
+            {
+                if (args.RowIndex == -1 && args.ColumnIndex == -1 && args.Button == MouseButtons.Right && this.TableScript.Valid)
+                {
+                    var menuItem = new MenuItem();
+                    menuItem.Text = "Execute Javascript";
+                    menuItem.Click += (s, a) => this.TableScript.ShowConfigForm(this.dataGridView);
+
+                    var contextMenu = new ContextMenu();
+                    contextMenu.MenuItems.Add(menuItem);
+
+                    contextMenu.Show(this.dataGridView, this.dataGridView.PointToClient(Cursor.Position));
                 }
             };
             #endregion

@@ -11,7 +11,7 @@ namespace TiaXmlReader.Generation.GridHandler.Data
 {
     public class GridDataColumn
     {
-        public static GridDataColumn GetFromReflection(Type type, int columnIndex, string propertyName)
+        public static GridDataColumn GetFromReflection(Type type, int columnIndex, string propertyName, string programmingFriendlyName = null)
         {
             var propertyInfo = type.GetProperty(propertyName) ?? throw new Exception("Invalid property name while creating GridDataColumn from reflection from type " + type.FullName);
             return new GridDataColumn()
@@ -20,6 +20,7 @@ namespace TiaXmlReader.Generation.GridHandler.Data
                 DataPropertyName = propertyInfo.Name,
                 ColumnIndex = columnIndex,
                 PropertyInfo = propertyInfo,
+                ProgrammingFriendlyName = programmingFriendlyName == null ? propertyInfo.Name.ToLower() : programmingFriendlyName,
             };
         }
 
@@ -41,6 +42,7 @@ namespace TiaXmlReader.Generation.GridHandler.Data
         public string DataPropertyName { get; set; }
         public int ColumnIndex { get; set; }
         public PropertyInfo PropertyInfo { get; set; }
+        public string ProgrammingFriendlyName { get; set; }
 
         public V GetValueFrom<V>(object obj)
         {

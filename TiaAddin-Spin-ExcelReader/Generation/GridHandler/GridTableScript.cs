@@ -3,24 +3,39 @@ using Jint;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Generation.GridHandler.Data;
+using TiaXmlReader.GenerationForms;
 using TiaXmlReader.Utility;
 
-namespace TiaXmlReader.Generation.IO.GenerationForm
+namespace TiaXmlReader.Generation.GridHandler
 {
-    public class IOGenerationTableScript
+    public class GridTableScript<C, T> where C : IGenerationConfiguration where T : IGridData<C>
     {
-        private readonly GridHandler<IOConfiguration, IOData> gridHandler;
-        private readonly IOGenerationSettings settings;
+        private readonly GridHandler<C, T> gridHandler;
+        private Func<string> readScriptFunc;
+        private Action<string> writeScriptAction;
+        public bool Valid { get => readScriptFunc != null && writeScriptAction != null; }
 
-        public IOGenerationTableScript(GridHandler<IOConfiguration, IOData> gridHandler, IOGenerationSettings settings)
+        public GridTableScript(GridHandler<C, T> gridHandler)
         {
             this.gridHandler = gridHandler;
-            this.settings = settings;
+        }
+
+        public GridTableScript<C, T> SetReadScriptFunc(Func<string> getJSTableScriptFunc)
+        {
+            this.readScriptFunc = getJSTableScriptFunc;
+            return this;
+        }
+
+        public GridTableScript<C, T> SetWriteScriptAction(Action<string> setJSTableScriptAction)
+        {
+            this.writeScriptAction = setJSTableScriptAction;
+            return this;
         }
 
         public void ShowConfigForm(IWin32Window window)
@@ -32,11 +47,12 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                 ShowControlBox = true,
             };
 
-            configForm.AddLine("Variables: address, ioName, dbName, variable, comment");
+            var text = "Variables: " + gridHandler.DataHandler.DataColumns.Select(c => c.ProgrammingFriendlyName + " [" + c.PropertyInfo.PropertyType.Name + "]").Aggregate((a, b) => a + ", " + b);
+            configForm.AddLine(text);
 
             configForm.AddJavascriptTextBoxLine(null, height: 350)
-                .ControlText(settings.JSTableScript)
-                .TextChanged(str => settings.JSTableScript = str);
+                .ControlText(readScriptFunc.Invoke())
+                .TextChanged(writeScriptAction);
 
             configForm.AddButtonPanelLine(null)
                 .AddButton("Conferma", () =>
@@ -55,7 +71,14 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
 
         private bool ParseJS()
         {
-            if (string.IsNullOrEmpty(settings.JSTableScript))
+            if(!Valid)
+            {
+                return false;
+            }
+
+
+            var tableScript = this.readScriptFunc.Invoke();
+            if (string.IsNullOrEmpty(tableScript))
             {
                 return false;
             }
@@ -73,15 +96,15 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                     options.LimitRecursion(1);
                 }))
                 {
-                    ExecuteJS(engine, new IOData()); //Execute on empty just to execute it once in case the data is empty.
+                    ExecuteJS(engine, tableScript, gridHandler.DataHandler.CreateInstance()); //Execute on empty just to execute it once in case the data is empty.
 
-                    var changedDataDict = new Dictionary<int, IOData>();
+                    var changedDataDict = new Dictionary<int, T>();
                     foreach (var entry in gridHandler.DataSource.GetNotEmptyDataDict())
                     {
                         var rowIndex = entry.Value;
                         var data = entry.Key;
 
-                        var newIOData = ExecuteJS(engine, data);
+                        var newIOData = ExecuteJS(engine, tableScript, data);
                         if (newIOData != null)
                         {
                             changedDataDict.Add(rowIndex, newIOData);
@@ -105,16 +128,27 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             return false;
         }
 
-        private IOData ExecuteJS(Engine engine, IOData data)
+        private T ExecuteJS(Engine engine, string script, T data)
         {
-            var dataValuesDict = new Dictionary<string, IOJSVariable>()
+            var dataValuesDict = new Dictionary<string, GridJSVariable>();
+            foreach (var dataColumn in gridHandler.DataHandler.DataColumns)
+            {
+                var value = dataColumn.GetValueFrom<object>(data);
+                if(value == null)
                 {
-                    { "address", new IOJSVariable() { OldValue = data.Address ?? "", Column = IOData.ADDRESS } },
-                    { "ioName", new IOJSVariable() { OldValue = data.IOName ?? "", Column = IOData.IO_NAME } },
-                    { "dbName", new IOJSVariable() { OldValue = data.DBName ?? "", Column = IOData.DB_NAME } },
-                    { "variable", new IOJSVariable() { OldValue = data.Variable ?? "", Column = IOData.VARIABLE } },
-                    { "comment", new IOJSVariable() { OldValue = data.Comment ?? "", Column = IOData.COMMENT } }
+                    if (dataColumn.PropertyInfo.PropertyType == typeof(string))
+                    {
+                        value = "";
+                    }
+                }
+
+                var jsVariable = new GridJSVariable()
+                {
+                    OldValue = value,
+                    Column = dataColumn
                 };
+                dataValuesDict.Add(dataColumn.ProgrammingFriendlyName, jsVariable);
+            }
 
             foreach (var entry in dataValuesDict)
             {
@@ -122,10 +156,10 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                 engine.SetValue(entry.Key, ioJSVariable.OldValue);
             }
 
-            var eval = engine.Evaluate(settings.JSTableScript);
+            var eval = engine.Evaluate(script);
             if (eval.IsBoolean() && !eval.AsBoolean())
             {
-                return null;
+                return default;
             }
 
             var changed = false;
@@ -136,26 +170,26 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                 var jsValue = engine.GetValue(entry.Key);
                 ioJSVariable.NewValue = (jsValue != null && jsValue.IsString()) ? jsValue.AsString() : ioJSVariable.OldValue;
 
-                changed |= Utils.AreStringDifferent(ioJSVariable.OldValue, ioJSVariable.NewValue);
+                changed |= Utils.AreValuesDifferent(ioJSVariable.OldValue, ioJSVariable.NewValue);
             }
 
             if (changed)
             {
-                var newIOData = new IOData();
+                var newData = gridHandler.DataHandler.CreateInstance();
                 foreach (var ioJSVariable in dataValuesDict.Values)
                 {
-                    ioJSVariable.Column.SetValueTo(newIOData, ioJSVariable.NewValue);
+                    ioJSVariable.Column.SetValueTo(newData, ioJSVariable.NewValue);
                 }
-                return newIOData;
+                return newData;
             }
 
-            return null;
+            return default;
         }
 
-        private class IOJSVariable
+        private class GridJSVariable
         {
-            public string OldValue { get; set; }
-            public string NewValue { get; set; }
+            public object OldValue { get; set; }
+            public object NewValue { get; set; }
             public GridDataColumn Column { get; set; }
         }
     }

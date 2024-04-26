@@ -20,18 +20,18 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
         public const int IONAME_COLUMN = 1;
         public const int COMMENT_COLUMN = 2;
 
-        private readonly IOGenerationExcelImportSettings importSettings;
+        private readonly IOGenerationExcelImportSettings settings;
         private readonly GridHandler<IOGenerationExcelImportSettings, IOGenerationExcelImportData> gridHandler;
 
         public IEnumerable<IOGenerationExcelImportData> ImportDataEnumerable { get => gridHandler.DataSource.GetNotEmptyDataDict().Keys; }
 
-        public IOGenerationExcelImportForm(IOGenerationExcelImportSettings importSettings, GridSettings gridSettings)
+        public IOGenerationExcelImportForm(IOGenerationExcelImportSettings settings, GridSettings gridSettings)
         {
             InitializeComponent();
 
-            this.importSettings = importSettings;
+            this.settings = settings;
             this.gridHandler = new GridHandler<IOGenerationExcelImportSettings, IOGenerationExcelImportData>
-                (this.dataGridView, gridSettings, importSettings, IOGenerationExcelImportData.COLUMN_LIST)
+                (this.dataGridView, gridSettings, settings, IOGenerationExcelImportData.COLUMN_LIST)
             {
                 RowCount = 1999
             };
@@ -79,6 +79,11 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
 
             gridHandler?.Init();
 
+            #region JS_SCRIPT
+            this.gridHandler.TableScript.SetReadScriptFunc(() => settings.JSScript);
+            this.gridHandler.TableScript.SetWriteScriptAction((str) => settings.JSScript = str);
+            #endregion
+
             this.ConfigButton.Click += (object sender, EventArgs args) =>
             {
                 var configForm = new ConfigForm("Configurazione")
@@ -87,24 +92,24 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
                 };
 
                 configForm.AddTextBoxLine("Indirizzo")
-                    .ControlText(importSettings.AddressCellConfig)
-                    .TextChanged(str => importSettings.AddressCellConfig = str);
+                    .ControlText(settings.AddressCellConfig)
+                    .TextChanged(str => settings.AddressCellConfig = str);
 
                 configForm.AddTextBoxLine("Nome IO")
-                    .ControlText(importSettings.IONameCellConfig)
-                    .TextChanged(str => importSettings.IONameCellConfig = str);
+                    .ControlText(settings.IONameCellConfig)
+                    .TextChanged(str => settings.IONameCellConfig = str);
 
                 configForm.AddTextBoxLine("Commento")
-                    .ControlText(importSettings.CommentCellConfig)
-                    .TextChanged(str => importSettings.CommentCellConfig = str);
+                    .ControlText(settings.CommentCellConfig)
+                    .TextChanged(str => settings.CommentCellConfig = str);
 
                 configForm.AddTextBoxLine("Riga di partenza")
-                    .ControlText(importSettings.StartingRow)
-                    .UIntChanged(num => importSettings.StartingRow = num);
+                    .ControlText(settings.StartingRow)
+                    .UIntChanged(num => settings.StartingRow = num);
 
                 configForm.AddJavascriptTextBoxLine("Espressione validità riga", height: 200)
-                    .ControlText(importSettings.IgnoreRowExpressionConfig)
-                    .TextChanged(str => importSettings.IgnoreRowExpressionConfig = str);
+                    .ControlText(settings.IgnoreRowExpressionConfig)
+                    .TextChanged(str => settings.IgnoreRowExpressionConfig = str);
 
                 configForm.StartShowingAtControl(this.ConfigButton);
                 configForm.Init();
@@ -141,12 +146,12 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
                     //var t1 = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
 
                     var excelCellLetterList = AddMatchExpression(new string[] {
-                        importSettings.AddressCellConfig, importSettings.CommentCellConfig, importSettings.IONameCellConfig, importSettings.IgnoreRowExpressionConfig
+                        settings.AddressCellConfig, settings.CommentCellConfig, settings.IONameCellConfig, settings.IgnoreRowExpressionConfig
                     });
 
                     var importDataList = new List<IOGenerationExcelImportData>();
 
-                    uint rowIndex = importSettings.StartingRow;
+                    uint rowIndex = settings.StartingRow;
                     while (true)
                     {
                         var excelCellValueDict = new Dictionary<string, string>();
@@ -175,9 +180,9 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
                             continue;
                         }
 
-                        var address = importSettings.AddressCellConfig;
-                        var ioName = importSettings.IONameCellConfig;
-                        var comment = importSettings.CommentCellConfig;
+                        var address = settings.AddressCellConfig;
+                        var ioName = settings.IONameCellConfig;
+                        var comment = settings.CommentCellConfig;
                         foreach (var entry in excelCellValueDict)
                         {
                             address = address.Replace(entry.Key, entry.Value);
@@ -221,7 +226,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
                         engine.SetValue(entry.Key, entry.Value);
                     }
 
-                    var eval = engine.Evaluate(importSettings.IgnoreRowExpressionConfig);
+                    var eval = engine.Evaluate(settings.IgnoreRowExpressionConfig);
                     if (!eval.IsBoolean())
                     {
                         MessageBox.Show("Return must be boolean.", "Invalid ignore row operation");
