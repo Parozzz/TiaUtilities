@@ -180,8 +180,8 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             #endregion
 
             #region JS_SCRIPT
-            this.gridHandler.TableScript.SetReadScriptFunc(() => settings.JSTableScript);
-            this.gridHandler.TableScript.SetWriteScriptAction((str) => settings.JSTableScript = str);
+            this.gridHandler.TableScript.SetReadScriptFunc(() => settings.JSScript);
+            this.gridHandler.TableScript.SetWriteScriptAction((str) => settings.JSScript = str);
             #endregion
 
             UpdateConfigPanel();
