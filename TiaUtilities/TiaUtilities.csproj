@@ -356,11 +356,12 @@
     <Compile Include="SimaticML\TagTable\XMLTag.cs" />
     <Compile Include="SimaticML\TagTable\XMLTagTable.cs" />
     <Compile Include="UndoRedo\UndoRedoHandler.cs" />
-    <Compile Include="Utility\ColorConverterExtension.cs" />
+    <Compile Include="Utility\Extensions\ColorConverterExtension.cs" />
     <Compile Include="Utility\Constants.cs" />
-    <Compile Include="Utility\DictionaryUtils.cs" />
+    <Compile Include="Utility\Extensions\DictionaryExtensions.cs" />
+    <Compile Include="Utility\LogHandler.cs" />
+    <Compile Include="Utility\ScriptTimer.cs" />
     <Compile Include="Utility\SystemVariables.cs" />
-    <Compile Include="Utility\Truple.cs" />
     <Compile Include="XMLClasses\UnknownXmlGlobalObject.cs" />
     <Compile Include="XMLClasses\XmlAttributeConfiguration.cs" />
     <Compile Include="XMLClasses\XmlConfigurator.cs" />

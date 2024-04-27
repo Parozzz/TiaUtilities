@@ -40,6 +40,25 @@ namespace TiaXmlReader
 
         private void Init()
         {
+            this.LogWorker.DoWork += (sender, args) =>
+            {
+                try
+                {
+                    LogHandler.INSTANCE.WriteToFile();
+                }
+                catch { }
+            };
+            
+            var logWorkerTimer = new Timer();
+            logWorkerTimer.Interval = 1000;
+            logWorkerTimer.Tick += (sender, args) =>
+            {
+                if (!this.LogWorker.IsBusy)
+                {
+                    this.LogWorker.RunWorkerAsync();
+                }
+            };
+            logWorkerTimer.Start();
 
             configExcelPathTextBox.Text = programSettings.lastExcelFileName;
             exportPathTextBlock.Text = programSettings.lastXMLExportPath;
@@ -255,7 +274,7 @@ namespace TiaXmlReader
             {
                 try
                 {
-                    if(JS == null)
+                    if (JS == null)
                     {
                         return;
                     }

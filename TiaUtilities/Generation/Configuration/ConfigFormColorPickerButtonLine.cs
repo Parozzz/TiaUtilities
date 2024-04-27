@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using TiaXmlReader.Utility;
 using TiaXmlReader.Generation.Configuration;
+using TiaXmlReader.Utility.Extensions;
 
 namespace TiaXmlReader.Generation.Configuration
 {

@@ -28,10 +28,10 @@ namespace TiaXmlReader.Utility
 
         public static void ShowExceptionMessage(Exception ex)
         {
-            string message = "Message => " + ex.Message + "\r\nCause => " + ex.Source + "\r\nStackTrace:\r\n" + ex.StackTrace + "\r\n";
+            string message = "Message => " + ex.Message + "\r\nCause => " + ex.Source + "\r\nStackTrace:\r\n" + ex.StackTrace;
             string caption = "An exception occoured while executing!";
             Console.WriteLine("Exception:\r\n{0}", message);
-
+            LogHandler.INSTANCE.AddException(message);
             InformationBox.Show(message, caption,  icon: InformationBoxIcon.Warning, order: InformationBoxOrder.TopMost, sound: InformationBoxSound.None);
             //MessageBox.Show(message, caption);
         }

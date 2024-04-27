@@ -29,7 +29,6 @@ namespace TiaXmlReader.Generation.IO
         private XMLTagTable variableTagTable;
         private readonly List<XMLTagTable> variableTagTableList;
 
-
         public IOXmlGenerator(IOConfiguration configuration, List<IOData> ioDataList)
         {
             this.config = configuration;
@@ -38,7 +37,6 @@ namespace TiaXmlReader.Generation.IO
             this.ioTagTableList = new List<XMLTagTable>();
             this.variableTagTableList = new List<XMLTagTable>();
         }
-
 
         public void GenerateBlocks()
         {

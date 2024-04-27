@@ -46,9 +46,10 @@
             this.generateAlarmsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.testToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importXMLToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.jSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.label4 = new System.Windows.Forms.Label();
             this.languageComboBox = new System.Windows.Forms.ComboBox();
-            this.jSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.LogWorker = new System.ComponentModel.BackgroundWorker();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -217,9 +218,16 @@
             // importXMLToolStripMenuItem
             // 
             this.importXMLToolStripMenuItem.Name = "importXMLToolStripMenuItem";
-            this.importXMLToolStripMenuItem.Size = new System.Drawing.Size(180, 26);
+            this.importXMLToolStripMenuItem.Size = new System.Drawing.Size(162, 26);
             this.importXMLToolStripMenuItem.Text = "Import XML";
             this.importXMLToolStripMenuItem.Click += new System.EventHandler(this.ImportXMLToolStripMenuItem_Click);
+            // 
+            // jSToolStripMenuItem
+            // 
+            this.jSToolStripMenuItem.Name = "jSToolStripMenuItem";
+            this.jSToolStripMenuItem.Size = new System.Drawing.Size(162, 26);
+            this.jSToolStripMenuItem.Text = "JS";
+            this.jSToolStripMenuItem.Click += new System.EventHandler(this.JSToolStripMenuItem_Click);
             // 
             // label4
             // 
@@ -241,13 +249,6 @@
             this.languageComboBox.Name = "languageComboBox";
             this.languageComboBox.Size = new System.Drawing.Size(79, 32);
             this.languageComboBox.TabIndex = 12;
-            // 
-            // jSToolStripMenuItem
-            // 
-            this.jSToolStripMenuItem.Name = "jSToolStripMenuItem";
-            this.jSToolStripMenuItem.Size = new System.Drawing.Size(180, 26);
-            this.jSToolStripMenuItem.Text = "JS";
-            this.jSToolStripMenuItem.Click += new System.EventHandler(this.JSToolStripMenuItem_Click);
             // 
             // MainImportExportForm
             // 
@@ -297,6 +298,7 @@
         private System.Windows.Forms.ToolStripMenuItem testToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem importXMLToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem jSToolStripMenuItem;
+        private System.ComponentModel.BackgroundWorker LogWorker;
     }
 }
 

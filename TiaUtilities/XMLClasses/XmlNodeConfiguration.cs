@@ -4,6 +4,7 @@ using System.Linq;
 using System.Xml;
 using TiaXmlReader.SimaticML;
 using TiaXmlReader.Utility;
+using TiaXmlReader.Utility.Extensions;
 
 namespace TiaXmlReader.XMLClasses
 {

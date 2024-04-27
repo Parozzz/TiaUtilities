@@ -9,6 +9,8 @@ using TiaXmlReader.Generation.GridHandler;
 using Jint;
 using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Drawing.Charts;
+using TiaXmlReader.Utility;
+using InfoBox;
 
 namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
 {
@@ -137,114 +139,128 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
         {
             this.gridHandler.DataSource.Clear();
 
-            using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            {
-                using (var configWorkbook = new XLWorkbook(stream))
-                {
-                    var worksheet = configWorkbook.Worksheets.Worksheet(1);
-
-                    //var t1 = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
-
-                    var excelCellLetterList = AddMatchExpression(new string[] {
-                        settings.AddressCellConfig, settings.CommentCellConfig, settings.IONameCellConfig, settings.IgnoreRowExpressionConfig
-                    });
-
-                    var importDataList = new List<IOGenerationExcelImportData>();
-
-                    uint rowIndex = settings.StartingRow;
-                    while (true)
-                    {
-                        var excelCellValueDict = new Dictionary<string, string>();
-
-                        bool allEmpty = true;
-                        foreach (var cellLetter in excelCellLetterList)
-                        {
-                            var cellValue = worksheet.Cell(cellLetter + rowIndex).Value.ToString();
-                            excelCellValueDict.Add(cellLetter, cellValue); //There should not be two equals cellLetter. If there are, somethign wrong in AddMatchExpression.
-
-                            allEmpty &= string.IsNullOrEmpty(cellValue);
-                        }
-                        rowIndex++;
-
-                        if (allEmpty)
-                        {
-                            break;
-                        }
-
-                        if (!EvaluteRowExpression(excelCellValueDict, out bool expressionResult))
-                        {
-                            break;
-                        }
-                        else if (!expressionResult)
-                        {
-                            continue;
-                        }
-
-                        var address = settings.AddressCellConfig;
-                        var ioName = settings.IONameCellConfig;
-                        var comment = settings.CommentCellConfig;
-                        foreach (var entry in excelCellValueDict)
-                        {
-                            address = address.Replace(entry.Key, entry.Value);
-                            ioName = ioName.Replace(entry.Key, entry.Value);
-                            comment = comment.Replace(entry.Key, entry.Value);
-                        }
-
-                        importDataList.Add(new IOGenerationExcelImportData()
-                        {
-                            Address = address,
-                            IOName = ioName,
-                            Comment = comment,
-                        });
-                    }
-                    //Splitted this way to increase performance. Changing cell one at the time for 20-30 values takes 400ms, this way 10ms
-                    var freeIndexList = this.gridHandler.DataSource.GetFirstEmptyRowIndexes(importDataList.Count);
-
-                    var dataDict = new Dictionary<int, IOGenerationExcelImportData>();
-                    for(int i = 0; i < freeIndexList.Count; i++)
-                    {
-                        dataDict.Add(freeIndexList[i], importDataList[i]);
-                    }
-                    this.gridHandler.ChangeMultipleRows(dataDict);
-
-                    //var t2 = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
-                    //Console.WriteLine("Time: " + (t2 - t1) + " ms");
-                }
-            }
-        }
-
-        private bool EvaluteRowExpression(Dictionary<string, string> dict, out bool result)
-        {
-            result = false;
-
+            var scriptTimer = new ScriptTimer();
             try
             {
-                using(var engine = new Engine())
+                using (Engine engine = new Engine())
                 {
-                    foreach (var entry in dict)
+                    using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                     {
-                        engine.SetValue(entry.Key, entry.Value);
-                    }
+                        using (var configWorkbook = new XLWorkbook(stream))
+                        {
+                            var worksheet = configWorkbook.Worksheets.Worksheet(1);
 
-                    var eval = engine.Evaluate(settings.IgnoreRowExpressionConfig);
-                    if (!eval.IsBoolean())
-                    {
-                        MessageBox.Show("Return must be boolean.", "Invalid ignore row operation");
-                        return false;
-                    }
+                            var excelCellLetterList = AddMatchExpression(new string[] {
+                                settings.AddressCellConfig, settings.CommentCellConfig, settings.IONameCellConfig, settings.IgnoreRowExpressionConfig
+                            });
 
-                    result = eval.AsBoolean();
+                            var importDataList = new List<IOGenerationExcelImportData>();
+
+                            uint rowIndex = settings.StartingRow;
+                            while (true)
+                            {
+                                var excelCellValueDict = new Dictionary<string, string>();
+
+                                bool allEmpty = true;
+                                foreach (var cellLetter in excelCellLetterList)
+                                {
+                                    var cellValue = worksheet.Cell(cellLetter + rowIndex).Value.ToString();
+                                    excelCellValueDict.Add(cellLetter, cellValue); //There should not be two equals cellLetter. If there are, somethign wrong in AddMatchExpression.
+
+                                    allEmpty &= string.IsNullOrEmpty(cellValue);
+                                }
+                                rowIndex++;
+
+                                if (allEmpty)
+                                {
+                                    break;
+                                }
+
+                                if (!EvaluteRowExpressionTimed(scriptTimer, engine, excelCellValueDict, out bool expressionResult))
+                                {
+                                    break;
+                                }
+                                else if (!expressionResult)
+                                {
+                                    continue;
+                                }
+
+                                var address = settings.AddressCellConfig;
+                                var ioName = settings.IONameCellConfig;
+                                var comment = settings.CommentCellConfig;
+                                foreach (var entry in excelCellValueDict)
+                                {
+                                    address = address.Replace(entry.Key, entry.Value);
+                                    ioName = ioName.Replace(entry.Key, entry.Value);
+                                    comment = comment.Replace(entry.Key, entry.Value);
+                                }
+
+                                importDataList.Add(new IOGenerationExcelImportData()
+                                {
+                                    Address = address,
+                                    IOName = ioName,
+                                    Comment = comment,
+                                });
+                            }
+                            //Splitted this way to increase performance. Changing cell one at the time for 20-30 values takes 400ms, this way 10ms
+                            var freeIndexList = this.gridHandler.DataSource.GetFirstEmptyRowIndexes(importDataList.Count);
+
+                            var dataDict = new Dictionary<int, IOGenerationExcelImportData>();
+                            for (int i = 0; i < freeIndexList.Count; i++)
+                            {
+                                dataDict.Add(freeIndexList[i], importDataList[i]);
+                            }
+                            this.gridHandler.ChangeMultipleRows(dataDict);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Utils.ShowExceptionMessage(ex);
+            }
+            finally
+            {
+                scriptTimer.StopAndSave();
+                scriptTimer.Log(settings.IgnoreRowExpressionConfig, "IOGenerationExcelImportForm");
+            }
+
+        }
+
+        private bool EvaluteRowExpressionTimed(ScriptTimer scriptTimer, Engine engine, Dictionary<string, string> dict, out bool result)
+        {
+            scriptTimer.Restart();
+            var ret = EvaluteRowExpression(engine, dict, out result);
+            scriptTimer.StopAndSave();
+
+            return ret;
+        }
+
+        private bool EvaluteRowExpression(Engine engine, Dictionary<string, string> dict, out bool result)
+        {
+            result = false;
+            try
+            {
+                foreach (var entry in dict)
+                {
+                    engine.SetValue(entry.Key, entry.Value);
                 }
 
+                var eval = engine.Evaluate(settings.IgnoreRowExpressionConfig);
+                if (!eval.IsBoolean())
+                {
+                    InformationBox.Show("Return must be boolean.", "Invalid ignore row operation", icon: InformationBoxIcon.Exclamation);
+                    return false;
+                }
+
+                result = eval.AsBoolean();
                 return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
-                MessageBox.Show("Error while compiling javascript.\n" + ex.Message, "Invalid ignore row operation");
+                Utils.ShowExceptionMessage(ex);
                 return false;
             }
-
         }
 
         private List<string> AddMatchExpression(string[] strArray)

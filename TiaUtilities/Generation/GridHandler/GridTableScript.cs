@@ -1,13 +1,9 @@
-﻿using DocumentFormat.OpenXml.Vml.Office;
-using Jint;
+﻿using Jint;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using System.Windows.Forms;
 using TiaXmlReader.Generation.Configuration;
-using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.GenerationForms;
 using TiaXmlReader.Utility;
@@ -76,7 +72,6 @@ namespace TiaXmlReader.Generation.GridHandler
                 return false;
             }
 
-
             var tableScript = this.readScriptFunc.Invoke();
             if (string.IsNullOrEmpty(tableScript))
             {
@@ -85,8 +80,7 @@ namespace TiaXmlReader.Generation.GridHandler
 
             try
             {
-                Stopwatch sw = new Stopwatch();
-                sw.Start();
+                var scriptTimer = new ScriptTimer();
 
                 using (var engine = new Engine(options =>
                 {
@@ -104,7 +98,7 @@ namespace TiaXmlReader.Generation.GridHandler
                         var rowIndex = entry.Value;
                         var data = entry.Key;
 
-                        var newIOData = ExecuteJS(engine, tableScript, data);
+                        var newIOData = ExecuteTimedJS(scriptTimer, engine, tableScript, data);
                         if (newIOData != null)
                         {
                             changedDataDict.Add(rowIndex, newIOData);
@@ -114,9 +108,7 @@ namespace TiaXmlReader.Generation.GridHandler
                     this.gridHandler.ChangeMultipleRows(changedDataDict);
                 }
 
-                sw.Stop();
-
-                Console.WriteLine("Time[ms]: " + sw.ElapsedMilliseconds + ", Time[Ticks]: " + sw.ElapsedTicks);
+                scriptTimer.Log(tableScript, typeof(T).Name);
 
                 return true;
             }
@@ -126,6 +118,15 @@ namespace TiaXmlReader.Generation.GridHandler
             }
 
             return false;
+        }
+
+        private T ExecuteTimedJS(ScriptTimer scriptTimer, Engine engine, string script, T data)
+        {
+            scriptTimer.Restart();
+            var ret = this.ExecuteJS(engine, script, data);
+            scriptTimer.StopAndSave();
+
+            return ret;
         }
 
         private T ExecuteJS(Engine engine, string script, T data)

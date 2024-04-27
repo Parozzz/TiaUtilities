@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using TiaXmlReader.Utility;
-using TiaXmlReader;
+using InfoBox;
+using Jint;
+using ClosedXML.Excel;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace TiaXmlReader
 {
@@ -17,6 +17,11 @@ namespace TiaXmlReader
         static void Main()
         {
             SystemVariables.INIT();
+
+            var _ = typeof(InformationBox); //InformationBox
+            _ = typeof(Engine); //Jint
+            _ = typeof(XLWorkbook); //ClosedXML
+            _ = typeof(CommonOpenFileDialog); //WindowsAPICodePack
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TiaXmlReader.Utility
+namespace TiaXmlReader.Utility.Extensions
 {
-    public static class DictionaryUtils
+    public static class DictionaryExtensions
     {
         public static void Compute<K, V>(this Dictionary<K, V> dictionary, K key, V value)
         {
