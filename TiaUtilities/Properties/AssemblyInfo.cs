@@ -6,12 +6,12 @@ using System.Runtime.InteropServices;
 // Le informazioni generali relative a un assembly sono controllate dal seguente 
 // set di attributi. Modificare i valori di questi attributi per modificare le informazioni
 // associate a un assembly.
-[assembly: AssemblyTitle("TiaAddin-Spin-ExcelReader")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("TiaUtilities")]
+[assembly: AssemblyDescription("Improves your TIA experience.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("TiaAddin-Spin-ExcelReader")]
-[assembly: AssemblyCopyright("Copyright ©  2021")]
+[assembly: AssemblyCompany("by Giacomo Paronetto")]
+[assembly: AssemblyProduct("TiaUtilities")]
+[assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

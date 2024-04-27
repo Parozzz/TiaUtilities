@@ -10,6 +10,8 @@ namespace TiaXmlReader
 {
     internal static class Program
     {
+        public const string VERSION = "0.1";
+
         /// <summary>
         /// Punto di ingresso principale dell'applicazione.
         /// </summary>
