@@ -10,12 +10,14 @@ using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter;
 using TiaXmlReader.AutoSave;
+using TiaXmlReader.Javascript;
 
 namespace TiaXmlReader.Generation.IO.GenerationForm
 {
     public partial class IOGenerationForm : Form
     {
-        private TimedSaveHandler autoSaveHandler;
+        private readonly JavascriptScriptErrorReportingThread jsErrorHandlingThread;
+        private readonly TimedSaveHandler autoSaveHandler;
         private readonly IOGenerationSettings settings;
         private readonly GridSettings gridSettings;
         private readonly GridHandler<IOConfiguration, IOData> gridHandler;
@@ -27,15 +29,16 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
 
         private string lastFilePath;
 
-        public IOGenerationForm(TimedSaveHandler autoSaveHandler, IOGenerationSettings settings, GridSettings gridSettings)
+        public IOGenerationForm(JavascriptScriptErrorReportingThread jsErrorHandlingThread, TimedSaveHandler autoSaveHandler, IOGenerationSettings settings, GridSettings gridSettings)
         {
             InitializeComponent();
 
+            this.jsErrorHandlingThread = jsErrorHandlingThread;
             this.autoSaveHandler = autoSaveHandler;
             this.settings = settings;
             this.gridSettings = gridSettings;
 
-            this.gridHandler = new GridHandler<IOConfiguration, IOData>(this.dataGridView, gridSettings, IOConfig, IOData.COLUMN_LIST, new IOGenerationComparer())
+            this.gridHandler = new GridHandler<IOConfiguration, IOData>(jsErrorHandlingThread, this.dataGridView, gridSettings, IOConfig, IOData.COLUMN_LIST, new IOGenerationComparer())
             {
                 RowCount = 2999
             };
@@ -94,7 +97,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             };
             this.importExcelToolStripMenuItem.Click += (object sender, EventArgs args) =>
             {
-                var excelImportForm = new IOGenerationExcelImportForm(this.ExcelImportConfig, this.gridSettings);
+                var excelImportForm = new IOGenerationExcelImportForm(this.jsErrorHandlingThread, this.ExcelImportConfig, this.gridSettings);
 
                 var dialogResult = excelImportForm.ShowDialog();
                 if (dialogResult == DialogResult.OK)

@@ -18,6 +18,8 @@ using TiaXmlReader.SimaticML.Enums;
 using TiaXmlReader.Generation.Configuration;
 using Jint;
 using MS.WindowsAPICodePack.Internal;
+using TiaXmlReader.Javascript;
+using System.ComponentModel;
 
 namespace TiaXmlReader
 {
@@ -25,6 +27,7 @@ namespace TiaXmlReader
     {
         private readonly ProgramSettings programSettings;
         private readonly TimedSaveHandler autoSaveHandler;
+        private readonly JavascriptScriptErrorReportingThread jsErrorHandlingThread;
 
         public MainImportExportForm()
         {
@@ -34,31 +37,18 @@ namespace TiaXmlReader
             this.programSettings.Save(); //To create file if not exist!
 
             this.autoSaveHandler = new TimedSaveHandler(programSettings, this.autoSaveComboBox.ComboBox);
+            this.jsErrorHandlingThread = new JavascriptScriptErrorReportingThread();
 
             Init();
         }
 
         private void Init()
         {
-            this.LogWorker.DoWork += (sender, args) =>
-            {
-                try
-                {
-                    LogHandler.INSTANCE.WriteToFile();
-                }
-                catch { }
-            };
-            
-            var logWorkerTimer = new Timer();
-            logWorkerTimer.Interval = 1000;
-            logWorkerTimer.Tick += (sender, args) =>
-            {
-                if (!this.LogWorker.IsBusy)
-                {
-                    this.LogWorker.RunWorkerAsync();
-                }
-            };
-            logWorkerTimer.Start();
+            LogHandler.INSTANCE.Init();
+            LogHandler.INSTANCE.Start();
+
+            jsErrorHandlingThread.Init();
+            jsErrorHandlingThread.Start();
 
             configExcelPathTextBox.Text = programSettings.lastExcelFileName;
             exportPathTextBlock.Text = programSettings.lastXMLExportPath;
@@ -205,12 +195,12 @@ namespace TiaXmlReader
 
         private void GenerateIOMenuItem_Click(object sender, EventArgs e)
         {
-            new IOGenerationForm(this.autoSaveHandler, this.programSettings.IOSettings, this.programSettings.GridSettings).Show(this);
+            new IOGenerationForm(this.jsErrorHandlingThread, this.autoSaveHandler, this.programSettings.IOSettings, this.programSettings.GridSettings).Show(this);
         }
 
         private void GenerateAlarmsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            new AlarmGenerationForm(this.autoSaveHandler, this.programSettings.AlarmSettings, this.programSettings.GridSettings).Show(this);
+            new AlarmGenerationForm(this.jsErrorHandlingThread, this.autoSaveHandler, this.programSettings.AlarmSettings, this.programSettings.GridSettings).Show(this);
         }
 
         private void ImportXMLToolStripMenuItem_Click(object sender, EventArgs e)

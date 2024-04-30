@@ -8,6 +8,7 @@ using TiaXmlReader.Utility;
 using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.AutoSave;
+using TiaXmlReader.Javascript;
 
 namespace TiaXmlReader.Generation.Alarms.GenerationForm
 {
@@ -25,7 +26,7 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
 
         private string lastFilePath;
 
-        public AlarmGenerationForm(TimedSaveHandler autoSaveHandler, AlarmGenerationSettings settings, GridSettings gridSettings)
+        public AlarmGenerationForm(JavascriptScriptErrorReportingThread jsErrorHandlingThread, TimedSaveHandler autoSaveHandler, AlarmGenerationSettings settings, GridSettings gridSettings)
         {
             InitializeComponent();
 
@@ -33,12 +34,12 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             this.settings = settings;
             this.gridSettings = gridSettings;
 
-            this.deviceGridHandler = new GridHandler<AlarmConfiguration, DeviceData>(this.DeviceDataGridView, gridSettings, AlarmConfig, DeviceData.COLUMN_LIST, null)
+            this.deviceGridHandler = new GridHandler<AlarmConfiguration, DeviceData>(jsErrorHandlingThread, this.DeviceDataGridView, gridSettings, AlarmConfig, DeviceData.COLUMN_LIST, null)
             {
                 RowCount = 499
             };
 
-            this.alarmGridHandler = new GridHandler<AlarmConfiguration, AlarmData>(this.AlarmDataGridView, gridSettings, AlarmConfig, AlarmData.COLUMN_LIST, null)
+            this.alarmGridHandler = new GridHandler<AlarmConfiguration, AlarmData>(jsErrorHandlingThread,this.AlarmDataGridView, gridSettings, AlarmConfig, AlarmData.COLUMN_LIST, null)
             {
                 RowCount = 29
             };

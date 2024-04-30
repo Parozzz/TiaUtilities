@@ -1,11 +1,8 @@
-﻿using Irony;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace TiaXmlReader.Utility
 {
@@ -19,10 +16,48 @@ namespace TiaXmlReader.Utility
 
         public static readonly LogHandler INSTANCE = new LogHandler();
 
+        private readonly BackgroundWorker worker;
+        private readonly Timer timer;
+
         private readonly ConcurrentBag<Log> messages;
+
+        private bool init;
+
         private LogHandler()
         {
+            this.worker = new BackgroundWorker();
+            this.timer = new Timer() { Interval = 1000 };
+
             messages = new ConcurrentBag<Log>();
+        }
+
+        public void Init()
+        {
+            if(init)
+            {
+                return;
+            }
+
+            this.worker.DoWork += (sender, args) => this.WriteToFile();
+            timer.Tick += (sender, args) =>
+            {
+                if (!this.worker.IsBusy)
+                {
+                    this.worker.RunWorkerAsync();
+                }
+            };
+
+            init = true;
+        }
+
+        public void Start()
+        {
+            timer.Start();
+        }
+
+        public void Stop()
+        {
+            timer.Stop();
         }
 
         private string GetFilePath(string fileName)
@@ -33,7 +68,6 @@ namespace TiaXmlReader.Utility
             var month = dateTime.ToString("MM");
             return Directory.GetCurrentDirectory() + "\\logs\\" + year + "\\" + month + "_" + fileName + ".log";
         }
-
 
         public void AddException(string message)
         {
@@ -54,18 +88,21 @@ namespace TiaXmlReader.Utility
 
         public void WriteToFile()
         {
-            if (!messages.TryTake(out Log log))
+            try
             {
-                return;
-            }
+                if (!messages.TryTake(out Log log))
+                {
+                    return;
+                }
 
-            var filePath = this.GetFilePath(log.FileName);
-            if (!File.Exists(filePath))
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(filePath));
-            }
+                var filePath = this.GetFilePath(log.FileName);
+                if (!File.Exists(filePath))
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+                }
 
-            File.AppendAllText(filePath, log.Message);
+                File.AppendAllText(filePath, log.Message);
+            } catch { }
         }
     }
 }

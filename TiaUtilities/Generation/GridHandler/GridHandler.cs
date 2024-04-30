@@ -11,6 +11,7 @@ using TiaXmlReader.Utility;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.GenerationForms;
+using TiaXmlReader.Javascript;
 
 namespace TiaXmlReader.Generation.GridHandler
 {
@@ -44,7 +45,7 @@ namespace TiaXmlReader.Generation.GridHandler
         public bool EnableRowSelectionFromRowHeaderClick { get; set; } = true;
         public bool ShowJSContextMenuTopLeft {  get; set; } = true;
 
-        public GridHandler(DataGridView dataGridView, GridSettings settings, C configuration, List<GridDataColumn> dataColumnList, IGridRowComparer<C, T> comparer = null)
+        public GridHandler(JavascriptScriptErrorReportingThread jsErrorHandlingThread, DataGridView dataGridView, GridSettings settings, C configuration, List<GridDataColumn> dataColumnList, IGridRowComparer<C, T> comparer = null)
         {
             this.dataGridView = dataGridView;
             // BUG => System.InvalidOperationException: 'L'operazione non può essere eseguita mentre è in corso il ridimensionamento di una colonna con riempimento automatico.'
@@ -56,7 +57,7 @@ namespace TiaXmlReader.Generation.GridHandler
             this.undoRedoHandler = new UndoRedoHandler();
             this.excelDragHandler = new GridExcelDragHandler(this.dataGridView, settings);
             this.sortHandler = new GridSortHandler<C, T>(this.dataGridView, this.DataSource, this.undoRedoHandler, comparer);
-            this.TableScript = new GridTableScript<C, T>(this);
+            this.TableScript = new GridTableScript<C, T>(this, jsErrorHandlingThread);
 
             this.columnInfoList = new List<ColumnInfo>();
             this.cellPainterList = new List<IGridCellPainter>();
@@ -321,8 +322,8 @@ namespace TiaXmlReader.Generation.GridHandler
             };
             #endregion
 
-            excelDragHandler.Init();
-            sortHandler.Init();
+            this.excelDragHandler.Init();
+            this.sortHandler.Init();
 
             this.dataGridView.ResumeLayout();
         }

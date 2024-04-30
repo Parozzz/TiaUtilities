@@ -26,14 +26,16 @@ namespace TiaXmlReader.Utility
             return new List<T>(new T[] { data });
         }
 
-        public static void ShowExceptionMessage(Exception ex)
+        public static void ShowExceptionMessage(Exception ex, bool silent = false)
         {
             string message = "Message => " + ex.Message + "\r\nCause => " + ex.Source + "\r\nStackTrace:\r\n" + ex.StackTrace;
             string caption = "An exception occoured while executing!";
             Console.WriteLine("Exception:\r\n{0}", message);
             LogHandler.INSTANCE.AddException(message);
-            InformationBox.Show(message, caption,  icon: InformationBoxIcon.Warning, order: InformationBoxOrder.TopMost, sound: InformationBoxSound.None);
-            //MessageBox.Show(message, caption);
+            if(silent)
+            {
+                InformationBox.Show(message, caption, icon: InformationBoxIcon.Warning, order: InformationBoxOrder.TopMost, sound: InformationBoxSound.None);
+            }
         }
 
         public static Dictionary<string, object> CreatePublicFieldSnapshot(object obj)

@@ -1,43 +1,27 @@
 ﻿using FastColoredTextBoxNS;
 using System;
+using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
+using TiaXmlReader.Javascript;
 
 namespace TiaXmlReader.Generation.Configuration
 {
     public class ConfigFormJavascriptTextBoxLine : ConfigFormLine
     {
+
+        private readonly JavascriptFCTB jsFCTB;
         private readonly FastColoredTextBox control;
 
         private Action<string> textChangedAction;
 
         public ConfigFormJavascriptTextBoxLine(string labelText, int height = 0) : base(labelText, height)
         {
-            this.control = new FastColoredTextBox();
+            this.jsFCTB = new JavascriptFCTB();
+            jsFCTB.InitControl();
+
+            this.control = jsFCTB.GetFCTB();
             this.control.TextChanged += TextChangedEventHandler;
-            // == BRACKETS ==
-            this.control.AutoCompleteBrackets = true;
-            this.control.AutoCompleteBracketsList = new char[] { '(', ')', '{', '}', '\"', '\"', '\'', '\'' };
-            this.control.BracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
-            this.control.LeftBracket = '(';
-            this.control.RightBracket = ')';
-            this.control.LeftBracket2 = '{';
-            this.control.RightBracket2 = '}';
-            // == INDENTATION ==
-            this.control.AutoIndent = true;
-            this.control.AutoIndentExistingLines = true;
-            this.control.AutoIndentChars = true;
-            this.control.TabLength = 4;
-            // == LINE NUMBERS ==
-            this.control.ShowLineNumbers = true;
-            this.control.LineNumberStartValue = 1;
-
-            this.control.AcceptsTab = true;
-            this.control.AcceptsReturn = true;
-            this.control.ShowFoldingLines = false;
-
-            this.control.Language = Language.JS;
-            this.control.HighlightingRangeType = HighlightingRangeType.AllTextRange;
-            
         }
 
         private void TextChangedEventHandler(object sender, EventArgs args)
@@ -57,6 +41,11 @@ namespace TiaXmlReader.Generation.Configuration
         {
             this.textChangedAction = action;
             return this;
+        }
+
+        public JavascriptFCTB GetJSFCTB()
+        {
+            return jsFCTB;
         }
 
         public override Control GetControl()

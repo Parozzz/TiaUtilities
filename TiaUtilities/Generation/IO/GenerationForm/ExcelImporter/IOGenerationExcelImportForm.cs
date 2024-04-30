@@ -11,6 +11,7 @@ using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Drawing.Charts;
 using TiaXmlReader.Utility;
 using InfoBox;
+using TiaXmlReader.Javascript;
 
 namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
 {
@@ -27,13 +28,13 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
 
         public IEnumerable<IOGenerationExcelImportData> ImportDataEnumerable { get => gridHandler.DataSource.GetNotEmptyDataDict().Keys; }
 
-        public IOGenerationExcelImportForm(IOGenerationExcelImportSettings settings, GridSettings gridSettings)
+        public IOGenerationExcelImportForm(JavascriptScriptErrorReportingThread jsErrorHandlingThread, IOGenerationExcelImportSettings settings, GridSettings gridSettings)
         {
             InitializeComponent();
 
             this.settings = settings;
             this.gridHandler = new GridHandler<IOGenerationExcelImportSettings, IOGenerationExcelImportData>
-                (this.dataGridView, gridSettings, settings, IOGenerationExcelImportData.COLUMN_LIST)
+                (jsErrorHandlingThread, this.dataGridView, gridSettings, settings, IOGenerationExcelImportData.COLUMN_LIST)
             {
                 RowCount = 1999
             };

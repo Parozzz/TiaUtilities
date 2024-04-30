@@ -277,6 +277,8 @@
     <Compile Include="Generation\Alarms\AlarmData.cs" />
     <Compile Include="Generation\Alarms\AlarmConfiguration.cs" />
     <Compile Include="Generation\Alarms\AlarmExcelImporter.cs" />
+    <Compile Include="Javascript\JavascriptScriptErrorReportingThread.cs" />
+    <Compile Include="Javascript\JavascriptFCTB.cs" />
     <Compile Include="Localization\Alarm\AlarmGenerationLocalization.Designer.cs">
       <DependentUpon>AlarmGenerationLocalization.resx</DependentUpon>
       <AutoGen>True</AutoGen>

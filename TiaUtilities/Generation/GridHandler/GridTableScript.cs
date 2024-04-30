@@ -1,4 +1,8 @@
-﻿using Jint;
+﻿using Esprima;
+using FastColoredTextBoxNS;
+using Jint;
+using Jint.Native;
+using Jint.Native.Function;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +10,7 @@ using System.Windows.Forms;
 using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.GenerationForms;
+using TiaXmlReader.Javascript;
 using TiaXmlReader.Utility;
 
 namespace TiaXmlReader.Generation.GridHandler
@@ -13,13 +18,21 @@ namespace TiaXmlReader.Generation.GridHandler
     public class GridTableScript<C, T> where C : IGenerationConfiguration where T : IGridData<C>
     {
         private readonly GridHandler<C, T> gridHandler;
+        private readonly JavascriptScriptErrorReportingThread jsErrorHandlingThread;
+
         private Func<string> readScriptFunc;
         private Action<string> writeScriptAction;
+        private ConfigFormJavascriptTextBoxLine javascriptTextBoxLine;
+
         public bool Valid { get => readScriptFunc != null && writeScriptAction != null; }
 
-        public GridTableScript(GridHandler<C, T> gridHandler)
+        private JavascriptScriptErrorReportingThread.JSScriptReport jsScriptReport;
+
+        public GridTableScript(GridHandler<C, T> gridHandler, JavascriptScriptErrorReportingThread jsErrorThread)
         {
             this.gridHandler = gridHandler;
+            this.jsErrorHandlingThread = jsErrorThread;
+
         }
 
         public GridTableScript<C, T> SetReadScriptFunc(Func<string> getJSTableScriptFunc)
@@ -46,7 +59,24 @@ namespace TiaXmlReader.Generation.GridHandler
             var text = "Variables: " + gridHandler.DataHandler.DataColumns.Select(c => c.ProgrammingFriendlyName + " [" + c.PropertyInfo.PropertyType.Name + "]").Aggregate((a, b) => a + ", " + b);
             configForm.AddLine(text);
 
-            configForm.AddJavascriptTextBoxLine(null, height: 350)
+            configForm.AddButtonPanelLine(null)
+                .AddButton("Format code", () => javascriptTextBoxLine?.GetJSFCTB().GetFCTB().DoAutoIndent())
+                .AddButton("Change Hotkeys", () =>
+                {
+                    var fctb = javascriptTextBoxLine?.GetJSFCTB().GetFCTB();
+                    if(fctb == null)
+                    {
+                        return;
+                    }
+
+                    var hotkeysEditorForm = new HotkeysEditorForm(fctb.HotkeysMapping);
+                    if (hotkeysEditorForm.ShowDialog() == DialogResult.OK)
+                    {
+                        fctb.HotkeysMapping = hotkeysEditorForm.GetHotkeys();
+                    }
+                });
+
+            javascriptTextBoxLine = configForm.AddJavascriptTextBoxLine(null, height: 350)
                 .ControlText(readScriptFunc.Invoke())
                 .TextChanged(writeScriptAction);
 
@@ -60,14 +90,47 @@ namespace TiaXmlReader.Generation.GridHandler
                 })
                 .AddButton("Annulla", () => configForm.Close());
 
-            configForm.StartShowingAtCursor();
+            configForm.Shown += (sender, args) =>
+            {
+                this.jsScriptReport = this.jsErrorHandlingThread.RegisterScript(this.readScriptFunc, UpdateJSErrors);
+            };
+
+            configForm.FormClosed += (sender, args) =>
+            {
+                this.javascriptTextBoxLine = null;
+
+                this.jsErrorHandlingThread.RemoveScript(this.jsScriptReport);
+                this.jsScriptReport = null;
+            };
+
             configForm.Init();
+
+            configForm.StartShowingAtCursor();
             configForm.Show(window);
+        }
+
+        public void UpdateJSErrors()
+        {
+            if (javascriptTextBoxLine == null || jsScriptReport == null)
+            {
+                return;
+            }
+
+            var jsFCTB = javascriptTextBoxLine.GetJSFCTB();
+            if(jsFCTB.HasError())
+            {
+                jsFCTB.ClearErrors();
+            }
+            
+            if(jsScriptReport.JSError != null)
+            {
+                jsFCTB.SetShownError(jsScriptReport.JSError.Line, jsScriptReport.JSError.Description);
+            }
         }
 
         private bool ParseJS()
         {
-            if(!Valid)
+            if (!Valid)
             {
                 return false;
             }
@@ -135,7 +198,7 @@ namespace TiaXmlReader.Generation.GridHandler
             foreach (var dataColumn in gridHandler.DataHandler.DataColumns)
             {
                 var value = dataColumn.GetValueFrom<object>(data);
-                if(value == null)
+                if (value == null)
                 {
                     if (dataColumn.PropertyInfo.PropertyType == typeof(string))
                     {
