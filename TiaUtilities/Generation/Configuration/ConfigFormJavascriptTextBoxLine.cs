@@ -43,7 +43,7 @@ namespace TiaXmlReader.Generation.Configuration
             return this;
         }
 
-        public JavascriptFCTB GetJSFCTB()
+        public JavascriptFCTB GetJavascriptFCTB()
         {
             return jsFCTB;
         }

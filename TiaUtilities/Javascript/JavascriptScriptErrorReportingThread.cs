@@ -1,4 +1,6 @@
 ﻿using Esprima;
+using Esprima.Utils;
+using Jint;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -14,6 +16,7 @@ namespace TiaXmlReader.Javascript
         public class JSError
         {
             public int Line { get; set; }
+            public int Column { get; set; }
             public string Description { get; set; }
         }
 
@@ -125,23 +128,24 @@ namespace TiaXmlReader.Javascript
 
                 try
                 {
-                    var options = new ParserOptions()
+                    var parsingOptions = new ParserOptions()
                     {
-                        AllowReturnOutsideFunction = true,
+                        AllowReturnOutsideFunction = true
                     };
-                    var type = options.GetType();
-                    type.GetProperty(nameof(ParserOptions.Tokens)).SetValue(options, true);
-                    type.GetProperty(nameof(ParserOptions.Tolerant)).SetValue(options, true);
-                    type.GetProperty(nameof(ParserOptions.Comments)).SetValue(options, true);
+                    var type = parsingOptions.GetType();
+                    type.GetProperty(nameof(ParserOptions.Tokens)).SetValue(parsingOptions, true);
+                    type.GetProperty(nameof(ParserOptions.Tolerant)).SetValue(parsingOptions, true);
+                    type.GetProperty(nameof(ParserOptions.Comments)).SetValue(parsingOptions, true);
 
-                    var program = new JavaScriptParser(options).ParseScript(scriptReport.Script);
+                    var program = new JavaScriptParser(parsingOptions).ParseScript(scriptReport.Script, strict: true);
                 }
                 catch (ParserException parseEx)
                 {
                     var error = parseEx.Error;
-                    scriptReport.JSError = new JSError()
+                     scriptReport.JSError = new JSError()
                     {
-                        Line = error.Position.Line - 2, //Not sure why the -2 but it was wrong? Mhh
+                        Line = error.Position.Line,
+                        Column = error.Position.Column,
                         Description = error.Description
                     };
                 }

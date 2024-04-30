@@ -3,20 +3,25 @@ using System;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using TiaXmlReader.Javascript.FCTB;
+using TiaXmlReader.Utility;
 
 namespace TiaXmlReader.Javascript
 {
     public class JavascriptFCTB
     {
         private static readonly Style SAME_WORDS_STYLE = new MarkerStyle(new SolidBrush(Color.FromArgb(65, Color.Green)));
-    private static readonly Style LINE_ERROR_WAVY_STYLE = new WavyLineStyle(255, Color.DarkRed); //new TextStyle(Brushes.Red, null, FontStyle.Italic);
-
+        private static readonly Style LINE_ERROR_WAVY_STYLE = new CustomWavyLineStyle(Color.FromArgb(255, Color.DarkRed), Color.FromArgb(125, Color.MediumVioletRed));
         private static readonly MarkerStyle HIGHLIGHTED_BRACKET_STYLE = new MarkerStyle(new SolidBrush(Color.FromArgb(150, Color.LightGreen)));
+
+        private const int SHOW_ERROR_DELAY_AFTER_TEXT_CHANGED = 1250; //ms
 
         private readonly FastColoredTextBox fctb;
 
-        private int currentErrorLine;
-        private string currentErrorDescription;
+        private JavascriptScriptErrorReportingThread.JSScriptReport scriptReport;
+        private DisplayedError currentError;
+
+        private bool haltError; //This is required to avoid having the wavy style contantly flash on screen. After changing text, give some time before accetting new text!
 
         public JavascriptFCTB()
         {
@@ -31,6 +36,8 @@ namespace TiaXmlReader.Javascript
         public void InitControl()
         {
             // == BRACKETS ==
+            fctb.Language = Language.JS;
+
             fctb.AutoCompleteBrackets = true;
             fctb.AutoCompleteBracketsList = new char[] { '(', ')', '{', '}', '\"', '\"', '\'', '\'' };
             fctb.BracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
@@ -53,124 +60,171 @@ namespace TiaXmlReader.Javascript
             fctb.CaretBlinking = true;
             fctb.ShowCaretWhenInactive = true;
             fctb.WideCaret = false;
-            
+
+            fctb.CharHeight = 16; //Default 14
+            fctb.LineInterval = 4; //Default 0
+
             fctb.AcceptsTab = true;
             fctb.AcceptsReturn = true;
             fctb.ShowFoldingLines = false;
 
-            fctb.Language = Language.JS;
             fctb.HighlightingRangeType = HighlightingRangeType.AllTextRange;
 
             //Highligh same word if something is selected.
             fctb.SelectionChangedDelayed += SelectionChangedDelayed;
 
-            fctb.ToolTip = new ToolTip();
             fctb.ToolTipNeeded += (sender, args) =>
             {
-                if (this.currentErrorLine < 0 || string.IsNullOrEmpty(this.currentErrorDescription) || args.Place.iLine != this.currentErrorLine)
+                if(currentError != null && currentError.Line == args.Place.iLine && args.Place.iChar >= currentError.Column)
+                {
+                    args.ToolTipTitle = "Error";
+                    args.ToolTipText = this.currentError.Description;
+                    args.ToolTipIcon = ToolTipIcon.Error;
+                }
+                else if(args.HoveredWord == "JSON")
+                {
+                    args.ToolTipTitle = "JSON";
+                    args.ToolTipText = "The JSON namespace object contains static methods for parsing values from and converting values to JavaScript Object Notation (JSON).\nhttps://devdocs.io/javascript/global_objects/json";
+                    args.ToolTipIcon = ToolTipIcon.Info;
+                }
+                else
                 {
                     args.ToolTipText = "";
-                    return;
                 }
-
-                args.ToolTipTitle = "Error";
-                args.ToolTipText = this.currentErrorDescription;
-                args.ToolTipIcon = ToolTipIcon.Error;
             };
-            ClearErrors();
+
+
+            var resetHaltErrorTimer = new Timer() { Interval = SHOW_ERROR_DELAY_AFTER_TEXT_CHANGED };
+            resetHaltErrorTimer.Tick += (sender, args) =>
+            {
+                resetHaltErrorTimer.Stop();
+                haltError = false;
+            };
+
+            fctb.TextChanged += (sender, args) =>
+            {
+                this.ClearError();
+                this.haltError = true;
+
+                resetHaltErrorTimer.Stop();
+                resetHaltErrorTimer.Start();
+            };
         }
 
-        public void ClearErrors()
+        public void RegisterErrorReport(JavascriptScriptErrorReportingThread errorReportingThread)
         {
-            this.currentErrorLine = -1;
-            this.currentErrorDescription = "";
-
-            fctb.Range.ClearStyle(LINE_ERROR_WAVY_STYLE);
+            this.scriptReport = errorReportingThread.RegisterScript(() => fctb.Text, this.ScriptReportDone);
         }
 
-        public void SetShownError(int line, string description)
+        public void UnregisterErrorReport(JavascriptScriptErrorReportingThread errorReportingThread)
         {
-            if (line < 0 || line >= fctb.Lines.Count || line == this.currentErrorLine || description == null || description.Equals(this.currentErrorDescription))
+            if(scriptReport != null)
+            {
+                errorReportingThread.RemoveScript(this.scriptReport);
+                this.scriptReport = null;
+            }
+        }
+
+        private void ScriptReportDone()
+        {
+            if (scriptReport == null || haltError)
             {
                 return;
             }
 
-            this.currentErrorLine = line;
-            this.currentErrorDescription = description;
+            var jsError = this.scriptReport.JSError;
+            if(jsError == null)
+            {
+                if(currentError != null)
+                {
+                    this.ClearError();
+                }
+            }
+            else
+            {
+                var newError = new DisplayedError()
+                {
+                    Line = jsError.Line - 1,
+                    Column = jsError.Column,
+                    Description = jsError.Description,
+                };
 
-            var lineRange = this.fctb.GetLine(line);
+                if(this.AreErrorLimitValid(newError) && Utils.AreValuesDifferent(this.currentError, newError))
+                {
+                    this.ClearError();
+
+                    this.currentError = newError;
+                    UpdateCurrentError();
+                }
+            }
+        }
+
+        private void UpdateCurrentError()
+        {
+            if(this.currentError == null && this.AreErrorLimitValid(currentError))
+            {
+                return;
+            }
+
+            var lineRange = this.fctb.GetLine(this.currentError.Line);
+
+            var start = lineRange.Start;
+            var end = lineRange.End;
+            if (this.currentError.Column >= 0 && this.currentError.Column < lineRange.Length)
+            {
+                lineRange.Start = new Place(this.currentError.Column, this.currentError.Line);
+                lineRange.End = end;
+            }
+
             lineRange.SetStyle(LINE_ERROR_WAVY_STYLE);
         }
 
-        public bool HasError()
+        private void ClearError()
         {
-            return this.currentErrorLine >= 0 || !string.IsNullOrEmpty(this.currentErrorDescription);
+            fctb.Range.ClearStyle(LINE_ERROR_WAVY_STYLE);
+            this.currentError = null;
+        }
+
+        private bool AreErrorLimitValid(DisplayedError currentError)
+        {
+            return currentError.Line >= 0 && currentError.Line < fctb.LinesCount && currentError.Column >= 0 && !string.IsNullOrEmpty(currentError.Description);
         }
 
         private void SelectionChangedDelayed(object sender, EventArgs args)
         {
-            this.fctb.VisibleRange.ClearStyle(SAME_WORDS_STYLE);
-
-            //get fragment around caret
-            string text = this.fctb.Selection.Text;
-            if (text.Length < 2)
+            try
             {
-                return;
-            }
+                this.fctb.VisibleRange.ClearStyle(SAME_WORDS_STYLE);
 
-            //highlight same words
-            var ranges = this.fctb.VisibleRange.GetRanges(text).ToArray();
-            if (ranges.Length > 1)
-            {
-                foreach (var r in ranges)
+                //get fragment around caret
+                string text = this.fctb.Selection.Text;
+                if (text.Length < 2)
                 {
-                    r.SetStyle(SAME_WORDS_STYLE);
+                    return;
                 }
+
+                //highlight same words
+                var ranges = this.fctb.VisibleRange.GetRanges(text).ToArray();
+                if (ranges.Length > 1)
+                {
+                    foreach (var r in ranges)
+                    {
+                        r.SetStyle(SAME_WORDS_STYLE);
+                    }
+                }
+            } catch(Exception ex)
+            {/*
+              analisi di ") {" - Troppe parentesi di chiusura. in corso...
+              */
+                Utils.ShowExceptionMessage(ex);
             }
         }
     }
-}
 
-/*
-
-var autoCompleteItemList = new List<AutocompleteItem>();
-
-var engine = new Engine();
-foreach(var globalPropertyEntry in engine.Global.GetOwnProperties())
-{
-    var jsValue = globalPropertyEntry.Key;
-    var globalPropertyDescriptor = globalPropertyEntry.Value;
-
-    if (globalPropertyDescriptor.Value is Function function)
+    class DisplayedError
     {
-        foreach(var functionPropertyEntry in function.GetOwnProperties())
-        {
-            if(functionPropertyEntry.Key.IsString() && functionPropertyEntry.Key.AsString() == "name")
-            {
-                var functionPropertyDescriptor = functionPropertyEntry.Value;
-                if(functionPropertyDescriptor.Value.IsString())
-                {
-                    var item = new AutocompleteItem(functionPropertyDescriptor.Value.AsString()); //Text in the constructor is needed! Otherwise null exception is thrown.
-                    autoCompleteItemList.Add(item);
-                }
-
-            }
-            var ___ = "";
-        }
-        var __ = "";
+        public int Line { get; set; }
+        public int Column { get; set; }
+        public string Description { get; set; }
     }
-
-    var _ = "";
 }
-
-var item = new AutocompleteItem("wow") //Text in the constructor is needed! Otherwise null exception is thrown.
-{
-    MenuText = "wow",
-    ToolTipTitle = "Desc",
-    ToolTipText = "wowowowowow",
-};
-
-var m = new AutocompleteMenu(fctb);
-m.Items.SetAutocompleteItems(autoCompleteItemList);
-m.Show(true);
-*/
