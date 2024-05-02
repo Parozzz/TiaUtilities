@@ -10,23 +10,20 @@ using System.Text;
 using System.Threading.Tasks;
 using TiaXmlReader.AutoSave;
 using TiaXmlReader.GenerationForms;
+using TiaXmlReader.Localization;
 
 namespace TiaXmlReader.Generation.IO
 {
-    public enum IOMemoryTypeEnum
-    {
-        [Display(Description = "MEMORY_TYPE_DB", ResourceType = typeof(Localization.IO.IOGenerationLocalization))]
-        DB = 0, //DEFAULT
-        [Display(Description = "MEMORY_TYPE_MERKER", ResourceType = typeof(Localization.IO.IOGenerationLocalization))]
-        MERKER
-    }
-
     public enum IOGroupingTypeEnum
     {
-        [Display(Description = "GROUPING_TYPE_BIT", ResourceType = typeof(Localization.IO.IOGenerationLocalization))]
-        PER_BIT,
-        [Display(Description = "GROUPING_TYPE_BYTE", ResourceType = typeof(Localization.IO.IOGenerationLocalization))]
-        PER_BYTE
+        [Localization("IO_CONFIG_GROUPING_BIT")] PER_BIT,
+        [Localization("IO_CONFIG_GROUPING_BYTE")] PER_BYTE
+    }
+
+    public enum IOMemoryTypeEnum
+    {
+        [Localization("IO_CONFIG_MEMORY_DB")] DB = 0, //DEFAULT
+        [Localization("IO_CONFIG_MEMORY_MERKER")] MERKER
     }
 
     public class IOConfiguration : IGenerationConfiguration, ISettingsAutoSave

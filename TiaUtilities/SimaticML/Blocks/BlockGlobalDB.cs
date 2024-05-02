@@ -44,8 +44,8 @@ namespace TiaXmlReader.SimaticML.Blocks
 
         public void Init()
         {
-            this.ComputeBlockTitle().SetText(SystemVariables.CULTURE, "");
-            this.ComputeBlockComment().SetText(SystemVariables.CULTURE, "");
+            this.ComputeBlockTitle().SetText(LocalizationVariables.CULTURE, "");
+            this.ComputeBlockComment().SetText(LocalizationVariables.CULTURE, "");
 
             blockAttributeList.ComputeSection(SectionTypeEnum.STATIC);
 

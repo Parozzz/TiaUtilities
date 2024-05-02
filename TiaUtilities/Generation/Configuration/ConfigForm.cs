@@ -48,44 +48,37 @@ namespace TiaXmlReader.Generation.Configuration
 
         public ConfigFormLine AddLine(string labelText, int height = 0)
         {
-            var line = new ConfigFormLine(labelText, height);
-            return this.AddConfigLine(line);
+            return this.AddConfigLine(new ConfigFormLine(labelText, height));
         }
 
         public ConfigFormButtonPanelLine AddButtonPanelLine(string labelText, int height = 0)
         {
-            var line = new ConfigFormButtonPanelLine(labelText, height);
-            return this.AddConfigLine(line);
+            return this.AddConfigLine(new ConfigFormButtonPanelLine(labelText, height));
         }
 
         public ConfigFormTextBoxLine AddTextBoxLine(string labelText, int height = 0)
         {
-            var line = new ConfigFormTextBoxLine(labelText, height);
-            return this.AddConfigLine(line);
+            return this.AddConfigLine(new ConfigFormTextBoxLine(labelText, height));
         }
 
         public ConfigFormJavascriptTextBoxLine AddJavascriptTextBoxLine(string labelText, int height = 0)
         {
-            var line = new ConfigFormJavascriptTextBoxLine(labelText, height);
-            return this.AddConfigLine(line);
+            return this.AddConfigLine(new ConfigFormJavascriptTextBoxLine(labelText, height));
         }
 
         public ConfigFormCheckBoxLine AddCheckBoxLine(string labelText, int height = 0)
         {
-            var line = new ConfigFormCheckBoxLine(labelText, height);
-            return this.AddConfigLine(line);
+            return this.AddConfigLine(new ConfigFormCheckBoxLine(labelText, height));
         }
 
         public ConfigFormComboBoxLine AddComboBoxLine(string labelText, int height = 0)
         {
-            var line = new ConfigFormComboBoxLine(labelText, height);
-            return this.AddConfigLine(line);
+            return this.AddConfigLine(new ConfigFormComboBoxLine(labelText, height));
         }
 
         public ConfigFormColorPickerButtonLine AddColorPickerLine(string labelText, int height = 0)
         {
-            var line = new ConfigFormColorPickerButtonLine(labelText, height);
-            return this.AddConfigLine(line);
+            return this.AddConfigLine(new ConfigFormColorPickerButtonLine(labelText, height));
         }
 
         public L AddConfigLine<L>(L line) where L : ConfigFormLine

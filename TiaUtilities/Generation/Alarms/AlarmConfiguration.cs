@@ -3,24 +3,20 @@ using System.ComponentModel.DataAnnotations;
 using TiaXmlReader.GenerationForms;
 using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.AutoSave;
+using TiaXmlReader.Localization;
 
 namespace TiaXmlReader.Generation.Alarms
 {
+    public enum AlarmGroupingType
+    {
+        [Localization("ALARM_CONFIG_GROUPING_GROUP")] GROUP,
+        [Localization("ALARM_CONFIG_GROUPING_ONE")] ONE
+    }
 
     public enum AlarmPartitionType
     {
-        [Display(Description = "PARITITION_TYPE_ALARM_TYPE", ResourceType = typeof(Localization.Alarm.AlarmGenerationLocalization))]
-        ALARM_TYPE,
-        [Display(Description = "PARITITION_TYPE_DEVICE", ResourceType = typeof(Localization.Alarm.AlarmGenerationLocalization))]
-        DEVICE
-    }
-
-    public enum AlarmGroupingType
-    {
-        [Display(Description = "GROUPING_TYPE_GROUP", ResourceType = typeof(Localization.Alarm.AlarmGenerationLocalization))]
-        GROUP,
-        [Display(Description = "GROUPING_TYPE_ONE", ResourceType = typeof(Localization.Alarm.AlarmGenerationLocalization))]
-        ONE
+        [Localization("ALARM_CONFIG_PARTITION_ALARM_TYPE")] ALARM_TYPE,
+        [Localization("ALARM_CONFIG_PARTITION_DEVICE")] DEVICE
     }
 
     public class AlarmConfiguration : IGenerationConfiguration, ISettingsAutoSave

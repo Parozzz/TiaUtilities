@@ -8,8 +8,10 @@ using System.Threading.Tasks;
 
 namespace TiaXmlReader.Utility
 {
-    public static class SystemVariables
+    public static class LocalizationVariables
     {
+        public const string DEFAULT_LANG = "it-IT";
+
         public static string LANG
         {
             get => _lang;
@@ -27,7 +29,7 @@ namespace TiaXmlReader.Utility
 
         public static void INIT()
         {
-            LANG = "it-IT";
+            LANG = DEFAULT_LANG;
         }
     }
 }

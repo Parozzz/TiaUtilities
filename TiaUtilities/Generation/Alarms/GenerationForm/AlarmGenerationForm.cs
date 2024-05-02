@@ -109,7 +109,7 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             var partitionTypeItems = new List<object>();
             foreach (AlarmPartitionType partitionType in Enum.GetValues(typeof(AlarmPartitionType)))
             {
-                partitionTypeItems.Add(new { Text = partitionType.GetEnumDescription(), Value = partitionType });
+                partitionTypeItems.Add(new { Text = partitionType.GetTranslation(), Value = partitionType });
             }
             this.partitionTypeComboBox.DataSource = partitionTypeItems;
             #endregion
@@ -121,7 +121,7 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             var gropingTypeItems = new List<object>();
             foreach (AlarmGroupingType groupingType in Enum.GetValues(typeof(AlarmGroupingType)))
             {
-                gropingTypeItems.Add(new { Text = groupingType.GetEnumDescription(), Value = groupingType });
+                gropingTypeItems.Add(new { Text = groupingType.GetTranslation(), Value = groupingType });
             }
             this.groupingTypeComboBox.DataSource = gropingTypeItems;
             #endregion

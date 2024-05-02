@@ -60,11 +60,12 @@ namespace TiaXmlReader
                 try
                 {
                     var culture = CultureInfo.GetCultureInfo(this.languageComboBox.Text);
-                    SystemVariables.LANG = programSettings.ietfLanguage = culture.IetfLanguageTag;
+                    LocalizationVariables.LANG = programSettings.ietfLanguage = culture.IetfLanguageTag;
                 }
-                catch (CultureNotFoundException)
+                catch (CultureNotFoundException ex)
                 {
                     this.languageComboBox.SelectedItem = this.languageComboBox.Items[0];
+                    Utils.ShowExceptionMessage(ex);
                 }
             };
             this.languageComboBox.Text = programSettings.ietfLanguage; //Call this after so the text changed event changes the system lang.

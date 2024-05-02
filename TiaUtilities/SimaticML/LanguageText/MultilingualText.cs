@@ -89,7 +89,7 @@ namespace TiaXmlReader.SimaticML.LanguageText
 
         public MultilingualTextItem GetByDefaultLocale()
         {
-            return GetByLocale(SystemVariables.CULTURE);
+            return GetByLocale(LocalizationVariables.CULTURE);
         }
 
         public MultilingualTextItem GetByLocale(CultureInfo culture)
@@ -157,7 +157,7 @@ namespace TiaXmlReader.SimaticML.LanguageText
             //==== INIT CONFIGURATION ====
         }
 
-        public MultilingualTextItem() : this(SystemVariables.CULTURE, "")
+        public MultilingualTextItem() : this(LocalizationVariables.CULTURE, "")
         {
 
         }

@@ -14,14 +14,15 @@ namespace TiaXmlReader.Generation.GridHandler.Data
         public static GridDataColumn GetFromReflection(Type type, int columnIndex, string propertyName, string programmingFriendlyName = null)
         {
             var propertyInfo = type.GetProperty(propertyName) ?? throw new Exception("Invalid property name while creating GridDataColumn from reflection from type " + type.FullName);
-            return new GridDataColumn()
+            var dataColumn = new GridDataColumn()
             {
-                Name = LocalizationHelper.GetDescription(propertyInfo),
+                Name = propertyInfo.GetTranslation(),
                 DataPropertyName = propertyInfo.Name,
                 ColumnIndex = columnIndex,
                 PropertyInfo = propertyInfo,
-                ProgrammingFriendlyName = programmingFriendlyName == null ? propertyInfo.Name.ToLower() : programmingFriendlyName,
+                ProgrammingFriendlyName = programmingFriendlyName ?? propertyInfo.Name.ToLower(),
             };
+            return dataColumn;
         }
 
         public static List<GridDataColumn> GetStaticColumnList(Type type)

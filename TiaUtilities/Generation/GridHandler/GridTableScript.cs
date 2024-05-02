@@ -59,11 +59,12 @@ namespace TiaXmlReader.Generation.GridHandler
             configForm.AddLine(text);
 
             configForm.AddButtonPanelLine(null)
-                .AddButton("Format code", () => this.javascriptTextBoxLine?.GetJavascriptFCTB().GetFCTB().DoAutoIndent())
-                .AddButton("Change Hotkeys", () =>
+                .AddButton("AutoFormattazione", () => this.javascriptTextBoxLine?.GetJavascriptFCTB().GetFCTB().DoAutoIndent())
+                .AddButton("Esegui Script", () => this.ParseJS());
+                /*.AddButton("Change Hotkeys", () =>
                 {
                     var fctb = javascriptTextBoxLine?.GetJavascriptFCTB().GetFCTB();
-                    if(fctb == null)
+                    if (fctb == null)
                     {
                         return;
                     }
@@ -73,21 +74,11 @@ namespace TiaXmlReader.Generation.GridHandler
                     {
                         fctb.HotkeysMapping = hotkeysEditorForm.GetHotkeys();
                     }
-                });
+                });*/
 
             this.javascriptTextBoxLine = configForm.AddJavascriptTextBoxLine(null, height: 350)
                 .ControlText(readScriptFunc.Invoke())
                 .TextChanged(writeScriptAction);
-
-            configForm.AddButtonPanelLine(null)
-                .AddButton("Conferma", () =>
-                {
-                    if (this.ParseJS())
-                    {
-                        configForm.Close();
-                    }
-                })
-                .AddButton("Annulla", () => configForm.Close());
 
             configForm.Shown += (sender, args) =>
             {
@@ -122,17 +113,16 @@ namespace TiaXmlReader.Generation.GridHandler
             {
                 var scriptTimer = new ScriptTimer();
 
-                var preparedScript = Engine.PrepareScript(tableScript);
+                var preparedScript = Engine.PrepareScript(tableScript, strict: true);
                 using (var engine = new Engine(options =>
                 {
                     options.LimitMemory(20_000_000); // Limit memory allocations to MB
-                    options.TimeoutInterval(TimeSpan.FromMilliseconds(500)); // Set a timeout to 4 seconds.
-                    options.MaxStatements(int.MaxValue); // Set limit of 1000 executed statements.
+                    options.TimeoutInterval(TimeSpan.FromMilliseconds(500)); // Set a timeout to 500 ms.
+                    options.MaxStatements(int.MaxValue);
                     options.LimitRecursion(1);
+                    options.Strict = true;
                 }))
                 {
-                    ExecuteJS(engine, preparedScript, gridHandler.DataHandler.CreateInstance()); //Execute on empty just to execute it once in case the data is empty.
-
                     var changedDataDict = new Dictionary<int, T>();
                     foreach (var entry in gridHandler.DataSource.GetNotEmptyDataDict())
                     {
@@ -176,20 +166,16 @@ namespace TiaXmlReader.Generation.GridHandler
             foreach (var dataColumn in gridHandler.DataHandler.DataColumns)
             {
                 var value = dataColumn.GetValueFrom<object>(data);
-                if (value == null)
+                if (value == null && dataColumn.PropertyInfo.PropertyType == typeof(string))
                 {
-                    if (dataColumn.PropertyInfo.PropertyType == typeof(string))
-                    {
-                        value = "";
-                    }
+                    value = "";
                 }
 
-                var jsVariable = new GridJSVariable()
+                dataValuesDict.Add(dataColumn.ProgrammingFriendlyName, new GridJSVariable()
                 {
                     OldValue = value,
                     Column = dataColumn
-                };
-                dataValuesDict.Add(dataColumn.ProgrammingFriendlyName, jsVariable);
+                });
             }
 
             foreach (var entry in dataValuesDict)
@@ -199,8 +185,6 @@ namespace TiaXmlReader.Generation.GridHandler
             }
 
             var eval = engine.Evaluate(script);
-            var _ = engine.Advanced.StackTrace;
-
             if (eval.IsBoolean() && !eval.AsBoolean())
             {
                 return default;
@@ -211,23 +195,24 @@ namespace TiaXmlReader.Generation.GridHandler
             {
                 var ioJSVariable = entry.Value;
 
-                var jsValue = engine.GetValue(entry.Key);
-                ioJSVariable.NewValue = (jsValue != null && jsValue.IsString()) ? jsValue.AsString() : ioJSVariable.OldValue;
+                var jsValue = engine.GetValue(entry.Key); //This will not return null! It will throw an exception instead.
+                ioJSVariable.NewValue = jsValue.IsString() ? jsValue.AsString() : ioJSVariable.OldValue;
 
                 changed |= Utils.AreValuesDifferent(ioJSVariable.OldValue, ioJSVariable.NewValue);
+                //I do not break the loop here because i want the NewValue property of all values to be compiled;
             }
 
-            if (changed)
+            if (!changed)
             {
-                var newData = gridHandler.DataHandler.CreateInstance();
-                foreach (var ioJSVariable in dataValuesDict.Values)
-                {
-                    ioJSVariable.Column.SetValueTo(newData, ioJSVariable.NewValue);
-                }
-                return newData;
+                return default;
             }
 
-            return default;
+            var newData = gridHandler.DataHandler.CreateInstance();
+            foreach (var ioJSVariable in dataValuesDict.Values)
+            {
+                ioJSVariable.Column.SetValueTo(newData, ioJSVariable.NewValue);
+            }
+            return newData;
         }
 
         private class GridJSVariable

@@ -11,6 +11,7 @@ using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter;
 using TiaXmlReader.AutoSave;
 using TiaXmlReader.Javascript;
+using TiaXmlReader.Generation.GridHandler.CustomColumns;
 
 namespace TiaXmlReader.Generation.IO.GenerationForm
 {
@@ -22,6 +23,8 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
         private readonly GridSettings gridSettings;
         private readonly GridHandler<IOConfiguration, IOData> gridHandler;
         private readonly IOGenerationFormConfigHandler configHandler;
+
+        private readonly SuggestionTextBoxColumn variableAddressColumn;
 
         private IOGenerationExcelImportSettings ExcelImportConfig { get => settings.ExcelImportConfiguration; }
         private IOConfiguration IOConfig { get => settings.IOConfiguration; }
@@ -44,6 +47,9 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             };
 
             this.configHandler = new IOGenerationFormConfigHandler(this, this.IOConfig, this.gridHandler);
+
+            this.variableAddressColumn = new SuggestionTextBoxColumn(() => new string[] { "Abbe", "Ce", "Dario" });
+
             Init();
         }
 
@@ -133,7 +139,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             var memoryTypeItems = new List<object>();
             foreach (IOMemoryTypeEnum memoryType in Enum.GetValues(typeof(IOMemoryTypeEnum)))
             {
-                memoryTypeItems.Add(new { Text = memoryType.GetEnumDescription(), Value = memoryType });
+                memoryTypeItems.Add(new { Text = memoryType.GetTranslation(), Value = memoryType });
             }
             this.memoryTypeComboBox.DataSource = memoryTypeItems;
 
@@ -147,7 +153,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             var gropingTypeItems = new List<object>();
             foreach (IOGroupingTypeEnum groupingType in Enum.GetValues(typeof(IOGroupingTypeEnum)))
             {
-                gropingTypeItems.Add(new { Text = groupingType.GetEnumDescription(), Value = groupingType });
+                gropingTypeItems.Add(new { Text = groupingType.GetTranslation(), Value = groupingType });
             }
             this.groupingTypeComboBox.DataSource = gropingTypeItems;
             #endregion
@@ -162,8 +168,9 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             addressColumn.MaxInputLength = 10;
 
             this.gridHandler.AddTextBoxColumn(IOData.IO_NAME, 110);
-            this.gridHandler.AddTextBoxColumn(IOData.DB_NAME, 110);
+            this.gridHandler.AddTextBoxColumn(IOData.DB_NAME, 120);
             this.gridHandler.AddTextBoxColumn(IOData.VARIABLE, 140);
+            this.gridHandler.AddCustomColumn(this.variableAddressColumn, IOData.VARIABLE_ADDRESS, 65);
             this.gridHandler.AddTextBoxColumn(IOData.COMMENT, 0);
             #endregion
 
@@ -228,23 +235,30 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
         }
         private void UpdateConfigPanel()
         {
-            configButtonPanel.SuspendLayout();
+            this.configButtonPanel.SuspendLayout();
+            //this.dataGridView.SuspendLayout();
 
-            configButtonPanel.Controls.Clear();
+            this.configButtonPanel.Controls.Clear();
 
-            configButtonPanel.Controls.Add(fcConfigButton);
+            this.configButtonPanel.Controls.Add(fcConfigButton);
+
+            this.gridHandler.RemoveColumn(IOData.VARIABLE_ADDRESS);
             if (IOMemoryTypeEnum.DB.Equals(memoryTypeComboBox.SelectedValue))
             {
-                configButtonPanel.Controls.Add(dbConfigButton);
+                this.configButtonPanel.Controls.Add(dbConfigButton);
             }
             else if (IOMemoryTypeEnum.MERKER.Equals(memoryTypeComboBox.SelectedValue))
             {
-                configButtonPanel.Controls.Add(variableTableConfigButton);
+                this.configButtonPanel.Controls.Add(variableTableConfigButton);
+                this.gridHandler.AddCustomColumn(this.variableAddressColumn, IOData.VARIABLE_ADDRESS, 65);
             }
-            configButtonPanel.Controls.Add(ioTableConfigButton);
-            configButtonPanel.Controls.Add(segmentNameConfigButton);
+            this.configButtonPanel.Controls.Add(ioTableConfigButton);
+            this.configButtonPanel.Controls.Add(segmentNameConfigButton);
 
-            configButtonPanel.ResumeLayout();
+            this.gridHandler.InitColumns();
+
+            this.configButtonPanel.ResumeLayout();
+            //this.dataGridView.ResumeLayout();
         }
     }
 }

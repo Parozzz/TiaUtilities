@@ -82,7 +82,7 @@ namespace TiaXmlReader.Generation.IO
                 var ioTag = ioTagTable.AddTag()
                     .SetBoolean(ioData.GetMemoryArea(), ioData.GetAddressByte(), ioData.GetAddressBit())
                     .SetTagName(FixDuplicateAddress(ioData.IOName, ioAddressDict))
-                    .SetCommentText(SystemVariables.CULTURE, ioData.Comment);
+                    .SetCommentText(LocalizationVariables.CULTURE, ioData.Comment);
 
                 string inOutAddress = null;
                 if (!string.IsNullOrEmpty(ioData.DBName) && !string.IsNullOrEmpty(ioData.Variable))
@@ -107,7 +107,7 @@ namespace TiaXmlReader.Generation.IO
                             inOutAddress = variableTagTable.AddTag()
                                             .SetTagName(fullTagAddress)
                                             .SetBoolean(SimaticMemoryArea.MERKER, merkerByte, merkerBit)
-                                            .SetCommentText(SystemVariables.CULTURE, ioData.Comment)
+                                            .SetCommentText(LocalizationVariables.CULTURE, ioData.Comment)
                                             .GetTagName();
                             if (merkerBit++ >= 8)
                             {
@@ -127,7 +127,7 @@ namespace TiaXmlReader.Generation.IO
                             var fullMemberAddress = FixDuplicateAddress(memberAddressPrefix + ioData.Variable, variableAddressDict);
                             inOutAddress = db.GetAttributes().ComputeSection(SectionTypeEnum.STATIC)
                                     .AddMembersFromAddress(fullMemberAddress, SimaticDataType.BOOLEAN)
-                                    .SetCommentText(SystemVariables.CULTURE, ioData.Comment)
+                                    .SetCommentText(LocalizationVariables.CULTURE, ioData.Comment)
                                     .GetCompleteSymbol();
                             break;
                     }
@@ -137,7 +137,7 @@ namespace TiaXmlReader.Generation.IO
                 {
                     compileUnit = fc.AddCompileUnit();
                     compileUnit.Init();
-                    compileUnit.ComputeBlockTitle().SetText(SystemVariables.CULTURE, placeholders.Parse(config.SegmentNameBitGrouping));
+                    compileUnit.ComputeBlockTitle().SetText(LocalizationVariables.CULTURE, placeholders.Parse(config.SegmentNameBitGrouping));
                 }
                 else if (config.GroupingType == IOGroupingTypeEnum.PER_BYTE && (ioData.GetAddressByte() != lastByteAddress || ioData.GetMemoryArea() != lastMemoryArea || compileUnit == null))
                 {
@@ -146,7 +146,7 @@ namespace TiaXmlReader.Generation.IO
 
                     compileUnit = fc.AddCompileUnit();
                     compileUnit.Init();
-                    compileUnit.ComputeBlockTitle().SetText(SystemVariables.CULTURE, placeholders.Parse(config.SegmentNameByteGrouping));
+                    compileUnit.ComputeBlockTitle().SetText(LocalizationVariables.CULTURE, placeholders.Parse(config.SegmentNameByteGrouping));
                 }
 
                 switch (ioData.GetMemoryArea())

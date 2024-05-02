@@ -32,7 +32,7 @@ namespace TiaXmlReader.Utility
             string caption = "An exception occoured while executing!";
             Console.WriteLine("Exception:\r\n{0}", message);
             LogHandler.INSTANCE.AddException(message);
-            if(silent)
+            if(!silent)
             {
                 InformationBox.Show(message, caption, icon: InformationBoxIcon.Warning, order: InformationBoxOrder.TopMost, sound: InformationBoxSound.None);
             }

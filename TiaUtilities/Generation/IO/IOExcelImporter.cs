@@ -35,14 +35,14 @@ namespace TiaXmlReader.Generation.IO
             config.FCBlockName = worksheet.Cell("C5").Value.ToString();
             config.FCBlockNumber = (uint)worksheet.Cell("C6").Value.GetNumber();
 
-            if(!LocalizationHelper.TryGetEnumByDescription(worksheet.Cell("C8").Value.ToString(), out IOMemoryTypeEnum memoryType))
+            if(!LocalizationHelper.TryGetEnumByTranslation(worksheet.Cell("C8").Value.ToString(), out IOMemoryTypeEnum memoryType))
             {
                 MessageBox.Show("Memory type is invalid.", "Invalid configuration", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             config.MemoryType = memoryType;
 
-            if (!LocalizationHelper.TryGetEnumByDescription(worksheet.Cell("C9").Value.ToString(), out IOGroupingTypeEnum groupingType))
+            if (!LocalizationHelper.TryGetEnumByTranslation(worksheet.Cell("C9").Value.ToString(), out IOGroupingTypeEnum groupingType))
             {
                 MessageBox.Show("Groping type is invalid.", "Invalid configuration", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;

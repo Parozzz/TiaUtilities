@@ -1,7 +1,11 @@
 ﻿using FastColoredTextBoxNS;
+using Jint;
+using Jint.Native;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using TiaXmlReader.Javascript.FCTB;
 using TiaXmlReader.Utility;
@@ -35,6 +39,7 @@ namespace TiaXmlReader.Javascript
 
         public void InitControl()
         {
+            #region FCTB_SETUP
             // == BRACKETS ==
             fctb.Language = Language.JS;
 
@@ -69,6 +74,7 @@ namespace TiaXmlReader.Javascript
             fctb.ShowFoldingLines = false;
 
             fctb.HighlightingRangeType = HighlightingRangeType.AllTextRange;
+            #endregion
 
             //Highligh same word if something is selected.
             fctb.SelectionChangedDelayed += SelectionChangedDelayed;
@@ -93,7 +99,6 @@ namespace TiaXmlReader.Javascript
                 }
             };
 
-
             var resetHaltErrorTimer = new Timer() { Interval = SHOW_ERROR_DELAY_AFTER_TEXT_CHANGED };
             resetHaltErrorTimer.Tick += (sender, args) =>
             {
@@ -106,7 +111,7 @@ namespace TiaXmlReader.Javascript
                 this.ClearError();
                 this.haltError = true;
 
-                resetHaltErrorTimer.Stop();
+                resetHaltErrorTimer.Stop(); //This reset the timer.
                 resetHaltErrorTimer.Start();
             };
         }
@@ -144,7 +149,7 @@ namespace TiaXmlReader.Javascript
             {
                 var newError = new DisplayedError()
                 {
-                    Line = jsError.Line - 1,
+                    Line = jsError.Line - 1, //Lines in FCTB start from 0!
                     Column = jsError.Column,
                     Description = jsError.Description,
                 };
@@ -204,7 +209,7 @@ namespace TiaXmlReader.Javascript
                 }
 
                 //highlight same words
-                var ranges = this.fctb.VisibleRange.GetRanges(text).ToArray();
+                var ranges = this.fctb.VisibleRange.GetRanges(Regex.Escape(text)).ToArray();
                 if (ranges.Length > 1)
                 {
                     foreach (var r in ranges)
@@ -213,9 +218,7 @@ namespace TiaXmlReader.Javascript
                     }
                 }
             } catch(Exception ex)
-            {/*
-              analisi di ") {" - Troppe parentesi di chiusura. in corso...
-              */
+            {
                 Utils.ShowExceptionMessage(ex);
             }
         }

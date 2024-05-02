@@ -70,7 +70,7 @@ namespace TiaXmlReader.Generation.Alarms
                             {
                                 compileUnit = fc.AddCompileUnit();
                                 compileUnit.Init();
-                                compileUnit.ComputeBlockTitle().SetText(SystemVariables.CULTURE, placeholders.Parse(config.OneEachSegmentName));
+                                compileUnit.ComputeBlockTitle().SetText(LocalizationVariables.CULTURE, placeholders.Parse(config.OneEachSegmentName));
                             }
 
                             FillAlarmCompileUnit(compileUnit, placeholders, parsedAlarmData);
@@ -99,7 +99,7 @@ namespace TiaXmlReader.Generation.Alarms
                         if (config.GroupingType == AlarmGroupingType.GROUP)
                         {
                             placeholders.SetStartEndAlarmNum(startAlarmNum, lastAlarmNum, config.AlarmNumFormat);
-                            compileUnit.ComputeBlockTitle().SetText(SystemVariables.CULTURE, placeholders.Parse(config.GroupSegmentName));
+                            compileUnit.ComputeBlockTitle().SetText(LocalizationVariables.CULTURE, placeholders.Parse(config.GroupSegmentName));
                         }
 
                         nextAlarmNum += config.SkipNumberAfterGroup;
@@ -139,7 +139,7 @@ namespace TiaXmlReader.Generation.Alarms
                             {
                                 compileUnit = fc.AddCompileUnit();
                                 compileUnit.Init();
-                                compileUnit.ComputeBlockTitle().SetText(SystemVariables.CULTURE, placeholders.Parse(config.OneEachSegmentName));
+                                compileUnit.ComputeBlockTitle().SetText(LocalizationVariables.CULTURE, placeholders.Parse(config.OneEachSegmentName));
                             }
 
                             FillAlarmCompileUnit(compileUnit, placeholders, parsedAlarmData);
@@ -168,7 +168,7 @@ namespace TiaXmlReader.Generation.Alarms
                         if (config.GroupingType == AlarmGroupingType.GROUP)
                         {
                             placeholders.SetStartEndAlarmNum(startAlarmNum, lastAlarmNum, config.AlarmNumFormat);
-                            compileUnit.ComputeBlockTitle().SetText(SystemVariables.CULTURE, placeholders.Parse(config.GroupSegmentName));
+                            compileUnit.ComputeBlockTitle().SetText(LocalizationVariables.CULTURE, placeholders.Parse(config.GroupSegmentName));
                         }
 
                         nextAlarmNum += config.SkipNumberAfterGroup;
@@ -208,7 +208,7 @@ namespace TiaXmlReader.Generation.Alarms
 
                 compileUnit = fc.AddCompileUnit();
                 compileUnit.Init();
-                compileUnit.ComputeBlockTitle().SetText(SystemVariables.CULTURE, placeholders.Parse(config.GroupEmptyAlarmSegmentName));
+                compileUnit.ComputeBlockTitle().SetText(LocalizationVariables.CULTURE, placeholders.Parse(config.GroupEmptyAlarmSegmentName));
             }
 
             for (int j = 0; j < alarmCount; j++)
@@ -219,7 +219,7 @@ namespace TiaXmlReader.Generation.Alarms
                 {
                     compileUnit = fc.AddCompileUnit();
                     compileUnit.Init();
-                    compileUnit.ComputeBlockTitle().SetText(SystemVariables.CULTURE, placeholders.Parse(config.OneEachEmptyAlarmSegmentName));
+                    compileUnit.ComputeBlockTitle().SetText(LocalizationVariables.CULTURE, placeholders.Parse(config.OneEachEmptyAlarmSegmentName));
                 }
 
                 FillAlarmCompileUnit(compileUnit, placeholders, emptyAlarmData);

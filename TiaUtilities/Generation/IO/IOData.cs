@@ -24,6 +24,7 @@ namespace TiaXmlReader.Generation.IO
         public static readonly GridDataColumn IO_NAME;
         public static readonly GridDataColumn DB_NAME;
         public static readonly GridDataColumn VARIABLE;
+        public static readonly GridDataColumn VARIABLE_ADDRESS;
         public static readonly GridDataColumn COMMENT;
         public static readonly List<GridDataColumn> COLUMN_LIST;
 
@@ -34,31 +35,19 @@ namespace TiaXmlReader.Generation.IO
             IO_NAME = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.IOName), "ioName");
             DB_NAME = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.DBName), "dbName");
             VARIABLE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.Variable));
+            VARIABLE_ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.VariableAddress), "variableAddress");
             COMMENT = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.Comment));
 
             COLUMN_LIST = GridDataColumn.GetStaticColumnList(type);
             COLUMN_LIST.Sort((x, y) => x.ColumnIndex.CompareTo(y.ColumnIndex));
         }
 
-        [JsonProperty]
-        [Display(Description = "DATA_ADDRESS", ResourceType = typeof(Localization.IO.IOGenerationLocalization))]
-        public string Address { get; set; }
-
-        [JsonProperty]
-        [Display(Description = "DATA_IONAME", ResourceType = typeof(Localization.IO.IOGenerationLocalization))]
-        public string IOName { get; set; }
-
-        [JsonProperty]
-        [Display(Description = "DATA_DBNAME", ResourceType = typeof(Localization.IO.IOGenerationLocalization))]
-        public string DBName { get; set; }
-
-        [JsonProperty]
-        [Display(Description = "DATA_VARIABLE", ResourceType = typeof(Localization.IO.IOGenerationLocalization))]
-        public string Variable { get; set; }
-
-        [JsonProperty]
-        [Display(Description = "DATA_COMMENT", ResourceType = typeof(Localization.IO.IOGenerationLocalization))]
-        public string Comment { get; set; }
+        [JsonProperty][Localization("IO_DATA_ADDRESS")] public string Address { get; set; }
+        [JsonProperty][Localization("IO_DATA_IO_NAME")] public string IOName { get; set; }
+        [JsonProperty][Localization("IO_DATA_DB_NAME")] public string DBName { get; set; }
+        [JsonProperty][Localization("IO_DATA_VARIABLE")] public string Variable { get; set; }
+        [JsonProperty][Localization("IO_DATA_VARIABLE_OFFSET")] public string VariableAddress { get; set; }
+        [JsonProperty][Localization("IO_DATA_COMMENT")] public string Comment { get; set; }
 
         public object this[int i]
         {
@@ -75,7 +64,8 @@ namespace TiaXmlReader.Generation.IO
 
         public GridDataPreview GetPreview(int column, IOConfiguration config)
         {
-            if (string.IsNullOrEmpty(this.Address) || this.IsEmpty() || SimaticTagAddress.FromAddress(this.Address) == null)
+            var addressTag = SimaticTagAddress.FromAddress(this.Address);
+            if (string.IsNullOrEmpty(this.Address) || this.IsEmpty() || addressTag == null)
             {
                 return null;
             }
@@ -121,7 +111,16 @@ namespace TiaXmlReader.Generation.IO
                     Value = this.Variable
                 };
             }
-
+            else if (column == VARIABLE_ADDRESS)
+            {
+                addressTag.MemoryArea = SimaticMemoryArea.MERKER;
+                addressTag.ByteOffset += config.VariableTableStartAddress;
+                return new GridDataPreview()
+                {
+                    DefaultValue = addressTag.ToString(),
+                    Value = this.VariableAddress,
+                };
+            }
 
             return null;
         }
@@ -166,13 +165,13 @@ namespace TiaXmlReader.Generation.IO
         public uint GetAddressBit()
         {
             var tag = GetTagAddress();
-            return tag == null ? 0 : tag.bitOffset;
+            return tag == null ? 0 : tag.BitOffset;
         }
 
         public uint GetAddressByte()
         {
             var tag = GetTagAddress();
-            return tag == null ? 0 : tag.byteOffset;
+            return tag == null ? 0 : tag.ByteOffset;
         }
 
         public SimaticTagAddress GetTagAddress()

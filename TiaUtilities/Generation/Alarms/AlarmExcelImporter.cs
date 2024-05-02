@@ -44,14 +44,14 @@ namespace TiaXmlReader.Generation.Alarms
             config.FCBlockNumber = (uint)worksheet.Cell("C6").Value.GetNumber();
             config.CoilFirst = worksheet.Cell("C7").Value.ToString().ToLower() == "true";
 
-            if (!LocalizationHelper.TryGetEnumByDescription(worksheet.Cell("C9").Value.ToString(), out AlarmPartitionType partitionType))
+            if (!LocalizationHelper.TryGetEnumByTranslation(worksheet.Cell("C9").Value.ToString(), out AlarmPartitionType partitionType))
             {
                 MessageBox.Show("Partition type is invalid.", "Invalid configuration", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             config.PartitionType = partitionType;
 
-            if (!LocalizationHelper.TryGetEnumByDescription(worksheet.Cell("C10").Value.ToString(), out AlarmGroupingType groupingType))
+            if (!LocalizationHelper.TryGetEnumByTranslation(worksheet.Cell("C10").Value.ToString(), out AlarmGroupingType groupingType))
             {
                 MessageBox.Show("Grouping type is invalid.", "Invalid configuration", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;

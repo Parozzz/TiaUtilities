@@ -18,7 +18,7 @@ namespace TiaXmlReader
         [STAThread]
         static void Main()
         {
-            SystemVariables.INIT();
+            LocalizationVariables.INIT();
 
             var _ = typeof(InformationBox); //InformationBox
             _ = typeof(Engine); //Jint

@@ -5,9 +5,6 @@ using TiaXmlReader.SimaticML.Enums;
 
 namespace TiaXmlReader.SimaticML
 {
-
-
-
     public class SimaticAddressComponent
     {
         public string Name;
@@ -101,26 +98,26 @@ namespace TiaXmlReader.SimaticML
 
             return new SimaticTagAddress()
             {
-                memoryArea = memoryArea,
-                length = length,
-                byteOffset = byteOffset,
-                bitOffset = bitOffset,
+                MemoryArea = memoryArea,
+                Length = length,
+                ByteOffset = byteOffset,
+                BitOffset = bitOffset,
             };
         }
 
-        public SimaticMemoryArea memoryArea;
-        public uint length;
-        public uint byteOffset;
-        public uint bitOffset;
+        public SimaticMemoryArea MemoryArea { get; set; }
+        public uint Length { get; private set; }
+        public uint ByteOffset { get; set; }
+        public uint BitOffset { get; set; }
 
         public long GetSortingNumber()
         {
-            return (long)((int)memoryArea * Math.Pow(10, 9) + byteOffset * Math.Pow(10, 3) + bitOffset);
+            return (long)((int)MemoryArea * Math.Pow(10, 9) + ByteOffset * Math.Pow(10, 3) + BitOffset);
         }
 
         public string GetAddress()
         {
-            return memoryArea.GetTIAMnemonic() + SimaticMLUtil.GetLengthIdentifier(length) + byteOffset + (length == 0 ? ("." + bitOffset) : "");
+            return MemoryArea.GetTIAMnemonic() + SimaticMLUtil.GetLengthIdentifier(Length) + ByteOffset + (Length == 0 ? ("." + BitOffset) : "");
         }
 
         public string GetSimaticMLAddress()
@@ -130,8 +127,8 @@ namespace TiaXmlReader.SimaticML
 
         public SimaticTagAddress NextBit(SimaticDataType dataType, uint toAdd = 1)
         {
-            uint nextByteOffset = byteOffset;
-            uint nextBitOffset = bitOffset;
+            uint nextByteOffset = ByteOffset;
+            uint nextBitOffset = BitOffset;
 
             var bitLength = dataType.GetSimaticLength() * 8;
 
@@ -146,15 +143,15 @@ namespace TiaXmlReader.SimaticML
                 nextBitOffset = 0;
             }
 
-            byteOffset = nextByteOffset + byteToAdd;
-            bitOffset = nextBitOffset + bitToAdd;
+            ByteOffset = nextByteOffset + byteToAdd;
+            BitOffset = nextBitOffset + bitToAdd;
             return this;
         }
 
         public SimaticTagAddress PreviousBit(SimaticDataType dataType, uint toRemove = 1)
         {
-            uint nextByteOffset = byteOffset;
-            uint nextBitOffset = bitOffset;
+            uint nextByteOffset = ByteOffset;
+            uint nextBitOffset = BitOffset;
 
             var bitLength = dataType.GetSimaticLength() * 8;
 
@@ -168,8 +165,8 @@ namespace TiaXmlReader.SimaticML
                 nextBitOffset = bitLength - 1;
             }
 
-            byteOffset = nextByteOffset - byteToRemove;
-            bitOffset = nextBitOffset - bitToRemove;
+            ByteOffset = nextByteOffset - byteToRemove;
+            BitOffset = nextBitOffset - bitToRemove;
             return this;
         }
 
@@ -177,10 +174,10 @@ namespace TiaXmlReader.SimaticML
         {
             return new SimaticTagAddress()
             {
-                memoryArea = memoryArea,
-                length = length,
-                byteOffset = newByteOffset,
-                bitOffset = newBitOffset
+                MemoryArea = MemoryArea,
+                Length = Length,
+                ByteOffset = newByteOffset,
+                BitOffset = newBitOffset
             };
         }
 

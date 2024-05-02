@@ -9,6 +9,7 @@ using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.IO;
 using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation.GridHandler.Data;
+using TiaXmlReader.Localization;
 
 namespace TiaXmlReader.Generation.Alarms
 {
@@ -32,17 +33,9 @@ namespace TiaXmlReader.Generation.Alarms
             COLUMN_LIST.Sort((x, y) => x.ColumnIndex.CompareTo(y.ColumnIndex));
         }
 
-        [JsonProperty]
-        [Display(Description = "DEVICE_DATA_NAME", ResourceType = typeof(Localization.Alarm.AlarmGenerationLocalization))]
-        public string Name { get; set; }
-
-        [JsonProperty]
-        [Display(Description = "DEVICE_DATA_ADDRESS", ResourceType = typeof(Localization.Alarm.AlarmGenerationLocalization))]
-        public string Address { get; set; }
-
-        [JsonProperty]
-        [Display(Description = "DEVICE_DATA_DESCRIPTION", ResourceType = typeof(Localization.Alarm.AlarmGenerationLocalization))]
-        public string Description { get; set; }
+        [JsonProperty][Localization("DEVICE_DATA_NAME")] public string Name { get; set; }
+        [JsonProperty][Localization("DEVICE_DATA_ADDRESS")] public string Address { get; set; }
+        [JsonProperty][Localization("DEVICE_DATA_DESCRIPTION")] public string Description { get; set; }
 
         public GridDataPreview GetPreview(int column, AlarmConfiguration config)
         {

@@ -1,0 +1,30 @@
+{
+  //IO GENERATION
+  "IO_DATA_ADDRESS": "Address",
+  "IO_DATA_IO_NAME": "IO Tag > {io_name}",
+  "IO_DATA_DB_NAME": "DB Name > {db_name}",
+  "IO_DATA_VARIABLE": "Variable > {variable_name}",
+  "IO_DATA_VARIABLE_OFFSET": "Variable Offset",
+  "IO_DATA_COMMENT": "Comment > {comment}",
+  "IO_CONFIG_GROUPING_BIT": "GroupEachBit",
+  "IO_CONFIG_GROUPING_BYTE": "GroupEachByte",
+  "IO_CONFIG_MEMORY_DB": "DB",
+  "IO_CONFIG_MEMORY_MERKER": "Merker",
+
+  //ALARM GENERATION
+  "ALARM_DATA_ENABLE": "Abilita",
+  "ALARM_DATA_ALM_VARIABLE": "Variabile allarme",
+  "ALARM_DATA_COIL_ADDRESS": "Indirizzo bobina",
+  "ALARM_DATA_SET_COIL_ADDRESS": "Indirizzo set",
+  "ALARM_DATA_TIMER_ADDRESS": "Indirizzo timer",
+  "ALARM_DATA_TIMER_TYPE": "Tipo timer",
+  "ALARM_DATA_TIMER_VALUE": "Valore timer",
+  "ALARM_DATA_DESCRIPTION": "Descrizione >  {alarm_description}",
+  "DEVICE_DATA_NAME": "Nome > {device_name}",
+  "DEVICE_DATA_ADDRESS": "Indirizzo > {device_address}",
+  "DEVICE_DATA_DESCRIPTION": "Descrizione > {device_description}",
+  "ALARM_CONFIG_GROUPING_GROUP": "GruppoPerSegmento",
+  "ALARM_CONFIG_GROUPING_ONE": "UnoPerSegmento",
+  "ALARM_CONFIG_PARTITION_ALARM_TYPE": "PerTipoAllarme",
+  "ALARM_CONFIG_PARTITION_DEVICE": "PerUtenza"
+}

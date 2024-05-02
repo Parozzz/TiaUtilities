@@ -7,6 +7,7 @@ namespace TiaXmlReader.Generation.Configuration
     {
         private readonly string labelText;
         private readonly int height;
+        private bool labelOnTop = false;
 
         public ConfigFormLine(string labelText, int height = 0) //Height = 0 means use standard value in ConfigForm
         {

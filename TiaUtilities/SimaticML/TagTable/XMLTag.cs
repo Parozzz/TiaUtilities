@@ -44,7 +44,7 @@ namespace TiaXmlReader.SimaticML.TagTable
 
         public void Init()
         {
-            comment.SetText(SystemVariables.CULTURE, "");
+            comment.SetText(LocalizationVariables.CULTURE, "");
         }
 
         public GlobalObjectData GetGlobalObjectData()

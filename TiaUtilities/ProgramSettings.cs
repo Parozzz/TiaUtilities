@@ -28,7 +28,7 @@ namespace TiaXmlReader
 
         [JsonProperty] public TimedSaveHandler.TimeEnum TimedSaveTime = TimedSaveHandler.TimeEnum.MIN_2;
         [JsonProperty] public uint lastTIAVersion = Constants.VERSION;
-        [JsonProperty] public string ietfLanguage = SystemVariables.LANG;
+        [JsonProperty] public string ietfLanguage = LocalizationVariables.LANG;
 
         [JsonProperty] public GridSettings GridSettings { get; set; } = new GridSettings();
         [JsonProperty] public IOGenerationSettings IOSettings { get; set; } = new IOGenerationSettings();

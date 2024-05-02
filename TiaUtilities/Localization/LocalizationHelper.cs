@@ -10,31 +10,34 @@ namespace TiaXmlReader.Localization
 {
     public static class LocalizationHelper
     {
-        public static string GetDescription(this MemberInfo memberInfo)
+        public static string GetTranslation(this MemberInfo memberInfo)
         {
-            var displayAttribute = memberInfo.GetCustomAttribute<DisplayAttribute>();
-            if (displayAttribute == null)
+            var localizationAttribute = memberInfo.GetCustomAttribute<LocalizationAttribute>();
+            if (localizationAttribute == null)
             {
                 return memberInfo.Name;
             }
 
-            return displayAttribute.GetDescription() ?? "unknown";
+            return localizationAttribute.GetTranslation() ?? memberInfo.Name;
         }
 
-        public static string GetEnumDescription(this Enum enumValue)
+        public static string GetTranslation(this Enum enumValue)
         {
-            return enumValue.GetType().GetMember(enumValue.ToString())
-                .FirstOrDefault()?
-                .GetCustomAttribute<DisplayAttribute>()
-                .GetDescription() ?? "unknown";
+            var memberInfo = enumValue.GetType().GetMember(enumValue.ToString()).FirstOrDefault();
+            if(memberInfo == null)
+            {
+                return "unknown";
+            }
+
+            return memberInfo.GetTranslation();
         }
 
-        public static bool TryGetEnumByDescription<T>(string displayString, out T enumValue) where T : Enum
+        public static bool TryGetEnumByTranslation<T>(string displayString, out T enumValue) where T : Enum
         {
-            enumValue = default(T);
+            enumValue = default;
             foreach (T loopEnumValue in Enum.GetValues(typeof(T)))
             {
-                var description = loopEnumValue.GetEnumDescription();
+                var description = loopEnumValue.GetTranslation();
                 if (displayString.ToLower() == description.ToLower())
                 {
                     enumValue = loopEnumValue;

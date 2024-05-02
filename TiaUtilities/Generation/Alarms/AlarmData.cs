@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using TiaXmlReader.Generation.IO;
 using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation.GridHandler.Data;
+using TiaXmlReader.Localization;
 
 namespace TiaXmlReader.Generation.Alarms
 {
@@ -41,37 +42,14 @@ namespace TiaXmlReader.Generation.Alarms
             COLUMN_LIST.Sort((x, y) => x.ColumnIndex.CompareTo(y.ColumnIndex));
         }
 
-        [JsonProperty]
-        [Display(Description = "ALARM_DATA_ENABLE", ResourceType = typeof(Localization.Alarm.AlarmGenerationLocalization))]
-        public bool Enable { get; set; }
-
-        [JsonProperty]
-        [Display(Description = "ALARM_DATA_ALARM_VARIABLE", ResourceType = typeof(Localization.Alarm.AlarmGenerationLocalization))]
-        public string AlarmVariable { get; set; }
-
-        [JsonProperty]
-        [Display(Description = "ALARM_DATA_COIL_ADDRESS", ResourceType = typeof(Localization.Alarm.AlarmGenerationLocalization))]
-        public string CoilAddress { get; set; }
-
-        [JsonProperty]
-        [Display(Description = "ALARM_DATA_SET_COIL_ADDRESS", ResourceType = typeof(Localization.Alarm.AlarmGenerationLocalization))]
-        public string SetCoilAddress { get; set; }
-
-        [JsonProperty]
-        [Display(Description = "ALARM_DATA_TIMER_ADDRESS", ResourceType = typeof(Localization.Alarm.AlarmGenerationLocalization))]
-        public string TimerAddress { get; set; }
-
-        [JsonProperty]
-        [Display(Description = "ALARM_DATA_TIMER_TYPE", ResourceType = typeof(Localization.Alarm.AlarmGenerationLocalization))]
-        public string TimerType { get; set; }
-
-        [JsonProperty]
-        [Display(Description = "ALARM_DATA_TIMER_VALUE", ResourceType = typeof(Localization.Alarm.AlarmGenerationLocalization))]
-        public string TimerValue { get; set; }
-
-        [JsonProperty]
-        [Display(Description = "ALARM_DATA_DESCRIPTION", ResourceType = typeof(Localization.Alarm.AlarmGenerationLocalization))]
-        public string Description { get; set; }
+        [JsonProperty][Localization("ALARM_DATA_ENABLE")] public bool Enable { get; set; }
+        [JsonProperty][Localization("ALARM_DATA_ALM_VARIABLE")] public string AlarmVariable { get; set; }
+        [JsonProperty][Localization("IO_CONFIG_GROUPING_BIT")] public string CoilAddress { get; set; }
+        [JsonProperty][Localization("ALARM_DATA_SET_COIL_ADDRESS")] public string SetCoilAddress { get; set; }
+        [JsonProperty][Localization("ALARM_DATA_TIMER_ADDRESS")] public string TimerAddress { get; set; }
+        [JsonProperty][Localization("ALARM_DATA_TIMER_TYPE")] public string TimerType { get; set; }
+        [JsonProperty][Localization("ALARM_DATA_TIMER_VALUE")] public string TimerValue { get; set; }
+        [JsonProperty][Localization("ALARM_DATA_DESCRIPTION")] public string Description { get; set; }
 
         public object this[int i]
         {
