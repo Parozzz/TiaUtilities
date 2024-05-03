@@ -13,5 +13,5 @@ At the moment, this is what is this project:
 3) AddIn for TIA to import / export blocks to .xml files.
 
 ### Mentions
-FastColoredTextBox (For JS Editor) - https://github.com/PavelTorgashov/FastColoredTextBox
-Jint (For JS parsing) - https://github.com/sebastienros/jint
+- FastColoredTextBox (For JS Editor) - https://github.com/PavelTorgashov/FastColoredTextBox
+- Jint (For JS parsing) - https://github.com/sebastienros/jint
