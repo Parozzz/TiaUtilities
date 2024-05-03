@@ -4,7 +4,7 @@
   "IO_DATA_IO_NAME": "IO Tag > {io_name}",
   "IO_DATA_DB_NAME": "DB Name > {db_name}",
   "IO_DATA_VARIABLE": "Variable > {variable_name}",
-  "IO_DATA_VARIABLE_OFFSET": "Variable Offset",
+  "IO_DATA_MERKER_ADDRESS": "Merker Address",
   "IO_DATA_COMMENT": "Comment > {comment}",
   "IO_CONFIG_GROUPING_BIT": "GroupEachBit",
   "IO_CONFIG_GROUPING_BYTE": "GroupEachByte",

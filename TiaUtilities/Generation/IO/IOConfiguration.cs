@@ -38,7 +38,8 @@ namespace TiaXmlReader.Generation.IO
         [JsonProperty] public uint DBNumber = 196;
 
         [JsonProperty] public string VariableTableName = "VariableTable";
-        [JsonProperty] public uint VariableTableStartAddress = 2890;
+        [JsonProperty] public uint VariableTableInputStartAddress = 100;
+        [JsonProperty] public uint VariableTableOutputStartAddress = 1000;
         [JsonProperty] public uint VariableTableSplitEvery = 250;
 
         [JsonProperty] public string IOTableName = "IOTags";

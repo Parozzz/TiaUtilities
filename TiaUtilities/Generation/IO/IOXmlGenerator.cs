@@ -45,19 +45,16 @@ namespace TiaXmlReader.Generation.IO
             fc.GetBlockAttributes().SetBlockName(config.FCBlockName).SetBlockNumber(config.FCBlockNumber).SetAutoNumber(config.FCBlockNumber > 0);
 
             uint tagCounter = 0;
-            uint variableTagCounter = 0;
+            uint merkerCounter = 0;
 
             var lastByteAddress = -1;
             var lastMemoryArea = SimaticMemoryArea.INPUT;
 
-            uint merkerByte = config.VariableTableStartAddress;
-            uint merkerBit = 0;
-
             var ioAddressDict = new Dictionary<string, uint>();
-            var variableAddressDict = new Dictionary<string, uint>();
+            var duplicatedAddressDict = new Dictionary<string, uint>();
 
             //Order list by ADRESS TYPE - BYTE - BIT 
-            foreach (var ioData in ioDataList.OrderBy(x => ((int)x.GetMemoryArea()) * Math.Pow(10, 9) + x.GetAddressByte() * Math.Pow(10, 3) + x.GetAddressBit()).ToList())
+            foreach (var ioData in ioDataList.OrderBy(x => ((int)x.GetAddressMemoryArea()) * Math.Pow(10, 9) + x.GetAddressByte() * Math.Pow(10, 3) + x.GetAddressBit()).ToList())
             {
                 //If name of variable is \ i will ignore everything and skip to the next
                 if (ioData.Variable == "\\" || ioData.IOName == "\\")
@@ -65,7 +62,7 @@ namespace TiaXmlReader.Generation.IO
                     continue;
                 }
 
-                ioData.LoadDefaults(config);
+                ioData.LoadDefaults(config, out bool ioNameDefault, out bool variableDefault, out bool merkerAddressDefault);
 
                 var placeholders = new GenerationPlaceholders().SetIOData(ioData);
                 ioData.ParsePlaceholders(placeholders);
@@ -80,40 +77,42 @@ namespace TiaXmlReader.Generation.IO
 
                 //Set it with default tag name. In case it has a specific one, it will be overwritten below.
                 var ioTag = ioTagTable.AddTag()
-                    .SetBoolean(ioData.GetMemoryArea(), ioData.GetAddressByte(), ioData.GetAddressBit())
+                    .SetBoolean(ioData.GetAddressMemoryArea(), ioData.GetAddressByte(), ioData.GetAddressBit())
                     .SetTagName(FixDuplicateAddress(ioData.IOName, ioAddressDict))
                     .SetCommentText(LocalizationVariables.CULTURE, ioData.Comment);
 
                 string inOutAddress = null;
-                if (!string.IsNullOrEmpty(ioData.DBName) && !string.IsNullOrEmpty(ioData.Variable))
+                if (!variableDefault)
                 {
-                    inOutAddress = $"{SimaticMLUtil.WrapAddressComponentIfRequired(ioData.DBName)}.{ioData.Variable}";
+                    inOutAddress = $"{ioData.Variable}";
                 }
                 else
                 {
                     switch (config.MemoryType)
                     {
                         case IOMemoryTypeEnum.MERKER:
-                            if (variableTagTable == null || (config.VariableTableSplitEvery > 0 && variableTagCounter % config.VariableTableSplitEvery == 0))
+                            if (variableTagTable == null || (config.VariableTableSplitEvery > 0 && merkerCounter % config.VariableTableSplitEvery == 0))
                             {
                                 variableTagTable = new XMLTagTable();
-                                variableTagTable.SetTagTableName(config.VariableTableName + "_" + variableTagCounter);
+                                variableTagTable.SetTagTableName(config.VariableTableName + "_" + merkerCounter);
                                 variableTagTableList.Add(variableTagTable);
                             }
-                            variableTagCounter++;
+                            merkerCounter++;
 
-                            var tagAddressPrefix = ioData.GetMemoryArea() == SimaticMemoryArea.INPUT ? config.PrefixInputMerker : config.PrefixOutputMerker;
-                            var fullTagAddress = FixDuplicateAddress(tagAddressPrefix + ioData.Variable, variableAddressDict);
+                            var merkerVariablePrefix = ioData.GetAddressMemoryArea() == SimaticMemoryArea.INPUT ? config.PrefixInputMerker : config.PrefixOutputMerker;
+                            var merkerVariableAddress = FixDuplicateAddress(merkerVariablePrefix + ioData.Variable, duplicatedAddressDict);
+
+                            var merkerVariableTag = SimaticTagAddress.FromAddress(ioData.MerkerAddress);
+                            if(merkerVariableAddress == null)
+                            {
+                                throw new Exception("Cannot parse Merker VariableAddress for " + ioData.MerkerAddress);
+                            }
+
                             inOutAddress = variableTagTable.AddTag()
-                                            .SetTagName(fullTagAddress)
-                                            .SetBoolean(SimaticMemoryArea.MERKER, merkerByte, merkerBit)
+                                            .SetTagName(merkerVariableAddress)
+                                            .SetBoolean(SimaticMemoryArea.MERKER, merkerVariableTag.ByteOffset, merkerVariableTag.BitOffset)
                                             .SetCommentText(LocalizationVariables.CULTURE, ioData.Comment)
                                             .GetTagName();
-                            if (merkerBit++ >= 8)
-                            {
-                                merkerByte++;
-                                merkerBit = 0;
-                            }
                             break;
                         case IOMemoryTypeEnum.DB:
                             if (db == null)
@@ -123,10 +122,11 @@ namespace TiaXmlReader.Generation.IO
                                 db.GetAttributes().SetBlockName(config.DBName).SetBlockNumber(config.DBNumber).SetAutoNumber(config.DBNumber > 0);
                             }
 
-                            var memberAddressPrefix = ioData.GetMemoryArea() == SimaticMemoryArea.INPUT ? config.PrefixInputDB : config.PrefixOutputDB;
-                            var fullMemberAddress = FixDuplicateAddress(memberAddressPrefix + ioData.Variable, variableAddressDict);
-                            inOutAddress = db.GetAttributes().ComputeSection(SectionTypeEnum.STATIC)
-                                    .AddMembersFromAddress(fullMemberAddress, SimaticDataType.BOOLEAN)
+                            var dbMemberPrefix = ioData.GetAddressMemoryArea() == SimaticMemoryArea.INPUT ? config.PrefixInputDB : config.PrefixOutputDB;
+                            var dbMemberAddress = FixDuplicateAddress(dbMemberPrefix + ioData.Variable, duplicatedAddressDict);
+
+                            var section = db.GetAttributes().ComputeSection(SectionTypeEnum.STATIC);
+                            inOutAddress = section.AddMembersFromAddress(dbMemberAddress, SimaticDataType.BOOLEAN)
                                     .SetCommentText(LocalizationVariables.CULTURE, ioData.Comment)
                                     .GetCompleteSymbol();
                             break;
@@ -139,17 +139,17 @@ namespace TiaXmlReader.Generation.IO
                     compileUnit.Init();
                     compileUnit.ComputeBlockTitle().SetText(LocalizationVariables.CULTURE, placeholders.Parse(config.SegmentNameBitGrouping));
                 }
-                else if (config.GroupingType == IOGroupingTypeEnum.PER_BYTE && (ioData.GetAddressByte() != lastByteAddress || ioData.GetMemoryArea() != lastMemoryArea || compileUnit == null))
+                else if (config.GroupingType == IOGroupingTypeEnum.PER_BYTE && (ioData.GetAddressByte() != lastByteAddress || ioData.GetAddressMemoryArea() != lastMemoryArea || compileUnit == null))
                 {
                     lastByteAddress = (int)ioData.GetAddressByte();
-                    lastMemoryArea = ioData.GetMemoryArea();
+                    lastMemoryArea = ioData.GetAddressMemoryArea();
 
                     compileUnit = fc.AddCompileUnit();
                     compileUnit.Init();
                     compileUnit.ComputeBlockTitle().SetText(LocalizationVariables.CULTURE, placeholders.Parse(config.SegmentNameByteGrouping));
                 }
 
-                switch (ioData.GetMemoryArea())
+                switch (ioData.GetAddressMemoryArea())
                 {
                     case SimaticMemoryArea.INPUT:
                         FillInOutCompileUnit(compileUnit, ioTag.GetTagName(), inOutAddress);

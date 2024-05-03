@@ -125,10 +125,10 @@ namespace TiaXmlReader.Generation
         }
         public GenerationPlaceholders SetIOData(IOData ioData, IOConfiguration config = null)
         {
-            AddOrReplace("{memory_type}", new StringGenerationPlaceholderData() { Value = ioData.GetMemoryArea().GetTIAMnemonic() });
+            AddOrReplace("{memory_type}", new StringGenerationPlaceholderData() { Value = ioData.GetAddressMemoryArea().GetTIAMnemonic() });
             AddOrReplace("{bit}", new StringGenerationPlaceholderData() { Value = "" + ioData.GetAddressBit() });
             AddOrReplace("{byte}", new StringGenerationPlaceholderData() { Value = "" + ioData.GetAddressByte() });
-            AddOrReplace("{db_name}", new StringGenerationPlaceholderData() { Value = ioData.DBName });
+            //AddOrReplace("{db_name}", new StringGenerationPlaceholderData() { Value = ioData.DBName });
 
             var variable = string.IsNullOrEmpty(ioData.Variable) && config != null ? config.DefaultVariableName : ioData.Variable;
             var ioName = string.IsNullOrEmpty(ioData.IOName) && config != null ? config.DefaultIoName : ioData.IOName;

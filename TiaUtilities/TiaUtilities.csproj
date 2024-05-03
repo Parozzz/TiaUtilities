@@ -227,6 +227,7 @@
     <Compile Include="AutoSave\TimedSaveHandler.cs" />
     <Compile Include="Generation\Configuration\ConfigFormJavascriptTextBoxLine.cs" />
     <Compile Include="Generation\GenerationUtils.cs" />
+    <Compile Include="Generation\GridHandler\CustomColumns\DropDownMenuScrollWheelHandler.cs" />
     <Compile Include="Generation\GridHandler\CustomColumns\IGridCustomColumn.cs" />
     <Compile Include="Generation\GridHandler\CustomColumns\SuggestionTextBoxColumn.cs" />
     <Compile Include="Generation\GridHandler\GridUtils.cs" />

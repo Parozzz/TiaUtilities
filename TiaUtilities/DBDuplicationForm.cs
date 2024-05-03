@@ -7,6 +7,7 @@ using TiaXmlReader.SimaticML.nBlockAttributeList;
 using TiaXmlReader.SimaticML;
 using TiaXmlReader.SimaticML.Blocks;
 using TiaXmlReader.Generation;
+using System;
 
 namespace TiaXmlReader
 {
@@ -49,9 +50,11 @@ namespace TiaXmlReader
 
         private BlockAttributeList LoadAttributeListFromXMLFile()
         {
-            var xmlDocument = new XmlDocument();
-            xmlDocument.Load(dbXMLPathTextBox.Text);
-            var xmlConfiguration = SimaticMLParser.ParseXML(xmlDocument);
+            var xmlConfiguration = SimaticMLParser.ParseFile(dbXMLPathTextBox.Text);
+            if(xmlConfiguration == null)
+            {
+                throw new Exception("Invalid XML File");
+            }
 
             BlockAttributeList attributeList = null;
             if (xmlConfiguration is BlockGlobalDB globlalDB)

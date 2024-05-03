@@ -38,6 +38,7 @@
             this.importExportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportXMLToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importExcelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.importSuggestionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.preferencesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.PlaceholdersLabel = new System.Windows.Forms.Label();
             this.configPanel = new System.Windows.Forms.Panel();
@@ -146,7 +147,8 @@
             // 
             this.importExportToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.exportXMLToolStripMenuItem,
-            this.importExcelToolStripMenuItem});
+            this.importExcelToolStripMenuItem,
+            this.importSuggestionsToolStripMenuItem});
             this.importExportToolStripMenuItem.Name = "importExportToolStripMenuItem";
             this.importExportToolStripMenuItem.Size = new System.Drawing.Size(94, 20);
             this.importExportToolStripMenuItem.Text = "Import/Export";
@@ -154,14 +156,20 @@
             // exportXMLToolStripMenuItem
             // 
             this.exportXMLToolStripMenuItem.Name = "exportXMLToolStripMenuItem";
-            this.exportXMLToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
+            this.exportXMLToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exportXMLToolStripMenuItem.Text = "Export XML";
             // 
             // importExcelToolStripMenuItem
             // 
             this.importExcelToolStripMenuItem.Name = "importExcelToolStripMenuItem";
-            this.importExcelToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
+            this.importExcelToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.importExcelToolStripMenuItem.Text = "Import Excel";
+            // 
+            // importSuggestionsToolStripMenuItem
+            // 
+            this.importSuggestionsToolStripMenuItem.Name = "importSuggestionsToolStripMenuItem";
+            this.importSuggestionsToolStripMenuItem.Size = new System.Drawing.Size(254, 22);
+            this.importSuggestionsToolStripMenuItem.Text = "Import Suggestions From DB/Tags";
             // 
             // preferencesToolStripMenuItem
             // 
@@ -363,5 +371,6 @@
         private System.Windows.Forms.ToolStripMenuItem exportXMLToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem importExcelToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem preferencesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem importSuggestionsToolStripMenuItem;
     }
 }

@@ -5,6 +5,7 @@ using InfoBox;
 using Jint;
 using ClosedXML.Excel;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using TiaXmlReader.Generation.GridHandler.CustomColumns;
 
 namespace TiaXmlReader
 {
@@ -24,6 +25,8 @@ namespace TiaXmlReader
             _ = typeof(Engine); //Jint
             _ = typeof(XLWorkbook); //ClosedXML
             _ = typeof(CommonOpenFileDialog); //WindowsAPICodePack
+
+            DropDownMenuScrollWheelHandler.Enable(true);
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

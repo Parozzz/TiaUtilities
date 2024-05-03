@@ -44,7 +44,7 @@ namespace TiaXmlReader.Generation.Alarms
 
         [JsonProperty][Localization("ALARM_DATA_ENABLE")] public bool Enable { get; set; }
         [JsonProperty][Localization("ALARM_DATA_ALM_VARIABLE")] public string AlarmVariable { get; set; }
-        [JsonProperty][Localization("IO_CONFIG_GROUPING_BIT")] public string CoilAddress { get; set; }
+        [JsonProperty][Localization("ALARM_DATA_COIL_ADDRESS")] public string CoilAddress { get; set; }
         [JsonProperty][Localization("ALARM_DATA_SET_COIL_ADDRESS")] public string SetCoilAddress { get; set; }
         [JsonProperty][Localization("ALARM_DATA_TIMER_ADDRESS")] public string TimerAddress { get; set; }
         [JsonProperty][Localization("ALARM_DATA_TIMER_TYPE")] public string TimerType { get; set; }

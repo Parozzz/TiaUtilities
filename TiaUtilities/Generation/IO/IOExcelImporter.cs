@@ -53,7 +53,7 @@ namespace TiaXmlReader.Generation.IO
             config.DBNumber = (uint)worksheet.Cell("C13").Value.GetNumber();
 
             config.VariableTableName = worksheet.Cell("C16").Value.ToString();
-            config.VariableTableStartAddress = (uint)worksheet.Cell("C17").Value.GetNumber();
+            config.VariableTableInputStartAddress = (uint)worksheet.Cell("C17").Value.GetNumber();
             config.VariableTableSplitEvery = (uint)worksheet.Cell("C18").Value.GetNumber();
 
             config.IOTableName = worksheet.Cell("C21").Value.ToString();
@@ -91,7 +91,7 @@ namespace TiaXmlReader.Generation.IO
                 {
                     Address = ioAddress.ToString(),
                     IOName = ioName.ToString(),
-                    DBName = dbName.ToString(),
+                    //DBName = dbName.ToString(),
                     Variable = variableName.ToString(),
                     Comment = comment.ToString(),
                 });

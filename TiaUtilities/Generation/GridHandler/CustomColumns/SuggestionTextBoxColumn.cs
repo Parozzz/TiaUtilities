@@ -1,16 +1,41 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace TiaXmlReader.Generation.GridHandler.CustomColumns
 {
     public class SuggestionTextBoxColumn : DataGridViewTextBoxColumn, IGridCustomColumn
     {
+        private class MyDropDown : ToolStripDropDownMenu
+        {
+            protected override Padding DefaultPadding
+            {
+                get { return Padding.Empty; }
+            }
+
+            public MyDropDown(int width, int height)
+            {
+                ShowImageMargin = ShowCheckMargin = false;
+                RenderMode = ToolStripRenderMode.System;
+                MaximumSize = new Size(width, height);
+                AllowTransparency = true;
+                AutoClose = false;
+                ShowItemToolTips = false; // I don't need it. Sometimes ghost tool tips remain after clicking item.
+                CanOverflow = true;
+
+                typeof(MyDropDown).InvokeMember("DoubleBuffered", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty, null, this, new object[] { true });
+            }
+        }
+
         private readonly Func<string[]> GetItemsFunc;
 
         private readonly DataGridViewCellCancelEventHandler cellBeginEditEvent;
         private readonly DataGridViewCellEventHandler cellEndEditEvent;
         private readonly DataGridViewEditingControlShowingEventHandler editingControlShowingEvent;
+
         private readonly EventHandler editingControlTextChangedEvent;
 
         private ToolStripDropDown dropDown;
@@ -25,6 +50,7 @@ namespace TiaXmlReader.Generation.GridHandler.CustomColumns
             this.cellBeginEditEvent = this.CellBeginEditEvent;
             this.cellEndEditEvent = this.CellEndEditEvent;
             this.editingControlShowingEvent = this.EditingControlShowingEvent;
+
             this.editingControlTextChangedEvent = this.EditingControlTextChangedEvent;
         }
 
@@ -34,7 +60,6 @@ namespace TiaXmlReader.Generation.GridHandler.CustomColumns
             dataGridView.CellEndEdit += cellEndEditEvent;
             dataGridView.EditingControlShowing += editingControlShowingEvent;
         }
-
 
         public void UnregisterEvents(DataGridView dataGridView)
         {
@@ -53,25 +78,36 @@ namespace TiaXmlReader.Generation.GridHandler.CustomColumns
 
             var cell = (DataGridViewTextBoxCell)dataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex];
 
+            var items = GetItemsFunc();
+            if (items == null || items.Length == 0)
+            {
+                return;
+            }
+
             inEditMode = true;
 
-            dropDown = new ToolStripDropDown();
-            GetItemsFunc.Invoke().ToList().ForEach(str => dropDown.Items.Add(str));
-            dropDown.AllowTransparency = true;
-            dropDown.AutoClose = false;
-            dropDown.ShowItemToolTips = false; //I don't need it. Sometimes ghost tool tips remain after clicking item.
+            var showPoint = dataGridView.GetCellDisplayRectangle(args.ColumnIndex, args.RowIndex, false).Location;
+            showPoint.Y += cell.Size.Height;
+
+            var height = 400;
+            if ((showPoint.Y + height) > dataGridView.Height)
+            {
+                height = Math.Min(height, dataGridView.Height - showPoint.Y);
+            }
+
+            dropDown = new MyDropDown(cell.Size.Width, height);
+            dropDown.Items.AddRange(items.Select(i => new ToolStripMenuItem() { Text = i }).ToArray()); //THIS IS WAAAAY FASTER! Without AddRange is super slow.
             dropDown.ItemClicked += (sender1, args1) =>
             {
-                if(editingControl != null)
+                if (editingControl == null)
                 {
-                    editingControl.Text = args1.ClickedItem.Text;
-                    editingControl.SelectionStart = editingControl.TextLength; //Move Caret to end!
+                    return;
                 }
-            };
 
-            var point = dataGridView.GetCellDisplayRectangle(args.ColumnIndex, args.RowIndex, false).Location;
-            point.Y += cell.Size.Height;
-            dropDown.Show(dataGridView, point);
+                editingControl.Text = args1.ClickedItem.Text;
+                this.DataGridView.EndEdit();
+            };
+            dropDown.Show(dataGridView, showPoint);
         }
 
         private void CellEndEditEvent(object sender, DataGridViewCellEventArgs e)
@@ -85,11 +121,29 @@ namespace TiaXmlReader.Generation.GridHandler.CustomColumns
                 dropDown = null;
             }
 
-            if(editingControl != null)
+            if (editingControl != null)
             {
                 editingControl.TextChanged -= editingControlTextChangedEvent;
                 editingControl = null;
             }
+        }
+
+        public bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (editingControl == null || dropDown == null || !inEditMode || (keyData != Keys.Up && keyData != Keys.Down))
+            {
+                return false;
+            }
+
+            //DropDown already support scrolling with arrows! This will focus it to enable it.
+            var focused = dropDown.Focused;
+            dropDown.Focus();
+            if (!focused) //This will avoid that the first arrow sent is skipped!
+            {
+                SendKeys.SendWait(keyData == Keys.Up ? "{UP}" : "{DOWN}");
+            }
+
+            return true;
         }
 
         private void EditingControlShowingEvent(object sender, DataGridViewEditingControlShowingEventArgs args)
@@ -103,6 +157,7 @@ namespace TiaXmlReader.Generation.GridHandler.CustomColumns
             if (args.Control is DataGridViewTextBoxEditingControl editingControl)
             {
                 this.editingControl = editingControl;
+
                 /* TEST EHEHEHEH
                 var btn = new Button();
                 btn.Padding = new Padding(0);
@@ -127,29 +182,21 @@ namespace TiaXmlReader.Generation.GridHandler.CustomColumns
 
         private void UpdateVisibileSuggestions()
         {
-            if(editingControl == null)
+            if (editingControl == null || dropDown == null || !inEditMode)
             {
                 return;
             }
 
-            var text = editingControl.Text;
+            this.dropDown.SuspendLayout(); //Without this is unusable. Cursor blink and is SLLLLLOOOOOOWWWW.
+
+            var text = editingControl.Text.ToLower();
             foreach (ToolStripItem item in dropDown.Items)
-            {//Done this way otherwise it will make the caret and cursor blink strage.
-                if (!item.Text.StartsWith(text) || item.Text.Equals(text))
-                {
-                    if (item.Visible)
-                    {
-                        item.Visible = false;
-                    }
-                }
-                else
-                {
-                    if (!item.Visible)
-                    {
-                        item.Visible = true;
-                    }
-                }
+            {
+                var lowerCaseItemText = item.Text.ToLower();
+                item.Visible = lowerCaseItemText.Contains(text) && !lowerCaseItemText.Equals(text);
             }
+
+            this.dropDown.ResumeLayout();
         }
     }
 }

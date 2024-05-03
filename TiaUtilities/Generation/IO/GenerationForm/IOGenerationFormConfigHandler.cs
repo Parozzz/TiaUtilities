@@ -81,9 +81,13 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                     .ControlText(config.VariableTableName)
                     .TextChanged(str => config.VariableTableName = str);
 
-                configForm.AddTextBoxLine("Indirizzo Start")
-                    .ControlText(config.VariableTableStartAddress)
-                    .UIntChanged(num => config.VariableTableStartAddress = num);
+                configForm.AddTextBoxLine("Indirizzo Start Input")
+                    .ControlText(config.VariableTableInputStartAddress)
+                    .UIntChanged(num => config.VariableTableInputStartAddress = num);
+
+                configForm.AddTextBoxLine("Indirizzo Start Output")
+                    .ControlText(config.VariableTableOutputStartAddress)
+                    .UIntChanged(num => config.VariableTableOutputStartAddress = num);
 
                 configForm.AddTextBoxLine("Nuova ogni n° bit")
                     .ControlText(config.VariableTableSplitEvery)

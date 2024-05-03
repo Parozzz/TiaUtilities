@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TiaXmlReader.Utility;
 using TiaXmlReader.SimaticML.Enums;
 using TiaXmlReader.XMLClasses;
+using System.Linq;
 
 namespace TiaXmlReader.SimaticML.nBlockAttributeList
 {
@@ -108,36 +109,29 @@ namespace TiaXmlReader.SimaticML.nBlockAttributeList
             IEnumerable<Member> lastMembersList = this.GetItems();
             for(int x = 0; x < components.Count; x++)
             {
-                Member foundMember = null;
+                Member existingMember = null;
 
                 var addressComponent = components[x];
 
                 var str = string.IsNullOrEmpty(addressComponent.Name) ? Constants.DEFAULT_EMPTY_STRUCT_NAME : addressComponent.Name;
-                foreach (var member in lastMembersList)
-                {
-                    if (member.GetMemberName().ToLower() == str.ToLower())
-                    {
-                        foundMember = member;
-                        break;
-                    }
-                }
+                existingMember = lastMembersList.Where(m => m.GetMemberName().ToLower() == str.ToLower()).FirstOrDefault();
 
                 var isLastComponent = (x == components.Count - 1);
-                if (foundMember == null)
+                if (existingMember == null)
                 {
-                    if(x == 0)
+                    if(x == 0) //First item!
                     {
-                        foundMember = this.AddMember(str, isLastComponent ? dataType : SimaticDataType.STRUCTURE);
+                        existingMember = this.AddMember(str, isLastComponent ? dataType : SimaticDataType.STRUCTURE);
                     }
                     else
                     {
                         Validate.IsTrue(lastMember != null, "Somethign went wrong while adding members from address");
-                        foundMember = lastMember.AddMember(str, isLastComponent ? dataType : SimaticDataType.STRUCTURE);
+                        existingMember = lastMember.AddMember(str, isLastComponent ? dataType : SimaticDataType.STRUCTURE);
                     }
                 }
 
-                lastMember = foundMember;
-                lastMembersList = foundMember.GetItems();
+                lastMember = existingMember;
+                lastMembersList = existingMember.GetItems();
             }
 
             return lastMember;

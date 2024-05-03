@@ -45,9 +45,9 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             return GenerationUtils.Load(ref filePath, EXTENSION, out AlarmGenerationProjectSave projectSave) ? projectSave : new AlarmGenerationProjectSave();
         }
 
-        public void Save(ref string filePath, bool saveAs = false)
+        public bool Save(ref string filePath, bool saveAs = false)
         {
-            GenerationUtils.Save(this, ref filePath, EXTENSION, saveAs);
+            return GenerationUtils.Save(this, ref filePath, EXTENSION, saveAs);
         }
     }
 }

@@ -139,9 +139,12 @@ namespace TiaXmlReader.SimaticML.nBlockAttributeList
 
         public Member AddMember(string name, SimaticDataType dataType)
         {
-            var member = this.AddNode(new Member());
+            var member = new Member();
             member.SetMemberName(name);
             member.SetMemberDataType(dataType.GetSimaticMLString());
+
+            this.GetItems().Add(member);
+
             return member;
         }
 
@@ -199,5 +202,7 @@ namespace TiaXmlReader.SimaticML.nBlockAttributeList
             }
             return dict;
         }
+
+        public string ToString() => $@"Member: {memberName.GetValue()}, Type: {dataType.GetValue()}";
     }
 }

@@ -106,7 +106,7 @@ namespace TiaXmlReader.SimaticML
         }
 
         public SimaticMemoryArea MemoryArea { get; set; }
-        public uint Length { get; private set; }
+        public uint Length { get; set; }
         public uint ByteOffset { get; set; }
         public uint BitOffset { get; set; }
 

@@ -22,9 +22,8 @@ namespace TiaXmlReader.Generation.IO
         //THESE IS THE ORDER IN WHICH THEY APPEAR!
         public static readonly GridDataColumn ADDRESS;
         public static readonly GridDataColumn IO_NAME;
-        public static readonly GridDataColumn DB_NAME;
         public static readonly GridDataColumn VARIABLE;
-        public static readonly GridDataColumn VARIABLE_ADDRESS;
+        public static readonly GridDataColumn MERKER_ADDRESS;
         public static readonly GridDataColumn COMMENT;
         public static readonly List<GridDataColumn> COLUMN_LIST;
 
@@ -33,9 +32,9 @@ namespace TiaXmlReader.Generation.IO
             var type = typeof(IOData);
             ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.Address));
             IO_NAME = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.IOName), "ioName");
-            DB_NAME = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.DBName), "dbName");
+            //DB_NAME = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.DBName), "dbName");
             VARIABLE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.Variable));
-            VARIABLE_ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.VariableAddress), "variableAddress");
+            MERKER_ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.MerkerAddress), "merkerAddress");
             COMMENT = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.Comment));
 
             COLUMN_LIST = GridDataColumn.GetStaticColumnList(type);
@@ -44,9 +43,8 @@ namespace TiaXmlReader.Generation.IO
 
         [JsonProperty][Localization("IO_DATA_ADDRESS")] public string Address { get; set; }
         [JsonProperty][Localization("IO_DATA_IO_NAME")] public string IOName { get; set; }
-        [JsonProperty][Localization("IO_DATA_DB_NAME")] public string DBName { get; set; }
         [JsonProperty][Localization("IO_DATA_VARIABLE")] public string Variable { get; set; }
-        [JsonProperty][Localization("IO_DATA_VARIABLE_OFFSET")] public string VariableAddress { get; set; }
+        [JsonProperty][Localization("IO_DATA_MERKER_ADDRESS")] public string MerkerAddress { get; set; }
         [JsonProperty][Localization("IO_DATA_COMMENT")] public string Comment { get; set; }
 
         public object this[int i]
@@ -91,19 +89,17 @@ namespace TiaXmlReader.Generation.IO
                 }
 
                 var prefix = "";
-                if (!string.IsNullOrEmpty(this.DBName))
+                if(string.IsNullOrEmpty(this.Variable))
                 {
-                    prefix = this.DBName + ".";
+                    if (config.MemoryType == IOMemoryTypeEnum.DB)
+                    {
+                        prefix = config.DBName + "." + (this.GetAddressMemoryArea() == SimaticMemoryArea.INPUT ? config.PrefixInputDB : config.PrefixOutputDB);
+                    }
+                    else if (config.MemoryType == IOMemoryTypeEnum.MERKER)
+                    {
+                        prefix = this.GetAddressMemoryArea() == SimaticMemoryArea.INPUT ? config.PrefixInputMerker : config.PrefixOutputMerker;
+                    }
                 }
-                else if (config.MemoryType == IOMemoryTypeEnum.DB)
-                {
-                    prefix = config.DBName + "." + (this.GetMemoryArea() == SimaticMemoryArea.INPUT ? config.PrefixInputDB : config.PrefixOutputDB);
-                }
-                else if (config.MemoryType == IOMemoryTypeEnum.MERKER)
-                {
-                    prefix = this.GetMemoryArea() == SimaticMemoryArea.INPUT ? config.PrefixInputMerker : config.PrefixOutputMerker;
-                }
-
                 return new GridDataPreview()
                 {
                     Prefix = prefix,
@@ -111,30 +107,51 @@ namespace TiaXmlReader.Generation.IO
                     Value = this.Variable
                 };
             }
-            else if (column == VARIABLE_ADDRESS)
+            else if (column == MERKER_ADDRESS)
             {
-                addressTag.MemoryArea = SimaticMemoryArea.MERKER;
-                addressTag.ByteOffset += config.VariableTableStartAddress;
+                var merkerTag = new SimaticTagAddress();
+                merkerTag.MemoryArea = SimaticMemoryArea.MERKER;
+                merkerTag.ByteOffset = addressTag.ByteOffset + (addressTag.MemoryArea == SimaticMemoryArea.INPUT ? config.VariableTableInputStartAddress : config.VariableTableOutputStartAddress);
+                merkerTag.BitOffset = addressTag.BitOffset;
+                merkerTag.Length = 0; //BIT
                 return new GridDataPreview()
                 {
-                    DefaultValue = addressTag.ToString(),
-                    Value = this.VariableAddress,
+                    DefaultValue = merkerTag.ToString(),
+                    Value = this.MerkerAddress,
                 };
             }
 
             return null;
         }
 
-        public void LoadDefaults(IOConfiguration config)
+        public void LoadDefaults(IOConfiguration config, out bool ioNameDefault, out bool variableDefault, out bool merkerAddressDefault)
         {
+            ioNameDefault = variableDefault = merkerAddressDefault = false;
+
             if (string.IsNullOrEmpty(IOName))
             {
+                ioNameDefault = true;
                 IOName = config.DefaultIoName;
             }
 
             if (string.IsNullOrEmpty(Variable))
             {
+                variableDefault = true;
                 Variable = config.DefaultVariableName;
+            }
+
+            var variableAddressTag = SimaticTagAddress.FromAddress(this.MerkerAddress);
+            if(variableAddressTag == null || variableAddressTag.MemoryArea != SimaticMemoryArea.MERKER)
+            {
+                var addressTag = SimaticTagAddress.FromAddress(this.Address);
+                if (addressTag != null)
+                {
+                    merkerAddressDefault = true;
+
+                    addressTag.MemoryArea = SimaticMemoryArea.MERKER;
+                    addressTag.ByteOffset += addressTag.MemoryArea == SimaticMemoryArea.INPUT ? config.VariableTableInputStartAddress : config.VariableTableOutputStartAddress;
+                    this.MerkerAddress = addressTag.ToString();
+                }
             }
         }
 
@@ -142,22 +159,23 @@ namespace TiaXmlReader.Generation.IO
         {
             Address = placeholders.Parse(Address);
             IOName = placeholders.Parse(IOName);
+            //DBName = placeholders.Parse(DBName);
             Variable = placeholders.Parse(Variable);
-            DBName = placeholders.Parse(DBName);
+            MerkerAddress = placeholders.Parse(MerkerAddress);
             Comment = placeholders.Parse(Comment);
         }
 
         public void Clear()
         {
-            this.Address = this.IOName = this.DBName = this.Variable = this.Comment = "";
+            this.Address = this.IOName/* = this.DBName*/ = this.Variable = this.Comment = "";
         }
 
         public bool IsEmpty()
         {
-            return string.IsNullOrEmpty(Address) && string.IsNullOrEmpty(IOName) && string.IsNullOrEmpty(DBName) && string.IsNullOrEmpty(Variable);
+            return string.IsNullOrEmpty(Address) && string.IsNullOrEmpty(IOName)/* && string.IsNullOrEmpty(DBName)*/ && string.IsNullOrEmpty(Variable);
         }
 
-        public SimaticMemoryArea GetMemoryArea()
+        public SimaticMemoryArea GetAddressMemoryArea()
         {
             return SimaticMemoryAreaUtil.GetFromAddress(Address);
         }
@@ -177,18 +195,6 @@ namespace TiaXmlReader.Generation.IO
         public SimaticTagAddress GetTagAddress()
         {
             return SimaticTagAddress.FromAddress(Address);
-        }
-
-        public IOData Clone()
-        {
-            return new IOData()
-            {
-                Address = this.Address,
-                IOName = this.IOName,
-                DBName = this.DBName,
-                Variable = this.Variable,
-                Comment = this.Comment
-            };
         }
     }
 }

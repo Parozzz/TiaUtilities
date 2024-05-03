@@ -9,6 +9,7 @@ using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.AutoSave;
 using TiaXmlReader.Javascript;
+using System.IO;
 
 namespace TiaXmlReader.Generation.Alarms.GenerationForm
 {
@@ -56,10 +57,15 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             {
                 case Keys.S | Keys.Control:
                     this.ProjectSave();
-                    return true;
+                    return true; //Return required otherwise will write the letter.
                 case Keys.L | Keys.Control:
                     this.ProjectLoad();
-                    return true;
+                    return true; //Return required otherwise will write the letter.
+            }
+
+            if (this.deviceGridHandler.ProcessCmdKey(ref msg, keyData) || this.alarmGridHandler.ProcessCmdKey(ref msg, keyData))
+            {
+                return true;
             }
 
             // Call the base class
@@ -86,8 +92,8 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
 
                     if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
                     {
-                        var alarmDataList = new List<AlarmData>(this.alarmGridHandler.DataSource.GetNotEmptyDataDict().Keys);
-                        var deviceDataList = new List<DeviceData>(this.deviceGridHandler.DataSource.GetNotEmptyDataDict().Keys);
+                        var alarmDataList = new List<AlarmData>(this.alarmGridHandler.DataSource.GetNotEmptyClonedDataDict().Keys);  //Return CLONED data, otherwise operations on the xml generation will affect the table!
+                        var deviceDataList = new List<DeviceData>(this.deviceGridHandler.DataSource.GetNotEmptyClonedDataDict().Keys);  //Return CLONED data, otherwise operations on the xml generation will affect the table!
 
                         var ioXmlGenerator = new AlarmXmlGenerator(this.AlarmConfig, alarmDataList, deviceDataList);
                         ioXmlGenerator.GenerateBlocks();
@@ -165,7 +171,7 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             #region AUTO_SAVE
             void eventHandler(object sender, EventArgs args)
             {
-                if (!string.IsNullOrEmpty(this.lastFilePath))
+                if (File.Exists(this.lastFilePath))
                 {
                     this.ProjectSave();
                 }
@@ -187,9 +193,15 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             {
                 projectSave.AddAlarmData(entry.Key, entry.Value);
             }
-            projectSave.Save(ref lastFilePath, saveAs || string.IsNullOrEmpty(lastFilePath));
 
-            this.Text = this.Name + ". File: " + lastFilePath;
+            var saveOK = projectSave.Save(ref lastFilePath, saveAs || !File.Exists(lastFilePath));
+            if (!saveOK)
+            {
+                this.Text = this.Name;
+                return;
+            }
+
+            this.Text = this.Name + ". Project File: " + lastFilePath;
         }
 
         public void ProjectLoad()
@@ -209,7 +221,7 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
                     if (rowIndex >= 0 && rowIndex <= this.deviceGridHandler.RowCount)
                     {
                         var data = this.deviceGridHandler.DataSource[rowIndex];
-                        this.deviceGridHandler.DataHandler.MoveValues(entry.Value, data);
+                        this.deviceGridHandler.DataHandler.CopyValues(entry.Value, data);
                     }
                 }
 
@@ -219,7 +231,7 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
                     if (rowIndex >= 0 && rowIndex <= this.alarmGridHandler.RowCount)
                     {
                         var data = this.alarmGridHandler.DataSource[rowIndex];
-                        this.alarmGridHandler.DataHandler.MoveValues(entry.Value, data);
+                        this.alarmGridHandler.DataHandler.CopyValues(entry.Value, data);
                     }
                 }
 
@@ -228,7 +240,7 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
                 this.AlarmDataGridView.ResumeLayout();
                 this.DeviceDataGridView.ResumeLayout();
 
-                this.Text = this.Name + ". File: " + lastFilePath;
+                this.Text = this.Name + ". Project File: " + lastFilePath;
             }
         }
     }

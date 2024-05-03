@@ -3,11 +3,24 @@ using TiaXmlReader.Utility;
 using TiaXmlReader.SimaticML.Blocks;
 using TiaXmlReader.SimaticML.TagTable;
 using TiaXmlReader.XMLClasses;
+using System.IO;
 
 namespace TiaXmlReader.SimaticML
 {
     public static class SimaticMLParser
     {
+
+        public static XmlNodeConfiguration ParseFile(string filePath)
+        {
+            if(!File.Exists(filePath) || Path.GetExtension(filePath) != ".xml")
+            {
+                return null;
+            }
+
+            var xmlDocument = new XmlDocument();
+            xmlDocument.Load(filePath);
+            return SimaticMLParser.ParseXML(xmlDocument);
+        }
 
         public static XmlNodeConfiguration ParseXML(XmlDocument document)
         {

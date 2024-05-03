@@ -34,11 +34,11 @@ namespace TiaXmlReader.Generation
             }
         }
 
-        public static void Save(object obj, ref string filePath, string extension, bool showFileDialog = false)
+        public static bool Save(object obj, ref string filePath, string extension, bool showFileDialog = false)
         {
             try
             {
-                if(!showFileDialog)
+                if (!showFileDialog)
                 {
                     if (string.IsNullOrEmpty(filePath))
                     {
@@ -54,10 +54,12 @@ namespace TiaXmlReader.Generation
                     if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
                     {
                         var fileDialog = CreateFileDialog(false, filePath, extension);
-                        if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
+                        if (fileDialog.ShowDialog() != CommonFileDialogResult.Ok)
                         {
-                            filePath = fileDialog.FileName;
+                            return false;
                         }
+
+                        filePath = fileDialog.FileName;
                     }
 
                     FixExtesion(ref filePath, extension);
@@ -78,11 +80,15 @@ namespace TiaXmlReader.Generation
                         writer.Flush();
                     }
                 }
+
+                return true;
             }
             catch (Exception ex)
             {
                 Utils.ShowExceptionMessage(ex);
             }
+
+            return false;
         }
 
         public static bool Load<C>(ref string filePath, string extension, out C loaded, bool showFileDialog = true)
@@ -101,7 +107,7 @@ namespace TiaXmlReader.Generation
 
                     filePath = fileDialog.FileName;
                 }
-                else if(!File.Exists(filePath))
+                else if (!File.Exists(filePath))
                 {
                     return false;
                 }

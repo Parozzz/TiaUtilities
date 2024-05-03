@@ -4,6 +4,9 @@ using TiaXmlReader.Utility;
 using TiaXmlReader.SimaticML.Enums;
 using TiaXmlReader.SimaticML.LanguageText;
 using TiaXmlReader.XMLClasses;
+using System.Windows.Documents;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace TiaXmlReader.SimaticML.Blocks
 {
@@ -89,6 +92,54 @@ namespace TiaXmlReader.SimaticML.Blocks
         public BlockAttributeList GetAttributes()
         {
             return blockAttributeList;
+        }
+
+        public List<string> GetAllMemberAddress()
+        {
+            var section = blockAttributeList.ComputeSection(SectionTypeEnum.STATIC);
+
+            var membersAddressList = new List<string>();
+            foreach(var member in section.GetItems())
+            {
+                var memberChildAddressList = this.GetAddressOfChildMembers(member);
+
+                var memberName = SimaticMLUtil.WrapAddressComponentIfRequired(member.GetMemberName());
+                membersAddressList.AddRange(memberChildAddressList.Select(s => this.blockAttributeList.GetBlockName() + "." + memberName + "." + s));
+            }
+
+            return membersAddressList;
+        }
+
+        private List<string> GetAddressOfChildMembers(Member member)
+        {
+            var childAddressList = new List<string>();
+
+            var items = member.GetItems();
+            if(items.Count == 0)
+            {
+                var memberName = SimaticMLUtil.WrapAddressComponentIfRequired(member.GetMemberName());
+                childAddressList.Add(memberName);
+            }
+            else
+            {
+                foreach (var childMember in items)
+                { //TO-DO Add arrays into list!
+                    var childName = SimaticMLUtil.WrapAddressComponentIfRequired(childMember.GetMemberName());
+
+                    var childItems = childMember.GetItems();
+                    if(childItems.Count == 0)
+                    {
+                        childAddressList.Add(childName);
+                    }
+                    else
+                    {
+                        var subChildAddressList = this.GetAddressOfChildMembers(childMember);
+                        childAddressList.AddRange(subChildAddressList.Select(s => childName + "." + s));
+                    }
+                }
+            }
+
+            return childAddressList;
         }
     }
 

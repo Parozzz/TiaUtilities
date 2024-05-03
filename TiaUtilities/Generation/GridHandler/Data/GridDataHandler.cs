@@ -29,7 +29,7 @@ namespace TiaXmlReader.Generation.GridHandler.Data
             return (T) type.Assembly.CreateInstance(type.FullName);
         }
 
-        public void MoveValues(T copyFrom, T moveTo)
+        public void CopyValues(T copyFrom, T moveTo)
         {
             foreach (var dataColumn in DataColumns)
             {

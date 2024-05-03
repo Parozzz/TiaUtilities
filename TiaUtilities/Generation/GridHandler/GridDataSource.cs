@@ -128,6 +128,24 @@ namespace TiaXmlReader.Generation.GridHandler
             return notEmptyDict;
         }
 
+        public Dictionary<T, int> GetNotEmptyClonedDataDict()
+        {
+            var notEmptyDict = new Dictionary<T, int>();
+
+            for (var x = 0; x < dataList.Count; x++)
+            {
+                var data = dataList[x];
+                if (!data.IsEmpty())
+                {
+                    var dataClone = dataHandler.CreateInstance();
+                    dataHandler.CopyValues(data, dataClone);
+                    notEmptyDict.Add(dataClone, x);
+                }
+            }
+            return notEmptyDict;
+        }
+
+
     }
 
 }

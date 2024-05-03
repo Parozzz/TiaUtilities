@@ -17,11 +17,12 @@ namespace TiaXmlReader.Generation.GridHandler
 {
     public class GridHandler<C, T> where C : IGenerationConfiguration where T : IGridData<C>
     {
-        private class ColumnInfo
+        public class ColumnInfo
         {
-            public DataGridViewColumn Column { get; set; }
-            public GridDataColumn DataColumn { get; set; }
+            public DataGridViewColumn Column { get; internal set; }
+            public GridDataColumn DataColumn { get; internal set; }
             public int Width { get; set; }
+            public bool Visible { get; set; } = true;
         }
 
         private readonly DataGridView dataGridView;
@@ -340,9 +341,7 @@ namespace TiaXmlReader.Generation.GridHandler
 
         public CC AddCustomColumn<CC>(CC customColumn, GridDataColumn dataColumn, int width) where CC : DataGridViewColumn, IGridCustomColumn
         {
-            this.AddColumn(customColumn, dataColumn, width);
-            customColumn.RegisterEvents(this.dataGridView);
-            return customColumn;
+            return this.AddColumn(customColumn, dataColumn, width);
         }
 
         private CL AddColumn<CL>(CL column, GridDataColumn dataColumn, int width) where CL : DataGridViewColumn
@@ -356,13 +355,9 @@ namespace TiaXmlReader.Generation.GridHandler
             return column;
         }
 
-        public void RemoveColumn(GridDataColumn dataColumn)
+        public ColumnInfo GetColumnInfo(GridDataColumn dataColumn)
         {
-            var columnInfo = columnInfoList.Where(i => i.DataColumn == dataColumn).FirstOrDefault();
-            if(columnInfo != null)
-            {
-                columnInfoList.Remove(columnInfo);
-            }
+           return columnInfoList.Where(i => i.DataColumn == dataColumn).FirstOrDefault();
         }
 
         public void InitColumns()
@@ -381,24 +376,51 @@ namespace TiaXmlReader.Generation.GridHandler
             foreach (var columnInfo in columnInfoList)
             {
                 var column = columnInfo.Column;
-                column.Name = columnInfo.DataColumn.Name;
-                column.DisplayIndex = columnInfo.DataColumn.ColumnIndex;
-                column.DataPropertyName = columnInfo.DataColumn.DataPropertyName;
-                column.DefaultCellStyle.SelectionBackColor = Color.LightGray;
-                column.DefaultCellStyle.BackColor = SystemColors.ControlLightLight;
-                column.DefaultCellStyle.SelectionForeColor = Color.Black;
-                column.DefaultCellStyle.ForeColor = Color.Black;
-                column.AutoSizeMode = columnInfo.Width <= 0 ? DataGridViewAutoSizeColumnMode.Fill : DataGridViewAutoSizeColumnMode.None;
-                column.Width = columnInfo.Width;
-                column.MinimumWidth = 15;
-                column.SortMode = DataGridViewColumnSortMode.Programmatic;
+                if(columnInfo.Visible)
+                {
+                    if (column is IGridCustomColumn customColumn)
+                    {
+                        customColumn.RegisterEvents(this.dataGridView);
+                    }
 
-                column.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
-                column.HeaderCell.Style.Padding = new Padding(0);
-                column.HeaderCell.Style.WrapMode = DataGridViewTriState.True;
+                    column.Visible = true;
+
+                    column.Name = columnInfo.DataColumn.Name;
+                    column.DisplayIndex = columnInfo.DataColumn.ColumnIndex;
+                    column.DataPropertyName = columnInfo.DataColumn.DataPropertyName;
+                    column.DefaultCellStyle.SelectionBackColor = Color.LightGray;
+                    column.DefaultCellStyle.BackColor = SystemColors.ControlLightLight;
+                    column.DefaultCellStyle.SelectionForeColor = Color.Black;
+                    column.DefaultCellStyle.ForeColor = Color.Black;
+                    column.AutoSizeMode = columnInfo.Width <= 0 ? DataGridViewAutoSizeColumnMode.Fill : DataGridViewAutoSizeColumnMode.None;
+                    column.Width = columnInfo.Width;
+                    column.MinimumWidth = 15;
+                    column.SortMode = DataGridViewColumnSortMode.Programmatic;
+
+                    column.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                    column.HeaderCell.Style.Padding = new Padding(0);
+                    column.HeaderCell.Style.WrapMode = DataGridViewTriState.True;
+                }
+                else
+                {
+                    column.Visible = false;
+                }
 
                 this.dataGridView.Columns.Add(column);
             }
+        }
+
+        public bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            foreach(var column in this.dataGridView.Columns)
+            {
+                if(column is IGridCustomColumn customColumn && customColumn.ProcessCmdKey(ref msg, keyData))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private void PasteFromExcel()

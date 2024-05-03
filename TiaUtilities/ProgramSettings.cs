@@ -45,10 +45,10 @@ namespace TiaXmlReader
             return GenerationUtils.Load(ref filePath, EXTENSION, out ProgramSettings settings, showFileDialog: false) ? settings : new ProgramSettings();
         }
 
-        public void Save()
+        public bool Save()
         {
             var filePath = ProgramSettings.GetFilePath();
-            GenerationUtils.Save(this, ref filePath, EXTENSION, showFileDialog: false);
+            return GenerationUtils.Save(this, ref filePath, EXTENSION, showFileDialog: false);
         }
     }
 }
