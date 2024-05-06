@@ -18,6 +18,7 @@ using InfoBox;
 using System.Diagnostics;
 using TiaXmlReader.SimaticML.TagTable;
 using System.IO;
+using System.Drawing;
 
 namespace TiaXmlReader.Generation.IO.GenerationForm
 {
@@ -28,11 +29,14 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
         private readonly JavascriptScriptErrorReportingThread jsErrorHandlingThread;
         private readonly TimedSaveHandler autoSaveHandler;
         private readonly IOGenerationSettings settings;
+
         private readonly GridSettings gridSettings;
-        private readonly GridHandler<IOConfiguration, IOData> gridHandler;
+        private readonly GridHandler<IOConfiguration, IOData> ioGridHandler;
+        private readonly GridHandler<IOConfiguration, IOSuggestion> suggestionGridHandler;
+
         private readonly IOGenerationFormConfigHandler configHandler;
 
-        private readonly List<string> variableSuggestionList;
+        //private readonly List<string> variableSuggestionList;
         private readonly SuggestionTextBoxColumn variableAddressColumn;
 
         private IOGenerationExcelImportSettings ExcelImportConfig { get => settings.ExcelImportConfiguration; }
@@ -50,23 +54,18 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             this.settings = settings;
             this.gridSettings = gridSettings;
 
-            this.gridHandler = new GridHandler<IOConfiguration, IOData>(jsErrorHandlingThread, this.dataGridView, gridSettings, IOConfig, IOData.COLUMN_LIST, new IOGenerationComparer())
+            this.ioGridHandler = new GridHandler<IOConfiguration, IOData>(jsErrorHandlingThread, this.ioDataGridView, gridSettings, IOConfig, IOData.COLUMN_LIST, new IOGenerationComparer())
             {
                 RowCount = 2999
             };
 
-            this.configHandler = new IOGenerationFormConfigHandler(this, this.IOConfig, this.gridHandler);
-
-            this.variableSuggestionList = new List<string>();
-            this.variableAddressColumn = new SuggestionTextBoxColumn(() =>
+            this.suggestionGridHandler = new GridHandler<IOConfiguration, IOSuggestion>(jsErrorHandlingThread, this.suggestionDataGridView, gridSettings, IOConfig, IOSuggestion.COLUMN_LIST, null)
             {
-                var list = new List<string>(variableSuggestionList);
-                foreach(var data in this.gridHandler.DataSource.GetNotEmptyDataDict().Keys)
-                {
-                    list.Remove(data.Variable);
-                }
-                return list.ToArray();
-            });
+                RowCount = 1999,
+            };
+
+            this.configHandler = new IOGenerationFormConfigHandler(this, this.IOConfig, this.ioGridHandler);
+            this.variableAddressColumn = new SuggestionTextBoxColumn();
 
             Init();
         }
@@ -83,7 +82,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                     return true; //Return required otherwise will write the letter.
             }
 
-            if(this.gridHandler.ProcessCmdKey(ref msg, keyData))
+            if (this.ioGridHandler.ProcessCmdKey(ref msg, keyData) || this.suggestionGridHandler.ProcessCmdKey(ref msg, keyData))
             {
                 return true;
             }
@@ -112,7 +111,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
 
                     if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
                     {
-                        var ioDataList = new List<IOData>(this.gridHandler.DataSource.GetNotEmptyClonedDataDict().Keys); //Return CLONED data, otherwise operations on the xml generation will affect the table!
+                        var ioDataList = new List<IOData>(this.ioGridHandler.DataSource.GetNotEmptyClonedDataDict().Keys); //Return CLONED data, otherwise operations on the xml generation will affect the table!
 
                         var ioXmlGenerator = new IOXmlGenerator(this.IOConfig, ioDataList);
                         ioXmlGenerator.GenerateBlocks();
@@ -142,14 +141,14 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                         });
                     }
 
-                    var firstEmptyIndexList = this.gridHandler.DataSource.GetFirstEmptyRowIndexes(ioDataList.Count);
+                    var firstEmptyIndexList = this.ioGridHandler.DataSource.GetFirstEmptyRowIndexes(ioDataList.Count);
 
                     var dataDict = new Dictionary<int, IOData>();
                     for (int i = 0; i < firstEmptyIndexList.Count; i++)
                     {
                         dataDict.Add(firstEmptyIndexList[i], ioDataList[i]);
                     }
-                    this.gridHandler.ChangeMultipleRows(dataDict);
+                    this.ioGridHandler.ChangeMultipleRows(dataDict);
                 }
             };
 
@@ -168,26 +167,31 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
 
                 if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
                 {
-                    this.variableSuggestionList.Clear();
+                    this.suggestionGridHandler.DataSource.InitializeData(this.suggestionGridHandler.RowCount);
 
-                    foreach(var filePath in fileDialog.FileNames)
+                    foreach (var filePath in fileDialog.FileNames)
                     {
                         var extension = Path.GetExtension(filePath);
 
                         var xmlNodeConfiguration = SimaticMLParser.ParseFile(filePath);
                         if (xmlNodeConfiguration is BlockGlobalDB globalDB)
                         {
-                            var list = globalDB.GetAllMemberAddress();
-                            this.variableSuggestionList.AddRange(list);
+                            var suggestionEnumerable = globalDB.GetAllMemberAddress().Select(v => new IOSuggestion() { Value = v });
+                            this.suggestionGridHandler.AddData(suggestionEnumerable);
+
                         }
-                        else if(xmlNodeConfiguration is XMLTagTable tagTable)
+                        else if (xmlNodeConfiguration is XMLTagTable tagTable)
                         {
-                            this.variableSuggestionList.AddRange(tagTable.GetTags().Values.Select(t => t.GetTagName()));
+                            var suggestionEnumerable = tagTable.GetTags().Values.Select(t => t.GetTagName())
+                                                                                .Select(n => new IOSuggestion() { Value = n });
+                            this.suggestionGridHandler.AddData(suggestionEnumerable);
                         }
                         else
                         {
                             InformationBox.Show("The selected block is NOT a GlobalDB or file is invalid.", "Invalid imported xml", icon: InformationBoxIcon.Exclamation);
                         }
+
+                        UpdateSuggestionColors();
                     }
                 }
 
@@ -223,26 +227,47 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             #endregion
 
             #region DRAG
-            this.gridHandler.SetDragPreviewAction(data => { IOGenerationUtils.DragPreview(data, this.gridHandler); });
-            this.gridHandler.SetDragMouseUpAction(data => { IOGenerationUtils.DragMouseUp(data, this.gridHandler); });
+            this.ioGridHandler.SetDragPreviewAction(data => { IOGenerationUtils.DragPreview(data, this.ioGridHandler); });
+            this.ioGridHandler.SetDragMouseUpAction(data => { IOGenerationUtils.DragMouseUp(data, this.ioGridHandler); });
+
+            this.suggestionGridHandler.SetDragPreviewAction(data => { GridUtils.DragPreview(data, this.ioGridHandler); });
+            this.suggestionGridHandler.SetDragMouseUpAction(data => { GridUtils.DragMouseUp(data, this.ioGridHandler); });
             #endregion
             //Column initialization before gridHandler.Init()
             #region COLUMNS
-            var addressColumn = this.gridHandler.AddTextBoxColumn(IOData.ADDRESS, 65);
+            var addressColumn = this.ioGridHandler.AddTextBoxColumn(IOData.ADDRESS, 65);
             addressColumn.MaxInputLength = 10;
 
-            this.gridHandler.AddTextBoxColumn(IOData.IO_NAME, 110);
-            this.gridHandler.AddCustomColumn(this.variableAddressColumn, IOData.VARIABLE, 200);
-            this.gridHandler.AddTextBoxColumn(IOData.MERKER_ADDRESS, MERKER_ADDRESS_COLUMN_SIZE);
-            this.gridHandler.AddTextBoxColumn(IOData.COMMENT, 0);
+            this.ioGridHandler.AddTextBoxColumn(IOData.IO_NAME, 110);
+            this.ioGridHandler.AddCustomColumn(this.variableAddressColumn, IOData.VARIABLE, 200);
+            this.variableAddressColumn.SetGetItemsFunc(() =>
+            {
+                var ioVariableEnumerable = this.ioGridHandler.DataSource.GetNotEmptyDataDict().Keys.Select(i => i.Variable);
+                var suggestionEnumerable = this.suggestionGridHandler.DataSource.GetNotEmptyDataDict();
+
+                var notAddedSuggestionEnumerable = suggestionEnumerable.Select(k => k.Key.Value).Except(ioVariableEnumerable).ToArray();
+                return notAddedSuggestionEnumerable;
+            });
+
+            this.ioGridHandler.AddTextBoxColumn(IOData.MERKER_ADDRESS, MERKER_ADDRESS_COLUMN_SIZE);
+            this.ioGridHandler.AddTextBoxColumn(IOData.COMMENT, 0);
+
+            this.suggestionGridHandler.AddTextBoxColumn(IOSuggestion.VALUE, 0);
             #endregion
 
-            this.gridHandler?.Init();
+            this.ioDataGridView.CellValueChanged += (sender, args) => UpdateSuggestionColors();
+            this.suggestionDataGridView.CellValueChanged += (sender, args) => UpdateSuggestionColors();
+
+            this.ioGridHandler?.Init();
+            this.suggestionGridHandler?.Init();
             this.configHandler?.Init();
 
             #region JS_SCRIPT
-            this.gridHandler.TableScript.SetReadScriptFunc(() => settings.JSScript);
-            this.gridHandler.TableScript.SetWriteScriptAction((str) => settings.JSScript = str);
+            this.ioGridHandler.TableScript.SetReadScriptFunc(() => settings.JSScript);
+            this.ioGridHandler.TableScript.SetWriteScriptAction(str => settings.JSScript = str);
+
+            this.suggestionGridHandler.TableScript.SetReadScriptFunc(() => settings.SuggestionJSScript);
+            this.suggestionGridHandler.TableScript.SetWriteScriptAction(str => settings.SuggestionJSScript = str);
             #endregion
 
             #region AUTO_SAVE
@@ -263,19 +288,18 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
         public void ProjectSave(bool saveAs = false)
         {
             var projectSave = new IOGenerationProjectSave();
-            foreach (var entry in gridHandler.DataSource.GetNotEmptyDataDict())
+            foreach (var entry in suggestionGridHandler.DataSource.GetNotEmptyDataDict())
+            {
+                projectSave.SuggestionRowDict.Add(entry.Value, entry.Key);
+            }
+
+            foreach (var entry in ioGridHandler.DataSource.GetNotEmptyDataDict())
             {
                 projectSave.RowDict.Add(entry.Value, entry.Key);
             }
-            
-            var saveOK = projectSave.Save(ref lastFilePath, saveAs || !File.Exists(lastFilePath));
-            if (!saveOK)
-            {
-                this.Text = this.Name;
-                return;
-            }
 
-            this.Text = this.Name + ". Project File: " + lastFilePath;
+            var saveOK = projectSave.Save(ref lastFilePath, saveAs || !File.Exists(lastFilePath));
+            this.Text = this.Name + (saveOK ? ". Project File: " + lastFilePath : "");
         }
 
         public void ProjectLoad()
@@ -283,25 +307,78 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             var loadedProjectSave = IOGenerationProjectSave.Load(ref lastFilePath);
             if (loadedProjectSave != null)
             {
-                this.dataGridView.SuspendLayout();
-                this.gridHandler.DataSource.InitializeData(this.gridHandler.RowCount);
+                this.ioDataGridView.SuspendLayout();
+                this.suggestionDataGridView.SuspendLayout();
+
+                this.ioGridHandler.DataSource.InitializeData(this.ioGridHandler.RowCount);
+                this.suggestionGridHandler.DataSource.InitializeData(this.suggestionGridHandler.RowCount);
 
                 foreach (var entry in loadedProjectSave.RowDict)
                 {
                     var rowIndex = entry.Key;
                     var data = entry.Value;
-                    if (rowIndex >= 0 && rowIndex <= this.gridHandler.RowCount)
+                    if (rowIndex >= 0 && rowIndex <= this.ioGridHandler.RowCount)
                     {
-                        this.gridHandler.DataHandler.CopyValues(data, this.gridHandler.DataSource[rowIndex]);
+                        this.ioGridHandler.DataHandler.CopyValues(data, this.ioGridHandler.DataSource[rowIndex]);
                     }
                 }
 
-                this.dataGridView.Refresh();
-                this.dataGridView.ResumeLayout();
+                foreach (var entry in loadedProjectSave.SuggestionRowDict)
+                {
+                    var rowIndex = entry.Key;
+                    var data = entry.Value;
+                    if (rowIndex >= 0 && rowIndex <= this.suggestionGridHandler.RowCount)
+                    {
+                        this.suggestionGridHandler.DataHandler.CopyValues(data, this.suggestionGridHandler.DataSource[rowIndex]);
+                    }
+                }
+                this.UpdateSuggestionColors(suspendLayout: false);
+
+                this.ioDataGridView.Refresh();
+                this.suggestionDataGridView.Refresh();
+
+                this.ioDataGridView.ResumeLayout();
+                this.suggestionDataGridView.ResumeLayout();
 
                 this.Text = this.Name + ". Project File: " + lastFilePath;
             }
         }
+
+        private void UpdateSuggestionColors(bool suspendLayout = true)
+        {
+            if (suspendLayout)
+            {
+                this.suggestionDataGridView.SuspendLayout();
+            }
+
+            foreach (DataGridViewRow row in this.suggestionDataGridView.Rows)
+            {
+                row.Cells[0].Style.BackColor = SystemColors.ControlLightLight;
+            }
+
+            var ioDataEnumerable = ioGridHandler.DataSource.GetNotEmptyData().Select(d => d.Variable);
+
+            var suggestionDict = suggestionGridHandler.DataSource.GetNotEmptyDataDict();
+            foreach (var entry in suggestionDict)
+            {
+                var suggestion = entry.Key;
+                var row = entry.Value;
+                if (ioDataEnumerable.Contains(suggestion.Value))
+                {
+                    this.suggestionDataGridView.Rows[row].Cells[0].Style.BackColor = Color.LightSeaGreen;
+                }
+                else
+                {
+                    this.suggestionDataGridView.Rows[row].Cells[0].Style.BackColor = Color.Orange;
+                }
+            }
+
+            if (suspendLayout)
+            {
+                this.suggestionDataGridView.ResumeLayout();
+            }
+        }
+
         private void UpdateConfigPanel()
         {
             this.configButtonPanel.SuspendLayout();
@@ -310,7 +387,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
 
             this.configButtonPanel.Controls.Add(fcConfigButton);
 
-            var merkerAddressColumnInfo = this.gridHandler.GetColumnInfo(IOData.MERKER_ADDRESS);
+            var merkerAddressColumnInfo = this.ioGridHandler.GetColumnInfo(IOData.MERKER_ADDRESS);
             merkerAddressColumnInfo.Visible = false;
             if (IOMemoryTypeEnum.DB.Equals(memoryTypeComboBox.SelectedValue))
             {
@@ -324,7 +401,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             this.configButtonPanel.Controls.Add(ioTableConfigButton);
             this.configButtonPanel.Controls.Add(segmentNameConfigButton);
 
-            this.gridHandler.InitColumns();
+            this.ioGridHandler.InitColumns();
 
             this.configButtonPanel.ResumeLayout();
         }

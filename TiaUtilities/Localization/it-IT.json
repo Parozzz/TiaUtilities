@@ -10,6 +10,7 @@
   "IO_CONFIG_GROUPING_BYTE": "RaggruppoPerByte",
   "IO_CONFIG_MEMORY_DB": "DB",
   "IO_CONFIG_MEMORY_MERKER": "Merker",
+  "IO_SUGGESTION_VALUE": "Suggerimento",
 
   //ALARM GENERATION
   "ALARM_DATA_ENABLE": "Abilita",

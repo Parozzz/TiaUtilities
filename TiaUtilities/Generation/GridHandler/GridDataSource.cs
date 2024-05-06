@@ -128,6 +128,11 @@ namespace TiaXmlReader.Generation.GridHandler
             return notEmptyDict;
         }
 
+        public IEnumerable<T> GetNotEmptyData()
+        {
+            return GetNotEmptyDataDict().Keys;
+        }
+
         public Dictionary<T, int> GetNotEmptyClonedDataDict()
         {
             var notEmptyDict = new Dictionary<T, int>();
@@ -143,6 +148,10 @@ namespace TiaXmlReader.Generation.GridHandler
                 }
             }
             return notEmptyDict;
+        }
+        public IEnumerable<T> GetNotEmptyClonedData()
+        {
+            return GetNotEmptyClonedDataDict().Keys;
         }
 
 

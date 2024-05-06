@@ -12,6 +12,7 @@ using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.GenerationForms;
 using TiaXmlReader.Javascript;
 using TiaXmlReader.Generation.GridHandler.CustomColumns;
+using TiaXmlReader.Utility.Extensions;
 
 namespace TiaXmlReader.Generation.GridHandler
 {
@@ -412,7 +413,14 @@ namespace TiaXmlReader.Generation.GridHandler
 
         public bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            foreach(var column in this.dataGridView.Columns)
+            switch (keyData)
+            {
+                case Keys.Escape:
+                    this.ShowCell(null);
+                    break;
+            }
+
+            foreach (var column in this.dataGridView.Columns)
             {
                 if(column is IGridCustomColumn customColumn && customColumn.ProcessCmdKey(ref msg, keyData))
                 {
@@ -542,6 +550,26 @@ namespace TiaXmlReader.Generation.GridHandler
             {
                 MessageBox.Show(ex.ToString(), "Error while changing cells", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        public void AddData(IEnumerable<T> dataEnumerable)
+        {
+            var dataDict = new Dictionary<int, T>();
+
+            var emptyIndexList = DataSource.GetFirstEmptyRowIndexes(dataEnumerable.Count());
+            
+            int i = 0;
+            foreach(var data in dataEnumerable)
+            {
+                if(i >= emptyIndexList.Count)
+                {
+                    break;
+                }
+
+                var index = emptyIndexList[i++];
+                dataDict.Compute(index, data);
+            }
+            this.ChangeMultipleRows(dataDict);
         }
 
         private void ShowCell(DataGridViewCell cell)

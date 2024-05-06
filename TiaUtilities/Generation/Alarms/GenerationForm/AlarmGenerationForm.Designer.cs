@@ -134,19 +134,19 @@
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
             this.saveToolStripMenuItem.Text = "Save";
             // 
             // saveAsToolStripMenuItem
             // 
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
             this.saveAsToolStripMenuItem.Text = "SaveAs";
             // 
             // loadToolStripMenuItem
             // 
             this.loadToolStripMenuItem.Name = "loadToolStripMenuItem";
-            this.loadToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.loadToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
             this.loadToolStripMenuItem.Text = "Load";
             // 
             // importExportToolStripMenuItem
@@ -338,8 +338,8 @@
             // 
             this.GridsSplitPanel.Panel2.Controls.Add(this.AlarmDataGridView);
             this.GridsSplitPanel.Size = new System.Drawing.Size(1378, 696);
-            this.GridsSplitPanel.SplitterDistance = 500;
-            this.GridsSplitPanel.SplitterWidth = 12;
+            this.GridsSplitPanel.SplitterDistance = 250;
+            this.GridsSplitPanel.SplitterWidth = 20;
             this.GridsSplitPanel.TabIndex = 19;
             // 
             // DeviceDataGridView
@@ -351,7 +351,7 @@
             this.DeviceDataGridView.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
             this.DeviceDataGridView.Name = "DeviceDataGridView";
             this.DeviceDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.DeviceDataGridView.Size = new System.Drawing.Size(500, 696);
+            this.DeviceDataGridView.Size = new System.Drawing.Size(250, 696);
             this.DeviceDataGridView.TabIndex = 2;
             // 
             // AlarmDataGridView
@@ -363,7 +363,7 @@
             this.AlarmDataGridView.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
             this.AlarmDataGridView.Name = "AlarmDataGridView";
             this.AlarmDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.AlarmDataGridView.Size = new System.Drawing.Size(866, 696);
+            this.AlarmDataGridView.Size = new System.Drawing.Size(1108, 696);
             this.AlarmDataGridView.TabIndex = 3;
             // 
             // AlarmGenerationForm

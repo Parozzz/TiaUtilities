@@ -22,7 +22,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
         public static string DEFAULT_FILE_PATH = Directory.GetCurrentDirectory() + @"\tempIOSave." + EXTENSION;
 
         [JsonProperty] public Dictionary<int, IOData> RowDict { get; set; } = new Dictionary<int, IOData>();
-
+        [JsonProperty] public Dictionary<int, IOSuggestion> SuggestionRowDict = new Dictionary<int, IOSuggestion>();
         public IOGenerationProjectSave()
         {
 

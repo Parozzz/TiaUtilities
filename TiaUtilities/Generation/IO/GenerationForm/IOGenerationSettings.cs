@@ -19,6 +19,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
         [JsonProperty] public IOConfiguration IOConfiguration { get; set; } = new IOConfiguration();
         [JsonProperty] public IOGenerationExcelImportSettings ExcelImportConfiguration { get; set; } = new IOGenerationExcelImportSettings();
         [JsonProperty] public string JSScript { get; set; } = "";
+        [JsonProperty] public string SuggestionJSScript { get; set; } = "";
         public IOGenerationSettings() { }
     }
 }

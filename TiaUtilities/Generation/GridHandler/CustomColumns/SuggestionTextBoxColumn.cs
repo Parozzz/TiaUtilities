@@ -30,7 +30,7 @@ namespace TiaXmlReader.Generation.GridHandler.CustomColumns
             }
         }
 
-        private readonly Func<string[]> GetItemsFunc;
+        
 
         private readonly DataGridViewCellCancelEventHandler cellBeginEditEvent;
         private readonly DataGridViewCellEventHandler cellEndEditEvent;
@@ -39,19 +39,23 @@ namespace TiaXmlReader.Generation.GridHandler.CustomColumns
         private readonly EventHandler editingControlTextChangedEvent;
 
         private ToolStripDropDown dropDown;
+        private Func<string[]> GetItemsFunc;
 
         private DataGridViewTextBoxEditingControl editingControl;
         private bool inEditMode;
 
-        public SuggestionTextBoxColumn(Func<string[]> GetItemsFunc)
+        public SuggestionTextBoxColumn()
         {
-            this.GetItemsFunc = GetItemsFunc;
-
             this.cellBeginEditEvent = this.CellBeginEditEvent;
             this.cellEndEditEvent = this.CellEndEditEvent;
             this.editingControlShowingEvent = this.EditingControlShowingEvent;
 
             this.editingControlTextChangedEvent = this.EditingControlTextChangedEvent;
+        }
+
+        public void SetGetItemsFunc(Func<string[]> GetItemsFunc)
+        {
+            this.GetItemsFunc = GetItemsFunc;
         }
 
         public void RegisterEvents(DataGridView dataGridView)
@@ -71,7 +75,7 @@ namespace TiaXmlReader.Generation.GridHandler.CustomColumns
         private void CellBeginEditEvent(object sender, DataGridViewCellCancelEventArgs args)
         {
             var dataGridView = (DataGridView)sender;
-            if (args.RowIndex < 0 || args.ColumnIndex < 0 || dataGridView.Columns[args.ColumnIndex] != this)
+            if (args.RowIndex < 0 || args.ColumnIndex < 0 || dataGridView.Columns[args.ColumnIndex] != this || GetItemsFunc == null)
             {
                 return;
             }
