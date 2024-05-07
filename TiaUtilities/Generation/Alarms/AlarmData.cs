@@ -51,19 +51,23 @@ namespace TiaXmlReader.Generation.Alarms
         [JsonProperty][Localization("ALARM_DATA_TIMER_VALUE")] public string TimerValue { get; set; }
         [JsonProperty][Localization("ALARM_DATA_DESCRIPTION")] public string Description { get; set; }
 
-        public object this[int i]
+        public object this[int column]
         {
             get
             {
-                if (i < 0 || i >= COLUMN_LIST.Count)
+                if (column < 0 || column >= COLUMN_LIST.Count)
                 {
                     throw new InvalidOperationException("Invalid index for get square bracket operator in IOData");
                 }
 
-                return COLUMN_LIST[i].PropertyInfo.GetValue(this);
+                return COLUMN_LIST[column].PropertyInfo.GetValue(this);
             }
         }
 
+        public GridDataColumn GetColumn(int column)
+        {
+            return COLUMN_LIST[column];
+        }
         public GridDataPreview GetPreview(int column, AlarmConfiguration config)
         {
             if(string.IsNullOrEmpty(AlarmVariable) || this.IsEmpty())

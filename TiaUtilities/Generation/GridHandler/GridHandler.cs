@@ -97,6 +97,7 @@ namespace TiaXmlReader.Generation.GridHandler
 
             this.DataGridView.SuspendLayout();
 
+            this.DataGridView.Name = "MyGrid_" + Guid.NewGuid().ToString();
             this.DataGridView.AutoGenerateColumns = false;
 
             this.DataGridView.Dock = DockStyle.Fill;
@@ -176,6 +177,9 @@ namespace TiaXmlReader.Generation.GridHandler
                         break;
                     case Keys.Escape:
                         this.ShowCell(null);
+                        break;
+                    case Keys.F5:
+                        this.DataGridView.Refresh();
                         break;
                     default:
                         handled = false;
@@ -466,14 +470,21 @@ namespace TiaXmlReader.Generation.GridHandler
                 return;
             }
 
-            this.DataGridView.SuspendLayout();
-            this.undoRedoHandler.Lock(); //Lock the handler. I do not want more actions been added by events here since are all handled below!
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
 
+            this.DataGridView.SuspendLayout();
+            
             try
             {
                 if (applyChanges)
                 {
-                    cellChangeList.ForEach(cellChange => cellChange.ApplyNewValue());
+                    this.undoRedoHandler.Lock();
+                    foreach (var cellChange in cellChangeList)
+                    {//Accessing DataSource instead of changing value of cell is WAAAAY faster (From 3s to 22ms)
+                        var data = this.DataSource[cellChange.RowIndex];
+                        data.GetColumn(cellChange.ColumnIndex).SetValueTo(data, cellChange.NewValue);
+                    }
                     this.undoRedoHandler.Unlock();
                 }
 
@@ -484,21 +495,30 @@ namespace TiaXmlReader.Generation.GridHandler
                 Utils.ShowExceptionMessage(ex);
             }
 
-            //NO REFRESH NEEDED HERE! WILL JUST SLOW EVERYTHING BY 3-4 TIMES!
+            this.DataGridView.Refresh();
             this.DataGridView.ResumeLayout();
             undoRedoHandler.Unlock(); //And a locked undoRedo
+
+            stopwatch.Stop();
+            Console.WriteLine("Stopwatch [ms]: " + stopwatch.ElapsedMilliseconds);
         }
 
         private void UndoChangeCells(List<GridCellChange> cellChangeList)
         {
             this.DataGridView.SuspendLayout();
-            this.undoRedoHandler.Lock();
+            
 
             try
             {
-                cellChangeList.ForEach(cellChange => cellChange.ApplyOldValue());
-                ShowCell(cellChangeList[cellChangeList.Count - 1].cell);  //Setting se current cell already center the grid to it.
+                this.undoRedoHandler.Lock();
+                foreach (var cellChange in cellChangeList)
+                {//Accessing DataSource instead of changing value of cell is WAAAAY faster (From 3s to 22ms)
+                    var data = this.DataSource[cellChange.RowIndex];
+                    data.GetColumn(cellChange.ColumnIndex).SetValueTo(data, cellChange.OldValue);
+                }
+                this.undoRedoHandler.Unlock();
 
+                ShowCell(cellChangeList[cellChangeList.Count - 1].cell);  //Setting se current cell already center the grid to it.
                 undoRedoHandler.AddRedo(() =>
                 {
                     ChangeCells(cellChangeList);
@@ -510,7 +530,7 @@ namespace TiaXmlReader.Generation.GridHandler
                 Utils.ShowExceptionMessage(ex);
             }
 
-            //NO REFRESH NEEDED HERE! WILL JUST SLOW EVERYTHING BY 3-4 TIMES!
+            this.DataGridView.Refresh();
             this.DataGridView.ResumeLayout();
             undoRedoHandler.Unlock(); //And a locked undoRedo
         }

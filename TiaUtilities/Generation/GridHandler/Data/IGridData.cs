@@ -17,5 +17,7 @@ namespace TiaXmlReader.Generation.GridHandler.Data
         GridDataPreview GetPreview(int column, C config);
         void Clear();
         bool IsEmpty();
+        GridDataColumn GetColumn(int column);
+        object this[int column] {  get; }
     }
 }

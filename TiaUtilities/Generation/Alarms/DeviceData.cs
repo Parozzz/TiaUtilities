@@ -36,7 +36,23 @@ namespace TiaXmlReader.Generation.Alarms
         [JsonProperty][Localization("DEVICE_DATA_NAME")] public string Name { get; set; }
         [JsonProperty][Localization("DEVICE_DATA_ADDRESS")] public string Address { get; set; }
         [JsonProperty][Localization("DEVICE_DATA_DESCRIPTION")] public string Description { get; set; }
+        public object this[int column]
+        {
+            get
+            {
+                if (column < 0 || column >= COLUMN_LIST.Count)
+                {
+                    throw new InvalidOperationException("Invalid index for get square bracket operator in IOData");
+                }
 
+                return COLUMN_LIST[column].PropertyInfo.GetValue(this);
+            }
+        }
+
+        public GridDataColumn GetColumn(int column)
+        {
+            return COLUMN_LIST[column];
+        }
         public GridDataPreview GetPreview(int column, AlarmConfiguration config)
         {
             return null;

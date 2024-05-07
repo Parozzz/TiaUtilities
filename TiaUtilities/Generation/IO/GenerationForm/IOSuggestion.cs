@@ -19,12 +19,29 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
         static IOSuggestion()
         {
             var type = typeof(IOSuggestion);
-            VALUE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOSuggestion.Value));
+            VALUE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOSuggestion.Value), "suggestion");
             COLUMN_LIST = GridDataColumn.GetStaticColumnList(type);
             COLUMN_LIST.Sort((x, y) => x.ColumnIndex.CompareTo(y.ColumnIndex));
         }
 
         [JsonProperty][Localization("IO_SUGGESTION_VALUE")] public string Value { get; set; }
+        public object this[int column]
+        {
+            get
+            {
+                if (column < 0 || column >= COLUMN_LIST.Count)
+                {
+                    throw new InvalidOperationException("Invalid index for get square bracket operator in IOData");
+                }
+
+                return COLUMN_LIST[column].PropertyInfo.GetValue(this);
+            }
+        }
+
+        public GridDataColumn GetColumn(int column)
+        {
+            return COLUMN_LIST[column];
+        }
 
         public GridDataPreview GetPreview(int column, IOConfiguration config)
         {

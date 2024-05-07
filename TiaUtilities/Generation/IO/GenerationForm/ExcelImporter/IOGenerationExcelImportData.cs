@@ -33,6 +33,24 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
         public string IOName { get; set; }
         public string Comment { get; set; }
 
+        public object this[int column]
+        {
+            get
+            {
+                if (column < 0 || column >= COLUMN_LIST.Count)
+                {
+                    throw new InvalidOperationException("Invalid index for get square bracket operator in IOData");
+                }
+
+                return COLUMN_LIST[column].PropertyInfo.GetValue(this);
+            }
+        }
+
+        public GridDataColumn GetColumn(int column)
+        {
+            return COLUMN_LIST[column];
+        }
+
         public GridDataPreview GetPreview(int column, IOGenerationExcelImportSettings config)
         {
             return null;

@@ -233,8 +233,8 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             this.ioGridHandler.SetDragPreviewAction(data => { IOGenerationUtils.DragPreview(data, this.ioGridHandler); });
             this.ioGridHandler.SetDragMouseUpAction(data => { IOGenerationUtils.DragMouseUp(data, this.ioGridHandler); });
 
-            this.suggestionGridHandler.SetDragPreviewAction(data => { GridUtils.DragPreview(data, this.ioGridHandler); });
-            this.suggestionGridHandler.SetDragMouseUpAction(data => { GridUtils.DragMouseUp(data, this.ioGridHandler); });
+            this.suggestionGridHandler.SetDragPreviewAction(data => { GridUtils.DragPreview(data, this.suggestionGridHandler); });
+            this.suggestionGridHandler.SetDragMouseUpAction(data => { GridUtils.DragMouseUp(data, this.suggestionGridHandler); });
             #endregion
             //Column initialization before gridHandler.Init()
             #region COLUMNS
@@ -284,6 +284,10 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             this.Shown += (sender, args) => autoSaveHandler.AddTickEventHandler(eventHandler);
             this.FormClosed += (sender, args) => autoSaveHandler.RemoveTickEventHandler(eventHandler);
             #endregion
+
+            this.ioGridHandler.TableScript.AddExternal(
+                () => IOSuggestion.COLUMN_LIST.Select(c => "suggestions [array]").ToList(),
+                () => new Dictionary<string, object>() { { "suggestions", this.suggestionGridHandler.DataSource.GetNotEmptyDataDict().Keys.Select(s => s.Value).ToArray() } });
 
             UpdateConfigPanel();
         }

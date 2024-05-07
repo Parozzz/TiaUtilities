@@ -21,6 +21,9 @@ namespace TiaXmlReader.Generation.GridHandler
         private readonly GridHandler<C, T> gridHandler;
         private readonly JavascriptErrorReportThread jsErrorHandlingThread;
 
+        private readonly List<Func<List<String>>> externalVariableNameFuncList;
+        private readonly List<Func<Dictionary<string, object>>> externalVariableFuncList;
+
         private Func<string> readScriptFunc;
         private Action<string> writeScriptAction;
         private ConfigFormJavascriptTextBoxLine javascriptTextBoxLine;
@@ -32,6 +35,8 @@ namespace TiaXmlReader.Generation.GridHandler
             this.gridHandler = gridHandler;
             this.jsErrorHandlingThread = jsErrorThread;
 
+            this.externalVariableNameFuncList = new List<Func<List<string>>>();
+            this.externalVariableFuncList = new List<Func<Dictionary<string, object>>>();
         }
 
         public GridTableScript<C, T> SetReadScriptFunc(Func<string> getJSTableScriptFunc)
@@ -46,6 +51,12 @@ namespace TiaXmlReader.Generation.GridHandler
             return this;
         }
 
+        public void AddExternal(Func<List<String>> variableNamesFunc, Func<Dictionary<string, object>> addVariableValueDict)
+        {
+            externalVariableNameFuncList.Add(variableNamesFunc);
+            externalVariableFuncList.Add(addVariableValueDict);
+        }
+
         public void ShowConfigForm(IWin32Window window)
         {
             var configForm = new ConfigForm("Espressione JS")
@@ -55,26 +66,37 @@ namespace TiaXmlReader.Generation.GridHandler
                 ShowControlBox = true,
             };
 
-            var text = "Variables: " + gridHandler.DataHandler.DataColumns.Select(c => c.ProgrammingFriendlyName + " [" + c.PropertyInfo.PropertyType.Name + "]").Aggregate((a, b) => a + ", " + b);
-            configForm.AddLine(text);
+            var variableList = gridHandler.DataHandler.DataColumns.Select(c => c.ProgrammingFriendlyName + " [" + c.PropertyInfo.PropertyType.Name + "]").ToList();
+            variableList.Add("row [int]");
+            foreach (var func in externalVariableNameFuncList)
+            {
+                var externalVariableList = func();
+                if (externalVariableList == null)
+                {
+                    continue;
+                }
 
+                variableList.AddRange(externalVariableList);
+            }
+
+            configForm.AddLine("Variables: " + variableList.Aggregate((a, b) => a + ", " + b));
             configForm.AddButtonPanelLine(null)
                 .AddButton("AutoFormattazione", () => this.javascriptTextBoxLine?.GetJavascriptFCTB().GetFCTB().DoAutoIndent())
                 .AddButton("Esegui Script", () => this.ParseJS());
-                /*.AddButton("Change Hotkeys", () =>
+            /*.AddButton("Change Hotkeys", () =>
+            {
+                var fctb = javascriptTextBoxLine?.GetJavascriptFCTB().GetFCTB();
+                if (fctb == null)
                 {
-                    var fctb = javascriptTextBoxLine?.GetJavascriptFCTB().GetFCTB();
-                    if (fctb == null)
-                    {
-                        return;
-                    }
+                    return;
+                }
 
-                    var hotkeysEditorForm = new HotkeysEditorForm(fctb.HotkeysMapping);
-                    if (hotkeysEditorForm.ShowDialog() == DialogResult.OK)
-                    {
-                        fctb.HotkeysMapping = hotkeysEditorForm.GetHotkeys();
-                    }
-                });*/
+                var hotkeysEditorForm = new HotkeysEditorForm(fctb.HotkeysMapping);
+                if (hotkeysEditorForm.ShowDialog() == DialogResult.OK)
+                {
+                    fctb.HotkeysMapping = hotkeysEditorForm.GetHotkeys();
+                }
+            });*/
 
             this.javascriptTextBoxLine = configForm.AddJavascriptTextBoxLine(null, height: 350)
                 .ControlText(readScriptFunc.Invoke())
@@ -123,11 +145,27 @@ namespace TiaXmlReader.Generation.GridHandler
                     options.Strict = true;
                 }))
                 {
+                    foreach (var func in externalVariableFuncList)
+                    {
+                        var externalVariableDict = func();
+                        if (externalVariableDict == null)
+                        {
+                            continue;
+                        }
+
+                        foreach (var entry in externalVariableDict)
+                        {
+                            engine.SetValue(entry.Key, entry.Value);
+                        }
+                    }
+
                     var changedDataDict = new Dictionary<int, T>();
                     foreach (var entry in gridHandler.DataSource.GetNotEmptyDataDict())
                     {
                         var rowIndex = entry.Value;
                         var data = entry.Key;
+
+                        engine.SetValue("row", rowIndex);
 
                         var newIOData = ExecuteTimedJS(scriptTimer, engine, preparedScript, data);
                         if (newIOData != null)
