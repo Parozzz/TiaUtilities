@@ -16,10 +16,9 @@ At the moment, this is what exists:
 Still WIP, but adds the ability to create segments programmatically. Still needs quite a grasp on how siemens generate .xml files since names are taken from there.
 
 Below an example on how to create an FC block.
-```
+```C#
 var fc = new BlockFC();
 
-#region BLOCK_ATTRIBUTES
 //Add basic block information, like name, number and programming language.
 fc.GetBlockAttributes()
     .SetBlockName("FC_TEST")
@@ -30,9 +29,7 @@ fc.GetBlockAttributes()
 var tempSection = fc.GetBlockAttributes().ComputeSection(SimaticML.nBlockAttributeList.SectionTypeEnum.TEMP);
 tempSection.AddMember("tVar1", SimaticDataType.BOOLEAN);
 tempSection.AddMember("tVar2", SimaticDataType.BOOLEAN);
-#region
 
-#region COMPILE_UNIT
 var compileUnit = fc.AddCompileUnit();
 
 //Create the parts that will form the compileUnit (Segment).
@@ -48,7 +45,6 @@ coil.CreateIdentWire(LocalVariableAccessData.Create(compileUnit, "tVar2"));
 // | --- || --- () 
 // |
 contact.CreatePowerrailConnection().CreateOutputConnection(coil);
-#endregion
 
 //Update all internal ID and UID of the block.
 fc.UpdateID_UId(new IDGenerator());
