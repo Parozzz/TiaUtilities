@@ -43,9 +43,7 @@ namespace TiaXmlReader.Utility
         {
             var scriptCalcInfo = new CalcInfo().Calculate(this.scriptTimeInfoList);
 
-            var message = $"JS Script executed for {classInfo}\n";
-            message += $"Average[ms]: {scriptCalcInfo.Average}, Deviation[ms]: {scriptCalcInfo.Deviation}, Min[ms]: {scriptCalcInfo.Min}, Max[ms]: {scriptCalcInfo.Max}, Executions: {executions}\n";
-            message += $"Script:\n";
+            var message = $"JS executed for {classInfo}. Avg[ms]:{scriptCalcInfo.Average}, Dev[ms]:{scriptCalcInfo.Deviation}, Min[ms]:{scriptCalcInfo.Min}, Max[ms]:{scriptCalcInfo.Max}, Count:{executions}\n";
             message += $"{script}";
 
             LogHandler.INSTANCE.AddMessage(message, "scripts");
