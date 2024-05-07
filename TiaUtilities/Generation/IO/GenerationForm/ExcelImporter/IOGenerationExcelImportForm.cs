@@ -28,13 +28,12 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
 
         public IEnumerable<IOGenerationExcelImportData> ImportDataEnumerable { get => gridHandler.DataSource.GetNotEmptyDataDict().Keys; }
 
-        public IOGenerationExcelImportForm(JavascriptScriptErrorReportingThread jsErrorHandlingThread, IOGenerationExcelImportSettings settings, GridSettings gridSettings)
+        public IOGenerationExcelImportForm(JavascriptErrorReportThread jsErrorHandlingThread, IOGenerationExcelImportSettings settings, GridSettings gridSettings)
         {
             InitializeComponent();
 
             this.settings = settings;
-            this.gridHandler = new GridHandler<IOGenerationExcelImportSettings, IOGenerationExcelImportData>
-                (jsErrorHandlingThread, this.dataGridView, gridSettings, settings, IOGenerationExcelImportData.COLUMN_LIST)
+            this.gridHandler = new GridHandler<IOGenerationExcelImportSettings, IOGenerationExcelImportData>(jsErrorHandlingThread, gridSettings, settings)
             {
                 RowCount = 1999
             };
@@ -56,6 +55,8 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
 
         private void Init()
         {
+            this.MainTableLayoutPanel.Controls.Add(this.gridHandler.DataGridView);
+
             #region FORM
             this.AcceptButton.Click += (object sender, EventArgs args) =>
             {

@@ -32,13 +32,11 @@
             this.TopPanel = new System.Windows.Forms.TableLayoutPanel();
             this.ImportExcelButton = new System.Windows.Forms.Button();
             this.ConfigButton = new System.Windows.Forms.Button();
-            this.dataGridView = new System.Windows.Forms.DataGridView();
             this.BottomPanel = new System.Windows.Forms.TableLayoutPanel();
             this.CancelButton = new System.Windows.Forms.Button();
             this.AcceptButton = new System.Windows.Forms.Button();
             this.MainTableLayoutPanel.SuspendLayout();
             this.TopPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
             this.BottomPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -49,7 +47,6 @@
             this.MainTableLayoutPanel.ColumnCount = 1;
             this.MainTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.MainTableLayoutPanel.Controls.Add(this.TopPanel, 0, 0);
-            this.MainTableLayoutPanel.Controls.Add(this.dataGridView, 0, 1);
             this.MainTableLayoutPanel.Controls.Add(this.BottomPanel, 0, 2);
             this.MainTableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MainTableLayoutPanel.Location = new System.Drawing.Point(0, 0);
@@ -101,16 +98,6 @@
             this.ConfigButton.Text = "Configurazione";
             this.ConfigButton.UseVisualStyleBackColor = true;
             // 
-            // dataGridView
-            // 
-            this.dataGridView.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.dataGridView.BackgroundColor = System.Drawing.SystemColors.Control;
-            this.dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView.Location = new System.Drawing.Point(3, 115);
-            this.dataGridView.Name = "dataGridView";
-            this.dataGridView.Size = new System.Drawing.Size(794, 154);
-            this.dataGridView.TabIndex = 2;
-            // 
             // BottomPanel
             // 
             this.BottomPanel.AutoSize = true;
@@ -157,14 +144,14 @@
             this.AcceptButton.Text = "Accetta";
             this.AcceptButton.UseVisualStyleBackColor = true;
             // 
-            // IOGenerationExcelImporterForm
+            // IOGenerationExcelImportForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(800, 385);
             this.ControlBox = false;
             this.Controls.Add(this.MainTableLayoutPanel);
-            this.Name = "IOGenerationExcelImporterForm";
+            this.Name = "IOGenerationExcelImportForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.Text = "IO Generation Excel Importer";
@@ -172,7 +159,6 @@
             this.MainTableLayoutPanel.PerformLayout();
             this.TopPanel.ResumeLayout(false);
             this.TopPanel.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).EndInit();
             this.BottomPanel.ResumeLayout(false);
             this.BottomPanel.PerformLayout();
             this.ResumeLayout(false);
@@ -188,7 +174,6 @@
         private System.Windows.Forms.TableLayoutPanel BottomPanel;
         private System.Windows.Forms.Button CancelButton;
         private System.Windows.Forms.Button AcceptButton;
-        private System.Windows.Forms.DataGridView dataGridView;
         private System.Windows.Forms.Button ConfigButton;
     }
 }

@@ -27,7 +27,7 @@ namespace TiaXmlReader
     {
         private readonly ProgramSettings programSettings;
         private readonly TimedSaveHandler autoSaveHandler;
-        private readonly JavascriptScriptErrorReportingThread jsErrorHandlingThread;
+        private readonly JavascriptErrorReportThread jsErrorHandlingThread;
 
         public MainImportExportForm()
         {
@@ -37,7 +37,7 @@ namespace TiaXmlReader
             this.programSettings.Save(); //To create file if not exist!
 
             this.autoSaveHandler = new TimedSaveHandler(programSettings, this.autoSaveComboBox.ComboBox);
-            this.jsErrorHandlingThread = new JavascriptScriptErrorReportingThread();
+            this.jsErrorHandlingThread = new JavascriptErrorReportThread();
 
             Init();
         }

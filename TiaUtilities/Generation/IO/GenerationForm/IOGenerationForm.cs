@@ -26,7 +26,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
     {
         private const int MERKER_ADDRESS_COLUMN_SIZE = 80;
 
-        private readonly JavascriptScriptErrorReportingThread jsErrorHandlingThread;
+        private readonly JavascriptErrorReportThread jsErrorHandlingThread;
         private readonly TimedSaveHandler autoSaveHandler;
         private readonly IOGenerationSettings settings;
 
@@ -45,7 +45,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
 
         private string lastFilePath;
 
-        public IOGenerationForm(JavascriptScriptErrorReportingThread jsErrorHandlingThread, TimedSaveHandler autoSaveHandler, IOGenerationSettings settings, GridSettings gridSettings)
+        public IOGenerationForm(JavascriptErrorReportThread jsErrorHandlingThread, TimedSaveHandler autoSaveHandler, IOGenerationSettings settings, GridSettings gridSettings)
         {
             InitializeComponent();
 
@@ -54,12 +54,12 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             this.settings = settings;
             this.gridSettings = gridSettings;
 
-            this.ioGridHandler = new GridHandler<IOConfiguration, IOData>(jsErrorHandlingThread, this.ioDataGridView, gridSettings, IOConfig, IOData.COLUMN_LIST, new IOGenerationComparer())
+            this.ioGridHandler = new GridHandler<IOConfiguration, IOData>(jsErrorHandlingThread, gridSettings, IOConfig, new IOGenerationComparer())
             {
                 RowCount = 2999
             };
 
-            this.suggestionGridHandler = new GridHandler<IOConfiguration, IOSuggestion>(jsErrorHandlingThread, this.suggestionDataGridView, gridSettings, IOConfig, IOSuggestion.COLUMN_LIST, null)
+            this.suggestionGridHandler = new GridHandler<IOConfiguration, IOSuggestion>(jsErrorHandlingThread, gridSettings, IOConfig)
             {
                 RowCount = 1999,
             };
@@ -93,6 +93,9 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
 
         public void Init()
         {
+            this.GridsSplitContainer.Panel1.Controls.Add(this.suggestionGridHandler.DataGridView);
+            this.GridsSplitContainer.Panel2.Controls.Add(this.ioGridHandler.DataGridView);
+
             #region TopMenu
             this.saveToolStripMenuItem.Click += (object sender, EventArgs args) => { this.ProjectSave(); };
             this.saveAsToolStripMenuItem.Click += (object sender, EventArgs args) => { this.ProjectSave(true); };
@@ -255,8 +258,8 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             this.suggestionGridHandler.AddTextBoxColumn(IOSuggestion.VALUE, 0);
             #endregion
 
-            this.ioDataGridView.CellValueChanged += (sender, args) => UpdateSuggestionColors();
-            this.suggestionDataGridView.CellValueChanged += (sender, args) => UpdateSuggestionColors();
+            this.ioGridHandler.DataGridView.CellValueChanged += (sender, args) => UpdateSuggestionColors();
+            this.suggestionGridHandler.DataGridView.CellValueChanged += (sender, args) => UpdateSuggestionColors();
 
             this.ioGridHandler?.Init();
             this.suggestionGridHandler?.Init();
@@ -307,8 +310,8 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             var loadedProjectSave = IOGenerationProjectSave.Load(ref lastFilePath);
             if (loadedProjectSave != null)
             {
-                this.ioDataGridView.SuspendLayout();
-                this.suggestionDataGridView.SuspendLayout();
+                this.ioGridHandler.DataGridView.SuspendLayout();
+                this.suggestionGridHandler.DataGridView.SuspendLayout();
 
                 this.ioGridHandler.DataSource.InitializeData(this.ioGridHandler.RowCount);
                 this.suggestionGridHandler.DataSource.InitializeData(this.suggestionGridHandler.RowCount);
@@ -334,11 +337,11 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                 }
                 this.UpdateSuggestionColors(suspendLayout: false);
 
-                this.ioDataGridView.Refresh();
-                this.suggestionDataGridView.Refresh();
+                this.ioGridHandler.DataGridView.Refresh();
+                this.suggestionGridHandler.DataGridView.Refresh();
 
-                this.ioDataGridView.ResumeLayout();
-                this.suggestionDataGridView.ResumeLayout();
+                this.ioGridHandler.DataGridView.ResumeLayout();
+                this.suggestionGridHandler.DataGridView.ResumeLayout();
 
                 this.Text = this.Name + ". Project File: " + lastFilePath;
             }
@@ -348,12 +351,14 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
         {
             if (suspendLayout)
             {
-                this.suggestionDataGridView.SuspendLayout();
+                this.suggestionGridHandler.DataGridView.SuspendLayout();
             }
 
-            foreach (DataGridViewRow row in this.suggestionDataGridView.Rows)
+            foreach (DataGridViewRow row in this.suggestionGridHandler.DataGridView.Rows)
             {
-                row.Cells[0].Style.BackColor = SystemColors.ControlLightLight;
+                var cellStyle = row.Cells[0].Style;
+                cellStyle.BackColor = SystemColors.ControlLightLight;
+                cellStyle.SelectionBackColor = Color.LightGray;
             }
 
             var ioDataEnumerable = ioGridHandler.DataSource.GetNotEmptyData().Select(d => d.Variable);
@@ -365,17 +370,14 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                 var row = entry.Value;
                 if (ioDataEnumerable.Contains(suggestion.Value))
                 {
-                    this.suggestionDataGridView.Rows[row].Cells[0].Style.BackColor = Color.LightSeaGreen;
-                }
-                else
-                {
-                    this.suggestionDataGridView.Rows[row].Cells[0].Style.BackColor = Color.Orange;
+                    var cellStyle = this.suggestionGridHandler.DataGridView.Rows[row].Cells[0].Style;
+                    cellStyle.BackColor = cellStyle.SelectionBackColor = Color.LightGreen;
                 }
             }
 
             if (suspendLayout)
             {
-                this.suggestionDataGridView.ResumeLayout();
+                this.suggestionGridHandler.DataGridView.ResumeLayout();
             }
         }
 

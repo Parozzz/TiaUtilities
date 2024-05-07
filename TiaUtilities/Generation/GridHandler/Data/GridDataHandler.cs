@@ -17,10 +17,27 @@ namespace TiaXmlReader.Generation.GridHandler.Data
         private readonly DataGridView dataGridView;
         public List<GridDataColumn> DataColumns { get; private set; }
 
-        public GridDataHandler(DataGridView dataGridView, List<GridDataColumn> dataColumns)
+        public GridDataHandler(DataGridView dataGridView)
         {
             this.dataGridView = dataGridView;
-            this.DataColumns = dataColumns;
+            this.DataColumns = ValidateColumnList();
+        }
+
+        private List<GridDataColumn> ValidateColumnList()
+        {
+            var type = typeof(T);
+            var fieldInfo = type.GetField("COLUMN_LIST", BindingFlags.Static | BindingFlags.Public);
+            if(fieldInfo == null)
+            {
+                throw new MissingFieldException("IGridData must have a public static List<GridDataColumn> COLUMN_LIST field for " + type.Name);
+            }
+
+            if(fieldInfo.FieldType != typeof(List<GridDataColumn>))
+            {
+                throw new MissingFieldException("IGridData must have a public static List<GridDataColumn> COLUMN_LIST field for " + type.Name);
+            }
+
+            return (List<GridDataColumn>)fieldInfo.GetValue(null);
         }
 
         public T CreateInstance()

@@ -279,7 +279,7 @@
     <Compile Include="Generation\Alarms\AlarmExcelImporter.cs" />
     <Compile Include="Javascript\FCTB\CustomWavyLineStyle.cs" />
     <Compile Include="Javascript\JavascriptAutocompleteMenu.cs" />
-    <Compile Include="Javascript\JavascriptScriptErrorReportingThread.cs" />
+    <Compile Include="Javascript\JavascriptErrorReportThread.cs" />
     <Compile Include="Javascript\JavascriptFCTB.cs" />
     <Compile Include="Localization\LocalizationAttribute.cs" />
     <Compile Include="Localization\LocalizationHelper.cs" />
@@ -340,6 +340,7 @@
     <Compile Include="Utility\Extensions\ColorConverterExtension.cs" />
     <Compile Include="Utility\Constants.cs" />
     <Compile Include="Utility\Extensions\DictionaryExtensions.cs" />
+    <Compile Include="Utility\Extensions\ListExtensions.cs" />
     <Compile Include="Utility\LogHandler.cs" />
     <Compile Include="Utility\ScriptTimer.cs" />
     <Compile Include="Localization\LocalizationVariables.cs" />

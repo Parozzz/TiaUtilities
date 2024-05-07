@@ -19,7 +19,7 @@ namespace TiaXmlReader.Generation.GridHandler
     public class GridTableScript<C, T> where C : IGenerationConfiguration where T : IGridData<C>
     {
         private readonly GridHandler<C, T> gridHandler;
-        private readonly JavascriptScriptErrorReportingThread jsErrorHandlingThread;
+        private readonly JavascriptErrorReportThread jsErrorHandlingThread;
 
         private Func<string> readScriptFunc;
         private Action<string> writeScriptAction;
@@ -27,7 +27,7 @@ namespace TiaXmlReader.Generation.GridHandler
 
         public bool Valid { get => readScriptFunc != null && writeScriptAction != null; }
 
-        public GridTableScript(GridHandler<C, T> gridHandler, JavascriptScriptErrorReportingThread jsErrorThread)
+        public GridTableScript(GridHandler<C, T> gridHandler, JavascriptErrorReportThread jsErrorThread)
         {
             this.gridHandler = gridHandler;
             this.jsErrorHandlingThread = jsErrorThread;

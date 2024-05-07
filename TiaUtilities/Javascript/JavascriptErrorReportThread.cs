@@ -9,7 +9,7 @@ using TiaXmlReader.Utility;
 
 namespace TiaXmlReader.Javascript
 {
-    public class JavascriptScriptErrorReportingThread
+    public class JavascriptErrorReportThread
     {
         public const int RUN_TIME_MS = 333;
 
@@ -36,7 +36,7 @@ namespace TiaXmlReader.Javascript
 
         public volatile bool Busy;
 
-        public JavascriptScriptErrorReportingThread()
+        public JavascriptErrorReportThread()
         {
             this.worker = new BackgroundWorker();
             this.timer = new Timer() { Interval = RUN_TIME_MS };

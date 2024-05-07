@@ -22,7 +22,7 @@ namespace TiaXmlReader.Javascript
 
         private readonly FastColoredTextBox fctb;
 
-        private JavascriptScriptErrorReportingThread.JSScriptReport scriptReport;
+        private JavascriptErrorReportThread.JSScriptReport scriptReport;
         private DisplayedError currentError;
 
         private bool haltError; //This is required to avoid having the wavy style contantly flash on screen. After changing text, give some time before accetting new text!
@@ -116,12 +116,12 @@ namespace TiaXmlReader.Javascript
             };
         }
 
-        public void RegisterErrorReport(JavascriptScriptErrorReportingThread errorReportingThread)
+        public void RegisterErrorReport(JavascriptErrorReportThread errorReportingThread)
         {
             this.scriptReport = errorReportingThread.RegisterScript(() => fctb.Text, this.ScriptReportDone);
         }
 
-        public void UnregisterErrorReport(JavascriptScriptErrorReportingThread errorReportingThread)
+        public void UnregisterErrorReport(JavascriptErrorReportThread errorReportingThread)
         {
             if(scriptReport != null)
             {

@@ -53,19 +53,13 @@
             this.partitionTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
             this.memoryTypeLabel = new System.Windows.Forms.Label();
             this.GridsSplitPanel = new System.Windows.Forms.SplitContainer();
-            this.DeviceDataGridView = new System.Windows.Forms.DataGridView();
-            this.AlarmDataGridView = new System.Windows.Forms.DataGridView();
             this.mainPanel.SuspendLayout();
             this.TopTableLayoutPanel.SuspendLayout();
             this.TopMenuStrip.SuspendLayout();
             this.configPanel.SuspendLayout();
             this.configButtonPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.GridsSplitPanel)).BeginInit();
-            this.GridsSplitPanel.Panel1.SuspendLayout();
-            this.GridsSplitPanel.Panel2.SuspendLayout();
             this.GridsSplitPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.DeviceDataGridView)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.AlarmDataGridView)).BeginInit();
             this.SuspendLayout();
             // 
             // mainPanel
@@ -327,44 +321,13 @@
             // GridsSplitPanel
             // 
             this.GridsSplitPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.GridsSplitPanel.Location = new System.Drawing.Point(3, 112);
+            this.GridsSplitPanel.Location = new System.Drawing.Point(5, 114);
+            this.GridsSplitPanel.Margin = new System.Windows.Forms.Padding(5);
             this.GridsSplitPanel.Name = "GridsSplitPanel";
-            // 
-            // GridsSplitPanel.Panel1
-            // 
-            this.GridsSplitPanel.Panel1.Controls.Add(this.DeviceDataGridView);
-            // 
-            // GridsSplitPanel.Panel2
-            // 
-            this.GridsSplitPanel.Panel2.Controls.Add(this.AlarmDataGridView);
-            this.GridsSplitPanel.Size = new System.Drawing.Size(1378, 696);
-            this.GridsSplitPanel.SplitterDistance = 250;
+            this.GridsSplitPanel.Size = new System.Drawing.Size(1374, 692);
+            this.GridsSplitPanel.SplitterDistance = 249;
             this.GridsSplitPanel.SplitterWidth = 20;
             this.GridsSplitPanel.TabIndex = 19;
-            // 
-            // DeviceDataGridView
-            // 
-            this.DeviceDataGridView.BackgroundColor = System.Drawing.SystemColors.Control;
-            this.DeviceDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.DeviceDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.DeviceDataGridView.Location = new System.Drawing.Point(0, 0);
-            this.DeviceDataGridView.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
-            this.DeviceDataGridView.Name = "DeviceDataGridView";
-            this.DeviceDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.DeviceDataGridView.Size = new System.Drawing.Size(250, 696);
-            this.DeviceDataGridView.TabIndex = 2;
-            // 
-            // AlarmDataGridView
-            // 
-            this.AlarmDataGridView.BackgroundColor = System.Drawing.SystemColors.Control;
-            this.AlarmDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.AlarmDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AlarmDataGridView.Location = new System.Drawing.Point(0, 0);
-            this.AlarmDataGridView.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
-            this.AlarmDataGridView.Name = "AlarmDataGridView";
-            this.AlarmDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.AlarmDataGridView.Size = new System.Drawing.Size(1108, 696);
-            this.AlarmDataGridView.TabIndex = 3;
             // 
             // AlarmGenerationForm
             // 
@@ -385,12 +348,8 @@
             this.configPanel.ResumeLayout(false);
             this.configPanel.PerformLayout();
             this.configButtonPanel.ResumeLayout(false);
-            this.GridsSplitPanel.Panel1.ResumeLayout(false);
-            this.GridsSplitPanel.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.GridsSplitPanel)).EndInit();
             this.GridsSplitPanel.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.DeviceDataGridView)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.AlarmDataGridView)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -404,7 +363,6 @@
         private System.Windows.Forms.Label divisionTypeLabel;
         public CustomControls.FlatComboBox partitionTypeComboBox;
         private System.Windows.Forms.Label memoryTypeLabel;
-        private System.Windows.Forms.DataGridView DeviceDataGridView;
         private System.Windows.Forms.Label PlaceholdersLabel;
         public System.Windows.Forms.Button fcConfigButton;
         public System.Windows.Forms.Button alarmGenerationConfigButton;
@@ -421,7 +379,6 @@
         private System.Windows.Forms.ToolStripMenuItem importExportToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exportXMLToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem preferencesToolStripMenuItem;
-        private System.Windows.Forms.DataGridView AlarmDataGridView;
         private System.Windows.Forms.SplitContainer GridsSplitPanel;
         public System.Windows.Forms.Button emptyAlarmGenerationConfigButton;
         public System.Windows.Forms.Button textListConfigButton;

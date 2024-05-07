@@ -51,8 +51,6 @@
             this.divisionTypeLabel = new System.Windows.Forms.Label();
             this.memoryTypeLabel = new System.Windows.Forms.Label();
             this.GridsSplitContainer = new System.Windows.Forms.SplitContainer();
-            this.suggestionDataGridView = new System.Windows.Forms.DataGridView();
-            this.ioDataGridView = new System.Windows.Forms.DataGridView();
             this.groupingTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
             this.memoryTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
             this.mainPanel.SuspendLayout();
@@ -61,11 +59,7 @@
             this.configPanel.SuspendLayout();
             this.configButtonPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.GridsSplitContainer)).BeginInit();
-            this.GridsSplitContainer.Panel1.SuspendLayout();
-            this.GridsSplitContainer.Panel2.SuspendLayout();
             this.GridsSplitContainer.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.suggestionDataGridView)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.ioDataGridView)).BeginInit();
             this.SuspendLayout();
             // 
             // mainPanel
@@ -80,7 +74,7 @@
             this.mainPanel.Location = new System.Drawing.Point(0, 0);
             this.mainPanel.Margin = new System.Windows.Forms.Padding(0);
             this.mainPanel.Name = "mainPanel";
-            this.mainPanel.RowCount = 3;
+            this.mainPanel.RowCount = 2;
             this.mainPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.mainPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.mainPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
@@ -302,43 +296,12 @@
             // GridsSplitContainer
             // 
             this.GridsSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.GridsSplitContainer.Location = new System.Drawing.Point(3, 112);
+            this.GridsSplitContainer.Location = new System.Drawing.Point(5, 114);
+            this.GridsSplitContainer.Margin = new System.Windows.Forms.Padding(5);
             this.GridsSplitContainer.Name = "GridsSplitContainer";
-            // 
-            // GridsSplitContainer.Panel1
-            // 
-            this.GridsSplitContainer.Panel1.Controls.Add(this.suggestionDataGridView);
-            // 
-            // GridsSplitContainer.Panel2
-            // 
-            this.GridsSplitContainer.Panel2.Controls.Add(this.ioDataGridView);
-            this.GridsSplitContainer.Size = new System.Drawing.Size(1258, 546);
-            this.GridsSplitContainer.SplitterDistance = 347;
+            this.GridsSplitContainer.Size = new System.Drawing.Size(1254, 562);
+            this.GridsSplitContainer.SplitterDistance = 345;
             this.GridsSplitContainer.TabIndex = 19;
-            // 
-            // suggestionDataGridView
-            // 
-            this.suggestionDataGridView.BackgroundColor = System.Drawing.SystemColors.Control;
-            this.suggestionDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.suggestionDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.suggestionDataGridView.Location = new System.Drawing.Point(0, 0);
-            this.suggestionDataGridView.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
-            this.suggestionDataGridView.Name = "suggestionDataGridView";
-            this.suggestionDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.suggestionDataGridView.Size = new System.Drawing.Size(347, 546);
-            this.suggestionDataGridView.TabIndex = 3;
-            // 
-            // ioDataGridView
-            // 
-            this.ioDataGridView.BackgroundColor = System.Drawing.SystemColors.Control;
-            this.ioDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.ioDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ioDataGridView.Location = new System.Drawing.Point(0, 0);
-            this.ioDataGridView.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
-            this.ioDataGridView.Name = "ioDataGridView";
-            this.ioDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.ioDataGridView.Size = new System.Drawing.Size(907, 546);
-            this.ioDataGridView.TabIndex = 2;
             // 
             // groupingTypeComboBox
             // 
@@ -375,12 +338,8 @@
             this.configPanel.ResumeLayout(false);
             this.configPanel.PerformLayout();
             this.configButtonPanel.ResumeLayout(false);
-            this.GridsSplitContainer.Panel1.ResumeLayout(false);
-            this.GridsSplitContainer.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.GridsSplitContainer)).EndInit();
             this.GridsSplitContainer.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.suggestionDataGridView)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.ioDataGridView)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -394,7 +353,6 @@
         private System.Windows.Forms.Label divisionTypeLabel;
         public CustomControls.FlatComboBox memoryTypeComboBox;
         private System.Windows.Forms.Label memoryTypeLabel;
-        private System.Windows.Forms.DataGridView ioDataGridView;
         private System.Windows.Forms.Label PlaceholdersLabel;
         public System.Windows.Forms.Button fcConfigButton;
         public System.Windows.Forms.Button dbConfigButton;
@@ -414,6 +372,5 @@
         private System.Windows.Forms.ToolStripMenuItem preferencesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem importSuggestionsToolStripMenuItem;
         private System.Windows.Forms.SplitContainer GridsSplitContainer;
-        private System.Windows.Forms.DataGridView suggestionDataGridView;
     }
 }

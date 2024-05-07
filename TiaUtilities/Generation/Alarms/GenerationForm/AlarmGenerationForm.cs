@@ -27,7 +27,7 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
 
         private string lastFilePath;
 
-        public AlarmGenerationForm(JavascriptScriptErrorReportingThread jsErrorHandlingThread, TimedSaveHandler autoSaveHandler, AlarmGenerationSettings settings, GridSettings gridSettings)
+        public AlarmGenerationForm(JavascriptErrorReportThread jsErrorHandlingThread, TimedSaveHandler autoSaveHandler, AlarmGenerationSettings settings, GridSettings gridSettings)
         {
             InitializeComponent();
 
@@ -35,15 +35,8 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             this.settings = settings;
             this.gridSettings = gridSettings;
 
-            this.deviceGridHandler = new GridHandler<AlarmConfiguration, DeviceData>(jsErrorHandlingThread, this.DeviceDataGridView, gridSettings, AlarmConfig, DeviceData.COLUMN_LIST, null)
-            {
-                RowCount = 499
-            };
-
-            this.alarmGridHandler = new GridHandler<AlarmConfiguration, AlarmData>(jsErrorHandlingThread,this.AlarmDataGridView, gridSettings, AlarmConfig, AlarmData.COLUMN_LIST, null)
-            {
-                RowCount = 29
-            };
+            this.deviceGridHandler = new GridHandler<AlarmConfiguration, DeviceData>(jsErrorHandlingThread, gridSettings, AlarmConfig) { RowCount = 499 };
+            this.alarmGridHandler = new GridHandler<AlarmConfiguration, AlarmData>(jsErrorHandlingThread, gridSettings, AlarmConfig) { RowCount = 29 };
 
             this.configHandler = new AlarmGenerationFormConfigHandler(this, this.AlarmConfig, this.deviceGridHandler, this.alarmGridHandler);
 
@@ -74,6 +67,9 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
 
         public void Init()
         {
+            this.GridsSplitPanel.Panel1.Controls.Add(this.deviceGridHandler.DataGridView);
+            this.GridsSplitPanel.Panel2.Controls.Add(this.alarmGridHandler.DataGridView);
+
             #region TopMenu
             this.saveToolStripMenuItem.Click += (object sender, EventArgs args) => { this.ProjectSave(); };
             this.saveAsToolStripMenuItem.Click += (object sender, EventArgs args) => { this.ProjectSave(true); };
@@ -209,8 +205,8 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             var loadedProjectSave = AlarmGenerationProjectSave.Load(ref lastFilePath);
             if (loadedProjectSave != null)
             {
-                this.AlarmDataGridView.SuspendLayout();
-                this.DeviceDataGridView.SuspendLayout();
+                this.alarmGridHandler.DataGridView.SuspendLayout();
+                this.deviceGridHandler.DataGridView.SuspendLayout();
 
                 this.alarmGridHandler.DataSource.InitializeData(this.alarmGridHandler.RowCount);
                 this.deviceGridHandler.DataSource.InitializeData(this.deviceGridHandler.RowCount);
@@ -235,10 +231,11 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
                     }
                 }
 
-                this.AlarmDataGridView.Refresh();
-                this.DeviceDataGridView.Refresh();
-                this.AlarmDataGridView.ResumeLayout();
-                this.DeviceDataGridView.ResumeLayout();
+                this.alarmGridHandler.DataGridView.Refresh();
+                this.deviceGridHandler.DataGridView.Refresh();
+
+                this.alarmGridHandler.DataGridView.ResumeLayout();
+                this.deviceGridHandler.DataGridView.ResumeLayout();
 
                 this.Text = this.Name + ". Project File: " + lastFilePath;
             }

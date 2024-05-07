@@ -13,6 +13,7 @@ using TiaXmlReader.GenerationForms;
 using TiaXmlReader.Javascript;
 using TiaXmlReader.Generation.GridHandler.CustomColumns;
 using TiaXmlReader.Utility.Extensions;
+using System.Diagnostics;
 
 namespace TiaXmlReader.Generation.GridHandler
 {
@@ -26,14 +27,15 @@ namespace TiaXmlReader.Generation.GridHandler
             public bool Visible { get; set; } = true;
         }
 
-        private readonly DataGridView dataGridView;
         private readonly GridSettings settings;
         private readonly C configuration;
-        public GridDataHandler<C, T> DataHandler { get; private set; }
-        public GridDataSource<C, T> DataSource { get; private set; }
         private readonly UndoRedoHandler undoRedoHandler;
         private readonly GridExcelDragHandler excelDragHandler;
         private readonly GridSortHandler<C, T> sortHandler;
+
+        public DataGridView DataGridView { get; private set; }
+        public GridDataHandler<C, T> DataHandler { get; private set; }
+        public GridDataSource<C, T> DataSource { get; private set; }
         public GridTableScript<C, T> TableScript { get; private set; }
 
         private readonly List<ColumnInfo> columnInfoList;
@@ -45,21 +47,21 @@ namespace TiaXmlReader.Generation.GridHandler
         public bool AddRowIndexToRowHeader { get; set; } = true;
         public bool EnablePasteFromExcel { get; set; } = true;
         public bool EnableRowSelectionFromRowHeaderClick { get; set; } = true;
-        public bool ShowJSContextMenuTopLeft {  get; set; } = true;
+        public bool ShowJSContextMenuTopLeft { get; set; } = true;
 
-        public GridHandler(JavascriptScriptErrorReportingThread jsErrorHandlingThread, DataGridView dataGridView, GridSettings settings, C configuration, List<GridDataColumn> dataColumnList, IGridRowComparer<C, T> comparer = null)
+        public GridHandler(JavascriptErrorReportThread jsErrorThread, GridSettings settings, C configuration, IGridRowComparer<C, T> comparer = null)
         {
-            this.dataGridView = dataGridView;
-            // BUG => System.InvalidOperationException: 'L'operazione non può essere eseguita mentre è in corso il ridimensionamento di una colonna con riempimento automatico.'
-            // FIX = https://stackoverflow.com/questions/34344499/invalidoperationexception-this-operation-cannot-be-performed-while-an-auto-fill
+            this.DataGridView = new MyGrid();
+
             this.settings = settings;
             this.configuration = configuration;
-            this.DataHandler = new GridDataHandler<C, T>(this.dataGridView, dataColumnList);
-            this.DataSource = new GridDataSource<C, T>(this.dataGridView, this.DataHandler);
             this.undoRedoHandler = new UndoRedoHandler();
-            this.excelDragHandler = new GridExcelDragHandler(this.dataGridView, settings);
-            this.sortHandler = new GridSortHandler<C, T>(this.dataGridView, this.DataSource, this.undoRedoHandler, comparer);
-            this.TableScript = new GridTableScript<C, T>(this, jsErrorHandlingThread);
+            this.excelDragHandler = new GridExcelDragHandler(this.DataGridView, settings);
+
+            this.DataHandler = new GridDataHandler<C, T>(this.DataGridView);
+            this.DataSource = new GridDataSource<C, T>(this.DataGridView, this.DataHandler);
+            this.sortHandler = new GridSortHandler<C, T>(this.DataGridView, this.DataSource, this.undoRedoHandler, comparer);
+            this.TableScript = new GridTableScript<C, T>(this, jsErrorThread);
 
             this.columnInfoList = new List<ColumnInfo>();
             this.cellPainterList = new List<IGridCellPainter>();
@@ -82,45 +84,45 @@ namespace TiaXmlReader.Generation.GridHandler
 
         public void Refresh()
         {
-            this.dataGridView.RefreshEdit();
-            this.dataGridView.Refresh();
+            this.DataGridView.RefreshEdit();
+            this.DataGridView.Refresh();
         }
 
         public void Init()
         {
-            if(init)
+            if (init)
             {
                 return;
             }
 
-            typeof(DataGridView).InvokeMember("DoubleBuffered", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty, null, this.dataGridView, new object[] { true });
+            this.DataGridView.SuspendLayout();
 
-            this.dataGridView.SuspendLayout();
+            this.DataGridView.AutoGenerateColumns = false;
 
-            this.dataGridView.AutoGenerateColumns = false;
+            this.DataGridView.Dock = DockStyle.Fill;
+            this.DataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None; //Is faster?
+            this.DataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
+            this.DataGridView.AllowUserToResizeRows = false;
 
-            this.dataGridView.Dock = DockStyle.Fill;
-            this.dataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.DataGridView.ClipboardCopyMode = DataGridViewClipboardCopyMode.Disable; //Do it myself!
+            this.DataGridView.SelectionMode = DataGridViewSelectionMode.CellSelect;
+            this.DataGridView.MultiSelect = true;
 
-            this.dataGridView.ClipboardCopyMode = DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
-            this.dataGridView.SelectionMode = DataGridViewSelectionMode.CellSelect;
-            this.dataGridView.MultiSelect = true;
+            this.DataGridView.EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2;
+            this.DataGridView.Font = settings.GridFont;
+            this.DataGridView.AllowUserToAddRows = false;
 
-            this.dataGridView.EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2;
-            this.dataGridView.Font = settings.GridFont;
-            this.dataGridView.AllowUserToAddRows = false;
-
-            this.dataGridView.DataError += DataErrorEventHandler;
+            this.DataGridView.DataError += DataErrorEventHandler;
 
             this.DataSource.InitializeData(this.RowCount);
 
             InitColumns();
 
             #region Cell Paiting
-            var paintHandler = new GridCellPaintHandler(this.dataGridView);
+            var paintHandler = new GridCellPaintHandler(this.DataGridView);
             paintHandler.AddPainter(this.sortHandler); //ORDER IS IMPORTANT!
             paintHandler.AddPainter(this.excelDragHandler);
-            paintHandler.AddPainter(new GridCellPreview<C,T>(this.DataSource, this.configuration, this.settings));
+            paintHandler.AddPainter(new GridCellPreview<C, T>(this.DataSource, this.configuration, this.settings));
             paintHandler.AddPainterRange(cellPainterList);
             paintHandler.Init();
             #endregion
@@ -128,7 +130,7 @@ namespace TiaXmlReader.Generation.GridHandler
             #region RowHeaderNumber
             if (AddRowIndexToRowHeader)
             {
-                this.dataGridView.RowPostPaint += (sender, args) =>
+                this.DataGridView.RowPostPaint += (sender, args) =>
                 {
                     var style = args.InheritedRowStyle;
 
@@ -142,92 +144,98 @@ namespace TiaXmlReader.Generation.GridHandler
                     };
 
                     var textSize = TextRenderer.MeasureText(rowIdx, style.Font); //get the size of the string
-                    dataGridView.RowHeadersWidth = Math.Max(dataGridView.RowHeadersWidth, textSize.Width + 15); //if header width lower then string width then resize
+                    DataGridView.RowHeadersWidth = Math.Max(DataGridView.RowHeadersWidth, textSize.Width + 15); //if header width lower then string width then resize
 
-                    var headerBounds = new Rectangle(args.RowBounds.Left, args.RowBounds.Top, dataGridView.RowHeadersWidth, args.RowBounds.Height);
+                    var headerBounds = new Rectangle(args.RowBounds.Left, args.RowBounds.Top, DataGridView.RowHeadersWidth, args.RowBounds.Height);
                     args.Graphics.DrawString(rowIdx, style.Font, SystemBrushes.ControlText, headerBounds, centerFormat);
                 };
             }
             #endregion
 
             #region KeyDown - Paste/Delete/Undo/Redo
-            this.dataGridView.KeyDown += (sender, args) =>
+            this.DataGridView.KeyDown += (sender, args) =>
             {
-                bool ctrlZ = args.Modifiers == Keys.Control && args.KeyCode == Keys.Z;
-                bool ctrlY = args.Modifiers == Keys.Control && args.KeyCode == Keys.Y;
-                bool ctrlV = args.Modifiers == Keys.Control && args.KeyCode == Keys.V;
-                bool shiftIns = args.Modifiers == Keys.Shift && args.KeyCode == Keys.Insert;
-
-                if (EnablePasteFromExcel && (ctrlV || shiftIns))
+                var handled = true;
+                switch (args.KeyData)
                 {
-                    PasteFromExcel();
+                    case Keys.Z | Keys.Control:
+                        undoRedoHandler.Undo();
+                        break;
+                    case Keys.Y | Keys.Control:
+                        undoRedoHandler.Redo();
+                        break;
+                    case Keys.C | Keys.Control:
+                        GridUtils.CopyAsExcel(this.DataGridView);
+                        break;
+                    case Keys.Insert | Keys.Shift:
+                    case Keys.V | Keys.Control:
+                        ChangeCells(GridUtils.PasteAsExcel(this.DataGridView));
+                        break;
+                    case Keys.Delete:
+                        this.DeleteSelectedCells();
+                        break;
+                    case Keys.Escape:
+                        this.ShowCell(null);
+                        break;
+                    default:
+                        handled = false;
+                        break;
                 }
 
-                if (args.KeyCode == Keys.Delete || args.KeyCode == Keys.Cancel)
-                {
-                    DeleteSelectedCells();
-                }
-
-                if (ctrlZ)
-                {
-                    undoRedoHandler.Undo();
-                }
-
-                if (ctrlY)
-                {
-                    undoRedoHandler.Redo();
-                }
+                args.Handled = handled;
             };
             #endregion
 
             #region MouseClick - RowSelection
             if (EnableRowSelectionFromRowHeaderClick)
             {
-                int lastClickedRowIndex = -1;
-                this.dataGridView.MouseDown += (sender, args) =>
+                this.DataGridView.MouseDown += (sender, args) =>
                 {
-                    var hitTest = dataGridView.HitTest(args.X, args.Y);
-                    if (hitTest.Type != DataGridViewHitTestType.RowHeader)
-                    {
-                        lastClickedRowIndex = -1;
-                    }
-
+                    var hitTest = this.DataGridView.HitTest(args.X, args.Y);
                     switch (hitTest.Type)
                     {
                         case DataGridViewHitTestType.None: //I want that to clear the selection, you do a simple click in an empty area!
-                            dataGridView.ClearSelection();
-                            dataGridView.CurrentCell = null; //This avoid the situation where if you click the old cell again, it start editing immediately! 
+                            this.DataGridView.ClearSelection();
+                            this.DataGridView.CurrentCell = null; //This avoid the situation where if you click the old cell again, it start editing immediately! 
                             break;
                         case DataGridViewHitTestType.RowHeader: //If i click a row head, i want the whole row to be selected!
-                            if (Control.ModifierKeys == Keys.Shift && dataGridView.CurrentRow != null)
+                            var currentRow = this.DataGridView.CurrentRow;
+                            if (Control.ModifierKeys == Keys.Shift && currentRow != null)
                             {
-                                var biggestIndex = Math.Max(lastClickedRowIndex, hitTest.RowIndex);
-                                var lowestIndex = Math.Min(lastClickedRowIndex, hitTest.RowIndex);
-                                for (int x = lowestIndex + 1; x < biggestIndex + 1; x++)
+                                if (hitTest.RowIndex < 0)
                                 {
-                                    if (x == dataGridView.CurrentRow.Index)
-                                    {
-                                        continue;
-                                    }
-
-                                    foreach (DataGridViewCell cell in dataGridView.Rows[x].Cells)
-                                    {
-                                        cell.Selected = !cell.Selected;
-                                    }
+                                    break;
                                 }
 
-                                lastClickedRowIndex = hitTest.RowIndex;
+                                var startRowIndex = currentRow.Index;
+                                var endRowIndex = hitTest.RowIndex;
+
+                                this.DataGridView.ClearSelection();
+
+                                var biggestIndex = Math.Max(startRowIndex, endRowIndex);
+                                var lowestIndex = Math.Min(startRowIndex, endRowIndex);
+                                for (int x = lowestIndex; x < biggestIndex + 1; x++)
+                                {
+                                    foreach (DataGridViewCell cell in this.DataGridView.Rows[x].Cells)
+                                    {
+                                        cell.Selected = true;
+                                    }
+                                }
                             }
                             else
                             {
-                                dataGridView.ClearSelection();
-                                dataGridView.CurrentCell = dataGridView.Rows[hitTest.RowIndex].Cells[0]; //I need to set the current cell, because i use the CurrentRow as a "starting row"
-                                                                                                         //Do not cancel current cell! It might select the first cell in the grid and mess up selection.
+                                this.DataGridView.ClearSelection();
 
-                                lastClickedRowIndex = hitTest.RowIndex;
-                                foreach (DataGridViewCell cell in dataGridView.Rows[hitTest.RowIndex].Cells)
+                                var hitRow = this.DataGridView.Rows[hitTest.RowIndex];
+                                if (hitRow.Cells.Count > 0)
                                 {
-                                    cell.Selected = true;
+                                    //I need to set the current cell, because i use the CurrentRow as a "starting row"
+                                    //Do not cancel current cell! It might select the first cell in the grid and mess up selection.
+                                    this.DataGridView.CurrentCell = hitRow.Cells[0];
+                                    foreach (DataGridViewCell cell in hitRow.Cells)
+                                    {
+                                        cell.Selected = true;
+                                    }
                                 }
                             }
 
@@ -241,44 +249,44 @@ namespace TiaXmlReader.Generation.GridHandler
 
             #region CellEdit Begin-End
             GridCellChange textBoxCellEdit = null;
-            dataGridView.CellBeginEdit += (sender, args) =>
+            DataGridView.CellBeginEdit += (sender, args) =>
             {
                 textBoxCellEdit = null;
 
-                var cell = this.dataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex];
+                var cell = this.DataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex];
                 if (cell is DataGridViewTextBoxCell || cell is DataGridViewComboBoxCell)
                 {
                     textBoxCellEdit = new GridCellChange(cell);
                 }
             };
 
-            dataGridView.CellEndEdit += (sender, args) =>
+            DataGridView.CellEndEdit += (sender, args) =>
             {
                 if (textBoxCellEdit?.cell == null)
                 {
                     return;
                 }
 
-                var cell = this.dataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex];
+                var cell = this.DataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex];
                 if (cell == textBoxCellEdit.cell)
                 {
-                    textBoxCellEdit.NewValue = dataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex].Value;
+                    textBoxCellEdit.NewValue = DataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex].Value;
                     ChangeCell(textBoxCellEdit, applyChanges: false);
 
                     textBoxCellEdit = null;
                 }
             };
 
-            dataGridView.CellContentClick += (sender, args) =>
+            DataGridView.CellContentClick += (sender, args) =>
             {
                 var rowIndex = args.RowIndex;
                 var columnIndex = args.ColumnIndex;
-                if(rowIndex < 0 || rowIndex >= this.dataGridView.RowCount || columnIndex < 0 || columnIndex >= this.dataGridView.ColumnCount)
+                if (rowIndex < 0 || rowIndex >= this.DataGridView.RowCount || columnIndex < 0 || columnIndex >= this.DataGridView.ColumnCount)
                 {
                     return;
                 }
 
-                var cell = this.dataGridView.Rows[rowIndex].Cells[columnIndex];
+                var cell = this.DataGridView.Rows[rowIndex].Cells[columnIndex];
                 if (cell is DataGridViewCheckBoxCell checkBoxCell)
                 {
                     var oldValue = (bool)(checkBoxCell.Value ?? false); //In this case the value is still the old one. For checkBox, been boolean value, i can predict the next!
@@ -289,18 +297,18 @@ namespace TiaXmlReader.Generation.GridHandler
             #endregion
 
             #region SHOW_JS_CONTEXT_MENU
-            this.dataGridView.CellMouseClick += (sender, args) =>
+            this.DataGridView.CellMouseClick += (sender, args) =>
             {
                 if (args.RowIndex == -1 && args.ColumnIndex == -1 && args.Button == MouseButtons.Right && this.TableScript.Valid)
                 {
                     var menuItem = new MenuItem();
                     menuItem.Text = "Execute Javascript";
-                    menuItem.Click += (s, a) => this.TableScript.ShowConfigForm(this.dataGridView);
+                    menuItem.Click += (s, a) => this.TableScript.ShowConfigForm(this.DataGridView);
 
                     var contextMenu = new ContextMenu();
                     contextMenu.MenuItems.Add(menuItem);
 
-                    contextMenu.Show(this.dataGridView, this.dataGridView.PointToClient(Cursor.Position));
+                    contextMenu.Show(this.DataGridView, this.DataGridView.PointToClient(Cursor.Position));
                 }
             };
             #endregion
@@ -308,14 +316,14 @@ namespace TiaXmlReader.Generation.GridHandler
             this.excelDragHandler.Init();
             this.sortHandler.Init();
 
-            this.dataGridView.ResumeLayout();
+            this.DataGridView.ResumeLayout();
 
             init = true;
         }
 
         private void DataErrorEventHandler(object sender, DataGridViewDataErrorEventArgs args)
         {
-            var cell = this.dataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex];
+            var cell = this.DataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex];
             if (cell is DataGridViewComboBoxCell comboBoxCell)
             {
                 comboBoxCell.Value = "";
@@ -358,30 +366,30 @@ namespace TiaXmlReader.Generation.GridHandler
 
         public ColumnInfo GetColumnInfo(GridDataColumn dataColumn)
         {
-           return columnInfoList.Where(i => i.DataColumn == dataColumn).FirstOrDefault();
+            return columnInfoList.Where(i => i.DataColumn == dataColumn).FirstOrDefault();
         }
 
         public void InitColumns()
         {
-            foreach(var column in this.dataGridView.Columns)
+            foreach (var column in this.DataGridView.Columns)
             {
-                if(column is IGridCustomColumn customColumn)
+                if (column is IGridCustomColumn customColumn)
                 {
-                    customColumn.UnregisterEvents(this.dataGridView);
+                    customColumn.UnregisterEvents(this.DataGridView);
                 }
             }
 
-            this.dataGridView.Columns.Clear();
+            this.DataGridView.Columns.Clear();
 
             columnInfoList.Sort((one, two) => one.DataColumn.ColumnIndex.CompareTo(two.DataColumn.ColumnIndex));
             foreach (var columnInfo in columnInfoList)
             {
                 var column = columnInfo.Column;
-                if(columnInfo.Visible)
+                if (columnInfo.Visible)
                 {
                     if (column is IGridCustomColumn customColumn)
                     {
-                        customColumn.RegisterEvents(this.dataGridView);
+                        customColumn.RegisterEvents(this.DataGridView);
                     }
 
                     column.Visible = true;
@@ -389,10 +397,6 @@ namespace TiaXmlReader.Generation.GridHandler
                     column.Name = columnInfo.DataColumn.Name;
                     column.DisplayIndex = columnInfo.DataColumn.ColumnIndex;
                     column.DataPropertyName = columnInfo.DataColumn.DataPropertyName;
-                    column.DefaultCellStyle.SelectionBackColor = Color.LightGray;
-                    column.DefaultCellStyle.BackColor = SystemColors.ControlLightLight;
-                    column.DefaultCellStyle.SelectionForeColor = Color.Black;
-                    column.DefaultCellStyle.ForeColor = Color.Black;
                     column.AutoSizeMode = columnInfo.Width <= 0 ? DataGridViewAutoSizeColumnMode.Fill : DataGridViewAutoSizeColumnMode.None;
                     column.Width = columnInfo.Width;
                     column.MinimumWidth = 15;
@@ -401,28 +405,26 @@ namespace TiaXmlReader.Generation.GridHandler
                     column.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
                     column.HeaderCell.Style.Padding = new Padding(0);
                     column.HeaderCell.Style.WrapMode = DataGridViewTriState.True;
+
+                    column.DefaultCellStyle.SelectionBackColor = Color.LightGray;
+                    column.DefaultCellStyle.BackColor = SystemColors.ControlLightLight;
+                    column.DefaultCellStyle.SelectionForeColor = Color.Black;
+                    column.DefaultCellStyle.ForeColor = Color.Black;
                 }
                 else
                 {
                     column.Visible = false;
                 }
 
-                this.dataGridView.Columns.Add(column);
+                this.DataGridView.Columns.Add(column);
             }
         }
 
         public bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            switch (keyData)
-            {
-                case Keys.Escape:
-                    this.ShowCell(null);
-                    break;
-            }
-
-            foreach (var column in this.dataGridView.Columns)
-            {
-                if(column is IGridCustomColumn customColumn && customColumn.ProcessCmdKey(ref msg, keyData))
+            foreach (var column in this.DataGridView.Columns)
+            {//This is required for some special actions! (Like arrows for Suggestions!)
+                if (column is IGridCustomColumn customColumn && customColumn.ProcessCmdKey(ref msg, keyData))
                 {
                     return true;
                 }
@@ -431,63 +433,10 @@ namespace TiaXmlReader.Generation.GridHandler
             return false;
         }
 
-        private void PasteFromExcel()
-        {
-            var clipboardDataObject = (DataObject)Clipboard.GetDataObject();
-            if (clipboardDataObject.GetDataPresent(DataFormats.Text))
-            {
-                var pastedCellList = new List<GridCellChange>();
-
-                var pasteString = clipboardDataObject.GetData(DataFormats.Text).ToString();
-                if (pasteString.Contains("\r\n") || pasteString.Contains('\t'))
-                {//If contains new lines or tab it needs to handled like an excel file. New line => next row. Tab => next column.
-                    string[] pastedRows = Regex.Split(pasteString.TrimEnd("\r\n".ToCharArray()), "\r\n");
-
-                    int startRowPointer = dataGridView.CurrentCell.RowIndex; //The currentCell row index needs to be taken BEFORE adding cells otherwise it will be moved!
-                    int startColumnPointer = dataGridView.CurrentCell.ColumnIndex;
-
-                    int rowPointer = startRowPointer;
-                    for (int pastedRowIndex = startRowPointer; pastedRowIndex < pastedRows.Length; rowPointer++, pastedRowIndex++)
-                    {
-                        if (rowPointer >= dataGridView.RowCount)
-                        {
-                            break;
-                        }
-
-                        string[] pastedColumns = pastedRows[pastedRowIndex].Split('\t');
-
-                        int columnPointer = startColumnPointer;
-                        for (int pastedColumnPointer = 0; pastedColumnPointer < pastedColumns.Length; columnPointer++, pastedColumnPointer++)
-                        {
-                            if (columnPointer >= dataGridView.ColumnCount)
-                            {
-                                break;
-                            }
-
-                            var cell = dataGridView.Rows[rowPointer]?.Cells[columnPointer];
-                            if (cell != null)
-                            {
-                                pastedCellList.Add(new GridCellChange(cell) { NewValue = pastedColumns[pastedColumnPointer] });
-                            }
-                        }
-                    }
-                }
-                else
-                {//If is a normal string, i will paste in ALL the selected cells!
-                    foreach (DataGridViewCell selectedCell in dataGridView.SelectedCells)
-                    {
-                        pastedCellList.Add(new GridCellChange(selectedCell) { NewValue = pasteString });
-                    }
-                }
-
-                ChangeCells(pastedCellList);
-            }
-        }
-
         public void DeleteSelectedCells()
         {
             var deletedCellList = new List<GridCellChange>();
-            foreach (DataGridViewCell selectedCell in dataGridView.SelectedCells)
+            foreach (DataGridViewCell selectedCell in DataGridView.SelectedCells)
             {
                 deletedCellList.Add(new GridCellChange(selectedCell) { NewValue = null }); //Set value to null so it will clear also checkboxes
             }
@@ -512,44 +461,58 @@ namespace TiaXmlReader.Generation.GridHandler
 
         public void ChangeCells(List<GridCellChange> cellChangeList, bool applyChanges = true)
         {
-            if (cellChangeList.Count == 0)
+            if (cellChangeList == null || cellChangeList.Count == 0)
             {
                 return;
             }
+
+            this.DataGridView.SuspendLayout();
+            this.undoRedoHandler.Lock(); //Lock the handler. I do not want more actions been added by events here since are all handled below!
 
             try
             {
                 if (applyChanges)
                 {
-                    undoRedoHandler.Lock(); //Lock the handler. I do not want more actions been added by events here since are all handled below!
-
                     cellChangeList.ForEach(cellChange => cellChange.ApplyNewValue());
-                    dataGridView.Refresh();
-
-                    undoRedoHandler.Unlock();
+                    this.undoRedoHandler.Unlock();
                 }
 
-                void undoRedoAction()
-                {
-                    undoRedoHandler.Lock();
-                    cellChangeList.ForEach(cellChange => cellChange.ApplyOldValue());
-                    undoRedoHandler.Unlock();
-
-                    ShowCell(cellChangeList[cellChangeList.Count - 1].cell);  //Setting se current cell already center the grid to it.
-                    undoRedoHandler.AddRedo(() =>
-                    {
-                        ChangeCells(cellChangeList);
-                        ShowCell(cellChangeList[0].cell);  //Setting se current cell already center the grid to it.
-                    });
-                }
-
-                undoRedoHandler.AddUndo(undoRedoAction);
-
+                undoRedoHandler.AddUndo(() => UndoChangeCells(cellChangeList));
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString(), "Error while changing cells", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Utils.ShowExceptionMessage(ex);
             }
+
+            //NO REFRESH NEEDED HERE! WILL JUST SLOW EVERYTHING BY 3-4 TIMES!
+            this.DataGridView.ResumeLayout();
+            undoRedoHandler.Unlock(); //And a locked undoRedo
+        }
+
+        private void UndoChangeCells(List<GridCellChange> cellChangeList)
+        {
+            this.DataGridView.SuspendLayout();
+            this.undoRedoHandler.Lock();
+
+            try
+            {
+                cellChangeList.ForEach(cellChange => cellChange.ApplyOldValue());
+                ShowCell(cellChangeList[cellChangeList.Count - 1].cell);  //Setting se current cell already center the grid to it.
+
+                undoRedoHandler.AddRedo(() =>
+                {
+                    ChangeCells(cellChangeList);
+                    ShowCell(cellChangeList[0].cell);  //Setting se current cell already center the grid to it.
+                });
+            }
+            catch (Exception ex)
+            {
+                Utils.ShowExceptionMessage(ex);
+            }
+
+            //NO REFRESH NEEDED HERE! WILL JUST SLOW EVERYTHING BY 3-4 TIMES!
+            this.DataGridView.ResumeLayout();
+            undoRedoHandler.Unlock(); //And a locked undoRedo
         }
 
         public void AddData(IEnumerable<T> dataEnumerable)
@@ -557,11 +520,11 @@ namespace TiaXmlReader.Generation.GridHandler
             var dataDict = new Dictionary<int, T>();
 
             var emptyIndexList = DataSource.GetFirstEmptyRowIndexes(dataEnumerable.Count());
-            
+
             int i = 0;
-            foreach(var data in dataEnumerable)
+            foreach (var data in dataEnumerable)
             {
-                if(i >= emptyIndexList.Count)
+                if (i >= emptyIndexList.Count)
                 {
                     break;
                 }
@@ -574,12 +537,35 @@ namespace TiaXmlReader.Generation.GridHandler
 
         private void ShowCell(DataGridViewCell cell)
         {
-            dataGridView.RefreshEdit(); //This is required to refresh checkbox otherwise, if the undo is in a selected cell, it will not update visually (DATA IS CHANGED!)
-            dataGridView.Refresh();
+            DataGridView.RefreshEdit(); //This is required to refresh checkbox otherwise, if the undo is in a selected cell, it will not update visually (DATA IS CHANGED!)
+            DataGridView.Refresh();
 
-            dataGridView.CurrentCell = cell; //Setting se current cell already center the grid to it.
-            dataGridView.Refresh();
+            DataGridView.CurrentCell = cell; //Setting se current cell already center the grid to it.
+            DataGridView.Refresh();
         }
 
+    }
+
+    internal class MyGrid : DataGridView
+    {
+        public MyGrid()
+        {
+            this.SetStyle(ControlStyles.SupportsTransparentBackColor, true); //this is the key
+            this.DoubleBuffered = true;
+        }
+
+        protected override void OnHandleCreated(EventArgs e)
+        {
+            // BUG => System.InvalidOperationException: 'L'operazione non può essere eseguita mentre è in corso il ridimensionamento di una colonna con riempimento automatico.'
+            // FIX = https://stackoverflow.com/questions/34344499/invalidoperationexception-this-operation-cannot-be-performed-while-an-auto-fill
+
+            // Touching the TopLeftHeaderCell here prevents
+            // System.InvalidOperationException:
+            // This operation cannot be performed while
+            // an auto-filled column is being resized.
+
+            var topLeftHeaderCell = TopLeftHeaderCell;
+            base.OnHandleCreated(e);
+        }
     }
 }
