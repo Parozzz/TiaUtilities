@@ -9,6 +9,7 @@ using TiaXmlReader.Generation.IO;
 using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Generation.IO.GenerationForm;
 using TiaXmlReader.Generation.GridHandler;
+using TiaXmlReader.Generation.Placeholders;
 
 namespace TiaXmlReader.Generation.IO.GenerationForm
 {
@@ -51,25 +52,21 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             form.dbConfigButton.Click += (object sender, EventArgs args) =>
             {
                 var configForm = new ConfigForm("DB Appoggi");
-                configForm.AddTextBoxLine("Nome")
+                configForm.AddTextBoxLine("Nome > " + GenerationPlaceholders.IO.CONFIG_DB_NAME)
                     .ControlText(config.DBName)
                     .TextChanged(str => config.DBName = str);
 
-                configForm.AddTextBoxLine("Numero")
+                configForm.AddTextBoxLine("Numero > " + GenerationPlaceholders.IO.CONFIG_DB_NUMBER)
                     .ControlText(config.DBNumber)
                     .UIntChanged(num => config.DBNumber = num);
 
-                configForm.AddTextBoxLine("Prefisso In")
-                    .ControlText(config.PrefixInputDB)
-                    .TextChanged(str => config.PrefixInputDB = str);
+                configForm.AddTextBoxLine("Valore Default Input")
+                    .ControlText(config.DefaultDBInputVariable)
+                    .TextChanged(str => config.DefaultDBInputVariable = str);
 
-                configForm.AddTextBoxLine("Prefisso Out")
-                    .ControlText(config.PrefixOutputDB)
-                    .TextChanged(str => config.PrefixOutputDB = str);
-
-                configForm.AddTextBoxLine("Nome variabile default")
-                    .ControlText(config.DefaultVariableName)
-                    .TextChanged(str => config.DefaultVariableName = str);
+                configForm.AddTextBoxLine("Valore Default Output")
+                    .ControlText(config.DefaultDBOutputVariable)
+                    .TextChanged(str => config.DefaultDBOutputVariable = str);
 
                 SetupConfigForm(form.dbConfigButton, configForm);
             };
@@ -81,29 +78,29 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                     .ControlText(config.VariableTableName)
                     .TextChanged(str => config.VariableTableName = str);
 
-                configForm.AddTextBoxLine("Indirizzo Start Input")
-                    .ControlText(config.VariableTableInputStartAddress)
-                    .UIntChanged(num => config.VariableTableInputStartAddress = num);
-
-                configForm.AddTextBoxLine("Indirizzo Start Output")
-                    .ControlText(config.VariableTableOutputStartAddress)
-                    .UIntChanged(num => config.VariableTableOutputStartAddress = num);
-
                 configForm.AddTextBoxLine("Nuova ogni n° bit")
                     .ControlText(config.VariableTableSplitEvery)
                     .UIntChanged(num => config.VariableTableSplitEvery = num);
 
-                configForm.AddTextBoxLine("Prefisso In")
-                    .ControlText(config.PrefixInputMerker)
-                    .TextChanged(str => config.PrefixInputMerker = str);
+                configForm.AddLine("Variabile Input");
 
-                configForm.AddTextBoxLine("Prefisso Out")
-                    .ControlText(config.PrefixOutputMerker)
-                    .TextChanged(str => config.PrefixOutputMerker = str);
+                configForm.AddTextBoxLine("Indirizzo Start")
+                    .ControlText(config.VariableTableInputStartAddress)
+                    .UIntChanged(num => config.VariableTableInputStartAddress = num);
 
-                configForm.AddTextBoxLine("Nome variabile default")
-                    .ControlText(config.DefaultVariableName)
-                    .TextChanged(str => config.DefaultVariableName = str);
+                configForm.AddTextBoxLine("Valore Default")
+                    .ControlText(config.DefaultMerkerInputVariable)
+                    .TextChanged(str => config.DefaultMerkerInputVariable = str);
+
+                configForm.AddLine("Variabile Output");
+
+                configForm.AddTextBoxLine("Indirizzo Start")
+                    .ControlText(config.VariableTableOutputStartAddress)
+                    .UIntChanged(num => config.VariableTableOutputStartAddress = num);
+
+                configForm.AddTextBoxLine("Valore Default")
+                    .ControlText(config.DefaultMerkerOutputVariable)
+                    .TextChanged(str => config.DefaultMerkerOutputVariable = str);
 
                 SetupConfigForm(form.variableTableConfigButton, configForm);
             };

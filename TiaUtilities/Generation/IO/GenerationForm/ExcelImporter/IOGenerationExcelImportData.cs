@@ -50,6 +50,10 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
         {
             return COLUMN_LIST[column];
         }
+        public GridDataPreview GetPreview(GridDataColumn column, IOGenerationExcelImportSettings config)
+        {
+            return this.GetPreview(column.ColumnIndex, config);
+        }
 
         public GridDataPreview GetPreview(int column, IOGenerationExcelImportSettings config)
         {
@@ -65,7 +69,5 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
         {
             return string.IsNullOrEmpty(Address) && string.IsNullOrEmpty(IOName) && string.IsNullOrEmpty(Comment);
         }
-
-
     }
 }

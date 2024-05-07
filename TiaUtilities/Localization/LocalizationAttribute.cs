@@ -60,9 +60,11 @@ namespace TiaXmlReader.Localization
         }
 
         private readonly string jsonKey;
-        public LocalizationAttribute(string jsonKey)
+        private readonly string append;
+        public LocalizationAttribute(string jsonKey, string append = "")
         {
             this.jsonKey = jsonKey;
+            this.append = append;
         }
 
         public string GetTranslation() //Can be null!
@@ -79,7 +81,7 @@ namespace TiaXmlReader.Localization
                 }
             }
 
-            return langDictionary.GetOrDefault(this.jsonKey);
+            return langDictionary.GetOrDefault(this.jsonKey) + append ?? "";
         }
     }
 }

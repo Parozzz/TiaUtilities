@@ -12,5 +12,10 @@ namespace TiaXmlReader.Generation.GridHandler.Data
         public string DefaultValue { get; set; }
         public string Value { get; set; }
         public string Suffix { get; set; }
+
+        public string ComposeDefaultValue()
+        {
+            return Prefix ?? "" + DefaultValue ?? "" + Suffix ?? "";
+        }
     }
 }

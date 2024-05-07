@@ -46,15 +46,19 @@ namespace TiaXmlReader.Generation.IO
         [JsonProperty] public uint IOTableSplitEvery = 250;
 
         [JsonProperty] public string DefaultIoName = "{memory_type}{byte}_{bit}";
-        [JsonProperty] public string DefaultVariableName = "{io_name}";
+        //[JsonProperty] public string DefaultVariableName = "{io_name}";
+        [JsonProperty] public string DefaultDBInputVariable = "{config_db_name}.IN.{io_name}";
+        [JsonProperty] public string DefaultDBOutputVariable = "{config_db_name}.OUT.{io_name}";
+        [JsonProperty] public string DefaultMerkerInputVariable = "MI_{io_name}";
+        [JsonProperty] public string DefaultMerkerOutputVariable = "MO_{io_name}";
 
         [JsonProperty] public string SegmentNameBitGrouping = "{memory_type}{byte}_{bit} - {comment}";
         [JsonProperty] public string SegmentNameByteGrouping = "{memory_type}B{byte}";
 
-        [JsonProperty] public string PrefixInputDB = "IN.";
-        [JsonProperty] public string PrefixInputMerker = "MI_";
-        [JsonProperty] public string PrefixOutputDB = "OUT.";
-        [JsonProperty] public string PrefixOutputMerker = "MO_";
+        //[JsonProperty] public string PrefixInputDB = "IN.";
+        //[JsonProperty] public string PrefixInputMerker = "MI_";
+        //[JsonProperty] public string PrefixOutputDB = "OUT.";
+        //[JsonProperty] public string PrefixOutputMerker = "MO_";
 
     }
 }

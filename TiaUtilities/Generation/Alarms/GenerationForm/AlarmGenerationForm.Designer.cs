@@ -48,11 +48,11 @@
             this.fieldPrefixConfigButton = new System.Windows.Forms.Button();
             this.segmentNameConfigButton = new System.Windows.Forms.Button();
             this.textListConfigButton = new System.Windows.Forms.Button();
-            this.groupingTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
             this.divisionTypeLabel = new System.Windows.Forms.Label();
-            this.partitionTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
             this.memoryTypeLabel = new System.Windows.Forms.Label();
             this.GridsSplitPanel = new System.Windows.Forms.SplitContainer();
+            this.groupingTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
+            this.partitionTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
             this.mainPanel.SuspendLayout();
             this.TopTableLayoutPanel.SuspendLayout();
             this.TopMenuStrip.SuspendLayout();
@@ -282,14 +282,6 @@
             this.textListConfigButton.Text = "Lista testi";
             this.textListConfigButton.UseVisualStyleBackColor = true;
             // 
-            // groupingTypeComboBox
-            // 
-            this.groupingTypeComboBox.FormattingEnabled = true;
-            this.groupingTypeComboBox.Location = new System.Drawing.Point(377, 33);
-            this.groupingTypeComboBox.Name = "groupingTypeComboBox";
-            this.groupingTypeComboBox.Size = new System.Drawing.Size(133, 21);
-            this.groupingTypeComboBox.TabIndex = 3;
-            // 
             // divisionTypeLabel
             // 
             this.divisionTypeLabel.AutoSize = true;
@@ -299,14 +291,6 @@
             this.divisionTypeLabel.Size = new System.Drawing.Size(149, 18);
             this.divisionTypeLabel.TabIndex = 2;
             this.divisionTypeLabel.Text = "Tipo raggruppamento";
-            // 
-            // partitionTypeComboBox
-            // 
-            this.partitionTypeComboBox.FormattingEnabled = true;
-            this.partitionTypeComboBox.Location = new System.Drawing.Point(123, 33);
-            this.partitionTypeComboBox.Name = "partitionTypeComboBox";
-            this.partitionTypeComboBox.Size = new System.Drawing.Size(100, 21);
-            this.partitionTypeComboBox.TabIndex = 1;
             // 
             // memoryTypeLabel
             // 
@@ -325,9 +309,25 @@
             this.GridsSplitPanel.Margin = new System.Windows.Forms.Padding(5);
             this.GridsSplitPanel.Name = "GridsSplitPanel";
             this.GridsSplitPanel.Size = new System.Drawing.Size(1374, 692);
-            this.GridsSplitPanel.SplitterDistance = 249;
+            this.GridsSplitPanel.SplitterDistance = 550;
             this.GridsSplitPanel.SplitterWidth = 20;
             this.GridsSplitPanel.TabIndex = 19;
+            // 
+            // groupingTypeComboBox
+            // 
+            this.groupingTypeComboBox.FormattingEnabled = true;
+            this.groupingTypeComboBox.Location = new System.Drawing.Point(377, 33);
+            this.groupingTypeComboBox.Name = "groupingTypeComboBox";
+            this.groupingTypeComboBox.Size = new System.Drawing.Size(133, 21);
+            this.groupingTypeComboBox.TabIndex = 3;
+            // 
+            // partitionTypeComboBox
+            // 
+            this.partitionTypeComboBox.FormattingEnabled = true;
+            this.partitionTypeComboBox.Location = new System.Drawing.Point(123, 33);
+            this.partitionTypeComboBox.Name = "partitionTypeComboBox";
+            this.partitionTypeComboBox.Size = new System.Drawing.Size(100, 21);
+            this.partitionTypeComboBox.TabIndex = 1;
             // 
             // AlarmGenerationForm
             // 

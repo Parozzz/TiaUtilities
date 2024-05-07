@@ -138,17 +138,17 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
 
             //Column initialization before gridHandler.Init()
             #region COLUMNS;
-            this.deviceGridHandler.AddTextBoxColumn(DeviceData.NAME, 80);
+            this.deviceGridHandler.AddTextBoxColumn(DeviceData.NAME, 125);
             this.deviceGridHandler.AddTextBoxColumn(DeviceData.ADDRESS, 160);
             this.deviceGridHandler.AddTextBoxColumn(DeviceData.DESCRIPTION, 0);
 
             this.alarmGridHandler.AddCheckBoxColumn(AlarmData.ENABLE, 40);
             this.alarmGridHandler.AddTextBoxColumn(AlarmData.ALARM_VARIABLE, 80);
-            this.alarmGridHandler.AddTextBoxColumn(AlarmData.COIL_ADDRESS, 80);
-            this.alarmGridHandler.AddTextBoxColumn(AlarmData.SET_COIL_ADDRESS, 80);
-            this.alarmGridHandler.AddTextBoxColumn(AlarmData.TIMER_ADDRESS, 80);
-            this.alarmGridHandler.AddComboBoxColumn(AlarmData.TIMER_TYPE, 60, new string[] { "TON", "TOF" });
-            this.alarmGridHandler.AddTextBoxColumn(AlarmData.TIMER_VALUE, 60);
+            this.alarmGridHandler.AddTextBoxColumn(AlarmData.COIL_ADDRESS, 95);
+            this.alarmGridHandler.AddTextBoxColumn(AlarmData.SET_COIL_ADDRESS, 95);
+            this.alarmGridHandler.AddTextBoxColumn(AlarmData.TIMER_ADDRESS, 95);
+            this.alarmGridHandler.AddComboBoxColumn(AlarmData.TIMER_TYPE, 50, new string[] { "TON", "TOF" });
+            this.alarmGridHandler.AddTextBoxColumn(AlarmData.TIMER_VALUE, 50);
             this.alarmGridHandler.AddTextBoxColumn(AlarmData.DESCRIPTION, 0);
             #endregion
 

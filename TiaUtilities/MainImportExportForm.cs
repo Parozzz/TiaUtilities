@@ -50,8 +50,6 @@ namespace TiaXmlReader
             jsErrorHandlingThread.Init();
             jsErrorHandlingThread.Start();
 
-            configExcelPathTextBox.Text = programSettings.lastExcelFileName;
-            exportPathTextBlock.Text = programSettings.lastXMLExportPath;
             tiaVersionComboBox.Text = "" + programSettings.lastTIAVersion;
 
             this.languageComboBox.Items.AddRange(new string[] { "it-IT", "en-US" });
@@ -93,97 +91,6 @@ namespace TiaXmlReader
             if (uint.TryParse(tiaVersionComboBox.Text, out var version))
             {
                 Constants.VERSION = programSettings.lastTIAVersion = version;
-            }
-        }
-
-        private void ConfigExcelPathTextBox_MouseClick(object sender, MouseEventArgs e)
-        {
-            try
-            {
-                var fileDialog = new CommonOpenFileDialog
-                {
-                    EnsureFileExists = true,
-                    EnsurePathExists = true,
-                    DefaultExtension = ".xlsx",
-                    Filters = { new CommonFileDialogFilter("Excel Files (*.xlsx)", "*.xlsx") }
-                };
-                fileDialog.InitialDirectory = string.IsNullOrEmpty(programSettings.lastExcelFileName) ? "" : Path.GetDirectoryName(programSettings.lastExcelFileName);
-
-                if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
-                {
-                    configExcelPathTextBox.Text = programSettings.lastExcelFileName = fileDialog.FileName;
-                }
-            }
-            catch { }
-
-        }
-
-        private void ExportPathTextBlock_MouseClick(object sender, MouseEventArgs e)
-        {
-            try
-            {
-                var fileDialog = new CommonOpenFileDialog
-                {
-                    IsFolderPicker = true,
-                    EnsurePathExists = true
-                };
-                fileDialog.InitialDirectory = programSettings.lastXMLExportPath;
-                if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
-                {
-                    exportPathTextBlock.Text = programSettings.lastXMLExportPath = fileDialog.FileName;
-                }
-            }
-            catch { }
-
-        }
-
-        private void GenerateXMLExportFiles_MouseClick(object sender, MouseEventArgs e)
-        {
-            try
-            {
-                //Allow opening file while having excel open. TIMESAVER!
-                using (var stream = new FileStream(configExcelPathTextBox.Text,
-                                 FileMode.Open,
-                                 FileAccess.Read,
-                                 FileShare.ReadWrite))
-                {
-
-                    using (var configWorkbook = new XLWorkbook(stream))
-                    {
-                        var configWorksheet = configWorkbook.Worksheets.Worksheet(1);
-
-                        var configTypeValue = configWorksheet.Cell("A2").Value;
-                        if (!configTypeValue.IsText || string.IsNullOrEmpty(configTypeValue.GetText()))
-                        {
-                            throw new ApplicationException("Configuration excel file invalid");
-                        }
-
-                        switch (configTypeValue.GetText().ToLower())
-                        {
-                            case "type1":
-                                var alarmExcelImporter = new AlarmExcelImporter();
-                                alarmExcelImporter.ImportExcelConfig(configWorksheet);
-
-                                var alarmXmlGenerator = new AlarmXmlGenerator(alarmExcelImporter.GetConfiguration(), alarmExcelImporter.GetAlarmDataList(), alarmExcelImporter.GetDeviceDataList());
-                                alarmXmlGenerator.GenerateBlocks();
-                                alarmXmlGenerator.ExportXML(exportPathTextBlock.Text);
-                                break;
-                            case "type3":
-                                var ioExcelImporter = new IOExcelImporter();
-                                ioExcelImporter.ImportExcelConfig(configWorksheet);
-
-                                var ioXmlGenerator = new IOXmlGenerator(ioExcelImporter.GetConfiguration(), ioExcelImporter.GetDataList());
-                                ioXmlGenerator.GenerateBlocks();
-                                ioXmlGenerator.ExportXML(exportPathTextBlock.Text);
-                                break;
-                        }
-                    }
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Utils.ShowExceptionMessage(ex);
             }
         }
 
@@ -348,4 +255,56 @@ namespace TiaXmlReader
             xmlDocument.DocumentElement.AppendChild(tagTable.Generate(xmlDocument));
             xmlDocument.Save(excelPathTextBox.Text);
         }
+        
+
+        private void GenerateXMLExportFiles_MouseClick(object sender, MouseEventArgs e)
+        {
+            try
+            {
+                //Allow opening file while having excel open. TIMESAVER!
+                using (var stream = new FileStream(configExcelPathTextBox.Text,
+                                 FileMode.Open,
+                                 FileAccess.Read,
+                                 FileShare.ReadWrite))
+                {
+
+                    using (var configWorkbook = new XLWorkbook(stream))
+                    {
+                        var configWorksheet = configWorkbook.Worksheets.Worksheet(1);
+
+                        var configTypeValue = configWorksheet.Cell("A2").Value;
+                        if (!configTypeValue.IsText || string.IsNullOrEmpty(configTypeValue.GetText()))
+                        {
+                            throw new ApplicationException("Configuration excel file invalid");
+                        }
+
+                        switch (configTypeValue.GetText().ToLower())
+                        {
+                            case "type1":
+                                var alarmExcelImporter = new AlarmExcelImporter();
+                                alarmExcelImporter.ImportExcelConfig(configWorksheet);
+
+                                var alarmXmlGenerator = new AlarmXmlGenerator(alarmExcelImporter.GetConfiguration(), alarmExcelImporter.GetAlarmDataList(), alarmExcelImporter.GetDeviceDataList());
+                                alarmXmlGenerator.GenerateBlocks();
+                                alarmXmlGenerator.ExportXML(exportPathTextBlock.Text);
+                                break;
+                            case "type3":
+                                var ioExcelImporter = new IOExcelImporter();
+                                ioExcelImporter.ImportExcelConfig(configWorksheet);
+
+                                var ioXmlGenerator = new IOXmlGenerator(ioExcelImporter.GetConfiguration(), ioExcelImporter.GetDataList());
+                                ioXmlGenerator.GenerateBlocks();
+                                ioXmlGenerator.ExportXML(exportPathTextBlock.Text);
+                                break;
+                        }
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Utils.ShowExceptionMessage(ex);
+            }
+        }
+        
 */

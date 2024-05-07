@@ -9,6 +9,7 @@ using TiaXmlReader.Generation.IO;
 using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.Localization;
+using TiaXmlReader.Generation.Placeholders;
 
 namespace TiaXmlReader.Generation.Alarms
 {
@@ -49,7 +50,7 @@ namespace TiaXmlReader.Generation.Alarms
         [JsonProperty][Localization("ALARM_DATA_TIMER_ADDRESS")] public string TimerAddress { get; set; }
         [JsonProperty][Localization("ALARM_DATA_TIMER_TYPE")] public string TimerType { get; set; }
         [JsonProperty][Localization("ALARM_DATA_TIMER_VALUE")] public string TimerValue { get; set; }
-        [JsonProperty][Localization("ALARM_DATA_DESCRIPTION")] public string Description { get; set; }
+        [JsonProperty][Localization("ALARM_DATA_DESCRIPTION", append: " > " + GenerationPlaceholders.Alarms.ALARM_DESCRIPTION)] public string Description { get; set; }
 
         public object this[int column]
         {
@@ -68,6 +69,11 @@ namespace TiaXmlReader.Generation.Alarms
         {
             return COLUMN_LIST[column];
         }
+        public GridDataPreview GetPreview(GridDataColumn column, AlarmConfiguration config)
+        {
+            return this.GetPreview(column.ColumnIndex, config);
+        }
+
         public GridDataPreview GetPreview(int column, AlarmConfiguration config)
         {
             if(string.IsNullOrEmpty(AlarmVariable) || this.IsEmpty())

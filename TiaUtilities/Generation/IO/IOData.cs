@@ -13,6 +13,7 @@ using TiaXmlReader.Localization;
 using System.Drawing;
 using System.Windows.Forms;
 using TiaXmlReader.Generation.GridHandler.Data;
+using TiaXmlReader.Generation.Placeholders;
 
 namespace TiaXmlReader.Generation.IO
 {
@@ -42,10 +43,10 @@ namespace TiaXmlReader.Generation.IO
         }
 
         [JsonProperty][Localization("IO_DATA_ADDRESS")] public string Address { get; set; }
-        [JsonProperty][Localization("IO_DATA_IO_NAME")] public string IOName { get; set; }
-        [JsonProperty][Localization("IO_DATA_VARIABLE")] public string Variable { get; set; }
+        [JsonProperty][Localization("IO_DATA_IO_NAME", append: " > " + GenerationPlaceholders.IO.IONAME)] public string IOName { get; set; }
+        [JsonProperty][Localization("IO_DATA_VARIABLE", append: " > " + GenerationPlaceholders.IO.VARIABLE)] public string Variable { get; set; }
         [JsonProperty][Localization("IO_DATA_MERKER_ADDRESS")] public string MerkerAddress { get; set; }
-        [JsonProperty][Localization("IO_DATA_COMMENT")] public string Comment { get; set; }
+        [JsonProperty][Localization("IO_DATA_COMMENT", append: " > " + GenerationPlaceholders.IO.COMMENT)] public string Comment { get; set; }
 
         public object this[int column]
         {
@@ -63,6 +64,11 @@ namespace TiaXmlReader.Generation.IO
         public GridDataColumn GetColumn(int column)
         {
             return COLUMN_LIST[column];
+        }
+
+        public GridDataPreview GetPreview(GridDataColumn column, IOConfiguration config)
+        {
+            return GetPreview(column.ColumnIndex, config);
         }
 
         public GridDataPreview GetPreview(int column, IOConfiguration config)
@@ -88,37 +94,36 @@ namespace TiaXmlReader.Generation.IO
             }
             else if (column == VARIABLE)
             {
-                if (string.IsNullOrEmpty(config.DefaultVariableName) && string.IsNullOrEmpty(this.Variable))
+                string defaultValue = "";
+                if(config.MemoryType == IOMemoryTypeEnum.DB)
+                {
+                    defaultValue = addressTag.MemoryArea == SimaticMemoryArea.INPUT ? config.DefaultDBInputVariable : config.DefaultDBOutputVariable;
+                }
+                else if (config.MemoryType == IOMemoryTypeEnum.MERKER)
+                {
+                    defaultValue = addressTag.MemoryArea == SimaticMemoryArea.INPUT ? config.DefaultMerkerInputVariable : config.DefaultMerkerOutputVariable;
+                }
+
+                if (string.IsNullOrEmpty(defaultValue) && string.IsNullOrEmpty(this.Variable))
                 {
                     return null;
                 }
 
-                var prefix = "";
-                if(string.IsNullOrEmpty(this.Variable))
-                {
-                    if (config.MemoryType == IOMemoryTypeEnum.DB)
-                    {
-                        prefix = config.DBName + "." + (this.GetAddressMemoryArea() == SimaticMemoryArea.INPUT ? config.PrefixInputDB : config.PrefixOutputDB);
-                    }
-                    else if (config.MemoryType == IOMemoryTypeEnum.MERKER)
-                    {
-                        prefix = this.GetAddressMemoryArea() == SimaticMemoryArea.INPUT ? config.PrefixInputMerker : config.PrefixOutputMerker;
-                    }
-                }
                 return new GridDataPreview()
                 {
-                    Prefix = prefix,
-                    DefaultValue = config.DefaultVariableName,
+                    DefaultValue = defaultValue,
                     Value = this.Variable
                 };
             }
             else if (column == MERKER_ADDRESS)
             {
-                var merkerTag = new SimaticTagAddress();
-                merkerTag.MemoryArea = SimaticMemoryArea.MERKER;
-                merkerTag.ByteOffset = addressTag.ByteOffset + (addressTag.MemoryArea == SimaticMemoryArea.INPUT ? config.VariableTableInputStartAddress : config.VariableTableOutputStartAddress);
-                merkerTag.BitOffset = addressTag.BitOffset;
-                merkerTag.Length = 0; //BIT
+                var merkerTag = new SimaticTagAddress
+                {
+                    MemoryArea = SimaticMemoryArea.MERKER,
+                    ByteOffset = addressTag.ByteOffset + (addressTag.MemoryArea == SimaticMemoryArea.INPUT ? config.VariableTableInputStartAddress : config.VariableTableOutputStartAddress),
+                    BitOffset = addressTag.BitOffset,
+                    Length = 0 //BIT
+                };
                 return new GridDataPreview()
                 {
                     DefaultValue = merkerTag.ToString(),
@@ -136,13 +141,17 @@ namespace TiaXmlReader.Generation.IO
             if (string.IsNullOrEmpty(IOName))
             {
                 ioNameDefault = true;
-                IOName = config.DefaultIoName;
+
+                var preview = this.GetPreview(IOData.IO_NAME, config);
+                IOName = preview.ComposeDefaultValue();
             }
 
             if (string.IsNullOrEmpty(Variable))
             {
                 variableDefault = true;
-                Variable = config.DefaultVariableName;
+
+                var preview = this.GetPreview(IOData.VARIABLE, config);
+                Variable = preview.ComposeDefaultValue();
             }
 
             var variableAddressTag = SimaticTagAddress.FromAddress(this.MerkerAddress);
@@ -160,11 +169,10 @@ namespace TiaXmlReader.Generation.IO
             }
         }
 
-        public void ParsePlaceholders(GenerationPlaceholders placeholders)
+        public void ParsePlaceholders(GenerationPlaceholderHandler placeholders)
         {
             Address = placeholders.Parse(Address);
             IOName = placeholders.Parse(IOName);
-            //DBName = placeholders.Parse(DBName);
             Variable = placeholders.Parse(Variable);
             MerkerAddress = placeholders.Parse(MerkerAddress);
             Comment = placeholders.Parse(Comment);

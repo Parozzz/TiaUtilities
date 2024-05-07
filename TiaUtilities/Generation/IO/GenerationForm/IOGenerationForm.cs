@@ -19,6 +19,7 @@ using System.Diagnostics;
 using TiaXmlReader.SimaticML.TagTable;
 using System.IO;
 using System.Drawing;
+using System.ComponentModel;
 
 namespace TiaXmlReader.Generation.IO.GenerationForm
 {
@@ -258,12 +259,18 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             this.suggestionGridHandler.AddTextBoxColumn(IOSuggestion.VALUE, 0);
             #endregion
 
-            this.ioGridHandler.DataGridView.CellValueChanged += (sender, args) => UpdateSuggestionColors();
-            this.suggestionGridHandler.DataGridView.CellValueChanged += (sender, args) => UpdateSuggestionColors();
 
             this.ioGridHandler?.Init();
             this.suggestionGridHandler?.Init();
             this.configHandler?.Init();
+
+
+            this.ioGridHandler.DataGridView.CellValueChanged += (sender, args) =>
+            {
+                UpdateSuggestionColors();
+                UpdateDuplicatedIOValues();
+            };
+            this.suggestionGridHandler.DataGridView.CellValueChanged += (sender, args) => UpdateSuggestionColors();
 
             #region JS_SCRIPT
             this.ioGridHandler.TableScript.SetReadScriptFunc(() => settings.JSScript);
@@ -349,6 +356,34 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
 
                 this.Text = this.Name + ". Project File: " + lastFilePath;
             }
+        }
+
+        private void UpdateDuplicatedIOValues()
+        {
+            this.ioGridHandler.DataGridView.SuspendLayout();
+
+            foreach (DataGridViewRow row in this.ioGridHandler.DataGridView.Rows)
+            {
+                var ioNameCellStyle = row.Cells[IOData.IO_NAME.ColumnIndex].Style;
+                ioNameCellStyle.BackColor = SystemColors.ControlLightLight;
+                ioNameCellStyle.SelectionBackColor = Color.LightGray;
+            }
+
+            var dataDict = this.ioGridHandler.DataSource.GetNotEmptyDataDict();
+
+            var multipleValuesGroupingList = dataDict.GroupBy(x => x.Key.IOName).Where(g => g.Count() > 1).ToList();
+            foreach (var grouping in multipleValuesGroupingList)
+            {
+                foreach(var entry in grouping)
+                {
+                    var rowIndex = entry.Value;
+
+                    var cellStyle = this.ioGridHandler.DataGridView.Rows[rowIndex].Cells[IOData.IO_NAME.ColumnIndex].Style;
+                    cellStyle.BackColor = Color.Orange;
+                }
+            }
+
+            this.ioGridHandler.DataGridView.ResumeLayout();
         }
 
         private void UpdateSuggestionColors(bool suspendLayout = true)

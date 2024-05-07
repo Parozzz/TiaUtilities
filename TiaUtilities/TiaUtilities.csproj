@@ -270,13 +270,15 @@
     <Compile Include="Generation\GridHandler\GridTableScript.cs" />
     <Compile Include="Generation\IO\GenerationForm\IOGenerationUtils.cs" />
     <Compile Include="Generation\IO\GenerationForm\IOSuggestion.cs" />
-    <Compile Include="Generation\IO\IOExcelImporter.cs" />
     <Compile Include="Generation\IO\IOConfiguration.cs" />
     <Compile Include="Generation\IO\IOData.cs" />
     <Compile Include="Generation\IO\IOXmlGenerator.cs" />
     <Compile Include="Generation\Alarms\AlarmData.cs" />
     <Compile Include="Generation\Alarms\AlarmConfiguration.cs" />
-    <Compile Include="Generation\Alarms\AlarmExcelImporter.cs" />
+    <Compile Include="Generation\Placeholders\Data\StringGenerationPlaceholderData.cs" />
+    <Compile Include="Generation\Placeholders\Data\UIntGenerationPlaceholderData.cs" />
+    <Compile Include="Generation\Placeholders\GenerationPlaceholders.cs" />
+    <Compile Include="Generation\Placeholders\Data\IGenerationPlaceholderData.cs" />
     <Compile Include="Javascript\FCTB\CustomWavyLineStyle.cs" />
     <Compile Include="Javascript\JavascriptAutocompleteMenu.cs" />
     <Compile Include="Javascript\JavascriptErrorReportThread.cs" />
@@ -314,7 +316,7 @@
     <Compile Include="SimaticML\Blocks\FlagNet\Wire.cs" />
     <Compile Include="SimaticML\nBlockAttributeList\Section.cs" />
     <Compile Include="Generation\Alarms\DeviceData.cs" />
-    <Compile Include="Generation\GenerationPlaceholders.cs" />
+    <Compile Include="Generation\Placeholders\GenerationPlaceholderHandler.cs" />
     <Compile Include="SimaticML\Enums\SimaticBlockType.cs" />
     <Compile Include="SimaticML\Enums\SimaticVariableScope.cs" />
     <Compile Include="SimaticML\IGlobalObject.cs" />

@@ -42,6 +42,10 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
         {
             return COLUMN_LIST[column];
         }
+        public GridDataPreview GetPreview(GridDataColumn column, IOConfiguration config)
+        {
+            return this.GetPreview(column.ColumnIndex, config);
+        }
 
         public GridDataPreview GetPreview(int column, IOConfiguration config)
         {

@@ -14,8 +14,6 @@ namespace TiaXmlReader
         public const string EXTENSION = "json";
         public const string FILE_NAME = "settings/ProgramSettings." + EXTENSION;
 
-        [JsonProperty] public string lastExcelFileName = "";
-        [JsonProperty] public string lastXMLExportPath = "";
         [JsonProperty] public string lastDBDuplicationFileName = "";
 
         [JsonProperty] public string DBDuplicationNewMemberName = "{replacement1}{replacement2}{replacement3}";

@@ -186,8 +186,8 @@
             this.PlaceholdersLabel.Name = "PlaceholdersLabel";
             this.PlaceholdersLabel.Size = new System.Drawing.Size(1252, 16);
             this.PlaceholdersLabel.TabIndex = 9;
-            this.PlaceholdersLabel.Text = "Placeholders: {memory_type} {bit} {byte} {io_name} {db_name} {variable_name} {com" +
-    "ment} ";
+            this.PlaceholdersLabel.Text = "Placeholders: {memory_type} {bit} {byte} {io_name} {variable_name} {comment} {con" +
+    "fig_db_name} {config_db_number}";
             // 
             // configPanel
             // 

@@ -5,6 +5,7 @@ using static TiaXmlReader.Generation.GridHandler.GridCellPaintHandler;
 using TiaXmlReader.Utility;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.GenerationForms;
+using TiaXmlReader.Generation.Placeholders;
 
 namespace TiaXmlReader.Generation.GridHandler
 {
@@ -14,7 +15,7 @@ namespace TiaXmlReader.Generation.GridHandler
         private readonly C config;
         private readonly GridSettings settings;
 
-        private readonly GenerationPlaceholders placeholders;
+        private readonly GenerationPlaceholderHandler placeholderHandler;
 
         public GridCellPreview(GridDataSource<C, T> dataSource, C config, GridSettings settings)
         {
@@ -22,7 +23,7 @@ namespace TiaXmlReader.Generation.GridHandler
             this.config = config;
             this.settings = settings;
 
-            this.placeholders = new GenerationPlaceholders();
+            this.placeholderHandler = new GenerationPlaceholderHandler();
         }
 
         public PaintRequest PaintCellRequest(DataGridViewCellPaintingEventArgs args)
@@ -83,17 +84,17 @@ namespace TiaXmlReader.Generation.GridHandler
 
                 //ioData.LoadDefaults(config);
 
-                placeholders.SetGridData(gridData, this.config);
+                placeholderHandler.SetGridData(gridData, this.config);
 
                 var isValueDefault = string.IsNullOrEmpty(previewData.Value);
-                var value = placeholders.Parse(isValueDefault ? previewData.DefaultValue : previewData.Value);
+                var value = placeholderHandler.Parse(isValueDefault ? previewData.DefaultValue : previewData.Value);
 
                 RectangleF rec = new RectangleF();
 
                 var hasPrefix = !string.IsNullOrEmpty(previewData.Prefix);
                 if (hasPrefix)
                 {
-                    var parsedPrefix = placeholders.Parse(previewData.Prefix);
+                    var parsedPrefix = placeholderHandler.Parse(previewData.Prefix);
                     var prefixMeasuredText = TextRenderer.MeasureText(parsedPrefix, style.Font);
 
                     rec = new RectangleF(bounds.Location, new Size(prefixMeasuredText.Width, bounds.Height));

@@ -152,7 +152,7 @@ namespace TiaXmlReader
                 }
 
                 attributeList.SetBlockNumber(startingDBNumber++);
-
+                /*
                 if(!string.IsNullOrEmpty(programSettings.lastXMLExportPath))
                 {
                     attributeList.GetParentConfiguration().UpdateID_UId(new IDGenerator());
@@ -160,7 +160,7 @@ namespace TiaXmlReader
                     var xmlDocument = SimaticMLParser.CreateDocument();
                     xmlDocument.DocumentElement.AppendChild(attributeList.GetParentConfiguration().Generate(xmlDocument));
                     xmlDocument.Save(programSettings.lastXMLExportPath + "/DB" + attributeList.GetBlockNumber() + "_" + attributeList.GetBlockName() + ".xml");
-                }
+                }*/
             }
         }
         private void ReplaceMemberNames(Member member, string toReplace, string replacement)

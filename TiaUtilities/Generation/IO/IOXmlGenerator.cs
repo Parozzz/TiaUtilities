@@ -11,6 +11,7 @@ using TiaXmlReader.SimaticML.Blocks.FlagNet.nAccess;
 using TiaXmlReader.SimaticML.Enums;
 using TiaXmlReader.SimaticML.TagTable;
 using TiaXmlReader.SimaticML.Blocks.FlagNet.nPart;
+using TiaXmlReader.Generation.Placeholders;
 
 namespace TiaXmlReader.Generation.IO
 {
@@ -64,8 +65,8 @@ namespace TiaXmlReader.Generation.IO
 
                 ioData.LoadDefaults(config, out bool ioNameDefault, out bool variableDefault, out bool merkerAddressDefault);
 
-                var placeholders = new GenerationPlaceholders().SetIOData(ioData);
-                ioData.ParsePlaceholders(placeholders);
+                var placeholderHandler = new GenerationPlaceholderHandler().SetIOData(ioData, this.config);
+                ioData.ParsePlaceholders(placeholderHandler);
 
                 if (ioTagTable == null || (config.IOTableSplitEvery > 0 && tagCounter % config.IOTableSplitEvery == 0))
                 {
@@ -99,8 +100,7 @@ namespace TiaXmlReader.Generation.IO
                             }
                             merkerCounter++;
 
-                            var merkerVariablePrefix = ioData.GetAddressMemoryArea() == SimaticMemoryArea.INPUT ? config.PrefixInputMerker : config.PrefixOutputMerker;
-                            var merkerVariableAddress = FixDuplicateAddress(merkerVariablePrefix + ioData.Variable, duplicatedAddressDict);
+                            var merkerVariableAddress = FixDuplicateAddress(ioData.Variable, duplicatedAddressDict);
 
                             var merkerVariableTag = SimaticTagAddress.FromAddress(ioData.MerkerAddress);
                             if(merkerVariableAddress == null)
@@ -122,8 +122,7 @@ namespace TiaXmlReader.Generation.IO
                                 db.GetAttributes().SetBlockName(config.DBName).SetBlockNumber(config.DBNumber).SetAutoNumber(config.DBNumber > 0);
                             }
 
-                            var dbMemberPrefix = ioData.GetAddressMemoryArea() == SimaticMemoryArea.INPUT ? config.PrefixInputDB : config.PrefixOutputDB;
-                            var dbMemberAddress = FixDuplicateAddress(dbMemberPrefix + ioData.Variable, duplicatedAddressDict);
+                            var dbMemberAddress = FixDuplicateAddress(ioData.Variable, duplicatedAddressDict);
 
                             var section = db.GetAttributes().ComputeSection(SectionTypeEnum.STATIC);
                             inOutAddress = section.AddMembersFromAddress(dbMemberAddress, SimaticDataType.BOOLEAN)
@@ -137,7 +136,7 @@ namespace TiaXmlReader.Generation.IO
                 {
                     compileUnit = fc.AddCompileUnit();
                     compileUnit.Init();
-                    compileUnit.ComputeBlockTitle().SetText(LocalizationVariables.CULTURE, placeholders.Parse(config.SegmentNameBitGrouping));
+                    compileUnit.ComputeBlockTitle().SetText(LocalizationVariables.CULTURE, placeholderHandler.Parse(config.SegmentNameBitGrouping));
                 }
                 else if (config.GroupingType == IOGroupingTypeEnum.PER_BYTE && (ioData.GetAddressByte() != lastByteAddress || ioData.GetAddressMemoryArea() != lastMemoryArea || compileUnit == null))
                 {
@@ -146,7 +145,7 @@ namespace TiaXmlReader.Generation.IO
 
                     compileUnit = fc.AddCompileUnit();
                     compileUnit.Init();
-                    compileUnit.ComputeBlockTitle().SetText(LocalizationVariables.CULTURE, placeholders.Parse(config.SegmentNameByteGrouping));
+                    compileUnit.ComputeBlockTitle().SetText(LocalizationVariables.CULTURE, placeholderHandler.Parse(config.SegmentNameByteGrouping));
                 }
 
                 switch (ioData.GetAddressMemoryArea())
