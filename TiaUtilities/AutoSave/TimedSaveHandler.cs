@@ -67,9 +67,10 @@ namespace TiaXmlReader.AutoSave
 
         private void SetIntervalAndStart(TimeEnum timeEnum)
         {
-            timer.Interval = ((int)timeEnum) * 1000;
-            if (timer.Interval > 0)
+            var interval = ((int)timeEnum) * 1000;
+            if (interval > 0)
             {
+                timer.Interval = interval;
                 timer.Start();
             }
         }

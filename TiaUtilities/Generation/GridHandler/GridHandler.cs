@@ -2,24 +2,22 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Reflection;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using TiaXmlReader.UndoRedo;
-using static TiaXmlReader.Generation.GridHandler.GridExcelDragHandler;
-using TiaXmlReader.Utility;
+using TiaXmlReader.Generation.GridHandler.CustomColumns;
 using TiaXmlReader.Generation.GridHandler.Data;
+using TiaXmlReader.Generation.GridHandler.Events;
 using TiaXmlReader.GenerationForms;
 using TiaXmlReader.Javascript;
-using TiaXmlReader.Generation.GridHandler.CustomColumns;
+using TiaXmlReader.UndoRedo;
+using TiaXmlReader.Utility;
 using TiaXmlReader.Utility.Extensions;
-using System.Diagnostics;
+using static TiaXmlReader.Generation.GridHandler.GridExcelDragHandler;
 
 namespace TiaXmlReader.Generation.GridHandler
 {
     public class GridHandler<C, T> where C : IGenerationConfiguration where T : IGridData<C>
     {
-        public class ColumnInfo
+        private class ColumnInfo
         {
             public DataGridViewColumn Column { get; internal set; }
             public GridDataColumn DataColumn { get; internal set; }
@@ -37,6 +35,7 @@ namespace TiaXmlReader.Generation.GridHandler
         public GridDataHandler<C, T> DataHandler { get; private set; }
         public GridDataSource<C, T> DataSource { get; private set; }
         public GridTableScript<C, T> TableScript { get; private set; }
+        public GridEvents<C, T> Events { get; private set; }
 
         private readonly List<ColumnInfo> columnInfoList;
         private readonly List<IGridCellPainter> cellPainterList;
@@ -62,6 +61,7 @@ namespace TiaXmlReader.Generation.GridHandler
             this.DataSource = new GridDataSource<C, T>(this.DataGridView, this.DataHandler);
             this.sortHandler = new GridSortHandler<C, T>(this.DataGridView, this.DataSource, this.undoRedoHandler, comparer);
             this.TableScript = new GridTableScript<C, T>(this, jsErrorThread);
+            this.Events = new GridEvents<C, T>();
 
             this.columnInfoList = new List<ColumnInfo>();
             this.cellPainterList = new List<IGridCellPainter>();
@@ -176,7 +176,7 @@ namespace TiaXmlReader.Generation.GridHandler
                         this.DeleteSelectedCells();
                         break;
                     case Keys.Escape:
-                        this.ShowCell(null);
+                        this.ResetShownCell();
                         break;
                     case Keys.F5:
                         this.DataGridView.Refresh();
@@ -252,33 +252,30 @@ namespace TiaXmlReader.Generation.GridHandler
             #endregion
 
             #region CellEdit Begin-End
-            GridCellChange textBoxCellEdit = null;
+            GridCellChange editCellChange = null;
             DataGridView.CellBeginEdit += (sender, args) =>
             {
-                textBoxCellEdit = null;
+                editCellChange = null;
 
                 var cell = this.DataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex];
                 if (cell is DataGridViewTextBoxCell || cell is DataGridViewComboBoxCell)
                 {
-                    textBoxCellEdit = new GridCellChange(cell);
+                    editCellChange = new GridCellChange(cell) { OldValue = cell.Value };
                 }
             };
 
             DataGridView.CellEndEdit += (sender, args) =>
             {
-                if (textBoxCellEdit?.cell == null)
+                if (editCellChange == null || editCellChange.ColumnIndex != args.ColumnIndex || editCellChange.RowIndex != args.RowIndex)
                 {
                     return;
                 }
 
                 var cell = this.DataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex];
-                if (cell == textBoxCellEdit.cell)
-                {
-                    textBoxCellEdit.NewValue = DataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex].Value;
-                    ChangeCell(textBoxCellEdit, applyChanges: false);
+                editCellChange.NewValue = cell.Value;
+                ChangeCell(editCellChange, applyChanges: false);
 
-                    textBoxCellEdit = null;
-                }
+                editCellChange = null;
             };
 
             DataGridView.CellContentClick += (sender, args) =>
@@ -368,9 +365,22 @@ namespace TiaXmlReader.Generation.GridHandler
             return column;
         }
 
-        public ColumnInfo GetColumnInfo(GridDataColumn dataColumn)
+        public void ShowColumn(GridDataColumn dataColumn)
         {
-            return columnInfoList.Where(i => i.DataColumn == dataColumn).FirstOrDefault();
+            var columnInfo = columnInfoList.Where(i => i.DataColumn == dataColumn).FirstOrDefault();
+            if (columnInfo != null)
+            {
+                columnInfo.Visible = true;
+            }
+        }
+
+        public void HideColumn(GridDataColumn dataColumn)
+        {
+            var columnInfo = columnInfoList.Where(i => i.DataColumn == dataColumn).FirstOrDefault();
+            if (columnInfo != null)
+            {
+                columnInfo.Visible = false;
+            }
         }
 
         public void InitColumns()
@@ -470,24 +480,25 @@ namespace TiaXmlReader.Generation.GridHandler
                 return;
             }
 
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-
             this.DataGridView.SuspendLayout();
-            
+
             try
             {
                 if (applyChanges)
                 {
                     this.undoRedoHandler.Lock();
-                    foreach (var cellChange in cellChangeList)
-                    {//Accessing DataSource instead of changing value of cell is WAAAAY faster (From 3s to 22ms)
+                    foreach (var cellChange in cellChangeList) //Accessing DataSource instead of changing value of cell is WAAAAY faster (From 3s to 22ms)
+                    {
                         var data = this.DataSource[cellChange.RowIndex];
-                        data.GetColumn(cellChange.ColumnIndex).SetValueTo(data, cellChange.NewValue);
+
+                        var dataColumn = data.GetColumn(cellChange.ColumnIndex);
+                        cellChange.OldValue = dataColumn.GetValueFrom<object>(data);
+                        dataColumn.SetValueTo(data, cellChange.NewValue);
                     }
                     this.undoRedoHandler.Unlock();
                 }
 
+                this.Events.CellChangeEvent(this, new GridCellChangeEventArgs() { CellChangeList = cellChangeList });
                 undoRedoHandler.AddUndo(() => UndoChangeCells(cellChangeList));
             }
             catch (Exception ex)
@@ -497,32 +508,36 @@ namespace TiaXmlReader.Generation.GridHandler
 
             this.DataGridView.Refresh();
             this.DataGridView.ResumeLayout();
-            undoRedoHandler.Unlock(); //And a locked undoRedo
 
-            stopwatch.Stop();
-            Console.WriteLine("Stopwatch [ms]: " + stopwatch.ElapsedMilliseconds);
+            undoRedoHandler.Unlock(); //And a locked undoRedo
         }
 
         private void UndoChangeCells(List<GridCellChange> cellChangeList)
         {
             this.DataGridView.SuspendLayout();
-            
+
 
             try
             {
                 this.undoRedoHandler.Lock();
-                foreach (var cellChange in cellChangeList)
-                {//Accessing DataSource instead of changing value of cell is WAAAAY faster (From 3s to 22ms)
+                foreach (var cellChange in cellChangeList) //Accessing DataSource instead of changing value of cell is WAAAAY faster (From 3s to 22ms)
+                {
                     var data = this.DataSource[cellChange.RowIndex];
                     data.GetColumn(cellChange.ColumnIndex).SetValueTo(data, cellChange.OldValue);
                 }
                 this.undoRedoHandler.Unlock();
 
-                ShowCell(cellChangeList[cellChangeList.Count - 1].cell);  //Setting se current cell already center the grid to it.
+                var lastCellChange = cellChangeList[cellChangeList.Count - 1];
+                ShowCell(lastCellChange);  //Setting se current cell already center the grid to it.
+
+                this.Events.CellChangeEvent(this, new GridCellChangeEventArgs() { CellChangeList = cellChangeList, IsUndo = true });
+
                 undoRedoHandler.AddRedo(() =>
                 {
                     ChangeCells(cellChangeList);
-                    ShowCell(cellChangeList[0].cell);  //Setting se current cell already center the grid to it.
+
+                    var firstCellChange = cellChangeList[0];
+                    ShowCell(firstCellChange);  //Setting se current cell already center the grid to it.
                 });
             }
             catch (Exception ex)
@@ -553,6 +568,16 @@ namespace TiaXmlReader.Generation.GridHandler
                 dataDict.Compute(index, data);
             }
             this.ChangeMultipleRows(dataDict);
+        }
+
+        private void ResetShownCell()
+        {
+            this.ShowCell(cell: null);
+        }
+
+        private void ShowCell(GridCellChange cellChange)
+        {
+            this.ShowCell(this.DataGridView.Rows[cellChange.RowIndex].Cells[cellChange.ColumnIndex]);
         }
 
         private void ShowCell(DataGridViewCell cell)

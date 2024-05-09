@@ -76,7 +76,7 @@ namespace TiaXmlReader.Generation.GridHandler
                         }
                     }
 
-                    var cellChange = new GridCellChange(data.DataGridView, data.DraggedColumn, rowIndex) { NewValue = (before + nextNumString + after) };
+                    var cellChange = new GridCellChange(data.DraggedColumn, rowIndex) { NewValue = (before + nextNumString + after) };
                     cellChangeList.Add(cellChange);
                 }
             }
@@ -84,7 +84,7 @@ namespace TiaXmlReader.Generation.GridHandler
             {
                 foreach (var rowIndex in rowIndexEnumeration)
                 {
-                    var cellChange = new GridCellChange(data.DataGridView, data.DraggedColumn, rowIndex) { NewValue = startString };
+                    var cellChange = new GridCellChange(data.DraggedColumn, rowIndex) { NewValue = startString };
                     cellChangeList.Add(cellChange);
                 }
             }

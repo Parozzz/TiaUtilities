@@ -7,24 +7,26 @@ namespace TiaXmlReader.Generation.Configuration
 {
     public partial class ConfigForm : Form
     {
-        private static readonly Font LABEL_FONT = new Font("Microsoft Sans Serif", 12.5f, FontStyle.Bold);
-        private static readonly Font CONTROL_FONT = new Font("Microsoft Sans Serif", 9f);
+        public static readonly Font LABEL_FONT = new Font("Microsoft Sans Serif", 12.5f, FontStyle.Bold);
+        public static readonly Font CONTROL_FONT = new Font("Microsoft Sans Serif", 9f);
 
         private readonly string title;
-        private readonly List<ConfigFormLine> lineList;
+        private readonly List<IConfigFormLine> lineList;
 
         public Font LabelFont { get; set; } = LABEL_FONT;
         public Font ControlFont { get; set; } = CONTROL_FONT;
         public int ControlWidth { get; set; } = 300;
         public int ControlHeight { get; set; } = 30;
         public bool CloseOnOutsideClick { get; set; } = true;
+        public bool CloseOnEnter {  get; set; } = true;
         public bool ShowControlBox { get; set; } = false;
+
         public ConfigForm(string title)
         {
             InitializeComponent();
 
             this.title = title;
-            this.lineList = new List<ConfigFormLine>();
+            this.lineList = new List<IConfigFormLine>();
         }
 
         public void StartShowingAtCursor()
@@ -46,45 +48,44 @@ namespace TiaXmlReader.Generation.Configuration
             this.Location = loc;
         }
 
-        public ConfigFormLine AddLine(string labelText, int height = 0)
+        public C AddLine<C>(ConfigFormLineType<C> type) where C : ConfigFormLine<C>
         {
-            return this.AddConfigLine(new ConfigFormLine(labelText, height));
-        }
+            IConfigFormLine line;
+            if (type.Equals(ConfigFormLineTypes.LABEL))
+            {
+                line = new ConfigFormLabelLine();
+            }
+            else if (type.Equals(ConfigFormLineTypes.TEXT_BOX))
+            {
+                line = new ConfigFormTextBoxLine();
+            }
+            else if (type.Equals(ConfigFormLineTypes.COMBO_BOX))
+            {
+                line = new ConfigFormComboBoxLine();
+            }
+            else if (type.Equals(ConfigFormLineTypes.CHECK_BOX))
+            {
+                line = new ConfigFormCheckBoxLine();
+            }
+            else if (type.Equals(ConfigFormLineTypes.BUTTON_PANEL))
+            {
+                line = new ConfigFormButtonPanelLine();
+            }
+            else if (type.Equals(ConfigFormLineTypes.COLOR_PICKER))
+            {
+                line = new ConfigFormColorPickerLine();
+            }
+            else if (type.Equals(ConfigFormLineTypes.JAVASCRIPT))
+            {
+                line = new ConfigFormJavascriptLine();
+            }
+            else
+            {
+                throw new Exception("Invalid ConfigForm.AddLine ConfigFormLineType for" + type);
+            }
 
-        public ConfigFormButtonPanelLine AddButtonPanelLine(string labelText, int height = 0)
-        {
-            return this.AddConfigLine(new ConfigFormButtonPanelLine(labelText, height));
-        }
-
-        public ConfigFormTextBoxLine AddTextBoxLine(string labelText, int height = 0)
-        {
-            return this.AddConfigLine(new ConfigFormTextBoxLine(labelText, height));
-        }
-
-        public ConfigFormJavascriptTextBoxLine AddJavascriptTextBoxLine(string labelText, int height = 0)
-        {
-            return this.AddConfigLine(new ConfigFormJavascriptTextBoxLine(labelText, height));
-        }
-
-        public ConfigFormCheckBoxLine AddCheckBoxLine(string labelText, int height = 0)
-        {
-            return this.AddConfigLine(new ConfigFormCheckBoxLine(labelText, height));
-        }
-
-        public ConfigFormComboBoxLine AddComboBoxLine(string labelText, int height = 0)
-        {
-            return this.AddConfigLine(new ConfigFormComboBoxLine(labelText, height));
-        }
-
-        public ConfigFormColorPickerButtonLine AddColorPickerLine(string labelText, int height = 0)
-        {
-            return this.AddConfigLine(new ConfigFormColorPickerButtonLine(labelText, height));
-        }
-
-        public L AddConfigLine<L>(L line) where L : ConfigFormLine
-        {
             lineList.Add(line);
-            return line;
+            return (C) line;
         }
 
         private bool formReadyToClose = false;
@@ -103,7 +104,7 @@ namespace TiaXmlReader.Generation.Configuration
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            if (keyData == Keys.Cancel || keyData == Keys.Escape)
+            if (keyData == Keys.Cancel || keyData == Keys.Escape || (keyData == Keys.Enter && this.CloseOnEnter))
             {
                 this.Close();
                 return true;    // indicate that you handled this keystroke
@@ -143,7 +144,7 @@ namespace TiaXmlReader.Generation.Configuration
                 linePanelList.Add(panel);
 
                 var labelText = line.GetLabelText();
-                if(labelText != null)
+                if (labelText != null)
                 {
                     panel.ColumnCount++;
                     panel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
@@ -156,8 +157,9 @@ namespace TiaXmlReader.Generation.Configuration
                         Text = line.GetLabelText(),
                         AutoSize = true,
                         Padding = new Padding(0),
-                        Margin = new Padding(2)
+                        Margin = new Padding(0)
                     };
+                    label.Font = line.GetLabelFont() ?? this.LabelFont;
                     panel.Controls.Add(label);
 
                     var size = TextRenderer.MeasureText(label.Text, this.LabelFont);
@@ -171,25 +173,32 @@ namespace TiaXmlReader.Generation.Configuration
                 var control = line.GetControl();
                 if (control != null)
                 {
-                    panel.ColumnCount++;
-                    panel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+                    if (line.IsLabelOnTop())
+                    {
+                        panel.RowCount++;
+                        panel.RowStyles.Add(new ColumnStyle(SizeType.Percent, 50f));
+                    }
+                    else
+                    {
+                        panel.ColumnCount++;
+                        panel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+                    }
 
                     control.Width = this.ControlWidth;
                     control.Height = line.GetHeight() == 0 ? this.ControlHeight : line.GetHeight();
                     control.Dock = DockStyle.Fill;
                     control.Font = this.ControlFont;
-                    control.Padding = new Padding(0);
-                    control.Margin = new Padding(2);
                     panel.Controls.Add(control);
                 }
 
+               
                 this.mainPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
                 this.mainPanel.Controls.Add(panel);
             }
 
             foreach (var panel in linePanelList)
             {
-                if(panel.ColumnCount == 2) //Only if there are both label AND control.
+                if (panel.ColumnCount == 2) //Only if there are both label AND control.
                 {
                     panel.ColumnStyles[0].SizeType = SizeType.Absolute;
                     panel.ColumnStyles[0].Width = biggestTitleLength;

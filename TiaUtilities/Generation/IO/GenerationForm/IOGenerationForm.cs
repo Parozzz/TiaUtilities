@@ -265,12 +265,19 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             this.configHandler?.Init();
 
 
-            this.ioGridHandler.DataGridView.CellValueChanged += (sender, args) =>
+            this.ioGridHandler.Events.CellChange += (sender, args) =>
             {
-                UpdateSuggestionColors();
-                UpdateDuplicatedIOValues();
+                if (args.CellChangeList.Where(c => c.ColumnIndex == IOData.VARIABLE).Any())
+                {
+                    UpdateSuggestionColors();
+                }
+
+                if (args.CellChangeList.Where(c => c.ColumnIndex == IOData.ADDRESS || c.ColumnIndex == IOData.IO_NAME).Any())
+                {
+                    UpdateDuplicatedIOValues();
+                }
             };
-            this.suggestionGridHandler.DataGridView.CellValueChanged += (sender, args) => UpdateSuggestionColors();
+            this.suggestionGridHandler.Events.CellChange += (sender, args) => UpdateSuggestionColors();
 
             #region JS_SCRIPT
             this.ioGridHandler.TableScript.SetReadScriptFunc(() => settings.JSScript);
@@ -324,8 +331,8 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                 this.ioGridHandler.DataGridView.SuspendLayout();
                 this.suggestionGridHandler.DataGridView.SuspendLayout();
 
-                this.ioGridHandler.DataSource.InitializeData(this.ioGridHandler.RowCount);
-                this.suggestionGridHandler.DataSource.InitializeData(this.suggestionGridHandler.RowCount);
+                this.ioGridHandler.DataSource.Clear();
+                this.suggestionGridHandler.DataSource.Clear();
 
                 foreach (var entry in loadedProjectSave.RowDict)
                 {
@@ -346,7 +353,9 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                         this.suggestionGridHandler.DataHandler.CopyValues(data, this.suggestionGridHandler.DataSource[rowIndex]);
                     }
                 }
-                this.UpdateSuggestionColors(suspendLayout: false);
+
+                this.UpdateDuplicatedIOValues();
+                this.UpdateSuggestionColors();
 
                 this.ioGridHandler.DataGridView.Refresh();
                 this.suggestionGridHandler.DataGridView.Refresh();
@@ -364,60 +373,93 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
 
             foreach (DataGridViewRow row in this.ioGridHandler.DataGridView.Rows)
             {
-                var ioNameCellStyle = row.Cells[IOData.IO_NAME.ColumnIndex].Style;
-                ioNameCellStyle.BackColor = SystemColors.ControlLightLight;
-                ioNameCellStyle.SelectionBackColor = Color.LightGray;
+                var addressCell = row.Cells[IOData.ADDRESS.ColumnIndex];
+                addressCell.ToolTipText = string.Empty;
+                addressCell.Style.BackColor = SystemColors.ControlLightLight;
+                addressCell.Style.SelectionBackColor = Color.LightGray;
+
+                var ioNameCell = row.Cells[IOData.IO_NAME.ColumnIndex];
+                ioNameCell.ToolTipText = string.Empty;
+                ioNameCell.Style.BackColor = SystemColors.ControlLightLight;
+                ioNameCell.Style.SelectionBackColor = Color.LightGray;
             }
 
             var dataDict = this.ioGridHandler.DataSource.GetNotEmptyDataDict();
 
-            var multipleValuesGroupingList = dataDict.GroupBy(x => x.Key.IOName).Where(g => g.Count() > 1).ToList();
-            foreach (var grouping in multipleValuesGroupingList)
+            var multipleIONameGroupingList = dataDict.Where(x => !string.IsNullOrEmpty(x.Key.IOName)).GroupBy(x => x.Key.IOName).Where(g => g.Count() > 1).ToList();
+            foreach (var grouping in multipleIONameGroupingList)
             {
-                foreach(var entry in grouping)
+                //+1 to row because rows index start from 0.
+                var tooltipText = grouping
+                    .Select(x => (x.Value + 1) + ") " + x.Key.Address + " - " + x.Key.Comment)
+                    .Aggregate((a, b) => a + '\n' + b);
+
+                foreach (var entry in grouping)
                 {
                     var rowIndex = entry.Value;
 
-                    var cellStyle = this.ioGridHandler.DataGridView.Rows[rowIndex].Cells[IOData.IO_NAME.ColumnIndex].Style;
-                    cellStyle.BackColor = Color.Orange;
+                    var ioNameCell = this.ioGridHandler.DataGridView.Rows[rowIndex].Cells[IOData.IO_NAME.ColumnIndex];
+                    ioNameCell.ToolTipText = tooltipText;
+                    ioNameCell.Style.BackColor = ControlPaint.LightLight(Color.Orange);
+                }
+            }
+
+            var multipleAddressGroupingList = dataDict.Where(x => !string.IsNullOrEmpty(x.Key.Address)).GroupBy(x => x.Key.Address).Where(g => g.Count() > 1).ToList();
+            foreach (var grouping in multipleAddressGroupingList)
+            {
+                //+1 to row because rows index start from 0.
+                var tooltipText = grouping
+                    .Select(x => (x.Value + 1) + ") " + x.Key.Address + " - " + x.Key.Comment)
+                    .Aggregate((a, b) => a + '\n' + b);
+
+                foreach (var entry in grouping)
+                {
+                    var rowIndex = entry.Value;
+
+                    var addressCell = this.ioGridHandler.DataGridView.Rows[rowIndex].Cells[IOData.ADDRESS.ColumnIndex];
+                    addressCell.ToolTipText = tooltipText;
+                    addressCell.Style.BackColor = ControlPaint.LightLight(Color.Orange);
                 }
             }
 
             this.ioGridHandler.DataGridView.ResumeLayout();
         }
 
-        private void UpdateSuggestionColors(bool suspendLayout = true)
+        private void UpdateSuggestionColors()
         {
-            if (suspendLayout)
-            {
-                this.suggestionGridHandler.DataGridView.SuspendLayout();
-            }
+            this.suggestionGridHandler.DataGridView.SuspendLayout();
 
             foreach (DataGridViewRow row in this.suggestionGridHandler.DataGridView.Rows)
             {
-                var cellStyle = row.Cells[0].Style;
-                cellStyle.BackColor = SystemColors.ControlLightLight;
-                cellStyle.SelectionBackColor = Color.LightGray;
+                var cell = row.Cells[IOSuggestion.VALUE.ColumnIndex];
+                cell.ToolTipText = "";
+                cell.Style.BackColor = SystemColors.ControlLightLight;
+                cell.Style.SelectionBackColor = Color.LightGray;
             }
 
-            var ioDataEnumerable = ioGridHandler.DataSource.GetNotEmptyData().Select(d => d.Variable);
+            var ioDataDict = ioGridHandler.DataSource.GetNotEmptyDataDict();
 
             var suggestionDict = suggestionGridHandler.DataSource.GetNotEmptyDataDict();
             foreach (var entry in suggestionDict)
             {
                 var suggestion = entry.Key;
                 var row = entry.Value;
-                if (ioDataEnumerable.Contains(suggestion.Value))
+
+                var foundDataEnumerable = ioDataDict.Where(d => d.Key.Variable == suggestion.Value);
+                if (foundDataEnumerable.Any())
                 {
-                    var cellStyle = this.suggestionGridHandler.DataGridView.Rows[row].Cells[0].Style;
-                    cellStyle.BackColor = cellStyle.SelectionBackColor = Color.LightGreen;
+                    //The suggestion could be used multiple times! So i will aggregate all the found data.
+                    var tooltipText = foundDataEnumerable
+                        .Select(x => (x.Value + 1) + ") " + x.Key.Address + " - " + x.Key.IOName + " - " + x.Key.Comment)
+                        .Aggregate((a, b) => a + '\n' + b);
+
+                    var cell = this.suggestionGridHandler.DataGridView.Rows[row].Cells[IOSuggestion.VALUE.ColumnIndex];
+                    cell.ToolTipText = tooltipText;
+                    cell.Style.BackColor = cell.Style.SelectionBackColor = Color.LightGreen;
                 }
             }
 
-            if (suspendLayout)
-            {
-                this.suggestionGridHandler.DataGridView.ResumeLayout();
-            }
+            this.suggestionGridHandler.DataGridView.ResumeLayout();
         }
 
         private void UpdateConfigPanel()
@@ -427,24 +469,24 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             this.configButtonPanel.Controls.Clear();
 
             this.configButtonPanel.Controls.Add(fcConfigButton);
-
-            var merkerAddressColumnInfo = this.ioGridHandler.GetColumnInfo(IOData.MERKER_ADDRESS);
-            merkerAddressColumnInfo.Visible = false;
             if (IOMemoryTypeEnum.DB.Equals(memoryTypeComboBox.SelectedValue))
             {
                 this.configButtonPanel.Controls.Add(dbConfigButton);
+                this.ioGridHandler.HideColumn(IOData.MERKER_ADDRESS);
             }
             else if (IOMemoryTypeEnum.MERKER.Equals(memoryTypeComboBox.SelectedValue))
             {
                 this.configButtonPanel.Controls.Add(variableTableConfigButton);
-                merkerAddressColumnInfo.Visible = true;
+                this.ioGridHandler.ShowColumn(IOData.MERKER_ADDRESS);
             }
             this.configButtonPanel.Controls.Add(ioTableConfigButton);
             this.configButtonPanel.Controls.Add(segmentNameConfigButton);
 
             this.ioGridHandler.InitColumns();
-
             this.configButtonPanel.ResumeLayout();
+
+            this.UpdateSuggestionColors();
+            this.UpdateDuplicatedIOValues();
         }
     }
 }

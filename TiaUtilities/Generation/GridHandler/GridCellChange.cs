@@ -11,22 +11,32 @@ namespace TiaXmlReader.Generation.GridHandler
 {
     public class GridCellChange
     {
-        public DataGridViewCell cell;
-        public object OldValue;
-        public object NewValue;
-        public int RowIndex => cell.RowIndex;
-        public int ColumnIndex => cell.ColumnIndex;
+        //public DataGridViewCell cell;
+        //public object OldValue { get; set; }
+        public object OldValue {  get; set; }
+        public object NewValue { get; set; }
+        public int RowIndex { get; private set; } = -1; //=> cell.RowIndex;
+        public int ColumnIndex { get; private set; } = -1; //=> cell.ColumnIndex;
 
+        /*
         public GridCellChange(DataGridView dataGridView, int column, int row) : this(dataGridView.Rows[row].Cells[column])
         {
         }
+        */
 
-        public GridCellChange(DataGridViewCell cell)
-        {
-            this.cell = cell;
-            this.OldValue = cell?.Value;
+        public GridCellChange(int columnIndex, int rowIndex) 
+        { 
+            this.ColumnIndex = columnIndex;
+            this.RowIndex = rowIndex;
         }
 
+        public GridCellChange(DataGridViewCell cell) : this(cell.ColumnIndex, cell.RowIndex)
+        {
+            //this.cell = cell;
+            //this.OldValue = cell?.Value;
+        }
+        
+        /*
         public void ReverseValues()
         {
             var savedOldValue = this.OldValue;
@@ -48,7 +58,7 @@ namespace TiaXmlReader.Generation.GridHandler
             {
                 this.cell.Value = this.OldValue;
             }
-        }
+        }*/
     }
 
 }

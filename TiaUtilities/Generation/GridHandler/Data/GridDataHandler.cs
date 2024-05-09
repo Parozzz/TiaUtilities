@@ -73,7 +73,7 @@ namespace TiaXmlReader.Generation.GridHandler.Data
                 {
                     var value = dataColumn.GetValueFrom<object>(data);
                     var columnIndex = dataColumn.ColumnIndex;
-                    cellChangeList.Add(new GridCellChange(dataGridView, columnIndex, rowIndex) { NewValue = value });
+                    cellChangeList.Add(new GridCellChange(columnIndex, rowIndex) { NewValue = value });
                 }
             }
 

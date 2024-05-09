@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,7 +10,7 @@ using TiaXmlReader.Generation.Configuration;
 
 namespace TiaXmlReader.Generation.Configuration
 {
-    public class ConfigFormComboBoxLine : ConfigFormLine
+    public class ConfigFormComboBoxLine : ConfigFormLine<ConfigFormComboBoxLine>
     {
         private readonly ComboBox control;
 
@@ -17,7 +18,7 @@ namespace TiaXmlReader.Generation.Configuration
         private Action<string> textChangedAction;
         private Action<uint> uintChangedAction;
 
-        public ConfigFormComboBoxLine(string labelText, int height = 0) : base(labelText, height)
+        public ConfigFormComboBoxLine()
         {
             this.control = new FlatComboBox();
             this.control.TextChanged += TextChangedEventHandler;

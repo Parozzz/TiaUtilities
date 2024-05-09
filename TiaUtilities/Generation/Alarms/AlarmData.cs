@@ -108,7 +108,7 @@ namespace TiaXmlReader.Generation.Alarms
                     Value = this.TimerAddress
                 };
             }
-            else if (column == TIMER_TYPE)
+            else if (column == TIMER_TYPE && this.TimerAddress != "\\")
             {
                 return new GridDataPreview()
                 {
@@ -116,7 +116,7 @@ namespace TiaXmlReader.Generation.Alarms
                     Value = this.TimerType
                 };
             }
-            else if (column == TIMER_VALUE)
+            else if (column == TIMER_VALUE && this.TimerAddress != "\\")
             {
                 return new GridDataPreview()
                 {

@@ -225,11 +225,14 @@
     <Compile Include="Generation\Configuration\ConfigFormButtonPanelLine.cs" />
     <Compile Include="Generation\Configuration\ConfigFormCheckBoxLine.cs" />
     <Compile Include="AutoSave\TimedSaveHandler.cs" />
-    <Compile Include="Generation\Configuration\ConfigFormJavascriptTextBoxLine.cs" />
+    <Compile Include="Generation\Configuration\ConfigFormJavascriptLine.cs" />
+    <Compile Include="Generation\Configuration\ConfigFormLabelLine.cs" />
     <Compile Include="Generation\GenerationUtils.cs" />
     <Compile Include="Generation\GridHandler\CustomColumns\DropDownMenuScrollWheelHandler.cs" />
     <Compile Include="Generation\GridHandler\CustomColumns\IGridCustomColumn.cs" />
     <Compile Include="Generation\GridHandler\CustomColumns\SuggestionTextBoxColumn.cs" />
+    <Compile Include="Generation\GridHandler\Events\GridCellChangeEventHandler.cs" />
+    <Compile Include="Generation\GridHandler\Events\GridEvents.cs" />
     <Compile Include="Generation\GridHandler\GridUtils.cs" />
     <Compile Include="Generation\GridHandler\Data\GridDataHandler.cs" />
     <Compile Include="Generation\GridHandler\Data\GridDataColumn.cs" />
@@ -246,7 +249,7 @@
     <Compile Include="Generation\GridHandler\GridHandler.cs" />
     <Compile Include="Generation\GridHandler\Data\IGridData.cs" />
     <Compile Include="Generation\GridHandler\IGridRowComparer.cs" />
-    <Compile Include="Generation\Configuration\ConfigFormColorPickerButtonLine.cs" />
+    <Compile Include="Generation\Configuration\ConfigFormColorPickerLine.cs" />
     <Compile Include="Generation\Configuration\ConfigFormComboBoxLine.cs" />
     <Compile Include="Generation\Configuration\ConfigFormTextBoxLine.cs" />
     <Compile Include="Generation\Configuration\ConfigFormLine.cs" />
@@ -342,6 +345,7 @@
     <Compile Include="Utility\Extensions\ColorConverterExtension.cs" />
     <Compile Include="Utility\Constants.cs" />
     <Compile Include="Utility\Extensions\DictionaryExtensions.cs" />
+    <Compile Include="Utility\Extensions\FontExtension.cs" />
     <Compile Include="Utility\Extensions\ListExtensions.cs" />
     <Compile Include="Utility\LogHandler.cs" />
     <Compile Include="Utility\ScriptTimer.cs" />

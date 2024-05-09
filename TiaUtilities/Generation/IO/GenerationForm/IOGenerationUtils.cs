@@ -65,7 +65,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
 
                 foreach (var rowIndex in rowIndexEnumeration)
                 {
-                    var cellChange = new GridCellChange(dataGridView, 0, rowIndex) { NewValue = tagAddress.GetAddress() };
+                    var cellChange = new GridCellChange(0, rowIndex) { NewValue = tagAddress.GetAddress() };
                     cellChangeList.Add(cellChange);
 
                     var _ = data.DraggingDown ? tagAddress.NextBit(SimaticDataType.BYTE) : tagAddress.PreviousBit(SimaticDataType.BYTE); //Increase at the end. The first value is valid!

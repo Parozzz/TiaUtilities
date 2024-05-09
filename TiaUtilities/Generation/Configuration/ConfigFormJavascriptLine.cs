@@ -7,7 +7,7 @@ using TiaXmlReader.Javascript;
 
 namespace TiaXmlReader.Generation.Configuration
 {
-    public class ConfigFormJavascriptTextBoxLine : ConfigFormLine
+    public class ConfigFormJavascriptLine : ConfigFormLine<ConfigFormJavascriptLine>
     {
 
         private readonly JavascriptFCTB jsFCTB;
@@ -15,7 +15,7 @@ namespace TiaXmlReader.Generation.Configuration
 
         private Action<string> textChangedAction;
 
-        public ConfigFormJavascriptTextBoxLine(string labelText, int height = 0) : base(labelText, height)
+        public ConfigFormJavascriptLine()
         {
             this.jsFCTB = new JavascriptFCTB();
             jsFCTB.InitControl();
@@ -30,14 +30,14 @@ namespace TiaXmlReader.Generation.Configuration
             textChangedAction?.Invoke(text);
         }
 
-        public ConfigFormJavascriptTextBoxLine ControlText(IConvertible value)
+        public ConfigFormJavascriptLine ControlText(IConvertible value)
         {
             this.control.Text = (value ?? "").ToString();
             this.control.ClearUndo(); //Avoid beeing able to undo after the text has been added.
             return this;
         }
 
-        public ConfigFormJavascriptTextBoxLine TextChanged(Action<string> action)
+        public ConfigFormJavascriptLine TextChanged(Action<string> action)
         {
             this.textChangedAction = action;
             return this;

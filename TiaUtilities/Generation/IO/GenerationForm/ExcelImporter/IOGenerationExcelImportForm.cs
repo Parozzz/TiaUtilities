@@ -95,23 +95,23 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
                     ControlWidth = 500
                 };
 
-                configForm.AddTextBoxLine("Indirizzo")
+                configForm.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Indirizzo")
                     .ControlText(settings.AddressCellConfig)
                     .TextChanged(str => settings.AddressCellConfig = str);
 
-                configForm.AddTextBoxLine("Nome IO")
+                configForm.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Nome IO")
                     .ControlText(settings.IONameCellConfig)
                     .TextChanged(str => settings.IONameCellConfig = str);
 
-                configForm.AddTextBoxLine("Commento")
+                configForm.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Commento")
                     .ControlText(settings.CommentCellConfig)
                     .TextChanged(str => settings.CommentCellConfig = str);
 
-                configForm.AddTextBoxLine("Riga di partenza")
+                configForm.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Riga di partenza")
                     .ControlText(settings.StartingRow)
                     .UIntChanged(num => settings.StartingRow = num);
 
-                configForm.AddJavascriptTextBoxLine("Espressione validità riga", height: 200)
+                configForm.AddLine(ConfigFormLineTypes.JAVASCRIPT).LabelText("Espressione validità riga").Height(200)
                     .ControlText(settings.IgnoreRowExpressionConfig)
                     .TextChanged(str => settings.IgnoreRowExpressionConfig = str);
 

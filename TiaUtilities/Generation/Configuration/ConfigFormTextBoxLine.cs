@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,7 +10,7 @@ using TiaXmlReader.Generation.Configuration;
 
 namespace TiaXmlReader.Generation.Configuration
 {
-    public class ConfigFormTextBoxLine : ConfigFormLine
+    public class ConfigFormTextBoxLine : ConfigFormLine<ConfigFormTextBoxLine>
     {
         private readonly TextBox control;
 
@@ -17,9 +18,12 @@ namespace TiaXmlReader.Generation.Configuration
         private Action<string> textChangedAction;
         private Action<uint> uintChangedAction;
 
-        public ConfigFormTextBoxLine(string labelText, int height = 0) : base(labelText, height)
+        public ConfigFormTextBoxLine()
         {
-            this.control = new FlatTextBox();
+            this.control = new FlatTextBox()
+            {
+                Margin = new Padding(0)
+            };
             this.control.TextChanged += TextChangedEventHandler;
             this.control.KeyPress += KeyPressEventHandler;
         }

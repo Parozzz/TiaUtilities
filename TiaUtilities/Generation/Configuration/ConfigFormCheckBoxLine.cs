@@ -1,21 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Drawing;
 using System.Windows.Forms;
-using TiaXmlReader.CustomControls;
-using TiaXmlReader.Generation.Configuration;
 
 namespace TiaXmlReader.Generation.Configuration
 {
-    public class ConfigFormCheckBoxLine : ConfigFormLine
+    public class ConfigFormCheckBoxLine : ConfigFormLine<ConfigFormCheckBoxLine>
     {
         private readonly CheckBox control;
 
         private Action<bool> checkedChangedAction;
 
-        public ConfigFormCheckBoxLine(string labelText, int height = 0) : base(labelText, height)
+        public ConfigFormCheckBoxLine()
         {
             this.control = new CheckBox
             {

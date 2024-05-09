@@ -38,11 +38,11 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             {
                 var configForm = new ConfigForm("FC");
 
-                configForm.AddTextBoxLine("Nome")
+                configForm.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Nome")
                     .ControlText(config.FCBlockName)
                     .TextChanged(str => config.FCBlockName = str);
 
-                configForm.AddTextBoxLine("Numero")
+                configForm.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Numero")
                     .ControlText(config.FCBlockNumber)
                     .UIntChanged(num => config.FCBlockNumber = num);
 
@@ -52,19 +52,19 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             form.dbConfigButton.Click += (object sender, EventArgs args) =>
             {
                 var configForm = new ConfigForm("DB Appoggi");
-                configForm.AddTextBoxLine("Nome > " + GenerationPlaceholders.IO.CONFIG_DB_NAME)
+                configForm.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Nome > " + GenerationPlaceholders.IO.CONFIG_DB_NAME)
                     .ControlText(config.DBName)
                     .TextChanged(str => config.DBName = str);
 
-                configForm.AddTextBoxLine("Numero > " + GenerationPlaceholders.IO.CONFIG_DB_NUMBER)
+                configForm.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Numero > " + GenerationPlaceholders.IO.CONFIG_DB_NUMBER)
                     .ControlText(config.DBNumber)
                     .UIntChanged(num => config.DBNumber = num);
 
-                configForm.AddTextBoxLine("Valore Default Input")
+                configForm.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Valore Default Input")
                     .ControlText(config.DefaultDBInputVariable)
                     .TextChanged(str => config.DefaultDBInputVariable = str);
 
-                configForm.AddTextBoxLine("Valore Default Output")
+                configForm.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Valore Default Output")
                     .ControlText(config.DefaultDBOutputVariable)
                     .TextChanged(str => config.DefaultDBOutputVariable = str);
 
@@ -74,31 +74,31 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             form.variableTableConfigButton.Click += (object sender, EventArgs args) =>
             {
                 var configForm = new ConfigForm("Tabella Appoggi");
-                configForm.AddTextBoxLine("Nome")
+                configForm.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Nome")
                     .ControlText(config.VariableTableName)
                     .TextChanged(str => config.VariableTableName = str);
 
-                configForm.AddTextBoxLine("Nuova ogni n° bit")
+                configForm.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Nuova ogni n° bit")
                     .ControlText(config.VariableTableSplitEvery)
                     .UIntChanged(num => config.VariableTableSplitEvery = num);
 
-                configForm.AddLine("Variabile Input");
+                configForm.AddLine(ConfigFormLineTypes.LABEL).LabelText("Variabile Input");
 
-                configForm.AddTextBoxLine("Indirizzo Start")
+                configForm.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Indirizzo Start")
                     .ControlText(config.VariableTableInputStartAddress)
                     .UIntChanged(num => config.VariableTableInputStartAddress = num);
 
-                configForm.AddTextBoxLine("Valore Default")
+                configForm.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Valore Default")
                     .ControlText(config.DefaultMerkerInputVariable)
                     .TextChanged(str => config.DefaultMerkerInputVariable = str);
 
-                configForm.AddLine("Variabile Output");
+                configForm.AddLine(ConfigFormLineTypes.LABEL).LabelText("Variabile Output");
 
-                configForm.AddTextBoxLine("Indirizzo Start")
+                configForm.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Indirizzo Start")
                     .ControlText(config.VariableTableOutputStartAddress)
                     .UIntChanged(num => config.VariableTableOutputStartAddress = num);
 
-                configForm.AddTextBoxLine("Valore Default")
+                configForm.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Valore Default")
                     .ControlText(config.DefaultMerkerOutputVariable)
                     .TextChanged(str => config.DefaultMerkerOutputVariable = str);
 
@@ -108,15 +108,15 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             form.ioTableConfigButton.Click += (object sender, EventArgs args) =>
             {
                 var configForm = new ConfigForm("Tabella IN/OUT");
-                configForm.AddTextBoxLine("Nome")
+                configForm.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Nome")
                     .ControlText(config.IOTableName)
                     .TextChanged(str => config.IOTableName = str);
 
-                configForm.AddTextBoxLine("Nuova ogni n° bit")
+                configForm.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Nuova ogni n° bit")
                     .ControlText(config.IOTableSplitEvery)
                     .UIntChanged(num => config.IOTableSplitEvery = num);
 
-                configForm.AddTextBoxLine("Nome tag default")
+                configForm.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Nome tag default")
                     .ControlText(config.DefaultIoName)
                     .TextChanged(str => config.DefaultIoName = str);
 
@@ -126,11 +126,11 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             form.segmentNameConfigButton.Click += (object sender, EventArgs args) =>
             {
                 var configForm = new ConfigForm("Nomi segmenti generati");
-                configForm.AddTextBoxLine("Divisione per bit")
+                configForm.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Divisione per bit")
                     .ControlText(config.SegmentNameBitGrouping)
                     .TextChanged(str => config.SegmentNameBitGrouping = str);
 
-                configForm.AddTextBoxLine("Divisione per byte")
+                configForm.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Divisione per byte")
                     .ControlText(config.SegmentNameByteGrouping)
                     .TextChanged(str => config.SegmentNameByteGrouping = str);
 

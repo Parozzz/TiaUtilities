@@ -15,10 +15,10 @@ namespace TiaXmlReader.Localization
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Enum)]
     public class LocalizationAttribute : Attribute
     {
-        private static readonly Dictionary<string, Dictionary<string, string>> TEXT_DICTIONARY;
+        private static readonly Dictionary<string, Dictionary<string, string>> LANG_TEXT_DICTIONARY;
         static LocalizationAttribute()
         {
-            TEXT_DICTIONARY = new Dictionary<string, Dictionary<string, string>>();
+            LANG_TEXT_DICTIONARY = new Dictionary<string, Dictionary<string, string>>();
 
             var directory = Directory.GetCurrentDirectory() + "//Localization";
             if (!Directory.Exists(directory))
@@ -41,9 +41,9 @@ namespace TiaXmlReader.Localization
                     var fileLang = Path.GetFileNameWithoutExtension(filePath);
                     var langDictionary = new Dictionary<string, string>();
 
-                    using (StreamReader file = File.OpenText(filePath))
+                    using (var stream = File.OpenText(filePath))
                     {
-                        using (JsonTextReader reader = new JsonTextReader(file))
+                        using (var reader = new JsonTextReader(stream))
                         {
                             var jsonObject = (JObject)JToken.ReadFrom(reader);
                             foreach (var entry in jsonObject)
@@ -53,7 +53,7 @@ namespace TiaXmlReader.Localization
                         }
                     }
 
-                    TEXT_DICTIONARY.Compute(fileLang, langDictionary);
+                    LANG_TEXT_DICTIONARY.Compute(fileLang, langDictionary);
                 }
                 catch { }
             }
@@ -69,10 +69,10 @@ namespace TiaXmlReader.Localization
 
         public string GetTranslation() //Can be null!
         {
-            var langDictionary = TEXT_DICTIONARY.GetOrDefault(LocalizationVariables.LANG);
+            var langDictionary = LANG_TEXT_DICTIONARY.GetOrDefault(LocalizationVariables.LANG);
             if (langDictionary == null)
             {
-                langDictionary = TEXT_DICTIONARY.GetOrDefault(LocalizationVariables.DEFAULT_LANG);
+                langDictionary = LANG_TEXT_DICTIONARY.GetOrDefault(LocalizationVariables.DEFAULT_LANG);
                 if (langDictionary == null)
                 {
                     var ex = new Exception("Cannot find text list for " + LocalizationVariables.LANG + " or " + LocalizationVariables.DEFAULT_LANG);

@@ -9,18 +9,18 @@ using TiaXmlReader.Utility;
 
 namespace TiaXmlReader.Generation.Configuration
 {
-    public class ConfigFormButtonPanelLine : ConfigFormLine
+    public class ConfigFormButtonPanelLine : ConfigFormLine<ConfigFormButtonPanelLine>
     {
         private readonly TableLayoutPanel panel;
 
-        public ConfigFormButtonPanelLine(string labelText, int height = 0) : base(labelText, height)
+        public ConfigFormButtonPanelLine()
         {
             this.panel = new TableLayoutPanel()
             {
                 Dock = DockStyle.Fill,
                 AutoSize = true,
                 Padding = new Padding(0),
-                Margin = new Padding(2),
+                Margin = new Padding(left:20, right:20, top:2, bottom:2),
                 ColumnCount = 0,
                 RowCount = 1,
                 RowStyles = { new RowStyle(SizeType.AutoSize) }

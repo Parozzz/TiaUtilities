@@ -42,6 +42,7 @@
             this.mainPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.mainPanel.Controls.Add(this.titleLabel, 0, 0);
             this.mainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.mainPanel.ForeColor = System.Drawing.SystemColors.ControlText;
             this.mainPanel.Location = new System.Drawing.Point(0, 0);
             this.mainPanel.Name = "mainPanel";
             this.mainPanel.RowCount = 1;

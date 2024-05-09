@@ -12,7 +12,7 @@ using TiaXmlReader.Utility.Extensions;
 
 namespace TiaXmlReader.Generation.Configuration
 {
-    public class ConfigFormColorPickerButtonLine : ConfigFormLine
+    public class ConfigFormColorPickerLine : ConfigFormLine<ConfigFormColorPickerLine>
     {
         private readonly TableLayoutPanel panel;
         private readonly TextBox colorTextBox;
@@ -22,7 +22,7 @@ namespace TiaXmlReader.Generation.Configuration
         private Action<Color> colorAction;
         private Color lastColor = Color.White;
 
-        public ConfigFormColorPickerButtonLine(string labelText, int height = 0) : base(labelText, height)
+        public ConfigFormColorPickerLine()
         {
             this.panel = new TableLayoutPanel()
             {
@@ -91,7 +91,7 @@ namespace TiaXmlReader.Generation.Configuration
             }
         }
 
-        public ConfigFormColorPickerButtonLine ApplyColor(Color color, bool overrideText = true)
+        public ConfigFormColorPickerLine ApplyColor(Color color, bool overrideText = true)
         {
             lastColor = color;
             if (overrideText)
@@ -103,7 +103,7 @@ namespace TiaXmlReader.Generation.Configuration
             return this;
         }
 
-        public ConfigFormColorPickerButtonLine ColorChanged(Action<Color> action)
+        public ConfigFormColorPickerLine ColorChanged(Action<Color> action)
         {
             this.colorAction = action;
             return this;

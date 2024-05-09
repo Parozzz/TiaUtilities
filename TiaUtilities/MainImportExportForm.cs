@@ -164,7 +164,8 @@ namespace TiaXmlReader
                 ControlWidth = 500
             };
 
-            configForm.AddJavascriptTextBoxLine("Espressione", height: 300)
+            configForm.AddLine(ConfigFormLineTypes.JAVASCRIPT)
+                .LabelText("Espressione").Height(300)
                 .ControlText(JS)
                 .TextChanged(str => JS = str);
 

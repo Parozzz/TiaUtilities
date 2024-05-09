@@ -17,19 +17,19 @@ namespace TiaXmlReader.Generation.GridHandler
         public void ShowConfigForm(IWin32Window owner)
         {
             var configForm = new ConfigForm("Preferenze");
-            configForm.AddColorPickerLine("Bordo cella selezionata")
+            configForm.AddLine(ConfigFormLineTypes.COLOR_PICKER).LabelText("Bordo cella selezionata")
                 .ApplyColor(this.SingleSelectedCellBorderColor)
                 .ColorChanged(color => this.SingleSelectedCellBorderColor = color);
 
-            configForm.AddColorPickerLine("Sfondo cella trascinata")
+            configForm.AddLine(ConfigFormLineTypes.COLOR_PICKER).LabelText("Sfondo cella trascinata")
                 .ApplyColor(this.DragSelectedCellBorderColor)
                 .ColorChanged(color => this.DragSelectedCellBorderColor = color);
 
-            configForm.AddColorPickerLine("Triangolo trascinamento")
+            configForm.AddLine(ConfigFormLineTypes.COLOR_PICKER).LabelText("Triangolo trascinamento")
                 .ApplyColor(this.SelectedCellTriangleColor)
                 .ColorChanged(color => this.SelectedCellTriangleColor = color);
 
-            configForm.AddColorPickerLine("Anteprima")
+            configForm.AddLine(ConfigFormLineTypes.COLOR_PICKER).LabelText("Anteprima")
                 .ApplyColor(this.PreviewColor)
                 .ColorChanged(color => this.PreviewColor = color);
 

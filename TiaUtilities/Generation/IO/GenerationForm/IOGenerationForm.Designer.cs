@@ -305,14 +305,16 @@
             // 
             // groupingTypeComboBox
             // 
+            this.groupingTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.groupingTypeComboBox.FormattingEnabled = true;
             this.groupingTypeComboBox.Location = new System.Drawing.Point(332, 33);
             this.groupingTypeComboBox.Name = "groupingTypeComboBox";
-            this.groupingTypeComboBox.Size = new System.Drawing.Size(112, 21);
+            this.groupingTypeComboBox.Size = new System.Drawing.Size(136, 21);
             this.groupingTypeComboBox.TabIndex = 3;
             // 
             // memoryTypeComboBox
             // 
+            this.memoryTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.memoryTypeComboBox.FormattingEnabled = true;
             this.memoryTypeComboBox.Location = new System.Drawing.Point(111, 33);
             this.memoryTypeComboBox.Name = "memoryTypeComboBox";

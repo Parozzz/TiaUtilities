@@ -10,7 +10,7 @@ namespace TiaXmlReader.Utility
 {
     public static class LocalizationVariables
     {
-        public const string DEFAULT_LANG = "it-IT";
+        public const string DEFAULT_LANG = "en-US";
 
         public static string LANG
         {

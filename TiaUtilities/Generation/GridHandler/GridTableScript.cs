@@ -6,6 +6,7 @@ using Jint.Native;
 using Jint.Native.Function;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using TiaXmlReader.Generation.Configuration;
@@ -13,6 +14,7 @@ using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.GenerationForms;
 using TiaXmlReader.Javascript;
 using TiaXmlReader.Utility;
+using TiaXmlReader.Utility.Extensions;
 
 namespace TiaXmlReader.Generation.GridHandler
 {
@@ -26,7 +28,7 @@ namespace TiaXmlReader.Generation.GridHandler
 
         private Func<string> readScriptFunc;
         private Action<string> writeScriptAction;
-        private ConfigFormJavascriptTextBoxLine javascriptTextBoxLine;
+        private ConfigFormJavascriptLine javascriptTextBoxLine;
 
         public bool Valid { get => readScriptFunc != null && writeScriptAction != null; }
 
@@ -79,8 +81,11 @@ namespace TiaXmlReader.Generation.GridHandler
                 variableList.AddRange(externalVariableList);
             }
 
-            configForm.AddLine("Variables: " + variableList.Aggregate((a, b) => a + ", " + b));
-            configForm.AddButtonPanelLine(null)
+            configForm.AddLine(ConfigFormLineTypes.LABEL)
+                .LabelText("Variables: " + variableList.Aggregate((a, b) => a + ", " + b))
+                .LabelFont(ConfigForm.LABEL_FONT.Copy(9f));
+
+            configForm.AddLine(ConfigFormLineTypes.BUTTON_PANEL)
                 .AddButton("AutoFormattazione", () => this.javascriptTextBoxLine?.GetJavascriptFCTB().GetFCTB().DoAutoIndent())
                 .AddButton("Esegui Script", () => this.ParseJS());
             /*.AddButton("Change Hotkeys", () =>
@@ -98,7 +103,7 @@ namespace TiaXmlReader.Generation.GridHandler
                 }
             });*/
 
-            this.javascriptTextBoxLine = configForm.AddJavascriptTextBoxLine(null, height: 350)
+            this.javascriptTextBoxLine = configForm.AddLine(ConfigFormLineTypes.JAVASCRIPT).Height(350)
                 .ControlText(readScriptFunc.Invoke())
                 .TextChanged(writeScriptAction);
 
