@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding ="utf-8"?>
+<Document>
+  <Engineering version="V19" />
+  <SW.Blocks.FC ID="0">
+    <AttributeList>
+      <Interface>
+        <Sections xmlns="http://www.siemens.com/automation/Openness/SW/Interface/v5">
+          <Section Name="Temp">
+            <Member Name="tVar1" Datatype="USInt" />
+            <Member Name="tVar2" Datatype="UInt" />
+          </Section>
+        </Sections>
+      </Interface>
+      <Name>FC_TEST</Name>
+      <Namespace />
+      <Number>123</Number>
+      <ProgrammingLanguage>LAD</ProgrammingLanguage>
+    </AttributeList>
+    <ObjectList>
+      <SW.Blocks.CompileUnit ID="1" CompositionName="CompileUnits">
+        <AttributeList>
+          <NetworkSource>
+            <FlgNet xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v5">
+              <Parts>
+                <Part UId="10000" Name="Contact" />
+                <Part UId="10001" Name="Coil" />
+                <Access Scope="LocalVariable" UId="10002">
+                  <Symbol>
+                    <Component Name="tVar1" />
+                  </Symbol>
+                </Access>
+                <Access Scope="LocalVariable" UId="10003">
+                  <Symbol>
+                    <Component Name="tVar2" />
+                  </Symbol>
+                </Access>
+              </Parts>
+              <Wires>
+                <Wire UId="10004">
+                  <IdentCon UId="10002" />
+                  <NameCon UId="10000" Name="operand" />
+                </Wire>
+                <Wire UId="10005">
+                  <IdentCon UId="10003" />
+                  <NameCon UId="10001" Name="operand" />
+                </Wire>
+                <Wire UId="10006">
+                  <Powerrail />
+                  <NameCon UId="10000" Name="in" />
+                </Wire>
+                <Wire UId="10007">
+                  <NameCon UId="10000" Name="out" />
+                  <NameCon UId="10001" Name="in" />
+                </Wire>
+              </Wires>
+            </FlgNet>
+          </NetworkSource>
+          <ProgrammingLanguage>LAD</ProgrammingLanguage>
+        </AttributeList>
+        <ObjectList />
+      </SW.Blocks.CompileUnit>
+    </ObjectList>
+  </SW.Blocks.FC>
+</Document>

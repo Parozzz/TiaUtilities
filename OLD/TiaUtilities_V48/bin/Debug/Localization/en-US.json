@@ -1,0 +1,31 @@
+{
+  //IO GENERATION
+  "IO_DATA_ADDRESS": "Address",
+  "IO_DATA_IO_NAME": "IO Tag",
+  "IO_DATA_DB_NAME": "DB Name",
+  "IO_DATA_VARIABLE": "Variable",
+  "IO_DATA_MERKER_ADDRESS": "Merker Address",
+  "IO_DATA_COMMENT": "Comment",
+  "IO_CONFIG_GROUPING_BIT": "GroupEachBit",
+  "IO_CONFIG_GROUPING_BYTE": "GroupEachByte",
+  "IO_CONFIG_MEMORY_DB": "DB",
+  "IO_CONFIG_MEMORY_MERKER": "Merker",
+  "IO_SUGGESTION_VALUE": "Prompt",
+
+  //ALARM GENERATION
+  "ALARM_DATA_ENABLE": "Enable",
+  "ALARM_DATA_ALM_VARIABLE": "Alarm Variable",
+  "ALARM_DATA_COIL_ADDRESS": "Coil Address",
+  "ALARM_DATA_SET_COIL_ADDRESS": "Set Coil Address",
+  "ALARM_DATA_TIMER_ADDRESS": "Timer Address",
+  "ALARM_DATA_TIMER_TYPE": "Type",
+  "ALARM_DATA_TIMER_VALUE": "Time",
+  "ALARM_DATA_DESCRIPTION": "Description",
+  "DEVICE_DATA_NAME": "Name",
+  "DEVICE_DATA_ADDRESS": "Address",
+  "DEVICE_DATA_DESCRIPTION": "Description",
+  "ALARM_CONFIG_GROUPING_GROUP": "GroupPerSegment",
+  "ALARM_CONFIG_GROUPING_ONE": "OnePerSegment",
+  "ALARM_CONFIG_PARTITION_ALARM_TYPE": "AlarmType",
+  "ALARM_CONFIG_PARTITION_DEVICE": "Device"
+}

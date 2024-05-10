@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Drawing;
-using FastColoredTextBoxNS;
+﻿using FastColoredTextBoxNS.Types;
 
 namespace TiaXmlReader.Javascript.FCTB
 {
@@ -21,7 +19,7 @@ namespace TiaXmlReader.Javascript.FCTB
             shortRangeBrush = new SolidBrush(shortRangeBackgroundColor);
         }
 
-        public override void Draw(Graphics graphics, Point position, Range range)
+        public override void Draw(Graphics graphics, Point position, TextSelectionRange range)
         {
             Size sizeOfRange = Style.GetSizeOfRange(range);
             Point start = new Point(position.X, position.Y + sizeOfRange.Height - WAVE_DISTANCE_FROM_TEXT);

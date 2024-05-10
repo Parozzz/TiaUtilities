@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.ComponentModel;
-using System.IO;
-using System.Windows.Forms;
+using Timer = System.Windows.Forms.Timer;
 
 namespace TiaXmlReader.Utility
 {

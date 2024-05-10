@@ -1,0 +1,49 @@
+Message => dd is not defined
+Cause => Jint
+StackTrace:
+   in Jint.Engine.ScriptEvaluation(ScriptRecord scriptRecord, ParserOptions parserOptions)
+   in Jint.Engine.ExecuteWithConstraints[T](Boolean strict, Func`1 callback)
+   in Jint.Engine.Execute(Prepared`1& preparedScript)
+   in Jint.Engine.Evaluate(String code, String source)
+   in TiaXmlReader.Generation.GridHandler.GridTableScript`2.ExecuteJS(Engine engine, String script, T data) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridTableScript.cs:riga 184
+   in TiaXmlReader.Generation.GridHandler.GridTableScript`2.ParseJS() in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridTableScript.cs:riga 117
+============================================= ^^^^^ 29/04/2024 07:55:22 916[ms] ^^^^^ =============================================
+Message => Line 4: Unexpected token }
+Cause => Esprima
+StackTrace:
+   in Esprima.JavaScriptParser.ThrowUnexpectedToken[T](Token& token, String message)
+   in Esprima.JavaScriptParser.ParsePrimaryExpression()
+   in Esprima.JavaScriptParser.InheritCoverGrammar[T](Func`1 parseFunction)
+   in Esprima.JavaScriptParser.ParseLeftHandSideExpressionAllowCall()
+   in Esprima.JavaScriptParser.InheritCoverGrammar[T](Func`1 parseFunction)
+   in Esprima.JavaScriptParser.ParseUpdateExpression()
+   in Esprima.JavaScriptParser.ParseUnaryExpression()
+   in Esprima.JavaScriptParser.InheritCoverGrammar[T](Func`1 parseFunction)
+   in Esprima.JavaScriptParser.ParseBinaryExpressionOperand()
+   in Esprima.JavaScriptParser.InheritCoverGrammar[T](Func`1 parseFunction)
+   in Esprima.JavaScriptParser.ParseBinaryExpression()
+   in Esprima.JavaScriptParser.InheritCoverGrammar[T](Func`1 parseFunction)
+   in Esprima.JavaScriptParser.ParseAssignmentExpression()
+   in Esprima.JavaScriptParser.IsolateCoverGrammar[T](Func`1 parseFunction)
+   in Esprima.JavaScriptParser.ParseExpression()
+   in Esprima.JavaScriptParser.ParseExpressionStatement()
+   in Esprima.JavaScriptParser.ParseStatement()
+   in Esprima.JavaScriptParser.ParseStatementListItem()
+   in Esprima.JavaScriptParser.ParseScript(String code, String source, Boolean strict)
+   in Jint.Engine.Evaluate(String code, String source)
+   in TiaXmlReader.Generation.GridHandler.GridTableScript`2.ExecuteJS(Engine engine, String script, T data) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridTableScript.cs:riga 184
+   in TiaXmlReader.Generation.GridHandler.GridTableScript`2.ParseJS() in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridTableScript.cs:riga 117
+============================================= ^^^^^ 29/04/2024 08:06:31 057[ms] ^^^^^ =============================================
+Message => analisi di "|| )
+{" - Troppe parentesi di chiusura. in corso...
+Cause => System
+StackTrace:
+   in System.Text.RegularExpressions.RegexParser.ScanRegex()
+   in System.Text.RegularExpressions.RegexParser.Parse(String re, RegexOptions op)
+   in System.Text.RegularExpressions.Regex..ctor(String pattern, RegexOptions options, TimeSpan matchTimeout, Boolean useCache)
+   in System.Text.RegularExpressions.Regex..ctor(String pattern, RegexOptions options)
+   in FastColoredTextBoxNS.Range.<GetRanges>d__73.MoveNext()
+   in System.Linq.Buffer`1..ctor(IEnumerable`1 source)
+   in System.Linq.Enumerable.ToArray[TSource](IEnumerable`1 source)
+   in TiaXmlReader.Javascript.JavascriptFCTB.SelectionChangedDelayed(Object sender, EventArgs args) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Javascript\JavascriptFCTB.cs:riga 197
+============================================= ^^^^^ 30/04/2024 18:10:23 695[ms] ^^^^^ =============================================

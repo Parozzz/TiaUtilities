@@ -1,0 +1,322 @@
+Message => SCORTA is not defined
+Cause => Jint
+StackTrace:
+   in Jint.Engine.ScriptEvaluation(ScriptRecord scriptRecord, ParserOptions parserOptions)
+   in Jint.Engine.ExecuteWithConstraints[T](Boolean strict, Func`1 callback)
+   in Jint.Engine.Execute(Prepared`1& preparedScript)
+   in Jint.Engine.Evaluate(Prepared`1& preparedScript)
+   in TiaXmlReader.Generation.GridHandler.GridTableScript`2.ExecuteJS(Engine engine, Prepared`1 script, T data) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridTableScript.cs:riga 187
+   in TiaXmlReader.Generation.GridHandler.GridTableScript`2.ExecuteTimedJS(ScriptTimer scriptTimer, Engine engine, Prepared`1 script, T data) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridTableScript.cs:riga 157
+   in TiaXmlReader.Generation.GridHandler.GridTableScript`2.ParseJS() in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridTableScript.cs:riga 132
+============================================= ^^^^^ 02/05/2024 11:24:19 042[ms] ^^^^^ =============================================
+Message => SCORTA is not defined
+Cause => Jint
+StackTrace:
+   in Jint.Engine.ScriptEvaluation(ScriptRecord scriptRecord, ParserOptions parserOptions)
+   in Jint.Engine.ExecuteWithConstraints[T](Boolean strict, Func`1 callback)
+   in Jint.Engine.Execute(Prepared`1& preparedScript)
+   in Jint.Engine.Evaluate(Prepared`1& preparedScript)
+   in TiaXmlReader.Generation.GridHandler.GridTableScript`2.ExecuteJS(Engine engine, Prepared`1 script, T data) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridTableScript.cs:riga 187
+   in TiaXmlReader.Generation.GridHandler.GridTableScript`2.ExecuteTimedJS(ScriptTimer scriptTimer, Engine engine, Prepared`1 script, T data) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridTableScript.cs:riga 157
+   in TiaXmlReader.Generation.GridHandler.GridTableScript`2.ParseJS() in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridTableScript.cs:riga 132
+============================================= ^^^^^ 02/05/2024 11:25:23 263[ms] ^^^^^ =============================================
+Message => SCORTA is not defined
+Cause => Jint
+StackTrace:
+   in Jint.Engine.ScriptEvaluation(ScriptRecord scriptRecord, ParserOptions parserOptions)
+   in Jint.Engine.ExecuteWithConstraints[T](Boolean strict, Func`1 callback)
+   in Jint.Engine.Execute(Prepared`1& preparedScript)
+   in Jint.Engine.Evaluate(Prepared`1& preparedScript)
+   in TiaXmlReader.Generation.GridHandler.GridTableScript`2.ExecuteJS(Engine engine, Prepared`1 script, T data) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridTableScript.cs:riga 187
+   in TiaXmlReader.Generation.GridHandler.GridTableScript`2.ExecuteTimedJS(ScriptTimer scriptTimer, Engine engine, Prepared`1 script, T data) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridTableScript.cs:riga 157
+   in TiaXmlReader.Generation.GridHandler.GridTableScript`2.ParseJS() in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridTableScript.cs:riga 132
+============================================= ^^^^^ 02/05/2024 11:33:51 594[ms] ^^^^^ =============================================
+Message => SCORTA is not defined
+Cause => Jint
+StackTrace:
+   in Jint.Engine.ScriptEvaluation(ScriptRecord scriptRecord, ParserOptions parserOptions)
+   in Jint.Engine.ExecuteWithConstraints[T](Boolean strict, Func`1 callback)
+   in Jint.Engine.Execute(Prepared`1& preparedScript)
+   in Jint.Engine.Evaluate(Prepared`1& preparedScript)
+   in TiaXmlReader.Generation.GridHandler.GridTableScript`2.ExecuteJS(Engine engine, Prepared`1 script, T data)
+   in TiaXmlReader.Generation.GridHandler.GridTableScript`2.ExecuteTimedJS(ScriptTimer scriptTimer, Engine engine, Prepared`1 script, T data)
+   in TiaXmlReader.Generation.GridHandler.GridTableScript`2.ParseJS()
+============================================= ^^^^^ 02/05/2024 11:34:48 239[ms] ^^^^^ =============================================
+Message => analisi di "toLowerCase().includes("scorta") || comment.startsWith(" "))
+{" - Troppe parentesi di chiusura. in corso...
+Cause => System
+StackTrace:
+   in System.Text.RegularExpressions.RegexParser.ScanRegex()
+   in System.Text.RegularExpressions.RegexParser.Parse(String re, RegexOptions op)
+   in System.Text.RegularExpressions.Regex..ctor(String pattern, RegexOptions options, TimeSpan matchTimeout, Boolean useCache)
+   in System.Text.RegularExpressions.Regex..ctor(String pattern, RegexOptions options)
+   in FastColoredTextBoxNS.Range.<GetRanges>d__73.MoveNext()
+   in System.Linq.Buffer`1..ctor(IEnumerable`1 source)
+   in System.Linq.Enumerable.ToArray[TSource](IEnumerable`1 source)
+   in TiaXmlReader.Javascript.JavascriptFCTB.SelectionChangedDelayed(Object sender, EventArgs args)
+============================================= ^^^^^ 02/05/2024 11:40:24 883[ms] ^^^^^ =============================================
+Message => analisi di "comment.toLowerCase().includes("scorta") || comment.startsWith(" "))
+{" - Troppe parentesi di chiusura. in corso...
+Cause => System
+StackTrace:
+   in System.Text.RegularExpressions.RegexParser.ScanRegex()
+   in System.Text.RegularExpressions.RegexParser.Parse(String re, RegexOptions op)
+   in System.Text.RegularExpressions.Regex..ctor(String pattern, RegexOptions options, TimeSpan matchTimeout, Boolean useCache)
+   in System.Text.RegularExpressions.Regex..ctor(String pattern, RegexOptions options)
+   in FastColoredTextBoxNS.Range.<GetRanges>d__73.MoveNext()
+   in System.Linq.Buffer`1..ctor(IEnumerable`1 source)
+   in System.Linq.Enumerable.ToArray[TSource](IEnumerable`1 source)
+   in TiaXmlReader.Javascript.JavascriptFCTB.SelectionChangedDelayed(Object sender, EventArgs args)
+============================================= ^^^^^ 02/05/2024 11:40:31 632[ms] ^^^^^ =============================================
+Message => analisi di "))
+{" - Troppe parentesi di chiusura. in corso...
+Cause => System
+StackTrace:
+   in System.Text.RegularExpressions.RegexParser.ScanRegex()
+   in System.Text.RegularExpressions.RegexParser.Parse(String re, RegexOptions op)
+   in System.Text.RegularExpressions.Regex..ctor(String pattern, RegexOptions options, TimeSpan matchTimeout, Boolean useCache)
+   in System.Text.RegularExpressions.Regex..ctor(String pattern, RegexOptions options)
+   in FastColoredTextBoxNS.Range.<GetRanges>d__73.MoveNext()
+   in System.Linq.Buffer`1..ctor(IEnumerable`1 source)
+   in System.Linq.Enumerable.ToArray[TSource](IEnumerable`1 source)
+   in TiaXmlReader.Javascript.JavascriptFCTB.SelectionChangedDelayed(Object sender, EventArgs args)
+============================================= ^^^^^ 02/05/2024 11:50:03 070[ms] ^^^^^ =============================================
+Message => analisi di "))" - Troppe parentesi di chiusura. in corso...
+Cause => System
+StackTrace:
+   in System.Text.RegularExpressions.RegexParser.ScanRegex()
+   in System.Text.RegularExpressions.RegexParser.Parse(String re, RegexOptions op)
+   in System.Text.RegularExpressions.Regex..ctor(String pattern, RegexOptions options, TimeSpan matchTimeout, Boolean useCache)
+   in System.Text.RegularExpressions.Regex..ctor(String pattern, RegexOptions options)
+   in FastColoredTextBoxNS.Range.<GetRanges>d__73.MoveNext()
+   in System.Linq.Buffer`1..ctor(IEnumerable`1 source)
+   in System.Linq.Enumerable.ToArray[TSource](IEnumerable`1 source)
+   in TiaXmlReader.Javascript.JavascriptFCTB.SelectionChangedDelayed(Object sender, EventArgs args)
+============================================= ^^^^^ 02/05/2024 11:50:30 070[ms] ^^^^^ =============================================
+Message => analisi di "))" - Troppe parentesi di chiusura. in corso...
+Cause => System
+StackTrace:
+   in System.Text.RegularExpressions.RegexParser.ScanRegex()
+   in System.Text.RegularExpressions.RegexParser.Parse(String re, RegexOptions op)
+   in System.Text.RegularExpressions.Regex..ctor(String pattern, RegexOptions options, TimeSpan matchTimeout, Boolean useCache)
+   in System.Text.RegularExpressions.Regex..ctor(String pattern, RegexOptions options)
+   in FastColoredTextBoxNS.Range.<GetRanges>d__73.MoveNext()
+   in System.Linq.Buffer`1..ctor(IEnumerable`1 source)
+   in System.Linq.Enumerable.ToArray[TSource](IEnumerable`1 source)
+   in TiaXmlReader.Javascript.JavascriptFCTB.SelectionChangedDelayed(Object sender, EventArgs args) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Javascript\JavascriptFCTB.cs:riga 211
+============================================= ^^^^^ 02/05/2024 11:53:57 349[ms] ^^^^^ =============================================
+Message => analisi di "))" - Troppe parentesi di chiusura. in corso...
+Cause => System
+StackTrace:
+   in System.Text.RegularExpressions.RegexParser.ScanRegex()
+   in System.Text.RegularExpressions.RegexParser.Parse(String re, RegexOptions op)
+   in System.Text.RegularExpressions.Regex..ctor(String pattern, RegexOptions options, TimeSpan matchTimeout, Boolean useCache)
+   in System.Text.RegularExpressions.Regex..ctor(String pattern, RegexOptions options)
+   in FastColoredTextBoxNS.Range.<GetRanges>d__73.MoveNext()
+   in System.Linq.Buffer`1..ctor(IEnumerable`1 source)
+   in System.Linq.Enumerable.ToArray[TSource](IEnumerable`1 source)
+   in TiaXmlReader.Javascript.JavascriptFCTB.SelectionChangedDelayed(Object sender, EventArgs args) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Javascript\JavascriptFCTB.cs:riga 211
+============================================= ^^^^^ 02/05/2024 11:56:54 251[ms] ^^^^^ =============================================
+Message => analisi di "'))'" - Troppe parentesi di chiusura. in corso...
+Cause => System
+StackTrace:
+   in System.Text.RegularExpressions.RegexParser.ScanRegex()
+   in System.Text.RegularExpressions.RegexParser.Parse(String re, RegexOptions op)
+   in System.Text.RegularExpressions.Regex..ctor(String pattern, RegexOptions options, TimeSpan matchTimeout, Boolean useCache)
+   in System.Text.RegularExpressions.Regex..ctor(String pattern, RegexOptions options)
+   in FastColoredTextBoxNS.Range.<GetRanges>d__73.MoveNext()
+   in System.Linq.Buffer`1..ctor(IEnumerable`1 source)
+   in System.Linq.Enumerable.ToArray[TSource](IEnumerable`1 source)
+   in TiaXmlReader.Javascript.JavascriptFCTB.SelectionChangedDelayed(Object sender, EventArgs args)
+============================================= ^^^^^ 02/05/2024 11:57:21 850[ms] ^^^^^ =============================================
+Message => analisi di "\))" - Troppe parentesi di chiusura. in corso...
+Cause => System
+StackTrace:
+   in System.Text.RegularExpressions.RegexParser.ScanRegex()
+   in System.Text.RegularExpressions.RegexParser.Parse(String re, RegexOptions op)
+   in System.Text.RegularExpressions.Regex..ctor(String pattern, RegexOptions options, TimeSpan matchTimeout, Boolean useCache)
+   in System.Text.RegularExpressions.Regex..ctor(String pattern, RegexOptions options)
+   in FastColoredTextBoxNS.Range.<GetRanges>d__73.MoveNext()
+   in System.Linq.Buffer`1..ctor(IEnumerable`1 source)
+   in System.Linq.Enumerable.ToArray[TSource](IEnumerable`1 source)
+   in TiaXmlReader.Javascript.JavascriptFCTB.SelectionChangedDelayed(Object sender, EventArgs args)
+============================================= ^^^^^ 02/05/2024 11:58:23 608[ms] ^^^^^ =============================================
+Message => analisi di "\ 
+//ioName  = ioName.replace("E"" - Parentesi chiuse insufficienti. in corso...
+Cause => System
+StackTrace:
+   in System.Text.RegularExpressions.RegexParser.ScanRegex()
+   in System.Text.RegularExpressions.RegexParser.Parse(String re, RegexOptions op)
+   in System.Text.RegularExpressions.Regex..ctor(String pattern, RegexOptions options, TimeSpan matchTimeout, Boolean useCache)
+   in System.Text.RegularExpressions.Regex..ctor(String pattern, RegexOptions options)
+   in FastColoredTextBoxNS.Range.<GetRanges>d__73.MoveNext()
+   in System.Linq.Buffer`1..ctor(IEnumerable`1 source)
+   in System.Linq.Enumerable.ToArray[TSource](IEnumerable`1 source)
+   in TiaXmlReader.Javascript.JavascriptFCTB.SelectionChangedDelayed(Object sender, EventArgs args)
+============================================= ^^^^^ 02/05/2024 11:58:34 599[ms] ^^^^^ =============================================
+Message => analisi di "))" - Troppe parentesi di chiusura. in corso...
+Cause => System
+StackTrace:
+   in System.Text.RegularExpressions.RegexParser.ScanRegex()
+   in System.Text.RegularExpressions.RegexParser.Parse(String re, RegexOptions op)
+   in System.Text.RegularExpressions.Regex..ctor(String pattern, RegexOptions options, TimeSpan matchTimeout, Boolean useCache)
+   in System.Text.RegularExpressions.Regex..ctor(String pattern, RegexOptions options)
+   in FastColoredTextBoxNS.Range.<GetRanges>d__73.MoveNext()
+   in System.Linq.Buffer`1..ctor(IEnumerable`1 source)
+   in System.Linq.Enumerable.ToArray[TSource](IEnumerable`1 source)
+   in TiaXmlReader.Javascript.JavascriptFCTB.SelectionChangedDelayed(Object sender, EventArgs args)
+============================================= ^^^^^ 02/05/2024 11:59:36 499[ms] ^^^^^ =============================================
+Message => SCORTA is not defined
+Cause => Jint
+StackTrace:
+   in Jint.Engine.ScriptEvaluation(ScriptRecord scriptRecord, ParserOptions parserOptions)
+   in Jint.Engine.ExecuteWithConstraints[T](Boolean strict, Func`1 callback)
+   in Jint.Engine.Execute(Prepared`1& preparedScript)
+   in Jint.Engine.Evaluate(Prepared`1& preparedScript)
+   in TiaXmlReader.Generation.GridHandler.GridTableScript`2.ExecuteJS(Engine engine, Prepared`1 script, T data) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridTableScript.cs:riga 187
+   in TiaXmlReader.Generation.GridHandler.GridTableScript`2.ExecuteTimedJS(ScriptTimer scriptTimer, Engine engine, Prepared`1 script, T data) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridTableScript.cs:riga 157
+   in TiaXmlReader.Generation.GridHandler.GridTableScript`2.ParseJS() in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridTableScript.cs:riga 132
+============================================= ^^^^^ 02/05/2024 13:04:34 210[ms] ^^^^^ =============================================
+Message => Path cannot be the empty string or all whitespace.
+Cause => mscorlib
+StackTrace:
+   at System.IO.Directory.CreateDirectory(String path)
+   at TiaXmlReader.Generation.GenerationUtils.Save(Object obj, String& filePath, String extension, Boolean showFileDialog) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GenerationUtils.cs:line 64
+============================================= ^^^^^ 03/05/2024 16:05:29 333[ms] ^^^^^ =============================================
+Message => Path cannot be the empty string or all whitespace.
+Cause => mscorlib
+StackTrace:
+   at System.IO.Directory.CreateDirectory(String path)
+   at TiaXmlReader.Generation.GenerationUtils.Save(Object obj, String& filePath, String extension, Boolean showFileDialog) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GenerationUtils.cs:line 49
+============================================= ^^^^^ 03/05/2024 16:05:44 070[ms] ^^^^^ =============================================
+Message => Path cannot be the empty string or all whitespace.
+Cause => mscorlib
+StackTrace:
+   at System.IO.Directory.CreateDirectory(String path)
+   at TiaXmlReader.Generation.GenerationUtils.Save(Object obj, String& filePath, String extension, Boolean showFileDialog) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GenerationUtils.cs:line 49
+============================================= ^^^^^ 03/05/2024 16:06:14 062[ms] ^^^^^ =============================================
+Message => Path cannot be the empty string or all whitespace.
+Cause => mscorlib
+StackTrace:
+   at System.IO.Directory.CreateDirectory(String path)
+   at TiaXmlReader.Generation.GenerationUtils.Save(Object obj, String& filePath, String extension, Boolean showFileDialog) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GenerationUtils.cs:line 49
+============================================= ^^^^^ 03/05/2024 16:06:24 982[ms] ^^^^^ =============================================
+Message => Path cannot be the empty string or all whitespace.
+Cause => mscorlib
+StackTrace:
+   at System.IO.Directory.CreateDirectory(String path)
+   at TiaXmlReader.Generation.GenerationUtils.Save(Object obj, String& filePath, String extension, Boolean showFileDialog) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GenerationUtils.cs:line 49
+============================================= ^^^^^ 03/05/2024 16:06:26 398[ms] ^^^^^ =============================================
+Message => Il percorso non può essere composto da una stringa vuota o costituita da soli spazi.
+Cause => mscorlib
+StackTrace:
+   in System.IO.Directory.CreateDirectory(String path)
+   in TiaXmlReader.Generation.GenerationUtils.Save(Object obj, String& filePath, String extension, Boolean showFileDialog) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GenerationUtils.cs:riga 64
+============================================= ^^^^^ 03/05/2024 18:40:12 196[ms] ^^^^^ =============================================
+Message => La cella specificata non appartiene a questo controllo DataGridView.
+Cause => System.Windows.Forms
+StackTrace:
+   in System.Windows.Forms.DataGridView.set_CurrentCell(DataGridViewCell value)
+   in TiaXmlReader.Generation.GridHandler.GridHandler`2.ShowCell(DataGridViewCell cell) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridHandler.cs:riga 564
+   in TiaXmlReader.Generation.GridHandler.GridHandler`2.<>c__DisplayClass64_0.<ChangeCells>g__undoRedoAction|1() in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridHandler.cs:riga 497
+============================================= ^^^^^ 07/05/2024 08:07:00 568[ms] ^^^^^ =============================================
+Message => La cella specificata non appartiene a questo controllo DataGridView.
+Cause => System.Windows.Forms
+StackTrace:
+   in System.Windows.Forms.DataGridView.set_CurrentCell(DataGridViewCell value)
+   in TiaXmlReader.Generation.GridHandler.GridHandler`2.ShowCell(DataGridViewCell cell) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridHandler.cs:riga 564
+   in TiaXmlReader.Generation.GridHandler.GridHandler`2.<>c__DisplayClass64_0.<ChangeCells>g__undoRedoAction|1() in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridHandler.cs:riga 497
+============================================= ^^^^^ 07/05/2024 08:07:11 170[ms] ^^^^^ =============================================
+Message => Index non compreso nell'intervallo. Richiesto valore non negativo e minore della dimensione della raccolta.
+Nome parametro: index
+Cause => mscorlib
+StackTrace:
+   in System.ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument argument, ExceptionResource resource)
+   in System.Collections.Generic.List`1.get_Item(Int32 index)
+   in TiaXmlReader.Generation.GridHandler.GridDataSource`2.get_Item(Int32 i) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridDataSource.cs:riga 34
+   in TiaXmlReader.Generation.GridHandler.GridHandler`2.UndoChangeCells(List`1 cellChangeList) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridHandler.cs:riga 515
+============================================= ^^^^^ 07/05/2024 10:52:41 422[ms] ^^^^^ =============================================
+Message => La cella specificata non appartiene a questo controllo DataGridView.
+Cause => System.Windows.Forms
+StackTrace:
+   in System.Windows.Forms.DataGridView.set_CurrentCell(DataGridViewCell value)
+   in TiaXmlReader.Generation.GridHandler.GridHandler`2.ShowCell(DataGridViewCell cell) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridHandler.cs:riga 562
+   in TiaXmlReader.Generation.GridHandler.GridHandler`2.UndoChangeCells(List`1 cellChangeList) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridHandler.cs:riga 520
+============================================= ^^^^^ 07/05/2024 11:33:58 484[ms] ^^^^^ =============================================
+Message => La cella specificata non appartiene a questo controllo DataGridView.
+Cause => System.Windows.Forms
+StackTrace:
+   in System.Windows.Forms.DataGridView.set_CurrentCell(DataGridViewCell value)
+   in TiaXmlReader.Generation.GridHandler.GridHandler`2.ShowCell(DataGridViewCell cell) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridHandler.cs:riga 562
+   in TiaXmlReader.Generation.GridHandler.GridHandler`2.UndoChangeCells(List`1 cellChangeList) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridHandler.cs:riga 520
+============================================= ^^^^^ 07/05/2024 11:34:13 609[ms] ^^^^^ =============================================
+Message => La cella specificata non appartiene a questo controllo DataGridView.
+Cause => System.Windows.Forms
+StackTrace:
+   in System.Windows.Forms.DataGridView.set_CurrentCell(DataGridViewCell value)
+   in TiaXmlReader.Generation.GridHandler.GridHandler`2.ShowCell(DataGridViewCell cell) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridHandler.cs:riga 562
+   in TiaXmlReader.Generation.GridHandler.GridHandler`2.UndoChangeCells(List`1 cellChangeList) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridHandler.cs:riga 520
+============================================= ^^^^^ 07/05/2024 11:34:19 143[ms] ^^^^^ =============================================
+Message => suggestionArray is not defined
+Cause => Jint
+StackTrace:
+   in Jint.Engine.ScriptEvaluation(ScriptRecord scriptRecord, ParserOptions parserOptions)
+   in Jint.Engine.ExecuteWithConstraints[T](Boolean strict, Func`1 callback)
+   in Jint.Engine.Execute(Prepared`1& preparedScript)
+   in Jint.Engine.Evaluate(Prepared`1& preparedScript)
+   in TiaXmlReader.Generation.GridHandler.GridTableScript`2.ExecuteJS(Engine engine, Prepared`1 script, T data) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridTableScript.cs:riga 206
+   in TiaXmlReader.Generation.GridHandler.GridTableScript`2.ExecuteTimedJS(ScriptTimer scriptTimer, Engine engine, Prepared`1 script, T data) in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridTableScript.cs:riga 176
+   in TiaXmlReader.Generation.GridHandler.GridTableScript`2.ParseJS() in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridTableScript.cs:riga 151
+============================================= ^^^^^ 07/05/2024 11:35:31 493[ms] ^^^^^ =============================================
+Message => Operazione o metodo non implementato.
+Cause => Jint
+StackTrace:
+   in Jint.Native.JsValue.System.IConvertible.ToType(Type conversionType, IFormatProvider provider)
+   in Newtonsoft.Json.JsonWriter.ResolveConvertibleValue(IConvertible convertible, PrimitiveTypeCode& typeCode, Object& value)
+   in Newtonsoft.Json.JsonWriter.WriteValue(JsonWriter writer, PrimitiveTypeCode typeCode, Object value)
+   in Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.Serialize(JsonWriter jsonWriter, Object value, Type objectType)
+   in Newtonsoft.Json.JsonSerializer.SerializeInternal(JsonWriter jsonWriter, Object value, Type objectType)
+   in Newtonsoft.Json.JsonConvert.SerializeObjectInternal(Object value, Type type, JsonSerializer jsonSerializer)
+   in Newtonsoft.Json.JsonConvert.SerializeObject(Object value)
+   in TiaXmlReader.Generation.GridHandler.GridScript`2.ParseJS() in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridScript.cs:riga 165
+============================================= ^^^^^ 10/05/2024 15:32:18 473[ms] ^^^^^ =============================================
+Message => Expected string but got Object, PlainObject
+Cause => Jint
+StackTrace:
+   in Jint.Runtime.ExceptionHelper.ThrowArgumentException(String message, String paramName)
+   in Jint.JsValueExtensions.ThrowWrongTypeException(JsValue value, String expectedType)
+   in Jint.JsValueExtensions.AsString(JsValue value)
+   in TiaXmlReader.Generation.GridHandler.GridScript`2.ParseJS() in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridScript.cs:riga 165
+============================================= ^^^^^ 10/05/2024 15:43:57 772[ms] ^^^^^ =============================================
+Message => Operazione o metodo non implementato.
+Cause => Jint
+StackTrace:
+   in Jint.Native.JsValue.System.IConvertible.ToType(Type conversionType, IFormatProvider provider)
+   in Newtonsoft.Json.JsonWriter.ResolveConvertibleValue(IConvertible convertible, PrimitiveTypeCode& typeCode, Object& value)
+   in Newtonsoft.Json.JsonWriter.WriteValue(JsonWriter writer, PrimitiveTypeCode typeCode, Object value)
+   in Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.Serialize(JsonWriter jsonWriter, Object value, Type objectType)
+   in Newtonsoft.Json.Converters.KeyValuePairConverter.WriteJson(JsonWriter writer, Object value, JsonSerializer serializer)
+   in Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeConvertable(JsonWriter writer, JsonConverter converter, Object value, JsonContract contract, JsonContainerContract collectionContract, JsonProperty containerProperty)
+   in Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeList(JsonWriter writer, IEnumerable values, JsonArrayContract contract, JsonProperty member, JsonContainerContract collectionContract, JsonProperty containerProperty)
+   in Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.Serialize(JsonWriter jsonWriter, Object value, Type objectType)
+   in Newtonsoft.Json.JsonSerializer.SerializeInternal(JsonWriter jsonWriter, Object value, Type objectType)
+   in Newtonsoft.Json.JsonConvert.SerializeObjectInternal(Object value, Type type, JsonSerializer jsonSerializer)
+   in Newtonsoft.Json.JsonConvert.SerializeObject(Object value)
+   in TiaXmlReader.Generation.GridHandler.GridScript`2.ParseJS() in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridScript.cs:riga 165
+============================================= ^^^^^ 10/05/2024 15:48:34 067[ms] ^^^^^ =============================================
+Message => Operazione o metodo non implementato.
+Cause => Jint
+StackTrace:
+   in Jint.Native.JsValue.System.IConvertible.ToType(Type conversionType, IFormatProvider provider)
+   in Newtonsoft.Json.JsonWriter.ResolveConvertibleValue(IConvertible convertible, PrimitiveTypeCode& typeCode, Object& value)
+   in Newtonsoft.Json.JsonWriter.WriteValue(JsonWriter writer, PrimitiveTypeCode typeCode, Object value)
+   in Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.Serialize(JsonWriter jsonWriter, Object value, Type objectType)
+   in Newtonsoft.Json.Converters.KeyValuePairConverter.WriteJson(JsonWriter writer, Object value, JsonSerializer serializer)
+   in Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeConvertable(JsonWriter writer, JsonConverter converter, Object value, JsonContract contract, JsonContainerContract collectionContract, JsonProperty containerProperty)
+   in Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeDictionary(JsonWriter writer, IDictionary values, JsonDictionaryContract contract, JsonProperty member, JsonContainerContract collectionContract, JsonProperty containerProperty)
+   in Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.Serialize(JsonWriter jsonWriter, Object value, Type objectType)
+   in Newtonsoft.Json.JsonSerializer.SerializeInternal(JsonWriter jsonWriter, Object value, Type objectType)
+   in Newtonsoft.Json.JsonConvert.SerializeObjectInternal(Object value, Type type, JsonSerializer jsonSerializer)
+   in Newtonsoft.Json.JsonConvert.SerializeObject(Object value)
+   in TiaXmlReader.Generation.GridHandler.GridScript`2.ParseJS() in C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\TiaUtilities\Generation\GridHandler\GridScript.cs:riga 165
+============================================= ^^^^^ 10/05/2024 15:50:54 771[ms] ^^^^^ =============================================

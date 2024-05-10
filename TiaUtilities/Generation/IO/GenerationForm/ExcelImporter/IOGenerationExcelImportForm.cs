@@ -84,8 +84,8 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
             gridHandler?.Init();
 
             #region JS_SCRIPT
-            this.gridHandler.TableScript.SetReadScriptFunc(() => settings.JSScript);
-            this.gridHandler.TableScript.SetWriteScriptAction((str) => settings.JSScript = str);
+            this.gridHandler.Script.SetReadScriptFunc(() => settings.JSScript);
+            this.gridHandler.Script.SetWriteScriptAction((str) => settings.JSScript = str);
             #endregion
 
             this.ConfigButton.Click += (object sender, EventArgs args) =>
@@ -95,32 +95,33 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
                     ControlWidth = 500
                 };
 
-                configForm.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Indirizzo")
+                var mainGroup = configForm.Init();
+                mainGroup.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Indirizzo")
                     .ControlText(settings.AddressCellConfig)
                     .TextChanged(str => settings.AddressCellConfig = str);
 
-                configForm.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Nome IO")
-                    .ControlText(settings.IONameCellConfig)
-                    .TextChanged(str => settings.IONameCellConfig = str);
+                mainGroup.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Nome IO")
+                     .ControlText(settings.IONameCellConfig)
+                     .TextChanged(str => settings.IONameCellConfig = str);
 
-                configForm.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Commento")
-                    .ControlText(settings.CommentCellConfig)
-                    .TextChanged(str => settings.CommentCellConfig = str);
+                mainGroup.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Commento")
+                     .ControlText(settings.CommentCellConfig)
+                     .TextChanged(str => settings.CommentCellConfig = str);
 
-                configForm.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Riga di partenza")
-                    .ControlText(settings.StartingRow)
-                    .UIntChanged(num => settings.StartingRow = num);
+                mainGroup.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Riga di partenza")
+                     .ControlText(settings.StartingRow)
+                     .UIntChanged(num => settings.StartingRow = num);
 
-                configForm.AddLine(ConfigFormLineTypes.JAVASCRIPT).LabelText("Espressione validità riga").Height(200)
-                    .ControlText(settings.IgnoreRowExpressionConfig)
-                    .TextChanged(str => settings.IgnoreRowExpressionConfig = str);
+                mainGroup.AddLine(ConfigFormLineTypes.JAVASCRIPT).LabelText("Espressione validità riga").Height(200)
+                     .ControlText(settings.IgnoreRowExpressionConfig)
+                     .TextChanged(str => settings.IgnoreRowExpressionConfig = str);
 
                 configForm.StartShowingAtControl(this.ConfigButton);
                 configForm.Init();
                 configForm.Show(this);
             };
 
-            this.ImportExcelButton.Click += (object sender, EventArgs args) =>
+            this.ImportExcelButton.Click += (sender, args) =>
             {
                 var fileDialog = new CommonOpenFileDialog
                 {
@@ -130,7 +131,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
                     Filters = { new CommonFileDialogFilter("Excel Files", "*.xlsx") }
                 };
 
-                if (fileDialog.ShowDialog(this.Handle) == CommonFileDialogResult.Ok)
+                if (fileDialog.ShowDialog(ownerWindowHandle: this.Handle) == CommonFileDialogResult.Ok)
                 {
                     this.ImportExcel(fileDialog.FileName);
                 }

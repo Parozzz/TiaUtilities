@@ -1,14 +1,9 @@
 ﻿using FastColoredTextBoxNS;
-using Jint;
-using Jint.Native;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
+using FastColoredTextBoxNS.Types;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
 using TiaXmlReader.Javascript.FCTB;
 using TiaXmlReader.Utility;
+using Timer = System.Windows.Forms.Timer;
 
 namespace TiaXmlReader.Javascript
 {
@@ -41,7 +36,7 @@ namespace TiaXmlReader.Javascript
         {
             #region FCTB_SETUP
             // == BRACKETS ==
-            fctb.Language = Language.JS;
+            fctb.Language = FastColoredTextBoxNS.Text.Language.JS;
 
             fctb.AutoCompleteBrackets = true;
             fctb.AutoCompleteBracketsList = new char[] { '(', ')', '{', '}', '\"', '\"', '\'', '\'' };

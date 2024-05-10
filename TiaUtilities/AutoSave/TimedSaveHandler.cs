@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
-using TiaXmlReader.Utility;
+﻿using Timer = System.Windows.Forms.Timer;
 
 namespace TiaXmlReader.AutoSave
 {
@@ -21,8 +17,6 @@ namespace TiaXmlReader.AutoSave
         private readonly ProgramSettings programSettings;
         private readonly ComboBox comboBox;
         private readonly Timer timer;
-
-
 
         public TimedSaveHandler(ProgramSettings settings, ComboBox comboBox)
         {

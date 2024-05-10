@@ -1,0 +1,228 @@
+JS Script executed for IOGenerationExcelImportForm
+Average[ms]: 2,03043285714286, Deviation[ms]: 16,8274233135823, Min[ms]: 0,0035, Max[ms]: 141,8095, Executions: 70
+Script:
+$A != ""
+============================================= ^^^^^ 29/04/2024 16:33:34 305[ms] ^^^^^ =============================================
+JS Script executed for IOData
+Average[ms]: 0,1092296875, Deviation[ms]: 0,696316911659054, Min[ms]: 0,0176, Max[ms]: 5,636, Executions: 64
+Script:
+address = address.replace("E", "I");
+============================================= ^^^^^ 29/04/2024 16:33:53 288[ms] ^^^^^ =============================================
+JS Script executed for IOData
+Average[ms]: 0, Deviation[ms]: 0, Min[ms]: 0, Max[ms]: 0, Executions: 0
+Script:
+address = address.replace("E", "I");
+if (address == "")
+{
+    return "";
+}
+============================================= ^^^^^ 29/04/2024 19:26:56 274[ms] ^^^^^ =============================================
+JS Script executed for IOData
+Average[ms]: 0, Deviation[ms]: 0, Min[ms]: 0, Max[ms]: 0, Executions: 0
+Script:
+address = address.replace("E", "I");
+if (address == "")
+{
+    return "";
+}
+
+============================================= ^^^^^ 29/04/2024 19:39:34 954[ms] ^^^^^ =============================================
+JS Script executed for IOData
+Average[ms]: 0, Deviation[ms]: 0, Min[ms]: 0, Max[ms]: 0, Executions: 0
+Script:
+address = address.replace("E", "I");
+if (address == "")
+{
+    return "";
+}
+
+var d = 33;
+return "" + d + "abc";
+============================================= ^^^^^ 30/04/2024 12:19:10 789[ms] ^^^^^ =============================================
+JS Script executed for IOData
+Average[ms]: 0, Deviation[ms]: 0, Min[ms]: 0, Max[ms]: 0, Executions: 0
+Script:
+address = address.replace("E", "I");
+if (address == "")
+{
+    return "";
+}
+============================================= ^^^^^ 30/04/2024 12:19:17 877[ms] ^^^^^ =============================================
+JS Script executed for IOData
+Average[ms]: 0,0600607913669063, Deviation[ms]: 0,796433023695318, Min[ms]: 0,0107, Max[ms]: 13,3152, Executions: 278
+Script:
+address = address.replace("I", "E");
+if (address == "")
+{
+    return "";
+}
+============================================= ^^^^^ 30/04/2024 12:19:33 353[ms] ^^^^^ =============================================
+JS Script executed for IOData
+Average[ms]: 0,0115460431654676, Deviation[ms]: 0,00244804329989009, Min[ms]: 0,0104, Max[ms]: 0,0372, Executions: 278
+Script:
+address = address.replace("E", "I");
+if (address == "")
+{
+    return "";
+}
+============================================= ^^^^^ 30/04/2024 12:20:14 066[ms] ^^^^^ =============================================
+JS Script executed for IOData
+Average[ms]: 0, Deviation[ms]: 0, Min[ms]: 0, Max[ms]: 0, Executions: 0
+Script:
+address = address.replace("E", "I"); 
+address = "i";
+if (address == "")
+{
+    return false;
+}
+
+============================================= ^^^^^ 30/04/2024 18:06:40 397[ms] ^^^^^ =============================================
+JS Script executed for IOData
+Average[ms]: 0,02174, Deviation[ms]: 0,0350653066909921, Min[ms]: 0,0108, Max[ms]: 0,1523, Executions: 15
+Script:
+address = address.replace("E", "I"); 
+address = "i";
+if (address == "")
+{
+    return false;
+}
+
+============================================= ^^^^^ 30/04/2024 18:06:49 910[ms] ^^^^^ =============================================
+JS Script executed for IOData
+Average[ms]: 0,0133, Deviation[ms]: 0,00825388797274755, Min[ms]: 0,0102, Max[ms]: 0,0439, Executions: 15
+Script:
+if (address == "")
+{
+    return false;
+}
+
+address = address.replace("E", "I"); 
+============================================= ^^^^^ 30/04/2024 18:07:05 903[ms] ^^^^^ =============================================
+JS Script executed for IOData
+Average[ms]: 0,0125666666666667, Deviation[ms]: 0,00632789239970325, Min[ms]: 0,0102, Max[ms]: 0,0361, Executions: 15
+Script:
+if (address == "")
+{
+    return false;
+}
+
+address = address.replace("E", "I"); 
+============================================= ^^^^^ 30/04/2024 18:07:11 031[ms] ^^^^^ =============================================
+JS Script executed for IOData
+Average[ms]: 0,941586666666666, Deviation[ms]: 3,47597923754188, Min[ms]: 0,0106, Max[ms]: 13,9475, Executions: 15
+Script:
+if (address == "")
+{
+    return false;
+}
+
+address = address.replace("I", "E"); 
+============================================= ^^^^^ 30/04/2024 18:07:17 749[ms] ^^^^^ =============================================
+JS Script executed for IOData
+Average[ms]: 0, Deviation[ms]: 0, Min[ms]: 0, Max[ms]: 0, Executions: 0
+Script:
+if (address == "")
+{
+    return false;
+}
+
+address = address.replace("I", "E"); 
+============================================= ^^^^^ 30/04/2024 18:09:06 710[ms] ^^^^^ =============================================
+JS Script executed for IOGenerationExcelImportForm
+Average[ms]: 0,0402899999999999, Deviation[ms]: 0,296769706362165, Min[ms]: 0,0032, Max[ms]: 2,5054, Executions: 70
+Script:
+$A != ""
+============================================= ^^^^^ 30/04/2024 18:09:13 132[ms] ^^^^^ =============================================
+JS Script executed for IOData
+Average[ms]: 0,750403125, Deviation[ms]: 5,85040097859136, Min[ms]: 0,0103, Max[ms]: 47,1865, Executions: 64
+Script:
+if (address == "")
+{
+    return false;
+}
+
+address = address.replace("E", "I"); 
+============================================= ^^^^^ 30/04/2024 18:09:19 972[ms] ^^^^^ =============================================
+JS Script executed for IOData
+Average[ms]: 0,0127796875, Deviation[ms]: 0,00486666530103969, Min[ms]: 0,0112, Max[ms]: 0,0505, Executions: 64
+Script:
+if (address == "")
+{
+    return false;
+}
+
+address = address.replace("E", "I"); 
+ioName  = ioName.replace("E", "I");
+============================================= ^^^^^ 30/04/2024 18:09:41 642[ms] ^^^^^ =============================================
+JS Script executed for IOData
+Average[ms]: 0,0271796875, Deviation[ms]: 0,116382881284802, Min[ms]: 0,0117, Max[ms]: 0,9509, Executions: 64
+Script:
+if (!address.startsWith("E") || !address.startsWith("I"))
+{
+    address = ioName = dbName = variable = comment = "";
+    return;
+}
+
+if (!ioName.startsWith("E") || !ioName.startsWith("E"))
+{ 
+    address = ioName = dbName = variable = comment = "";
+    return;
+}
+
+address = address.replace("E", "I"); 
+ioName  = ioName.replace("E", "I");
+============================================= ^^^^^ 30/04/2024 18:10:42 839[ms] ^^^^^ =============================================
+JS Script executed for IOData
+Average[ms]: 0,014778125, Deviation[ms]: 0,00413636573387497, Min[ms]: 0,0121, Max[ms]: 0,0405, Executions: 64
+Script:
+if (!(address.startsWith("E") || address.startsWith("I")))
+{
+    address = ioName = dbName = variable = comment = "";
+    return;
+}
+
+if (!(ioName.startsWith("E") || ioName.startsWith("I")))
+{ 
+    address = ioName = dbName = variable = comment = "";
+    return;
+}
+
+address = address.replace("E", "I"); 
+ioName  = ioName.replace("E", "I");
+============================================= ^^^^^ 30/04/2024 18:11:52 127[ms] ^^^^^ =============================================
+JS Script executed for IOData
+Average[ms]: 0, Deviation[ms]: 0, Min[ms]: 0, Max[ms]: 0, Executions: 0
+Script:
+if (!(address.startsWith("E") || address.startsWith("I")))
+{
+    address = ioName = dbName = variable = comment = "";
+    return;
+}
+JSON.banana();
+if (!(ioName.startsWith("E") || ioName.startsWith("I")))
+{ 
+    address = ioName = dbName = variable = comment = "";
+    return;
+}
+
+address = address.replace("E", "I"); 
+//ioName  = ioName.replace("E", "I");
+============================================= ^^^^^ 30/04/2024 19:10:00 531[ms] ^^^^^ =============================================
+JS Script executed for IOData
+Average[ms]: 0, Deviation[ms]: 0, Min[ms]: 0, Max[ms]: 0, Executions: 0
+Script:
+if (!(address.startsWith("E") || address.startsWith("I")))
+{
+    address = ioName = dbName = variable = comment = "";
+    return;
+}
+JSON.banana();
+if (!(ioName.startsWith("E") || ioName.startsWith("I")))
+{ 
+    address = ioName = dbName = variable = comment = "";
+    return;
+}
+
+address = address.replace("E", "I"); 
+//ioName  = ioName.replace("E", "I");
+============================================= ^^^^^ 30/04/2024 19:17:02 156[ms] ^^^^^ =============================================

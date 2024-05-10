@@ -1,0 +1,431 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{514D5D33-EDFD-4048-9DC8-B8A6729F9CF5}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>TiaXmlReader</RootNamespace>
+    <AssemblyName>TiaXmlReader</AssemblyName>
+    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'V17|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\V17\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'V16|AnyCPU'">
+    <OutputPath>bin\V16\</OutputPath>
+    <Prefer32Bit>true</Prefer32Bit>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'V19|AnyCPU'">
+    <OutputPath>bin\V19\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>
+    </StartupObject>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ClosedXML, Version=0.102.2.0, Culture=neutral, PublicKeyToken=fd1eb21b62ae805b, processorArchitecture=MSIL">
+      <HintPath>..\packages\ClosedXML.0.102.2\lib\netstandard2.0\ClosedXML.dll</HintPath>
+    </Reference>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.16.0.0, Culture=neutral, PublicKeyToken=8fb06cb64d019a17, processorArchitecture=MSIL">
+      <HintPath>..\packages\DocumentFormat.OpenXml.2.16.0\lib\net46\DocumentFormat.OpenXml.dll</HintPath>
+    </Reference>
+    <Reference Include="Esprima, Version=3.0.5.0, Culture=neutral, PublicKeyToken=2e92ba9c8d81157f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Esprima.3.0.5\lib\net462\Esprima.dll</HintPath>
+    </Reference>
+    <Reference Include="ExcelNumberFormat, Version=1.1.0.0, Culture=neutral, PublicKeyToken=23c6f5d73be07eca, processorArchitecture=MSIL">
+      <HintPath>..\packages\ExcelNumberFormat.1.1.0\lib\net20\ExcelNumberFormat.dll</HintPath>
+    </Reference>
+    <Reference Include="FastColoredTextBox, Version=2.16.24.0, Culture=neutral, PublicKeyToken=fb8aa12b994ef61b, processorArchitecture=MSIL">
+      <HintPath>..\packages\FCTB.2.16.24\lib\FastColoredTextBox.dll</HintPath>
+    </Reference>
+    <Reference Include="InfoBox, Version=1.3.0.152, Culture=neutral, PublicKeyToken=6f5edd306b0cc770, processorArchitecture=MSIL">
+      <HintPath>..\packages\InformationBox.1.3.0.152\lib\net48\InfoBox.dll</HintPath>
+    </Reference>
+    <Reference Include="Irony, Version=1.0.11.0, Culture=neutral, PublicKeyToken=ca48ace7223ead47, processorArchitecture=MSIL">
+      <HintPath>..\packages\Irony.NetCore.1.0.11\lib\net461\Irony.dll</HintPath>
+    </Reference>
+    <Reference Include="Jint, Version=3.1.0.0, Culture=neutral, PublicKeyToken=2e92ba9c8d81157f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Jint.3.1.0\lib\net462\Jint.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.Core, Version=7.0.4.0, Culture=neutral, PublicKeyToken=8afb38e9204fc0a9, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack.7.0.4\lib\net481\Microsoft.WindowsAPICodePack.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.ExtendedLinguisticServices, Version=7.0.4.0, Culture=neutral, PublicKeyToken=8afb38e9204fc0a9, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack.7.0.4\lib\net481\Microsoft.WindowsAPICodePack.ExtendedLinguisticServices.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.Sensors, Version=7.0.4.0, Culture=neutral, PublicKeyToken=8afb38e9204fc0a9, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack.7.0.4\lib\net481\Microsoft.WindowsAPICodePack.Sensors.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=7.0.4.0, Culture=neutral, PublicKeyToken=8afb38e9204fc0a9, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack.7.0.4\lib\net481\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.ShellExtensions, Version=7.0.4.0, Culture=neutral, PublicKeyToken=8afb38e9204fc0a9, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack.7.0.4\lib\net481\Microsoft.WindowsAPICodePack.ShellExtensions.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationFramework" />
+    <Reference Include="SixLabors.Fonts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=d998eea7b14cab13, processorArchitecture=MSIL">
+      <HintPath>..\packages\SixLabors.Fonts.1.0.0\lib\netstandard2.0\SixLabors.Fonts.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.IO, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IO.4.3.0\lib\net462\System.IO.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Packaging, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IO.Packaging.6.0.0\lib\net461\System.IO.Packaging.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http, Version=4.1.1.3, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Net.Http.4.3.4\lib\net46\System.Net.Http.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reflection, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reflection.4.3.0\lib\net462\System.Reflection.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Runtime, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.4.3.0\lib\net462\System.Runtime.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.6.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.7.0\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Algorithms, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Cryptography.Algorithms.4.3.0\lib\net463\System.Security.Cryptography.Algorithms.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Encoding, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Cryptography.Encoding.4.3.0\lib\net46\System.Security.Cryptography.Encoding.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Primitives, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Cryptography.Primitives.4.3.0\lib\net46\System.Security.Cryptography.Primitives.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.X509Certificates, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Cryptography.X509Certificates.4.3.0\lib\net461\System.Security.Cryptography.X509Certificates.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Text.RegularExpressions, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.RegularExpressions.4.3.1\lib\net463\System.Text.RegularExpressions.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="XLParser, Version=1.5.2.0, Culture=neutral, PublicKeyToken=63397e1e46bb91b4, processorArchitecture=MSIL">
+      <HintPath>..\packages\XLParser.1.5.2\lib\net461\XLParser.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AutoSave\ISettingsAutoSave.cs" />
+    <Compile Include="AutoSave\AutoSaveSettingsWrapper.cs" />
+    <Compile Include="CustomControls\FlatComboBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CustomControls\FlatTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DBDuplicationForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DBDuplicationForm.Designer.cs">
+      <DependentUpon>DBDuplicationForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generation\Alarms\GenerationForm\AlarmGenerationForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Generation\Alarms\GenerationForm\AlarmGenerationForm.Designer.cs">
+      <DependentUpon>AlarmGenerationForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generation\Alarms\GenerationForm\AlarmGenerationFormConfigHandler.cs" />
+    <Compile Include="Generation\Alarms\GenerationForm\AlarmGenerationProjectSave.cs" />
+    <Compile Include="Generation\Alarms\GenerationForm\AlarmGenerationSettings.cs" />
+    <Compile Include="Generation\Configuration\ConfigFormButtonPanelLine.cs" />
+    <Compile Include="Generation\Configuration\ConfigFormCheckBoxLine.cs" />
+    <Compile Include="AutoSave\TimedSaveHandler.cs" />
+    <Compile Include="Generation\Configuration\ConfigFormGroup.cs" />
+    <Compile Include="Generation\Configuration\ConfigFormJavascriptLine.cs" />
+    <Compile Include="Generation\Configuration\ConfigFormJSONLine.cs" />
+    <Compile Include="Generation\Configuration\ConfigFormLabelLine.cs" />
+    <Compile Include="Generation\Configuration\IConfigObject.cs" />
+    <Compile Include="Generation\GenerationUtils.cs" />
+    <Compile Include="Generation\GridHandler\CustomColumns\DropDownMenuScrollWheelHandler.cs" />
+    <Compile Include="Generation\GridHandler\CustomColumns\IGridCustomColumn.cs" />
+    <Compile Include="Generation\GridHandler\CustomColumns\SuggestionTextBoxColumn.cs" />
+    <Compile Include="Generation\GridHandler\Events\GridCellChangeEventHandler.cs" />
+    <Compile Include="Generation\GridHandler\Events\GridEvents.cs" />
+    <Compile Include="Generation\GridHandler\Events\GridScriptAddVariableEventHandler.cs" />
+    <Compile Include="Generation\GridHandler\Events\GridScriptShowVariablesEventHandler.cs" />
+    <Compile Include="Generation\GridHandler\GridUtils.cs" />
+    <Compile Include="Generation\GridHandler\Data\GridDataHandler.cs" />
+    <Compile Include="Generation\GridHandler\Data\GridDataColumn.cs" />
+    <Compile Include="Generation\GridHandler\Data\GridDataPreview.cs" />
+    <Compile Include="Generation\GridHandler\GridSettings.cs" />
+    <Compile Include="Generation\Configuration\ConfigForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Generation\Configuration\ConfigForm.Designer.cs">
+      <DependentUpon>ConfigForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generation\GridHandler\GridCellChange.cs" />
+    <Compile Include="Generation\GridHandler\GridDataSource.cs" />
+    <Compile Include="Generation\GridHandler\GridHandler.cs" />
+    <Compile Include="Generation\GridHandler\Data\IGridData.cs" />
+    <Compile Include="Generation\GridHandler\IGridRowComparer.cs" />
+    <Compile Include="Generation\Configuration\ConfigFormColorPickerLine.cs" />
+    <Compile Include="Generation\Configuration\ConfigFormComboBoxLine.cs" />
+    <Compile Include="Generation\Configuration\ConfigFormTextBoxLine.cs" />
+    <Compile Include="Generation\Configuration\ConfigFormLine.cs" />
+    <Compile Include="Generation\IGenerationConfiguration.cs" />
+    <Compile Include="Generation\IO\GenerationForm\ExcelImporter\IOGenerationExcelImportSettings.cs" />
+    <Compile Include="Generation\IO\GenerationForm\ExcelImporter\IOGenerationExcelImportData.cs" />
+    <Compile Include="Generation\IO\GenerationForm\ExcelImporter\IOGenerationExcelImportForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Generation\IO\GenerationForm\ExcelImporter\IOGenerationExcelImportForm.Designer.cs">
+      <DependentUpon>IOGenerationExcelImportForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Generation\IO\GenerationForm\IOGenerationFormConfigHandler.cs" />
+    <Compile Include="Generation\GridHandler\GridCellPreview.cs" />
+    <Compile Include="Generation\IO\GenerationForm\IOGenerationSettings.cs" />
+    <Compile Include="Generation\IO\GenerationForm\IOGenerationProjectSave.cs" />
+    <Compile Include="Generation\IO\GenerationForm\IOGenerationComparer.cs" />
+    <Compile Include="Generation\GridHandler\GridExcelDragHandler.cs" />
+    <Compile Include="Generation\GridHandler\GridCellPaintHandler.cs" />
+    <Compile Include="Generation\GridHandler\GridSortHandler.cs" />
+    <Compile Include="Generation\GridHandler\GridScript.cs" />
+    <Compile Include="Generation\IO\GenerationForm\IOGenerationUtils.cs" />
+    <Compile Include="Generation\IO\GenerationForm\IOSuggestion.cs" />
+    <Compile Include="Generation\IO\IOConfiguration.cs" />
+    <Compile Include="Generation\IO\IOData.cs" />
+    <Compile Include="Generation\IO\IOXmlGenerator.cs" />
+    <Compile Include="Generation\Alarms\AlarmData.cs" />
+    <Compile Include="Generation\Alarms\AlarmConfiguration.cs" />
+    <Compile Include="Generation\Placeholders\Data\StringGenerationPlaceholderData.cs" />
+    <Compile Include="Generation\Placeholders\Data\UIntGenerationPlaceholderData.cs" />
+    <Compile Include="Generation\Placeholders\GenerationPlaceholders.cs" />
+    <Compile Include="Generation\Placeholders\Data\IGenerationPlaceholderData.cs" />
+    <Compile Include="Javascript\FCTB\CustomWavyLineStyle.cs" />
+    <Compile Include="Javascript\JavascriptAutocompleteMenu.cs" />
+    <Compile Include="Javascript\JavascriptErrorReportThread.cs" />
+    <Compile Include="Javascript\JavascriptFCTB.cs" />
+    <Compile Include="Localization\LocalizationAttribute.cs" />
+    <Compile Include="Localization\LocalizationHelper.cs" />
+    <Compile Include="SimaticML\Attributes\Attribute.cs" />
+    <Compile Include="Generation\Alarms\AlarmXmlGenerator.cs" />
+    <Compile Include="Generation\IGeneration.cs" />
+    <Compile Include="Generation\IO\GenerationForm\IOGenerationForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Generation\IO\GenerationForm\IOGenerationForm.Designer.cs">
+      <DependentUpon>IOGenerationForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ProgramSettings.cs" />
+    <Compile Include="SimaticML\Blocks\FlagNet\nCall\CallInfo.cs" />
+    <Compile Include="SimaticML\Blocks\FlagNet\nCall\CallParameter.cs" />
+    <Compile Include="SimaticML\ILocalObject.cs" />
+    <Compile Include="SimaticML\ILocalObjectMaster.cs" />
+    <Compile Include="SimaticML\nBlockAttributeList\BlockAttributeList.cs" />
+    <Compile Include="SimaticML\nBlockAttributeList\Member.cs" />
+    <Compile Include="SimaticML\Blocks\BlockFB.cs" />
+    <Compile Include="SimaticML\Blocks\BlockInstanceDB.cs" />
+    <Compile Include="SimaticML\Blocks\BlockUDT.cs" />
+    <Compile Include="SimaticML\Blocks\FlagNet\LabelDeclaration.cs" />
+    <Compile Include="SimaticML\Blocks\FlagNet\nAccess\Access.cs" />
+    <Compile Include="SimaticML\Blocks\CompileUnit.cs" />
+    <Compile Include="SimaticML\Blocks\BlockFC.cs" />
+    <Compile Include="SimaticML\Blocks\FlagNet\nAccess\IAccessData.cs" />
+    <Compile Include="SimaticML\Blocks\FlagNet\nCall\Call.cs" />
+    <Compile Include="SimaticML\Blocks\FlagNet\nCall\Instance.cs" />
+    <Compile Include="SimaticML\Blocks\FlagNet\nPart\IPartData.cs" />
+    <Compile Include="SimaticML\Blocks\FlagNet\nPart\Part.cs" />
+    <Compile Include="SimaticML\Blocks\FlagNet\Wire.cs" />
+    <Compile Include="SimaticML\nBlockAttributeList\Section.cs" />
+    <Compile Include="Generation\Alarms\DeviceData.cs" />
+    <Compile Include="Generation\Placeholders\GenerationPlaceholderHandler.cs" />
+    <Compile Include="SimaticML\Enums\SimaticBlockType.cs" />
+    <Compile Include="SimaticML\Enums\SimaticVariableScope.cs" />
+    <Compile Include="SimaticML\IGlobalObject.cs" />
+    <Compile Include="SimaticML\LanguageText\Comment.cs" />
+    <Compile Include="SimaticML\Enums\SimaticDataType.cs" />
+    <Compile Include="SimaticML\Blocks\BlockGlobalDB.cs" />
+    <Compile Include="SimaticML\Enums\SimaticMemoryArea.cs" />
+    <Compile Include="SimaticML\SimaticMLUtil.cs" />
+    <Compile Include="SimaticML\Enums\SimaticProgrammingLanguage.cs" />
+    <Compile Include="MainImportExportForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainImportExportForm.Designer.cs">
+      <DependentUpon>MainImportExportForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SimaticML\LanguageText\MultilingualText.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SimaticML\SimaticMLParser.cs" />
+    <Compile Include="SimaticML\TagTable\XMLTag.cs" />
+    <Compile Include="SimaticML\TagTable\XMLTagTable.cs" />
+    <Compile Include="UndoRedo\UndoRedoHandler.cs" />
+    <Compile Include="Utility\Extensions\ColorConverterExtension.cs" />
+    <Compile Include="Utility\Constants.cs" />
+    <Compile Include="Utility\Extensions\DictionaryExtensions.cs" />
+    <Compile Include="Utility\Extensions\FontExtension.cs" />
+    <Compile Include="Utility\Extensions\ListExtensions.cs" />
+    <Compile Include="Utility\LogHandler.cs" />
+    <Compile Include="Utility\ScriptTimer.cs" />
+    <Compile Include="Localization\LocalizationVariables.cs" />
+    <Compile Include="XMLClasses\UnknownXmlGlobalObject.cs" />
+    <Compile Include="XMLClasses\XmlAttributeConfiguration.cs" />
+    <Compile Include="XMLClasses\XmlConfigurator.cs" />
+    <Compile Include="Utility\Utils.cs" />
+    <Compile Include="Utility\XMLUtils.cs" />
+    <Compile Include="XMLClasses\XmlNodeConfiguration.cs" />
+    <Compile Include="XMLClasses\XmlNodeListConfiguration.cs" />
+    <EmbeddedResource Include="DBDuplicationForm.resx">
+      <DependentUpon>DBDuplicationForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Generation\Alarms\GenerationForm\AlarmGenerationForm.resx">
+      <DependentUpon>AlarmGenerationForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Generation\Configuration\ConfigForm.resx">
+      <DependentUpon>ConfigForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Generation\IO\GenerationForm\ExcelImporter\IOGenerationExcelImportForm.resx">
+      <DependentUpon>IOGenerationExcelImportForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Generation\IO\GenerationForm\IOGenerationForm.resx">
+      <DependentUpon>IOGenerationForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MainImportExportForm.resx">
+      <DependentUpon>MainImportExportForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="!!!REMEMBER!!!" />
+    <EmbeddedResource Include="Localization\en-US.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Localization\it-IT.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.8">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.8 %28x86 e x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="!!TO-DO!!.txt" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

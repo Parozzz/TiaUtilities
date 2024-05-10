@@ -1,11 +1,7 @@
 ﻿using Esprima;
-using Esprima.Utils;
-using Jint;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Windows.Forms;
 using TiaXmlReader.Utility;
+using Timer = System.Windows.Forms.Timer;
 
 namespace TiaXmlReader.Javascript
 {

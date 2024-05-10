@@ -56,7 +56,7 @@ namespace TiaXmlReader
                 throw new Exception("Invalid XML File");
             }
 
-            BlockAttributeList attributeList = null;
+            BlockAttributeList? attributeList = null;
             if (xmlConfiguration is BlockGlobalDB globlalDB)
             {
                 attributeList = globlalDB.GetAttributes();

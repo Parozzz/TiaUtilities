@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
-using TiaXmlReader.Generation.GridHandler.CustomColumns;
+﻿using TiaXmlReader.Generation.GridHandler.CustomColumns;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.Generation.GridHandler.Events;
 using TiaXmlReader.GenerationForms;
@@ -34,7 +29,7 @@ namespace TiaXmlReader.Generation.GridHandler
         public DataGridView DataGridView { get; private set; }
         public GridDataHandler<C, T> DataHandler { get; private set; }
         public GridDataSource<C, T> DataSource { get; private set; }
-        public GridTableScript<C, T> TableScript { get; private set; }
+        public GridScript<C, T> Script { get; private set; }
         public GridEvents<C, T> Events { get; private set; }
 
         private readonly List<ColumnInfo> columnInfoList;
@@ -60,7 +55,7 @@ namespace TiaXmlReader.Generation.GridHandler
             this.DataHandler = new GridDataHandler<C, T>(this.DataGridView);
             this.DataSource = new GridDataSource<C, T>(this.DataGridView, this.DataHandler);
             this.sortHandler = new GridSortHandler<C, T>(this.DataGridView, this.DataSource, this.undoRedoHandler, comparer);
-            this.TableScript = new GridTableScript<C, T>(this, jsErrorThread);
+            this.Script = new GridScript<C, T>(this, jsErrorThread);
             this.Events = new GridEvents<C, T>();
 
             this.columnInfoList = new List<ColumnInfo>();
@@ -300,14 +295,14 @@ namespace TiaXmlReader.Generation.GridHandler
             #region SHOW_JS_CONTEXT_MENU
             this.DataGridView.CellMouseClick += (sender, args) =>
             {
-                if (args.RowIndex == -1 && args.ColumnIndex == -1 && args.Button == MouseButtons.Right && this.TableScript.Valid)
+                if (args.RowIndex == -1 && args.ColumnIndex == -1 && args.Button == MouseButtons.Right && this.Script.Valid)
                 {
-                    var menuItem = new MenuItem();
+                    var menuItem = new ToolStripMenuItem();
                     menuItem.Text = "Execute Javascript";
-                    menuItem.Click += (s, a) => this.TableScript.ShowConfigForm(this.DataGridView);
-
-                    var contextMenu = new ContextMenu();
-                    contextMenu.MenuItems.Add(menuItem);
+                    menuItem.Click += (s, a) => this.Script.ShowConfigForm(this.DataGridView);
+                    
+                    var contextMenu = new ContextMenuStrip();
+                    contextMenu.Items.Add(menuItem);
 
                     contextMenu.Show(this.DataGridView, this.DataGridView.PointToClient(Cursor.Position));
                 }

@@ -45,12 +45,12 @@ namespace TiaXmlReader.Generation.GridHandler.Data
         public PropertyInfo PropertyInfo { get; set; }
         public string ProgrammingFriendlyName { get; set; }
 
-        public V GetValueFrom<V>(object obj)
+        public V? GetValueFrom<V>(object obj)
         {
             return obj != null && PropertyInfo.DeclaringType == obj.GetType() && PropertyInfo.GetValue(obj) is V value ? value : default;
         }
 
-        public void SetValueTo(object obj, object value)
+        public void SetValueTo(object obj, object? value)
         {
             if (obj == null || PropertyInfo.DeclaringType != obj.GetType())
             {

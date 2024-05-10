@@ -1,25 +1,16 @@
-﻿using ClosedXML.Excel;
-using Microsoft.WindowsAPICodePack.Dialogs;
-using System;
+﻿using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Globalization;
-using System.IO;
-using System.Windows.Forms;
-using TiaXmlReader.Generation.IO;
 using TiaXmlReader.Utility;
-using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation.Alarms.GenerationForm;
 using TiaXmlReader.Generation.IO.GenerationForm;
-using System.Collections.Generic;
-using System.Linq;
 using TiaXmlReader.AutoSave;
 using TiaXmlReader.SimaticML;
 using System.Xml;
 using TiaXmlReader.SimaticML.Enums;
 using TiaXmlReader.Generation.Configuration;
 using Jint;
-using MS.WindowsAPICodePack.Internal;
 using TiaXmlReader.Javascript;
-using System.ComponentModel;
+using Timer = System.Windows.Forms.Timer;
 
 namespace TiaXmlReader
 {
@@ -164,10 +155,11 @@ namespace TiaXmlReader
                 ControlWidth = 500
             };
 
-            configForm.AddLine(ConfigFormLineTypes.JAVASCRIPT)
-                .LabelText("Espressione").Height(300)
-                .ControlText(JS)
-                .TextChanged(str => JS = str);
+            var mainGroup = configForm.Init();
+            mainGroup.AddLine(ConfigFormLineTypes.JAVASCRIPT)
+                  .LabelText("Espressione").Height(300)
+                  .ControlText(JS)
+                  .TextChanged(str => JS = str);
 
             configForm.FormClosed += (s, e) =>
             {
