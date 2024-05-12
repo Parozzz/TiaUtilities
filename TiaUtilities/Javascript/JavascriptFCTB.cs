@@ -148,7 +148,7 @@ namespace TiaXmlReader.Javascript
                     Description = jsError.Description,
                 };
 
-                if(this.AreErrorLimitValid(newError) && Utils.AreValuesDifferent(this.currentError, newError))
+                if(this.AreErrorLimitValid(newError) && Utils.AreDifferentObject(this.currentError, newError))
                 {
                     this.ClearError();
 

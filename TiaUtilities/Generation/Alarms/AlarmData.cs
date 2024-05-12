@@ -25,7 +25,7 @@ namespace TiaXmlReader.Generation.Alarms
         public static readonly GridDataColumn TIMER_TYPE;
         public static readonly GridDataColumn TIMER_VALUE;
         public static readonly GridDataColumn DESCRIPTION;
-        public static readonly List<GridDataColumn> COLUMN_LIST;
+        public static readonly IReadOnlyList<GridDataColumn> COLUMN_LIST;
 
         static AlarmData()
         {
@@ -39,8 +39,9 @@ namespace TiaXmlReader.Generation.Alarms
             TIMER_VALUE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.TimerValue), "timerValue");
             DESCRIPTION = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.Description));
 
-            COLUMN_LIST = GridDataColumn.GetStaticColumnList(type);
-            COLUMN_LIST.Sort((x, y) => x.ColumnIndex.CompareTo(y.ColumnIndex));
+            var columnList = GridDataColumn.GetStaticColumnList(type);
+            columnList.Sort((x, y) => x.ColumnIndex.CompareTo(y.ColumnIndex));
+            COLUMN_LIST = columnList.AsReadOnly();
         }
 
         [JsonProperty][Localization("ALARM_DATA_ENABLE")] public bool Enable { get; set; }
@@ -63,6 +64,10 @@ namespace TiaXmlReader.Generation.Alarms
 
                 return COLUMN_LIST[column].PropertyInfo.GetValue(this);
             }
+        }
+        public IReadOnlyList<GridDataColumn> GetColumns()
+        {
+            return COLUMN_LIST;
         }
 
         public GridDataColumn GetColumn(int column)

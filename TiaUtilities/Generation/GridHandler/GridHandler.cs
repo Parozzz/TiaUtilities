@@ -1,4 +1,6 @@
-﻿using TiaXmlReader.Generation.GridHandler.CustomColumns;
+﻿using InfoBox;
+using TiaUtilities.Generation.GridHandler;
+using TiaXmlReader.Generation.GridHandler.CustomColumns;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.Generation.GridHandler.Events;
 using TiaXmlReader.GenerationForms;
@@ -20,6 +22,13 @@ namespace TiaXmlReader.Generation.GridHandler
             public bool Visible { get; set; } = true;
         }
 
+        private class FindData(T data, GridDataColumn column, int row)
+        {
+            public T Data { get; init; } = data;
+            public GridDataColumn Column { get; init; } = column;
+            public int Row { get; init; } = row;
+        }
+
         private readonly GridSettings settings;
         private readonly C configuration;
         private readonly UndoRedoHandler undoRedoHandler;
@@ -36,6 +45,7 @@ namespace TiaXmlReader.Generation.GridHandler
         private readonly List<IGridCellPainter> cellPainterList;
 
         private bool init;
+        private FindData? lastFindData;
 
         public uint RowCount { get; set; } = 9;
         public bool AddRowIndexToRowHeader { get; set; } = true;
@@ -58,8 +68,8 @@ namespace TiaXmlReader.Generation.GridHandler
             this.Script = new GridScript<C, T>(this, jsErrorThread);
             this.Events = new GridEvents();
 
-            this.columnInfoList = new List<ColumnInfo>();
-            this.cellPainterList = new List<IGridCellPainter>();
+            this.columnInfoList = [];
+            this.cellPainterList = [];
         }
 
         public void AddCellPainter(IGridCellPainter cellPainter)
@@ -148,7 +158,7 @@ namespace TiaXmlReader.Generation.GridHandler
             }
             #endregion
 
-            #region KeyDown - Paste/Delete/Undo/Redo
+            #region KeyDown - Paste/Delete/Undo/Redo/Find
             this.DataGridView.KeyDown += (sender, args) =>
             {
                 var handled = true;
@@ -166,6 +176,9 @@ namespace TiaXmlReader.Generation.GridHandler
                     case Keys.Insert | Keys.Shift:
                     case Keys.V | Keys.Control:
                         ChangeCells(GridUtils.PasteAsExcel(this.DataGridView));
+                        break;
+                    case Keys.F | Keys.Control:
+                        StartSearch();
                         break;
                     case Keys.Delete:
                         this.DeleteSelectedCells();
@@ -299,7 +312,7 @@ namespace TiaXmlReader.Generation.GridHandler
                 {
                     var menuItem = new ToolStripMenuItem { Text = "Execute Javascript" };
                     menuItem.Click += (s, a) => this.Script.ShowConfigForm(this.DataGridView);
-                    
+
                     var contextMenu = new ContextMenuStrip();
                     contextMenu.Items.Add(menuItem);
 
@@ -314,6 +327,170 @@ namespace TiaXmlReader.Generation.GridHandler
             this.DataGridView.ResumeLayout();
 
             init = true;
+        }
+
+        private void StartSearch()
+        {
+            var form = this.DataGridView.FindForm();
+            if (form == null)
+            {
+                return;
+            }
+
+            var searchForm = new GridSearchForm();
+
+            var currentCell = this.DataGridView.CurrentCell;
+            if (currentCell != null && currentCell.Value is string strValue)
+            {
+                searchForm.FindTextBox.Text = strValue;
+            }
+
+            searchForm.FormClosed += (sender, args) => this.lastFindData = null;
+
+            searchForm.FindButton.Click += (sender, args) =>
+            {
+                var findText = searchForm.FindTextBox.Text;
+                if (!string.IsNullOrEmpty(findText))
+                {
+                    TryFindText(findText, searchForm.MatchCaseCheckBox.Checked);
+                }
+            };
+
+            searchForm.ReplaceButton.Click += (sender, args) =>
+            {
+                var findText = searchForm.FindTextBox.Text;
+                var replaceText = searchForm.ReplaceTextBox.Text;
+                if (string.IsNullOrEmpty(findText) || (this.lastFindData == null && !TryFindText(findText, searchForm.MatchCaseCheckBox.Checked)) || string.IsNullOrEmpty(replaceText))
+                {
+                    return;
+                }
+
+                var cellChange = CreateReplateCellChange(findText, replaceText);
+                if (cellChange != null)
+                {
+                    this.ChangeCell(cellChange);
+                    this.TryFindText(findText, searchForm.MatchCaseCheckBox.Checked); //Select the next one!
+                }
+            };
+
+            searchForm.ReplaceAllButton.Click += (sender, args) =>
+            {
+                var findText = searchForm.FindTextBox.Text;
+                var replaceText = searchForm.ReplaceTextBox.Text;
+                if (string.IsNullOrEmpty(findText) || string.IsNullOrEmpty(replaceText))
+                {
+                    return;
+                }
+
+                this.lastFindData = null; //I want to search everything. So reset and start from the top.
+
+                var cellChangeList = new List<GridCellChange>();
+                while (TryFindText(findText, searchForm.MatchCaseCheckBox.Checked, showFoundCell: false, showInfoAndClearOnFail: false))
+                {
+                    var cellChange = CreateReplateCellChange(findText, replaceText);
+                    if (cellChange != null)
+                    {
+                        cellChangeList.Add(cellChange);
+                    }
+                }
+
+                this.ChangeCells(cellChangeList);
+
+                InformationBox.Show("Search completed. Replaced " + cellChangeList.Count + " values.", "Find and Replace",
+                        buttons: InformationBoxButtons.OK,
+                        icon: InformationBoxIcon.Information,
+                        titleStyle: InformationBoxTitleIconStyle.SameAsBox);
+                this.lastFindData = null; //Allows the search to loop around and start from top!
+            };
+
+            searchForm.Show(form);
+        }
+
+        private GridCellChange? CreateReplateCellChange(string findText, string replaceText)
+        {
+            if (this.lastFindData == null)
+            {
+                return null;
+            }
+
+            var text = this.lastFindData.Column.GetValueFrom<string>(this.lastFindData.Data);
+            if (text == null)
+            {
+                return null;
+            }
+
+            var replacedText = text.Replace(findText, replaceText, StringComparison.OrdinalIgnoreCase);
+            return new GridCellChange(this.lastFindData.Column.ColumnIndex, this.lastFindData.Row) { NewValue = replacedText };
+        }
+
+        private bool TryFindText(string findText, bool matchCase, bool showFoundCell = true, bool showInfoAndClearOnFail = true)
+        {
+            var dataDict = this.DataSource.GetNotEmptyDataDict();
+
+            var found = false;
+
+            foreach (var entry in dataDict)
+            {
+                var row = entry.Value;
+                var data = entry.Key;
+
+                var columnList = data.GetColumns();
+                foreach (var column in columnList.Where(c => c.PropertyInfo.PropertyType == typeof(string)))
+                {
+                    var value = column.GetValueFrom<string>(data);
+                    if (value == null)
+                    {
+                        continue;
+                    }
+
+                    if (value.Contains(findText, matchCase ? StringComparison.Ordinal : StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        var findDataOK = this.lastFindData == null;
+                        if (!findDataOK && this.lastFindData != null)
+                        {
+                            var dataIsEqual = Utils.AreEqualsObject(this.lastFindData.Data, data);
+                            if (!dataIsEqual)
+                            {
+                                findDataOK = row > this.lastFindData.Row;
+                            }
+                            else
+                            {
+                                findDataOK = column.ColumnIndex > this.lastFindData.Column.ColumnIndex;
+                            }
+
+                            if (!findDataOK)
+                            {
+                                continue;
+                            }
+                        }
+
+                        this.lastFindData = new FindData(data, column, row);
+                        found = true;
+
+                        if (showFoundCell)
+                        {
+                            this.ShowCell(row, column.ColumnIndex);
+                        }
+                        break;
+                    }
+                }
+
+                if (found)
+                {
+                    break;
+                }
+            }
+
+            if (!found && showInfoAndClearOnFail)
+            {
+                InformationBox.Show("Search completed.", "Find and Replace",
+                        buttons: InformationBoxButtons.OK,
+                        icon: InformationBoxIcon.Information,
+                        titleStyle: InformationBoxTitleIconStyle.SameAsBox);
+                this.lastFindData = null; //Allows the search to loop around and start from top!
+            }
+
+            return found;
         }
 
         private void DataErrorEventHandler(object sender, DataGridViewDataErrorEventArgs args)
@@ -559,17 +736,22 @@ namespace TiaXmlReader.Generation.GridHandler
             this.ChangeMultipleRows(dataDict);
         }
 
-        private void ResetShownCell()
+        public void ResetShownCell()
         {
             this.ShowCell(cell: null);
         }
 
         private void ShowCell(GridCellChange cellChange)
         {
-            this.ShowCell(this.DataGridView.Rows[cellChange.RowIndex].Cells[cellChange.ColumnIndex]);
+            this.ShowCell(cellChange.RowIndex, cellChange.ColumnIndex);
         }
 
-        private void ShowCell(DataGridViewCell cell)
+        public void ShowCell(int rowIndex, int columnIndex)
+        {
+            this.ShowCell(this.DataGridView.Rows[rowIndex].Cells[columnIndex]);
+        }
+
+        private void ShowCell(DataGridViewCell? cell)
         {
             DataGridView.RefreshEdit(); //This is required to refresh checkbox otherwise, if the undo is in a selected cell, it will not update visually (DATA IS CHANGED!)
             DataGridView.Refresh();

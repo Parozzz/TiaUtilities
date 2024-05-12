@@ -56,7 +56,7 @@ namespace TiaXmlReader.AutoSave
                 var helper = entry.Key;
                 var snapshotValue = entry.Value;
                 var actualValue = helper.GetReflectedValue(this.obj);
-                if (Utils.AreValuesDifferent(snapshotValue, actualValue))
+                if (Utils.AreDifferentObject(snapshotValue, actualValue))
                 {
                     snapshotChanged = true;
                     break;

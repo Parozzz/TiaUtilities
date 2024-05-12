@@ -25,6 +25,7 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
         private AlarmConfiguration AlarmConfig { get => settings.Configuration; }
 
         private string? lastFilePath;
+        private static readonly string[] items = new string[] { "TON", "TOF" };
 
         public AlarmGenerationForm(JavascriptErrorReportThread jsErrorHandlingThread, TimedSaveHandler autoSaveHandler, AlarmGenerationSettings settings, GridSettings gridSettings)
         {
@@ -154,7 +155,7 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             this.alarmGridHandler.AddTextBoxColumn(AlarmData.COIL_ADDRESS, 95);
             this.alarmGridHandler.AddTextBoxColumn(AlarmData.SET_COIL_ADDRESS, 95);
             this.alarmGridHandler.AddTextBoxColumn(AlarmData.TIMER_ADDRESS, 95);
-            this.alarmGridHandler.AddComboBoxColumn(AlarmData.TIMER_TYPE, 50, new string[] { "TON", "TOF" });
+            this.alarmGridHandler.AddComboBoxColumn(AlarmData.TIMER_TYPE, 55, items);
             this.alarmGridHandler.AddTextBoxColumn(AlarmData.TIMER_VALUE, 50);
             this.alarmGridHandler.AddTextBoxColumn(AlarmData.DESCRIPTION, 0);
             #endregion

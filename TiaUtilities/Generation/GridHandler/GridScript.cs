@@ -238,7 +238,7 @@ namespace TiaXmlReader.Generation.GridHandler
                 var jsValue = engine.GetValue(entry.Key); //This will not return null! It will throw an exception instead.
                 ioJSVariable.NewValue = jsValue.IsString() ? jsValue.AsString() : ioJSVariable.OldValue;
 
-                changed |= Utils.AreValuesDifferent(ioJSVariable.OldValue, ioJSVariable.NewValue);
+                changed |= Utils.AreDifferentObject(ioJSVariable.OldValue, ioJSVariable.NewValue);
                 //I do not break the loop here because i want the NewValue property of all values to be compiled;
             }
 

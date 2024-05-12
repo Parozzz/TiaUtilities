@@ -72,7 +72,7 @@ namespace TiaXmlReader.Generation.GridHandler.CustomColumns
             dataGridView.EditingControlShowing -= editingControlShowingEvent;
         }
 
-        private void CellBeginEditEvent(object sender, DataGridViewCellCancelEventArgs args)
+        private void CellBeginEditEvent(object? sender, DataGridViewCellCancelEventArgs args)
         {
             var dataGridView = (DataGridView)sender;
             if (args.RowIndex < 0 || args.ColumnIndex < 0 || dataGridView.Columns[args.ColumnIndex] != this || GetItemsFunc == null)
@@ -114,7 +114,7 @@ namespace TiaXmlReader.Generation.GridHandler.CustomColumns
             dropDown.Show(dataGridView, showPoint);
         }
 
-        private void CellEndEditEvent(object sender, DataGridViewCellEventArgs e)
+        private void CellEndEditEvent(object? sender, DataGridViewCellEventArgs e)
         {
             inEditMode = false;
 
@@ -150,7 +150,7 @@ namespace TiaXmlReader.Generation.GridHandler.CustomColumns
             return true;
         }
 
-        private void EditingControlShowingEvent(object sender, DataGridViewEditingControlShowingEventArgs args)
+        private void EditingControlShowingEvent(object? sender, DataGridViewEditingControlShowingEventArgs args)
         {
             var dataGridView = (DataGridView)sender;
             if (dropDown == null || !inEditMode)
@@ -179,7 +179,7 @@ namespace TiaXmlReader.Generation.GridHandler.CustomColumns
             }
         }
 
-        private void EditingControlTextChangedEvent(object sender, EventArgs args)
+        private void EditingControlTextChangedEvent(object? sender, EventArgs args)
         {
             this.UpdateVisibileSuggestions();
         }

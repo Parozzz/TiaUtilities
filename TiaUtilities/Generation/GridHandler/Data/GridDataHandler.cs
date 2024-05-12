@@ -15,7 +15,7 @@ namespace TiaXmlReader.Generation.GridHandler.Data
     public class GridDataHandler<C, T> where C : IGenerationConfiguration where T : IGridData<C>
     {
         private readonly DataGridView dataGridView;
-        public List<GridDataColumn> DataColumns { get; private set; }
+        public IReadOnlyList<GridDataColumn> DataColumns { get; private set; }
 
         public GridDataHandler(DataGridView dataGridView)
         {
@@ -23,7 +23,7 @@ namespace TiaXmlReader.Generation.GridHandler.Data
             this.DataColumns = ValidateColumnList();
         }
 
-        private List<GridDataColumn> ValidateColumnList()
+        private IReadOnlyList<GridDataColumn> ValidateColumnList()
         {
             var type = typeof(T);
             var fieldInfo = type.GetField("COLUMN_LIST", BindingFlags.Static | BindingFlags.Public);
@@ -32,12 +32,12 @@ namespace TiaXmlReader.Generation.GridHandler.Data
                 throw new MissingFieldException("IGridData must have a public static List<GridDataColumn> COLUMN_LIST field for " + type.Name);
             }
 
-            if(fieldInfo.FieldType != typeof(List<GridDataColumn>))
+            if(fieldInfo.FieldType != typeof(IReadOnlyList<GridDataColumn>))
             {
                 throw new MissingFieldException("IGridData must have a public static List<GridDataColumn> COLUMN_LIST field for " + type.Name);
             }
 
-            return (List<GridDataColumn>)fieldInfo.GetValue(null);
+            return (IReadOnlyList<GridDataColumn>) fieldInfo.GetValue(null);
         }
 
         public T CreateInstance()

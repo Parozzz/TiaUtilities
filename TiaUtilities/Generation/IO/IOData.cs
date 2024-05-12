@@ -26,7 +26,7 @@ namespace TiaXmlReader.Generation.IO
         public static readonly GridDataColumn VARIABLE;
         public static readonly GridDataColumn MERKER_ADDRESS;
         public static readonly GridDataColumn COMMENT;
-        public static readonly List<GridDataColumn> COLUMN_LIST;
+        public static readonly IReadOnlyList<GridDataColumn> COLUMN_LIST;
 
         static IOData()
         {
@@ -38,8 +38,9 @@ namespace TiaXmlReader.Generation.IO
             MERKER_ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.MerkerAddress), "merkerAddress");
             COMMENT = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.Comment));
 
-            COLUMN_LIST = GridDataColumn.GetStaticColumnList(type);
-            COLUMN_LIST.Sort((x, y) => x.ColumnIndex.CompareTo(y.ColumnIndex));
+            var columnList = GridDataColumn.GetStaticColumnList(type);
+            columnList.Sort((x, y) => x.ColumnIndex.CompareTo(y.ColumnIndex));
+            COLUMN_LIST = columnList.AsReadOnly();
         }
 
         [JsonProperty][Localization("IO_DATA_ADDRESS")] public string? Address { get; set; }
@@ -59,6 +60,11 @@ namespace TiaXmlReader.Generation.IO
 
                 return COLUMN_LIST[column].PropertyInfo.GetValue(this);
             }
+        }
+
+        public IReadOnlyList<GridDataColumn> GetColumns()
+        {
+            return COLUMN_LIST;
         }
 
         public GridDataColumn GetColumn(int column)

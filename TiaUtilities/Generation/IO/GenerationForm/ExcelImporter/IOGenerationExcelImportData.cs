@@ -16,7 +16,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
         public static readonly GridDataColumn ADDRESS;
         public static readonly GridDataColumn IO_NAME;
         public static readonly GridDataColumn COMMENT;
-        public static readonly List<GridDataColumn> COLUMN_LIST;
+        public static readonly IReadOnlyList<GridDataColumn> COLUMN_LIST;
 
         static IOGenerationExcelImportData()
         {
@@ -25,15 +25,16 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
             IO_NAME = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOGenerationExcelImportData.IOName));
             COMMENT = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOGenerationExcelImportData.Comment));
 
-            COLUMN_LIST = GridDataColumn.GetStaticColumnList(type);
-            COLUMN_LIST.Sort((x, y) => x.ColumnIndex.CompareTo(y.ColumnIndex));
+            var columnList = GridDataColumn.GetStaticColumnList(type);
+            columnList.Sort((x, y) => x.ColumnIndex.CompareTo(y.ColumnIndex));
+            COLUMN_LIST = columnList.AsReadOnly();
         }
 
-        public string Address { get; set; }
-        public string IOName { get; set; }
-        public string Comment { get; set; }
+        public string? Address { get; set; }
+        public string? IOName { get; set; }
+        public string? Comment { get; set; }
 
-        public object this[int column]
+        public object? this[int column]
         {
             get
             {
@@ -45,17 +46,22 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
                 return COLUMN_LIST[column].PropertyInfo.GetValue(this);
             }
         }
+        public IReadOnlyList<GridDataColumn> GetColumns()
+        {
+            return COLUMN_LIST;
+        }
 
         public GridDataColumn GetColumn(int column)
         {
             return COLUMN_LIST[column];
         }
-        public GridDataPreview GetPreview(GridDataColumn column, IOGenerationExcelImportSettings config)
+
+        public GridDataPreview? GetPreview(GridDataColumn column, IOGenerationExcelImportSettings config)
         {
             return this.GetPreview(column.ColumnIndex, config);
         }
 
-        public GridDataPreview GetPreview(int column, IOGenerationExcelImportSettings config)
+        public GridDataPreview? GetPreview(int column, IOGenerationExcelImportSettings config)
         {
             return null;
         }

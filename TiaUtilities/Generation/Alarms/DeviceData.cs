@@ -21,7 +21,7 @@ namespace TiaXmlReader.Generation.Alarms
         public static readonly GridDataColumn NAME;
         public static readonly GridDataColumn ADDRESS;
         public static readonly GridDataColumn DESCRIPTION;
-        public static readonly List<GridDataColumn> COLUMN_LIST;
+        public static readonly IReadOnlyList<GridDataColumn> COLUMN_LIST;
 
         static DeviceData()
         {
@@ -30,8 +30,9 @@ namespace TiaXmlReader.Generation.Alarms
             ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(DeviceData.Address));
             DESCRIPTION = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(DeviceData.Description));
 
-            COLUMN_LIST = GridDataColumn.GetStaticColumnList(type);
-            COLUMN_LIST.Sort((x, y) => x.ColumnIndex.CompareTo(y.ColumnIndex));
+            var columnList = GridDataColumn.GetStaticColumnList(type);
+            columnList.Sort((x, y) => x.ColumnIndex.CompareTo(y.ColumnIndex));
+            COLUMN_LIST = columnList.AsReadOnly();
         }
 
         [JsonProperty][Localization("DEVICE_DATA_NAME", append: " > " + GenerationPlaceholders.Alarms.DEVICE_NAME)] public string? Name { get; set; }
@@ -48,6 +49,11 @@ namespace TiaXmlReader.Generation.Alarms
 
                 return COLUMN_LIST[column].PropertyInfo.GetValue(this);
             }
+        }
+
+        public IReadOnlyList<GridDataColumn> GetColumns()
+        {
+            return COLUMN_LIST;
         }
 
         public GridDataColumn GetColumn(int column)

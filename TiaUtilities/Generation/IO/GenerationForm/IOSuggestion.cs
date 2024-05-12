@@ -14,18 +14,21 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
         public static int COLUMN_COUNT = 0;
         //THESE IS THE ORDER IN WHICH THEY APPEAR!
         public static readonly GridDataColumn VALUE;
-        public static readonly List<GridDataColumn> COLUMN_LIST;
+        public static readonly IReadOnlyList<GridDataColumn> COLUMN_LIST;
 
         static IOSuggestion()
         {
             var type = typeof(IOSuggestion);
             VALUE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOSuggestion.Value), "suggestion");
-            COLUMN_LIST = GridDataColumn.GetStaticColumnList(type);
-            COLUMN_LIST.Sort((x, y) => x.ColumnIndex.CompareTo(y.ColumnIndex));
+
+            var columnList = GridDataColumn.GetStaticColumnList(type);
+            columnList.Sort((x, y) => x.ColumnIndex.CompareTo(y.ColumnIndex));
+            COLUMN_LIST = columnList.AsReadOnly();
         }
 
-        [JsonProperty][Localization("IO_SUGGESTION_VALUE")] public string Value { get; set; }
-        public object this[int column]
+        [JsonProperty][Localization("IO_SUGGESTION_VALUE")] public string? Value { get; set; }
+
+        public object? this[int column]
         {
             get
             {
@@ -37,7 +40,10 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                 return COLUMN_LIST[column].PropertyInfo.GetValue(this);
             }
         }
-
+        public IReadOnlyList<GridDataColumn> GetColumns()
+        {
+            return COLUMN_LIST;
+        }
         public GridDataColumn GetColumn(int column)
         {
             return COLUMN_LIST[column];

@@ -81,7 +81,7 @@ namespace TiaXmlReader.Utility
 
                 var snapshotValue = snapshotDict[fieldName];
                 var value = field.GetValue(obj);
-                if (AreValuesDifferent(snapshotValue, value))
+                if (AreDifferentObject(snapshotValue, value))
                 {
                     return false;
                 }
@@ -98,7 +98,7 @@ namespace TiaXmlReader.Utility
 
                 var snapshotValue = snapshotDict[propertyName];
                 var value = property.GetValue(obj);
-                if (AreValuesDifferent(snapshotValue, value))
+                if (AreDifferentObject(snapshotValue, value))
                 {
                     return false;
                 }
@@ -114,7 +114,12 @@ namespace TiaXmlReader.Utility
             return (oneEmpty && !twoEmpty) || (!oneEmpty && twoEmpty) || (strOne != null && strOne.Equals(strTwo));
         }
 
-        public static bool AreValuesDifferent(object? valueOne, object? valueTwo)
+        public static bool AreEqualsObject(object? valueOne, object? valueTwo)
+        {
+            return !AreDifferentObject(valueOne, valueTwo);
+        }
+
+        public static bool AreDifferentObject(object? valueOne, object? valueTwo)
         {
             if(valueOne is string strOne && valueOne is string strTwo)
             {
