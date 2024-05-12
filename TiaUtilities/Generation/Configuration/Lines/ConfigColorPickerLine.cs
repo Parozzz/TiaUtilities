@@ -10,21 +10,21 @@ using TiaXmlReader.Utility;
 using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Utility.Extensions;
 
-namespace TiaXmlReader.Generation.Configuration
+namespace TiaUtilities.Generation.Configuration.Lines
 {
-    public class ConfigFormColorPickerLine : ConfigFormLine<ConfigFormColorPickerLine>
+    public class ConfigColorPickerLine : ConfigLine<ConfigColorPickerLine>
     {
         private readonly TableLayoutPanel panel;
         private readonly TextBox colorTextBox;
         private readonly Button colorPickerButton;
 
-        
+
         private Action<Color> colorAction;
         private Color lastColor = Color.White;
 
-        public ConfigFormColorPickerLine()
+        public ConfigColorPickerLine()
         {
-            this.panel = new TableLayoutPanel()
+            panel = new TableLayoutPanel()
             {
                 Dock = DockStyle.Fill,
                 AutoSize = true,
@@ -44,7 +44,7 @@ namespace TiaXmlReader.Generation.Configuration
                 Margin = new Padding(0)
             };
             colorTextBox.TextChanged += ColorTextBoxTextChangedEvent;
-            this.panel.Controls.Add(colorTextBox);
+            panel.Controls.Add(colorTextBox);
 
             colorPickerButton = new Button()
             {
@@ -55,18 +55,14 @@ namespace TiaXmlReader.Generation.Configuration
                 Margin = new Padding(0)
             };
             colorPickerButton.Click += ColorPickerButtonClickEvent;
-            this.panel.Controls.Add(colorPickerButton);
+            panel.Controls.Add(colorPickerButton);
         }
 
         private void ColorTextBoxTextChangedEvent(object sender, EventArgs e)
         {
             try
             {
-                var color = ColorTranslator.FromHtml(colorTextBox.Text);
-                if (color != null)
-                {
-                    this.ApplyColor(color, overrideText: false);
-                }
+                ApplyColor(ColorTranslator.FromHtml(colorTextBox.Text), overrideText: false);
             }
             catch { }
         }
@@ -82,7 +78,7 @@ namespace TiaXmlReader.Generation.Configuration
 
                 if (colorDialog.ShowDialog() == DialogResult.OK)
                 {
-                    this.ApplyColor(colorDialog.Color);
+                    ApplyColor(colorDialog.Color);
                 }
             }
             catch (Exception ex)
@@ -91,7 +87,7 @@ namespace TiaXmlReader.Generation.Configuration
             }
         }
 
-        public ConfigFormColorPickerLine ApplyColor(Color color, bool overrideText = true)
+        public ConfigColorPickerLine ApplyColor(Color color, bool overrideText = true)
         {
             lastColor = color;
             if (overrideText)
@@ -103,9 +99,9 @@ namespace TiaXmlReader.Generation.Configuration
             return this;
         }
 
-        public ConfigFormColorPickerLine ColorChanged(Action<Color> action)
+        public ConfigColorPickerLine ColorChanged(Action<Color> action)
         {
-            this.colorAction = action;
+            colorAction = action;
             return this;
         }
 

@@ -12,6 +12,7 @@ using DocumentFormat.OpenXml.Drawing.Charts;
 using TiaXmlReader.Utility;
 using InfoBox;
 using TiaXmlReader.Javascript;
+using TiaUtilities.Generation.Configuration.Utility;
 
 namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
 {
@@ -81,14 +82,12 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
             this.gridHandler.AddTextBoxColumn(IOGenerationExcelImportData.COMMENT, 0);
             #endregion
 
-            gridHandler?.Init();
+            gridHandler.Init();
 
-            #region JS_SCRIPT
-            this.gridHandler.Script.SetReadScriptFunc(() => settings.JSScript);
-            this.gridHandler.Script.SetWriteScriptAction((str) => settings.JSScript = str);
-            #endregion
+            this.gridHandler.Events.ScriptLoad += args => args.Script = settings.JSScript;
+            this.gridHandler.Events.ScriptChanged += args => settings.JSScript = args.Script;
 
-            this.ConfigButton.Click += (object sender, EventArgs args) =>
+            this.ConfigButton.Click += (sender, args) =>
             {
                 var configForm = new ConfigForm("Configurazione")
                 {
@@ -96,23 +95,23 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
                 };
 
                 var mainGroup = configForm.Init();
-                mainGroup.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Indirizzo")
+                mainGroup.AddTextBox().LabelText("Indirizzo")
                     .ControlText(settings.AddressCellConfig)
                     .TextChanged(str => settings.AddressCellConfig = str);
 
-                mainGroup.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Nome IO")
+                mainGroup.AddTextBox().LabelText("Nome IO")
                      .ControlText(settings.IONameCellConfig)
                      .TextChanged(str => settings.IONameCellConfig = str);
 
-                mainGroup.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Commento")
+                mainGroup.AddTextBox().LabelText("Commento")
                      .ControlText(settings.CommentCellConfig)
                      .TextChanged(str => settings.CommentCellConfig = str);
 
-                mainGroup.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Riga di partenza")
+                mainGroup.AddTextBox().LabelText("Riga di partenza")
                      .ControlText(settings.StartingRow)
                      .UIntChanged(num => settings.StartingRow = num);
 
-                mainGroup.AddLine(ConfigFormLineTypes.JAVASCRIPT).LabelText("Espressione validità riga").Height(200)
+                mainGroup.AddJavascript().LabelText("Espressione validità riga").Height(200)
                      .ControlText(settings.IgnoreRowExpressionConfig)
                      .TextChanged(str => settings.IgnoreRowExpressionConfig = str);
 
@@ -127,13 +126,16 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
                 {
                     EnsurePathExists = true,
                     EnsureFileExists = true,
-                    DefaultExtension = ".xlsx",
-                    Filters = { new CommonFileDialogFilter("Excel Files", "*.xlsx") }
+                    Filters = { new CommonFileDialogFilter("Excel Files", "*.xlsx,*.xls") }
                 };
 
                 if (fileDialog.ShowDialog(ownerWindowHandle: this.Handle) == CommonFileDialogResult.Ok)
                 {
-                    this.ImportExcel(fileDialog.FileName);
+                    var fileName = fileDialog.FileName;
+                    if (fileName != null)
+                    {
+                        this.ImportExcel(fileName);
+                    }
                 }
             };
         }
@@ -145,78 +147,73 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
             var scriptTimer = new ScriptTimer();
             try
             {
-                using (Engine engine = new Engine())
-                {
-                    using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                    {
-                        using (var configWorkbook = new XLWorkbook(stream))
-                        {
-                            var worksheet = configWorkbook.Worksheets.Worksheet(1);
+                using var engine = new Engine();
+                using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using var configWorkbook = new XLWorkbook(stream);
 
-                            var excelCellLetterList = AddMatchExpression(new string[] {
+                var worksheet = configWorkbook.Worksheets.Worksheet(1);
+
+                var excelCellLetterList = AddMatchExpression([
                                 settings.AddressCellConfig, settings.CommentCellConfig, settings.IONameCellConfig, settings.IgnoreRowExpressionConfig
-                            });
+                            ]);
 
-                            var importDataList = new List<IOGenerationExcelImportData>();
+                var importDataList = new List<IOGenerationExcelImportData>();
 
-                            uint rowIndex = settings.StartingRow;
-                            while (true)
-                            {
-                                var excelCellValueDict = new Dictionary<string, string>();
+                uint rowIndex = settings.StartingRow;
+                while (true)
+                {
+                    var excelCellValueDict = new Dictionary<string, string>();
 
-                                bool allEmpty = true;
-                                foreach (var cellLetter in excelCellLetterList)
-                                {
-                                    var cellValue = worksheet.Cell(cellLetter + rowIndex).Value.ToString();
-                                    excelCellValueDict.Add(cellLetter, cellValue); //There should not be two equals cellLetter. If there are, somethign wrong in AddMatchExpression.
+                    bool allEmpty = true;
+                    foreach (var cellLetter in excelCellLetterList)
+                    {
+                        var cellValue = worksheet.Cell(cellLetter + rowIndex).Value.ToString();
+                        excelCellValueDict.Add(cellLetter, cellValue); //There should not be two equals cellLetter. If there are, somethign wrong in AddMatchExpression.
 
-                                    allEmpty &= string.IsNullOrEmpty(cellValue);
-                                }
-                                rowIndex++;
-
-                                if (allEmpty)
-                                {
-                                    break;
-                                }
-
-                                if (!EvaluteRowExpressionTimed(scriptTimer, engine, excelCellValueDict, out bool expressionResult))
-                                {
-                                    break;
-                                }
-                                else if (!expressionResult)
-                                {
-                                    continue;
-                                }
-
-                                var address = settings.AddressCellConfig;
-                                var ioName = settings.IONameCellConfig;
-                                var comment = settings.CommentCellConfig;
-                                foreach (var entry in excelCellValueDict)
-                                {
-                                    address = address.Replace(entry.Key, entry.Value);
-                                    ioName = ioName.Replace(entry.Key, entry.Value);
-                                    comment = comment.Replace(entry.Key, entry.Value);
-                                }
-
-                                importDataList.Add(new IOGenerationExcelImportData()
-                                {
-                                    Address = address,
-                                    IOName = ioName,
-                                    Comment = comment,
-                                });
-                            }
-                            //Splitted this way to increase performance. Changing cell one at the time for 20-30 values takes 400ms, this way 10ms
-                            var freeIndexList = this.gridHandler.DataSource.GetFirstEmptyRowIndexes(importDataList.Count);
-
-                            var dataDict = new Dictionary<int, IOGenerationExcelImportData>();
-                            for (int i = 0; i < freeIndexList.Count; i++)
-                            {
-                                dataDict.Add(freeIndexList[i], importDataList[i]);
-                            }
-                            this.gridHandler.ChangeMultipleRows(dataDict);
-                        }
+                        allEmpty &= string.IsNullOrEmpty(cellValue);
                     }
+                    rowIndex++;
+
+                    if (allEmpty)
+                    {
+                        break;
+                    }
+
+                    if (!EvaluteRowExpressionTimed(scriptTimer, engine, excelCellValueDict, out bool expressionResult))
+                    {
+                        break;
+                    }
+                    else if (!expressionResult)
+                    {
+                        continue;
+                    }
+
+                    var address = settings.AddressCellConfig;
+                    var ioName = settings.IONameCellConfig;
+                    var comment = settings.CommentCellConfig;
+                    foreach (var entry in excelCellValueDict)
+                    {
+                        address = address.Replace(entry.Key, entry.Value);
+                        ioName = ioName.Replace(entry.Key, entry.Value);
+                        comment = comment.Replace(entry.Key, entry.Value);
+                    }
+
+                    importDataList.Add(new IOGenerationExcelImportData()
+                    {
+                        Address = address,
+                        IOName = ioName,
+                        Comment = comment,
+                    });
                 }
+                //Splitted this way to increase performance. Changing cell one at the time for 20-30 values takes 400ms, this way 10ms
+                var freeIndexList = this.gridHandler.DataSource.GetFirstEmptyRowIndexes(importDataList.Count);
+
+                var dataDict = new Dictionary<int, IOGenerationExcelImportData>();
+                for (int i = 0; i < freeIndexList.Count; i++)
+                {
+                    dataDict.Add(freeIndexList[i], importDataList[i]);
+                }
+                this.gridHandler.ChangeMultipleRows(dataDict);
             }
             catch (Exception ex)
             {
@@ -266,23 +263,18 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
             }
         }
 
-        private List<string> AddMatchExpression(string[] strArray)
+        [GeneratedRegex(@"[$]+\w")]
+        private static partial Regex RowRegex();
+
+        private static List<string> AddMatchExpression(string[] strArray)
         {
             var matchCollection = new List<string>();
             foreach (var str in strArray)
             {
-                var matches = Regex.Matches(str, "[" + ROW_SPECIAL_CHAR + "]+\\w"); //Matches all the string with $+LETTER
-                foreach (Match match in matches)
-                {
-                    if (match.Success)
-                    {
-                        var matchString = match.Value.ToUpper();
-                        if (!matchCollection.Contains(matchString))
-                        {
-                            matchCollection.Add(matchString);
-                        }
-                    }
-                }
+                var matches = RowRegex().Matches(str); //Matches all the string with $+LETTER
+                matchCollection.AddRange(
+                    matches.Where(m => m.Success).Select(m => m.Value.ToUpper()).Where(s => !matchCollection.Contains(s))
+                );
             }
             return matchCollection;
         }

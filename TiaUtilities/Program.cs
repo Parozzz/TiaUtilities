@@ -4,6 +4,7 @@ using InfoBox;
 using Jint;
 using ClosedXML.Excel;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using FastColoredTextBoxNS;
 
 namespace TiaXmlReader
 {
@@ -23,12 +24,19 @@ namespace TiaXmlReader
             _ = typeof(Engine); //Jint
             _ = typeof(XLWorkbook); //ClosedXML
             _ = typeof(CommonOpenFileDialog); //WindowsAPICodePack
+            _ = typeof(FastColoredTextBox);
 
             DropDownMenuScrollWheelHandler.Enable(true);
 
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainImportExportForm());
+            try
+            {
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+                Application.Run(new MainImportExportForm());
+            } catch(Exception ex) {
+                Utils.ShowExceptionMessage(ex);
+            }
+
         }
     }
 }

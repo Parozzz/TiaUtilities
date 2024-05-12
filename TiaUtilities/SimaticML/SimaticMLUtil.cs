@@ -28,7 +28,7 @@ namespace TiaXmlReader.SimaticML
 
     public class SimaticTagAddress : IComparable<SimaticTagAddress>
     {
-        public static SimaticTagAddress FromAddress(string address)
+        public static SimaticTagAddress? FromAddress(string? address)
         {
             if (address == null || address.Length < 3) //Min is IB0 or IW0, so 3 chars
             {

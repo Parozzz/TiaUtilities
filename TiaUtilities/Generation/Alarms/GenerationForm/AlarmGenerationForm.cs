@@ -22,10 +22,9 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
         private readonly GridHandler<AlarmConfiguration, AlarmData> alarmGridHandler;
         private readonly AlarmGenerationFormConfigHandler configHandler;
 
-
         private AlarmConfiguration AlarmConfig { get => settings.Configuration; }
 
-        private string lastFilePath;
+        private string? lastFilePath;
 
         public AlarmGenerationForm(JavascriptErrorReportThread jsErrorHandlingThread, TimedSaveHandler autoSaveHandler, AlarmGenerationSettings settings, GridSettings gridSettings)
         {
@@ -46,20 +45,28 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            switch (keyData)
+            try
             {
-                case Keys.S | Keys.Control:
-                    this.ProjectSave();
-                    return true; //Return required otherwise will write the letter.
-                case Keys.L | Keys.Control:
-                    this.ProjectLoad();
-                    return true; //Return required otherwise will write the letter.
+                switch (keyData)
+                {
+                    case Keys.S | Keys.Control:
+                        this.ProjectSave();
+                        return true; //Return required otherwise will write the letter.
+                    case Keys.L | Keys.Control:
+                        this.ProjectLoad();
+                        return true; //Return required otherwise will write the letter.
+                }
+
+                if (this.deviceGridHandler.ProcessCmdKey(ref msg, keyData) || this.alarmGridHandler.ProcessCmdKey(ref msg, keyData))
+                {
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Utils.ShowExceptionMessage(ex);
             }
 
-            if (this.deviceGridHandler.ProcessCmdKey(ref msg, keyData) || this.alarmGridHandler.ProcessCmdKey(ref msg, keyData))
-            {
-                return true;
-            }
 
             // Call the base class
             return base.ProcessCmdKey(ref msg, keyData);
@@ -137,7 +144,7 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             #endregion 
 
             //Column initialization before gridHandler.Init()
-            #region COLUMNS;
+            #region COLUMNS
             this.deviceGridHandler.AddTextBoxColumn(DeviceData.NAME, 125);
             this.deviceGridHandler.AddTextBoxColumn(DeviceData.ADDRESS, 160);
             this.deviceGridHandler.AddTextBoxColumn(DeviceData.DESCRIPTION, 0);
@@ -152,18 +159,16 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             this.alarmGridHandler.AddTextBoxColumn(AlarmData.DESCRIPTION, 0);
             #endregion
 
-            this.deviceGridHandler?.Init();
-            this.alarmGridHandler?.Init();
-            this.configHandler?.Init();
+            this.deviceGridHandler.Init();
+            this.alarmGridHandler.Init();
+            this.configHandler.Init();
 
-            #region JS_SCRIPT
-            this.deviceGridHandler.Script.SetReadScriptFunc(() => settings.DeviceJSScript);
-            this.deviceGridHandler.Script.SetWriteScriptAction((str) => settings.DeviceJSScript = str);
+            this.deviceGridHandler.Events.ScriptLoad += args => args.Script = settings.DeviceJSScript;
+            this.deviceGridHandler.Events.ScriptChanged += args => settings.DeviceJSScript = args.Script;
 
-            this.alarmGridHandler.Script.SetReadScriptFunc(() => settings.AlarmJSScript);
-            this.alarmGridHandler.Script.SetWriteScriptAction((str) => settings.AlarmJSScript = str);
-            #endregion
-
+            this.alarmGridHandler.Events.ScriptLoad += args => args.Script = settings.AlarmJSScript;
+            this.alarmGridHandler.Events.ScriptChanged += args => settings.AlarmJSScript = args.Script;
+            
             #region AUTO_SAVE
             void eventHandler(object sender, EventArgs args)
             {

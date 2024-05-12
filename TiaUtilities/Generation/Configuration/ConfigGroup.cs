@@ -1,72 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Windows.Forms;
+﻿using TiaUtilities.Generation.Configuration.Lines;
 
 namespace TiaXmlReader.Generation.Configuration
 {
-    public class ConfigFormGroup : IConfigGroup
+    public class ConfigGroup : IConfigGroup
     {
         private readonly ConfigForm configForm;
         private readonly List<IConfigObject> configObjectList;
 
         public bool IsSubGroup { get; set; } = false;
 
-        public ConfigFormGroup(ConfigForm configForm)
+        public ConfigGroup(ConfigForm configForm)
         {
             this.configForm = configForm;
-            this.configObjectList = new List<IConfigObject>();
+            this.configObjectList = [];
         }
 
-        public ConfigFormGroup AddGroup()
+        public ConfigForm GetConfigForm()
         {
-            var group = new ConfigFormGroup(this.configForm) { IsSubGroup  = true };
-            this.configObjectList.Add(group);
-            return group;
+            return configForm;
         }
 
-        public C AddLine<C>(ConfigFormLineType<C> type) where C : ConfigFormLine<C>
+        public C Add<C>(C configObject) where C : IConfigObject
         {
-            IConfigLine line;
-            if (type.Equals(ConfigFormLineTypes.LABEL))
-            {
-                line = new ConfigFormLabelLine();
-            }
-            else if (type.Equals(ConfigFormLineTypes.TEXT_BOX))
-            {
-                line = new ConfigFormTextBoxLine();
-            }
-            else if (type.Equals(ConfigFormLineTypes.COMBO_BOX))
-            {
-                line = new ConfigFormComboBoxLine();
-            }
-            else if (type.Equals(ConfigFormLineTypes.CHECK_BOX))
-            {
-                line = new ConfigFormCheckBoxLine();
-            }
-            else if (type.Equals(ConfigFormLineTypes.BUTTON_PANEL))
-            {
-                line = new ConfigFormButtonPanelLine();
-            }
-            else if (type.Equals(ConfigFormLineTypes.COLOR_PICKER))
-            {
-                line = new ConfigFormColorPickerLine();
-            }
-            else if (type.Equals(ConfigFormLineTypes.JAVASCRIPT))
-            {
-                line = new ConfigFormJavascriptLine();
-            }
-            else if (type.Equals(ConfigFormLineTypes.JSON))
-            {
-                line = new ConfigFormJSONLine();
-            }
-            else
-            {
-                throw new Exception("Invalid ConfigForm.AddLine ConfigFormLineType for" + type);
-            }
-
-            configObjectList.Add(line);
-            return (C)line;
+            this.configObjectList.Add(configObject);
+            return configObject;
         }
 
         public Control GetControl()

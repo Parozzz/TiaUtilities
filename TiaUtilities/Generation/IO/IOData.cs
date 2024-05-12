@@ -42,13 +42,13 @@ namespace TiaXmlReader.Generation.IO
             COLUMN_LIST.Sort((x, y) => x.ColumnIndex.CompareTo(y.ColumnIndex));
         }
 
-        [JsonProperty][Localization("IO_DATA_ADDRESS")] public string Address { get; set; }
-        [JsonProperty][Localization("IO_DATA_IO_NAME", append: " > " + GenerationPlaceholders.IO.IONAME)] public string IOName { get; set; }
-        [JsonProperty][Localization("IO_DATA_VARIABLE", append: " > " + GenerationPlaceholders.IO.VARIABLE)] public string Variable { get; set; }
-        [JsonProperty][Localization("IO_DATA_MERKER_ADDRESS")] public string MerkerAddress { get; set; }
-        [JsonProperty][Localization("IO_DATA_COMMENT", append: " > " + GenerationPlaceholders.IO.COMMENT)] public string Comment { get; set; }
+        [JsonProperty][Localization("IO_DATA_ADDRESS")] public string? Address { get; set; }
+        [JsonProperty][Localization("IO_DATA_IO_NAME", append: " > " + GenerationPlaceholders.IO.IONAME)] public string? IOName { get; set; }
+        [JsonProperty][Localization("IO_DATA_VARIABLE", append: " > " + GenerationPlaceholders.IO.VARIABLE)] public string? Variable { get; set; }
+        [JsonProperty][Localization("IO_DATA_MERKER_ADDRESS")] public string? MerkerAddress { get; set; }
+        [JsonProperty][Localization("IO_DATA_COMMENT", append: " > " + GenerationPlaceholders.IO.COMMENT)] public string? Comment { get; set; }
 
-        public object this[int column]
+        public object? this[int column]
         {
             get
             {
@@ -66,12 +66,12 @@ namespace TiaXmlReader.Generation.IO
             return COLUMN_LIST[column];
         }
 
-        public GridDataPreview GetPreview(GridDataColumn column, IOConfiguration config)
+        public GridDataPreview? GetPreview(GridDataColumn column, IOConfiguration config)
         {
             return GetPreview(column.ColumnIndex, config);
         }
 
-        public GridDataPreview GetPreview(int column, IOConfiguration config)
+        public GridDataPreview? GetPreview(int column, IOConfiguration config)
         {
             var addressTag = SimaticTagAddress.FromAddress(this.Address);
             if (string.IsNullOrEmpty(this.Address) || this.IsEmpty() || addressTag == null)
@@ -143,7 +143,7 @@ namespace TiaXmlReader.Generation.IO
                 ioNameDefault = true;
 
                 var preview = this.GetPreview(IOData.IO_NAME, config);
-                IOName = preview.ComposeDefaultValue();
+                IOName = preview?.ComposeDefaultValue();
             }
 
             if (string.IsNullOrEmpty(Variable))
@@ -151,7 +151,7 @@ namespace TiaXmlReader.Generation.IO
                 variableDefault = true;
 
                 var preview = this.GetPreview(IOData.VARIABLE, config);
-                Variable = preview.ComposeDefaultValue();
+                Variable = preview?.ComposeDefaultValue();
             }
 
             var variableAddressTag = SimaticTagAddress.FromAddress(this.MerkerAddress);

@@ -12,11 +12,11 @@ namespace TiaXmlReader.Generation.GridHandler
 {
     public class GridHandler<C, T> where C : IGenerationConfiguration where T : IGridData<C>
     {
-        private class ColumnInfo
+        private class ColumnInfo(DataGridViewColumn column, GridDataColumn dataColumn, int width)
         {
-            public DataGridViewColumn Column { get; internal set; }
-            public GridDataColumn DataColumn { get; internal set; }
-            public int Width { get; set; }
+            public DataGridViewColumn Column { get; init; } = column;
+            public GridDataColumn DataColumn { get; init; } = dataColumn;
+            public int Width { get; init; } = width;
             public bool Visible { get; set; } = true;
         }
 
@@ -30,7 +30,7 @@ namespace TiaXmlReader.Generation.GridHandler
         public GridDataHandler<C, T> DataHandler { get; private set; }
         public GridDataSource<C, T> DataSource { get; private set; }
         public GridScript<C, T> Script { get; private set; }
-        public GridEvents<C, T> Events { get; private set; }
+        public GridEvents Events { get; private set; }
 
         private readonly List<ColumnInfo> columnInfoList;
         private readonly List<IGridCellPainter> cellPainterList;
@@ -56,7 +56,7 @@ namespace TiaXmlReader.Generation.GridHandler
             this.DataSource = new GridDataSource<C, T>(this.DataGridView, this.DataHandler);
             this.sortHandler = new GridSortHandler<C, T>(this.DataGridView, this.DataSource, this.undoRedoHandler, comparer);
             this.Script = new GridScript<C, T>(this, jsErrorThread);
-            this.Events = new GridEvents<C, T>();
+            this.Events = new GridEvents();
 
             this.columnInfoList = new List<ColumnInfo>();
             this.cellPainterList = new List<IGridCellPainter>();
@@ -295,10 +295,9 @@ namespace TiaXmlReader.Generation.GridHandler
             #region SHOW_JS_CONTEXT_MENU
             this.DataGridView.CellMouseClick += (sender, args) =>
             {
-                if (args.RowIndex == -1 && args.ColumnIndex == -1 && args.Button == MouseButtons.Right && this.Script.Valid)
+                if (args.RowIndex == -1 && args.ColumnIndex == -1 && args.Button == MouseButtons.Right)
                 {
-                    var menuItem = new ToolStripMenuItem();
-                    menuItem.Text = "Execute Javascript";
+                    var menuItem = new ToolStripMenuItem { Text = "Execute Javascript" };
                     menuItem.Click += (s, a) => this.Script.ShowConfigForm(this.DataGridView);
                     
                     var contextMenu = new ContextMenuStrip();
@@ -351,12 +350,7 @@ namespace TiaXmlReader.Generation.GridHandler
 
         private CL AddColumn<CL>(CL column, GridDataColumn dataColumn, int width) where CL : DataGridViewColumn
         {
-            this.columnInfoList.Add(new ColumnInfo()
-            {
-                Column = column,
-                DataColumn = dataColumn,
-                Width = width
-            });
+            this.columnInfoList.Add(new ColumnInfo(column, dataColumn, width));
             return column;
         }
 
@@ -493,7 +487,7 @@ namespace TiaXmlReader.Generation.GridHandler
                     this.undoRedoHandler.Unlock();
                 }
 
-                this.Events.CellChangeEvent(this, new GridCellChangeEventArgs() { CellChangeList = cellChangeList });
+                this.Events.CellChangeEvent(new GridCellChangeEventArgs() { CellChangeList = cellChangeList });
                 undoRedoHandler.AddUndo(() => UndoChangeCells(cellChangeList));
             }
             catch (Exception ex)
@@ -525,7 +519,7 @@ namespace TiaXmlReader.Generation.GridHandler
                 var lastCellChange = cellChangeList[cellChangeList.Count - 1];
                 ShowCell(lastCellChange);  //Setting se current cell already center the grid to it.
 
-                this.Events.CellChangeEvent(this, new GridCellChangeEventArgs() { CellChangeList = cellChangeList, IsUndo = true });
+                this.Events.CellChangeEvent(new GridCellChangeEventArgs() { CellChangeList = cellChangeList, IsUndo = true });
 
                 undoRedoHandler.AddRedo(() =>
                 {

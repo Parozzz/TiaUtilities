@@ -44,7 +44,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
         private IOConfiguration IOConfig { get => settings.IOConfiguration; }
 
 
-        private string lastFilePath;
+        private string? lastFilePath;
 
         public IOGenerationForm(JavascriptErrorReportThread jsErrorHandlingThread, TimedSaveHandler autoSaveHandler, IOGenerationSettings settings, GridSettings gridSettings)
         {
@@ -73,20 +73,28 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            switch (keyData)
+            try
             {
-                case Keys.S | Keys.Control:
-                    this.ProjectSave();
-                    return true; //Return required otherwise will write the letter.
-                case Keys.L | Keys.Control:
-                    this.ProjectLoad();
-                    return true; //Return required otherwise will write the letter.
+                switch (keyData)
+                {
+                    case Keys.S | Keys.Control:
+                        this.ProjectSave();
+                        return true; //Return required otherwise will write the letter.
+                    case Keys.L | Keys.Control:
+                        this.ProjectLoad();
+                        return true; //Return required otherwise will write the letter.
+                }
+
+                if (this.ioGridHandler.ProcessCmdKey(ref msg, keyData) || this.suggestionGridHandler.ProcessCmdKey(ref msg, keyData))
+                {
+                    return true;
+                }
+            }
+            catch(Exception ex)
+            {
+                Utils.ShowExceptionMessage(ex);
             }
 
-            if (this.ioGridHandler.ProcessCmdKey(ref msg, keyData) || this.suggestionGridHandler.ProcessCmdKey(ref msg, keyData))
-            {
-                return true;
-            }
 
             // Call the base class
             return base.ProcessCmdKey(ref msg, keyData);
@@ -260,11 +268,11 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             #endregion
 
 
-            this.ioGridHandler?.Init();
-            this.suggestionGridHandler?.Init();
-            this.configHandler?.Init();
+            this.ioGridHandler.Init();
+            this.suggestionGridHandler.Init();
+            this.configHandler.Init();
 
-            this.ioGridHandler.Events.CellChange += (sender, args) =>
+            this.ioGridHandler.Events.CellChange += args =>
             {
                 if (args.CellChangeList.Where(c => c.ColumnIndex == IOData.VARIABLE).Any())
                 {
@@ -276,18 +284,14 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                     UpdateDuplicatedIOValues();
                 }
             };
-            this.suggestionGridHandler.Events.CellChange += (sender, args) => UpdateSuggestionColors();
+            this.ioGridHandler.Events.ScriptShowVariable += args => args.VariableList.Add("suggestions [array]");
+            this.ioGridHandler.Events.ScriptAddVariables += args => args.VariableDict.Add("suggestions", this.suggestionGridHandler.DataSource.GetNotEmptyData().Select(s => s.Value).ToArray());
+            this.ioGridHandler.Events.ScriptLoad += args => args.Script = settings.JSScript;
+            this.ioGridHandler.Events.ScriptChanged += args => settings.JSScript = args.Script;
 
-            this.ioGridHandler.Events.ScriptShowVariable += (sender, args) => args.VariableList.Add("suggestions [array]");
-            this.ioGridHandler.Events.ScriptAddVariables += (sender, args) => args.VariableDict.Add("suggestions", this.suggestionGridHandler.DataSource.GetNotEmptyData().Select(s => s.Value).ToArray());
-
-            #region JS_SCRIPT
-            this.ioGridHandler.Script.SetReadScriptFunc(() => settings.JSScript);
-            this.ioGridHandler.Script.SetWriteScriptAction(str => settings.JSScript = str);
-
-            this.suggestionGridHandler.Script.SetReadScriptFunc(() => settings.SuggestionJSScript);
-            this.suggestionGridHandler.Script.SetWriteScriptAction(str => settings.SuggestionJSScript = str);
-            #endregion
+            this.suggestionGridHandler.Events.CellChange += args => UpdateSuggestionColors();
+            this.suggestionGridHandler.Events.ScriptLoad += args => args.Script = settings.SuggestionJSScript;
+            this.suggestionGridHandler.Events.ScriptChanged += args => settings.SuggestionJSScript = args.Script;
 
             #region AUTO_SAVE
             void eventHandler(object sender, EventArgs args)

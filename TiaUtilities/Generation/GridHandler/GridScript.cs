@@ -1,16 +1,8 @@
-﻿using DocumentFormat.OpenXml.Vml.Office;
-using Esprima;
-using Esprima.Ast;
-using FastColoredTextBoxNS;
+﻿using Esprima.Ast;
 using Jint;
-using Jint.Native;
-using Jint.Native.Function;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
+using TiaUtilities.Generation.Configuration.Lines;
+using TiaUtilities.Generation.Configuration.Utility;
+using TiaUtilities.Generation.GridHandler.Events;
 using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.Generation.GridHandler.Events;
@@ -26,31 +18,14 @@ namespace TiaXmlReader.Generation.GridHandler
         private readonly GridHandler<C, T> gridHandler;
         private readonly JavascriptErrorReportThread jsErrorHandlingThread;
 
-        private Func<string> readScriptFunc;
-        private Action<string> writeScriptAction;
-
-        private ConfigFormTextBoxLine logTextBoxLine;
-        private ConfigFormJavascriptLine? javascriptLine;
-        private ConfigFormJSONLine jsonLine;
-
-        public bool Valid { get => readScriptFunc != null && writeScriptAction != null; }
+        private ConfigTextBoxLine? logTextBoxLine;
+        private ConfigJavascriptLine? javascriptLine;
+        private ConfigJSONLine? jsonLine;
 
         public GridScript(GridHandler<C, T> gridHandler, JavascriptErrorReportThread jsErrorThread)
         {
             this.gridHandler = gridHandler;
             this.jsErrorHandlingThread = jsErrorThread;
-        }
-
-        public GridScript<C, T> SetReadScriptFunc(Func<string> getJSTableScriptFunc)
-        {
-            this.readScriptFunc = getJSTableScriptFunc;
-            return this;
-        }
-
-        public GridScript<C, T> SetWriteScriptAction(Action<string> setJSTableScriptAction)
-        {
-            this.writeScriptAction = setJSTableScriptAction;
-            return this;
         }
 
         public void ShowConfigForm(IWin32Window window)
@@ -69,31 +44,42 @@ namespace TiaXmlReader.Generation.GridHandler
             variableList.AddRange(gridHandler.DataHandler.DataColumns.Select(c => c.ProgrammingFriendlyName + " [" + c.PropertyInfo.PropertyType.Name + "]"));
             variableList.Add("row [int]");
 
-            gridHandler.Events.ScriptShowVariableEvent(this.gridHandler, showVariableEventArgs);
+            gridHandler.Events.ScriptShowVariableEvent(showVariableEventArgs);
 
             var mainGroup = configForm.Init();
-            mainGroup.AddLine(ConfigFormLineTypes.LABEL)
+            mainGroup.AddLabel()
                 .LabelText("Variables: " + showVariableEventArgs.VariableList.Aggregate((a, b) => a + ", " + b))
                 .LabelFont(ConfigForm.LABEL_FONT.Copy(9f, FontStyle.Regular));
 
-            this.logTextBoxLine = mainGroup.AddLine(ConfigFormLineTypes.TEXT_BOX).Height(100)
+            var debugGroup = mainGroup.AddVerticalGroup().Height(150).SplitterDistance(95);
+            this.logTextBoxLine = debugGroup.AddTextBox()
                 .LabelText("Log > log(string)").LabelFont(ConfigForm.LABEL_FONT.Copy(9f, FontStyle.Regular)).LabelOnTop()
                 .Readonly().Multiline();
-
-            this.javascriptLine = mainGroup.AddLine(ConfigFormLineTypes.JAVASCRIPT).Height(350)
-                .ControlText(readScriptFunc.Invoke())
-                .TextChanged(writeScriptAction);
-
-            this.jsonLine = mainGroup.AddLine(ConfigFormLineTypes.JSON).Height(150)
+            this.jsonLine = debugGroup.AddJSON().Readonly()
                 .LabelText("Context Json").LabelFont(ConfigForm.LABEL_FONT.Copy(9f, FontStyle.Regular)).LabelOnTop();
 
-            mainGroup.AddLine(ConfigFormLineTypes.BUTTON_PANEL)
+
+            var loadScriptArgs = new GridScriptEventArgs();
+            this.gridHandler.Events.ScriptLoadEvent(loadScriptArgs);
+
+            this.javascriptLine = mainGroup.AddJavascript().Height(350)
+                .ControlText(loadScriptArgs.Script)
+                .TextChanged(str =>  
+                {
+                    var scriptChangedArgs = new GridScriptEventArgs() { Script = str };
+                    this.gridHandler.Events.ScriptChangedEvent(scriptChangedArgs);
+                });
+
+
+            mainGroup.AddButtonPanel()
                  .AddButton("AutoFormattazione", () => this.javascriptLine?.GetJavascriptFCTB().GetFCTB().DoAutoIndent())
                  .AddButton("Esegui Script", () => this.ParseJS());
 
             configForm.Shown += (sender, args) =>
             {
                 this.javascriptLine.GetJavascriptFCTB().RegisterErrorReport(this.jsErrorHandlingThread);
+
+                this.ParseJS(debugRun: true);
             };
 
             configForm.FormClosed += (sender, args) =>
@@ -123,21 +109,17 @@ namespace TiaXmlReader.Generation.GridHandler
             }
         }
 
-        private bool ParseJS()
+        private bool ParseJS(bool debugRun = false)
         {
-            if (!Valid)
-            {
-                return false;
-            }
-
-            var tableScript = this.readScriptFunc.Invoke();
-            if (string.IsNullOrEmpty(tableScript))
+            if (javascriptLine == null)
             {
                 return false;
             }
 
             try
             {
+                var tableScript = this.javascriptLine.GetControl().Text;
+
                 var scriptTimer = new ScriptTimer();
 
                 var preparedScript = Engine.PrepareScript(tableScript, strict: true);
@@ -150,17 +132,30 @@ namespace TiaXmlReader.Generation.GridHandler
                     options.Strict = true;
                 }))
                 {
-                    engine.SetValue("log", new Action<string>(Log));
+                    //During a debugRun i do not won't any debug to show but the same time not to throw errors.
+                    Action<string> logAction = debugRun ? str => { } : new Action<string>(Log);
+                    engine.SetValue("log", logAction);
 
                     var addVariablesArgs = new GridScriptAddVariableEventArgs();
-                    this.gridHandler.Events.ScriptAddVariablesEvent(gridHandler, addVariablesArgs);
+                    this.gridHandler.Events.ScriptAddVariablesEvent(addVariablesArgs);
                     foreach (var entry in addVariablesArgs.VariableDict)
                     {
                         engine.SetValue(entry.Key, entry.Value);
                     }
 
                     var changedDataDict = new Dictionary<int, T>();
-                    foreach (var entry in gridHandler.DataSource.GetNotEmptyDataDict())
+
+                    Dictionary<T, int> dataDict;
+                    if (debugRun)
+                    {
+                        dataDict = new() { { this.gridHandler.DataHandler.CreateInstance(), 0 } };
+                    }
+                    else
+                    {
+                        dataDict = gridHandler.DataSource.GetNotEmptyDataDict();
+                    }
+
+                    foreach (var entry in dataDict)
                     {
                         var rowIndex = entry.Value;
                         var data = entry.Key;
@@ -174,13 +169,19 @@ namespace TiaXmlReader.Generation.GridHandler
                         }
                     }
 
-                    var contextJsonJSValue = engine.Evaluate(@"JSON.stringify(this, null, 2);");
-                    if (contextJsonJSValue.IsString())
+                    if (jsonLine != null)
                     {
-                        jsonLine.GetControl().Text = contextJsonJSValue.AsString();
+                        var contextJsonJSValue = engine.Evaluate(@"JSON.stringify(this, null, 2);");
+                        if (contextJsonJSValue.IsString())
+                        {
+                            jsonLine.GetControl().Text = contextJsonJSValue.AsString();
+                        }
                     }
 
-                    this.gridHandler.ChangeMultipleRows(changedDataDict);
+                    if (!debugRun)
+                    {
+                        this.gridHandler.ChangeMultipleRows(changedDataDict);
+                    }
                 }
 
                 scriptTimer.Log(tableScript, typeof(T).Name);
@@ -195,12 +196,11 @@ namespace TiaXmlReader.Generation.GridHandler
             return false;
         }
 
-        private T ExecuteTimedJS(ScriptTimer scriptTimer, Engine engine, Prepared<Script> script, T data)
+        private T? ExecuteTimedJS(ScriptTimer scriptTimer, Engine engine, Prepared<Script> script, T data)
         {
             scriptTimer.Restart();
             var ret = this.ExecuteJS(engine, script, data);
             scriptTimer.StopAndSave();
-
             return ret;
         }
 

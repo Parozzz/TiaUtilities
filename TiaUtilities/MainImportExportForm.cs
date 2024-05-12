@@ -11,6 +11,7 @@ using TiaXmlReader.Generation.Configuration;
 using Jint;
 using TiaXmlReader.Javascript;
 using Timer = System.Windows.Forms.Timer;
+using TiaUtilities.Generation.Configuration.Utility;
 
 namespace TiaXmlReader
 {
@@ -156,8 +157,7 @@ namespace TiaXmlReader
             };
 
             var mainGroup = configForm.Init();
-            mainGroup.AddLine(ConfigFormLineTypes.JAVASCRIPT)
-                  .LabelText("Espressione").Height(300)
+            mainGroup.AddJavascript().LabelText("Espressione").Height(300)
                   .ControlText(JS)
                   .TextChanged(str => JS = str);
 

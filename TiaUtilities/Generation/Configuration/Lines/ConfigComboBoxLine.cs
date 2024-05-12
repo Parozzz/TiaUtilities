@@ -8,9 +8,9 @@ using System.Windows.Forms;
 using TiaXmlReader.CustomControls;
 using TiaXmlReader.Generation.Configuration;
 
-namespace TiaXmlReader.Generation.Configuration
+namespace TiaUtilities.Generation.Configuration.Lines
 {
-    public class ConfigFormComboBoxLine : ConfigFormLine<ConfigFormComboBoxLine>
+    public class ConfigComboBoxLine : ConfigLine<ConfigComboBoxLine>
     {
         private readonly ComboBox control;
 
@@ -18,24 +18,24 @@ namespace TiaXmlReader.Generation.Configuration
         private Action<string> textChangedAction;
         private Action<uint> uintChangedAction;
 
-        public ConfigFormComboBoxLine()
+        public ConfigComboBoxLine()
         {
-            this.control = new FlatComboBox();
-            this.control.TextChanged += TextChangedEventHandler;
-            this.control.KeyPress += KeyPressEventHandler;
+            control = new FlatComboBox();
+            control.TextChanged += TextChangedEventHandler;
+            control.KeyPress += KeyPressEventHandler;
         }
 
         private void KeyPressEventHandler(object sender, KeyPressEventArgs args)
         {
             if (numericOnly)
             {
-                args.Handled = Char.IsLetter(args.KeyChar);
+                args.Handled = char.IsLetter(args.KeyChar);
             }
         }
 
         private void TextChangedEventHandler(object sender, EventArgs args)
         {
-            var text = this.control.Text;
+            var text = control.Text;
             textChangedAction?.Invoke(text);
 
             if (uintChangedAction != null && uint.TryParse(text, out uint result))
@@ -44,31 +44,25 @@ namespace TiaXmlReader.Generation.Configuration
             }
         }
 
-        public ConfigFormComboBoxLine ControlText(IConvertible value)
+        public ConfigComboBoxLine Items(object[] items)
         {
-            this.control.Text = value.ToString();
+            control.Items.AddRange(items);
             return this;
         }
 
-        public ConfigFormComboBoxLine Items(object[] items)
+        public ConfigComboBoxLine TextChanged(Action<string> action)
         {
-            this.control.Items.AddRange(items);
+            textChangedAction = action;
             return this;
         }
 
-        public ConfigFormComboBoxLine TextChanged(Action<string> action)
+        public ConfigComboBoxLine UIntChanged(Action<uint> action)
         {
-            this.textChangedAction = action;
+            uintChangedAction = action;
             return this;
         }
 
-        public ConfigFormComboBoxLine UIntChanged(Action<uint> action)
-        {
-            this.uintChangedAction = action;
-            return this;
-        }
-
-        public ConfigFormComboBoxLine NumericOnly()
+        public ConfigComboBoxLine NumericOnly()
         {
             numericOnly = true;
             return this;

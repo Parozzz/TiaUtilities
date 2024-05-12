@@ -28,323 +28,312 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.mainPanel = new System.Windows.Forms.TableLayoutPanel();
-            this.TopTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
-            this.TopMenuStrip = new System.Windows.Forms.MenuStrip();
-            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.loadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.importExportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.exportXMLToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.importExcelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.importSuggestionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.preferencesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.PlaceholdersLabel = new System.Windows.Forms.Label();
-            this.configPanel = new System.Windows.Forms.Panel();
-            this.configButtonPanel = new System.Windows.Forms.FlowLayoutPanel();
-            this.fcConfigButton = new System.Windows.Forms.Button();
-            this.dbConfigButton = new System.Windows.Forms.Button();
-            this.variableTableConfigButton = new System.Windows.Forms.Button();
-            this.ioTableConfigButton = new System.Windows.Forms.Button();
-            this.segmentNameConfigButton = new System.Windows.Forms.Button();
-            this.divisionTypeLabel = new System.Windows.Forms.Label();
-            this.memoryTypeLabel = new System.Windows.Forms.Label();
-            this.GridsSplitContainer = new System.Windows.Forms.SplitContainer();
-            this.groupingTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
-            this.memoryTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
-            this.mainPanel.SuspendLayout();
-            this.TopTableLayoutPanel.SuspendLayout();
-            this.TopMenuStrip.SuspendLayout();
-            this.configPanel.SuspendLayout();
-            this.configButtonPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.GridsSplitContainer)).BeginInit();
-            this.GridsSplitContainer.SuspendLayout();
-            this.SuspendLayout();
+            mainPanel = new TableLayoutPanel();
+            TopTableLayoutPanel = new TableLayoutPanel();
+            TopMenuStrip = new MenuStrip();
+            fileToolStripMenuItem = new ToolStripMenuItem();
+            saveToolStripMenuItem = new ToolStripMenuItem();
+            saveAsToolStripMenuItem = new ToolStripMenuItem();
+            loadToolStripMenuItem = new ToolStripMenuItem();
+            importExportToolStripMenuItem = new ToolStripMenuItem();
+            exportXMLToolStripMenuItem = new ToolStripMenuItem();
+            importExcelToolStripMenuItem = new ToolStripMenuItem();
+            importSuggestionsToolStripMenuItem = new ToolStripMenuItem();
+            preferencesToolStripMenuItem = new ToolStripMenuItem();
+            PlaceholdersLabel = new Label();
+            configPanel = new Panel();
+            configButtonPanel = new FlowLayoutPanel();
+            fcConfigButton = new Button();
+            dbConfigButton = new Button();
+            variableTableConfigButton = new Button();
+            ioTableConfigButton = new Button();
+            segmentNameConfigButton = new Button();
+            groupingTypeComboBox = new CustomControls.FlatComboBox();
+            divisionTypeLabel = new Label();
+            memoryTypeComboBox = new CustomControls.FlatComboBox();
+            memoryTypeLabel = new Label();
+            GridsSplitContainer = new SplitContainer();
+            mainPanel.SuspendLayout();
+            TopTableLayoutPanel.SuspendLayout();
+            TopMenuStrip.SuspendLayout();
+            configPanel.SuspendLayout();
+            configButtonPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)GridsSplitContainer).BeginInit();
+            GridsSplitContainer.SuspendLayout();
+            SuspendLayout();
             // 
             // mainPanel
             // 
-            this.mainPanel.AutoSize = true;
-            this.mainPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.mainPanel.ColumnCount = 1;
-            this.mainPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.mainPanel.Controls.Add(this.TopTableLayoutPanel, 0, 0);
-            this.mainPanel.Controls.Add(this.GridsSplitContainer, 0, 1);
-            this.mainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.mainPanel.Location = new System.Drawing.Point(0, 0);
-            this.mainPanel.Margin = new System.Windows.Forms.Padding(0);
-            this.mainPanel.Name = "mainPanel";
-            this.mainPanel.RowCount = 2;
-            this.mainPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.mainPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.mainPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.mainPanel.Size = new System.Drawing.Size(1264, 681);
-            this.mainPanel.TabIndex = 1;
+            mainPanel.AutoSize = true;
+            mainPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            mainPanel.ColumnCount = 1;
+            mainPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            mainPanel.Controls.Add(TopTableLayoutPanel, 0, 0);
+            mainPanel.Controls.Add(GridsSplitContainer, 0, 1);
+            mainPanel.Dock = DockStyle.Fill;
+            mainPanel.Location = new Point(0, 0);
+            mainPanel.Margin = new Padding(0);
+            mainPanel.Name = "mainPanel";
+            mainPanel.RowCount = 2;
+            mainPanel.RowStyles.Add(new RowStyle());
+            mainPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            mainPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            mainPanel.Size = new Size(1264, 681);
+            mainPanel.TabIndex = 1;
             // 
             // TopTableLayoutPanel
             // 
-            this.TopTableLayoutPanel.AutoSize = true;
-            this.TopTableLayoutPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.TopTableLayoutPanel.ColumnCount = 1;
-            this.TopTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.TopTableLayoutPanel.Controls.Add(this.TopMenuStrip, 0, 0);
-            this.TopTableLayoutPanel.Controls.Add(this.PlaceholdersLabel, 0, 1);
-            this.TopTableLayoutPanel.Controls.Add(this.configPanel, 0, 2);
-            this.TopTableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Top;
-            this.TopTableLayoutPanel.Location = new System.Drawing.Point(3, 3);
-            this.TopTableLayoutPanel.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
-            this.TopTableLayoutPanel.Name = "TopTableLayoutPanel";
-            this.TopTableLayoutPanel.RowCount = 2;
-            this.TopTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.TopTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.TopTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.TopTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.TopTableLayoutPanel.Size = new System.Drawing.Size(1258, 106);
-            this.TopTableLayoutPanel.TabIndex = 18;
+            TopTableLayoutPanel.AutoSize = true;
+            TopTableLayoutPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            TopTableLayoutPanel.ColumnCount = 1;
+            TopTableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            TopTableLayoutPanel.Controls.Add(TopMenuStrip, 0, 0);
+            TopTableLayoutPanel.Controls.Add(PlaceholdersLabel, 0, 1);
+            TopTableLayoutPanel.Controls.Add(configPanel, 0, 2);
+            TopTableLayoutPanel.Dock = DockStyle.Top;
+            TopTableLayoutPanel.Location = new Point(3, 3);
+            TopTableLayoutPanel.Margin = new Padding(3, 3, 3, 0);
+            TopTableLayoutPanel.Name = "TopTableLayoutPanel";
+            TopTableLayoutPanel.RowCount = 2;
+            TopTableLayoutPanel.RowStyles.Add(new RowStyle());
+            TopTableLayoutPanel.RowStyles.Add(new RowStyle());
+            TopTableLayoutPanel.RowStyles.Add(new RowStyle());
+            TopTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            TopTableLayoutPanel.Size = new Size(1258, 106);
+            TopTableLayoutPanel.TabIndex = 18;
             // 
             // TopMenuStrip
             // 
-            this.TopMenuStrip.BackColor = System.Drawing.Color.Transparent;
-            this.TopMenuStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Visible;
-            this.TopMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem,
-            this.importExportToolStripMenuItem,
-            this.preferencesToolStripMenuItem});
-            this.TopMenuStrip.Location = new System.Drawing.Point(0, 0);
-            this.TopMenuStrip.Name = "TopMenuStrip";
-            this.TopMenuStrip.Size = new System.Drawing.Size(1258, 24);
-            this.TopMenuStrip.TabIndex = 17;
-            this.TopMenuStrip.Text = "menuStrip1";
+            TopMenuStrip.BackColor = Color.Transparent;
+            TopMenuStrip.GripStyle = ToolStripGripStyle.Visible;
+            TopMenuStrip.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, importExportToolStripMenuItem, preferencesToolStripMenuItem });
+            TopMenuStrip.Location = new Point(0, 0);
+            TopMenuStrip.Name = "TopMenuStrip";
+            TopMenuStrip.Size = new Size(1258, 24);
+            TopMenuStrip.TabIndex = 17;
+            TopMenuStrip.Text = "menuStrip1";
             // 
             // fileToolStripMenuItem
             // 
-            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.saveToolStripMenuItem,
-            this.saveAsToolStripMenuItem,
-            this.loadToolStripMenuItem});
-            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
-            this.fileToolStripMenuItem.Text = "File";
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { saveToolStripMenuItem, saveAsToolStripMenuItem, loadToolStripMenuItem });
+            fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            fileToolStripMenuItem.Size = new Size(37, 20);
+            fileToolStripMenuItem.Text = "File";
             // 
             // saveToolStripMenuItem
             // 
-            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
-            this.saveToolStripMenuItem.Text = "Save";
+            saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+            saveToolStripMenuItem.Size = new Size(111, 22);
+            saveToolStripMenuItem.Text = "Save";
             // 
             // saveAsToolStripMenuItem
             // 
-            this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
-            this.saveAsToolStripMenuItem.Text = "SaveAs";
+            saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
+            saveAsToolStripMenuItem.Size = new Size(111, 22);
+            saveAsToolStripMenuItem.Text = "SaveAs";
             // 
             // loadToolStripMenuItem
             // 
-            this.loadToolStripMenuItem.Name = "loadToolStripMenuItem";
-            this.loadToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
-            this.loadToolStripMenuItem.Text = "Load";
+            loadToolStripMenuItem.Name = "loadToolStripMenuItem";
+            loadToolStripMenuItem.Size = new Size(111, 22);
+            loadToolStripMenuItem.Text = "Load";
             // 
             // importExportToolStripMenuItem
             // 
-            this.importExportToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.exportXMLToolStripMenuItem,
-            this.importExcelToolStripMenuItem,
-            this.importSuggestionsToolStripMenuItem});
-            this.importExportToolStripMenuItem.Name = "importExportToolStripMenuItem";
-            this.importExportToolStripMenuItem.Size = new System.Drawing.Size(94, 20);
-            this.importExportToolStripMenuItem.Text = "Import/Export";
+            importExportToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { exportXMLToolStripMenuItem, importExcelToolStripMenuItem, importSuggestionsToolStripMenuItem });
+            importExportToolStripMenuItem.Name = "importExportToolStripMenuItem";
+            importExportToolStripMenuItem.Size = new Size(94, 20);
+            importExportToolStripMenuItem.Text = "Import/Export";
             // 
             // exportXMLToolStripMenuItem
             // 
-            this.exportXMLToolStripMenuItem.Name = "exportXMLToolStripMenuItem";
-            this.exportXMLToolStripMenuItem.Size = new System.Drawing.Size(254, 22);
-            this.exportXMLToolStripMenuItem.Text = "Export XML";
+            exportXMLToolStripMenuItem.Name = "exportXMLToolStripMenuItem";
+            exportXMLToolStripMenuItem.Size = new Size(254, 22);
+            exportXMLToolStripMenuItem.Text = "Export XML";
             // 
             // importExcelToolStripMenuItem
             // 
-            this.importExcelToolStripMenuItem.Name = "importExcelToolStripMenuItem";
-            this.importExcelToolStripMenuItem.Size = new System.Drawing.Size(254, 22);
-            this.importExcelToolStripMenuItem.Text = "Import Excel";
+            importExcelToolStripMenuItem.Name = "importExcelToolStripMenuItem";
+            importExcelToolStripMenuItem.Size = new Size(254, 22);
+            importExcelToolStripMenuItem.Text = "Import Excel";
             // 
             // importSuggestionsToolStripMenuItem
             // 
-            this.importSuggestionsToolStripMenuItem.Name = "importSuggestionsToolStripMenuItem";
-            this.importSuggestionsToolStripMenuItem.Size = new System.Drawing.Size(254, 22);
-            this.importSuggestionsToolStripMenuItem.Text = "Import Suggestions From DB/Tags";
+            importSuggestionsToolStripMenuItem.Name = "importSuggestionsToolStripMenuItem";
+            importSuggestionsToolStripMenuItem.Size = new Size(254, 22);
+            importSuggestionsToolStripMenuItem.Text = "Import Suggestions From DB/Tags";
             // 
             // preferencesToolStripMenuItem
             // 
-            this.preferencesToolStripMenuItem.Name = "preferencesToolStripMenuItem";
-            this.preferencesToolStripMenuItem.Size = new System.Drawing.Size(80, 20);
-            this.preferencesToolStripMenuItem.Text = "Preferences";
+            preferencesToolStripMenuItem.Name = "preferencesToolStripMenuItem";
+            preferencesToolStripMenuItem.Size = new Size(80, 20);
+            preferencesToolStripMenuItem.Text = "Preferences";
             // 
             // PlaceholdersLabel
             // 
-            this.PlaceholdersLabel.Dock = System.Windows.Forms.DockStyle.Top;
-            this.PlaceholdersLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.PlaceholdersLabel.Location = new System.Drawing.Point(3, 24);
-            this.PlaceholdersLabel.Name = "PlaceholdersLabel";
-            this.PlaceholdersLabel.Size = new System.Drawing.Size(1252, 16);
-            this.PlaceholdersLabel.TabIndex = 9;
-            this.PlaceholdersLabel.Text = "Placeholders: {memory_type} {bit} {byte} {io_name} {variable_name} {comment} {con" +
-    "fig_db_name} {config_db_number}";
+            PlaceholdersLabel.Dock = DockStyle.Top;
+            PlaceholdersLabel.Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            PlaceholdersLabel.Location = new Point(3, 24);
+            PlaceholdersLabel.Name = "PlaceholdersLabel";
+            PlaceholdersLabel.Size = new Size(1252, 16);
+            PlaceholdersLabel.TabIndex = 9;
+            PlaceholdersLabel.Text = "Placeholders: {memory_type} {bit} {byte} {io_name} {variable_name} {comment} {config_db_name} {config_db_number}";
             // 
             // configPanel
             // 
-            this.configPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.configPanel.Controls.Add(this.configButtonPanel);
-            this.configPanel.Controls.Add(this.groupingTypeComboBox);
-            this.configPanel.Controls.Add(this.divisionTypeLabel);
-            this.configPanel.Controls.Add(this.memoryTypeComboBox);
-            this.configPanel.Controls.Add(this.memoryTypeLabel);
-            this.configPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.configPanel.Location = new System.Drawing.Point(3, 43);
-            this.configPanel.Name = "configPanel";
-            this.configPanel.Size = new System.Drawing.Size(1252, 60);
-            this.configPanel.TabIndex = 3;
+            configPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            configPanel.Controls.Add(configButtonPanel);
+            configPanel.Controls.Add(groupingTypeComboBox);
+            configPanel.Controls.Add(divisionTypeLabel);
+            configPanel.Controls.Add(memoryTypeComboBox);
+            configPanel.Controls.Add(memoryTypeLabel);
+            configPanel.Dock = DockStyle.Fill;
+            configPanel.Location = new Point(3, 43);
+            configPanel.Name = "configPanel";
+            configPanel.Size = new Size(1252, 60);
+            configPanel.TabIndex = 3;
             // 
             // configButtonPanel
             // 
-            this.configButtonPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.configButtonPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.configButtonPanel.Controls.Add(this.fcConfigButton);
-            this.configButtonPanel.Controls.Add(this.dbConfigButton);
-            this.configButtonPanel.Controls.Add(this.variableTableConfigButton);
-            this.configButtonPanel.Controls.Add(this.ioTableConfigButton);
-            this.configButtonPanel.Controls.Add(this.segmentNameConfigButton);
-            this.configButtonPanel.Location = new System.Drawing.Point(0, -1);
-            this.configButtonPanel.Margin = new System.Windows.Forms.Padding(0);
-            this.configButtonPanel.Name = "configButtonPanel";
-            this.configButtonPanel.Size = new System.Drawing.Size(1252, 30);
-            this.configButtonPanel.TabIndex = 15;
+            configButtonPanel.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            configButtonPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            configButtonPanel.Controls.Add(fcConfigButton);
+            configButtonPanel.Controls.Add(dbConfigButton);
+            configButtonPanel.Controls.Add(variableTableConfigButton);
+            configButtonPanel.Controls.Add(ioTableConfigButton);
+            configButtonPanel.Controls.Add(segmentNameConfigButton);
+            configButtonPanel.Location = new Point(0, -1);
+            configButtonPanel.Margin = new Padding(0);
+            configButtonPanel.Name = "configButtonPanel";
+            configButtonPanel.Size = new Size(1252, 30);
+            configButtonPanel.TabIndex = 15;
             // 
             // fcConfigButton
             // 
-            this.fcConfigButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.75F, System.Drawing.FontStyle.Bold);
-            this.fcConfigButton.Location = new System.Drawing.Point(0, 0);
-            this.fcConfigButton.Margin = new System.Windows.Forms.Padding(0);
-            this.fcConfigButton.Name = "fcConfigButton";
-            this.fcConfigButton.Size = new System.Drawing.Size(71, 30);
-            this.fcConfigButton.TabIndex = 10;
-            this.fcConfigButton.Text = "FC";
-            this.fcConfigButton.UseVisualStyleBackColor = true;
+            fcConfigButton.Font = new Font("Microsoft Sans Serif", 12.75F, FontStyle.Bold);
+            fcConfigButton.Location = new Point(0, 0);
+            fcConfigButton.Margin = new Padding(0);
+            fcConfigButton.Name = "fcConfigButton";
+            fcConfigButton.Size = new Size(71, 30);
+            fcConfigButton.TabIndex = 10;
+            fcConfigButton.Text = "FC";
+            fcConfigButton.UseVisualStyleBackColor = true;
             // 
             // dbConfigButton
             // 
-            this.dbConfigButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.75F, System.Drawing.FontStyle.Bold);
-            this.dbConfigButton.Location = new System.Drawing.Point(71, 0);
-            this.dbConfigButton.Margin = new System.Windows.Forms.Padding(0);
-            this.dbConfigButton.Name = "dbConfigButton";
-            this.dbConfigButton.Size = new System.Drawing.Size(147, 30);
-            this.dbConfigButton.TabIndex = 11;
-            this.dbConfigButton.Text = "DB Appoggi";
-            this.dbConfigButton.UseVisualStyleBackColor = true;
+            dbConfigButton.Font = new Font("Microsoft Sans Serif", 12.75F, FontStyle.Bold);
+            dbConfigButton.Location = new Point(71, 0);
+            dbConfigButton.Margin = new Padding(0);
+            dbConfigButton.Name = "dbConfigButton";
+            dbConfigButton.Size = new Size(147, 30);
+            dbConfigButton.TabIndex = 11;
+            dbConfigButton.Text = "DB Appoggi";
+            dbConfigButton.UseVisualStyleBackColor = true;
             // 
             // variableTableConfigButton
             // 
-            this.variableTableConfigButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.75F, System.Drawing.FontStyle.Bold);
-            this.variableTableConfigButton.Location = new System.Drawing.Point(218, 0);
-            this.variableTableConfigButton.Margin = new System.Windows.Forms.Padding(0);
-            this.variableTableConfigButton.Name = "variableTableConfigButton";
-            this.variableTableConfigButton.Size = new System.Drawing.Size(183, 30);
-            this.variableTableConfigButton.TabIndex = 12;
-            this.variableTableConfigButton.Text = "Tabella Appoggi";
-            this.variableTableConfigButton.UseVisualStyleBackColor = true;
+            variableTableConfigButton.Font = new Font("Microsoft Sans Serif", 12.75F, FontStyle.Bold);
+            variableTableConfigButton.Location = new Point(218, 0);
+            variableTableConfigButton.Margin = new Padding(0);
+            variableTableConfigButton.Name = "variableTableConfigButton";
+            variableTableConfigButton.Size = new Size(183, 30);
+            variableTableConfigButton.TabIndex = 12;
+            variableTableConfigButton.Text = "Tabella Appoggi";
+            variableTableConfigButton.UseVisualStyleBackColor = true;
             // 
             // ioTableConfigButton
             // 
-            this.ioTableConfigButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.75F, System.Drawing.FontStyle.Bold);
-            this.ioTableConfigButton.Location = new System.Drawing.Point(401, 0);
-            this.ioTableConfigButton.Margin = new System.Windows.Forms.Padding(0);
-            this.ioTableConfigButton.Name = "ioTableConfigButton";
-            this.ioTableConfigButton.Size = new System.Drawing.Size(134, 30);
-            this.ioTableConfigButton.TabIndex = 13;
-            this.ioTableConfigButton.Text = "Tabella IO";
-            this.ioTableConfigButton.UseVisualStyleBackColor = true;
+            ioTableConfigButton.Font = new Font("Microsoft Sans Serif", 12.75F, FontStyle.Bold);
+            ioTableConfigButton.Location = new Point(401, 0);
+            ioTableConfigButton.Margin = new Padding(0);
+            ioTableConfigButton.Name = "ioTableConfigButton";
+            ioTableConfigButton.Size = new Size(134, 30);
+            ioTableConfigButton.TabIndex = 13;
+            ioTableConfigButton.Text = "Tabella IO";
+            ioTableConfigButton.UseVisualStyleBackColor = true;
             // 
             // segmentNameConfigButton
             // 
-            this.segmentNameConfigButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.75F, System.Drawing.FontStyle.Bold);
-            this.segmentNameConfigButton.Location = new System.Drawing.Point(535, 0);
-            this.segmentNameConfigButton.Margin = new System.Windows.Forms.Padding(0);
-            this.segmentNameConfigButton.Name = "segmentNameConfigButton";
-            this.segmentNameConfigButton.Size = new System.Drawing.Size(152, 30);
-            this.segmentNameConfigButton.TabIndex = 14;
-            this.segmentNameConfigButton.Text = "Nomi Segmenti";
-            this.segmentNameConfigButton.UseVisualStyleBackColor = true;
-            // 
-            // divisionTypeLabel
-            // 
-            this.divisionTypeLabel.AutoSize = true;
-            this.divisionTypeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.divisionTypeLabel.Location = new System.Drawing.Point(184, 34);
-            this.divisionTypeLabel.Name = "divisionTypeLabel";
-            this.divisionTypeLabel.Size = new System.Drawing.Size(149, 18);
-            this.divisionTypeLabel.TabIndex = 2;
-            this.divisionTypeLabel.Text = "Tipo raggruppamento";
-            // 
-            // memoryTypeLabel
-            // 
-            this.memoryTypeLabel.AutoSize = true;
-            this.memoryTypeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.memoryTypeLabel.Location = new System.Drawing.Point(9, 34);
-            this.memoryTypeLabel.Name = "memoryTypeLabel";
-            this.memoryTypeLabel.Size = new System.Drawing.Size(100, 18);
-            this.memoryTypeLabel.TabIndex = 0;
-            this.memoryTypeLabel.Text = "Tipo memoria";
-            // 
-            // GridsSplitContainer
-            // 
-            this.GridsSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.GridsSplitContainer.Location = new System.Drawing.Point(5, 114);
-            this.GridsSplitContainer.Margin = new System.Windows.Forms.Padding(5);
-            this.GridsSplitContainer.Name = "GridsSplitContainer";
-            this.GridsSplitContainer.Size = new System.Drawing.Size(1254, 562);
-            this.GridsSplitContainer.SplitterDistance = 345;
-            this.GridsSplitContainer.TabIndex = 19;
+            segmentNameConfigButton.Font = new Font("Microsoft Sans Serif", 12.75F, FontStyle.Bold);
+            segmentNameConfigButton.Location = new Point(535, 0);
+            segmentNameConfigButton.Margin = new Padding(0);
+            segmentNameConfigButton.Name = "segmentNameConfigButton";
+            segmentNameConfigButton.Size = new Size(152, 30);
+            segmentNameConfigButton.TabIndex = 14;
+            segmentNameConfigButton.Text = "Nomi Segmenti";
+            segmentNameConfigButton.UseVisualStyleBackColor = true;
             // 
             // groupingTypeComboBox
             // 
-            this.groupingTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.groupingTypeComboBox.FormattingEnabled = true;
-            this.groupingTypeComboBox.Location = new System.Drawing.Point(332, 33);
-            this.groupingTypeComboBox.Name = "groupingTypeComboBox";
-            this.groupingTypeComboBox.Size = new System.Drawing.Size(136, 21);
-            this.groupingTypeComboBox.TabIndex = 3;
+            groupingTypeComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            groupingTypeComboBox.FormattingEnabled = true;
+            groupingTypeComboBox.Location = new Point(332, 33);
+            groupingTypeComboBox.Name = "groupingTypeComboBox";
+            groupingTypeComboBox.Size = new Size(136, 23);
+            groupingTypeComboBox.TabIndex = 3;
+            // 
+            // divisionTypeLabel
+            // 
+            divisionTypeLabel.AutoSize = true;
+            divisionTypeLabel.Font = new Font("Microsoft Sans Serif", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            divisionTypeLabel.Location = new Point(184, 34);
+            divisionTypeLabel.Name = "divisionTypeLabel";
+            divisionTypeLabel.Size = new Size(149, 18);
+            divisionTypeLabel.TabIndex = 2;
+            divisionTypeLabel.Text = "Tipo raggruppamento";
             // 
             // memoryTypeComboBox
             // 
-            this.memoryTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.memoryTypeComboBox.FormattingEnabled = true;
-            this.memoryTypeComboBox.Location = new System.Drawing.Point(111, 33);
-            this.memoryTypeComboBox.Name = "memoryTypeComboBox";
-            this.memoryTypeComboBox.Size = new System.Drawing.Size(65, 21);
-            this.memoryTypeComboBox.TabIndex = 1;
+            memoryTypeComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            memoryTypeComboBox.FormattingEnabled = true;
+            memoryTypeComboBox.Location = new Point(111, 33);
+            memoryTypeComboBox.Name = "memoryTypeComboBox";
+            memoryTypeComboBox.Size = new Size(65, 23);
+            memoryTypeComboBox.TabIndex = 1;
+            // 
+            // memoryTypeLabel
+            // 
+            memoryTypeLabel.AutoSize = true;
+            memoryTypeLabel.Font = new Font("Microsoft Sans Serif", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            memoryTypeLabel.Location = new Point(9, 34);
+            memoryTypeLabel.Name = "memoryTypeLabel";
+            memoryTypeLabel.Size = new Size(100, 18);
+            memoryTypeLabel.TabIndex = 0;
+            memoryTypeLabel.Text = "Tipo memoria";
+            // 
+            // GridsSplitContainer
+            // 
+            GridsSplitContainer.Dock = DockStyle.Fill;
+            GridsSplitContainer.Location = new Point(5, 114);
+            GridsSplitContainer.Margin = new Padding(5);
+            GridsSplitContainer.Name = "GridsSplitContainer";
+            GridsSplitContainer.Size = new Size(1254, 562);
+            GridsSplitContainer.SplitterDistance = 345;
+            GridsSplitContainer.TabIndex = 19;
             // 
             // IOGenerationForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(1264, 681);
-            this.Controls.Add(this.mainPanel);
-            this.DoubleBuffered = true;
-            this.MainMenuStrip = this.TopMenuStrip;
-            this.Name = "IOGenerationForm";
-            this.Text = "IOGenerationForm";
-            this.mainPanel.ResumeLayout(false);
-            this.mainPanel.PerformLayout();
-            this.TopTableLayoutPanel.ResumeLayout(false);
-            this.TopTableLayoutPanel.PerformLayout();
-            this.TopMenuStrip.ResumeLayout(false);
-            this.TopMenuStrip.PerformLayout();
-            this.configPanel.ResumeLayout(false);
-            this.configPanel.PerformLayout();
-            this.configButtonPanel.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.GridsSplitContainer)).EndInit();
-            this.GridsSplitContainer.ResumeLayout(false);
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
+            ClientSize = new Size(1264, 681);
+            Controls.Add(mainPanel);
+            DoubleBuffered = true;
+            MainMenuStrip = TopMenuStrip;
+            Name = "IOGenerationForm";
+            Text = "IOGenerationForm";
+            mainPanel.ResumeLayout(false);
+            mainPanel.PerformLayout();
+            TopTableLayoutPanel.ResumeLayout(false);
+            TopTableLayoutPanel.PerformLayout();
+            TopMenuStrip.ResumeLayout(false);
+            TopMenuStrip.PerformLayout();
+            configPanel.ResumeLayout(false);
+            configPanel.PerformLayout();
+            configButtonPanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)GridsSplitContainer).EndInit();
+            GridsSplitContainer.ResumeLayout(false);
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion

@@ -10,6 +10,7 @@ using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Generation.IO.GenerationForm;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Generation.Placeholders;
+using TiaUtilities.Generation.Configuration.Utility;
 
 namespace TiaXmlReader.Generation.IO.GenerationForm
 {
@@ -34,40 +35,40 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             form.memoryTypeComboBox.SelectedValue = config.MemoryType;
             form.memoryTypeComboBox.SelectionChangeCommitted += (sender, args) => config.MemoryType = (IOMemoryTypeEnum)form.memoryTypeComboBox.SelectedValue;
 
-            form.fcConfigButton.Click += (object sender, EventArgs args) =>
+            form.fcConfigButton.Click += (sender, args) =>
             {
                 var configForm = new ConfigForm("FC");
 
                 var mainGroup = configForm.Init();
-                mainGroup.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Nome")
+                mainGroup.AddTextBox().LabelText("Nome")
                      .ControlText(config.FCBlockName)
                      .TextChanged(str => config.FCBlockName = str);
 
-                mainGroup.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Numero")
+                mainGroup.AddTextBox().LabelText("Numero")
                      .ControlText(config.FCBlockNumber)
                      .UIntChanged(num => config.FCBlockNumber = num);
 
                 SetupConfigForm(form.fcConfigButton, configForm);
             };
 
-            form.dbConfigButton.Click += (object sender, EventArgs args) =>
+            form.dbConfigButton.Click += (sender, args) =>
             {
                 var configForm = new ConfigForm("DB Appoggi");
 
                 var mainGroup = configForm.Init();
-                mainGroup.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Nome > " + GenerationPlaceholders.IO.CONFIG_DB_NAME)
+                mainGroup.AddTextBox().LabelText("Nome > " + GenerationPlaceholders.IO.CONFIG_DB_NAME)
                      .ControlText(config.DBName)
                      .TextChanged(str => config.DBName = str);
 
-                mainGroup.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Numero > " + GenerationPlaceholders.IO.CONFIG_DB_NUMBER)
+                mainGroup.AddTextBox().LabelText("Numero > " + GenerationPlaceholders.IO.CONFIG_DB_NUMBER)
                      .ControlText(config.DBNumber)
                      .UIntChanged(num => config.DBNumber = num);
 
-                mainGroup.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Valore Default Input")
+                mainGroup.AddTextBox().LabelText("Valore Default Input")
                      .ControlText(config.DefaultDBInputVariable)
                      .TextChanged(str => config.DefaultDBInputVariable = str);
 
-                mainGroup.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Valore Default Output")
+                mainGroup.AddTextBox().LabelText("Valore Default Output")
                      .ControlText(config.DefaultDBOutputVariable)
                      .TextChanged(str => config.DefaultDBOutputVariable = str);
 
@@ -79,33 +80,33 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                 var configForm = new ConfigForm("Tabella Appoggi");
 
                 var mainGroup = configForm.Init();
-                mainGroup.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Nome")
+                mainGroup.AddTextBox().LabelText("Nome")
                      .ControlText(config.VariableTableName)
                      .TextChanged(str => config.VariableTableName = str);
 
-                mainGroup.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Nuova ogni n° bit")
+                mainGroup.AddTextBox().LabelText("Nuova ogni n° bit")
                      .ControlText(config.VariableTableSplitEvery)
                      .UIntChanged(num => config.VariableTableSplitEvery = num);
 
                 var inputGroup = mainGroup.AddGroup();
-                inputGroup.AddLine(ConfigFormLineTypes.LABEL).LabelText("Variabile Input");
+                inputGroup.AddLabel().LabelText("Variabile Input");
 
-                inputGroup.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Indirizzo Start")
+                inputGroup.AddTextBox().LabelText("Indirizzo Start")
                      .ControlText(config.VariableTableInputStartAddress)
                      .UIntChanged(num => config.VariableTableInputStartAddress = num);
 
-                inputGroup.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Valore Default")
+                inputGroup.AddTextBox().LabelText("Valore Default")
                      .ControlText(config.DefaultMerkerInputVariable)
                      .TextChanged(str => config.DefaultMerkerInputVariable = str);
 
                 var outputGroup = mainGroup.AddGroup();
-                outputGroup.AddLine(ConfigFormLineTypes.LABEL).LabelText("Variabile Output");
+                outputGroup.AddLabel().LabelText("Variabile Output");
 
-                outputGroup.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Indirizzo Start")
+                outputGroup.AddTextBox().LabelText("Indirizzo Start")
                      .ControlText(config.VariableTableOutputStartAddress)
                      .UIntChanged(num => config.VariableTableOutputStartAddress = num);
 
-                outputGroup.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Valore Default")
+                outputGroup.AddTextBox().LabelText("Valore Default")
                      .ControlText(config.DefaultMerkerOutputVariable)
                      .TextChanged(str => config.DefaultMerkerOutputVariable = str);
 
@@ -117,15 +118,15 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                 var configForm = new ConfigForm("Tabella IN/OUT");
 
                 var mainGroup = configForm.Init();
-                mainGroup.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Nome")
+                mainGroup.AddTextBox().LabelText("Nome")
                      .ControlText(config.IOTableName)
                      .TextChanged(str => config.IOTableName = str);
 
-                mainGroup.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Nuova ogni n° bit")
+                mainGroup.AddTextBox().LabelText("Nuova ogni n° bit")
                      .ControlText(config.IOTableSplitEvery)
                      .UIntChanged(num => config.IOTableSplitEvery = num);
 
-                mainGroup.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Nome tag default")
+                mainGroup.AddTextBox().LabelText("Nome tag default")
                      .ControlText(config.DefaultIoName)
                      .TextChanged(str => config.DefaultIoName = str);
 
@@ -137,11 +138,11 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                 var configForm = new ConfigForm("Nomi segmenti generati");
 
                 var mainGroup = configForm.Init();
-                mainGroup.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Divisione per bit")
+                mainGroup.AddTextBox().LabelText("Divisione per bit")
                      .ControlText(config.SegmentNameBitGrouping)
                      .TextChanged(str => config.SegmentNameBitGrouping = str);
 
-                mainGroup.AddLine(ConfigFormLineTypes.TEXT_BOX).LabelText("Divisione per byte")
+                mainGroup.AddTextBox().LabelText("Divisione per byte")
                      .ControlText(config.SegmentNameByteGrouping)
                      .TextChanged(str => config.SegmentNameByteGrouping = str);
 

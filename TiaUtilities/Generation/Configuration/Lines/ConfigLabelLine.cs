@@ -5,12 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TiaXmlReader.Generation.Configuration;
 
-namespace TiaXmlReader.Generation.Configuration
+namespace TiaUtilities.Generation.Configuration.Lines
 {
-    public class ConfigFormLabelLine : ConfigFormLine<ConfigFormLabelLine>
+    public class ConfigLabelLine : ConfigLine<ConfigLabelLine>
     {
-        public ConfigFormLabelLine()
+        public ConfigLabelLine()
         {
         }
 

@@ -1,5 +1,4 @@
 ﻿using FastColoredTextBoxNS;
-using FastColoredTextBoxNS.Types;
 using System.Text.RegularExpressions;
 using TiaXmlReader.Javascript.FCTB;
 using TiaXmlReader.Utility;
@@ -17,8 +16,8 @@ namespace TiaXmlReader.Javascript
 
         private readonly FastColoredTextBox fctb;
 
-        private JavascriptErrorReportThread.JSScriptReport scriptReport;
-        private DisplayedError currentError;
+        private JavascriptErrorReportThread.JSScriptReport? scriptReport;
+        private DisplayedError? currentError;
 
         private bool haltError; //This is required to avoid having the wavy style contantly flash on screen. After changing text, give some time before accetting new text!
 
@@ -36,10 +35,10 @@ namespace TiaXmlReader.Javascript
         {
             #region FCTB_SETUP
             // == BRACKETS ==
-            fctb.Language = FastColoredTextBoxNS.Text.Language.JS;
+            fctb.Language = Language.JS;
 
             fctb.AutoCompleteBrackets = true;
-            fctb.AutoCompleteBracketsList = new char[] { '(', ')', '{', '}', '\"', '\"', '\'', '\'' };
+            fctb.AutoCompleteBracketsList = ['(', ')', '{', '}', '\"', '\"', '\'', '\''];
             fctb.BracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
             fctb.BracketsStyle = HIGHLIGHTED_BRACKET_STYLE;
             fctb.BracketsStyle2 = HIGHLIGHTED_BRACKET_STYLE;
@@ -161,7 +160,7 @@ namespace TiaXmlReader.Javascript
 
         private void UpdateCurrentError()
         {
-            if(this.currentError == null && this.AreErrorLimitValid(currentError))
+            if(this.currentError == null || !this.AreErrorLimitValid(currentError))
             {
                 return;
             }
@@ -185,12 +184,12 @@ namespace TiaXmlReader.Javascript
             this.currentError = null;
         }
 
-        private bool AreErrorLimitValid(DisplayedError currentError)
+        private bool AreErrorLimitValid(DisplayedError error)
         {
-            return currentError.Line >= 0 && currentError.Line < fctb.LinesCount && currentError.Column >= 0 && !string.IsNullOrEmpty(currentError.Description);
+            return error.Line >= 0 && error.Line < fctb.LinesCount && error.Column >= 0 && !string.IsNullOrEmpty(error.Description);
         }
 
-        private void SelectionChangedDelayed(object sender, EventArgs args)
+        private void SelectionChangedDelayed(object? sender, EventArgs args)
         {
             try
             {

@@ -44,15 +44,15 @@ namespace TiaXmlReader.Generation.Alarms
         }
 
         [JsonProperty][Localization("ALARM_DATA_ENABLE")] public bool Enable { get; set; }
-        [JsonProperty][Localization("ALARM_DATA_ALM_VARIABLE")] public string AlarmVariable { get; set; }
-        [JsonProperty][Localization("ALARM_DATA_COIL_ADDRESS")] public string CoilAddress { get; set; }
-        [JsonProperty][Localization("ALARM_DATA_SET_COIL_ADDRESS")] public string SetCoilAddress { get; set; }
-        [JsonProperty][Localization("ALARM_DATA_TIMER_ADDRESS")] public string TimerAddress { get; set; }
-        [JsonProperty][Localization("ALARM_DATA_TIMER_TYPE")] public string TimerType { get; set; }
-        [JsonProperty][Localization("ALARM_DATA_TIMER_VALUE")] public string TimerValue { get; set; }
-        [JsonProperty][Localization("ALARM_DATA_DESCRIPTION", append: " > " + GenerationPlaceholders.Alarms.ALARM_DESCRIPTION)] public string Description { get; set; }
+        [JsonProperty][Localization("ALARM_DATA_ALM_VARIABLE")] public string? AlarmVariable { get; set; }
+        [JsonProperty][Localization("ALARM_DATA_COIL_ADDRESS")] public string? CoilAddress { get; set; }
+        [JsonProperty][Localization("ALARM_DATA_SET_COIL_ADDRESS")] public string? SetCoilAddress { get; set; }
+        [JsonProperty][Localization("ALARM_DATA_TIMER_ADDRESS")] public string? TimerAddress { get; set; }
+        [JsonProperty][Localization("ALARM_DATA_TIMER_TYPE")] public string? TimerType { get; set; }
+        [JsonProperty][Localization("ALARM_DATA_TIMER_VALUE")] public string? TimerValue { get; set; }
+        [JsonProperty][Localization("ALARM_DATA_DESCRIPTION", append: " > " + GenerationPlaceholders.Alarms.ALARM_DESCRIPTION)] public string? Description { get; set; }
 
-        public object this[int column]
+        public object? this[int column]
         {
             get
             {
@@ -69,12 +69,12 @@ namespace TiaXmlReader.Generation.Alarms
         {
             return COLUMN_LIST[column];
         }
-        public GridDataPreview GetPreview(GridDataColumn column, AlarmConfiguration config)
+        public GridDataPreview? GetPreview(GridDataColumn column, AlarmConfiguration config)
         {
             return this.GetPreview(column.ColumnIndex, config);
         }
 
-        public GridDataPreview GetPreview(int column, AlarmConfiguration config)
+        public GridDataPreview? GetPreview(int column, AlarmConfiguration config)
         {
             if(string.IsNullOrEmpty(AlarmVariable) || this.IsEmpty())
             {

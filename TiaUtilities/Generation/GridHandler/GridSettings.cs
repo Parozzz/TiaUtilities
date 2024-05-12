@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Drawing;
 using System.Windows.Forms;
+using TiaUtilities.Generation.Configuration.Utility;
 using TiaXmlReader.AutoSave;
 using TiaXmlReader.Generation.Configuration;
 
@@ -19,19 +20,19 @@ namespace TiaXmlReader.Generation.GridHandler
             var configForm = new ConfigForm("Preferenze");
 
             var mainGroup = configForm.Init();
-            mainGroup.AddLine(ConfigFormLineTypes.COLOR_PICKER).LabelText("Bordo cella selezionata")
+            mainGroup.AddColorPicker().LabelText("Bordo cella selezionata")
                 .ApplyColor(this.SingleSelectedCellBorderColor)
                 .ColorChanged(color => this.SingleSelectedCellBorderColor = color);
 
-            mainGroup.AddLine(ConfigFormLineTypes.COLOR_PICKER).LabelText("Sfondo cella trascinata")
+            mainGroup.AddColorPicker().LabelText("Sfondo cella trascinata")
                  .ApplyColor(this.DragSelectedCellBorderColor)
                  .ColorChanged(color => this.DragSelectedCellBorderColor = color);
 
-            mainGroup.AddLine(ConfigFormLineTypes.COLOR_PICKER).LabelText("Triangolo trascinamento")
+            mainGroup.AddColorPicker().LabelText("Triangolo trascinamento")
                  .ApplyColor(this.SelectedCellTriangleColor)
                  .ColorChanged(color => this.SelectedCellTriangleColor = color);
 
-            mainGroup.AddLine(ConfigFormLineTypes.COLOR_PICKER).LabelText("Anteprima")
+            mainGroup.AddColorPicker().LabelText("Anteprima")
                  .ApplyColor(this.PreviewColor)
                  .ColorChanged(color => this.PreviewColor = color);
 

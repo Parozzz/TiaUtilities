@@ -1,4 +1,6 @@
-﻿namespace TiaXmlReader.Generation.Configuration
+﻿using TiaXmlReader.Utility;
+
+namespace TiaXmlReader.Generation.Configuration
 {
     public partial class ConfigForm : Form
     {
@@ -41,7 +43,7 @@
             this.Location = loc;
         }
 
-        public ConfigFormGroup Init()
+        public ConfigGroup Init()
         {
             this.ControlBox = this.ShowControlBox;
             this.MaximizeBox = false;
@@ -49,7 +51,7 @@
 
             this.titleLabel.Text = title;
 
-            var mainGroup = new ConfigFormGroup(this);
+            var mainGroup = new ConfigGroup(this);
 
             this.Load += (sender, args) =>
             {
@@ -65,12 +67,19 @@
         private bool formReadyToClose = false;
         protected override void WndProc(ref Message m)
         {
-            // if click outside dialog -> Close Dlg
-            //CanFocus is false if there is a modal window open to avoid closing for cliking it (Like color dialog or file dialog)
-            if (CloseOnOutsideClick && formReadyToClose && m.Msg == 0x86 && this.CanFocus && !this.RectangleToScreen(this.DisplayRectangle).Contains(Cursor.Position)) //0x86 WM_NCACTIVATE
+            try
             {
-                this.Close();
-                return;
+                // if click outside dialog -> Close Dlg
+                //CanFocus is false if there is a modal window open to avoid closing for cliking it (Like color dialog or file dialog)
+                if (CloseOnOutsideClick && formReadyToClose && m.Msg == 0x86 && this.CanFocus && !this.RectangleToScreen(this.DisplayRectangle).Contains(Cursor.Position)) //0x86 WM_NCACTIVATE
+                {
+                    this.Close();
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                Utils.ShowExceptionMessage(ex);
             }
 
             base.WndProc(ref m);
@@ -78,10 +87,17 @@
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            if (keyData == Keys.Cancel || keyData == Keys.Escape || (keyData == Keys.Enter && this.CloseOnEnter))
+            try
             {
-                this.Close();
-                return true;    // indicate that you handled this keystroke
+                if (keyData == Keys.Cancel || keyData == Keys.Escape || (keyData == Keys.Enter && this.CloseOnEnter))
+                {
+                    this.Close();
+                    return true;    // indicate that you handled this keystroke
+                }
+            }
+            catch (Exception ex)
+            {
+                Utils.ShowExceptionMessage(ex);
             }
 
             // Call the base class

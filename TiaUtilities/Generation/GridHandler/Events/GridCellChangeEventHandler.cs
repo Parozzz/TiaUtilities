@@ -9,11 +9,11 @@ using TiaXmlReader.GenerationForms;
 
 namespace TiaXmlReader.Generation.GridHandler.Events
 {
-    public delegate void GridCellChangeEventHandler<C, T>(GridHandler<C, T> sender, GridCellChangeEventArgs args) where C : IGenerationConfiguration where T : IGridData<C>;
+    public delegate void GridCellChangeEventHandler(GridCellChangeEventArgs args);
 
     public class GridCellChangeEventArgs : EventArgs
     {
-        public List<GridCellChange> CellChangeList {  get; set; }
+        public List<GridCellChange>? CellChangeList {  get; set; }
         public bool IsUndo { get; set; }
     }
 }
