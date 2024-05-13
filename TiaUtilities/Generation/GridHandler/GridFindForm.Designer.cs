@@ -1,6 +1,6 @@
 ﻿namespace TiaUtilities.Generation.GridHandler
 {
-    partial class GridSearchForm
+    partial class GridFindForm
     {
         /// <summary>
         /// Required designer variable.
@@ -249,7 +249,7 @@
             ReplaceAllButton.Text = "ReplaceAll";
             ReplaceAllButton.UseVisualStyleBackColor = true;
             // 
-            // GridSearchForm
+            // GridFindForm
             // 
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
@@ -260,7 +260,7 @@
             FormBorderStyle = FormBorderStyle.FixedToolWindow;
             MaximizeBox = false;
             MinimizeBox = false;
-            Name = "GridSearchForm";
+            Name = "GridFindForm";
             ShowIcon = false;
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterParent;
