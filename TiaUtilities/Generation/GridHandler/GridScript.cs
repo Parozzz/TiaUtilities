@@ -1,5 +1,8 @@
-﻿using Esprima.Ast;
+﻿using DocumentFormat.OpenXml.Vml.Office;
+using Esprima.Ast;
 using Jint;
+using Jint.Native;
+using Jint.Native.ShadowRealm;
 using TiaUtilities.Generation.Configuration.Lines;
 using TiaUtilities.Generation.Configuration.Utility;
 using TiaUtilities.Generation.GridHandler.Events;
@@ -64,7 +67,7 @@ namespace TiaXmlReader.Generation.GridHandler
 
             this.javascriptLine = mainGroup.AddJavascript().Height(350)
                 .ControlText(loadScriptArgs.Script)
-                .TextChanged(str =>  
+                .TextChanged(str =>
                 {
                     var scriptChangedArgs = new GridScriptEventArgs() { Script = str };
                     this.gridHandler.Events.ScriptChangedEvent(scriptChangedArgs);
@@ -73,7 +76,8 @@ namespace TiaXmlReader.Generation.GridHandler
 
             mainGroup.AddButtonPanel()
                  .AddButton("AutoFormattazione", () => this.javascriptLine?.GetJavascriptFCTB().GetFCTB().DoAutoIndent())
-                 .AddButton("Esegui Script", () => this.ParseJS());
+                 .AddButton("Esegui Script", () => this.ParseJS())
+                 .AddButton("Esegui in DebugMode", () => this.ParseJS(debugRun: true));
 
             configForm.Shown += (sender, args) =>
             {
@@ -123,65 +127,65 @@ namespace TiaXmlReader.Generation.GridHandler
                 var scriptTimer = new ScriptTimer();
 
                 var preparedScript = Engine.PrepareScript(tableScript, strict: true);
-                using (var engine = new Engine(options =>
+
+                using var engine = new Engine(options =>
                 {
                     options.LimitMemory(20_000_000); // Limit memory allocations to MB
-                    options.TimeoutInterval(TimeSpan.FromMilliseconds(500)); // Set a timeout to 500 ms.
+                    options.TimeoutInterval(TimeSpan.FromMilliseconds(1000)); // Set a timeout to 500 ms.
                     options.MaxStatements(int.MaxValue);
                     options.LimitRecursion(1);
                     options.Strict = true;
-                }))
+                });
+
+                //During a debugRun i do not won't any debug to show but the same time not to throw errors.
+                Action<string> logAction = debugRun ? str => { } : new Action<string>(Log);
+                engine.SetValue("log", logAction);
+
+                var addVariablesArgs = new GridScriptAddVariableEventArgs();
+                this.gridHandler.Events.ScriptAddVariablesEvent(addVariablesArgs);
+                foreach (var entry in addVariablesArgs.VariableDict)
                 {
-                    //During a debugRun i do not won't any debug to show but the same time not to throw errors.
-                    Action<string> logAction = debugRun ? str => { } : new Action<string>(Log);
-                    engine.SetValue("log", logAction);
+                    engine.SetValue(entry.Key, entry.Value);
+                }
 
-                    var addVariablesArgs = new GridScriptAddVariableEventArgs();
-                    this.gridHandler.Events.ScriptAddVariablesEvent(addVariablesArgs);
-                    foreach (var entry in addVariablesArgs.VariableDict)
+                var changedDataDict = new Dictionary<int, T>();
+
+                Dictionary<T, int> dataDict;
+                if (debugRun)
+                {
+                    dataDict = new() { { this.gridHandler.DataHandler.CreateInstance(), 0 } };
+                }
+                else
+                {
+                    dataDict = gridHandler.DataSource.GetNotEmptyDataDict();
+                }
+
+                foreach (var entry in dataDict)
+                {
+                    var rowIndex = entry.Value;
+                    var data = entry.Key;
+
+                    engine.SetValue("row", rowIndex);
+
+                    var newIOData = ExecuteTimedJS(scriptTimer, engine, preparedScript, data);
+                    if (newIOData != null)
                     {
-                        engine.SetValue(entry.Key, entry.Value);
+                        changedDataDict.Add(rowIndex, newIOData);
                     }
+                }
 
-                    var changedDataDict = new Dictionary<int, T>();
-
-                    Dictionary<T, int> dataDict;
-                    if (debugRun)
+                if (jsonLine != null)
+                {
+                    var contextJsonJSValue = engine.Evaluate(@"JSON.stringify(this, null, 2);");
+                    if (contextJsonJSValue.IsString())
                     {
-                        dataDict = new() { { this.gridHandler.DataHandler.CreateInstance(), 0 } };
+                        jsonLine.GetControl().Text = contextJsonJSValue.AsString();
                     }
-                    else
-                    {
-                        dataDict = gridHandler.DataSource.GetNotEmptyDataDict();
-                    }
+                }
 
-                    foreach (var entry in dataDict)
-                    {
-                        var rowIndex = entry.Value;
-                        var data = entry.Key;
-
-                        engine.SetValue("row", rowIndex);
-
-                        var newIOData = ExecuteTimedJS(scriptTimer, engine, preparedScript, data);
-                        if (newIOData != null)
-                        {
-                            changedDataDict.Add(rowIndex, newIOData);
-                        }
-                    }
-
-                    if (jsonLine != null)
-                    {
-                        var contextJsonJSValue = engine.Evaluate(@"JSON.stringify(this, null, 2);");
-                        if (contextJsonJSValue.IsString())
-                        {
-                            jsonLine.GetControl().Text = contextJsonJSValue.AsString();
-                        }
-                    }
-
-                    if (!debugRun)
-                    {
-                        this.gridHandler.ChangeMultipleRows(changedDataDict);
-                    }
+                if (!debugRun)
+                {
+                    this.gridHandler.ChangeMultipleRows(changedDataDict);
                 }
 
                 scriptTimer.Log(tableScript, typeof(T).Name);
