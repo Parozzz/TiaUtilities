@@ -49,11 +49,12 @@ namespace TiaXmlReader.Javascript
             // == INDENTATION ==
             fctb.AutoIndent = true;
             fctb.AutoIndentExistingLines = true;
-            fctb.AutoIndentChars = true;
+            fctb.AutoIndentChars = false;
             fctb.TabLength = 4;
             // == LINE NUMBERS ==
             fctb.ShowLineNumbers = true;
             fctb.LineNumberStartValue = 1;
+            fctb.LineNumberColor = Color.DarkGreen;
             // == CARET ==
             fctb.CaretVisible = true;
             fctb.CaretBlinking = true;
@@ -75,11 +76,20 @@ namespace TiaXmlReader.Javascript
 
             fctb.ToolTipNeeded += (sender, args) =>
             {
-                if(currentError != null && currentError.Line == args.Place.iLine && args.Place.iChar >= currentError.Column)
+                if(currentError != null)
                 {
-                    args.ToolTipTitle = "Error";
-                    args.ToolTipText = this.currentError.Description;
-                    args.ToolTipIcon = ToolTipIcon.Error;
+                    var errorLine = currentError.Line;
+                    var errorColumn = currentError.Column;
+
+                    var lineEnd = this.fctb.GetLine(errorLine).End;
+
+                    var place = args.Place;
+                    if(place.iLine == errorLine && (errorColumn >= lineEnd.iChar || place.iChar >= errorColumn))
+                    {  //Display the error after the error column ONLY if valid, otherwise while hovering the whole line!
+                        args.ToolTipTitle = "Error";
+                        args.ToolTipText = this.currentError.Description;
+                        args.ToolTipIcon = ToolTipIcon.Error;
+                    }
                 }
                 else if(args.HoveredWord == "JSON")
                 {

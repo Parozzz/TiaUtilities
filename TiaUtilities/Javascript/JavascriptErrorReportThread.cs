@@ -1,6 +1,10 @@
 ﻿using Esprima;
+using Irony.Parsing;
+using Jint;
 using System.ComponentModel;
 using TiaXmlReader.Utility;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using static TiaXmlReader.Javascript.JavascriptErrorReportThread;
 using Timer = System.Windows.Forms.Timer;
 
 namespace TiaXmlReader.Javascript
@@ -9,19 +13,19 @@ namespace TiaXmlReader.Javascript
     {
         public const int RUN_TIME_MS = 333;
 
-        public class JSError
+        public class JSError(int line, int column, string description)
         {
-            public int Line { get; set; }
-            public int Column { get; set; }
-            public string Description { get; set; }
+            public int Line { get; init; } = line;
+            public int Column { get; init; } = column;
+            public string Description { get; init; } = description;
         }
 
-        public class JSScriptReport
+        public class JSScriptReport(Func<string> getScriptSyncFunc, Action doneAction)
         {
-            public Func<string> GetScriptSyncFunc;
-            public Action DoneAction;
-            public volatile string Script;
-            public JSError JSError;
+            public Func<string> GetScriptSyncFunc { get; init; } = getScriptSyncFunc;
+            public Action DoneAction { get; init; } = doneAction;
+            public volatile string? Script;
+            public JSError? JSError;
         }
 
         private readonly BackgroundWorker worker;
@@ -37,8 +41,8 @@ namespace TiaXmlReader.Javascript
             this.worker = new BackgroundWorker();
             this.timer = new Timer() { Interval = RUN_TIME_MS };
 
-            this.scriptReportList = new List<JSScriptReport>();
-            this.asyncScriptReportList = new List<JSScriptReport>();
+            this.scriptReportList = [];
+            this.asyncScriptReportList = [];
         }
 
         public void Init()
@@ -76,12 +80,7 @@ namespace TiaXmlReader.Javascript
 
         public JSScriptReport RegisterScript(Func<string> getScriptSyncFunc, Action doneAction)
         {
-            var scriptReport = new JSScriptReport()
-            {
-                GetScriptSyncFunc = getScriptSyncFunc,
-                DoneAction = doneAction
-            };
-
+            var scriptReport = new JSScriptReport(getScriptSyncFunc, doneAction);
             this.scriptReportList.Add(scriptReport);
             return scriptReport;
         }
@@ -124,26 +123,26 @@ namespace TiaXmlReader.Javascript
 
                 try
                 {
+                    var errorHandler = new CollectingErrorHandler();
                     var parsingOptions = new ParserOptions()
                     {
-                        AllowReturnOutsideFunction = true
+                        AllowReturnOutsideFunction = true,
+                        Tokens = true,
+                        Tolerant = false,
+                        Comments = true,
+                        ErrorHandler = errorHandler
                     };
-                    var type = parsingOptions.GetType();
-                    type.GetProperty(nameof(ParserOptions.Tokens)).SetValue(parsingOptions, true);
-                    type.GetProperty(nameof(ParserOptions.Tolerant)).SetValue(parsingOptions, true);
-                    type.GetProperty(nameof(ParserOptions.Comments)).SetValue(parsingOptions, true);
 
                     var program = new JavaScriptParser(parsingOptions).ParseScript(scriptReport.Script, strict: true);
+                    foreach (var error in errorHandler.Errors)
+                    {
+                        scriptReport.JSError = this.CreateError(error);
+                        break;
+                    }
                 }
                 catch (ParserException parseEx)
                 {
-                    var error = parseEx.Error;
-                     scriptReport.JSError = new JSError()
-                    {
-                        Line = error.Position.Line,
-                        Column = error.Position.Column,
-                        Description = error.Description
-                    };
+                    scriptReport.JSError = this.CreateError(parseEx.Error);
                 }
                 catch (Exception ex)
                 {
@@ -152,6 +151,17 @@ namespace TiaXmlReader.Javascript
             }
 
             Busy = false;
+        }
+
+        private JSError? CreateError(ParseError? parseError)
+        {
+            if (parseError == null)
+            {
+                return null;
+            }
+
+            var pos = parseError.Position;
+            return new JSError(pos.Line, pos.Column, parseError.Description);
         }
 
     }
