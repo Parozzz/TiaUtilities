@@ -1,7 +1,6 @@
 ﻿using System.Globalization;
 using System.Xml;
-using TiaXmlReader.SimaticML.Blocks.FlagNet;
-using TiaXmlReader.Utility;
+using TiaXmlReader.Languages;
 using TiaXmlReader.XMLClasses;
 
 namespace TiaXmlReader.SimaticML.LanguageText

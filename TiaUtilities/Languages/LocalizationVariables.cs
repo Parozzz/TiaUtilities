@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TiaXmlReader.Utility
+namespace TiaXmlReader.Languages
 {
     public static class LocalizationVariables
     {

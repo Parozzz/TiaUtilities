@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using TiaXmlReader.Localization;
-using TiaXmlReader.Generation.GridHandler.Data;
+﻿using System.Reflection;
+using TiaXmlReader.Languages;
+using TiaXmlReader.Utility;
 
 namespace TiaXmlReader.Generation.GridHandler.Data
 {
@@ -32,7 +27,14 @@ namespace TiaXmlReader.Generation.GridHandler.Data
             {
                 if (field.IsStatic && field.FieldType == typeof(GridDataColumn))
                 {
-                    var column = (GridDataColumn)field.GetValue(null);
+                    var fieldValue = field.GetValue(null);
+                    if(fieldValue == null)
+                    {
+                        Utils.ShowExceptionMessage(new Exception("GridDataColumn is null inside " + type.Name));
+                        continue;
+                    }
+
+                    var column = (GridDataColumn)fieldValue;
                     columnList.Add(column);
                 }
             }
@@ -70,7 +72,7 @@ namespace TiaXmlReader.Generation.GridHandler.Data
             }
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is GridDataColumn column &&
                    Name == column.Name &&

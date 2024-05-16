@@ -31,15 +31,15 @@
             mainPanel = new TableLayoutPanel();
             TopTableLayoutPanel = new TableLayoutPanel();
             TopMenuStrip = new MenuStrip();
-            fileToolStripMenuItem = new ToolStripMenuItem();
-            saveToolStripMenuItem = new ToolStripMenuItem();
-            saveAsToolStripMenuItem = new ToolStripMenuItem();
-            loadToolStripMenuItem = new ToolStripMenuItem();
-            importExportToolStripMenuItem = new ToolStripMenuItem();
-            exportXMLToolStripMenuItem = new ToolStripMenuItem();
-            importExcelToolStripMenuItem = new ToolStripMenuItem();
-            importSuggestionsToolStripMenuItem = new ToolStripMenuItem();
-            preferencesToolStripMenuItem = new ToolStripMenuItem();
+            fileMenuItem = new ToolStripMenuItem();
+            saveMenuItem = new ToolStripMenuItem();
+            saveAsMenuItem = new ToolStripMenuItem();
+            loadMenuItem = new ToolStripMenuItem();
+            importExportMenuItem = new ToolStripMenuItem();
+            exportXMLMenuItem = new ToolStripMenuItem();
+            importExcelMenuItem = new ToolStripMenuItem();
+            importSuggestionsMenuItem = new ToolStripMenuItem();
+            preferencesMenuItem = new ToolStripMenuItem();
             PlaceholdersLabel = new Label();
             configPanel = new Panel();
             configButtonPanel = new FlowLayoutPanel();
@@ -49,7 +49,7 @@
             ioTableConfigButton = new Button();
             segmentNameConfigButton = new Button();
             groupingTypeComboBox = new CustomControls.FlatComboBox();
-            divisionTypeLabel = new Label();
+            groupingTypeLabel = new Label();
             memoryTypeComboBox = new CustomControls.FlatComboBox();
             memoryTypeLabel = new Label();
             GridsSplitContainer = new SplitContainer();
@@ -106,68 +106,68 @@
             // 
             TopMenuStrip.BackColor = Color.Transparent;
             TopMenuStrip.GripStyle = ToolStripGripStyle.Visible;
-            TopMenuStrip.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, importExportToolStripMenuItem, preferencesToolStripMenuItem });
+            TopMenuStrip.Items.AddRange(new ToolStripItem[] { fileMenuItem, importExportMenuItem, preferencesMenuItem });
             TopMenuStrip.Location = new Point(0, 0);
             TopMenuStrip.Name = "TopMenuStrip";
             TopMenuStrip.Size = new Size(1258, 24);
             TopMenuStrip.TabIndex = 17;
             TopMenuStrip.Text = "menuStrip1";
             // 
-            // fileToolStripMenuItem
+            // fileMenuItem
             // 
-            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { saveToolStripMenuItem, saveAsToolStripMenuItem, loadToolStripMenuItem });
-            fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            fileToolStripMenuItem.Size = new Size(37, 20);
-            fileToolStripMenuItem.Text = "File";
+            fileMenuItem.DropDownItems.AddRange(new ToolStripItem[] { saveMenuItem, saveAsMenuItem, loadMenuItem });
+            fileMenuItem.Name = "fileMenuItem";
+            fileMenuItem.Size = new Size(37, 20);
+            fileMenuItem.Text = "File";
             // 
-            // saveToolStripMenuItem
+            // saveMenuItem
             // 
-            saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            saveToolStripMenuItem.Size = new Size(111, 22);
-            saveToolStripMenuItem.Text = "Save";
+            saveMenuItem.Name = "saveMenuItem";
+            saveMenuItem.Size = new Size(111, 22);
+            saveMenuItem.Text = "Save";
             // 
-            // saveAsToolStripMenuItem
+            // saveAsMenuItem
             // 
-            saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            saveAsToolStripMenuItem.Size = new Size(111, 22);
-            saveAsToolStripMenuItem.Text = "SaveAs";
+            saveAsMenuItem.Name = "saveAsMenuItem";
+            saveAsMenuItem.Size = new Size(111, 22);
+            saveAsMenuItem.Text = "SaveAs";
             // 
-            // loadToolStripMenuItem
+            // loadMenuItem
             // 
-            loadToolStripMenuItem.Name = "loadToolStripMenuItem";
-            loadToolStripMenuItem.Size = new Size(111, 22);
-            loadToolStripMenuItem.Text = "Load";
+            loadMenuItem.Name = "loadMenuItem";
+            loadMenuItem.Size = new Size(111, 22);
+            loadMenuItem.Text = "Load";
             // 
-            // importExportToolStripMenuItem
+            // importExportMenuItem
             // 
-            importExportToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { exportXMLToolStripMenuItem, importExcelToolStripMenuItem, importSuggestionsToolStripMenuItem });
-            importExportToolStripMenuItem.Name = "importExportToolStripMenuItem";
-            importExportToolStripMenuItem.Size = new Size(94, 20);
-            importExportToolStripMenuItem.Text = "Import/Export";
+            importExportMenuItem.DropDownItems.AddRange(new ToolStripItem[] { exportXMLMenuItem, importExcelMenuItem, importSuggestionsMenuItem });
+            importExportMenuItem.Name = "importExportMenuItem";
+            importExportMenuItem.Size = new Size(94, 20);
+            importExportMenuItem.Text = "Import/Export";
             // 
-            // exportXMLToolStripMenuItem
+            // exportXMLMenuItem
             // 
-            exportXMLToolStripMenuItem.Name = "exportXMLToolStripMenuItem";
-            exportXMLToolStripMenuItem.Size = new Size(254, 22);
-            exportXMLToolStripMenuItem.Text = "Export XML";
+            exportXMLMenuItem.Name = "exportXMLMenuItem";
+            exportXMLMenuItem.Size = new Size(254, 22);
+            exportXMLMenuItem.Text = "Export XML";
             // 
-            // importExcelToolStripMenuItem
+            // importExcelMenuItem
             // 
-            importExcelToolStripMenuItem.Name = "importExcelToolStripMenuItem";
-            importExcelToolStripMenuItem.Size = new Size(254, 22);
-            importExcelToolStripMenuItem.Text = "Import Excel";
+            importExcelMenuItem.Name = "importExcelMenuItem";
+            importExcelMenuItem.Size = new Size(254, 22);
+            importExcelMenuItem.Text = "Import Excel";
             // 
-            // importSuggestionsToolStripMenuItem
+            // importSuggestionsMenuItem
             // 
-            importSuggestionsToolStripMenuItem.Name = "importSuggestionsToolStripMenuItem";
-            importSuggestionsToolStripMenuItem.Size = new Size(254, 22);
-            importSuggestionsToolStripMenuItem.Text = "Import Suggestions From DB/Tags";
+            importSuggestionsMenuItem.Name = "importSuggestionsMenuItem";
+            importSuggestionsMenuItem.Size = new Size(254, 22);
+            importSuggestionsMenuItem.Text = "Import Suggestions From DB/Tags";
             // 
-            // preferencesToolStripMenuItem
+            // preferencesMenuItem
             // 
-            preferencesToolStripMenuItem.Name = "preferencesToolStripMenuItem";
-            preferencesToolStripMenuItem.Size = new Size(80, 20);
-            preferencesToolStripMenuItem.Text = "Preferences";
+            preferencesMenuItem.Name = "preferencesMenuItem";
+            preferencesMenuItem.Size = new Size(80, 20);
+            preferencesMenuItem.Text = "Preferences";
             // 
             // PlaceholdersLabel
             // 
@@ -184,7 +184,7 @@
             configPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             configPanel.Controls.Add(configButtonPanel);
             configPanel.Controls.Add(groupingTypeComboBox);
-            configPanel.Controls.Add(divisionTypeLabel);
+            configPanel.Controls.Add(groupingTypeLabel);
             configPanel.Controls.Add(memoryTypeComboBox);
             configPanel.Controls.Add(memoryTypeLabel);
             configPanel.Dock = DockStyle.Fill;
@@ -210,55 +210,70 @@
             // 
             // fcConfigButton
             // 
+            fcConfigButton.AutoSize = true;
+            fcConfigButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             fcConfigButton.Font = new Font("Microsoft Sans Serif", 12.75F, FontStyle.Bold);
-            fcConfigButton.Location = new Point(0, 0);
-            fcConfigButton.Margin = new Padding(0);
+            fcConfigButton.Location = new Point(3, 0);
+            fcConfigButton.Margin = new Padding(3, 0, 0, 0);
             fcConfigButton.Name = "fcConfigButton";
-            fcConfigButton.Size = new Size(71, 30);
+            fcConfigButton.Padding = new Padding(8, 0, 8, 0);
+            fcConfigButton.Size = new Size(59, 30);
             fcConfigButton.TabIndex = 10;
             fcConfigButton.Text = "FC";
             fcConfigButton.UseVisualStyleBackColor = true;
             // 
             // dbConfigButton
             // 
+            dbConfigButton.AutoSize = true;
+            dbConfigButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             dbConfigButton.Font = new Font("Microsoft Sans Serif", 12.75F, FontStyle.Bold);
-            dbConfigButton.Location = new Point(71, 0);
-            dbConfigButton.Margin = new Padding(0);
+            dbConfigButton.Location = new Point(65, 0);
+            dbConfigButton.Margin = new Padding(3, 0, 0, 0);
             dbConfigButton.Name = "dbConfigButton";
-            dbConfigButton.Size = new Size(147, 30);
+            dbConfigButton.Padding = new Padding(8, 0, 8, 0);
+            dbConfigButton.Size = new Size(135, 30);
             dbConfigButton.TabIndex = 11;
             dbConfigButton.Text = "DB Appoggi";
             dbConfigButton.UseVisualStyleBackColor = true;
             // 
             // variableTableConfigButton
             // 
+            variableTableConfigButton.AutoSize = true;
+            variableTableConfigButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             variableTableConfigButton.Font = new Font("Microsoft Sans Serif", 12.75F, FontStyle.Bold);
-            variableTableConfigButton.Location = new Point(218, 0);
-            variableTableConfigButton.Margin = new Padding(0);
+            variableTableConfigButton.Location = new Point(203, 0);
+            variableTableConfigButton.Margin = new Padding(3, 0, 0, 0);
             variableTableConfigButton.Name = "variableTableConfigButton";
-            variableTableConfigButton.Size = new Size(183, 30);
+            variableTableConfigButton.Padding = new Padding(8, 0, 8, 0);
+            variableTableConfigButton.Size = new Size(169, 30);
             variableTableConfigButton.TabIndex = 12;
             variableTableConfigButton.Text = "Tabella Appoggi";
             variableTableConfigButton.UseVisualStyleBackColor = true;
             // 
             // ioTableConfigButton
             // 
+            ioTableConfigButton.AutoSize = true;
+            ioTableConfigButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             ioTableConfigButton.Font = new Font("Microsoft Sans Serif", 12.75F, FontStyle.Bold);
-            ioTableConfigButton.Location = new Point(401, 0);
-            ioTableConfigButton.Margin = new Padding(0);
+            ioTableConfigButton.Location = new Point(375, 0);
+            ioTableConfigButton.Margin = new Padding(3, 0, 0, 0);
             ioTableConfigButton.Name = "ioTableConfigButton";
-            ioTableConfigButton.Size = new Size(134, 30);
+            ioTableConfigButton.Padding = new Padding(8, 0, 8, 0);
+            ioTableConfigButton.Size = new Size(121, 30);
             ioTableConfigButton.TabIndex = 13;
             ioTableConfigButton.Text = "Tabella IO";
             ioTableConfigButton.UseVisualStyleBackColor = true;
             // 
             // segmentNameConfigButton
             // 
+            segmentNameConfigButton.AutoSize = true;
+            segmentNameConfigButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             segmentNameConfigButton.Font = new Font("Microsoft Sans Serif", 12.75F, FontStyle.Bold);
-            segmentNameConfigButton.Location = new Point(535, 0);
-            segmentNameConfigButton.Margin = new Padding(0);
+            segmentNameConfigButton.Location = new Point(499, 0);
+            segmentNameConfigButton.Margin = new Padding(3, 0, 0, 0);
             segmentNameConfigButton.Name = "segmentNameConfigButton";
-            segmentNameConfigButton.Size = new Size(152, 30);
+            segmentNameConfigButton.Padding = new Padding(8, 0, 8, 0);
+            segmentNameConfigButton.Size = new Size(162, 30);
             segmentNameConfigButton.TabIndex = 14;
             segmentNameConfigButton.Text = "Nomi Segmenti";
             segmentNameConfigButton.UseVisualStyleBackColor = true;
@@ -272,15 +287,15 @@
             groupingTypeComboBox.Size = new Size(136, 23);
             groupingTypeComboBox.TabIndex = 3;
             // 
-            // divisionTypeLabel
+            // groupingTypeLabel
             // 
-            divisionTypeLabel.AutoSize = true;
-            divisionTypeLabel.Font = new Font("Microsoft Sans Serif", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            divisionTypeLabel.Location = new Point(184, 34);
-            divisionTypeLabel.Name = "divisionTypeLabel";
-            divisionTypeLabel.Size = new Size(149, 18);
-            divisionTypeLabel.TabIndex = 2;
-            divisionTypeLabel.Text = "Tipo raggruppamento";
+            groupingTypeLabel.AutoSize = true;
+            groupingTypeLabel.Font = new Font("Microsoft Sans Serif", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            groupingTypeLabel.Location = new Point(184, 34);
+            groupingTypeLabel.Name = "groupingTypeLabel";
+            groupingTypeLabel.Size = new Size(149, 18);
+            groupingTypeLabel.TabIndex = 2;
+            groupingTypeLabel.Text = "Tipo raggruppamento";
             // 
             // memoryTypeComboBox
             // 
@@ -330,6 +345,7 @@
             configPanel.ResumeLayout(false);
             configPanel.PerformLayout();
             configButtonPanel.ResumeLayout(false);
+            configButtonPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)GridsSplitContainer).EndInit();
             GridsSplitContainer.ResumeLayout(false);
             ResumeLayout(false);
@@ -343,7 +359,6 @@
         public CustomControls.FlatComboBox groupingTypeComboBox;
         private System.Windows.Forms.Label divisionTypeLabel;
         public CustomControls.FlatComboBox memoryTypeComboBox;
-        private System.Windows.Forms.Label memoryTypeLabel;
         private System.Windows.Forms.Label PlaceholdersLabel;
         public System.Windows.Forms.Button fcConfigButton;
         public System.Windows.Forms.Button dbConfigButton;
@@ -352,16 +367,18 @@
         public System.Windows.Forms.Button segmentNameConfigButton;
         private System.Windows.Forms.FlowLayoutPanel configButtonPanel;
         private System.Windows.Forms.MenuStrip TopMenuStrip;
-        private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem loadToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem fileMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveAsMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem loadMenuItem;
         private System.Windows.Forms.TableLayoutPanel TopTableLayoutPanel;
-        private System.Windows.Forms.ToolStripMenuItem importExportToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem exportXMLToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem importExcelToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem preferencesToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem importSuggestionsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem importExportMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exportXMLMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem importExcelMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem preferencesMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem importSuggestionsMenuItem;
         private System.Windows.Forms.SplitContainer GridsSplitContainer;
+        public Label groupingTypeLabel;
+        public Label memoryTypeLabel;
     }
 }

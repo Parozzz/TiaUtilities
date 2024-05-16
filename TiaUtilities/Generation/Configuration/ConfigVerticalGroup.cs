@@ -96,7 +96,7 @@ namespace TiaUtilities.Generation.Configuration
                 AutoSizeMode = AutoSizeMode.GrowAndShrink,
                 Dock = DockStyle.Fill,
                 ColumnCount = 1,
-                ColumnStyles = { new ColumnStyle(SizeType.AutoSize) },
+                ColumnStyles = { new ColumnStyle(SizeType.Percent, 50f) },
                 RowCount = 1,
                 RowStyles = { new RowStyle(SizeType.Percent, 50f) },
                 Margin = new Padding(0),
@@ -178,7 +178,8 @@ namespace TiaUtilities.Generation.Configuration
             }
             else
             {
-                return configObject.GetControl();
+                var control = configObject.GetControl();
+                return control == null ? null : CreateSingleControlPanel(control);
             }
         }
     }

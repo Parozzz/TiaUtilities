@@ -11,7 +11,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
 {
     public class IOGenerationExcelImportData : IGridData<IOGenerationExcelImportSettings>
     {
-        public static int COLUMN_COUNT = 0;
+        private readonly static int COLUMN_COUNT = 0;
         //THESE IS THE ORDER IN WHICH THEY APPEAR!
         public static readonly GridDataColumn ADDRESS;
         public static readonly GridDataColumn IO_NAME;

@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using TiaUtilities.Utility;
 
 namespace TiaXmlReader.Generation.GridHandler.CustomColumns
 {
@@ -18,19 +20,18 @@ namespace TiaXmlReader.Generation.GridHandler.CustomColumns
 
             public MyDropDown(int width, int height)
             {
-                ShowImageMargin = ShowCheckMargin = false;
-                RenderMode = ToolStripRenderMode.System;
-                MaximumSize = new Size(width, height);
-                AllowTransparency = true;
-                AutoClose = false;
-                ShowItemToolTips = false; // I don't need it. Sometimes ghost tool tips remain after clicking item.
-                CanOverflow = true;
-
-                typeof(MyDropDown).InvokeMember("DoubleBuffered", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty, null, this, new object[] { true });
+                this.ShowImageMargin = ShowCheckMargin = false;
+                this.RenderMode = ToolStripRenderMode.Professional;
+                this.LayoutStyle = ToolStripLayoutStyle.VerticalStackWithOverflow;
+                this.MaximumSize = new Size(width, height);
+                this.AllowTransparency = true;
+                this.AutoClose = false;
+                this.ShowItemToolTips = false; // I don't need it. Sometimes ghost tool tips remain after clicking item.
+                this.CanOverflow = false;
+                this.DoubleBuffered = true;
             }
         }
 
-        
 
         private readonly DataGridViewCellCancelEventHandler cellBeginEditEvent;
         private readonly DataGridViewCellEventHandler cellEndEditEvent;
@@ -38,10 +39,10 @@ namespace TiaXmlReader.Generation.GridHandler.CustomColumns
 
         private readonly EventHandler editingControlTextChangedEvent;
 
-        private ToolStripDropDown dropDown;
-        private Func<string[]> GetItemsFunc;
+        private ToolStripDropDown? dropDown;
+        private Func<string[]>? GetItemsFunc;
 
-        private DataGridViewTextBoxEditingControl editingControl;
+        private DataGridViewTextBoxEditingControl? editingControl;
         private bool inEditMode;
 
         public SuggestionTextBoxColumn()
@@ -74,6 +75,11 @@ namespace TiaXmlReader.Generation.GridHandler.CustomColumns
 
         private void CellBeginEditEvent(object? sender, DataGridViewCellCancelEventArgs args)
         {
+            if (sender is DataGridView == false)
+            {
+                return;
+            }
+
             var dataGridView = (DataGridView)sender;
             if (args.RowIndex < 0 || args.ColumnIndex < 0 || dataGridView.Columns[args.ColumnIndex] != this || GetItemsFunc == null)
             {
@@ -101,9 +107,28 @@ namespace TiaXmlReader.Generation.GridHandler.CustomColumns
 
             dropDown = new MyDropDown(cell.Size.Width, height);
             dropDown.Items.AddRange(items.Select(i => new ToolStripMenuItem() { Text = i }).ToArray()); //THIS IS WAAAAY FASTER! Without AddRange is super slow.
+            dropDown.KeyDown += (sender1, args1) =>
+            {//This is cool. If i start tipying again i want to trasnfer to the editing control so the mouse is not needed!
+                if (this.editingControl == null || this.editingControl.Focused)
+                {
+                    return;
+                }
+
+                if (args1.KeyData == Keys.Enter || args1.KeyData == Keys.Up || args1.KeyData == Keys.Down)
+                {
+                    return;
+                }
+
+                args1.Handled = true;
+
+                this.editingControl.FindForm()?.Focus();
+                this.editingControl.Focus();
+                //This trasfer the key data from the DropDown to the editing control.
+                DllImports.PostMessage(this.editingControl.Handle, DllImports.WM_KEYDOWN, (int)args1.KeyData, 0);
+            };
             dropDown.ItemClicked += (sender1, args1) =>
             {
-                if (editingControl == null)
+                if (editingControl == null || this.DataGridView == null || args1.ClickedItem == null)
                 {
                     return;
                 }
@@ -134,24 +159,33 @@ namespace TiaXmlReader.Generation.GridHandler.CustomColumns
 
         public bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            if (editingControl == null || dropDown == null || !inEditMode || (keyData != Keys.Up && keyData != Keys.Down))
+            if (editingControl == null || dropDown == null || !inEditMode)
             {
                 return false;
             }
 
-            //DropDown already support scrolling with arrows! This will focus it to enable it.
-            var focused = dropDown.Focused;
-            dropDown.Focus();
-            if (!focused) //This will avoid that the first arrow sent is skipped!
+            if (keyData == Keys.Up || keyData == Keys.Down)
             {
-                SendKeys.SendWait(keyData == Keys.Up ? "{UP}" : "{DOWN}");
+                //DropDown already support scrolling with arrows! This will focus it to enable it.
+                var focused = dropDown.Focused;
+                dropDown.Focus();
+                if (!focused) //This will avoid that the first arrow sent is skipped!
+                {
+                    SendKeys.SendWait(keyData == Keys.Up ? "{UP}" : "{DOWN}");
+                }
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         private void EditingControlShowingEvent(object? sender, DataGridViewEditingControlShowingEventArgs args)
         {
+            if(sender is DataGridView == false)
+            {
+                return;
+            }
+
             var dataGridView = (DataGridView)sender;
             if (dropDown == null || !inEditMode)
             {
@@ -162,15 +196,17 @@ namespace TiaXmlReader.Generation.GridHandler.CustomColumns
             {
                 this.editingControl = editingControl;
 
-                /* TEST EHEHEHEH
-                var btn = new Button();
-                btn.Padding = new Padding(0);
-                btn.Margin = new Padding(0);
-                btn.AutoSize = true;
-                btn.Text = "";
-                btn.Width = editingControl.Width / 5;
-                btn.Height = editingControl.Height;
-                btn.Dock = DockStyle.Right;
+                // TEST EHEHEHEH
+                /*var btn = new Button
+                {
+                    Padding = new Padding(0),
+                    Margin = new Padding(0),
+                    AutoSize = true,
+                    Text = "...",
+                    Width = editingControl.Width / 5,
+                    Height = editingControl.Height,
+                    Dock = DockStyle.Right
+                };
                 editingControl.Controls.Add(btn);
                 */
                 this.UpdateVisibileSuggestions();
@@ -193,14 +229,21 @@ namespace TiaXmlReader.Generation.GridHandler.CustomColumns
 
             this.dropDown.SuspendLayout(); //Without this is unusable. Cursor blink and is SLLLLLOOOOOOWWWW.
 
-            var text = editingControl.Text.ToLower();
+            int visibleItemCount = 0;
+
+            var text = editingControl.Text;
             foreach (ToolStripItem item in dropDown.Items)
             {
-                var lowerCaseItemText = item.Text.ToLower();
-                item.Visible = lowerCaseItemText.Contains(text) && !lowerCaseItemText.Equals(text);
+                var itemText = item.Text;
+                item.Visible = text != null && itemText != null && itemText.Contains(text, StringComparison.OrdinalIgnoreCase);// && !itemText.Equals(text, StringComparison.OrdinalIgnoreCase);
+                if (item.Visible)
+                {
+                    visibleItemCount++;
+                }
             }
 
-            this.dropDown.ResumeLayout();
+            this.dropDown.MinimumSize = new Size(0, visibleItemCount <= 6 ? 25 * visibleItemCount : 0); //If there too little elements, they are not displayed correctly. This fixes it.
+            this.dropDown.ResumeLayout(true);
         }
     }
 }

@@ -12,6 +12,8 @@ using Jint;
 using TiaXmlReader.Javascript;
 using Timer = System.Windows.Forms.Timer;
 using TiaUtilities.Generation.Configuration.Utility;
+using InfoBox;
+using TiaXmlReader.Languages;
 
 namespace TiaXmlReader
 {
@@ -28,7 +30,7 @@ namespace TiaXmlReader
             this.programSettings = ProgramSettings.Load();
             this.programSettings.Save(); //To create file if not exist!
 
-            this.autoSaveHandler = new TimedSaveHandler(programSettings, this.autoSaveComboBox.ComboBox);
+            this.autoSaveHandler = new TimedSaveHandler(programSettings);
             this.jsErrorHandlingThread = new JavascriptErrorReportThread();
 
             Init();
@@ -44,13 +46,28 @@ namespace TiaXmlReader
 
             tiaVersionComboBox.Text = "" + programSettings.lastTIAVersion;
 
-            this.languageComboBox.Items.AddRange(new string[] { "it-IT", "en-US" });
-            this.languageComboBox.TextChanged += (object sender, EventArgs args) =>
+            var ignoreLanguageBoxAtStartup = true;
+
+            this.languageComboBox.Items.AddRange(["it-IT", "en-US"]);
+            this.languageComboBox.TextChanged += (sender, args) =>
             {
                 try
                 {
                     var culture = CultureInfo.GetCultureInfo(this.languageComboBox.Text);
                     LocalizationVariables.LANG = programSettings.ietfLanguage = culture.IetfLanguageTag;
+
+                    if (ignoreLanguageBoxAtStartup)
+                    {
+                        return;
+                    }
+
+                    //This should stay always in english. In case someone set an unkown language, this will be neautral.
+                    var result = InformationBox.Show("Do you want to restart application?", "Restart to change language", buttons: InformationBoxButtons.YesNo);
+                    if (result == InformationBoxResult.Yes)
+                    {
+                        Application.Restart();
+                        Environment.Exit(0);
+                    }
                 }
                 catch (CultureNotFoundException ex)
                 {
@@ -60,8 +77,17 @@ namespace TiaXmlReader
             };
             this.languageComboBox.Text = programSettings.ietfLanguage; //Call this after so the text changed event changes the system lang.
 
+            ignoreLanguageBoxAtStartup = false;
+
             #region SETTINGS_SAVE_TICK + AUTO_SAVE
-            this.autoSaveHandler.Start();
+            this.autoSaveTimeTextBox.TextChanged += (sender, args) =>
+            {
+                if (int.TryParse(autoSaveTimeTextBox.Text, out int time))
+                {
+                    this.autoSaveHandler.SetIntervalAndStart(time);
+                }
+            };
+            this.autoSaveTimeTextBox.Text = "" + programSettings.TimedSaveTime; //Call this after so it start auto save
 
             var settingsWrapper = new AutoSaveSettingsWrapper(this.programSettings);
             settingsWrapper.Scan();
@@ -76,6 +102,23 @@ namespace TiaXmlReader
                 }
             };
             #endregion
+
+            Translate();
+        }
+
+        private void Translate()
+        {
+            this.Text = Localization.Get("MAIN_FORM");
+
+            this.fileToolStripMenuItem.Text = Localization.Get("GENERICS_FILE");
+            this.autoSaveMenuItem.Text = Localization.Get("MAIN_FORM_TOP_FILE_AUTO_SAVE");
+
+            this.dbDuplicationMenuItem.Text = Localization.Get("MAIN_FORM_TOP_DB_DUPLICATION");
+            this.generateIOMenuItem.Text = Localization.Get("MAIN_FORM_TOP_IO_GENERATION");
+            this.generateAlarmsMenuItem.Text = Localization.Get("MAIN_FORM_TOP_ALARM_GENERATOR");
+
+            this.tiaVersionLabel.Text = Localization.Get("MAIN_FORM_TIA_VERSION");
+            this.languageLabel.Text = Localization.Get("MAIN_FORM_LANGUAGE");
         }
 
         private void TiaVersionComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -157,7 +200,7 @@ namespace TiaXmlReader
             };
 
             var mainGroup = configForm.Init();
-            mainGroup.AddJavascript().LabelText("Espressione").Height(300)
+            mainGroup.AddJavascript().Label("Espressione").Height(300)
                   .ControlText(JS)
                   .TextChanged(str => JS = str);
 

@@ -3,6 +3,7 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using TiaUtilities.Generation.Configuration.Lines;
+using TiaXmlReader.Languages;
 
 namespace TiaXmlReader.Generation.Configuration
 {
@@ -22,9 +23,15 @@ namespace TiaXmlReader.Generation.Configuration
             return (LINE)this;
         }
 
-        public LINE LabelText(string labelText)
+        public LINE Label(string labelText)
         {
             this.labelText = labelText;
+            return (LINE)this;
+        }
+
+        public LINE LocalizedLabel(string jsonKey, string append = "")
+        {
+            this.labelText = Localization.Get(jsonKey, append);
             return (LINE)this;
         }
 

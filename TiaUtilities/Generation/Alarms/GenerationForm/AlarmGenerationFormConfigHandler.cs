@@ -3,6 +3,7 @@ using System.Windows.Forms;
 using TiaUtilities.Generation.Configuration.Utility;
 using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Generation.GridHandler;
+using TiaXmlReader.Languages;
 
 namespace TiaXmlReader.Generation.Alarms.GenerationForm
 {
@@ -35,18 +36,18 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
 
             form.fcConfigButton.Click += (sender, args) =>
             {
-                var configForm = new ConfigForm("FC");
+                var configForm = new ConfigForm(Localization.Get("ALARM_CONFIG_FC"));
 
                 var mainGroup = configForm.Init();
-                mainGroup.AddTextBox().LabelText("Nome")
+                mainGroup.AddTextBox().LocalizedLabel("GENERICS_NAME")
                     .ControlText(config.FCBlockName)
                     .TextChanged(v => config.FCBlockName = v);
 
-                mainGroup.AddTextBox().LabelText("Numero")
+                mainGroup.AddTextBox().LocalizedLabel("GENERICS_NUMBER")
                     .ControlText(config.FCBlockNumber)
                     .UIntChanged(v => config.FCBlockNumber = v);
 
-                mainGroup.AddCheckBox().LabelText("Genera prima bobina")
+                mainGroup.AddCheckBox().LocalizedLabel("ALARM_CONFIG_FC_COIL_FIRST")
                     .Value(config.CoilFirst)
                     .CheckedChanged(v => config.CoilFirst = v);
 
@@ -55,22 +56,22 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
 
             form.alarmGenerationConfigButton.Click += (sender, args) =>
             {
-                var configForm = new ConfigForm("Generazione Allarmi");
+                var configForm = new ConfigForm(Localization.Get("ALARM_CONFIG_GENERATION"));
 
                 var mainGroup = configForm.Init();
-                mainGroup.AddTextBox().LabelText("Num. Partenza")
+                mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_GENERATION_START_NUM")
                      .ControlText(config.StartingAlarmNum)
                      .UIntChanged(v => config.StartingAlarmNum = v);
 
-                mainGroup.AddTextBox().LabelText("Formato")
+                mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_GENERATION_FORMAT")
                      .ControlText(config.AlarmNumFormat)
                      .TextChanged(v => config.AlarmNumFormat = v);
 
-                mainGroup.AddTextBox().LabelText("Anti-Slittamento")
+                mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_GENERATION_ANTI_SLIP")
                      .ControlText(config.AntiSlipNumber)
                      .UIntChanged(v => config.AntiSlipNumber = v);
 
-                mainGroup.AddTextBox().LabelText("Salta a fine gruppo")
+                mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_GENERATION_SKIP")
                      .ControlText(config.SkipNumberAfterGroup)
                      .UIntChanged(v => config.SkipNumberAfterGroup = v);
 
@@ -79,31 +80,36 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
 
             form.emptyAlarmGenerationConfigButton.Click += (sender, args) =>
             {
-                var configForm = new ConfigForm("Generazione Allarmi Vuoti");
+                var configForm = new ConfigForm(Localization.Get("ALARM_CONFIG_GENERATION_EMPTY")) { ControlWidth = 200 };
 
                 var mainGroup = configForm.Init();
-                mainGroup.AddCheckBox().LabelText("Genera in anti-slittamento")
+                mainGroup.AddCheckBox().LocalizedLabel("ALARM_CONFIG_GENERATION_EMPTY_ANTI_SLIP")
                      .Value(config.GenerateEmptyAlarmAntiSlip)
                      .CheckedChanged(v => config.GenerateEmptyAlarmAntiSlip = v);
 
-                mainGroup.AddTextBox().LabelText("Num. alla fine")
+                mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_GENERATION_EMPTY_NUM")
                      .ControlText(config.EmptyAlarmAtEnd)
                      .UIntChanged(v => config.EmptyAlarmAtEnd = v);
 
-                mainGroup.AddTextBox().LabelText("Indirizzo allarme")
+                mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_GENERATION_EMPTY_ALARM_ADDRESS")
                      .ControlText(config.EmptyAlarmContactAddress)
                      .TextChanged(v => config.EmptyAlarmContactAddress = v);
 
-                mainGroup.AddTextBox().LabelText("Indirizzo timer")
+
+                var timerGroup = mainGroup.AddGroup().ControlWidth(150).NoAdapt();
+
+                timerGroup.AddLabel().LocalizedLabel("ALARM_CONFIG_GENERATION_EMPTY_TIMER");
+
+                timerGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_GENERATION_EMPTY_TIMER_ADDRESS")
                      .ControlText(config.EmptyAlarmTimerAddress)
                      .TextChanged(v => config.EmptyAlarmTimerAddress = v);
 
-                mainGroup.AddComboBox().LabelText("Tipo timer")
-                     .Items(new string[] { "TON", "TOF" })
+                timerGroup.AddComboBox().LocalizedLabel("ALARM_CONFIG_GENERATION_EMPTY_TIMER_TYPE")
+                     .Items([ "TON", "TOF" ]).DisableEdit()
                      .ControlText(config.EmptyAlarmTimerType)
                      .TextChanged(v => config.EmptyAlarmTimerType = v);
 
-                mainGroup.AddTextBox().LabelText("Valore timer")
+                timerGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_GENERATION_EMPTY_TIMER_VALUE")
                      .ControlText(config.EmptyAlarmTimerValue)
                      .TextChanged(v => config.EmptyAlarmTimerValue = v);
 
@@ -112,27 +118,31 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
 
             form.fieldDefaultValueConfigButton.Click += (sender, args) =>
             {
-                var configForm = new ConfigForm("Valori default campi");
+                var configForm = new ConfigForm(Localization.Get("ALARM_CONFIG_DEFAULTS"));
 
                 var mainGroup = configForm.Init();
-                mainGroup.AddTextBox().LabelText("Bobina")
+                mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_DEFAULTS_COIL")
                      .ControlText(config.DefaultCoilAddress)
                      .TextChanged(v => config.DefaultCoilAddress = v);
 
-                mainGroup.AddTextBox().LabelText("Set")
+                mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_DEFAULTS_SET_COIL")
                      .ControlText(config.DefaultSetCoilAddress)
                      .TextChanged(v => config.DefaultSetCoilAddress = v);
 
-                mainGroup.AddTextBox().LabelText("Timer")
+                var timerGroup = mainGroup.AddGroup().ControlWidth(150).NoAdapt();
+
+                timerGroup.AddLabel().LocalizedLabel("ALARM_CONFIG_DEFAULTS_TIMER");
+
+                timerGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_DEFAULTS_TIMER_ADDRESS")
                      .ControlText(config.DefaultTimerAddress)
                      .TextChanged(v => config.DefaultTimerAddress = v);
 
-                mainGroup.AddComboBox().LabelText("Timer tipo")
+                timerGroup.AddComboBox().LocalizedLabel("ALARM_CONFIG_DEFAULTS_TIMER_TYPE")
+                     .Items(["TON", "TOF"]).DisableEdit()
                      .ControlText(config.DefaultTimerType)
-                     .Items(new string[] { "TON", "TOF" })
                      .TextChanged(v => config.DefaultTimerType = v);
 
-                mainGroup.AddTextBox().LabelText("Timer valore")
+                timerGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_DEFAULTS_TIMER_VALUE")
                      .ControlText(config.DefaultTimerValue)
                      .TextChanged(v => config.DefaultTimerValue = v);
 
@@ -144,19 +154,19 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
                 var configForm = new ConfigForm("Prefissi campi");
 
                 var mainGroup = configForm.Init();
-                mainGroup.AddTextBox().LabelText("Indirizzo allarme")
+                mainGroup.AddTextBox().Label("Indirizzo allarme")
                      .ControlText(config.AlarmAddressPrefix)
                      .TextChanged(v => config.AlarmAddressPrefix = v);
 
-                mainGroup.AddTextBox().LabelText("Indirizzo bobina")
+                mainGroup.AddTextBox().Label("Indirizzo bobina")
                      .ControlText(config.CoilAddressPrefix)
                      .TextChanged(v => config.CoilAddressPrefix = v);
 
-                mainGroup.AddTextBox().LabelText("Indirizzo set")
+                mainGroup.AddTextBox().Label("Indirizzo set")
                      .ControlText(config.SetCoilAddressPrefix)
                      .TextChanged(v => config.SetCoilAddressPrefix = v);
 
-                mainGroup.AddTextBox().LabelText("Indirizzo timer")
+                mainGroup.AddTextBox().Label("Indirizzo timer")
                      .ControlText(config.TimerAddressPrefix)
                      .TextChanged(v => config.TimerAddressPrefix = v);
 
@@ -171,19 +181,19 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
                 };
 
                 var mainGroup = configForm.Init();
-                mainGroup.AddTextBox().LabelText("Uno per segmento")
+                mainGroup.AddTextBox().Label("Uno per segmento")
                      .ControlText(config.OneEachSegmentName)
                      .TextChanged(v => config.OneEachSegmentName = v);
 
-                mainGroup.AddTextBox().LabelText("Uno per segmento (Vuoti)")
+                mainGroup.AddTextBox().Label("Uno per segmento (Vuoti)")
                      .ControlText(config.OneEachEmptyAlarmSegmentName)
                      .TextChanged(v => config.OneEachEmptyAlarmSegmentName = v);
 
-                mainGroup.AddTextBox().LabelText("Gruppo per segmento")
+                mainGroup.AddTextBox().Label("Gruppo per segmento")
                      .ControlText(config.GroupSegmentName)
                      .TextChanged(v => config.GroupSegmentName = v);
 
-                mainGroup.AddTextBox().LabelText("Gruppo per segmento (Vuoti)")
+                mainGroup.AddTextBox().Label("Gruppo per segmento (Vuoti)")
                      .ControlText(config.GroupEmptyAlarmSegmentName)
                      .TextChanged(v => config.GroupEmptyAlarmSegmentName = v);
 
@@ -195,11 +205,11 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
                 var configForm = new ConfigForm("Lista testi allarmi");
 
                 var mainGroup = configForm.Init();
-                mainGroup.AddTextBox().LabelText("Testo allarme")
+                mainGroup.AddTextBox().Label("Testo allarme")
                      .ControlText(config.AlarmTextInList)
                      .TextChanged(v => config.AlarmTextInList = v);
 
-                mainGroup.AddTextBox().LabelText("Testo allarme vuoto")
+                mainGroup.AddTextBox().Label("Testo allarme vuoto")
                      .ControlText(config.EmptyAlarmTextInList)
                      .TextChanged(v => config.EmptyAlarmTextInList = v);
 

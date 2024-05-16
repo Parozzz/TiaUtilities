@@ -44,6 +44,12 @@ namespace TiaUtilities.Generation.Configuration.Lines
             }
         }
 
+        public ConfigComboBoxLine DisableEdit()
+        {
+            this.control.DropDownStyle = ComboBoxStyle.DropDownList;
+            return this;
+        }
+
         public ConfigComboBoxLine Items(object[] items)
         {
             control.Items.AddRange(items);

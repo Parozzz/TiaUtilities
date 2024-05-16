@@ -22,7 +22,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
         public static string DEFAULT_FILE_PATH = Directory.GetCurrentDirectory() + @"\tempIOSave." + EXTENSION;
 
         [JsonProperty] public Dictionary<int, IOData> RowDict { get; set; } = new Dictionary<int, IOData>();
-        [JsonProperty] public Dictionary<int, IOSuggestion> SuggestionRowDict = new Dictionary<int, IOSuggestion>();
+        [JsonProperty] public Dictionary<int, IOSuggestionData> SuggestionRowDict = new Dictionary<int, IOSuggestionData>();
         public IOGenerationProjectSave()
         {
 
@@ -30,10 +30,10 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
 
         public static IOGenerationProjectSave Load(ref string filePath)
         {
-            return GenerationUtils.Load(ref filePath, EXTENSION, out IOGenerationProjectSave projectSave) ? projectSave : new IOGenerationProjectSave();
+            return GenerationUtils.Load(ref filePath, EXTENSION, out IOGenerationProjectSave? projectSave) && projectSave != null ? projectSave : new IOGenerationProjectSave();
         }
 
-        public bool Save(ref string filePath, bool showFileDialog = false)
+        public bool Save(ref string? filePath, bool showFileDialog = false)
         {
             return GenerationUtils.Save(this, ref filePath, EXTENSION, showFileDialog);
         }

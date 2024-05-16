@@ -5,6 +5,7 @@ using Jint;
 using ClosedXML.Excel;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using FastColoredTextBoxNS;
+using TiaXmlReader.Languages;
 
 namespace TiaXmlReader
 {

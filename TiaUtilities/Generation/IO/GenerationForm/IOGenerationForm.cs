@@ -1,12 +1,7 @@
 ﻿
 using Microsoft.WindowsAPICodePack.Dialogs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
-using TiaXmlReader.Localization;
+using TiaXmlReader.Languages;
 using TiaXmlReader.Utility;
-using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter;
 using TiaXmlReader.AutoSave;
@@ -15,11 +10,7 @@ using TiaXmlReader.Generation.GridHandler.CustomColumns;
 using TiaXmlReader.SimaticML;
 using TiaXmlReader.SimaticML.Blocks;
 using InfoBox;
-using System.Diagnostics;
 using TiaXmlReader.SimaticML.TagTable;
-using System.IO;
-using System.Drawing;
-using System.ComponentModel;
 
 namespace TiaXmlReader.Generation.IO.GenerationForm
 {
@@ -33,11 +24,9 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
 
         private readonly GridSettings gridSettings;
         private readonly GridHandler<IOConfiguration, IOData> ioGridHandler;
-        private readonly GridHandler<IOConfiguration, IOSuggestion> suggestionGridHandler;
+        private readonly GridHandler<IOConfiguration, IOSuggestionData> suggestionGridHandler;
 
         private readonly IOGenerationFormConfigHandler configHandler;
-
-        //private readonly List<string> variableSuggestionList;
         private readonly SuggestionTextBoxColumn variableAddressColumn;
 
         private IOGenerationExcelImportSettings ExcelImportConfig { get => settings.ExcelImportConfiguration; }
@@ -55,15 +44,8 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             this.settings = settings;
             this.gridSettings = gridSettings;
 
-            this.ioGridHandler = new GridHandler<IOConfiguration, IOData>(jsErrorHandlingThread, gridSettings, IOConfig, new IOGenerationComparer())
-            {
-                RowCount = 2999
-            };
-
-            this.suggestionGridHandler = new GridHandler<IOConfiguration, IOSuggestion>(jsErrorHandlingThread, gridSettings, IOConfig)
-            {
-                RowCount = 1999,
-            };
+            this.ioGridHandler = new GridHandler<IOConfiguration, IOData>(jsErrorHandlingThread, gridSettings, IOConfig, new IOGenerationComparer()) { RowCount = 2999 };
+            this.suggestionGridHandler = new GridHandler<IOConfiguration, IOSuggestionData>(jsErrorHandlingThread, gridSettings, IOConfig) { RowCount = 1999, };
 
             this.configHandler = new IOGenerationFormConfigHandler(this, this.IOConfig, this.ioGridHandler);
             this.variableAddressColumn = new SuggestionTextBoxColumn();
@@ -106,10 +88,10 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             this.GridsSplitContainer.Panel2.Controls.Add(this.ioGridHandler.DataGridView);
 
             #region TopMenu
-            this.saveToolStripMenuItem.Click += (object sender, EventArgs args) => { this.ProjectSave(); };
-            this.saveAsToolStripMenuItem.Click += (object sender, EventArgs args) => { this.ProjectSave(true); };
-            this.loadToolStripMenuItem.Click += (object sender, EventArgs args) => { this.ProjectLoad(); };
-            this.exportXMLToolStripMenuItem.Click += (object sender, EventArgs args) =>
+            this.saveMenuItem.Click += (sender, args) => { this.ProjectSave(); };
+            this.saveAsMenuItem.Click += (sender, args) => { this.ProjectSave(true); };
+            this.loadMenuItem.Click += (sender, args) => { this.ProjectLoad(); };
+            this.exportXMLMenuItem.Click += (sender, args) =>
             {
                 try
                 {
@@ -135,7 +117,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                     Utils.ShowExceptionMessage(ex);
                 }
             };
-            this.importExcelToolStripMenuItem.Click += (object sender, EventArgs args) =>
+            this.importExcelMenuItem.Click += (sender, args) =>
             {
                 var excelImportForm = new IOGenerationExcelImportForm(this.jsErrorHandlingThread, this.ExcelImportConfig, this.gridSettings);
 
@@ -164,7 +146,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                 }
             };
 
-            this.importSuggestionsToolStripMenuItem.Click += (sender, args) =>
+            this.importSuggestionsMenuItem.Click += (sender, args) =>
             {
                 var fileDialog = new CommonOpenFileDialog
                 {
@@ -188,14 +170,14 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                         var xmlNodeConfiguration = SimaticMLParser.ParseFile(filePath);
                         if (xmlNodeConfiguration is BlockGlobalDB globalDB)
                         {
-                            var suggestionEnumerable = globalDB.GetAllMemberAddress().Select(v => new IOSuggestion() { Value = v });
+                            var suggestionEnumerable = globalDB.GetAllMemberAddress().Select(v => new IOSuggestionData() { Value = v });
                             this.suggestionGridHandler.AddData(suggestionEnumerable);
 
                         }
                         else if (xmlNodeConfiguration is XMLTagTable tagTable)
                         {
                             var suggestionEnumerable = tagTable.GetTags().Values.Select(t => t.GetTagName())
-                                                                                .Select(n => new IOSuggestion() { Value = n });
+                                                                                .Select(n => new IOSuggestionData() { Value = n });
                             this.suggestionGridHandler.AddData(suggestionEnumerable);
                         }
                         else
@@ -209,7 +191,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
 
             };
 
-            this.preferencesToolStripMenuItem.Click += (object sender, EventArgs args) => this.gridSettings.ShowConfigForm(this);
+            this.preferencesMenuItem.Click += (sender, args) => this.gridSettings.ShowConfigForm(this);
             #endregion
 
             #region MemoryType ComboBox
@@ -264,7 +246,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             this.ioGridHandler.AddTextBoxColumn(IOData.MERKER_ADDRESS, MERKER_ADDRESS_COLUMN_SIZE);
             this.ioGridHandler.AddTextBoxColumn(IOData.COMMENT, 0);
 
-            this.suggestionGridHandler.AddTextBoxColumn(IOSuggestion.VALUE, 0);
+            this.suggestionGridHandler.AddTextBoxColumn(IOSuggestionData.VALUE, 0);
             #endregion
 
 
@@ -306,6 +288,26 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             #endregion
 
             UpdateConfigPanel();
+            Translate();
+        }
+
+        private void Translate()
+        {
+            this.Text = Localization.Get("IO_GEN_FORM");
+
+            this.fileMenuItem.Text = Localization.Get("GENERICS_FILE");
+            this.saveMenuItem.Text = Localization.Get("GENERICS_SAVE");
+            this.saveAsMenuItem.Text = Localization.Get("GENERICS_SAVE_AS");
+            this.loadMenuItem.Text = Localization.Get("GENERICS_LOAD");
+
+            this.importExportMenuItem.Text = Localization.Get("IO_GEN_FORM_IMPEXP");
+            this.importExcelMenuItem.Text = Localization.Get("IO_GEN_FORM_IMPEXP_IMPORT_EXCEL");
+            this.exportXMLMenuItem.Text = Localization.Get("IO_GEN_FORM_IMPEXP_EXPORT_XML");
+            this.importSuggestionsMenuItem.Text = Localization.Get("IO_GEN_FORM_IMPEXP_IMPORT_SUGGESTION");
+
+            this.preferencesMenuItem.Text = Localization.Get("GRID_PREFERENCES");
+
+            this.configHandler.Translate();
         }
 
         public void ProjectSave(bool saveAs = false)
@@ -322,7 +324,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             }
 
             var saveOK = projectSave.Save(ref lastFilePath, saveAs || !File.Exists(lastFilePath));
-            this.Text = this.Name + (saveOK ? ". Project File: " + lastFilePath : "");
+            this.Text = Localization.Get("IO_GEN_FORM") + (saveOK ? ". Project File: " + lastFilePath : "");
         }
 
         public void ProjectLoad()
@@ -365,7 +367,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                 this.ioGridHandler.DataGridView.ResumeLayout();
                 this.suggestionGridHandler.DataGridView.ResumeLayout();
 
-                this.Text = this.Name + ". Project File: " + lastFilePath;
+                this.Text = Localization.Get("IO_GEN_FORM") + ". Project File: " + lastFilePath;
             }
         }
 
@@ -433,7 +435,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
 
             foreach (DataGridViewRow row in this.suggestionGridHandler.DataGridView.Rows)
             {
-                var cell = row.Cells[IOSuggestion.VALUE.ColumnIndex];
+                var cell = row.Cells[IOSuggestionData.VALUE.ColumnIndex];
                 cell.ToolTipText = "";
                 cell.Style.BackColor = SystemColors.ControlLightLight;
                 cell.Style.SelectionBackColor = Color.LightGray;
@@ -455,7 +457,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                         .Select(x => (x.Value + 1) + ") " + x.Key.Address + " - " + x.Key.IOName + " - " + x.Key.Comment)
                         .Aggregate((a, b) => a + '\n' + b);
 
-                    var cell = this.suggestionGridHandler.DataGridView.Rows[row].Cells[IOSuggestion.VALUE.ColumnIndex];
+                    var cell = this.suggestionGridHandler.DataGridView.Rows[row].Cells[IOSuggestionData.VALUE.ColumnIndex];
                     cell.ToolTipText = tooltipText;
                     cell.Style.BackColor = cell.Style.SelectionBackColor = Color.LightGreen;
                 }

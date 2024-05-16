@@ -34,7 +34,7 @@ namespace TiaXmlReader.Generation
             }
         }
 
-        public static bool Save(object obj, ref string filePath, string extension, bool showFileDialog = false)
+        public static bool Save(object obj, ref string? filePath, string extension, bool showFileDialog = false)
         {
             try
             {
@@ -72,14 +72,10 @@ namespace TiaXmlReader.Generation
                 serializer.DefaultValueHandling = DefaultValueHandling.Include;
                 serializer.Formatting = Formatting.Indented;
 
-                using (var sw = new StreamWriter(filePath))
-                {
-                    using (var writer = new JsonTextWriter(sw))
-                    {
-                        serializer.Serialize(writer, obj);
-                        writer.Flush();
-                    }
-                }
+                using var sw = new StreamWriter(filePath);
+                using var writer = new JsonTextWriter(sw);
+                serializer.Serialize(writer, obj);
+                writer.Flush();
 
                 return true;
             }
@@ -91,7 +87,7 @@ namespace TiaXmlReader.Generation
             return false;
         }
 
-        public static bool Load<C>(ref string filePath, string extension, out C loaded, bool showFileDialog = true)
+        public static bool Load<C>(ref string filePath, string extension, out C? loaded, bool showFileDialog = true)
         {
             loaded = default;
 
@@ -120,14 +116,10 @@ namespace TiaXmlReader.Generation
                 serializer.DefaultValueHandling = DefaultValueHandling.Include;
                 serializer.Formatting = Formatting.Indented;
 
-                using (var sr = new StreamReader(filePath))
-                {
-                    using (var reader = new JsonTextReader(sr))
-                    {
-                        loaded = serializer.Deserialize<C>(reader);
-                        return true;
-                    }
-                }
+                using var sr = new StreamReader(filePath);
+                using var reader = new JsonTextReader(sr);
+                loaded = serializer.Deserialize<C>(reader);
+                return true;
             }
             catch (Exception ex)
             {

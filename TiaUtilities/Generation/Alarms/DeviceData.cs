@@ -1,22 +1,13 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TiaXmlReader.Generation;
-using TiaXmlReader.Generation.IO;
-using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation.GridHandler.Data;
-using TiaXmlReader.Localization;
 using TiaXmlReader.Generation.Placeholders;
+using TiaXmlReader.Languages;
 
 namespace TiaXmlReader.Generation.Alarms
 {
     public class DeviceData : IGridData<AlarmConfiguration>
     {
-        public static int COLUMN_COUNT = 0;
+        private readonly static int COLUMN_COUNT = 0;
         //THESE IS THE ORDER IN WHICH THEY APPEAR!
         public static readonly GridDataColumn NAME;
         public static readonly GridDataColumn ADDRESS;

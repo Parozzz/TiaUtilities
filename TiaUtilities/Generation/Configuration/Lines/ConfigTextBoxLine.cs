@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -15,20 +16,20 @@ namespace TiaUtilities.Generation.Configuration.Lines
         private readonly TextBox control;
 
         private bool numericOnly;
-        private Action<string> textChangedAction;
-        private Action<uint> uintChangedAction;
+        private Action<string>? textChangedAction;
+        private Action<uint>? uintChangedAction;
 
         public ConfigTextBoxLine()
         {
-            control = new FlatTextBox()
+            this.control = new FlatTextBox()
             {
                 Margin = new Padding(0),
             };
-            control.TextChanged += TextChangedEventHandler;
-            control.KeyPress += KeyPressEventHandler;
+            this.control.TextChanged += TextChangedEventHandler;
+            this.control.KeyPress += KeyPressEventHandler;
         }
 
-        private void KeyPressEventHandler(object sender, KeyPressEventArgs args)
+        private void KeyPressEventHandler(object? sender, KeyPressEventArgs args)
         {
             if (numericOnly)
             {
@@ -36,9 +37,9 @@ namespace TiaUtilities.Generation.Configuration.Lines
             }
         }
 
-        private void TextChangedEventHandler(object sender, EventArgs args)
+        private void TextChangedEventHandler(object? sender, EventArgs args)
         {
-            var text = control.Text;
+            var text = this.control.Text;
             textChangedAction?.Invoke(text);
 
             if (uintChangedAction != null && uint.TryParse(text, out uint result))
@@ -49,14 +50,14 @@ namespace TiaUtilities.Generation.Configuration.Lines
 
         public ConfigTextBoxLine Readonly()
         {
-            control.ReadOnly = true;
+            this.control.ReadOnly = true;
             return this;
         }
 
         public ConfigTextBoxLine Multiline()
         {
-            control.Multiline = true;
-            control.ScrollBars = ScrollBars.Both;
+            this.control.Multiline = true;
+            this.control.ScrollBars = ScrollBars.Both;
             return this;
         }
         public ConfigTextBoxLine TextChanged(Action<string> action)
@@ -74,7 +75,7 @@ namespace TiaUtilities.Generation.Configuration.Lines
 
         public override Control GetControl()
         {
-            return control;
+            return this.control;
         }
     }
 }

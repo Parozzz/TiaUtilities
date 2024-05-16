@@ -57,15 +57,15 @@ namespace TiaXmlReader.Generation.GridHandler
 
             var mainGroup = configForm.Init();
             mainGroup.AddLabel()
-                .LabelText("Variables: " + showVariableEventArgs.VariableList.Aggregate((a, b) => a + ", " + b))
+                .Label("Variables: " + showVariableEventArgs.VariableList.Aggregate((a, b) => a + ", " + b))
                 .LabelFont(ConfigForm.LABEL_FONT.Copy(9f, FontStyle.Regular));
 
             var debugGroup = mainGroup.AddVerticalGroup().Height(150).SplitterDistance(95);
             this.logTextBoxLine = debugGroup.AddTextBox()
-                .LabelText("Log > " + ENGINE_LOG_FUNCTION + "(string)").LabelFont(ConfigForm.LABEL_FONT.Copy(9f, FontStyle.Regular)).LabelOnTop()
+                .Label("Log > " + ENGINE_LOG_FUNCTION + "(string)").LabelFont(ConfigForm.LABEL_FONT.Copy(9f, FontStyle.Regular)).LabelOnTop()
                 .Readonly().Multiline();
             this.jsonLine = debugGroup.AddJSON().Readonly()
-                .LabelText("Context Json").LabelFont(ConfigForm.LABEL_FONT.Copy(9f, FontStyle.Regular)).LabelOnTop();
+                .Label("Context Json").LabelFont(ConfigForm.LABEL_FONT.Copy(9f, FontStyle.Regular)).LabelOnTop();
 
 
             var loadScriptArgs = new GridScriptEventArgs();

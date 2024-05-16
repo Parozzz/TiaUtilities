@@ -1,32 +1,27 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TiaXmlReader.Generation.GridHandler.Data;
-using TiaXmlReader.Localization;
+using TiaXmlReader.Languages;
 
 namespace TiaXmlReader.Generation.IO.GenerationForm
 {
-    public class IOSuggestion : IGridData<IOConfiguration>
+    public class IOSuggestionData : IGridData<IOConfiguration>
     {
-        public static int COLUMN_COUNT = 0;
+        private readonly static int COLUMN_COUNT = 0;
         //THESE IS THE ORDER IN WHICH THEY APPEAR!
         public static readonly GridDataColumn VALUE;
         public static readonly IReadOnlyList<GridDataColumn> COLUMN_LIST;
 
-        static IOSuggestion()
+        static IOSuggestionData()
         {
-            var type = typeof(IOSuggestion);
-            VALUE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOSuggestion.Value), "suggestion");
+            var type = typeof(IOSuggestionData);
+            VALUE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOSuggestionData.Value), "suggestion");
 
             var columnList = GridDataColumn.GetStaticColumnList(type);
             columnList.Sort((x, y) => x.ColumnIndex.CompareTo(y.ColumnIndex));
             COLUMN_LIST = columnList.AsReadOnly();
         }
 
-        [JsonProperty][Localization("IO_SUGGESTION_VALUE")] public string? Value { get; set; }
+        [JsonProperty][Localization("IO_SUGGESTION_DATA_VALUE")] public string? Value { get; set; }
 
         public object? this[int column]
         {

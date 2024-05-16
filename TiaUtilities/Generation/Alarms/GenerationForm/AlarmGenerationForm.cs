@@ -1,15 +1,10 @@
 ﻿
 using Microsoft.WindowsAPICodePack.Dialogs;
-using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
-using TiaXmlReader.Localization;
+using TiaXmlReader.Languages;
 using TiaXmlReader.Utility;
-using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.AutoSave;
 using TiaXmlReader.Javascript;
-using System.IO;
 
 namespace TiaXmlReader.Generation.Alarms.GenerationForm
 {
@@ -25,7 +20,7 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
         private AlarmConfiguration AlarmConfig { get => settings.Configuration; }
 
         private string? lastFilePath;
-        private static readonly string[] items = new string[] { "TON", "TOF" };
+        private static readonly string[] items = ["TON", "TOF"];
 
         public AlarmGenerationForm(JavascriptErrorReportThread jsErrorHandlingThread, TimedSaveHandler autoSaveHandler, AlarmGenerationSettings settings, GridSettings gridSettings)
         {

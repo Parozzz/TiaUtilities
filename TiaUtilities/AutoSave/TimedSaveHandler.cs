@@ -2,28 +2,10 @@
 
 namespace TiaXmlReader.AutoSave
 {
-    public class TimedSaveHandler
+    public class TimedSaveHandler(ProgramSettings settings)
     {
-        public enum TimeEnum
-        {
-            OFF = 0,
-            SEC_30 = 30,
-            MIN_1 = 60,
-            MIN_2 = 120,
-            MIN_5 = 300,
-            MIN_10 = 600
-        }
-
-        private readonly ProgramSettings programSettings;
-        private readonly ComboBox comboBox;
-        private readonly Timer timer;
-
-        public TimedSaveHandler(ProgramSettings settings, ComboBox comboBox)
-        {
-            this.programSettings = settings;
-            this.comboBox = comboBox;
-            this.timer = new Timer();
-        }
+        private readonly ProgramSettings programSettings = settings;
+        private readonly Timer timer = new();
 
         public void AddTickEventHandler(EventHandler eventHandler)
         {
@@ -37,31 +19,12 @@ namespace TiaXmlReader.AutoSave
 
         public void Start()
         {
-            this.comboBox.Items.Clear();
-
-            var timeEnumType = typeof(TimeEnum);
-            foreach (TimeEnum autoSaveEnum in Enum.GetValues(timeEnumType))
-            {
-                var enumName = Enum.GetName(timeEnumType, autoSaveEnum);
-                this.comboBox.Items.Add(enumName);
-            }
-            this.comboBox.Text = Enum.GetName(timeEnumType, programSettings.TimedSaveTime);
-
             SetIntervalAndStart(programSettings.TimedSaveTime);
-            this.comboBox.SelectedValueChanged += (sender, args) =>
-            {
-                timer.Stop();
-                if (Enum.TryParse(this.comboBox.Text, out TimeEnum autoSave))
-                {
-                    programSettings.TimedSaveTime = autoSave;
-                    SetIntervalAndStart(autoSave);
-                }
-            };
         }
 
-        private void SetIntervalAndStart(TimeEnum timeEnum)
+        public void SetIntervalAndStart(int interval)
         {
-            var interval = ((int)timeEnum) * 1000;
+            timer.Stop();
             if (interval > 0)
             {
                 timer.Interval = interval;

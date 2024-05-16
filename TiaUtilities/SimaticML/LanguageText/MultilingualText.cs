@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Globalization;
 using System.Xml;
+using TiaXmlReader.Languages;
 using TiaXmlReader.Utility;
 using TiaXmlReader.XMLClasses;
 

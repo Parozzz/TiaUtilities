@@ -1,11 +1,11 @@
 ﻿using Newtonsoft.Json;
-using System.IO;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Utility;
 using TiaXmlReader.AutoSave;
 using TiaXmlReader.Generation.IO.GenerationForm;
 using TiaXmlReader.Generation.Alarms.GenerationForm;
 using TiaXmlReader.Generation.GridHandler;
+using TiaXmlReader.Languages;
 
 namespace TiaXmlReader
 {
@@ -24,7 +24,7 @@ namespace TiaXmlReader
         [JsonProperty] public string DBDuplicationReplacementList2;
         [JsonProperty] public string DBDuplicationReplacementList3;
 
-        [JsonProperty] public TimedSaveHandler.TimeEnum TimedSaveTime = TimedSaveHandler.TimeEnum.MIN_2;
+        [JsonProperty] public int TimedSaveTime = 2; //Seconds
         [JsonProperty] public uint lastTIAVersion = Constants.VERSION;
         [JsonProperty] public string ietfLanguage = LocalizationVariables.LANG;
 

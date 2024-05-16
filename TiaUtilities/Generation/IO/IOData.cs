@@ -1,25 +1,15 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TiaXmlReader.Generation.IO;
 using TiaXmlReader.SimaticML;
-using TiaXmlReader.Generation;
 using TiaXmlReader.SimaticML.Enums;
-using System.ComponentModel.DataAnnotations;
-using TiaXmlReader.Localization;
-using System.Drawing;
-using System.Windows.Forms;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.Generation.Placeholders;
+using TiaXmlReader.Languages;
 
 namespace TiaXmlReader.Generation.IO
 {
     public class IOData : IGridData<IOConfiguration>
     {
-        public static int COLUMN_COUNT = 0;
+        private readonly static int COLUMN_COUNT = 0;
         //THESE IS THE ORDER IN WHICH THEY APPEAR!
         public static readonly GridDataColumn ADDRESS;
         public static readonly GridDataColumn IO_NAME;
@@ -33,7 +23,6 @@ namespace TiaXmlReader.Generation.IO
             var type = typeof(IOData);
             ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.Address));
             IO_NAME = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.IOName), "ioName");
-            //DB_NAME = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.DBName), "dbName");
             VARIABLE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.Variable));
             MERKER_ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.MerkerAddress), "merkerAddress");
             COMMENT = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.Comment));

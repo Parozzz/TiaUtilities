@@ -4,13 +4,14 @@ using TiaXmlReader.Utility;
 using TiaXmlReader.SimaticML.Enums;
 using TiaXmlReader.SimaticML.LanguageText;
 using TiaXmlReader.XMLClasses;
+using TiaXmlReader.Languages;
 
 namespace TiaXmlReader.SimaticML.TagTable
 {
     public class XMLTag : XmlNodeConfiguration, IGlobalObject
     {
         public const string NODE_NAME = "SW.Tags.PlcTag";
-        public static XMLTag CreateTag(XmlNode node)
+        public static XMLTag? CreateTag(XmlNode node)
         {
             return node.Name == XMLTag.NODE_NAME ? new XMLTag() : null;
         }

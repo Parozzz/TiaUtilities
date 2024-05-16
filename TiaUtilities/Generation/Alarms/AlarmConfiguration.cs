@@ -1,9 +1,7 @@
 ﻿using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
 using TiaXmlReader.GenerationForms;
-using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.AutoSave;
-using TiaXmlReader.Localization;
+using TiaXmlReader.Languages;
 
 namespace TiaXmlReader.Generation.Alarms
 {
