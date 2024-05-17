@@ -72,7 +72,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                     return true;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Utils.ShowExceptionMessage(ex);
             }
@@ -249,11 +249,19 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             this.suggestionGridHandler.AddTextBoxColumn(IOSuggestionData.VALUE, 0);
             #endregion
 
-
             this.ioGridHandler.Init();
             this.suggestionGridHandler.Init();
             this.configHandler.Init();
 
+            #region GRIDS_JSSCRIPT_EVENTS
+            this.ioGridHandler.Events.ScriptLoad += args => args.Script = settings.JSScript;
+            this.ioGridHandler.Events.ScriptChanged += args => settings.JSScript = args.Script;
+
+            this.suggestionGridHandler.Events.ScriptLoad += args => args.Script = settings.SuggestionJSScript;
+            this.suggestionGridHandler.Events.ScriptChanged += args => settings.SuggestionJSScript = args.Script;
+            #endregion
+
+            #region SUGGESTION_GRIDS_EVENTS
             this.ioGridHandler.Events.CellChange += args =>
             {
                 if (args.CellChangeList.Where(c => c.ColumnIndex == IOData.VARIABLE).Any())
@@ -266,14 +274,16 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                     UpdateDuplicatedIOValues();
                 }
             };
+            this.ioGridHandler.Events.PostSort += args =>
+            {
+                UpdateSuggestionColors();
+                UpdateDuplicatedIOValues();
+            };
             this.ioGridHandler.Events.ScriptShowVariable += args => args.VariableList.Add("suggestions [array]");
             this.ioGridHandler.Events.ScriptAddVariables += args => args.VariableDict.Add("suggestions", this.suggestionGridHandler.DataSource.GetNotEmptyData().Select(s => s.Value).ToArray());
-            this.ioGridHandler.Events.ScriptLoad += args => args.Script = settings.JSScript;
-            this.ioGridHandler.Events.ScriptChanged += args => settings.JSScript = args.Script;
 
             this.suggestionGridHandler.Events.CellChange += args => UpdateSuggestionColors();
-            this.suggestionGridHandler.Events.ScriptLoad += args => args.Script = settings.SuggestionJSScript;
-            this.suggestionGridHandler.Events.ScriptChanged += args => settings.SuggestionJSScript = args.Script;
+            #endregion
 
             #region AUTO_SAVE
             void eventHandler(object sender, EventArgs args)
@@ -287,13 +297,19 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             this.FormClosed += (sender, args) => autoSaveHandler.RemoveTickEventHandler(eventHandler);
             #endregion
 
+            this.Shown += (sender, args) =>
+            {
+                this.ioGridHandler.DataGridView.AutoResizeColumnHeadersHeight();
+                this.suggestionGridHandler.DataGridView.AutoResizeColumnHeadersHeight();
+            };
+
             UpdateConfigPanel();
             Translate();
         }
 
         private void Translate()
         {
-            this.Text = Localization.Get("IO_GEN_FORM");
+            this.Text = this.GetFormLocalizatedName();
 
             this.fileMenuItem.Text = Localization.Get("GENERICS_FILE");
             this.saveMenuItem.Text = Localization.Get("GENERICS_SAVE");
@@ -324,7 +340,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             }
 
             var saveOK = projectSave.Save(ref lastFilePath, saveAs || !File.Exists(lastFilePath));
-            this.Text = Localization.Get("IO_GEN_FORM") + (saveOK ? ". Project File: " + lastFilePath : "");
+            this.Text = this.GetFormLocalizatedName() + (saveOK ? ". Project File: " + lastFilePath : "");
         }
 
         public void ProjectLoad()
@@ -367,7 +383,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                 this.ioGridHandler.DataGridView.ResumeLayout();
                 this.suggestionGridHandler.DataGridView.ResumeLayout();
 
-                this.Text = Localization.Get("IO_GEN_FORM") + ". Project File: " + lastFilePath;
+                this.Text = this.GetFormLocalizatedName() + ". Project File: " + lastFilePath;
             }
         }
 
@@ -491,6 +507,11 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
 
             this.UpdateSuggestionColors();
             this.UpdateDuplicatedIOValues();
+        }
+
+        private string GetFormLocalizatedName()
+        {
+            return Localization.Get("IO_GEN_FORM");
         }
     }
 }

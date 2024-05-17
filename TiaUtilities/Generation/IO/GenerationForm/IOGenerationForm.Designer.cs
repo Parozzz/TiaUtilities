@@ -282,39 +282,39 @@
             // 
             groupingTypeComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             groupingTypeComboBox.FormattingEnabled = true;
-            groupingTypeComboBox.Location = new Point(332, 33);
+            groupingTypeComboBox.Location = new Point(397, 33);
             groupingTypeComboBox.Name = "groupingTypeComboBox";
-            groupingTypeComboBox.Size = new Size(136, 23);
+            groupingTypeComboBox.Size = new Size(156, 23);
             groupingTypeComboBox.TabIndex = 3;
             // 
             // groupingTypeLabel
             // 
-            groupingTypeLabel.AutoSize = true;
             groupingTypeLabel.Font = new Font("Microsoft Sans Serif", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            groupingTypeLabel.Location = new Point(184, 34);
+            groupingTypeLabel.Location = new Point(211, 35);
             groupingTypeLabel.Name = "groupingTypeLabel";
-            groupingTypeLabel.Size = new Size(149, 18);
+            groupingTypeLabel.Size = new Size(185, 18);
             groupingTypeLabel.TabIndex = 2;
             groupingTypeLabel.Text = "Tipo raggruppamento";
+            groupingTypeLabel.TextAlign = ContentAlignment.MiddleRight;
             // 
             // memoryTypeComboBox
             // 
             memoryTypeComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             memoryTypeComboBox.FormattingEnabled = true;
-            memoryTypeComboBox.Location = new Point(111, 33);
+            memoryTypeComboBox.Location = new Point(140, 33);
             memoryTypeComboBox.Name = "memoryTypeComboBox";
             memoryTypeComboBox.Size = new Size(65, 23);
             memoryTypeComboBox.TabIndex = 1;
             // 
             // memoryTypeLabel
             // 
-            memoryTypeLabel.AutoSize = true;
             memoryTypeLabel.Font = new Font("Microsoft Sans Serif", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            memoryTypeLabel.Location = new Point(9, 34);
+            memoryTypeLabel.Location = new Point(6, 35);
             memoryTypeLabel.Name = "memoryTypeLabel";
-            memoryTypeLabel.Size = new Size(100, 18);
+            memoryTypeLabel.Size = new Size(135, 18);
             memoryTypeLabel.TabIndex = 0;
             memoryTypeLabel.Text = "Tipo memoria";
+            memoryTypeLabel.TextAlign = ContentAlignment.MiddleRight;
             // 
             // GridsSplitContainer
             // 
@@ -343,7 +343,6 @@
             TopMenuStrip.ResumeLayout(false);
             TopMenuStrip.PerformLayout();
             configPanel.ResumeLayout(false);
-            configPanel.PerformLayout();
             configButtonPanel.ResumeLayout(false);
             configButtonPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)GridsSplitContainer).EndInit();

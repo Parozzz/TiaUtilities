@@ -58,7 +58,7 @@ namespace TiaXmlReader.Generation.GridHandler
 
             this.DataHandler = new GridDataHandler<C, T>(this.DataGridView);
             this.DataSource = new GridDataSource<C, T>(this.DataGridView, this.DataHandler);
-            this.sortHandler = new GridSortHandler<C, T>(this.DataGridView, this.DataSource, this.undoRedoHandler, comparer);
+            this.sortHandler = new GridSortHandler<C, T>(this, this.undoRedoHandler, comparer);
             this.Script = new GridScript<C, T>(this, jsErrorThread);
             this.Events = new GridEvents();
 

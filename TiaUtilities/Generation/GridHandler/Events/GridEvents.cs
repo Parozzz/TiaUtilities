@@ -19,6 +19,8 @@ namespace TiaXmlReader.Generation.GridHandler.Events
         public event GridScriptLoadEventHandlers ScriptLoad = delegate { };
         public event GridScriptChangedEventHandlers ScriptChanged = delegate { };
 
+        public event GridPreSortEventHandler PreSort = delegate { };
+        public event GridPostSortEventHandler PostSort = delegate { };
 
         public void CellChangeEvent(GridCellChangeEventArgs args)
         {
@@ -43,6 +45,16 @@ namespace TiaXmlReader.Generation.GridHandler.Events
         public void ScriptChangedEvent(GridScriptEventArgs args)
         {
             ScriptChanged(args);
+        }
+
+        public void PreSortEvent(GridPreSortEventArgs args)
+        {
+            PreSort(args);
+        }
+
+        public void PostSortEvent(GridPostSortEventArgs args)
+        {
+            PostSort(args);
         }
     }
 }

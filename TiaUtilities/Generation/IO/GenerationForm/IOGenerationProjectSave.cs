@@ -19,18 +19,17 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
     public class IOGenerationProjectSave
     {
         public const string EXTENSION = "json";
-        public static string DEFAULT_FILE_PATH = Directory.GetCurrentDirectory() + @"\tempIOSave." + EXTENSION;
 
-        [JsonProperty] public Dictionary<int, IOData> RowDict { get; set; } = new Dictionary<int, IOData>();
-        [JsonProperty] public Dictionary<int, IOSuggestionData> SuggestionRowDict = new Dictionary<int, IOSuggestionData>();
+        [JsonProperty] public Dictionary<int, IOData> RowDict { get; set; } = [];
+        [JsonProperty] public Dictionary<int, IOSuggestionData> SuggestionRowDict = [];
         public IOGenerationProjectSave()
         {
 
         }
 
-        public static IOGenerationProjectSave Load(ref string filePath)
+        public static IOGenerationProjectSave Load(ref string? filePath)
         {
-            return GenerationUtils.Load(ref filePath, EXTENSION, out IOGenerationProjectSave? projectSave) && projectSave != null ? projectSave : new IOGenerationProjectSave();
+            return GenerationUtils.Load<IOGenerationProjectSave>(ref filePath, EXTENSION) ?? new IOGenerationProjectSave();
         }
 
         public bool Save(ref string? filePath, bool showFileDialog = false)

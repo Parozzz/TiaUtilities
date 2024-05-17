@@ -7,14 +7,14 @@ namespace TiaXmlReader.Generation.Alarms
 {
     public enum AlarmGroupingType
     {
-        [Localization("ALARM_CONFIG_GROUPING_GROUP")] GROUP,
-        [Localization("ALARM_CONFIG_GROUPING_ONE")] ONE
+        [Localization("ALARM_CONFIG_GROUPING_TYPE_GROUP")] GROUP,
+        [Localization("ALARM_CONFIG_GROUPING_TYPE_ONE")] ONE
     }
 
     public enum AlarmPartitionType
     {
-        [Localization("ALARM_CONFIG_PARTITION_ALARM_TYPE")] ALARM_TYPE,
-        [Localization("ALARM_CONFIG_PARTITION_DEVICE")] DEVICE
+        [Localization("ALARM_CONFIG_PARTITION_TYPE_ALARM_TYPE")] ALARM_TYPE,
+        [Localization("ALARM_CONFIG_PARTITION_TYPE_DEVICE")] DEVICE
     }
 
     public class AlarmConfiguration : IGenerationConfiguration, ISettingsAutoSave

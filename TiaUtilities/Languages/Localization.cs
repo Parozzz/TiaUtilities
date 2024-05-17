@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using DocumentFormat.OpenXml.Vml.Office;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,7 @@ namespace TiaXmlReader.Languages
             var directory = Directory.GetCurrentDirectory() + "//" + nameof(Languages);
             if (!Directory.Exists(directory))
             {
-                var ex = new Exception("Localization folder not found");
+                var ex = new Exception(nameof(Languages) + " folder not found");
                 Utils.ShowExceptionMessage(ex);
                 throw ex;
             }
@@ -38,25 +39,13 @@ namespace TiaXmlReader.Languages
                     var fileLang = Path.GetFileNameWithoutExtension(filePath);
                     var langDictionary = new Dictionary<string, string>();
 
-                    using (var stream = File.OpenText(filePath))
-                    {
-                        using (var reader = new JsonTextReader(stream))
-                        {
-                            var jsonObject = (JObject)JToken.ReadFrom(reader);
-                            foreach (var entry in jsonObject)
-                            {
-                                var jsonKey = entry.Key;
-                                var jsonValue = entry.Value;
-                                if(jsonValue == null)
-                                {
-                                    continue;
-                                }
+                    using var stream = File.OpenText(filePath);
+                    using var reader = new JsonTextReader(stream);
 
-                                langDictionary.Add(jsonKey, jsonValue.ToString());
-                            }
-                        }
-                    }
-
+                    var jsonObject = (JObject)JToken.ReadFrom(reader);
+                    jsonObject.Cast<KeyValuePair<string, JToken>>()
+                        .Where(e => e.Value != null)
+                        .ForEach(e => langDictionary.Add(e.Key, e.Value.ToString()));
                     LANG_TEXT_DICTIONARY.Compute(fileLang, langDictionary);
                 }
                 catch { }
@@ -71,13 +60,13 @@ namespace TiaXmlReader.Languages
                 langDictionary = LANG_TEXT_DICTIONARY.GetOrDefault(LocalizationVariables.DEFAULT_LANG);
                 if (langDictionary == null)
                 {
-                    var ex = new Exception("Cannot find text list for " + LocalizationVariables.LANG + " or " + LocalizationVariables.DEFAULT_LANG);
+                    var ex = new Exception("Cannot find text with key " + jsonKey + " for " + LocalizationVariables.LANG + " or " + LocalizationVariables.DEFAULT_LANG);
                     Utils.ShowExceptionMessage(ex);
                     throw ex;
                 }
             }
 
-            return langDictionary.GetOrDefault(jsonKey) + append ?? "";
+            return (langDictionary.GetOrDefault(jsonKey) ?? "") + append;
         }
 
         public static string GetTranslation(this MemberInfo memberInfo)
@@ -93,13 +82,9 @@ namespace TiaXmlReader.Languages
 
         public static string GetTranslation(this Enum enumValue)
         {
-            var memberInfo = enumValue.GetType().GetMember(enumValue.ToString()).FirstOrDefault();
-            if(memberInfo == null)
-            {
-                return "unknown";
-            }
-
-            return memberInfo.GetTranslation();
+            return enumValue.GetType().GetMember(enumValue.ToString())
+                .Select(m => m.GetTranslation())
+                .FirstOrElse(() => "unkown");
         }
 
         public static bool TryGetEnumByTranslation<T>(string displayString, out T enumValue) where T : Enum

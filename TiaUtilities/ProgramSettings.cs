@@ -40,7 +40,7 @@ namespace TiaXmlReader
         public static ProgramSettings Load()
         {
             var filePath = ProgramSettings.GetFilePath();
-            return GenerationUtils.Load(ref filePath, EXTENSION, out ProgramSettings settings, showFileDialog: false) ? settings : new ProgramSettings();
+            return GenerationUtils.Load<ProgramSettings>(ref filePath, EXTENSION, showFileDialog: false) ?? new ProgramSettings();
         }
 
         public bool Save()

@@ -6,32 +6,34 @@ using static TiaXmlReader.Generation.GridHandler.GridCellPaintHandler;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.GenerationForms;
+using TiaUtilities.Generation.GridHandler.Events;
 
 namespace TiaXmlReader.Generation.GridHandler
 {
     public class GridSortHandler<C, T> : IGridCellPainter where C : IGenerationConfiguration where T : IGridData<C>
     {
-        private readonly GridDataSource<C, T> dataSource;
-        private readonly DataGridView dataGridView;
+        private readonly GridHandler<C, T> gridHandler;
         private readonly UndoRedoHandler undoRedoHandler;
         private readonly IGridRowComparer<C, T> comparer;
 
         private SortOrder sortOrder = SortOrder.None;
-        private Dictionary<T, int> noSortIndexSnapshot;
+        private Dictionary<T, int>? noSortIndexSnapshot;
+
+        private DataGridView DataGridView { get => gridHandler.DataGridView; }
+        private GridDataSource<C, T> DataSource { get => gridHandler.DataSource; }
 
         public Color SortIconColor { get; set; } = Color.Green;
 
-        public GridSortHandler(DataGridView dataGridView, GridDataSource<C, T> dataSource, UndoRedoHandler undoRedoHandler, IGridRowComparer<C, T> comparer)
+        public GridSortHandler(GridHandler<C, T> gridHandler, UndoRedoHandler undoRedoHandler, IGridRowComparer<C, T> comparer)
         {
-            this.dataGridView = dataGridView;
-            this.dataSource = dataSource;
+            this.gridHandler = gridHandler;
             this.undoRedoHandler = undoRedoHandler;
             this.comparer = comparer;
         }
 
         public void Init()
         {
-            this.dataGridView.ColumnHeaderMouseClick += (sender, args) =>
+            this.DataGridView.ColumnHeaderMouseClick += (sender, args) =>
             {
                 if (this.comparer == null || args.Button == MouseButtons.Right)
                 {
@@ -47,17 +49,17 @@ namespace TiaXmlReader.Generation.GridHandler
 
         private void NextColumnSort(int columnIndex)
         {
-            var oldSortOrder = sortOrder;
-            switch (sortOrder)
+            var oldSortOrder = this.sortOrder;
+            switch (this.sortOrder)
             {
                 case SortOrder.None:
-                    sortOrder = SortOrder.Ascending;
+                    this.sortOrder = SortOrder.Ascending;
                     break;
                 case SortOrder.Ascending:
-                    sortOrder = SortOrder.Descending;
+                    this.sortOrder = SortOrder.Descending;
                     break;
                 case SortOrder.Descending:
-                    sortOrder = SortOrder.None;
+                    this.sortOrder = SortOrder.None;
                     break;
             }
 
@@ -66,45 +68,57 @@ namespace TiaXmlReader.Generation.GridHandler
 
         private void ColumnSort(SortOrder oldSortOrder, int columnIndex)
         {
-            var snapDict = dataSource.CreateIndexListSnapshot();
+            var preSortEventArgs = new GridPreSortEventArgs(oldSortOrder, this.sortOrder, columnIndex);
+            this.gridHandler.Events.PreSortEvent(preSortEventArgs);
 
-            if (sortOrder != SortOrder.None && oldSortOrder == SortOrder.None)
+            if(preSortEventArgs.Handled)
+            {
+                return;
+            }
+
+            this.sortOrder = preSortEventArgs.SortOrder;
+
+            var snapDict = this.DataSource.CreateIndexListSnapshot();
+            if (this.sortOrder != SortOrder.None && oldSortOrder == SortOrder.None)
             {
                 this.noSortIndexSnapshot = snapDict;
             }
 
             ClearAllSortGlyphDirection();
-            dataGridView.Columns[columnIndex].HeaderCell.SortGlyphDirection = sortOrder;
+            this.DataGridView.Columns[columnIndex].HeaderCell.SortGlyphDirection = this.sortOrder;
 
-            if (sortOrder == SortOrder.None)
+            if (this.sortOrder == SortOrder.None)
             {
                 if (noSortIndexSnapshot != null)
                 {
-                    dataSource.RestoreIndexListSnapshot(noSortIndexSnapshot);
+                    this.DataSource.RestoreIndexListSnapshot(noSortIndexSnapshot);
                     noSortIndexSnapshot = null;
                 }
             }
             else
             {
                 comparer.SetSortedColumn(columnIndex);
-                comparer.SetSortOrder(sortOrder);
-                dataSource.Sort(comparer, sortOrder);
+                comparer.SetSortOrder(this.sortOrder);
+                this.DataSource.Sort(comparer, this.sortOrder);
             }
 
             undoRedoHandler.AddUndo(() =>
             {
                 this.sortOrder = oldSortOrder;
-                dataGridView.Columns[columnIndex].HeaderCell.SortGlyphDirection = oldSortOrder;
+                this.DataGridView.Columns[columnIndex].HeaderCell.SortGlyphDirection = oldSortOrder;
 
-                var undoSnap = dataSource.CreateIndexListSnapshot();
-                dataSource.RestoreIndexListSnapshot(snapDict);
-                undoRedoHandler.AddRedo(() => dataSource.RestoreIndexListSnapshot(undoSnap));
+                var undoSnap = this.DataSource.CreateIndexListSnapshot();
+                this.DataSource.RestoreIndexListSnapshot(snapDict);
+                undoRedoHandler.AddRedo(() => this.DataSource.RestoreIndexListSnapshot(undoSnap));
             });
+
+            var postSortEventArgs = new GridPostSortEventArgs(oldSortOrder, this.sortOrder, columnIndex);
+            this.gridHandler.Events.PostSortEvent(postSortEventArgs);
         }
 
         private void ClearAllSortGlyphDirection()
         {
-            foreach (DataGridViewColumn column in dataGridView.Columns)
+            foreach (DataGridViewColumn column in this.DataGridView.Columns)
             {
                 column.HeaderCell.SortGlyphDirection = SortOrder.None;
             }
@@ -119,7 +133,7 @@ namespace TiaXmlReader.Generation.GridHandler
             }
 
             var columnIndex = args.ColumnIndex;
-            if (columnIndex < 0 || columnIndex >= dataGridView.ColumnCount) //To avoid 0xffffffff (Top left square corner!)
+            if (columnIndex < 0 || columnIndex >= this.DataGridView.ColumnCount) //To avoid 0xffffffff (Top left square corner!)
             {
                 return paintResult;
             }
@@ -129,9 +143,13 @@ namespace TiaXmlReader.Generation.GridHandler
 
         public void PaintCell(DataGridViewCellPaintingEventArgs args, PaintRequest request, bool backgroundRequested)
         {
+            var bounds = args.CellBounds;
+            var graphics = args.Graphics;
+            var style = args.CellStyle;
+
             var rowIndex = args.RowIndex;
             var columnIndex = args.ColumnIndex;
-            if (rowIndex != -1 || columnIndex < 0 || columnIndex >= dataGridView.ColumnCount)
+            if (rowIndex != -1 || columnIndex < 0 || columnIndex >= this.DataGridView.ColumnCount || graphics == null)
             {
                 return;
             }
@@ -141,14 +159,9 @@ namespace TiaXmlReader.Generation.GridHandler
                 args.PaintBackground(args.ClipBounds, false);
             }
 
-            var bounds = args.CellBounds;
-            var graphics = args.Graphics;
-
-            var style = args.CellStyle;
-
             TextRenderer.DrawText(graphics, string.Format("{0}", args.FormattedValue), style.Font, bounds, style.ForeColor, TextFormatFlags.VerticalCenter | TextFormatFlags.Left);
 
-            var column = dataGridView.Columns[columnIndex];
+            var column = this.DataGridView.Columns[columnIndex];
             if (column.HeaderCell.SortGlyphDirection != SortOrder.None)
             {
                 var sortIcon = column.HeaderCell.SortGlyphDirection == SortOrder.Ascending ? "▲" : "▼";

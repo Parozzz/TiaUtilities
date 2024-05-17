@@ -16,7 +16,8 @@ namespace TiaUtilities.Generation.Configuration.Lines
             control = new CheckBox
             {
                 FlatStyle = FlatStyle.Flat,
-                Text = ""
+                Text = "",
+                AutoSize = true,
             };
             control.CheckedChanged += CheckedChangedEventHandler;
         }

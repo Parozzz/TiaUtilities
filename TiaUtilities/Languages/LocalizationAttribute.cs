@@ -18,7 +18,7 @@ namespace TiaXmlReader.Languages
         private readonly string jsonKey = jsonKey;
         private readonly string append = append;
 
-        public string GetTranslation() //Can be null!
+        public string? GetTranslation()
         {
             return Localization.Get(this.jsonKey, this.append);
         }

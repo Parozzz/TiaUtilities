@@ -23,125 +23,147 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
 
         public void Init()
         {
-            form.groupingTypeComboBox.SelectedValue = config.GroupingType;
-            form.groupingTypeComboBox.SelectionChangeCommitted += (sender, args) => config.GroupingType = (IOGroupingTypeEnum)form.groupingTypeComboBox.SelectedValue;
-
-            form.memoryTypeComboBox.SelectedValue = config.MemoryType;
-            form.memoryTypeComboBox.SelectionChangeCommitted += (sender, args) => config.MemoryType = (IOMemoryTypeEnum)form.memoryTypeComboBox.SelectedValue;
-
-            form.fcConfigButton.Click += (sender, args) =>
             {
-                var configForm = new ConfigForm(Localization.Get("IO_GEN_CONFIG_FC")) { ControlWidth = 150 };
+                var comboBox = form.groupingTypeComboBox;
+                comboBox.SelectedValue = config.GroupingType;
+                comboBox.SelectionChangeCommitted += (sender, args) => config.GroupingType = (IOGroupingTypeEnum)(comboBox.SelectedValue ?? default(IOGroupingTypeEnum));
+            }
 
-                var mainGroup = configForm.Init();
-                mainGroup.AddTextBox().LocalizedLabel("GENERICS_NAME")
-                     .ControlText(config.FCBlockName)
-                     .TextChanged(str => config.FCBlockName = str);
-
-                mainGroup.AddTextBox().LocalizedLabel("GENERICS_NUMBER")
-                     .ControlText(config.FCBlockNumber)
-                     .UIntChanged(num => config.FCBlockNumber = num);
-
-                SetupConfigForm(form.fcConfigButton, configForm);
-            };
-
-            form.dbConfigButton.Click += (sender, args) =>
             {
-                var configForm = new ConfigForm(Localization.Get("IO_GEN_CONFIG_ALIAS_DB")) { ControlWidth = 250 };
+                var comboBox = form.memoryTypeComboBox;
+                comboBox.SelectedValue = config.MemoryType;
+                comboBox.SelectionChangeCommitted += (sender, args) => config.MemoryType = (IOMemoryTypeEnum)(comboBox.SelectedValue ?? default(IOMemoryTypeEnum));
+            }
 
-                var mainGroup = configForm.Init();
-                mainGroup.AddTextBox().LocalizedLabel("GENERICS_NAME", " > " + GenerationPlaceholders.IO.CONFIG_DB_NAME)
-                     .ControlText(config.DBName)
-                     .TextChanged(str => config.DBName = str);
-
-                mainGroup.AddTextBox().LocalizedLabel("GENERICS_NUMBER", " > " + GenerationPlaceholders.IO.CONFIG_DB_NUMBER)
-                     .ControlText(config.DBNumber)
-                     .UIntChanged(num => config.DBNumber = num);
-
-                mainGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_ALIAS_DB_IN_DEFAULT")
-                     .ControlText(config.DefaultDBInputVariable)
-                     .TextChanged(str => config.DefaultDBInputVariable = str);
-
-                mainGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_ALIAS_DB_OUT_DEFAULT")
-                     .ControlText(config.DefaultDBOutputVariable)
-                     .TextChanged(str => config.DefaultDBOutputVariable = str);
-
-                SetupConfigForm(form.dbConfigButton, configForm);
-            };
-
-            form.variableTableConfigButton.Click += (sender, args) =>
             {
-                var configForm = new ConfigForm(Localization.Get("IO_GEN_CONFIG_ALIAS_TABLE")) { ControlWidth = 250 };
+                var button = form.fcConfigButton;
+                button.Click += (sender, args) =>
+                {
+                    var configForm = new ConfigForm(button.Text) { ControlWidth = 150 };
 
-                var mainGroup = configForm.Init();
-                mainGroup.AddTextBox().LocalizedLabel("GENERICS_NAME")
-                     .ControlText(config.VariableTableName)
-                     .TextChanged(str => config.VariableTableName = str);
+                    var mainGroup = configForm.Init();
+                    mainGroup.AddTextBox().LocalizedLabel("GENERICS_NAME")
+                         .ControlText(config.FCBlockName)
+                         .TextChanged(str => config.FCBlockName = str);
 
-                mainGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_ALIAS_TABLE_NEW_EVERY")
-                     .ControlText(config.VariableTableSplitEvery)
-                     .UIntChanged(num => config.VariableTableSplitEvery = num);
+                    mainGroup.AddTextBox().LocalizedLabel("GENERICS_NUMBER")
+                         .ControlText(config.FCBlockNumber)
+                         .UIntChanged(num => config.FCBlockNumber = num);
 
-                var inputGroup = mainGroup.AddGroup();
-                inputGroup.AddLabel().LocalizedLabel("IO_GEN_CONFIG_ALIAS_TABLE_INPUT_VARIABLE");
+                    SetupConfigForm(button, configForm);
+                };
+            }
 
-                inputGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_START_ADDRESS")
-                     .ControlText(config.VariableTableInputStartAddress)
-                     .UIntChanged(num => config.VariableTableInputStartAddress = num);
-
-                inputGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_DEFAULT")
-                     .ControlText(config.DefaultMerkerInputVariable)
-                     .TextChanged(str => config.DefaultMerkerInputVariable = str);
-
-                var outputGroup = mainGroup.AddGroup();
-                outputGroup.AddLabel().LocalizedLabel("IO_GEN_CONFIG_ALIAS_TABLE_OUTPUT_VARIABLE");
-
-                outputGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_START_ADDRESS")
-                     .ControlText(config.VariableTableOutputStartAddress)
-                     .UIntChanged(num => config.VariableTableOutputStartAddress = num);
-
-                outputGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_DEFAULT")
-                     .ControlText(config.DefaultMerkerOutputVariable)
-                     .TextChanged(str => config.DefaultMerkerOutputVariable = str);
-
-                SetupConfigForm(form.variableTableConfigButton, configForm);
-            };
-
-            form.ioTableConfigButton.Click += (sender, args) =>
             {
-                var configForm = new ConfigForm(Localization.Get("IO_GEN_CONFIG_IO_TABLE")) { ControlWidth = 285 };
+                var button = form.dbConfigButton;
+                button.Click += (sender, args) =>
+                {
+                    var configForm = new ConfigForm(button.Text) { ControlWidth = 250 };
 
-                var mainGroup = configForm.Init();
-                mainGroup.AddTextBox().LocalizedLabel("GENERICS_NAME")
-                     .ControlText(config.IOTableName)
-                     .TextChanged(str => config.IOTableName = str);
+                    var mainGroup = configForm.Init();
+                    mainGroup.AddTextBox().LocalizedLabel("GENERICS_NAME", " > " + GenerationPlaceholders.IO.CONFIG_DB_NAME)
+                         .ControlText(config.DBName)
+                         .TextChanged(str => config.DBName = str);
 
-                mainGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_IO_TABLE_NEW_EVERY")
-                     .ControlText(config.IOTableSplitEvery)
-                     .UIntChanged(num => config.IOTableSplitEvery = num);
+                    mainGroup.AddTextBox().LocalizedLabel("GENERICS_NUMBER", " > " + GenerationPlaceholders.IO.CONFIG_DB_NUMBER)
+                         .ControlText(config.DBNumber)
+                         .UIntChanged(num => config.DBNumber = num);
 
-                mainGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_IO_TABLE_DEFAULT_NAME")
-                     .ControlText(config.DefaultIoName)
-                     .TextChanged(str => config.DefaultIoName = str);
+                    mainGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_ALIAS_DB_IN_DEFAULT")
+                         .ControlText(config.DefaultDBInputVariable)
+                         .TextChanged(str => config.DefaultDBInputVariable = str);
 
-                SetupConfigForm(form.ioTableConfigButton, configForm);
-            };
+                    mainGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_ALIAS_DB_OUT_DEFAULT")
+                         .ControlText(config.DefaultDBOutputVariable)
+                         .TextChanged(str => config.DefaultDBOutputVariable = str);
 
-            form.segmentNameConfigButton.Click += (sender, args) =>
+                    SetupConfigForm(button, configForm);
+                };
+            }
+
             {
-                var configForm = new ConfigForm(Localization.Get("IO_GEN_CONFIG_SEGMENT")) { ControlWidth = 400 };
+                var button = form.variableTableConfigButton;
+                button.Click += (sender, args) =>
+                {
+                    var configForm = new ConfigForm(button.Text) { ControlWidth = 250 };
 
-                var mainGroup = configForm.Init();
-                mainGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_SEGMENT_BIT_DIVISION")
-                     .ControlText(config.SegmentNameBitGrouping)
-                     .TextChanged(str => config.SegmentNameBitGrouping = str);
+                    var mainGroup = configForm.Init();
+                    mainGroup.AddTextBox().LocalizedLabel("GENERICS_NAME")
+                         .ControlText(config.VariableTableName)
+                         .TextChanged(str => config.VariableTableName = str);
 
-                mainGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_SEGMENT_BYTE_DIVISION")
-                     .ControlText(config.SegmentNameByteGrouping)
-                     .TextChanged(str => config.SegmentNameByteGrouping = str);
+                    mainGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_ALIAS_TABLE_NEW_EVERY")
+                         .ControlText(config.VariableTableSplitEvery)
+                         .UIntChanged(num => config.VariableTableSplitEvery = num);
 
-                SetupConfigForm(form.segmentNameConfigButton, configForm);
-            };
+                    var inputGroup = mainGroup.AddGroup();
+                    inputGroup.AddLabel().LocalizedLabel("IO_GEN_CONFIG_ALIAS_TABLE_INPUT_VARIABLE");
+
+                    inputGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_START_ADDRESS")
+                         .ControlText(config.VariableTableInputStartAddress)
+                         .UIntChanged(num => config.VariableTableInputStartAddress = num);
+
+                    inputGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_DEFAULT")
+                         .ControlText(config.DefaultMerkerInputVariable)
+                         .TextChanged(str => config.DefaultMerkerInputVariable = str);
+
+                    var outputGroup = mainGroup.AddGroup();
+                    outputGroup.AddLabel().LocalizedLabel("IO_GEN_CONFIG_ALIAS_TABLE_OUTPUT_VARIABLE");
+
+                    outputGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_START_ADDRESS")
+                         .ControlText(config.VariableTableOutputStartAddress)
+                         .UIntChanged(num => config.VariableTableOutputStartAddress = num);
+
+                    outputGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_DEFAULT")
+                         .ControlText(config.DefaultMerkerOutputVariable)
+                         .TextChanged(str => config.DefaultMerkerOutputVariable = str);
+
+                    SetupConfigForm(button, configForm);
+                };
+            }
+
+            {
+                var button = form.ioTableConfigButton;
+                button.Click += (sender, args) =>
+                {
+                    var configForm = new ConfigForm(button.Text) { ControlWidth = 285 };
+
+                    var mainGroup = configForm.Init();
+                    mainGroup.AddTextBox().LocalizedLabel("GENERICS_NAME")
+                         .ControlText(config.IOTableName)
+                         .TextChanged(str => config.IOTableName = str);
+
+                    mainGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_IO_TABLE_NEW_EVERY")
+                         .ControlText(config.IOTableSplitEvery)
+                         .UIntChanged(num => config.IOTableSplitEvery = num);
+
+                    mainGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_IO_TABLE_DEFAULT_NAME")
+                         .ControlText(config.DefaultIoName)
+                         .TextChanged(str => config.DefaultIoName = str);
+
+                    SetupConfigForm(button, configForm);
+                };
+            }
+
+            {
+                var button = form.segmentNameConfigButton;
+                button.Click += (sender, args) =>
+                {
+                    var configForm = new ConfigForm(button.Text) { ControlWidth = 400 };
+
+                    var mainGroup = configForm.Init();
+                    mainGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_SEGMENT_BIT_DIVISION")
+                         .ControlText(config.SegmentNameBitGrouping)
+                         .TextChanged(str => config.SegmentNameBitGrouping = str);
+
+                    mainGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_SEGMENT_BYTE_DIVISION")
+                         .ControlText(config.SegmentNameByteGrouping)
+                         .TextChanged(str => config.SegmentNameByteGrouping = str);
+
+                    SetupConfigForm(button, configForm);
+                };
+            }
+
         }
 
         public void Translate()

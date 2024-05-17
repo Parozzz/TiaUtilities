@@ -33,7 +33,7 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             this.deviceGridHandler = new GridHandler<AlarmConfiguration, DeviceData>(jsErrorHandlingThread, gridSettings, AlarmConfig) { RowCount = 499 };
             this.alarmGridHandler = new GridHandler<AlarmConfiguration, AlarmData>(jsErrorHandlingThread, gridSettings, AlarmConfig) { RowCount = 29 };
 
-            this.configHandler = new AlarmGenerationFormConfigHandler(this, this.AlarmConfig, this.deviceGridHandler, this.alarmGridHandler);
+            this.configHandler = new AlarmGenerationFormConfigHandler(this, this.AlarmConfig);
 
 
             Init();
@@ -74,10 +74,10 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             this.GridsSplitPanel.Panel2.Controls.Add(this.alarmGridHandler.DataGridView);
 
             #region TopMenu
-            this.saveToolStripMenuItem.Click += (object sender, EventArgs args) => { this.ProjectSave(); };
-            this.saveAsToolStripMenuItem.Click += (object sender, EventArgs args) => { this.ProjectSave(true); };
-            this.loadToolStripMenuItem.Click += (object sender, EventArgs args) => { this.ProjectLoad(); };
-            this.exportXMLToolStripMenuItem.Click += (object sender, EventArgs args) =>
+            this.saveMenuItem.Click += (object sender, EventArgs args) => { this.ProjectSave(); };
+            this.saveAsMenuItem.Click += (object sender, EventArgs args) => { this.ProjectSave(true); };
+            this.loadMenuItem.Click += (object sender, EventArgs args) => { this.ProjectLoad(); };
+            this.exportXMLMenuItem.Click += (object sender, EventArgs args) =>
             {
                 try
                 {
@@ -104,7 +104,7 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
                     Utils.ShowExceptionMessage(ex);
                 }
             };
-            this.preferencesToolStripMenuItem.Click += (object sender, EventArgs args) => this.gridSettings.ShowConfigForm(this);
+            this.preferencesMenuItem.Click += (object sender, EventArgs args) => this.gridSettings.ShowConfigForm(this);
             #endregion
 
             #region PartitionType ComboBox
@@ -159,12 +159,14 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             this.alarmGridHandler.Init();
             this.configHandler.Init();
 
+            #region GRIDS_JSCRIPT_EVENTS
             this.deviceGridHandler.Events.ScriptLoad += args => args.Script = settings.DeviceJSScript;
             this.deviceGridHandler.Events.ScriptChanged += args => settings.DeviceJSScript = args.Script;
 
             this.alarmGridHandler.Events.ScriptLoad += args => args.Script = settings.AlarmJSScript;
             this.alarmGridHandler.Events.ScriptChanged += args => settings.AlarmJSScript = args.Script;
-            
+            #endregion
+
             #region AUTO_SAVE
             void eventHandler(object sender, EventArgs args)
             {
@@ -176,6 +178,31 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             this.Shown += (sender, args) => timedSaveHandler.AddTickEventHandler(eventHandler);
             this.FormClosed += (sender, args) => timedSaveHandler.RemoveTickEventHandler(eventHandler);
             #endregion
+
+            this.Shown += (sender, args) =>
+            {
+                this.alarmGridHandler.DataGridView.AutoResizeColumnHeadersHeight();
+                this.deviceGridHandler.DataGridView.AutoResizeColumnHeadersHeight();
+            };
+
+            Translate();
+        }
+
+        private void Translate()
+        {
+            this.Text = this.GetFormLocalizatedName();
+
+            this.fileMenuItem.Text = Localization.Get("GENERICS_FILE");
+            this.saveMenuItem.Text = Localization.Get("GENERICS_SAVE");
+            this.saveAsMenuItem.Text = Localization.Get("GENERICS_SAVE_AS");
+            this.loadMenuItem.Text = Localization.Get("GENERICS_LOAD");
+
+            this.importExportMenuItem.Text = Localization.Get("IO_GEN_FORM_IMPEXP");
+            this.exportXMLMenuItem.Text = Localization.Get("IO_GEN_FORM_IMPEXP_EXPORT_XML");
+
+            this.preferencesMenuItem.Text = Localization.Get("GRID_PREFERENCES");
+
+            this.configHandler.Translate();
         }
 
         public void ProjectSave(bool saveAs = false)
@@ -194,11 +221,11 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             var saveOK = projectSave.Save(ref lastFilePath, saveAs || !File.Exists(lastFilePath));
             if (!saveOK)
             {
-                this.Text = this.Name;
+                this.Text = this.GetFormLocalizatedName();
                 return;
             }
 
-            this.Text = this.Name + ". Project File: " + lastFilePath;
+            this.Text = this.GetFormLocalizatedName() + ". Project File: " + lastFilePath;
         }
 
         public void ProjectLoad()
@@ -238,8 +265,13 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
                 this.alarmGridHandler.DataGridView.ResumeLayout();
                 this.deviceGridHandler.DataGridView.ResumeLayout();
 
-                this.Text = this.Name + ". Project File: " + lastFilePath;
+                this.Text = this.GetFormLocalizatedName() + ". Project File: " + lastFilePath;
             }
+        }
+
+        private string GetFormLocalizatedName()
+        {
+            return Localization.Get("ALARM_GEN_FORM");
         }
     }
 }

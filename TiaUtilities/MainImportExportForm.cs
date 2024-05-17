@@ -65,6 +65,8 @@ namespace TiaXmlReader
                     var result = InformationBox.Show("Do you want to restart application?", "Restart to change language", buttons: InformationBoxButtons.YesNo);
                     if (result == InformationBoxResult.Yes)
                     {
+                        this.programSettings.Save(); //Without save, after restart it would restore the old (Meaning it would be useless)
+
                         Application.Restart();
                         Environment.Exit(0);
                     }

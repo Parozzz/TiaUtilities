@@ -17,12 +17,11 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
     public class AlarmGenerationProjectSave
     {
         public const string EXTENSION = "json";
-        public static string DEFAULT_FILE_PATH = Directory.GetCurrentDirectory() + @"\tempAlarmSave." + EXTENSION;
 
         public class AlarmProjectSaveData
         {
-            [JsonProperty] public Dictionary<int, AlarmData> AlarmDataDict = new Dictionary<int, AlarmData>();
-            [JsonProperty] public Dictionary<int, DeviceData> DeviceDataDict = new Dictionary<int, DeviceData>();
+            [JsonProperty] public Dictionary<int, AlarmData> AlarmDataDict = [];
+            [JsonProperty] public Dictionary<int, DeviceData> DeviceDataDict = [];
         }
 
         [JsonProperty] public AlarmProjectSaveData SaveData { get; set; } = new AlarmProjectSaveData();
@@ -40,12 +39,13 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
         {
             this.SaveData.DeviceDataDict.Add(rowIndex, deviceData);
         }
-        public static AlarmGenerationProjectSave Load(ref string filePath)
+
+        public static AlarmGenerationProjectSave Load(ref string? filePath)
         {
-            return GenerationUtils.Load(ref filePath, EXTENSION, out AlarmGenerationProjectSave projectSave) ? projectSave : new AlarmGenerationProjectSave();
+            return GenerationUtils.Load<AlarmGenerationProjectSave>(ref filePath, EXTENSION) ?? new AlarmGenerationProjectSave();
         }
 
-        public bool Save(ref string filePath, bool saveAs = false)
+        public bool Save(ref string? filePath, bool saveAs = false)
         {
             return GenerationUtils.Save(this, ref filePath, EXTENSION, saveAs);
         }

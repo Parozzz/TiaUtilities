@@ -14,7 +14,7 @@ namespace TiaXmlReader.Generation
 {
     public static class GenerationUtils
     {
-        private static CommonOpenFileDialog CreateFileDialog(bool ensureFileExists, string filePath, string extension)
+        private static CommonOpenFileDialog CreateFileDialog(bool ensureFileExists, string? filePath, string extension)
         {
             return new CommonOpenFileDialog
             {
@@ -22,7 +22,7 @@ namespace TiaXmlReader.Generation
                 EnsureFileExists = ensureFileExists,
                 DefaultExtension = "." + extension,
                 Filters = { new CommonFileDialogFilter(extension + " Files", "*." + extension) },
-                InitialDirectory = File.Exists(filePath) ? Path.GetDirectoryName(filePath) : Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
+                InitialDirectory = !string.IsNullOrEmpty(filePath) && File.Exists(filePath) ? Path.GetDirectoryName(filePath) : null,// : Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
             };
         }
         private static void FixExtesion(ref string filePath, string extension)
@@ -38,35 +38,37 @@ namespace TiaXmlReader.Generation
         {
             try
             {
-                if (!showFileDialog)
+                if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath) || showFileDialog)
                 {
+                    if(!showFileDialog)
+                    {
+                        throw new ArgumentException("File path invalid while saving without opening file dialog. Path: " + filePath);
+                    }
+
+                    var fileDialog = CreateFileDialog(false, filePath, extension);
+                    if (fileDialog.ShowDialog() != CommonFileDialogResult.Ok)
+                    {
+                        return false;
+                    }
+
+                    filePath = fileDialog.FileName;
                     if (string.IsNullOrEmpty(filePath))
                     {
-                        throw new ArgumentException("File path invalid while saving without opening file dialog.");
+                        return false;
                     }
-
-                    FixExtesion(ref filePath, extension);
-                    Directory.CreateDirectory(Path.GetDirectoryName(filePath));
-                    File.Create(filePath).Close(); //This is just to throw an exception in case the path is wrong!
                 }
-                else
+
+                FixExtesion(ref filePath, extension);
+                var directoryName = Path.GetDirectoryName(filePath);
+                if (string.IsNullOrEmpty(directoryName))
                 {
-                    if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
-                    {
-                        var fileDialog = CreateFileDialog(false, filePath, extension);
-                        if (fileDialog.ShowDialog() != CommonFileDialogResult.Ok)
-                        {
-                            return false;
-                        }
-
-                        filePath = fileDialog.FileName;
-                    }
-
-                    FixExtesion(ref filePath, extension);
-                    Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+                    return false;
                 }
 
-                JsonSerializer serializer = new JsonSerializer();
+                Directory.CreateDirectory(directoryName);
+                File.Create(filePath).Close(); //This is just to throw an exception in case the path is wrong!
+
+                var serializer = new JsonSerializer();
                 serializer.Converters.Add(new JavaScriptDateTimeConverter());
                 serializer.NullValueHandling = NullValueHandling.Ignore;
                 serializer.DefaultValueHandling = DefaultValueHandling.Include;
@@ -87,10 +89,8 @@ namespace TiaXmlReader.Generation
             return false;
         }
 
-        public static bool Load<C>(ref string filePath, string extension, out C? loaded, bool showFileDialog = true)
+        public static C? Load<C>(ref string? filePath, string extension, bool showFileDialog = true)
         {
-            loaded = default;
-
             try
             {
                 if (showFileDialog)
@@ -98,19 +98,20 @@ namespace TiaXmlReader.Generation
                     var fileDialog = CreateFileDialog(true, filePath, extension);
                     if (fileDialog.ShowDialog() != CommonFileDialogResult.Ok)
                     {
-                        return false;
+                        return default;
                     }
 
                     filePath = fileDialog.FileName;
                 }
-                else if (!File.Exists(filePath))
+
+                if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
                 {
-                    return false;
+                    return default;
                 }
 
                 FixExtesion(ref filePath, extension);
 
-                JsonSerializer serializer = new JsonSerializer();
+                var serializer = new JsonSerializer();
                 serializer.Converters.Add(new JavaScriptDateTimeConverter());
                 serializer.NullValueHandling = NullValueHandling.Ignore;
                 serializer.DefaultValueHandling = DefaultValueHandling.Include;
@@ -118,15 +119,15 @@ namespace TiaXmlReader.Generation
 
                 using var sr = new StreamReader(filePath);
                 using var reader = new JsonTextReader(sr);
-                loaded = serializer.Deserialize<C>(reader);
-                return true;
+                var deserialized = serializer.Deserialize<C>(reader);
+                return deserialized;
             }
             catch (Exception ex)
             {
                 Utils.ShowExceptionMessage(ex);
             }
 
-            return false;
+            return default;
         }
 
     }
