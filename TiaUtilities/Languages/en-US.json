@@ -25,6 +25,15 @@
   "GRID_PREFERENCES_DRAG_TRIANGLE_COLOR": "Drag triangle",
   "GRID_PREFERENCES_PREVIEW_FORE": "Preview",
 
+  //FIND&REPLACE
+  "FIND_FORM": "Grid - Find and Replace",
+  "FIND_FORM_FIND": "Find",
+  "FIND_FORM_REPLACE": "Replace",
+  "FIND_FORM_REPLACE_ALL": "ReplaceAll",
+  "FIND_FORM_MATCH_CASE": "Match Case",
+  "FIND_FORM_SEARCH_COMPLETED": "Search completed",
+  "FIND_FORM_REPLACE_ALL_COMPLETED": "Search completed. Replaced {count} values",
+
   //IO GENERATION
   "IO_DATA_ADDRESS": "Address",
   "IO_DATA_IO_NAME": "IO Tag",
@@ -100,9 +109,10 @@
   "ALARM_CONFIG_GENERATION": "Generation",
   "ALARM_CONFIG_GENERATION_START_NUM": "Starting Num.",
   "ALARM_CONFIG_GENERATION_FORMAT": "Format",
-  "ALARM_CONFIG_GENERATION_ANTI_SLIP": "Anti-Slip",
   "ALARM_CONFIG_GENERATION_SKIP": "Skip after each group",
-
+  "ALARM_CONFIG_GENERATION_ANTI_SLIP": "Anti-Slip",
+  "ALARM_CONFIG_GENERATION_ANTI_SLIP_AMOUNT": "Group Size",
+  "ALARM_CONFIG_GENERATION_ANTI_SLIP_GEN_EMPTY": "Generate Empty",
   "ALARM_CONFIG_GENERATION_EMPTY": "Generation Empty",
   "ALARM_CONFIG_GENERATION_EMPTY_ANTI_SLIP": "Generate in anti-slip",
   "ALARM_CONFIG_GENERATION_EMPTY_NUM": "Num. at end",

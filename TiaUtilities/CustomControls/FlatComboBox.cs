@@ -25,7 +25,7 @@ namespace TiaXmlReader.CustomControls
                 }
             }
         }
-        
+
         [DefaultValue(typeof(Color), "LightGray")]
         [Category("Appearance")]
         public Color ButtonColor
@@ -46,15 +46,12 @@ namespace TiaXmlReader.CustomControls
             if (m.Msg == WM_PAINT && DropDownStyle != ComboBoxStyle.Simple)
             {
                 var clientRect = ClientRectangle;
+
                 var dropDownButtonWidth = SystemInformation.HorizontalScrollBarArrowWidth;
-                var outerBorder = new Rectangle(clientRect.Location,
-                    new Size(clientRect.Width - 1, clientRect.Height - 1));
-                var innerBorder = new Rectangle(outerBorder.X + 1, outerBorder.Y + 1,
-                    outerBorder.Width - dropDownButtonWidth - 2, outerBorder.Height - 2);
-                var innerInnerBorder = new Rectangle(innerBorder.X + 1, innerBorder.Y + 1,
-                    innerBorder.Width - 2, innerBorder.Height - 2);
-                var dropDownRect = new Rectangle(innerBorder.Right + 1, innerBorder.Y,
-                    dropDownButtonWidth, innerBorder.Height + 1);
+                var outerBorder = new Rectangle(clientRect.Location, new Size(clientRect.Width - 1, clientRect.Height - 1));
+                var innerBorder = new Rectangle(outerBorder.X + 1, outerBorder.Y + 1, outerBorder.Width - dropDownButtonWidth - 2, outerBorder.Height - 2);
+                var innerInnerBorder = new Rectangle(innerBorder.X + 1, innerBorder.Y + 1, innerBorder.Width - 2, innerBorder.Height - 2);
+                var dropDownRect = new Rectangle(innerBorder.Right + 1, innerBorder.Y, dropDownButtonWidth, innerBorder.Height + 1);
                 if (RightToLeft == RightToLeft.Yes)
                 {
                     innerBorder.X = clientRect.Width - innerBorder.Right;
@@ -62,23 +59,18 @@ namespace TiaXmlReader.CustomControls
                     dropDownRect.X = clientRect.Width - dropDownRect.Right;
                     dropDownRect.Width += 1;
                 }
-                var innerBorderColor = Enabled ? BackColor : SystemColors.Control;
-                var outerBorderColor = Enabled ? BorderColor : SystemColors.ControlDark;
-                var buttonColor = Enabled ? ButtonColor : SystemColors.Control;
-                var middle = new Point(dropDownRect.Left + dropDownRect.Width / 2,
-                    dropDownRect.Top + dropDownRect.Height / 2);
-                var arrow = new Point[]
-                {
-                new Point(middle.X - 3, middle.Y - 2),
-                new Point(middle.X + 4, middle.Y - 2),
-                new Point(middle.X, middle.Y + 2)
-                };
-                var ps = new PAINTSTRUCT();
+                var innerBorderColor = BackColor; //Enabled ? BackColor : SystemColors.Control;
+                var outerBorderColor = BorderColor; //Enabled ? BorderColor : SystemColors.ControlDark;
+                var buttonColor = ButtonColor; //Enabled ? ButtonColor : SystemColors.Control;
+                var middle = new Point(dropDownRect.Left + dropDownRect.Width / 2, dropDownRect.Top + dropDownRect.Height / 2);
+                var arrow = new Point[] { new(middle.X - 3, middle.Y - 2), new(middle.X + 4, middle.Y - 2), new(middle.X, middle.Y + 2) };
+
+                var paintStruct = new PAINTSTRUCT();
                 bool shoulEndPaint = false;
                 IntPtr dc;
                 if (m.WParam == IntPtr.Zero)
                 {
-                    dc = BeginPaint(Handle, ref ps);
+                    dc = BeginPaint(Handle, ref paintStruct);
                     m.WParam = dc;
                     shoulEndPaint = true;
                 }
@@ -94,32 +86,32 @@ namespace TiaXmlReader.CustomControls
                 rgn = CreateRectRgn(clientRect.Left, clientRect.Top,
                     clientRect.Right, clientRect.Bottom);
                 SelectClipRgn(dc, rgn);
-                using (var g = Graphics.FromHdc(dc))
-                {
-                    using (var b = new SolidBrush(buttonColor))
-                    {
-                        g.FillRectangle(b, dropDownRect);
-                    }
-                    using (var b = new SolidBrush(outerBorderColor))
-                    {
-                        g.FillPolygon(b, arrow);
-                    }
-                    using (var p = new Pen(innerBorderColor))
-                    {
-                        g.DrawRectangle(p, innerBorder);
-                        g.DrawRectangle(p, innerInnerBorder);
-                    }
-                    using (var p = new Pen(outerBorderColor))
-                    {
-                        g.DrawRectangle(p, outerBorder);
-                    }
-                }
+
+                using var graphics = Graphics.FromHdc(dc);
+
+                using var buttonBrush = new SolidBrush(buttonColor);
+                graphics.FillRectangle(buttonBrush, dropDownRect);
+
+                using var outerBorderBrush = new SolidBrush(outerBorderColor);
+                graphics.FillPolygon(outerBorderBrush, arrow);
+
+                using var innerBorderPen = new Pen(innerBorderColor);
+                graphics.DrawRectangle(innerBorderPen, innerBorder);
+                graphics.DrawRectangle(innerBorderPen, innerInnerBorder);
+
+                using var outerBorderPen = new Pen(outerBorderColor);
+                graphics.DrawRectangle(outerBorderPen, outerBorder);
+
                 if (shoulEndPaint)
-                    EndPaint(Handle, ref ps);
+                {
+                    EndPaint(Handle, ref paintStruct);
+                }
                 DeleteObject(rgn);
             }
             else
+            {
                 base.WndProc(ref m);
+            }   
         }
 
         private const int WM_PAINT = 0xF;

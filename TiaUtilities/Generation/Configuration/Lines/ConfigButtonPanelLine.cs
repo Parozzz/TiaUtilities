@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -35,10 +36,16 @@ namespace TiaUtilities.Generation.Configuration.Lines
 
             var button = new Button
             {
-                Text = buttonText,
                 Dock = DockStyle.Top,
-                AutoSize = true
+                AutoSize = true,
+                ForeColor = ConfigStyle.FORE_COLOR,
+                BackColor = ConfigStyle.BACK_COLOR,
+                FlatStyle = FlatStyle.Flat,
+                Text = buttonText,
             };
+            button.FlatAppearance.BorderColor = ConfigStyle.DETAIL_COLOR_DARKDARK;
+            button.FlatAppearance.BorderSize = 2;
+
             button.Click += (sender, args) => clickAction.Invoke();
             panel.Controls.Add(button);
 

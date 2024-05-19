@@ -69,4 +69,10 @@
     </Compile>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Mentions.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

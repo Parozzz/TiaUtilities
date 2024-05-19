@@ -1,18 +1,10 @@
 ﻿using InfoBox;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.GenerationForms;
+using TiaXmlReader.Languages;
 using TiaXmlReader.Utility;
-using static TiaUtilities.Generation.GridHandler.GridFindForm;
 
 namespace TiaUtilities.Generation.GridHandler
 {
@@ -86,7 +78,9 @@ namespace TiaUtilities.Generation.GridHandler
                 }
                 gridHandler.ChangeCells(cellChangeList);
 
-                InformationBox.Show("Search completed. Replaced " + cellChangeList.Count + " values.", "Find and Replace",
+                var title = Localization.Get("FIND_FORM");
+                var searchCompletedText = Localization.Get("FIND_FORM_REPLACE_ALL_COMPLETED").Replace("{count}", cellChangeList.Count.ToString());
+                InformationBox.Show(searchCompletedText, title,
                         buttons: InformationBoxButtons.OK,
                         icon: InformationBoxIcon.Information,
                         titleStyle: InformationBoxTitleIconStyle.SameAsBox);
@@ -180,7 +174,10 @@ namespace TiaUtilities.Generation.GridHandler
 
             if (!found && showInfoAndClearOnFail)
             {
-                InformationBox.Show("Search completed.", "Find and Replace",
+                var title = Localization.Get("FIND_FORM");
+                var searchCompletedText = Localization.Get("FIND_FORM_SEARCH_COMPLETED");
+
+                InformationBox.Show(searchCompletedText, title,
                         buttons: InformationBoxButtons.OK,
                         icon: InformationBoxIcon.Information,
                         titleStyle: InformationBoxTitleIconStyle.SameAsBox);
@@ -194,6 +191,22 @@ namespace TiaUtilities.Generation.GridHandler
         public GridFindForm()
         {
             InitializeComponent();
+
+            Init();
+        }
+
+        private void Init()
+        {
+            Translate();
+        }
+
+        private void Translate()
+        {
+            this.Text = Localization.Get("FIND_FORM");
+            this.FindLabel.Text = this.FindButton.Text = Localization.Get("FIND_FORM_FIND");
+            this.ReplaceLabel.Text = this.ReplaceButton.Text = Localization.Get("FIND_FORM_REPLACE");
+            this.ReplaceAllButton.Text = Localization.Get("FIND_FORM_REPLACE_ALL");
+            this.MatchCaseCheckBox.Text = Localization.Get("FIND_FORM_MATCH_CASE");
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)

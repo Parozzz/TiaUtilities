@@ -64,3 +64,4 @@ xmlDocument.Save(Directory.GetCurrentDirectory() + "/fc.xml");
 ### Mentions
 - FastColoredTextBox (For JS Editor) - https://github.com/PavelTorgashov/FastColoredTextBox
 - Jint (For JS parsing) - https://github.com/sebastienros/jint
+- RJControls (RJCodeAdvance) - https://github.com/RJCodeAdvance/Custom-TextBox-2--Rounded-Placeholder

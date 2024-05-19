@@ -38,7 +38,7 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
                 {
                     var configForm = new ConfigForm(button.Text);
 
-                    var mainGroup = configForm.Init();
+                    var mainGroup = configForm.Init().ControlWidth(185);
                     mainGroup.AddTextBox().LocalizedLabel("GENERICS_NAME")
                         .ControlText(config.FCBlockName)
                         .TextChanged(v => config.FCBlockName = v);
@@ -47,7 +47,7 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
                         .ControlText(config.FCBlockNumber)
                         .UIntChanged(v => config.FCBlockNumber = v);
 
-                    mainGroup.AddCheckBox().LocalizedLabel("ALARM_CONFIG_FC_COIL_FIRST")
+                    mainGroup.AddCheckBox().LocalizedLabel("ALARM_CONFIG_FC_COIL_FIRST").ControlNoAdapt()
                         .Value(config.CoilFirst)
                         .CheckedChanged(v => config.CoilFirst = v);
 
@@ -59,62 +59,51 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
                 var button = form.alarmGenerationConfigButton;
                 button.Click += (sender, args) =>
                 {
-                    var configForm = new ConfigForm(button.Text);
+                    var configForm = new ConfigForm(button.Text) { ControlWidth = 300 };
 
-                    var mainGroup = configForm.Init();
+                    var mainGroup = configForm.Init().ControlWidth(150);
                     mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_GENERATION_START_NUM")
                          .ControlText(config.StartingAlarmNum)
                          .UIntChanged(v => config.StartingAlarmNum = v);
-
                     mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_GENERATION_FORMAT")
                          .ControlText(config.AlarmNumFormat)
                          .TextChanged(v => config.AlarmNumFormat = v);
-
-                    mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_GENERATION_ANTI_SLIP")
-                         .ControlText(config.AntiSlipNumber)
-                         .UIntChanged(v => config.AntiSlipNumber = v);
-
                     mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_GENERATION_SKIP")
                          .ControlText(config.SkipNumberAfterGroup)
                          .UIntChanged(v => config.SkipNumberAfterGroup = v);
 
-                    SetupConfigForm(button, configForm);
-                };
-            }
+                    mainGroup.AddSeparator().Height(15);
 
-            {
-                var button = form.emptyAlarmGenerationConfigButton;
-                button.Click += (sender, args) =>
-                {
-                    var configForm = new ConfigForm(button.Text) { ControlWidth = 200 };
+                    var antiSlipGroup = mainGroup.AddGroup().ControlWidth(175).NoAdapt();
+                    antiSlipGroup.AddLabel().LocalizedLabel("ALARM_CONFIG_GENERATION_ANTI_SLIP");
+                    antiSlipGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_GENERATION_ANTI_SLIP_AMOUNT")
+                         .ControlText(config.AntiSlipNumber)
+                         .UIntChanged(v => config.AntiSlipNumber = v);
+                    antiSlipGroup.AddCheckBox().LocalizedLabel("ALARM_CONFIG_GENERATION_ANTI_SLIP_GEN_EMPTY")
+                        .ControlNoAdapt()
+                        .Value(config.GenerateEmptyAlarmAntiSlip)
+                        .CheckedChanged(v => config.GenerateEmptyAlarmAntiSlip = v);
 
-                    var mainGroup = configForm.Init();
-                    mainGroup.AddCheckBox().LocalizedLabel("ALARM_CONFIG_GENERATION_EMPTY_ANTI_SLIP")
-                         .Value(config.GenerateEmptyAlarmAntiSlip)
-                         .CheckedChanged(v => config.GenerateEmptyAlarmAntiSlip = v);
+                    mainGroup.AddSeparator().Height(15);
 
-                    mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_GENERATION_EMPTY_NUM")
+                    var emptyAlarmGroup = mainGroup.AddGroup().ControlWidth(175).NoAdapt();
+                    emptyAlarmGroup.AddLabel().Label("Empty Alarms");
+                    emptyAlarmGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_GENERATION_EMPTY_NUM")
                          .ControlText(config.EmptyAlarmAtEnd)
                          .UIntChanged(v => config.EmptyAlarmAtEnd = v);
-
-                    mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_GENERATION_EMPTY_ALARM_ADDRESS")
+                    emptyAlarmGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_GENERATION_EMPTY_ALARM_ADDRESS")
                          .ControlText(config.EmptyAlarmContactAddress)
                          .TextChanged(v => config.EmptyAlarmContactAddress = v);
 
-
-                    var timerGroup = mainGroup.AddGroup().ControlWidth(225).NoAdapt();
-
+                    var timerGroup = emptyAlarmGroup.AddGroup().ControlWidth(175);
                     timerGroup.AddLabel().LocalizedLabel("ALARM_CONFIG_GENERATION_EMPTY_TIMER");
-
                     timerGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_GENERATION_EMPTY_TIMER_ADDRESS")
                          .ControlText(config.EmptyAlarmTimerAddress)
                          .TextChanged(v => config.EmptyAlarmTimerAddress = v);
-
                     timerGroup.AddComboBox().LocalizedLabel("ALARM_CONFIG_GENERATION_EMPTY_TIMER_TYPE")
                          .Items(["TON", "TOF"]).DisableEdit()
                          .ControlText(config.EmptyAlarmTimerType)
                          .TextChanged(v => config.EmptyAlarmTimerType = v);
-
                     timerGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_GENERATION_EMPTY_TIMER_VALUE")
                          .ControlText(config.EmptyAlarmTimerValue)
                          .TextChanged(v => config.EmptyAlarmTimerValue = v);
@@ -247,7 +236,6 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
 
             form.fcConfigButton.Text = Localization.Get("ALARM_CONFIG_FC");
             form.alarmGenerationConfigButton.Text = Localization.Get("ALARM_CONFIG_GENERATION");
-            form.emptyAlarmGenerationConfigButton.Text = Localization.Get("ALARM_CONFIG_GENERATION_EMPTY");
             form.fieldDefaultValueConfigButton.Text = Localization.Get("ALARM_CONFIG_DEFAULTS");
             form.fieldPrefixConfigButton.Text = Localization.Get("ALARM_CONFIG_PREFIX");
             form.segmentNameConfigButton.Text = Localization.Get("ALARM_CONFIG_SEGMENT_NAME");

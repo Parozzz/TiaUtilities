@@ -1,16 +1,15 @@
-﻿using TiaXmlReader.Utility;
+﻿using TiaUtilities.Generation.Configuration;
+using TiaXmlReader.Utility;
 
 namespace TiaXmlReader.Generation.Configuration
 {
     public partial class ConfigForm : Form
     {
-        public static readonly Font LABEL_FONT = new(FontFamily.GenericMonospace, 12.5f, FontStyle.Bold);
-        public static readonly Font CONTROL_FONT = new(FontFamily.GenericMonospace, 9f);
 
         private readonly string title;
 
-        public Font LabelFont { get; set; } = LABEL_FONT;
-        public Font ControlFont { get; set; } = CONTROL_FONT;
+        public Font LabelFont { get; set; } = ConfigStyle.LABEL_FONT;
+        public Font ControlFont { get; set; } = ConfigStyle.CONTROL_FONT;
         public int ControlWidth { get; set; } = 300;
         public int ControlHeight { get; set; } = 30;
         public bool CloseOnOutsideClick { get; set; } = true;

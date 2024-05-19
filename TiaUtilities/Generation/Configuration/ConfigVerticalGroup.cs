@@ -182,6 +182,11 @@ namespace TiaUtilities.Generation.Configuration
                 return control == null ? null : CreateSingleControlPanel(control);
             }
         }
+
+        public Control? GetWrappedControl()
+        {
+            return this.GetControl();
+        }
     }
 }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CustomControls.RJControls;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -12,20 +13,31 @@ namespace TiaUtilities.Generation.Configuration.Lines
 {
     public class ConfigComboBoxLine : ConfigLine<ConfigComboBoxLine>
     {
-        private readonly ComboBox control;
+        private readonly RJComboBox comboBox;
 
         private bool numericOnly;
-        private Action<string> textChangedAction;
-        private Action<uint> uintChangedAction;
+        private Action<string>? textChangedAction;
+        private Action<uint>? uintChangedAction;
 
         public ConfigComboBoxLine()
         {
-            control = new FlatComboBox();
-            control.TextChanged += TextChangedEventHandler;
-            control.KeyPress += KeyPressEventHandler;
+            this.comboBox = new RJComboBox()
+            {
+                Margin = Padding.Empty,
+                ForeColor = ConfigStyle.FORE_COLOR,
+                BackColor = ConfigStyle.BACK_COLOR,
+                IconBackColor = ConfigStyle.DETAIL_COLOR_DARK,
+                IconColor = ConfigStyle.DETAIL_COLOR_DARKDARK,
+                BorderStyle = BorderStyle.None,
+                Underlined = true,
+                UnderlineColor = ConfigStyle.UNDERLINE_COLOR,
+            };
+
+            comboBox.TextChanged += TextChangedEventHandler;
+            comboBox.KeyPress += KeyPressEventHandler;
         }
 
-        private void KeyPressEventHandler(object sender, KeyPressEventArgs args)
+        private void KeyPressEventHandler(object? sender, KeyPressEventArgs args)
         {
             if (numericOnly)
             {
@@ -33,9 +45,9 @@ namespace TiaUtilities.Generation.Configuration.Lines
             }
         }
 
-        private void TextChangedEventHandler(object sender, EventArgs args)
+        private void TextChangedEventHandler(object? sender, EventArgs args)
         {
-            var text = control.Text;
+            var text = comboBox.Text;
             textChangedAction?.Invoke(text);
 
             if (uintChangedAction != null && uint.TryParse(text, out uint result))
@@ -46,13 +58,19 @@ namespace TiaUtilities.Generation.Configuration.Lines
 
         public ConfigComboBoxLine DisableEdit()
         {
-            this.control.DropDownStyle = ComboBoxStyle.DropDownList;
+            this.comboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             return this;
         }
 
         public ConfigComboBoxLine Items(object[] items)
         {
-            control.Items.AddRange(items);
+            comboBox.Items.AddRange(items);
+            return this;
+        }
+
+        public ConfigComboBoxLine SelectecItem(object item)
+        {
+            comboBox.SelectedItem = item;
             return this;
         }
 
@@ -76,7 +94,7 @@ namespace TiaUtilities.Generation.Configuration.Lines
 
         public override Control GetControl()
         {
-            return control;
+            return comboBox;
         }
     }
 }

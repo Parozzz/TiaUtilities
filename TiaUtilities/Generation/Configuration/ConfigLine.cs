@@ -14,6 +14,7 @@ namespace TiaXmlReader.Generation.Configuration
         private Font? labelFont = null;
 
         private int height = 0; // 0 = means use standard value in ConfigForm
+        private bool controlNoAdapt = false;
 
         public ConfigLine() { }
 
@@ -58,6 +59,12 @@ namespace TiaXmlReader.Generation.Configuration
             return (LINE)this;
         }
 
+        public LINE ControlNoAdapt()
+        {
+            this.controlNoAdapt = true;
+            return (LINE)this;
+        }
+
         public string? GetLabelText()
         {
             return labelText;
@@ -76,6 +83,11 @@ namespace TiaXmlReader.Generation.Configuration
         public int GetHeight()
         {
             return height;
+        }
+
+        public bool IsControlNoAdapt()
+        {
+            return this.controlNoAdapt;
         }
 
         public abstract Control? GetControl();

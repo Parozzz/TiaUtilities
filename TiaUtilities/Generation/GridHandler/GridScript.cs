@@ -4,6 +4,7 @@ using InfoBox;
 using Jint;
 using Jint.Native;
 using Jint.Native.ShadowRealm;
+using TiaUtilities.Generation.Configuration;
 using TiaUtilities.Generation.Configuration.Lines;
 using TiaUtilities.Generation.Configuration.Utility;
 using TiaUtilities.Generation.GridHandler.Events;
@@ -58,15 +59,15 @@ namespace TiaXmlReader.Generation.GridHandler
             var mainGroup = configForm.Init();
             mainGroup.AddLabel()
                 .Label("Variables: " + showVariableEventArgs.VariableList.Aggregate((a, b) => a + ", " + b))
-                .LabelFont(ConfigForm.LABEL_FONT.Copy(9f, FontStyle.Regular));
+                .LabelFont(ConfigStyle.LABEL_FONT.Copy(9f, FontStyle.Regular));
 
             var debugGroup = mainGroup.AddVerticalGroup().Height(150).SplitterDistance(95);
             this.logTextBoxLine = debugGroup.AddTextBox()
-                .Label("Log > " + ENGINE_LOG_FUNCTION + "(string)").LabelFont(ConfigForm.LABEL_FONT.Copy(9f, FontStyle.Regular)).LabelOnTop()
+                .Label("Log > " + ENGINE_LOG_FUNCTION + "(string)").LabelFont(ConfigStyle.LABEL_FONT.Copy(9f, FontStyle.Regular)).LabelOnTop()
                 .Readonly().Multiline();
-            this.jsonLine = debugGroup.AddJSON().Readonly()
-                .Label("Context Json").LabelFont(ConfigForm.LABEL_FONT.Copy(9f, FontStyle.Regular)).LabelOnTop();
 
+            this.jsonLine = debugGroup.AddJSON().Readonly()
+                .Label("Context Json").LabelFont(ConfigStyle.LABEL_FONT.Copy(9f, FontStyle.Regular)).LabelOnTop();
 
             var loadScriptArgs = new GridScriptEventArgs();
             this.gridHandler.Events.ScriptLoadEvent(loadScriptArgs);

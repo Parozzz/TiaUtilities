@@ -9,56 +9,46 @@ using System.Windows.Forms;
 using TiaXmlReader.Utility;
 using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Utility.Extensions;
+using CustomControls.RJControls;
 
 namespace TiaUtilities.Generation.Configuration.Lines
 {
     public class ConfigColorPickerLine : ConfigLine<ConfigColorPickerLine>
     {
-        private readonly TableLayoutPanel panel;
-        private readonly TextBox colorTextBox;
+        private readonly RJTextBox colorTextBox;
         private readonly Button colorPickerButton;
 
-
-        private Action<Color> colorAction;
+        private Action<Color>? colorAction;
         private Color lastColor = Color.White;
 
         public ConfigColorPickerLine()
         {
-            panel = new TableLayoutPanel()
+            this.colorTextBox = new RJTextBox()
             {
-                Dock = DockStyle.Fill,
-                AutoSize = true,
-                Padding = new Padding(0),
-                Margin = new Padding(2),
-                ColumnCount = 2,
-                ColumnStyles = { new ColumnStyle(SizeType.Percent, 30f), new ColumnStyle(SizeType.Percent, 70f) },
-                RowCount = 1,
-                RowStyles = { new RowStyle(SizeType.AutoSize) }
-            };
-
-            colorTextBox = new TextBox()
-            {
-                Dock = DockStyle.Fill,
+                ForeColor = ConfigStyle.FORE_COLOR,
+                BackColor = ConfigStyle.BACK_COLOR,
+                Margin = Padding.Empty,
+                BorderStyle = BorderStyle.None,
+                Underlined = true,
+                UnderlineColor = ConfigStyle.UNDERLINE_COLOR,
                 TextAlign = HorizontalAlignment.Center,
-                Padding = new Padding(0),
-                Margin = new Padding(0)
             };
-            colorTextBox.TextChanged += ColorTextBoxTextChangedEvent;
-            panel.Controls.Add(colorTextBox);
+            this.colorTextBox.TextChanged += ColorTextBoxTextChangedEvent;
 
-            colorPickerButton = new Button()
+            this.colorPickerButton = new Button()
             {
+                ForeColor = ConfigStyle.FORE_COLOR,
+                BackColor = ConfigStyle.BACK_COLOR,
                 Dock = DockStyle.Fill,
                 AutoSize = true,
                 AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                Padding = new Padding(0),
-                Margin = new Padding(0)
+                Padding = Padding.Empty,
+                Margin = new(2),
             };
-            colorPickerButton.Click += ColorPickerButtonClickEvent;
-            panel.Controls.Add(colorPickerButton);
+            this.colorPickerButton.Click += ColorPickerButtonClickEvent;
         }
 
-        private void ColorTextBoxTextChangedEvent(object sender, EventArgs e)
+        private void ColorTextBoxTextChangedEvent(object? sender, EventArgs e)
         {
             try
             {
@@ -67,15 +57,11 @@ namespace TiaUtilities.Generation.Configuration.Lines
             catch { }
         }
 
-        private void ColorPickerButtonClickEvent(object sender, EventArgs e)
+        private void ColorPickerButtonClickEvent(object? sender, EventArgs e)
         {
             try
             {
-                var colorDialog = new ColorDialog()
-                {
-                    Color = lastColor,
-                };
-
+                var colorDialog = new ColorDialog() { Color = lastColor, };
                 if (colorDialog.ShowDialog() == DialogResult.OK)
                 {
                     ApplyColor(colorDialog.Color);
@@ -107,7 +93,17 @@ namespace TiaUtilities.Generation.Configuration.Lines
 
         public override Control GetControl()
         {
-            return panel;
+            return new TableLayoutPanel()
+            {
+                Dock = DockStyle.Fill,
+                Padding = Padding.Empty,
+                Margin = Padding.Empty,
+                ColumnCount = 2,
+                ColumnStyles = { new ColumnStyle(SizeType.Percent, 30f), new ColumnStyle(SizeType.Percent, 70f) },
+                RowCount = 1,
+                RowStyles = { new RowStyle(SizeType.AutoSize) },
+                Controls = { this.colorTextBox, this.colorPickerButton }
+            };
         }
     }
 }

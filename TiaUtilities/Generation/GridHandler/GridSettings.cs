@@ -18,7 +18,7 @@ namespace TiaXmlReader.Generation.GridHandler
 
         public void ShowConfigForm(IWin32Window owner)
         {
-            var configForm = new ConfigForm(Localization.Get("GRID_PREFERENCES"));
+            var configForm = new ConfigForm(Localization.Get("GRID_PREFERENCES")) { ControlWidth = 300 };
 
             var mainGroup = configForm.Init();
             mainGroup.AddColorPicker().LocalizedLabel("GRID_PREFERENCES_SELECTED_CELL_BORDER")

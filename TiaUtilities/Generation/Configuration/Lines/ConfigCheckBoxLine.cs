@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CustomControls.RJControls;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 using TiaXmlReader.Generation.Configuration;
@@ -7,17 +8,22 @@ namespace TiaUtilities.Generation.Configuration.Lines
 {
     public class ConfigCheckBoxLine : ConfigLine<ConfigCheckBoxLine>
     {
-        private readonly CheckBox control;
+        private readonly RJToggleButton control;
 
         private Action<bool>? checkedChangedAction;
 
         public ConfigCheckBoxLine()
         {
-            control = new CheckBox
+            control = new RJToggleButton
             {
                 FlatStyle = FlatStyle.Flat,
                 Text = "",
                 AutoSize = true,
+                BorderColor = SystemColors.ControlDark,
+                OnBackColor = Color.Transparent,
+                OffBackColor = Color.Transparent,
+                OnToggleColor = Color.DarkGreen,
+                OffToggleColor = Color.PaleVioletRed,
             };
             control.CheckedChanged += CheckedChangedEventHandler;
         }

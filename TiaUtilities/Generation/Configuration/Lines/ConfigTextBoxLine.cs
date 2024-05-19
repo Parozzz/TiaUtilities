@@ -1,32 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using TiaXmlReader.CustomControls;
+﻿using CustomControls.RJControls;
 using TiaXmlReader.Generation.Configuration;
 
 namespace TiaUtilities.Generation.Configuration.Lines
 {
     public class ConfigTextBoxLine : ConfigLine<ConfigTextBoxLine>
     {
-        private readonly TextBox control;
+        private readonly RJTextBox textBox;
 
         private bool numericOnly;
-        private Action<string>? textChangedAction;
+        private Action<string?>? textChangedAction;
         private Action<uint>? uintChangedAction;
 
         public ConfigTextBoxLine()
         {
-            this.control = new FlatTextBox()
+            this.textBox = new RJTextBox()
             {
                 Margin = new Padding(0),
+                ForeColor = ConfigStyle.FORE_COLOR,
+                BackColor = ConfigStyle.BACK_COLOR,
+                BorderColor = ConfigStyle.DETAIL_COLOR_DARK,
+                BorderFocusColor = ConfigStyle.DETAIL_COLOR_DARKDARK,
+                BorderStyle = BorderStyle.None,
+                Underlined = true,
+                UnderlineColor = ConfigStyle.UNDERLINE_COLOR,
+                TextLeftPadding = 3,
             };
-            this.control.TextChanged += TextChangedEventHandler;
-            this.control.KeyPress += KeyPressEventHandler;
+            this.textBox.TextChanged += TextChangedEventHandler;
+            this.textBox.KeyPress += KeyPressEventHandler;
         }
 
         private void KeyPressEventHandler(object? sender, KeyPressEventArgs args)
@@ -39,7 +39,7 @@ namespace TiaUtilities.Generation.Configuration.Lines
 
         private void TextChangedEventHandler(object? sender, EventArgs args)
         {
-            var text = this.control.Text;
+            var text = this.textBox.Text;
             textChangedAction?.Invoke(text);
 
             if (uintChangedAction != null && uint.TryParse(text, out uint result))
@@ -50,17 +50,19 @@ namespace TiaUtilities.Generation.Configuration.Lines
 
         public ConfigTextBoxLine Readonly()
         {
-            this.control.ReadOnly = true;
+            this.textBox.Underlined = false;
+            this.textBox.ReadOnly = true;
             return this;
         }
 
         public ConfigTextBoxLine Multiline()
         {
-            this.control.Multiline = true;
-            this.control.ScrollBars = ScrollBars.Both;
+            this.textBox.Multiline = true;
+            this.textBox.ScrollBars = ScrollBars.Both;
             return this;
         }
-        public ConfigTextBoxLine TextChanged(Action<string> action)
+
+        public ConfigTextBoxLine TextChanged(Action<string?> action)
         {
             textChangedAction = action;
             return this;
@@ -75,7 +77,7 @@ namespace TiaUtilities.Generation.Configuration.Lines
 
         public override Control GetControl()
         {
-            return this.control;
+            return this.textBox;
         }
     }
 }

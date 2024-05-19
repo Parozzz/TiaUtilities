@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using static TiaXmlReader.CustomControls.FlatComboBox;
 
 namespace TiaXmlReader.CustomControls
 {
@@ -39,17 +40,23 @@ namespace TiaXmlReader.CustomControls
 
         protected override void WndProc(ref Message m)
         {
-            base.WndProc(ref m);
-            if (m.Msg == WM_NCPAINT && BorderColor != Color.Transparent &&
-                BorderStyle == System.Windows.Forms.BorderStyle.Fixed3D)
+            if (m.Msg == WM_NCPAINT && BorderColor != Color.Transparent) //&& BorderStyle == BorderStyle.Fixed3D)
             {
                 var hdc = GetWindowDC(this.Handle);
-                using (var g = Graphics.FromHdcInternal(hdc))
-                using (var p = new Pen(BorderColor))
-                    g.DrawRectangle(p, new Rectangle(0, 0, Width - 1, Height - 1));
+
+                using var graphics = Graphics.FromHdcInternal(hdc);
+
+                using var borderPen = new Pen(BorderColor, 2);
+                graphics.DrawRectangle(borderPen, new Rectangle(0, 0, Width - 1, Height - 1));
+
                 ReleaseDC(this.Handle, hdc);
             }
+            else
+            {
+                base.WndProc(ref m);
+            }
         }
+
         protected override void OnSizeChanged(EventArgs e)
         {
             base.OnSizeChanged(e);

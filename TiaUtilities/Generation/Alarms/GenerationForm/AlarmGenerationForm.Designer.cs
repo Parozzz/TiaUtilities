@@ -43,7 +43,6 @@
             configButtonPanel = new FlowLayoutPanel();
             fcConfigButton = new Button();
             alarmGenerationConfigButton = new Button();
-            emptyAlarmGenerationConfigButton = new Button();
             fieldDefaultValueConfigButton = new Button();
             fieldPrefixConfigButton = new Button();
             segmentNameConfigButton = new Button();
@@ -186,7 +185,6 @@
             configButtonPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             configButtonPanel.Controls.Add(fcConfigButton);
             configButtonPanel.Controls.Add(alarmGenerationConfigButton);
-            configButtonPanel.Controls.Add(emptyAlarmGenerationConfigButton);
             configButtonPanel.Controls.Add(fieldDefaultValueConfigButton);
             configButtonPanel.Controls.Add(fieldPrefixConfigButton);
             configButtonPanel.Controls.Add(segmentNameConfigButton);
@@ -225,26 +223,12 @@
             alarmGenerationConfigButton.Text = "Generazione Allarmi";
             alarmGenerationConfigButton.UseVisualStyleBackColor = true;
             // 
-            // emptyAlarmGenerationConfigButton
-            // 
-            emptyAlarmGenerationConfigButton.AutoSize = true;
-            emptyAlarmGenerationConfigButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            emptyAlarmGenerationConfigButton.Font = new Font("Microsoft Sans Serif", 12.75F, FontStyle.Bold);
-            emptyAlarmGenerationConfigButton.Location = new Point(274, 0);
-            emptyAlarmGenerationConfigButton.Margin = new Padding(3, 0, 0, 0);
-            emptyAlarmGenerationConfigButton.Name = "emptyAlarmGenerationConfigButton";
-            emptyAlarmGenerationConfigButton.Padding = new Padding(8, 0, 8, 0);
-            emptyAlarmGenerationConfigButton.Size = new Size(255, 30);
-            emptyAlarmGenerationConfigButton.TabIndex = 15;
-            emptyAlarmGenerationConfigButton.Text = "Generazione Allarmi Vuoti";
-            emptyAlarmGenerationConfigButton.UseVisualStyleBackColor = true;
-            // 
             // fieldDefaultValueConfigButton
             // 
             fieldDefaultValueConfigButton.AutoSize = true;
             fieldDefaultValueConfigButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             fieldDefaultValueConfigButton.Font = new Font("Microsoft Sans Serif", 12.75F, FontStyle.Bold);
-            fieldDefaultValueConfigButton.Location = new Point(532, 0);
+            fieldDefaultValueConfigButton.Location = new Point(274, 0);
             fieldDefaultValueConfigButton.Margin = new Padding(3, 0, 0, 0);
             fieldDefaultValueConfigButton.Name = "fieldDefaultValueConfigButton";
             fieldDefaultValueConfigButton.Padding = new Padding(8, 0, 8, 0);
@@ -258,7 +242,7 @@
             fieldPrefixConfigButton.AutoSize = true;
             fieldPrefixConfigButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             fieldPrefixConfigButton.Font = new Font("Microsoft Sans Serif", 12.75F, FontStyle.Bold);
-            fieldPrefixConfigButton.Location = new Point(738, 0);
+            fieldPrefixConfigButton.Location = new Point(480, 0);
             fieldPrefixConfigButton.Margin = new Padding(3, 0, 0, 0);
             fieldPrefixConfigButton.Name = "fieldPrefixConfigButton";
             fieldPrefixConfigButton.Padding = new Padding(8, 0, 8, 0);
@@ -272,7 +256,7 @@
             segmentNameConfigButton.AutoSize = true;
             segmentNameConfigButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             segmentNameConfigButton.Font = new Font("Microsoft Sans Serif", 12.75F, FontStyle.Bold);
-            segmentNameConfigButton.Location = new Point(900, 0);
+            segmentNameConfigButton.Location = new Point(642, 0);
             segmentNameConfigButton.Margin = new Padding(3, 0, 0, 0);
             segmentNameConfigButton.Name = "segmentNameConfigButton";
             segmentNameConfigButton.Padding = new Padding(8, 0, 8, 0);
@@ -286,7 +270,7 @@
             textListConfigButton.AutoSize = true;
             textListConfigButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             textListConfigButton.Font = new Font("Microsoft Sans Serif", 12.75F, FontStyle.Bold);
-            textListConfigButton.Location = new Point(1065, 0);
+            textListConfigButton.Location = new Point(807, 0);
             textListConfigButton.Margin = new Padding(3, 0, 0, 0);
             textListConfigButton.Name = "textListConfigButton";
             textListConfigButton.Padding = new Padding(8, 0, 8, 0);
@@ -394,7 +378,6 @@
         private System.Windows.Forms.ToolStripMenuItem exportXMLMenuItem;
         private System.Windows.Forms.ToolStripMenuItem preferencesMenuItem;
         private System.Windows.Forms.SplitContainer GridsSplitPanel;
-        public System.Windows.Forms.Button emptyAlarmGenerationConfigButton;
         public System.Windows.Forms.Button textListConfigButton;
         public Label partitionTypeLabel;
         public Label groupingTypeLabel;

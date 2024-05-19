@@ -111,7 +111,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
                      .ControlText(settings.StartingRow)
                      .UIntChanged(num => settings.StartingRow = num);
 
-                mainGroup.AddJavascript().Label("Espressione validità riga").Height(200)
+                mainGroup.AddJavascript().Label("Espressione\nvalidità riga").Height(200)
                      .ControlText(settings.IgnoreRowExpressionConfig)
                      .TextChanged(str => settings.IgnoreRowExpressionConfig = str);
 
@@ -147,7 +147,14 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
             var scriptTimer = new ScriptTimer();
             try
             {
-                using var engine = new Engine();
+                using var engine = new Engine(options =>
+                {
+                    options.LimitMemory(20_000_000); // Limit memory allocations to MB
+                    options.TimeoutInterval(TimeSpan.FromMilliseconds(1000)); // Set a timeout to 500 ms.
+                    options.MaxStatements(int.MaxValue);
+                    options.LimitRecursion(1);
+                    options.Strict = true;
+                });
                 using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 using var configWorkbook = new XLWorkbook(stream);
 

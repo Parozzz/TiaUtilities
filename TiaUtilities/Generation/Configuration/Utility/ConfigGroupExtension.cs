@@ -14,6 +14,7 @@ namespace TiaUtilities.Generation.Configuration.Utility
         public static ConfigVerticalGroup AddVerticalGroup(this IConfigGroup group) => group.Add(new ConfigVerticalGroup(group.GetConfigForm()));
 
         public static ConfigLabelLine AddLabel(this IConfigGroup group) => group.Add(new ConfigLabelLine());
+        public static ConfigSeparatorLine AddSeparator(this IConfigGroup group) => group.Add(new ConfigSeparatorLine());
         public static ConfigTextBoxLine AddTextBox(this IConfigGroup group) => group.Add(new ConfigTextBoxLine());
         public static ConfigCheckBoxLine AddCheckBox(this IConfigGroup group) => group.Add(new ConfigCheckBoxLine());
         public static ConfigComboBoxLine AddComboBox(this IConfigGroup group) => group.Add(new ConfigComboBoxLine());

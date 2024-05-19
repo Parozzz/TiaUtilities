@@ -25,6 +25,15 @@
   "GRID_PREFERENCES_DRAG_TRIANGLE_COLOR": "Triangolo trascinamento",
   "GRID_PREFERENCES_PREVIEW_FORE": "Anteprima",
 
+  //FIND&REPLACE
+  "FIND_FORM": "Grid - Trova e Sostituisci",
+  "FIND_FORM_FIND": "Cerca",
+  "FIND_FORM_REPLACE": "Sostituisci",
+  "FIND_FORM_REPLACE_ALL": "Sostituisci Tutti",
+  "FIND_FORM_MATCH_CASE": "Rispetta Maiuscole",
+  "FIND_FORM_SEARCH_COMPLETED": "Operazione completata.",
+  "FIND_FORM_REPLACE_ALL_COMPLETED": "Operazione completata. Sostituiti {count} valori.",
+
   //IO GENERATION
   "IO_DATA_ADDRESS": "Indirizzo",
   "IO_DATA_IO_NAME": "Merker IO",
@@ -100,11 +109,11 @@
   "ALARM_CONFIG_GENERATION": "Generazione",
   "ALARM_CONFIG_GENERATION_START_NUM": "Num. partenza",
   "ALARM_CONFIG_GENERATION_FORMAT": "Formato",
-  "ALARM_CONFIG_GENERATION_ANTI_SLIP": "Anti-Slip",
   "ALARM_CONFIG_GENERATION_SKIP": "Salta a fine gruppo",
-
+  "ALARM_CONFIG_GENERATION_ANTI_SLIP": "Anti-Slip",
+  "ALARM_CONFIG_GENERATION_ANTI_SLIP_AMOUNT": "Dimensioni Gruppo",
+  "ALARM_CONFIG_GENERATION_ANTI_SLIP_GEN_EMPTY": "Genera Vuoti",
   "ALARM_CONFIG_GENERATION_EMPTY": "Generazione Vuoti",
-  "ALARM_CONFIG_GENERATION_EMPTY_ANTI_SLIP": "Genera durante anti-slip",
   "ALARM_CONFIG_GENERATION_EMPTY_NUM": "Quantità alla fine",
   "ALARM_CONFIG_GENERATION_EMPTY_ALARM_ADDRESS": "Indirizzo Allarme",
   "ALARM_CONFIG_GENERATION_EMPTY_TIMER": "Timer",

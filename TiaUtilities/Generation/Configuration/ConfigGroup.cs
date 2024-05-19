@@ -2,21 +2,15 @@
 
 namespace TiaXmlReader.Generation.Configuration
 {
-    public class ConfigGroup : IConfigGroup
+    public class ConfigGroup(ConfigForm configForm) : IConfigGroup
     {
-        private readonly ConfigForm configForm;
-        private readonly List<IConfigObject> configObjectList;
+        private readonly ConfigForm configForm = configForm;
+        private readonly List<IConfigObject> configObjectList = [];
 
         private int controlWidth = 0;
-        private bool noAdapt = true;
+        private bool noAdapt = false;
 
         public bool IsSubGroup { get; set; } = false;
-
-        public ConfigGroup(ConfigForm configForm)
-        {
-            this.configForm = configForm;
-            this.configObjectList = [];
-        }
 
         public ConfigForm GetConfigForm()
         {
@@ -48,58 +42,56 @@ namespace TiaXmlReader.Generation.Configuration
                 AutoSize = true,
                 AutoSizeMode = AutoSizeMode.GrowAndShrink,
                 Anchor = AnchorStyles.None,
-                Dock = DockStyle.Fill,
+                Dock = noAdapt ? DockStyle.None : DockStyle.Fill,
                 ColumnCount = 1,
                 ColumnStyles = { new ColumnStyle(SizeType.AutoSize) },
-                Margin = new Padding(0),
-                Padding = new Padding(0),
-                CellBorderStyle = this.IsSubGroup ? TableLayoutPanelCellBorderStyle.Single : TableLayoutPanelCellBorderStyle.None
+                Margin = new Padding(3, 0, 3, 0),
+                Padding = Padding.Empty,
+                CellBorderStyle = this.IsSubGroup ? TableLayoutPanelCellBorderStyle.OutsetDouble : TableLayoutPanelCellBorderStyle.None,
             };
 
-            if(noAdapt)
-            {
-                mainPanel.Dock = DockStyle.None;
-                mainPanel.Anchor = AnchorStyles.None;
-            }
-            
             var linePanelList = new List<TableLayoutPanel>();
             var biggestTitleLength = 0;
 
             foreach (var configObject in configObjectList)
             {
-                var objectPanel = new TableLayoutPanel
+                Control? configObjectControl;
+                if (configObject is IConfigLine line)
                 {
-                    Dock = DockStyle.Fill,
-                    AutoSize = true,
-                    Margin = new Padding(2),
-                    Padding = new Padding(0),
-                    RowCount = 1,
-                    RowStyles = { new RowStyle(SizeType.Percent, 50f) },
-                };
-                linePanelList.Add(objectPanel);
-
-                if(configObject is IConfigLine line)
-                {
-                    var labelText = line.GetLabelText();
-                    if (labelText != null)
+                    var linePanel = new TableLayoutPanel
                     {
-                        objectPanel.ColumnCount++;
-                        objectPanel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+                        AutoSize = true,
+                        AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                        Anchor = AnchorStyles.None,
+                        Dock = DockStyle.Fill,
+                        Margin = Padding.Empty,
+                        Padding = Padding.Empty,
+                    };
+                    configObjectControl = linePanel;
+                    linePanelList.Add(linePanel);
 
-                        var label = new Label
+                    Label? label = null;
+
+                    var labelText = line.GetLabelText();
+                    var hasLabel = !string.IsNullOrEmpty(labelText);
+                    if (hasLabel)
+                    {
+                        linePanel.RowCount++;
+                        linePanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+                        linePanel.ColumnCount++;
+                        linePanel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+                        linePanel.Controls.Add(label = new Label
                         {
-                            Font = this.configForm.LabelFont,
+                            AutoSize = true,
                             TextAlign = ContentAlignment.MiddleCenter,
                             Dock = DockStyle.Fill,
-                            Text = line.GetLabelText(),
-                            AutoSize = true,
-                            Padding = new Padding(0),
-                            Margin = new Padding(0)
-                        };
-                        label.Font = line.GetLabelFont() ?? this.configForm.LabelFont;
-                        objectPanel.Controls.Add(label);
+                            Text = labelText,
+                            Padding = Padding.Empty,
+                            Margin = Padding.Empty,
+                            Font = line.GetLabelFont() ?? this.configForm.LabelFont
+                        });
 
-                        var size = TextRenderer.MeasureText(label.Text, this.configForm.LabelFont);
+                        var size = TextRenderer.MeasureText(labelText, this.configForm.LabelFont);
                         size.Width += 4; //Padding
                         if (size.Width > biggestTitleLength)
                         {
@@ -110,41 +102,47 @@ namespace TiaXmlReader.Generation.Configuration
                     var control = line.GetControl();
                     if (control != null)
                     {
-                        if (line.IsLabelOnTop())
+                        if (hasLabel && line.IsLabelOnTop())
                         {
-                            objectPanel.RowCount++;
-                            objectPanel.RowStyles.Add(new ColumnStyle(SizeType.AutoSize)); //Autosize is needed otherwise it will take the same space as the row below and occupy useless space.
+                            linePanel.RowCount++;
+                            linePanel.RowStyles.Add(new ColumnStyle(SizeType.AutoSize)); //Autosize is needed otherwise it will take the same space as the row below and occupy useless space.
                         }
                         else
                         {
-                            objectPanel.ColumnCount++;
-                            objectPanel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+                            if (!hasLabel)
+                            {
+                                linePanel.RowCount++;
+                                linePanel.RowStyles.Add(new RowStyle(SizeType.Percent, 50f));
+                            }
+
+                            if(label != null)
+                            {
+                                label.TextAlign = ContentAlignment.MiddleRight; //Set the text to be closer to the control!
+                                label.Padding = new(0, 0, 4, 0);
+                            }
+
+                            linePanel.ColumnCount++;
+                            linePanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50f));
                         }
 
                         control.Width = this.controlWidth == 0 ? this.configForm.ControlWidth : this.controlWidth;
                         control.Height = line.GetHeight() == 0 ? this.configForm.ControlHeight : line.GetHeight();
-                        control.Dock = DockStyle.Fill;
+                        control.Dock = line.IsControlNoAdapt() ? DockStyle.None : DockStyle.Fill;
                         control.Font = this.configForm.ControlFont;
-                        objectPanel.Controls.Add(control);
+                        linePanel.Controls.Add(control);
                     }
-
-                    mainPanel.RowCount++;
-                    mainPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-
-                    mainPanel.Controls.Add(objectPanel);
                 }
                 else
                 {
-                    var control = configObject.GetControl();
-                    if(control != null)
-                    {
-                        mainPanel.RowCount++;
-                        mainPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-
-                        mainPanel.Controls.Add(control);
-                    }
+                    configObjectControl = configObject.GetControl();
                 }
 
+                if (configObjectControl != null)
+                {
+                    mainPanel.RowCount++;
+                    mainPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+                    mainPanel.Controls.Add(configObjectControl);
+                }
             }
 
             foreach (var panel in linePanelList)

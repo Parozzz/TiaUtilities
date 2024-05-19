@@ -21,6 +21,7 @@ namespace TiaXmlReader.Generation.Configuration
         Font? GetLabelFont();
 
         int GetHeight();
+        bool IsControlNoAdapt();
     }
 
     public interface IConfigGroup : IConfigObject
