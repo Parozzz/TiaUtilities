@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using TiaXmlReader.SimaticML;
-using static TiaXmlReader.Generation.GridHandler.GridExcelDragHandler;
-using TiaXmlReader.SimaticML.Enums;
-using TiaXmlReader.Utility;
-using TiaXmlReader.Generation.IO;
+﻿using static TiaXmlReader.Generation.GridHandler.GridExcelDragHandler;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.GenerationForms;
+using SimaticML;
+using SimaticML.Enums;
 
 namespace TiaXmlReader.Generation.IO.GenerationForm
 {

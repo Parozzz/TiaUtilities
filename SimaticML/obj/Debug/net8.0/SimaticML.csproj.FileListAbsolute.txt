@@ -1,0 +1,13 @@
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\SimaticML\bin\Debug\net8.0\SimaticML.deps.json
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\SimaticML\bin\Debug\net8.0\SimaticML.dll
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\SimaticML\bin\Debug\net8.0\SimaticML.pdb
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\SimaticML\obj\Debug\net8.0\SimaticML.csproj.AssemblyReference.cache
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\SimaticML\obj\Debug\net8.0\SimaticML.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\SimaticML\obj\Debug\net8.0\SimaticML.AssemblyInfoInputs.cache
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\SimaticML\obj\Debug\net8.0\SimaticML.AssemblyInfo.cs
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\SimaticML\obj\Debug\net8.0\SimaticML.csproj.CoreCompileInputs.cache
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\SimaticML\obj\Debug\net8.0\SimaticML.sourcelink.json
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\SimaticML\obj\Debug\net8.0\SimaticML.dll
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\SimaticML\obj\Debug\net8.0\refint\SimaticML.dll
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\SimaticML\obj\Debug\net8.0\SimaticML.pdb
+C:\Users\PARONETTO G\Documents\GitHub\TiaAddIn-Spin\SimaticML\obj\Debug\net8.0\ref\SimaticML.dll

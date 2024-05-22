@@ -7,10 +7,10 @@ using TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter;
 using TiaXmlReader.AutoSave;
 using TiaXmlReader.Javascript;
 using TiaXmlReader.Generation.GridHandler.CustomColumns;
-using TiaXmlReader.SimaticML;
-using TiaXmlReader.SimaticML.Blocks;
 using InfoBox;
-using TiaXmlReader.SimaticML.TagTable;
+using SimaticML;
+using SimaticML.TagTable;
+using SimaticML.Blocks;
 
 namespace TiaXmlReader.Generation.IO.GenerationForm
 {
@@ -167,7 +167,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                     {
                         var extension = Path.GetExtension(filePath);
 
-                        var xmlNodeConfiguration = SimaticMLParser.ParseFile(filePath);
+                        var xmlNodeConfiguration = SimaticML.SimaticMLAPI.ParseFile(filePath);
                         if (xmlNodeConfiguration is BlockGlobalDB globalDB)
                         {
                             var suggestionEnumerable = globalDB.GetAllMemberAddress().Select(v => new IOSuggestionData() { Value = v });
@@ -176,7 +176,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                         }
                         else if (xmlNodeConfiguration is XMLTagTable tagTable)
                         {
-                            var suggestionEnumerable = tagTable.GetTags().Values.Select(t => t.GetTagName())
+                            var suggestionEnumerable = tagTable.GetTags().Values.Select(t => t.TagName)
                                                                                 .Select(n => new IOSuggestionData() { Value = n });
                             this.suggestionGridHandler.AddData(suggestionEnumerable);
                         }

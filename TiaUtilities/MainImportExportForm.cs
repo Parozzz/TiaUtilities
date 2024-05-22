@@ -4,9 +4,7 @@ using TiaXmlReader.Utility;
 using TiaXmlReader.Generation.Alarms.GenerationForm;
 using TiaXmlReader.Generation.IO.GenerationForm;
 using TiaXmlReader.AutoSave;
-using TiaXmlReader.SimaticML;
 using System.Xml;
-using TiaXmlReader.SimaticML.Enums;
 using TiaXmlReader.Generation.Configuration;
 using Jint;
 using TiaXmlReader.Javascript;
@@ -14,6 +12,12 @@ using Timer = System.Windows.Forms.Timer;
 using TiaUtilities.Generation.Configuration.Utility;
 using InfoBox;
 using TiaXmlReader.Languages;
+using SimaticML;
+using SimaticML.Blocks.FlagNet.nAccess;
+using SimaticML.Blocks.FlagNet.nPart;
+using SimaticML.Blocks;
+using SimaticML.nBlockAttributeList;
+using SimaticML.Enums;
 
 namespace TiaXmlReader
 {
@@ -127,7 +131,7 @@ namespace TiaXmlReader
         {
             if (uint.TryParse(tiaVersionComboBox.Text, out var version))
             {
-                Constants.VERSION = programSettings.lastTIAVersion = version;
+                SimaticMLAPI.TIA_VERSION = programSettings.lastTIAVersion = version;
             }
         }
 
@@ -162,15 +166,21 @@ namespace TiaXmlReader
             if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
                 var filePath = fileDialog.FileName;
+                if(filePath == null)
+                {
+                    return;
+                }
 
                 var xmlDocument = new XmlDocument();
                 xmlDocument.Load(filePath);
-                var xmlNodeConfiguration = SimaticMLParser.ParseXML(xmlDocument);
 
+                var xmlNodeConfiguration = SimaticMLAPI.ParseXML(xmlDocument);
+                if(xmlNodeConfiguration == null)
+                {
+                    return;
+                }
 
                 xmlNodeConfiguration.UpdateID_UId(new IDGenerator());
-                var document = SimaticMLParser.CreateDocument();
-                var generatedXML = xmlNodeConfiguration.Generate(document);
 
                 fileDialog = new CommonOpenFileDialog
                 {
@@ -183,17 +193,20 @@ namespace TiaXmlReader
 
                 if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
                 {
-                    var __ = SimaticDataType.BOOLEAN;
-
                     filePath = fileDialog.FileName;
-                    document.DocumentElement.AppendChild(generatedXML);
+                    if(filePath == null)
+                    {
+                        return;
+                    }
+
+                    var document = SimaticMLAPI.CreateDocument(xmlNodeConfiguration);
                     document.Save(filePath);
                 }
                 var _debug = "" + "";
             }
         }
 
-        private string JS;
+        private string? JS;
         private void JSToolStripMenuItem_Click(object sender, EventArgs args)
         {
             var configForm = new ConfigForm("TEST JS")
@@ -235,6 +248,53 @@ namespace TiaXmlReader
             configForm.Init();
             configForm.Show(this);
 
+        }
+
+        private void generateButton_Click(object sender, EventArgs e)
+        {
+            var fc = new BlockFC();
+
+            //Add basic block information, like name, number and programming language.
+            fc.AttributeList.BlockName = "FC_TEST";
+            fc.AttributeList.BlockNumber = 123;
+            fc.AttributeList.ProgrammingLanguage = SimaticProgrammingLanguage.LADDER;
+
+            //Add two temp variables to the specific section.
+            fc.AttributeList.TEMP.AddMember("tVar1", SimaticDataType.BOOLEAN);
+            fc.AttributeList.TEMP.AddMember("tVar2", SimaticDataType.BOOLEAN);
+
+            var compileUnit = fc.AddCompileUnit();
+
+            //Create the parts that will form the compileUnit (Segment).
+            //A Part is everything that does something inside a segment (Contact, Coil, Block) that is not an FC/FB.
+            var contact = new ContactPartData(compileUnit);
+            var coil = new CoilPartData(compileUnit);
+
+            //Create the access.
+            //"Access" are used to create an access a variable that needs to be used inside the block.
+            var contactAccess = compileUnit.AccessFactory.AddLocalVariable("tVar1");
+            var coilAccess = compileUnit.AccessFactory.AddLocalVariable("tVar2");
+
+            //Create the wires for coil and contact.
+            //Wires are how everything connect (IdentWire is association Part - Access).
+            contact.CreateIdentWire(contactAccess);
+            coil.CreateIdentWire(coilAccess);
+
+            //Create the connections wires
+            //Now create the interconnection between the created wires
+            // |
+            // | --- || --- () 
+            // |
+            var wire = compileUnit.Powerrail & contact & coil; //Create a AND connection between all the parts.
+
+            //Update all internal ID and UID of the block.
+            fc.UpdateID_UId(new IDGenerator());
+
+            //Create skeleton for the XML Document and add the FC to it.
+            var xmlDocument = SimaticMLAPI.CreateDocument(fc);
+
+            //Save the file.
+            xmlDocument.Save(Directory.GetCurrentDirectory() + "/fc.xml");
         }
     }
 }

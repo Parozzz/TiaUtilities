@@ -43,6 +43,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SimaticML\SimaticML.csproj">
+      <Private>True</Private>
+      <ReferenceOutputAssembly>True</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="CustomControls\FlatComboBox.cs">
       <SubType>Component</SubType>
     </Compile>

@@ -20,41 +20,43 @@ Below an example on how to create an FC block.
 var fc = new BlockFC();
 
 //Add basic block information, like name, number and programming language.
-fc.GetBlockAttributes()
-    .SetBlockName("FC_TEST")
-    .SetBlockNumber(123)
-    .SetBlockProgrammingLanguage(SimaticProgrammingLanguage.LADDER);
+fc.AttributeList.BlockName = "FC_TEST";
+fc.AttributeList.BlockNumber = 123;
+fc.AttributeList.ProgrammingLanguage = SimaticProgrammingLanguage.LADDER;
 
 //Add two temp variables to the specific section.
-var tempSection = fc.GetBlockAttributes().ComputeSection(SimaticML.nBlockAttributeList.SectionTypeEnum.TEMP);
-tempSection.AddMember("tVar1", SimaticDataType.BOOLEAN);
-tempSection.AddMember("tVar2", SimaticDataType.BOOLEAN);
+fc.AttributeList.TEMP.AddMember("tVar1", SimaticDataType.BOOLEAN);
+fc.AttributeList.TEMP.AddMember("tVar2", SimaticDataType.BOOLEAN);
 
 var compileUnit = fc.AddCompileUnit();
 
 //Create the parts that will form the compileUnit (Segment).
+//A Part is everything that does something inside a segment (Contact, Coil, Block) that is not an FC/FB.
 var contact = new ContactPartData(compileUnit);
 var coil = new CoilPartData(compileUnit);
 
-//Create the wires (association part-variable) for coil and contact.
-contact.CreateIdentWire(LocalVariableAccessData.Create(compileUnit, "tVar1"));
-coil.CreateIdentWire(LocalVariableAccessData.Create(compileUnit, "tVar2"));
+//Create the access.
+//"Access" are used to create an access a variable that needs to be used inside the block.
+var contactAccess = compileUnit.AccessFactory.AddLocalVariable("tVar1");
+var coilAccess = compileUnit.AccessFactory.AddLocalVariable("tVar2");
 
+//Create the wires for coil and contact.
+//Wires are how everything connect (IdentWire is association Part - Access).
+contact.CreateIdentWire(contactAccess);
+coil.CreateIdentWire(coilAccess);
+
+//Create the connections wires
 //Now create the interconnection between the created wires
 // |
 // | --- || --- () 
 // |
-contact.CreatePowerrailConnection().CreateOutputConnection(coil);
+var wire = compileUnit.Powerrail & contact & coil; //Create a AND connection between all the parts.
 
 //Update all internal ID and UID of the block.
 fc.UpdateID_UId(new IDGenerator());
 
-//Create skeleton for the XML Document.
-var xmlDocument = SimaticMLParser.CreateDocument();
-
-// Add it to the created document.
-var generatedXmlElement = fc.Generate(xmlDocument);
-xmlDocument.DocumentElement.AppendChild(generatedXmlElement);
+//Create skeleton for the XML Document and add the FC to it.
+var xmlDocument = SimaticMLAPI.CreateDocument(fc);
 
 //Save the file.
 xmlDocument.Save(Directory.GetCurrentDirectory() + "/fc.xml");

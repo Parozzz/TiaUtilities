@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json;
-using TiaXmlReader.SimaticML;
-using TiaXmlReader.SimaticML.Enums;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.Generation.Placeholders;
 using TiaXmlReader.Languages;
+using SimaticML;
+using SimaticML.Enums;
 
 namespace TiaXmlReader.Generation.IO
 {
@@ -185,7 +185,8 @@ namespace TiaXmlReader.Generation.IO
 
         public SimaticMemoryArea GetAddressMemoryArea()
         {
-            return SimaticMemoryAreaUtil.GetFromAddress(Address);
+            var tagAddress = this.GetTagAddress();
+            return tagAddress == null ? default : tagAddress.MemoryArea;
         }
 
         public uint GetAddressBit()
@@ -200,7 +201,7 @@ namespace TiaXmlReader.Generation.IO
             return tag == null ? 0 : tag.ByteOffset;
         }
 
-        public SimaticTagAddress GetTagAddress()
+        public SimaticTagAddress? GetTagAddress()
         {
             return SimaticTagAddress.FromAddress(Address);
         }

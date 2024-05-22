@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using TiaXmlReader.Generation.IO;
-using TiaXmlReader.SimaticML.Enums;
+﻿using TiaXmlReader.Generation.IO;
 using TiaXmlReader.GenerationForms;
 using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.Generation.Placeholders.Data;
+using SimaticML.Enums;
 
 namespace TiaXmlReader.Generation.Placeholders
 {
@@ -87,7 +84,7 @@ namespace TiaXmlReader.Generation.Placeholders
                 throw new ArgumentNullException("config", "Impossible to set IOData to placeholders without its config.");
             }
 
-            AddOrReplace(GenerationPlaceholders.IO.MEMORY_TYPE, new StringGenerationPlaceholderData() { Value = ioData.GetAddressMemoryArea().GetTIAMnemonic() });
+            AddOrReplace(GenerationPlaceholders.IO.MEMORY_TYPE, new StringGenerationPlaceholderData() { Value = ioData.GetAddressMemoryArea().GetSimaticMLString() });
             AddOrReplace(GenerationPlaceholders.IO.BIT, new StringGenerationPlaceholderData() { Value = "" + ioData.GetAddressBit() });
             AddOrReplace(GenerationPlaceholders.IO.BYTE, new StringGenerationPlaceholderData() { Value = "" + ioData.GetAddressByte() });
             //AddOrReplace("{db_name}", new StringGenerationPlaceholderData() { Value = ioData.DBName });

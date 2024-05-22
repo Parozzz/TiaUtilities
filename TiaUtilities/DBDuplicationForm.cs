@@ -3,11 +3,11 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.Xml;
-using TiaXmlReader.SimaticML.nBlockAttributeList;
-using TiaXmlReader.SimaticML;
-using TiaXmlReader.SimaticML.Blocks;
 using TiaXmlReader.Generation;
 using System;
+using SimaticML.nBlockAttributeList;
+using SimaticML.Blocks;
+using SimaticML;
 
 namespace TiaXmlReader
 {
@@ -50,28 +50,13 @@ namespace TiaXmlReader
 
         private BlockAttributeList LoadAttributeListFromXMLFile()
         {
-            var xmlConfiguration = SimaticMLParser.ParseFile(dbXMLPathTextBox.Text);
-            if(xmlConfiguration == null)
+            var xmlConfiguration = SimaticMLAPI.ParseFile(dbXMLPathTextBox.Text) ?? throw new Exception("Invalid XML File");
+            if (xmlConfiguration is not BlockDB)
             {
-                throw new Exception("Invalid XML File");
+                throw new Exception("Imported xml is not a DB or is invalid.");
             }
 
-            BlockAttributeList? attributeList = null;
-            if (xmlConfiguration is BlockGlobalDB globlalDB)
-            {
-                attributeList = globlalDB.GetAttributes();
-            }
-            else if (xmlConfiguration is BlockInstanceDB instanceDB)
-            {
-                attributeList = instanceDB.GetAttributes();
-            }
-
-            if (attributeList == null)
-            {
-                throw new System.Exception("Imported xml is not a DB or is invalid.");
-            }
-
-            return attributeList;
+            return ((BlockDB) xmlConfiguration).AttributeList;
         }
 
         private void AnalyzeFileButton_MouseClick(object sender, MouseEventArgs e)
@@ -81,7 +66,7 @@ namespace TiaXmlReader
                 return;
             }
 
-            var section = LoadAttributeListFromXMLFile().ComputeSection(SectionTypeEnum.STATIC);
+            var section = LoadAttributeListFromXMLFile().STATIC;
 
             memberWordDict.Clear();
             foreach (var member in section.GetItems())
@@ -96,7 +81,7 @@ namespace TiaXmlReader
 
         private void AnalyzeMemberNames(Member member)
         {
-            var memberName = member.GetMemberName();
+            var memberName = member.MemberName;
             if (!memberWordDict.ContainsKey(memberName))
             {
                 memberWordDict.Add(memberName, 0);
@@ -129,7 +114,7 @@ namespace TiaXmlReader
 
                 var attributeList = LoadAttributeListFromXMLFile();
 
-                var section = attributeList.ComputeSection(SectionTypeEnum.STATIC);
+                var section = attributeList.STATIC;
                 if (!string.IsNullOrEmpty(memberReplacementComboBox.Text))
                 {
                     foreach (var member in section.GetItems())
@@ -148,10 +133,10 @@ namespace TiaXmlReader
                         .Replace("{replacement1}", replacement1)
                         .Replace("{replacement2}", replacement2)
                         .Replace("{replacement3}", replacement3);
-                    attributeList.SetBlockName(newBlockDBName);
+                    attributeList.BlockName = newBlockDBName;
                 }
 
-                attributeList.SetBlockNumber(startingDBNumber++);
+                attributeList.BlockNumber = startingDBNumber++;
                 /*
                 if(!string.IsNullOrEmpty(programSettings.lastXMLExportPath))
                 {
@@ -165,9 +150,9 @@ namespace TiaXmlReader
         }
         private void ReplaceMemberNames(Member member, string toReplace, string replacement)
         {
-            if (toReplace.ToLower() == member.GetMemberName().ToLower())
+            if (toReplace.ToLower() == member.MemberName.ToLower())
             {
-                member.SetMemberName(replacement);
+                member.MemberName = replacement;
             }
 
             foreach (var subMember in member.GetItems())

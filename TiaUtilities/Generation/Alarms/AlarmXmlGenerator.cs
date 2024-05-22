@@ -1,11 +1,11 @@
-﻿using TiaXmlReader.SimaticML.Enums;
-using TiaXmlReader.Utility;
-using TiaXmlReader.SimaticML;
-using TiaXmlReader.SimaticML.Blocks;
-using TiaXmlReader.SimaticML.Blocks.FlagNet.nAccess;
-using TiaXmlReader.SimaticML.Blocks.FlagNet.nPart;
+﻿using TiaXmlReader.Utility;
 using TiaXmlReader.Generation.Placeholders;
 using TiaXmlReader.Languages;
+using SimaticML.Blocks;
+using SimaticML.Blocks.FlagNet.nPart;
+using SimaticML.Blocks.FlagNet.nAccess;
+using SimaticML.Enums;
+using SimaticML;
 
 namespace TiaXmlReader.Generation.Alarms
 {
@@ -31,7 +31,9 @@ namespace TiaXmlReader.Generation.Alarms
         {
             fc = new BlockFC();
             fc.Init();
-            fc.GetBlockAttributes().SetBlockName(config.FCBlockName).SetBlockNumber(config.FCBlockNumber).SetAutoNumber(config.FCBlockNumber > 0);
+            fc.AttributeList.BlockName = config.FCBlockName;
+            fc.AttributeList.BlockNumber = config.FCBlockNumber;
+            fc.AttributeList.AutoNumber = (config.FCBlockNumber > 0);
 
             fullAlarmList = "";
 
@@ -68,7 +70,7 @@ namespace TiaXmlReader.Generation.Alarms
                             {
                                 compileUnit = fc.AddCompileUnit();
                                 compileUnit.Init();
-                                compileUnit.ComputeBlockTitle().SetText(LocalizationVariables.CULTURE, placeholderHandler.Parse(config.OneEachSegmentName));
+                                compileUnit.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(config.OneEachSegmentName);
                             }
 
                             FillAlarmCompileUnit(compileUnit, placeholderHandler, parsedAlarmData);
@@ -77,7 +79,7 @@ namespace TiaXmlReader.Generation.Alarms
                         var lastAlarmNum = nextAlarmNum - 1;
                         var alarmCount = (lastAlarmNum - startAlarmNum) + 1;
 
-                        var slippingAlarmCount = config.AntiSlipNumber % alarmCount;
+                        var slippingAlarmCount = alarmCount == 0 ? 0 : config.AntiSlipNumber % alarmCount;
                         if (config.AntiSlipNumber > 0 && slippingAlarmCount > 0)
                         {
                             nextAlarmNum += slippingAlarmCount;
@@ -97,7 +99,7 @@ namespace TiaXmlReader.Generation.Alarms
                         if (config.GroupingType == AlarmGroupingType.GROUP)
                         {
                             placeholderHandler.SetStartEndAlarmNum(startAlarmNum, lastAlarmNum, config.AlarmNumFormat);
-                            compileUnit.ComputeBlockTitle().SetText(LocalizationVariables.CULTURE, placeholderHandler.Parse(config.GroupSegmentName));
+                            compileUnit.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(config.GroupSegmentName);
                         }
 
                         nextAlarmNum += config.SkipNumberAfterGroup;
@@ -137,7 +139,7 @@ namespace TiaXmlReader.Generation.Alarms
                             {
                                 compileUnit = fc.AddCompileUnit();
                                 compileUnit.Init();
-                                compileUnit.ComputeBlockTitle().SetText(LocalizationVariables.CULTURE, placeholderHandler.Parse(config.OneEachSegmentName));
+                                compileUnit.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(config.OneEachSegmentName);
                             }
 
                             FillAlarmCompileUnit(compileUnit, placeholderHandler, parsedAlarmData);
@@ -166,7 +168,7 @@ namespace TiaXmlReader.Generation.Alarms
                         if (config.GroupingType == AlarmGroupingType.GROUP)
                         {
                             placeholderHandler.SetStartEndAlarmNum(startAlarmNum, lastAlarmNum, config.AlarmNumFormat);
-                            compileUnit.ComputeBlockTitle().SetText(LocalizationVariables.CULTURE, placeholderHandler.Parse(config.GroupSegmentName));
+                            compileUnit.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(config.GroupSegmentName);
                         }
 
                         nextAlarmNum += config.SkipNumberAfterGroup;
@@ -206,7 +208,7 @@ namespace TiaXmlReader.Generation.Alarms
 
                 compileUnit = fc.AddCompileUnit();
                 compileUnit.Init();
-                compileUnit.ComputeBlockTitle().SetText(LocalizationVariables.CULTURE, placeholderHandler.Parse(config.GroupEmptyAlarmSegmentName));
+                compileUnit.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(config.GroupEmptyAlarmSegmentName);
             }
 
             for (int j = 0; j < alarmCount; j++)
@@ -217,7 +219,7 @@ namespace TiaXmlReader.Generation.Alarms
                 {
                     compileUnit = fc.AddCompileUnit();
                     compileUnit.Init();
-                    compileUnit.ComputeBlockTitle().SetText(LocalizationVariables.CULTURE, placeholderHandler.Parse(config.OneEachEmptyAlarmSegmentName));
+                    compileUnit.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(config.OneEachEmptyAlarmSegmentName);
                 }
 
                 FillAlarmCompileUnit(compileUnit, placeholderHandler, emptyAlarmData);
@@ -242,69 +244,67 @@ namespace TiaXmlReader.Generation.Alarms
 
         private void FillAlarmCompileUnit(CompileUnit compileUnit, GenerationPlaceholderHandler placeholders, AlarmData alarmData)
         {
-            var parsedContactAddress = placeholders.Parse(alarmData.AlarmVariable);
-
-            IAccessData contactAccessData;
-            switch (parsedContactAddress.ToLower())
+            if(string.IsNullOrEmpty(alarmData.AlarmVariable))
             {
-                case "false":
-                    contactAccessData = LiteralConstantAccessData.Create(compileUnit, SimaticDataType.BOOLEAN, "FALSE");
-                    break;
-                case "0":
-                    contactAccessData = LiteralConstantAccessData.Create(compileUnit, SimaticDataType.BOOLEAN, "0");
-                    break;
-                case "true":
-                    contactAccessData = LiteralConstantAccessData.Create(compileUnit, SimaticDataType.BOOLEAN, "TRUE");
-                    break;
-                case "1":
-                    contactAccessData = LiteralConstantAccessData.Create(compileUnit, SimaticDataType.BOOLEAN, "1");
-                    break;
-                default:
-                    contactAccessData = GlobalVariableAccessData.Create(compileUnit, parsedContactAddress);
-                    break;
+                return;
             }
+
+
+            var parsedContactAddress = placeholders.Parse(alarmData.AlarmVariable);
+            IAccessData contactAccessData = parsedContactAddress.ToLower() switch
+            {
+                "false" => compileUnit.AccessFactory.AddLiteralConstant(SimaticDataType.BOOLEAN, "FALSE"),
+                "0" => compileUnit.AccessFactory.AddLiteralConstant(SimaticDataType.BOOLEAN, "0"),
+                "true" => compileUnit.AccessFactory.AddLiteralConstant(SimaticDataType.BOOLEAN, "TRUE"),
+                "1" => compileUnit.AccessFactory.AddLiteralConstant(SimaticDataType.BOOLEAN, "1"),
+                _ => compileUnit.AccessFactory.AddGlobalVariable(parsedContactAddress),
+            };
 
             var contact = new ContactPartData(compileUnit);
             contact.CreateIdentWire(contactAccessData);
-            contact.CreatePowerrailConnection();
 
-            IPartData timer = null;
-            if (!string.IsNullOrEmpty(alarmData.TimerAddress) && alarmData.TimerAddress.ToLower() != "\\")
+            compileUnit.Powerrail.Add(contact);
+
+            IPartData? timer = null;
+            if (!string.IsNullOrEmpty(alarmData.TimerAddress) 
+                && !string.IsNullOrEmpty(alarmData.TimerType)
+                && !string.IsNullOrEmpty(alarmData.TimerValue)
+                && alarmData.TimerAddress.ToLower() != "\\")
             {
-                PartType partType;
-                switch (alarmData.TimerType.ToLower())
+                var partType = alarmData.TimerType.ToLower() switch
                 {
-                    case "ton":
-                        partType = PartType.TON;
-                        break;
-                    case "tof":
-                        partType = PartType.TOF;
-                        break;
-                    default:
-                        throw new Exception("Unknow timer type of " + alarmData.TimerType);
-                }
+                    "ton" => PartType.TON,
+                    "tof" => PartType.TOF,
+                    _ => throw new Exception("Unknow timer type of " + alarmData.TimerType),
+                };
 
-                timer = new TimerPartData(compileUnit, partType);
-                ((TimerPartData)timer)
-                    .SetPartInstance(SimaticVariableScope.GLOBAL_VARIABLE, placeholders.Parse(alarmData.TimerAddress))
-                    .SetTimeValue(alarmData.TimerValue);
+                timer = new TimerPartData(compileUnit, partType)
+                {
+                    InstanceScope = SimaticVariableScope.GLOBAL_VARIABLE,
+                    Address = placeholders.Parse(alarmData.TimerAddress),
+                    TimeTypedConstant = alarmData.TimerValue,
+                };
             }
 
-            IPartData setCoil = null;
-            if (alarmData.SetCoilAddress.ToLower() != "\\")
+            IPartData? setCoil = null;
+            if (!string.IsNullOrEmpty(alarmData.SetCoilAddress) && alarmData.SetCoilAddress.ToLower() != "\\")
             {
+                var setCoilAccess = compileUnit.AccessFactory.AddGlobalVariable(placeholders.Parse(alarmData.SetCoilAddress));
+
                 setCoil = new SetCoilPartData(compileUnit);
-                ((SetCoilPartData)setCoil).CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, placeholders.Parse(alarmData.SetCoilAddress)));
+                ((SetCoilPartData)setCoil).CreateIdentWire(setCoilAccess);
             }
 
-            IPartData coil = null;
-            if (alarmData.CoilAddress.ToLower() != "\\")
+            IPartData? coil = null;
+            if (!string.IsNullOrEmpty(alarmData.CoilAddress) && alarmData.CoilAddress.ToLower() != "\\")
             {
+                var coilAccess = compileUnit.AccessFactory.AddGlobalVariable(placeholders.Parse(alarmData.CoilAddress));
+
                 coil = new CoilPartData(compileUnit);
-                ((CoilPartData)coil).CreateIdentWire(GlobalVariableAccessData.Create(compileUnit, placeholders.Parse(alarmData.CoilAddress)));
+                ((CoilPartData)coil).CreateIdentWire(coilAccess);
             }
 
-            var partDataList = new List<IPartData>
+            var partDataList = new List<IPartData?>
             {
                 contact,
                 timer,
@@ -312,7 +312,7 @@ namespace TiaXmlReader.Generation.Alarms
                 config.CoilFirst ? setCoil : coil
             };
 
-            IPartData previousPartData = null;
+            IPartData? previousPartData = null;
             foreach (var partData in partDataList)
             {
                 if (previousPartData == null)
@@ -347,9 +347,8 @@ namespace TiaXmlReader.Generation.Alarms
 
             fc.UpdateID_UId(new IDGenerator());
 
-            var xmlDocument = SimaticMLParser.CreateDocument();
-            xmlDocument.DocumentElement.AppendChild(fc.Generate(xmlDocument));
-            xmlDocument.Save(exportPath + "/fcExport_" + fc.GetBlockAttributes().GetBlockName() + ".xml");
+            var xmlDocument = SimaticMLAPI.CreateDocument(fc);
+            xmlDocument.Save(exportPath + "/fcExport_" + fc.AttributeList.BlockName + ".xml");
 
             var alarmTextPath = exportPath + "/alarmsText.txt";
             using (var stream = File.CreateText(alarmTextPath))
