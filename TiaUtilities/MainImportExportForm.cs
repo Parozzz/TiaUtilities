@@ -13,11 +13,10 @@ using TiaUtilities.Generation.Configuration.Utility;
 using InfoBox;
 using TiaXmlReader.Languages;
 using SimaticML;
-using SimaticML.Blocks.FlagNet.nAccess;
-using SimaticML.Blocks.FlagNet.nPart;
 using SimaticML.Blocks;
-using SimaticML.nBlockAttributeList;
 using SimaticML.Enums;
+using SimaticML.Blocks.FlagNet;
+using SimaticML.Blocks.FlagNet.nPart;
 
 namespace TiaXmlReader
 {
@@ -265,27 +264,16 @@ namespace TiaXmlReader
 
             var compileUnit = fc.AddCompileUnit();
 
-            //Create the parts that will form the compileUnit (Segment).
+            //Create the parts that will form the compileUnit (Segment). Also add the operand of the part to the local variable created before.
             //A Part is everything that does something inside a segment (Contact, Coil, Block) that is not an FC/FB.
-            var contact = new ContactPartData(compileUnit);
-            var coil = new CoilPartData(compileUnit);
+            var contact = new ContactPart(compileUnit) { Operand = new SimaticLocalVariable("tVar1") };
+            var coil = new CoilPart(compileUnit) { Operand = new SimaticLocalVariable("tVar2") };
 
-            //Create the access.
-            //"Access" are used to create an access a variable that needs to be used inside the block.
-            var contactAccess = compileUnit.AccessFactory.AddLocalVariable("tVar1");
-            var coilAccess = compileUnit.AccessFactory.AddLocalVariable("tVar2");
-
-            //Create the wires for coil and contact.
-            //Wires are how everything connect (IdentWire is association Part - Access).
-            contact.CreateIdentWire(contactAccess);
-            coil.CreateIdentWire(coilAccess);
-
-            //Create the connections wires
-            //Now create the interconnection between the created wires
+            //Create the connections between the parts
             // |
             // | --- || --- () 
             // |
-            var wire = compileUnit.Powerrail & contact & coil; //Create a AND connection between all the parts.
+            var _ = compileUnit.Powerrail & contact & coil; //Create a AND connection between all the parts.
 
             //Update all internal ID and UID of the block.
             fc.UpdateID_UId(new IDGenerator());

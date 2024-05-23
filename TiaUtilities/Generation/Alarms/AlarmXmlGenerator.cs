@@ -6,6 +6,7 @@ using SimaticML.Blocks.FlagNet.nPart;
 using SimaticML.Blocks.FlagNet.nAccess;
 using SimaticML.Enums;
 using SimaticML;
+using SimaticML.Blocks.FlagNet;
 
 namespace TiaXmlReader.Generation.Alarms
 {
@@ -16,9 +17,9 @@ namespace TiaXmlReader.Generation.Alarms
         private readonly List<AlarmData> alarmDataList;
         private readonly List<DeviceData> deviceDataList;
 
-        private BlockFC fc;
-        private CompileUnit compileUnit;
-        private string fullAlarmList;
+        private BlockFC? fc;
+        private CompileUnit? compileUnit;
+        private string fullAlarmList = "";
 
         public AlarmXmlGenerator(AlarmConfiguration config, List<AlarmData> alarmDataList, List<DeviceData> deviceDataList)
         {
@@ -199,7 +200,7 @@ namespace TiaXmlReader.Generation.Alarms
 
             var alarmNum = startAlarmNum;
 
-            CompileUnit compileUnit = externalGroupCompileUnit;
+            CompileUnit? compileUnit = externalGroupCompileUnit;
             if (compileUnit == null && groupingType == AlarmGroupingType.GROUP)
             {
                 var placeholderHandler = new GenerationPlaceholderHandler()
@@ -244,32 +245,33 @@ namespace TiaXmlReader.Generation.Alarms
 
         private void FillAlarmCompileUnit(CompileUnit compileUnit, GenerationPlaceholderHandler placeholders, AlarmData alarmData)
         {
-            if(string.IsNullOrEmpty(alarmData.AlarmVariable))
+            if (string.IsNullOrEmpty(alarmData.AlarmVariable))
             {
                 return;
             }
 
 
             var parsedContactAddress = placeholders.Parse(alarmData.AlarmVariable);
-            IAccessData contactAccessData = parsedContactAddress.ToLower() switch
-            {
-                "false" => compileUnit.AccessFactory.AddLiteralConstant(SimaticDataType.BOOLEAN, "FALSE"),
-                "0" => compileUnit.AccessFactory.AddLiteralConstant(SimaticDataType.BOOLEAN, "0"),
-                "true" => compileUnit.AccessFactory.AddLiteralConstant(SimaticDataType.BOOLEAN, "TRUE"),
-                "1" => compileUnit.AccessFactory.AddLiteralConstant(SimaticDataType.BOOLEAN, "1"),
-                _ => compileUnit.AccessFactory.AddGlobalVariable(parsedContactAddress),
-            };
 
-            var contact = new ContactPartData(compileUnit);
-            contact.CreateIdentWire(contactAccessData);
+            var contact = new ContactPart(compileUnit)
+            {
+                Operand = parsedContactAddress.ToLower() switch
+                {
+                    "false" => new SimaticLiteralConstant(SimaticDataType.BOOLEAN, "FALSE"),
+                    "0" => new SimaticLiteralConstant(SimaticDataType.BOOLEAN, "0"),
+                    "true" => new SimaticLiteralConstant(SimaticDataType.BOOLEAN, "TRUE"),
+                    "1" => new SimaticLiteralConstant(SimaticDataType.BOOLEAN, "1"),
+                    _ => new SimaticGlobalVariable(parsedContactAddress),
+                }
+            };
 
             compileUnit.Powerrail.Add(contact);
 
             IPartData? timer = null;
-            if (!string.IsNullOrEmpty(alarmData.TimerAddress) 
+            if (!string.IsNullOrEmpty(alarmData.TimerAddress)
                 && !string.IsNullOrEmpty(alarmData.TimerType)
                 && !string.IsNullOrEmpty(alarmData.TimerValue)
-                && alarmData.TimerAddress.ToLower() != "\\")
+                && alarmData.TimerAddress != "\\")
             {
                 var partType = alarmData.TimerType.ToLower() switch
                 {
@@ -278,30 +280,32 @@ namespace TiaXmlReader.Generation.Alarms
                     _ => throw new Exception("Unknow timer type of " + alarmData.TimerType),
                 };
 
-                timer = new TimerPartData(compileUnit, partType)
+                timer = new TimerPart(compileUnit, partType)
                 {
                     InstanceScope = SimaticVariableScope.GLOBAL_VARIABLE,
-                    Address = placeholders.Parse(alarmData.TimerAddress),
-                    TimeTypedConstant = alarmData.TimerValue,
+                    InstanceAddress = placeholders.Parse(alarmData.TimerAddress),
+                    PT = new SimaticTypedConstant(alarmData.TimerValue),
                 };
             }
 
             IPartData? setCoil = null;
-            if (!string.IsNullOrEmpty(alarmData.SetCoilAddress) && alarmData.SetCoilAddress.ToLower() != "\\")
+            if (!string.IsNullOrEmpty(alarmData.SetCoilAddress) && alarmData.SetCoilAddress != "\\")
             {
-                var setCoilAccess = compileUnit.AccessFactory.AddGlobalVariable(placeholders.Parse(alarmData.SetCoilAddress));
-
-                setCoil = new SetCoilPartData(compileUnit);
-                ((SetCoilPartData)setCoil).CreateIdentWire(setCoilAccess);
+                var setCoilVariable = new SimaticGlobalVariable(placeholders.Parse(alarmData.SetCoilAddress));
+                setCoil = new SetCoilPart(compileUnit)
+                {
+                    Operand = setCoilVariable
+                };
             }
 
             IPartData? coil = null;
-            if (!string.IsNullOrEmpty(alarmData.CoilAddress) && alarmData.CoilAddress.ToLower() != "\\")
+            if (!string.IsNullOrEmpty(alarmData.CoilAddress) && alarmData.CoilAddress != "\\")
             {
-                var coilAccess = compileUnit.AccessFactory.AddGlobalVariable(placeholders.Parse(alarmData.CoilAddress));
-
-                coil = new CoilPartData(compileUnit);
-                ((CoilPartData)coil).CreateIdentWire(coilAccess);
+                var coilVariable = new SimaticGlobalVariable(placeholders.Parse(alarmData.CoilAddress));
+                coil = new CoilPart(compileUnit)
+                {
+                    Operand = coilVariable
+                };
             }
 
             var partDataList = new List<IPartData?>
@@ -323,7 +327,7 @@ namespace TiaXmlReader.Generation.Alarms
 
                 if (partData != null)
                 {
-                    previousPartData.CreateOutputConnection(previousPartData = partData);
+                    previousPartData &= partData;
                 }
             }
 
@@ -340,10 +344,7 @@ namespace TiaXmlReader.Generation.Alarms
                 return;
             }
 
-            if (fc == null)
-            {
-                throw new ArgumentNullException("Blocks has not been generated");
-            }
+            ArgumentNullException.ThrowIfNull(fc, nameof(fc));
 
             fc.UpdateID_UId(new IDGenerator());
 
@@ -351,10 +352,9 @@ namespace TiaXmlReader.Generation.Alarms
             xmlDocument.Save(exportPath + "/fcExport_" + fc.AttributeList.BlockName + ".xml");
 
             var alarmTextPath = exportPath + "/alarmsText.txt";
-            using (var stream = File.CreateText(alarmTextPath))
-            {
-                stream.Write(fullAlarmList);
-            }
+
+            using var stream = File.CreateText(alarmTextPath);
+            stream.Write(fullAlarmList);
         }
 
     }

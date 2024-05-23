@@ -6,6 +6,7 @@ using SimaticML;
 using SimaticML.Blocks.FlagNet;
 using SimaticML.Blocks.FlagNet.nAccess;
 using SimaticML.Blocks.FlagNet.nPart;
+using SimaticML.Enums;
 using SimaticML.XMLClasses;
 
 namespace SimaticML.Blocks.FlagNet
@@ -21,18 +22,21 @@ namespace SimaticML.Blocks.FlagNet
     public class Wire : XmlNodeListConfiguration<Con>, ILocalObject
     {
         public const string NODE_NAME = "Wire";
-        public static Wire? CreateWire(XmlNode node)
+        public static Wire? CreateWire(CompileUnit compileUnit, XmlNode node)
         {
-            return node.Name == Wire.NODE_NAME ? new Wire() : null;
+            return node.Name == Wire.NODE_NAME ? new Wire(compileUnit) : null;
         }
 
         private readonly XmlAttributeConfiguration uid;
+        private readonly CompileUnit compileUnit;
 
-        public Wire() : base(Wire.NODE_NAME, Con.CreateCon)
+        public Wire(CompileUnit compileUnit) : base(Wire.NODE_NAME, Con.CreateCon)
         {
             //==== INIT CONFIGURATION ====
             uid = this.AddAttribute("UId");
             //==== INIT CONFIGURATION ====
+
+            this.compileUnit = compileUnit;
         }
 
         public void UpdateLocalUId(IDGenerator localIDGeneration)
@@ -94,6 +98,17 @@ namespace SimaticML.Blocks.FlagNet
         public bool IsIdentCon()
         {
             return GetIdentCon() != null;
+        }
+
+        public Wire CreateIdentCon(SimaticVariable variable, Part part, string partConnectionName)
+        {
+            var access = variable.CreateAccess(this.compileUnit);
+            if(access == null)
+            {
+                return this;
+            }
+
+            return this.CreateIdentCon(access, part, partConnectionName);
         }
 
         public Wire CreateIdentCon(Access access, Part part, string partConnectionName)

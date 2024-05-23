@@ -7,6 +7,7 @@ using SimaticML.Blocks.FlagNet.nPart;
 using SimaticML.Blocks.FlagNet.nAccess;
 using SimaticML;
 using SimaticML.nBlockAttributeList;
+using SimaticML.Blocks.FlagNet;
 
 namespace TiaXmlReader.Generation.IO
 {
@@ -178,12 +179,8 @@ namespace TiaXmlReader.Generation.IO
 
         private void FillInOutCompileUnit(CompileUnit compileUnit, string contactAddress, string coilAddress)
         {
-            var contact = new ContactPartData(compileUnit);
-            var coil = new CoilPartData(compileUnit);
-
-            contact.CreateIdentWire(compileUnit.AccessFactory.AddGlobalVariable(contactAddress));
-            coil.CreateIdentWire(compileUnit.AccessFactory.AddGlobalVariable(coilAddress));
-
+            var contact = new ContactPart(compileUnit) { Operand = new SimaticGlobalVariable(contactAddress) };
+            var coil = new CoilPart(compileUnit) { Operand = new SimaticGlobalVariable(coilAddress) };
             var _ = compileUnit.Powerrail & contact & coil;
         }
 

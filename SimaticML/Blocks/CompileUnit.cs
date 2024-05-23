@@ -27,7 +27,6 @@ namespace SimaticML.Blocks
         public SimaticProgrammingLanguage ProgrammingLanguage { get => this.programmingLanguage.AsEnum<SimaticProgrammingLanguage>(); set => this.programmingLanguage.AsEnum(value); }
         public MultilingualText Title { get => this.ComputeMultilingualText(MultilingualTextType.TITLE); }
         public MultilingualText Comment { get => this.ComputeMultilingualText(MultilingualTextType.COMMENT); }
-        public AccessFactory AccessFactory { get; init; }
         public PowerrailWire Powerrail { get => new(this.ComputePowerrail()); }
 
         //Start from a high number in case there are nodes not included! Since siemens starts from 20, i SHOULD avoid most conflicts.
@@ -58,14 +57,12 @@ namespace SimaticML.Blocks
             flgNet = networkSource.AddNode("FlgNet", namespaceURI: SimaticMLAPI.GET_FLAG_NET_NAMESPACE());
             labels = flgNet.AddNodeList("Labels", LabelDeclaration.CreateLabelDeclaration); //FIRST! It will not work otherwise.
             parts = flgNet.AddNodeList("Parts", CompileUnit.CreatePart);
-            wires = flgNet.AddNodeList("Wires", Wire.CreateWire);
+            wires = flgNet.AddNodeList("Wires", xmlNode => Wire.CreateWire(this, xmlNode));
 
             objectList = this.AddNodeList(SimaticMLAPI.OBJECT_LIST_KEY, MultilingualText.CreateMultilingualText, required: true);
 
             programmingLanguage = attributeList.AddNode("ProgrammingLanguage", required: true, defaultInnerText: SimaticProgrammingLanguage.LADDER.GetSimaticMLString());
             //==== INIT CONFIGURATION ====
-
-            this.AccessFactory = new(this);
         }
 
         public GlobalObjectData GetGlobalObjectData()
@@ -121,11 +118,6 @@ namespace SimaticML.Blocks
             objectList.AddRange(this.wires.GetItems()); //UPDATE WIRES AFTER PARTS! OTHERWISE PART LOCAL UID ARE NOT UPDATED AND IT WON'T WORK!
             foreach (XmlNodeConfiguration nodeConfig in objectList)
             {
-                if (nodeConfig == null)
-                {
-                    continue;
-                }
-
                 if (nodeConfig is ILocalObject localObject)
                 {
                     localObject.UpdateLocalUId(this.LocalIDGenerator);
@@ -146,17 +138,13 @@ namespace SimaticML.Blocks
 
         private MultilingualText ComputeMultilingualText(MultilingualTextType type)
         {
-            foreach (var item in objectList.GetItems())
+            var multilingualText = this.objectList.GetItems().Where(i => i.TextType == type).FirstOrDefault();
+            if(multilingualText == null)
             {
-                if (item.TextType == type)
-                {
-                    return item;
-                }
+                multilingualText = new MultilingualText(type);
+                this.objectList.GetItems().Add(multilingualText);
             }
-
-            var comment = new MultilingualText(type);
-            objectList.GetItems().Add(comment);
-            return comment;
+            return multilingualText;
         }
 
 
@@ -176,36 +164,14 @@ namespace SimaticML.Blocks
 
         public Wire CreateWire()
         {
-            var wire = new Wire();
+            var wire = new Wire(this);
             wires.GetItems().Add(wire);
             return wire;
         }
 
-        public Wire ComputePowerrail()
+        private Wire ComputePowerrail()
         {
             return this.wires.GetItems().SingleOrDefault(wire => wire.IsPowerrail()) ?? this.CreateWire().SetPowerrail();
         }
-        /*
-        public CompileUnit AddPowerrailConnections(Dictionary<Part, string> partConnectionDict)
-        {
-            var powerrailWire = this.wires.GetItems().SingleOrDefault(wire => wire.IsPowerrail());
-            if (powerrailWire == null)
-            {
-                powerrailWire = this.CreateWire().SetPowerrail();
-            }
-
-            foreach (var entry in partConnectionDict)
-            {
-                powerrailWire.CreateNameCon(entry.Key, entry.Value);
-            }
-
-            return this;
-        }
-
-        public CompileUnit AddPowerrailConnections(Part part, string partConnection)
-        {
-            var dict = new Dictionary<Part, string>() { { part, partConnection } };
-            return AddPowerrailConnections(dict);
-        }*/
     }
 }

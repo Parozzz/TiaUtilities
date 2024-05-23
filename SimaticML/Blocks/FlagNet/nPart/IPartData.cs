@@ -55,95 +55,57 @@ namespace SimaticML.Blocks.FlagNet.nPart
         public static IPartData operator &(IPartData partData, IPartData outputPartData) => partData.CreateOutputConnection(outputPartData);
     }
 
-    public abstract class SimplePartData(CompileUnit compileUnit, PartType partType) : IPartData(compileUnit, partType)
+    public abstract class SimplePart(CompileUnit compileUnit, PartType partType) : IPartData(compileUnit, partType)
     {
         public override string InputConName => "in";
         public override string OutputConName => "out";
     }
 
-    public class NOTPartData(CompileUnit compileUnit) : SimplePartData(compileUnit, PartType.NOT) { }
-
-    public abstract class SimpleIdenfiablePartData(CompileUnit compileUnit, PartType partType) : SimplePartData(compileUnit, partType)
+    public abstract class OperandPart(CompileUnit compileUnit, PartType partType) : SimplePart(compileUnit, partType)
     {
-        public Wire CreateIdentWire(IAccessData accessData)
+        public SimaticVariable Operand { set => this.CreateOperandIdentWire(value); }
+
+        private Wire CreateOperandIdentWire(SimaticVariable simaticVariable)
         {
-            return this.compileUnit.CreateWire().CreateIdentCon(accessData.Access, part, "operand");
+            return this.compileUnit.CreateWire().CreateIdentCon(simaticVariable, base.part, "operand");
+        }
+
+        public Wire CreateOperandIdentWire(Access access)
+        {
+            return this.compileUnit.CreateWire().CreateIdentCon(access, base.part, "operand");
         }
     }
 
-    public class ContactPartData(CompileUnit compileUnit) : SimpleIdenfiablePartData(compileUnit, PartType.CONTACT)
+    public class ContactPart(CompileUnit compileUnit) : OperandPart(compileUnit, PartType.CONTACT)
     {
-        public ContactPartData SetNegated()
-        {
-            this.part.Negated = true;
-            return this;
-        }
-    }
-    public class CoilPartData(CompileUnit compileUnit) : SimpleIdenfiablePartData(compileUnit, PartType.COIL)
-    {
-        public CoilPartData SetNegated()
-        {
-            this.part.Negated = true;
-            return this;
-        }
-    }
-    public class SetCoilPartData : SimpleIdenfiablePartData
-    {
-        public SetCoilPartData(CompileUnit compileUnit) : base(compileUnit, PartType.SET_COIL) { }
-    }
-    public class ResetCoilPartData : SimpleIdenfiablePartData
-    {
-        public ResetCoilPartData(CompileUnit compileUnit) : base(compileUnit, PartType.RESET_COIL) { }
+        public bool Negated { get => this.part.Negated; set => this.part.Negated = value; }
     }
 
-    public class TimerPartData : IPartData
+    public class CoilPart(CompileUnit compileUnit) : OperandPart(compileUnit, PartType.COIL)
+    {
+        public bool Negated { get => this.part.Negated; set => this.part.Negated = value; }
+    }
+
+    public class SetCoilPart(CompileUnit compileUnit) : OperandPart(compileUnit, PartType.SET_COIL) { }
+
+    public class ResetCoilPart(CompileUnit compileUnit) : OperandPart(compileUnit, PartType.RESET_COIL) { }
+
+    public class TimerPart : IPartData
     {
         public override string InputConName => "IN";
         public override string OutputConName => "Q";
 
         public SimaticVariableScope InstanceScope { get => part.Instance.VariableScope; set => part.Instance.VariableScope = value; }
-        public string Address { get => part.Instance.GetAddress(); set => part.Instance.SetAddress(value); }
+        public string InstanceAddress { get => part.Instance.GetAddress(); set => part.Instance.SetAddress(value); }
+        public SimaticVariable PT { set => this.compileUnit.CreateWire().CreateIdentCon(value, part, "PT"); }
 
-        public string TimeTypedConstant 
-        { 
-            get => this.timeValueAccess.ConstantValue; 
-            set
-            {
-                this.timeValueAccess.VariableScope = SimaticVariableScope.TYPED_CONSTANT;
-                this.timeValueAccess.ConstantValue = value;
-            }
-        }
-        public string TimeLocalVariable
+        public TimerPart(CompileUnit compileUnit, PartType partType) : base(compileUnit, partType)
         {
-            get => this.timeValueAccess.GetAddress();
-            set
-            {
-                this.timeValueAccess.VariableScope = SimaticVariableScope.LOCAL_VARIABLE;
-                this.timeValueAccess.SetAddress(value);
-            }
-        }
-        public string TimeGlobalVariable
-        {
-            get => this.timeValueAccess.GetAddress();
-            set
-            {
-                this.timeValueAccess.VariableScope = SimaticVariableScope.GLOBAL_VARIABLE;
-                this.timeValueAccess.SetAddress(value);
-            }
-        }
-
-        private readonly Access timeValueAccess;
-        public TimerPartData(CompileUnit compileUnit, PartType partType) : base(compileUnit, partType)
-        {
-            this.timeValueAccess = compileUnit.CreateAccess();
-
             base.part.TemplateValue = "Time";
             base.part.TemplateValueName = "time_type";
             base.part.TemplateValueType = "Type";
-            this.TimeTypedConstant = "T#0s";
 
             this.compileUnit.CreateWire().CreateNameCon(part, "ET").CreateOpenCon();
-            this.compileUnit.CreateWire().CreateIdentCon(timeValueAccess, part, "PT");
         }
     }
 }
