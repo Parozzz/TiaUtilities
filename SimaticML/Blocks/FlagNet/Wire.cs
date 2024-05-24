@@ -3,7 +3,7 @@ using System.Linq;
 using System.Xml;
 using DocumentFormat.OpenXml.Math;
 using SimaticML;
-using SimaticML.Blocks.FlagNet;
+using SimaticML.API;
 using SimaticML.Blocks.FlagNet.nAccess;
 using SimaticML.Blocks.FlagNet.nPart;
 using SimaticML.Enums;

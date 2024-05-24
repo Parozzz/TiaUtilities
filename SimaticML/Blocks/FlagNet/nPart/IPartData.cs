@@ -1,4 +1,5 @@
-﻿using SimaticML.Blocks.FlagNet.nAccess;
+﻿using SimaticML.API;
+using SimaticML.Blocks.FlagNet.nAccess;
 using SimaticML.Enums;
 
 namespace SimaticML.Blocks.FlagNet.nPart
