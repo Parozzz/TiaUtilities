@@ -43,6 +43,7 @@
             testToolStripMenuItem = new ToolStripMenuItem();
             importXMLToolStripMenuItem = new ToolStripMenuItem();
             jSToolStripMenuItem = new ToolStripMenuItem();
+            sampleXMLMenuItem = new ToolStripMenuItem();
             languageLabel = new Label();
             languageComboBox = new ComboBox();
             LogWorker = new System.ComponentModel.BackgroundWorker();
@@ -155,7 +156,7 @@
             // 
             // testToolStripMenuItem
             // 
-            testToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { importXMLToolStripMenuItem, jSToolStripMenuItem });
+            testToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { importXMLToolStripMenuItem, jSToolStripMenuItem, sampleXMLMenuItem });
             testToolStripMenuItem.Font = new Font("Segoe UI", 12F);
             testToolStripMenuItem.Name = "testToolStripMenuItem";
             testToolStripMenuItem.Size = new Size(48, 25);
@@ -164,16 +165,23 @@
             // importXMLToolStripMenuItem
             // 
             importXMLToolStripMenuItem.Name = "importXMLToolStripMenuItem";
-            importXMLToolStripMenuItem.Size = new Size(162, 26);
+            importXMLToolStripMenuItem.Size = new Size(180, 26);
             importXMLToolStripMenuItem.Text = "Import XML";
             importXMLToolStripMenuItem.Click += ImportXMLToolStripMenuItem_Click;
             // 
             // jSToolStripMenuItem
             // 
             jSToolStripMenuItem.Name = "jSToolStripMenuItem";
-            jSToolStripMenuItem.Size = new Size(162, 26);
+            jSToolStripMenuItem.Size = new Size(180, 26);
             jSToolStripMenuItem.Text = "JS";
             jSToolStripMenuItem.Click += JSToolStripMenuItem_Click;
+            // 
+            // sampleXMLMenuItem
+            // 
+            sampleXMLMenuItem.Name = "sampleXMLMenuItem";
+            sampleXMLMenuItem.Size = new Size(180, 26);
+            sampleXMLMenuItem.Text = "Sample XML";
+            sampleXMLMenuItem.Click += SampleXMLMenuItem_Click;
             // 
             // languageLabel
             // 
@@ -280,6 +288,7 @@
         private TableLayoutPanel SettingsLayoutPanel;
         private ToolStripTextBox autoSaveTimeTextBox;
         private ToolStripSeparator toolStripSeparator1;
+        private ToolStripMenuItem sampleXMLMenuItem;
     }
 }
 

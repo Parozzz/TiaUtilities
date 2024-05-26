@@ -4,6 +4,7 @@ using SimaticML.Enums;
 
 namespace SimaticML.Blocks.FlagNet.nPart
 {
+/*
     public abstract class IPartData
     {        
         //all LADDER blocks have input / output connections ("in" and "out" for contact, "en" and "eno" for blocks).
@@ -23,13 +24,6 @@ namespace SimaticML.Blocks.FlagNet.nPart
         public Part GetPart() => part;
 
         public PartType GetPartType() => part.PartType;
-
-        /*
-        public IPartData CreatePowerrailConnection()
-        {
-            this.compileUnit.Powerrail.Add(this.part, this.InputConName);
-            return this;
-        }*/
 
         public T CreateInputConnection<T>(T inputPartData) where T : IPartData
         {
@@ -108,5 +102,5 @@ namespace SimaticML.Blocks.FlagNet.nPart
 
             this.compileUnit.CreateWire().CreateNameCon(part, "ET").CreateOpenCon();
         }
-    }
+    }*/
 }

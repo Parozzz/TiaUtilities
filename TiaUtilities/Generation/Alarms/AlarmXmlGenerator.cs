@@ -5,8 +5,8 @@ using SimaticML.Blocks;
 using SimaticML.Blocks.FlagNet.nPart;
 using SimaticML.Blocks.FlagNet.nAccess;
 using SimaticML.Enums;
-using SimaticML;
 using SimaticML.Blocks.FlagNet;
+using SimaticML.API;
 
 namespace TiaXmlReader.Generation.Alarms
 {
@@ -18,7 +18,6 @@ namespace TiaXmlReader.Generation.Alarms
         private readonly List<DeviceData> deviceDataList;
 
         private BlockFC? fc;
-        private CompileUnit? compileUnit;
         private string fullAlarmList = "";
 
         public AlarmXmlGenerator(AlarmConfiguration config, List<AlarmData> alarmDataList, List<DeviceData> deviceDataList)
@@ -38,6 +37,8 @@ namespace TiaXmlReader.Generation.Alarms
 
             fullAlarmList = "";
 
+            var segment = new SimaticLADSegment();
+
             var nextAlarmNum = config.StartingAlarmNum;
             switch (config.PartitionType)
             {
@@ -46,8 +47,7 @@ namespace TiaXmlReader.Generation.Alarms
                     {
                         if (config.GroupingType == AlarmGroupingType.GROUP)
                         {
-                            compileUnit = fc.AddCompileUnit();
-                            compileUnit.Init();
+                            segment = new SimaticLADSegment();
                         }
 
                         var placeholderHandler = new GenerationPlaceholderHandler();
@@ -69,12 +69,16 @@ namespace TiaXmlReader.Generation.Alarms
 
                             if (config.GroupingType == AlarmGroupingType.ONE)
                             {
-                                compileUnit = fc.AddCompileUnit();
-                                compileUnit.Init();
-                                compileUnit.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(config.OneEachSegmentName);
+                                segment = new SimaticLADSegment();
+                                segment.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(config.OneEachSegmentName);
                             }
 
-                            FillAlarmCompileUnit(compileUnit, placeholderHandler, parsedAlarmData);
+                            FillAlarmSegment(segment, placeholderHandler, parsedAlarmData);
+
+                            if(config.GroupingType == AlarmGroupingType.ONE)
+                            {
+                                segment.Create(this.fc);
+                            }
                         }
 
                         var lastAlarmNum = nextAlarmNum - 1;
@@ -87,7 +91,7 @@ namespace TiaXmlReader.Generation.Alarms
 
                             if (config.GenerateEmptyAlarmAntiSlip)
                             {
-                                GenerateEmptyAlarms(config.GroupingType, config.PartitionType, lastAlarmNum + 1, slippingAlarmCount, compileUnit); //CompileUnit only used for group division
+                                GenerateEmptyAlarms(config.GroupingType, config.PartitionType, lastAlarmNum + 1, slippingAlarmCount, segment); //CompileUnit only used for group division
                                 lastAlarmNum += slippingAlarmCount;
                             }
 
@@ -100,7 +104,9 @@ namespace TiaXmlReader.Generation.Alarms
                         if (config.GroupingType == AlarmGroupingType.GROUP)
                         {
                             placeholderHandler.SetStartEndAlarmNum(startAlarmNum, lastAlarmNum, config.AlarmNumFormat);
-                            compileUnit.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(config.GroupSegmentName);
+
+                            segment.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(config.GroupSegmentName);
+                            segment.Create(this.fc);
                         }
 
                         nextAlarmNum += config.SkipNumberAfterGroup;
@@ -122,8 +128,7 @@ namespace TiaXmlReader.Generation.Alarms
 
                         if (config.GroupingType == AlarmGroupingType.GROUP)
                         {
-                            compileUnit = fc.AddCompileUnit();
-                            compileUnit.Init();
+                            segment = new SimaticLADSegment();
                         }
 
                         var placeholderHandler = new GenerationPlaceholderHandler();
@@ -138,12 +143,16 @@ namespace TiaXmlReader.Generation.Alarms
 
                             if (config.GroupingType == AlarmGroupingType.ONE)
                             {
-                                compileUnit = fc.AddCompileUnit();
-                                compileUnit.Init();
-                                compileUnit.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(config.OneEachSegmentName);
+                                segment = new SimaticLADSegment();
+                                segment.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(config.OneEachSegmentName);
                             }
 
-                            FillAlarmCompileUnit(compileUnit, placeholderHandler, parsedAlarmData);
+                            FillAlarmSegment(segment, placeholderHandler, parsedAlarmData);
+
+                            if (config.GroupingType == AlarmGroupingType.ONE)
+                            {
+                                segment.Create(this.fc);
+                            }
                         }
 
                         var lastAlarmNum = nextAlarmNum - 1;
@@ -156,7 +165,7 @@ namespace TiaXmlReader.Generation.Alarms
 
                             if (config.GenerateEmptyAlarmAntiSlip)
                             {
-                                GenerateEmptyAlarms(config.GroupingType, config.PartitionType, lastAlarmNum + 1, slippingAlarmCount, compileUnit); //CompileUnit only used for group division
+                                GenerateEmptyAlarms(config.GroupingType, config.PartitionType, lastAlarmNum + 1, slippingAlarmCount, segment); //CompileUnit only used for group division
                                 lastAlarmNum += slippingAlarmCount;
                             }
 
@@ -169,7 +178,9 @@ namespace TiaXmlReader.Generation.Alarms
                         if (config.GroupingType == AlarmGroupingType.GROUP)
                         {
                             placeholderHandler.SetStartEndAlarmNum(startAlarmNum, lastAlarmNum, config.AlarmNumFormat);
-                            compileUnit.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(config.GroupSegmentName);
+
+                            segment.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(config.GroupSegmentName);
+                            segment.Create(this.fc);
                         }
 
                         nextAlarmNum += config.SkipNumberAfterGroup;
@@ -184,7 +195,7 @@ namespace TiaXmlReader.Generation.Alarms
             GenerateEmptyAlarms(config.GroupingType, config.PartitionType, nextAlarmNum, config.EmptyAlarmAtEnd);
         }
 
-        private void GenerateEmptyAlarms(AlarmGroupingType groupingType, AlarmPartitionType partitionType, uint startAlarmNum, uint alarmCount, CompileUnit externalGroupCompileUnit = null)
+        private void GenerateEmptyAlarms(AlarmGroupingType groupingType, AlarmPartitionType partitionType, uint startAlarmNum, uint alarmCount, SimaticLADSegment? externalGroupSegment = null)
         {
             var emptyAlarmData = new AlarmData()
             {
@@ -200,16 +211,15 @@ namespace TiaXmlReader.Generation.Alarms
 
             var alarmNum = startAlarmNum;
 
-            CompileUnit? compileUnit = externalGroupCompileUnit;
-            if (compileUnit == null && groupingType == AlarmGroupingType.GROUP)
+            SimaticLADSegment? segment = externalGroupSegment;
+            if (segment == null && groupingType == AlarmGroupingType.GROUP)
             {
                 var placeholderHandler = new GenerationPlaceholderHandler()
                     .SetAlarmData(emptyAlarmData)
                     .SetStartEndAlarmNum(alarmNum, alarmNum + (alarmCount - 1), config.AlarmNumFormat);
 
-                compileUnit = fc.AddCompileUnit();
-                compileUnit.Init();
-                compileUnit.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(config.GroupEmptyAlarmSegmentName);
+                segment = new SimaticLADSegment();
+                segment.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(config.GroupEmptyAlarmSegmentName);
             }
 
             for (int j = 0; j < alarmCount; j++)
@@ -218,12 +228,12 @@ namespace TiaXmlReader.Generation.Alarms
 
                 if (groupingType == AlarmGroupingType.ONE)
                 {
-                    compileUnit = fc.AddCompileUnit();
-                    compileUnit.Init();
-                    compileUnit.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(config.OneEachEmptyAlarmSegmentName);
+                    segment = new SimaticLADSegment();
+                    segment.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(config.OneEachEmptyAlarmSegmentName);
                 }
 
-                FillAlarmCompileUnit(compileUnit, placeholderHandler, emptyAlarmData);
+                ArgumentNullException.ThrowIfNull(segment, nameof(segment));
+                FillAlarmSegment(segment, placeholderHandler, emptyAlarmData);
             }
         }
 
@@ -235,25 +245,23 @@ namespace TiaXmlReader.Generation.Alarms
                 CoilAddress = string.IsNullOrEmpty(alarmData.CoilAddress) ? config.DefaultCoilAddress : (config.CoilAddressPrefix + alarmData.CoilAddress),
                 SetCoilAddress = string.IsNullOrEmpty(alarmData.SetCoilAddress) ? config.DefaultSetCoilAddress : (config.SetCoilAddressPrefix + alarmData.SetCoilAddress),
                 TimerAddress = string.IsNullOrEmpty(alarmData.TimerAddress) ? config.DefaultTimerAddress : (config.TimerAddressPrefix + alarmData.TimerAddress),
-                TimerType = Utils.StringFullOr(alarmData.TimerType, config.DefaultTimerType),
-                TimerValue = Utils.StringFullOr(alarmData.TimerValue, config.DefaultTimerValue),
+                TimerType = string.IsNullOrEmpty(alarmData.TimerType) ? config.DefaultTimerType : alarmData.TimerType,
+                TimerValue = string.IsNullOrEmpty(alarmData.TimerValue) ? config.DefaultTimerValue : alarmData.TimerValue,
                 Description = alarmData.Description,
                 Enable = alarmData.Enable
             };
 
         }
 
-        private void FillAlarmCompileUnit(CompileUnit compileUnit, GenerationPlaceholderHandler placeholders, AlarmData alarmData)
+        private void FillAlarmSegment(SimaticLADSegment segment, GenerationPlaceholderHandler placeholders, AlarmData alarmData)
         {
             if (string.IsNullOrEmpty(alarmData.AlarmVariable))
             {
                 return;
             }
 
-
             var parsedContactAddress = placeholders.Parse(alarmData.AlarmVariable);
-
-            var contact = new ContactPart(compileUnit)
+            var contact = new ContactPart()
             {
                 Operand = parsedContactAddress.ToLower() switch
                 {
@@ -265,9 +273,7 @@ namespace TiaXmlReader.Generation.Alarms
                 }
             };
 
-            compileUnit.Powerrail.Add(contact);
-
-            IPartData? timer = null;
+            TimerPart? timer = null;
             if (!string.IsNullOrEmpty(alarmData.TimerAddress)
                 && !string.IsNullOrEmpty(alarmData.TimerType)
                 && !string.IsNullOrEmpty(alarmData.TimerValue)
@@ -280,7 +286,7 @@ namespace TiaXmlReader.Generation.Alarms
                     _ => throw new Exception("Unknow timer type of " + alarmData.TimerType),
                 };
 
-                timer = new TimerPart(compileUnit, partType)
+                timer = new TimerPart(partType)
                 {
                     InstanceScope = SimaticVariableScope.GLOBAL_VARIABLE,
                     InstanceAddress = placeholders.Parse(alarmData.TimerAddress),
@@ -288,27 +294,21 @@ namespace TiaXmlReader.Generation.Alarms
                 };
             }
 
-            IPartData? setCoil = null;
+            SetCoilPart? setCoil = null;
             if (!string.IsNullOrEmpty(alarmData.SetCoilAddress) && alarmData.SetCoilAddress != "\\")
             {
                 var setCoilVariable = new SimaticGlobalVariable(placeholders.Parse(alarmData.SetCoilAddress));
-                setCoil = new SetCoilPart(compileUnit)
-                {
-                    Operand = setCoilVariable
-                };
+                setCoil = new SetCoilPart() { Operand = setCoilVariable };
             }
 
-            IPartData? coil = null;
+            CoilPart? coil = null;
             if (!string.IsNullOrEmpty(alarmData.CoilAddress) && alarmData.CoilAddress != "\\")
             {
                 var coilVariable = new SimaticGlobalVariable(placeholders.Parse(alarmData.CoilAddress));
-                coil = new CoilPart(compileUnit)
-                {
-                    Operand = coilVariable
-                };
+                coil = new CoilPart() { Operand = coilVariable };
             }
 
-            var partDataList = new List<IPartData?>
+            var simaticPartList = new List<SimaticPart?>
             {
                 contact,
                 timer,
@@ -316,24 +316,23 @@ namespace TiaXmlReader.Generation.Alarms
                 config.CoilFirst ? setCoil : coil
             };
 
-            IPartData? previousPartData = null;
-            foreach (var partData in partDataList)
+            SimaticPart? lastPart = null;
+            foreach (var simaticPart in simaticPartList)
             {
-                if (previousPartData == null)
+                if(simaticPart == null)
                 {
-                    previousPartData = partData;
                     continue;
                 }
 
-                if (partData != null)
+                if (lastPart == null)
                 {
-                    previousPartData &= partData;
+                    segment.Powerrail.Add(simaticPart);
+                    lastPart = simaticPart;
+                    continue;
                 }
-            }
 
-            if (previousPartData == contact)
-            {
-                contact.CreateOpenCon();
+                lastPart.AND(simaticPart);
+                lastPart = simaticPart;
             }
         }
 
@@ -345,8 +344,6 @@ namespace TiaXmlReader.Generation.Alarms
             }
 
             ArgumentNullException.ThrowIfNull(fc, nameof(fc));
-
-            fc.UpdateID_UId(new IDGenerator());
 
             var xmlDocument = SimaticMLAPI.CreateDocument(fc);
             xmlDocument.Save(exportPath + "/fcExport_" + fc.AttributeList.BlockName + ".xml");

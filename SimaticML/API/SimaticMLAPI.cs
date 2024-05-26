@@ -4,7 +4,7 @@ using SimaticML.Blocks;
 using SimaticML.TagTable;
 using SimaticML.XMLClasses;
 
-namespace SimaticML
+namespace SimaticML.API
 {
     public static class SimaticMLAPI
     {
@@ -65,7 +65,7 @@ namespace SimaticML
 
             var xmlDocument = new XmlDocument();
             xmlDocument.Load(filePath);
-            return SimaticMLAPI.ParseXML(xmlDocument);
+            return ParseXML(xmlDocument);
         }
 
         public static XmlNodeConfiguration? ParseXML(XmlDocument document)
@@ -121,7 +121,9 @@ namespace SimaticML
 
         public static XmlDocument CreateDocument(XmlNodeConfiguration mainNode)
         {
-            var document = SimaticMLAPI.CreateDocument();
+            mainNode.UpdateID_UId(new IDGenerator());
+
+            var document = CreateDocument();
 
             var xml = mainNode.Generate(document);
             (document.DocumentElement ?? throw new InvalidProgramException()).AppendChild(xml);
@@ -139,7 +141,7 @@ namespace SimaticML
             var engineering = xmlDocument.CreateElement("Engineering");
 
             var versionAttribute = xmlDocument.CreateAttribute("version");
-            versionAttribute.Value = "V" + SimaticMLAPI.TIA_VERSION;
+            versionAttribute.Value = "V" + TIA_VERSION;
             engineering.Attributes.Append(versionAttribute);
 
             root.AppendChild(engineering);

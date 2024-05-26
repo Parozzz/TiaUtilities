@@ -1,4 +1,5 @@
 ﻿using System.Xml;
+using SimaticML.API;
 using SimaticML.Enums;
 using SimaticML.LanguageText;
 using SimaticML.nBlockAttributeList;
@@ -6,7 +7,7 @@ using SimaticML.XMLClasses;
 
 namespace SimaticML.Blocks
 {
-    public class BlockFB : XmlNodeConfiguration, IGlobalObject
+    public class BlockFB : XmlNodeConfiguration, IProgramBlock, IGlobalObject
     {
         public const string NODE_NAME = "SW.Blocks.FB";
         public static XmlNodeConfiguration? CreateObjectListConfiguration(XmlNode node)

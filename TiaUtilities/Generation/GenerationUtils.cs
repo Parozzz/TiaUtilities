@@ -14,7 +14,7 @@ namespace TiaXmlReader.Generation
 {
     public static class GenerationUtils
     {
-        private static CommonOpenFileDialog CreateFileDialog(bool ensureFileExists, string? filePath, string extension)
+        public static CommonOpenFileDialog CreateFileDialog(bool ensureFileExists, string? filePath, string extension)
         {
             return new CommonOpenFileDialog
             {

@@ -1,4 +1,5 @@
-﻿using SimaticML.Enums;
+﻿using SimaticML.API;
+using SimaticML.Enums;
 using SimaticML.LanguageText;
 using SimaticML.nBlockAttributeList;
 using SimaticML.XMLClasses;

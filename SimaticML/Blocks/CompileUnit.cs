@@ -7,6 +7,7 @@ using SimaticML.Blocks.FlagNet.nCall;
 using SimaticML.Blocks.FlagNet.nPart;
 using SimaticML.LanguageText;
 using SimaticML.XMLClasses;
+using SimaticML.API;
 
 namespace SimaticML.Blocks
 {

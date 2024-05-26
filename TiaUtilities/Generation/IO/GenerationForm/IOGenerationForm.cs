@@ -8,9 +8,9 @@ using TiaXmlReader.AutoSave;
 using TiaXmlReader.Javascript;
 using TiaXmlReader.Generation.GridHandler.CustomColumns;
 using InfoBox;
-using SimaticML;
 using SimaticML.TagTable;
 using SimaticML.Blocks;
+using SimaticML.API;
 
 namespace TiaXmlReader.Generation.IO.GenerationForm
 {
@@ -167,7 +167,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                     {
                         var extension = Path.GetExtension(filePath);
 
-                        var xmlNodeConfiguration = SimaticML.SimaticMLAPI.ParseFile(filePath);
+                        var xmlNodeConfiguration = SimaticMLAPI.ParseFile(filePath);
                         if (xmlNodeConfiguration is BlockGlobalDB globalDB)
                         {
                             var suggestionEnumerable = globalDB.GetAllMemberAddress().Select(v => new IOSuggestionData() { Value = v });

@@ -17,6 +17,8 @@ using SimaticML.Blocks;
 using SimaticML.Enums;
 using SimaticML.Blocks.FlagNet;
 using SimaticML.Blocks.FlagNet.nPart;
+using SimaticML.API;
+using TiaXmlReader.Generation;
 
 namespace TiaXmlReader
 {
@@ -165,7 +167,7 @@ namespace TiaXmlReader
             if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
                 var filePath = fileDialog.FileName;
-                if(filePath == null)
+                if (filePath == null)
                 {
                     return;
                 }
@@ -174,7 +176,7 @@ namespace TiaXmlReader
                 xmlDocument.Load(filePath);
 
                 var xmlNodeConfiguration = SimaticMLAPI.ParseXML(xmlDocument);
-                if(xmlNodeConfiguration == null)
+                if (xmlNodeConfiguration == null)
                 {
                     return;
                 }
@@ -193,7 +195,7 @@ namespace TiaXmlReader
                 if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
                 {
                     filePath = fileDialog.FileName;
-                    if(filePath == null)
+                    if (filePath == null)
                     {
                         return;
                     }
@@ -249,7 +251,7 @@ namespace TiaXmlReader
 
         }
 
-        private void generateButton_Click(object sender, EventArgs e)
+        private void SampleXMLMenuItem_Click(object sender, EventArgs e)
         {
             var fc = new BlockFC();
 
@@ -259,9 +261,28 @@ namespace TiaXmlReader
             fc.AttributeList.ProgrammingLanguage = SimaticProgrammingLanguage.LADDER;
 
             //Add two temp variables to the specific section.
-            fc.AttributeList.TEMP.AddMember("tVar1", SimaticDataType.BOOLEAN);
-            fc.AttributeList.TEMP.AddMember("tVar2", SimaticDataType.BOOLEAN);
 
+            for(int i = 0; i < 10; i++)
+            {
+                fc.AttributeList.TEMP.AddMember($"tContact{i}", SimaticDataType.BOOLEAN);
+            }
+            fc.AttributeList.TEMP.AddMember("tCoil1", SimaticDataType.BOOLEAN);
+
+            var segment = new SimaticLADSegment();
+            segment.Title[LocalizationVariables.CULTURE] = "Segment Title!";
+            segment.Comment[LocalizationVariables.CULTURE] = "Segment Comment! Much information here ...";
+
+            ContactPart[] contacts = new ContactPart[10];
+            for (int i = 0; i < 10; i++)
+            {
+                contacts[i] = new ContactPart() { Operand = new SimaticLocalVariable($"tContact{i}") };
+            }
+            var coil = new CoilPart() { Operand = new SimaticLocalVariable("tCoil1") };
+
+            var _ = segment.Powerrail & contacts[0] & (((contacts[1] | contacts[2]) & (contacts[3] | contacts[4])) | contacts[5]) & coil;
+
+            segment.Create(fc);
+            /*
             var compileUnit = fc.AddCompileUnit();
 
             //Create the parts that will form the compileUnit (Segment). Also add the operand of the part to the local variable created before.
@@ -274,15 +295,19 @@ namespace TiaXmlReader
             // | --- || --- () 
             // |
             var _ = compileUnit.Powerrail & contact & coil; //Create a AND connection between all the parts.
-
-            //Update all internal ID and UID of the block.
-            fc.UpdateID_UId(new IDGenerator());
+            */
 
             //Create skeleton for the XML Document and add the FC to it.
             var xmlDocument = SimaticMLAPI.CreateDocument(fc);
 
+            var fileDialog = GenerationUtils.CreateFileDialog(false, null, "xml");
+            if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok && !string.IsNullOrEmpty(fileDialog.FileName))
+            {
+                xmlDocument.Save(fileDialog.FileName);
+            }
+
             //Save the file.
-            xmlDocument.Save(Directory.GetCurrentDirectory() + "/fc.xml");
+            //xmlDocument.Save(Directory.GetCurrentDirectory() + "/fc.xml");
         }
     }
 }

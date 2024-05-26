@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Xml;
 using DocumentFormat.OpenXml.Math;
+using DocumentFormat.OpenXml.Vml.Office;
 using SimaticML;
 using SimaticML.API;
 using SimaticML.Blocks.FlagNet.nAccess;
@@ -159,28 +160,29 @@ namespace SimaticML.Blocks.FlagNet
     {
         private readonly Wire wire = wire;
 
+        public PowerrailWire Add(Part part, string partConnection)
+        {
+            wire.CreateNameCon(part, partConnection);
+            return this;
+        }
+
         public PowerrailWire Add(Dictionary<Part, string> partConnectionDict)
         {
             foreach (var entry in partConnectionDict)
             {
-                wire.CreateNameCon(entry.Key, entry.Value);
+                this.Add(entry.Key, entry.Value);
             }
             return this;
         }
 
-        public PowerrailWire Add(Part part, string partConnection)
-        {
-            var dict = new Dictionary<Part, string>() { { part, partConnection } };
-            return this.Add(dict);
-        }
-
+        /*
         public T Add<T>(T partData) where T : IPartData
         {
             this.Add(partData.GetPart(), partData.InputConName);
             return partData;
         }
 
-        public static IPartData operator &(PowerrailWire powerrail, IPartData partData) => powerrail.Add(partData);
+        public static IPartData operator &(PowerrailWire powerrail, IPartData partData) => powerrail.Add(partData);*/
     }
 
     public class Con : XmlNodeConfiguration

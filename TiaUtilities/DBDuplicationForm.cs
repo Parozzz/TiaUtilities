@@ -7,7 +7,7 @@ using TiaXmlReader.Generation;
 using System;
 using SimaticML.nBlockAttributeList;
 using SimaticML.Blocks;
-using SimaticML;
+using SimaticML.API;
 
 namespace TiaXmlReader
 {

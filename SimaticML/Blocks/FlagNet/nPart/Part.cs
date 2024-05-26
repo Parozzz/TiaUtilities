@@ -18,6 +18,7 @@ namespace SimaticML.Blocks.FlagNet.nPart
         [SimaticEnum("Not")] NOT,
         [SimaticEnum("TON")] TON,
         [SimaticEnum("TOF")] TOF,
+        [SimaticEnum("O")] OR,
         UNKNOWN = 0 //Default value. Do not implement SimaticEnum so an exception is thrown!
     }
 
@@ -26,7 +27,7 @@ namespace SimaticML.Blocks.FlagNet.nPart
         public const string NODE_NAME = "Part";
 
         public PartType PartType { get => this.partName.AsEnum<PartType>(); set => this.partName.AsEnum(value); }
-        public bool Negated { get => this.negated.AsBool; set => this.negated.AsBool = value; }
+        public string Negated { get => this.negatedName.AsString; set => this.negatedName.AsString = value; }
         public bool DisabledENO { get => this.disabledENO.AsBool; set => this.disabledENO.AsBool = value; }
 
         public bool AutomaticTyped { get => this.automaticTyped.AsBool; set => this.automaticTyped.AsBool = value; }
@@ -112,5 +113,7 @@ namespace SimaticML.Blocks.FlagNet.nPart
         {
             return localObjectData;
         }*/
+
+        public override string ToString() => $"Type: {this.PartType}";
     }
 }

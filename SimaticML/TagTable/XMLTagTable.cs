@@ -1,4 +1,5 @@
-﻿using SimaticML.XMLClasses;
+﻿using SimaticML.API;
+using SimaticML.XMLClasses;
 
 namespace SimaticML.TagTable
 {

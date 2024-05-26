@@ -23,7 +23,7 @@ namespace TiaXmlReader.Utility
 
         public static List<T> SingletonList<T>(T data)
         {
-            return new List<T>(new T[] { data });
+            return new List<T>( [data] );
         }
 
         public static void ShowExceptionMessage(Exception ex, bool silent = false)
@@ -38,11 +38,11 @@ namespace TiaXmlReader.Utility
             }
         }
 
-        public static Dictionary<string, object> CreatePublicFieldSnapshot(object obj)
+        public static Dictionary<string, object?> CreatePublicFieldSnapshot(object obj)
         {
-            Validate.NotNull(obj);
+            ArgumentNullException.ThrowIfNull(obj, nameof(obj));
 
-            var snapshotDict = new Dictionary<string, object>();
+            var snapshotDict = new Dictionary<string, object?>();
 
             var type = obj.GetType();
 
@@ -63,10 +63,10 @@ namespace TiaXmlReader.Utility
             return snapshotDict;
         }
 
-        public static bool ComparePublicFieldSnapshot(object obj, Dictionary<string, object> snapshotDict) //TRUE IF ALL EQUALS
+        public static bool ComparePublicFieldSnapshot(object obj, Dictionary<string, object?> snapshotDict) //TRUE IF ALL EQUALS
         {
-            Validate.NotNull(obj);
-            Validate.NotNull(snapshotDict);
+            ArgumentNullException.ThrowIfNull(obj, nameof(obj));
+            ArgumentNullException.ThrowIfNull(snapshotDict, nameof(snapshotDict));
 
             var type = obj.GetType();
 
@@ -74,12 +74,11 @@ namespace TiaXmlReader.Utility
             foreach (var field in fields.Where(f => f.IsPublic))
             {
                 var fieldName = "FIELD_" + field.Name;
-                if (!snapshotDict.ContainsKey(fieldName))
+                if (!snapshotDict.TryGetValue(fieldName, out object? snapshotValue))
                 {
                     return false;
                 }
 
-                var snapshotValue = snapshotDict[fieldName];
                 var value = field.GetValue(obj);
                 if (AreDifferentObject(snapshotValue, value))
                 {
@@ -91,12 +90,11 @@ namespace TiaXmlReader.Utility
             foreach (var property in properties.Where(p => p.CanRead))
             {
                 var propertyName = "PROPERTY_" + property.Name;
-                if (!snapshotDict.ContainsKey(propertyName))
+                if (!snapshotDict.TryGetValue(propertyName, out object? snapshotValue))
                 {
                     return false;
                 }
 
-                var snapshotValue = snapshotDict[propertyName];
                 var value = property.GetValue(obj);
                 if (AreDifferentObject(snapshotValue, value))
                 {
@@ -142,28 +140,6 @@ namespace TiaXmlReader.Utility
             }
 
             return false;
-        }
-
-        public static bool TryNotNull<OBJ>(OBJ obj, out OBJ outObj)
-        {
-            if (obj == null)
-            {
-                outObj = default;
-                return false;
-            }
-
-            outObj = obj;
-            return true;
-        }
-
-        public static string StringFullOr(string str, string or)
-        {
-            return string.IsNullOrEmpty(str) ? or : str;
-        }
-
-        public static void StringFullOr(ref string str, string or)
-        {
-            str = string.IsNullOrEmpty(str) ? or : str;
         }
 
         public static T FindEnumByStringMethod<T>(string toMatchStr, Func<T, string> stringFunc) where T : Enum
@@ -256,34 +232,5 @@ namespace TiaXmlReader.Utility
             return true;
         }
 
-    }
-
-    public static class Validate
-    {
-        public static void NotNull(Object obj, string exceptionMsg)
-        {
-            if (obj == null)
-            {
-                throw new NullReferenceException(exceptionMsg);
-            }
-        }
-
-        public static void NotNull(Object obj)
-        {
-            NotNull(obj, "An object is null when shouldn't");
-        }
-
-        public static void IsTrue(bool condition, string exceptionMsg)
-        {
-            if (!condition)
-            {
-                throw new ArgumentException(exceptionMsg);
-            }
-        }
-
-        public static void IsTrue(bool condition)
-        {
-            IsTrue(condition, "A condition is false when should be true");
-        }
     }
 }

@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Xml;
+using SimaticML.API;
 using SimaticML.Enums;
 using SimaticML.XMLClasses;
 
@@ -14,7 +15,7 @@ namespace SimaticML.LanguageText
 
     }
 
-    public class MultilingualText : XmlNodeConfiguration, IGlobalObject
+    public class MultilingualText : XmlNodeConfiguration, ICulturedText, IGlobalObject
     {
         public const string NODE_NAME = "MultilingualText";
         public static MultilingualText? CreateMultilingualText(XmlNode node)
@@ -79,6 +80,15 @@ namespace SimaticML.LanguageText
                     items.Add(new MultilingualTextItem(culture, value));
                 }
             }
+        }
+        public Dictionary<CultureInfo, string> GetDictionary()
+        {
+            var dict = new Dictionary<CultureInfo, string>();
+            foreach (var item in this.objectList.GetItems())
+            {
+                dict.Add(item.Culture, item.Text);
+            }
+            return dict;
         }
 
         public GlobalObjectData GetGlobalObjectData()

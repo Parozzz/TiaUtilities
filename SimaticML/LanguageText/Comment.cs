@@ -1,12 +1,12 @@
 ﻿using System.Globalization;
 using System.Xml;
-using SimaticML;
+using SimaticML.API;
 using SimaticML.LanguageText;
 using SimaticML.XMLClasses;
 
 namespace SimaticML.LanguageText
 {
-    public class Comment : XmlNodeListConfiguration<MultiLanguageText>
+    public class Comment : XmlNodeListConfiguration<MultiLanguageText>, ICulturedText
     {
         public const string NODE_NAME = "Comment";
 
@@ -21,30 +21,34 @@ namespace SimaticML.LanguageText
             //==== INIT CONFIGURATION ====
         }
 
-        public Comment SetText(CultureInfo culture, string text)
+        public string? this[CultureInfo culture]
         {
-            if (string.IsNullOrEmpty(text))
+            get => this.GetItems().Where(i => i.Lang == culture).FirstOrDefault()?.LangText;
+            set
             {
-                return this;
-            }
+                var items = this.GetItems();
 
-            foreach (var item in this.GetItems())
-            {
-                if (item.Lang == culture)
+                MultiLanguageText? textItem = items.Where(i => i.Lang == culture).FirstOrDefault();
+                if (textItem != null)
                 {
-                    item.LangText = text;
-                    return this;
+                    items.Remove(textItem);
+                }
+
+                if (value != null)
+                {
+                    items.Add(new MultiLanguageText { Lang = culture, LangText = value });
                 }
             }
+        }
 
-            var multiLanguageText = new MultiLanguageText
+        public Dictionary<CultureInfo, string> GetDictionary()
+        {
+            var dict = new Dictionary<CultureInfo, string>();
+            foreach(var item in this.GetItems())
             {
-                Lang = culture,
-                LangText = text
-            };
-            this.GetItems().Add(multiLanguageText);
-
-            return this;
+                dict.Add(item.Lang, item.LangText);
+            }
+            return dict;
         }
     }
 

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SimaticML")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7fbf4c0872b584fb67e830552762b9c7360c5679")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+df8181fbcd637f190539f2bf34befdd1ee414ec7")]
 [assembly: System.Reflection.AssemblyProductAttribute("SimaticML")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SimaticML")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
