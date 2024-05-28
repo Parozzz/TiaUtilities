@@ -9,6 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using TiaXmlReader.Utility;
 using TiaXmlReader.Generation.Alarms.GenerationForm;
+using System.Reflection;
+using Newtonsoft.Json.Serialization;
 
 namespace TiaXmlReader.Generation
 {
@@ -40,7 +42,7 @@ namespace TiaXmlReader.Generation
             {
                 if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath) || showFileDialog)
                 {
-                    if(!showFileDialog)
+                    if (!showFileDialog)
                     {
                         throw new ArgumentException("File path invalid while saving without opening file dialog. Path: " + filePath);
                     }
@@ -130,5 +132,35 @@ namespace TiaXmlReader.Generation
             return default;
         }
 
+        public static void CopyJsonFieldsAndProperties<T>(T copyFrom, T saveTo)
+        {
+            var type = typeof(T);
+
+            var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public);
+            foreach (var field in fields)
+            {
+                var attribute = field.GetCustomAttribute<JsonPropertyAttribute>();
+                if(attribute == null)
+                {
+                    continue;
+                }
+
+                var obj = field.GetValue(copyFrom);
+                field.SetValue(saveTo, obj);
+            }
+
+            var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public).Where(p => p.CanRead && p.CanWrite);
+            foreach(var property in properties)
+            {
+                var attribute = property.GetCustomAttribute<JsonPropertyAttribute>();
+                if (attribute == null)
+                {
+                    continue;
+                }
+
+                var obj = property.GetValue(copyFrom);
+                property.SetValue(saveTo, obj);
+            }
+        }
     }
 }

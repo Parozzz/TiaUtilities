@@ -165,21 +165,21 @@
             // importXMLToolStripMenuItem
             // 
             importXMLToolStripMenuItem.Name = "importXMLToolStripMenuItem";
-            importXMLToolStripMenuItem.Size = new Size(180, 26);
+            importXMLToolStripMenuItem.Size = new Size(167, 26);
             importXMLToolStripMenuItem.Text = "Import XML";
             importXMLToolStripMenuItem.Click += ImportXMLToolStripMenuItem_Click;
             // 
             // jSToolStripMenuItem
             // 
             jSToolStripMenuItem.Name = "jSToolStripMenuItem";
-            jSToolStripMenuItem.Size = new Size(180, 26);
+            jSToolStripMenuItem.Size = new Size(167, 26);
             jSToolStripMenuItem.Text = "JS";
             jSToolStripMenuItem.Click += JSToolStripMenuItem_Click;
             // 
             // sampleXMLMenuItem
             // 
             sampleXMLMenuItem.Name = "sampleXMLMenuItem";
-            sampleXMLMenuItem.Size = new Size(180, 26);
+            sampleXMLMenuItem.Size = new Size(167, 26);
             sampleXMLMenuItem.Text = "Sample XML";
             sampleXMLMenuItem.Click += SampleXMLMenuItem_Click;
             // 

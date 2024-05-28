@@ -208,6 +208,9 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
         public void ProjectSave(bool saveAs = false)
         {
             var projectSave = new AlarmGenerationProjectSave();
+
+            GenerationUtils.CopyJsonFieldsAndProperties(this.AlarmConfig, projectSave.AlarmConfig);
+
             foreach (var entry in this.deviceGridHandler.DataSource.GetNotEmptyDataDict())
             {
                 projectSave.AddDeviceData(entry.Key, entry.Value);
@@ -233,6 +236,8 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             var loadedProjectSave = AlarmGenerationProjectSave.Load(ref lastFilePath);
             if (loadedProjectSave != null)
             {
+                GenerationUtils.CopyJsonFieldsAndProperties(loadedProjectSave.AlarmConfig, this.AlarmConfig);
+
                 this.alarmGridHandler.DataGridView.SuspendLayout();
                 this.deviceGridHandler.DataGridView.SuspendLayout();
 

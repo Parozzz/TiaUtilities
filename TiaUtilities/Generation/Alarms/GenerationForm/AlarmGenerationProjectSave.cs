@@ -24,7 +24,8 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             [JsonProperty] public Dictionary<int, DeviceData> DeviceDataDict = [];
         }
 
-        [JsonProperty] public AlarmProjectSaveData SaveData { get; set; } = new AlarmProjectSaveData();
+        [JsonProperty] public AlarmConfiguration AlarmConfig { get; set; } = new();
+        [JsonProperty] public AlarmProjectSaveData SaveData { get; set; } = new();
 
         public AlarmGenerationProjectSave()
         {

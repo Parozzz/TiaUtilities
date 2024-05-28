@@ -63,7 +63,10 @@ namespace TiaXmlReader.Utility
             return snapshotDict;
         }
 
-        public static bool ComparePublicFieldSnapshot(object obj, Dictionary<string, object?> snapshotDict) //TRUE IF ALL EQUALS
+        /// <summary>
+        ///  Returns true if all fields / properties are equals 
+        /// </summary>
+        public static bool ComparePublicFieldSnapshot(object obj, Dictionary<string, object?> snapshotDict) 
         {
             ArgumentNullException.ThrowIfNull(obj, nameof(obj));
             ArgumentNullException.ThrowIfNull(snapshotDict, nameof(snapshotDict));

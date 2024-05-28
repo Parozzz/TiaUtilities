@@ -329,6 +329,9 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
         public void ProjectSave(bool saveAs = false)
         {
             var projectSave = new IOGenerationProjectSave();
+
+            GenerationUtils.CopyJsonFieldsAndProperties(this.IOConfig, projectSave.IOConfiguration);
+
             foreach (var entry in suggestionGridHandler.DataSource.GetNotEmptyDataDict())
             {
                 projectSave.SuggestionRowDict.Add(entry.Value, entry.Key);
@@ -348,6 +351,8 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             var loadedProjectSave = IOGenerationProjectSave.Load(ref lastFilePath);
             if (loadedProjectSave != null)
             {
+                GenerationUtils.CopyJsonFieldsAndProperties(loadedProjectSave.IOConfiguration, this.IOConfig);
+
                 this.ioGridHandler.DataGridView.SuspendLayout();
                 this.suggestionGridHandler.DataGridView.SuspendLayout();
 

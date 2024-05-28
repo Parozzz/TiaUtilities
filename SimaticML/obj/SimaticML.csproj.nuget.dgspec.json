@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Jack\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddIn-Spin\\SimaticML\\SimaticML.csproj": {}
+    "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\SimaticML\\SimaticML.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Jack\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddIn-Spin\\SimaticML\\SimaticML.csproj": {
+    "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\SimaticML\\SimaticML.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Jack\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddIn-Spin\\SimaticML\\SimaticML.csproj",
+        "projectUniqueName": "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\SimaticML\\SimaticML.csproj",
         "projectName": "SimaticML",
-        "projectPath": "C:\\Users\\Jack\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddIn-Spin\\SimaticML\\SimaticML.csproj",
-        "packagesPath": "C:\\Users\\Jack\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Jack\\Documents\\GitHub\\TiaAddIn-Spin\\TiaAddIn-Spin\\SimaticML\\obj\\",
+        "projectPath": "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\SimaticML\\SimaticML.csproj",
+        "packagesPath": "C:\\Users\\PARONETTO G\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\PARONETTO G\\Documents\\GitHub\\TiaAddIn-Spin\\SimaticML\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Jack\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\PARONETTO G\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -23,7 +23,8 @@
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "C:\\Program Files\\dotnet\\library-packs": {},
-          "https://api.nuget.org/v3/index.json": {}
+          "https://api.nuget.org/v3/index.json": {},
+          "https://github.com/PavelTorgashov/FastColoredTextBox": {}
         },
         "frameworks": {
           "net8.0": {

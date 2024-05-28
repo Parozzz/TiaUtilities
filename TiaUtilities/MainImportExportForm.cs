@@ -91,7 +91,7 @@ namespace TiaXmlReader
             {
                 if (int.TryParse(autoSaveTimeTextBox.Text, out int time))
                 {
-                    this.autoSaveHandler.SetIntervalAndStart(time);
+                    this.autoSaveHandler.SetIntervalAndStart(time * 1000);
                 }
             };
             this.autoSaveTimeTextBox.Text = "" + programSettings.TimedSaveTime; //Call this after so it start auto save
@@ -138,8 +138,10 @@ namespace TiaXmlReader
 
         private void DbDuplicationMenuItem_Click(object sender, EventArgs e)
         {
-            var dbDuplicationForm = new DBDuplicationForm(programSettings);
-            dbDuplicationForm.ShowInTaskbar = false;
+            var dbDuplicationForm = new DBDuplicationForm(programSettings)
+            {
+                ShowInTaskbar = false
+            };
             dbDuplicationForm.ShowDialog();
         }
 

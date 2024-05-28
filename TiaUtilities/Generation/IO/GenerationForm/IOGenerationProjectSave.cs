@@ -20,8 +20,10 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
     {
         public const string EXTENSION = "json";
 
+        [JsonProperty] public IOConfiguration IOConfiguration { get; set; } = new IOConfiguration();
         [JsonProperty] public Dictionary<int, IOData> RowDict { get; set; } = [];
         [JsonProperty] public Dictionary<int, IOSuggestionData> SuggestionRowDict = [];
+
         public IOGenerationProjectSave()
         {
 
