@@ -6,6 +6,8 @@ using ClosedXML.Excel;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using FastColoredTextBoxNS;
 using TiaXmlReader.Languages;
+using System.Diagnostics;
+using System.Runtime.ExceptionServices;
 
 namespace TiaXmlReader
 {
@@ -31,6 +33,16 @@ namespace TiaXmlReader
 
             try
             {
+                AppDomain.CurrentDomain.FirstChanceException += (sender, args) =>
+                {
+                    if (args.Exception is Esprima.ParserException)
+                    {
+                        return;
+                    }
+
+                    Utils.ShowExceptionMessage(args.Exception);
+                };
+
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
                 Application.Run(new MainImportExportForm());
@@ -40,4 +52,5 @@ namespace TiaXmlReader
 
         }
     }
+
 }

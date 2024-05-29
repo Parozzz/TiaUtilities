@@ -281,7 +281,7 @@ namespace TiaXmlReader
             }
             var coil = new CoilPart() { Operand = new SimaticLocalVariable("tCoil1") };
 
-            var _ = segment.Powerrail & contacts[0] & (((contacts[1] | contacts[2]) & (contacts[3] | contacts[4])) | contacts[5]) & coil;
+            var _ = segment.Powerrail & contacts[0] & (((contacts[1] | contacts[2]) & (contacts[3] | contacts[4])) | (contacts[5] & contacts[6])) & (contacts[7] | contacts[8]) & coil;
 
             segment.Create(fc);
             /*

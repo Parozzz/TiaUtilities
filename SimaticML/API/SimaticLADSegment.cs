@@ -38,12 +38,15 @@ namespace SimaticML.API
         public PowerrailWire Powerrail { get; init; }
         public SimaticMultilingualText Title { get; init; }
         public SimaticMultilingualText Comment { get; init; }
+        private readonly List<SegmentPart> segmentParts;
 
         public SimaticLADSegment()
         {
             this.Powerrail = new();
             this.Title = new();
             this.Comment = new();
+
+            this.segmentParts = [];
         }
 
         public void Create(IProgramBlock programBlock)
@@ -65,7 +68,7 @@ namespace SimaticML.API
 
             foreach (var simaticPart in Powerrail.PartList)
             {
-                var part = SegmentPart.Create(compileUnit, simaticPart);
+                var part = this.ComputePart(compileUnit, simaticPart);
                 ArgumentNullException.ThrowIfNull(part, nameof(part));
 
                 compileUnit.Powerrail.Add(part.Part, simaticPart.InputConName);
@@ -76,29 +79,35 @@ namespace SimaticML.API
 
         private void ParsePart(CompileUnit compileUnit, SegmentPart previousPart)
         {
-            var part = SegmentPart.Create(compileUnit, previousPart.And);
-            if(part == null)
+            var part = this.ComputePart(compileUnit, previousPart.Next);
+            if (part == null)
             {
                 return;
             }
 
-            if(part.SimaticPart is OrPart nextOrSimaticPart)
+            if (part.SimaticPart is OrPart nextOrSimaticPart)
             {
                 var or = part;
 
-                var wire = compileUnit.CreateWire()
-                                            .CreateNameCon(previousPart.Part, previousPart.OutputConName);
+                var wire = compileUnit.CreateWire().CreateNameCon(previousPart.Part, previousPart.OutputConName);
+                foreach(var previousOrPart in nextOrSimaticPart.PreviousParts)
+                {
+                    var loopPart = this.ComputePart(compileUnit, previousOrPart) ?? throw new ArgumentNullException(nameof(previousOrPart));
+                    wire.CreateNameCon(loopPart.Part, loopPart.InputConName);
+
+                    //Here i need to parse the PREVIOUS part that could contains more connections afterwards.
+                    this.ParsePart(compileUnit, loopPart);
+                }
 
                 for (int i = 0; i < nextOrSimaticPart.PartList.Count; i++)
                 {
-                    var loopPart = SegmentPart.Create(compileUnit, nextOrSimaticPart.PartList[i]);
-                    ArgumentNullException.ThrowIfNull(loopPart, nameof(loopPart));
-
-                    wire.CreateNameCon(loopPart.Part, loopPart.InputConName);
+                    var loopPart = this.ComputePart(compileUnit, nextOrSimaticPart.PartList[i].FindLast()) ?? throw new ArgumentNullException(nameof(nextOrSimaticPart));
 
                     compileUnit.CreateWire()
                                     .CreateNameCon(or.Part, or.InputConName + (i + 1))
                                     .CreateNameCon(loopPart.Part, loopPart.OutputConName);
+
+                    ParsePart(compileUnit, loopPart);
                 }
             }
             else
@@ -108,55 +117,31 @@ namespace SimaticML.API
                     .CreateNameCon(part.Part, part.InputConName);
             }
 
-
             ParsePart(compileUnit, part);
 
-            /*
-            if (previousSimaticPart.AndPart != null)
+        }
+
+        private SegmentPart? ComputePart(CompileUnit compileUnit, SimaticPart? simaticPart)
+        {
+            if(simaticPart == null)
             {
-                var nextSimaticPart = previousSimaticPart.AndPart;
+                return null;
+            }
 
-                if (nextSimaticPart is OrPart or)
-                {
-                    var orPart = nextSimaticPart.FillCompileUnit(compileUnit);
-
-                    var wire = compileUnit.CreateWire()
-                                        .CreateNameCon(previousPart, previousSimaticPart.OutputConName);
-
-                    for (int i = 0; i < or.PartList.Count; i++)
-                    {
-                        var simaticPart = or.PartList[i];
-                        var part = simaticPart.FillCompileUnit(compileUnit);
-
-                        wire.CreateNameCon(part, simaticPart.InputConName);
-
-                        compileUnit.CreateWire()
-                                        .CreateNameCon(orPart, or.InputConName + (i + 1))
-                                        .CreateNameCon(part, simaticPart.OutputConName);
-
-                        ParsePart(compileUnit, part, simaticPart);
-                    }
-
-                    ParsePart(compileUnit, orPart, or);
-                }
-                else
-                {
-                    var nextPart = nextSimaticPart.FillCompileUnit(compileUnit);
-
-                    compileUnit.CreateWire()
-                                    .CreateNameCon(previousPart, previousSimaticPart.OutputConName)
-                                    .CreateNameCon(nextPart, nextSimaticPart.InputConName);
-
-                    ParsePart(compileUnit, nextPart, nextSimaticPart);
-                }
-            }*/
+            SegmentPart? segmentPart = this.segmentParts.Where(p => p.SimaticPart == simaticPart).FirstOrDefault();
+            if (segmentPart == null)
+            {
+                segmentPart = SegmentPart.Create(compileUnit, simaticPart);
+                this.segmentParts.Add(segmentPart);
+            }
+            return segmentPart;
         }
 
         private class SegmentPart
         {
-            public static SegmentPart? Create(CompileUnit compileUnit, SimaticPart? simaticPart)
+            public static SegmentPart Create(CompileUnit compileUnit, SimaticPart simaticPart)
             {
-                return simaticPart == null ? null : new(compileUnit, simaticPart);
+                return new(compileUnit, simaticPart);
             }
 
             public string InputConName { get => this.SimaticPart.InputConName; }
@@ -164,8 +149,7 @@ namespace SimaticML.API
 
             public SimaticPart SimaticPart { get; init; }
             public Part Part { get; init; }
-
-            public SimaticPart? And { get => this.SimaticPart.Next; }
+            public SimaticPart? Next { get => this.SimaticPart.Next; }
 
             private SegmentPart(CompileUnit compileUnit, SimaticPart simaticPart)
             {

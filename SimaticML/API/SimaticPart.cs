@@ -15,6 +15,9 @@ namespace SimaticML.API
 
         public PartType PartType { get; init; }
         public SimaticMultilingualText Comment { get; init; }
+
+        //A part can only have 1 previous part but multiple next
+        //(The OR is considered one single part when connection something AFTER. Before the OR, the part will have multiple connections)
         public SimaticPart? Next { get; set; }
 
         public SimaticPart(PartType partType)
@@ -29,7 +32,7 @@ namespace SimaticML.API
         {
             var part = compileUnit.CreatePart();
             part.PartType = this.PartType;
-            foreach(var entry in this.Comment.GetDictionary())
+            foreach (var entry in this.Comment.GetDictionary())
             {
                 part.Comment[entry.Key] = entry.Value;
             }
@@ -42,17 +45,21 @@ namespace SimaticML.API
 
         public virtual SimaticPart AND(SimaticPart nextPart)
         {
-            this.FindLastAnd().Next = nextPart;
+            var last = this.FindLast();
+            last.Next = nextPart;
             return this;
         }
 
-        private SimaticPart FindLastAnd() => this.Next == null ? this : this.Next.FindLastAnd();
+        public SimaticPart FindLast() => this.Next == null ? this : this.Next.FindLast();
 
         public virtual SimaticPart OR(SimaticPart nextPart)
         {
             var orPart = new OrPart();
             orPart.PartList.Add(this);
             orPart.PartList.Add(nextPart);
+
+            orPart.PreviousParts.AddRange(orPart.PartList);
+
             return orPart;
         }
 
@@ -69,6 +76,8 @@ namespace SimaticML.API
 
     public class OrPart() : SimplePart(PartType.OR)
     {//Here the InputConName will need the number of the input, it will be added later!
+
+        public List<SimaticPart> PreviousParts { get; init; } = [];
         public List<SimaticPart> PartList { get; init; } = [];
 
         public override Part GetPart(CompileUnit compileUnit)
@@ -82,22 +91,20 @@ namespace SimaticML.API
 
         public override SimaticPart OR(SimaticPart nextPart)
         {
-            if(this.Next != null)
-            { //If this or has something AFTER this, it means that doing an OR now will result adding this into the OR.
-                var or = new OrPart();
-                or.PartList.Add(this);
-                or.PartList.Add(nextPart);
-                return or;
-            }
-            else if(nextPart is OrPart orPart)
+            if (nextPart is OrPart orPart)
             {//If i Or another OrPart, it will be incorporated!
                 this.PartList.AddRange(orPart.PartList);
                 return this;
             }
 
-            this.PartList.Add(nextPart);
+            var lastOr = this.FindLastOR();
+            lastOr.PartList.Add(nextPart.FindLast());
+
+            this.PreviousParts.Add(nextPart);
             return this;
         }
+
+        private OrPart FindLastOR() => this.Next is OrPart orPart ? orPart.FindLastOR() : this;
 
         public override string ToString() => $"{base.ToString()}, Count: {PartList.Count}";
     }
@@ -182,7 +189,7 @@ namespace SimaticML.API
             part.TemplateValueName = "time_type";
             part.TemplateValueType = "Type";
 
-            if(InstanceScope != default && InstanceAddress != null)
+            if (InstanceScope != default && InstanceAddress != null)
             {
                 part.Instance.VariableScope = InstanceScope;
                 part.Instance.SetAddress(InstanceAddress);
