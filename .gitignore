@@ -1,4 +1,7 @@
 .vs/
+SimaticML/bin/
+SimaticML/obj/
+SimaticML/.vs/
 TiaUtilities/bin/
 TiaUtilities/obj/
 TiaUtilities/.vs/
