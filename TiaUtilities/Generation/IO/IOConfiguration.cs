@@ -27,6 +27,7 @@ namespace TiaXmlReader.Generation.IO
 
         [JsonProperty] public string DBName = "TestIO_DB";
         [JsonProperty] public uint DBNumber = 196;
+        [JsonProperty] public bool GenerateDefinedVariableAnyway = false;
 
         [JsonProperty] public string VariableTableName = "VariableTable";
         [JsonProperty] public uint VariableTableInputStartAddress = 100;

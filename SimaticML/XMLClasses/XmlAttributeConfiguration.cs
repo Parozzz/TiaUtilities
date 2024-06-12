@@ -53,5 +53,7 @@ namespace SimaticML.XMLClasses
             xmlAttribute.Value = string.IsNullOrEmpty(this.value) ? this.requiredValue : this.value;
             xmlNode.Attributes?.Append(xmlAttribute);
         }
+
+        public override string ToString() => $"Attribute - {base.ToString()}, RequiredValue: {this.requiredValue}";
     }
 }

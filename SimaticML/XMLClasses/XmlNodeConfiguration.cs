@@ -248,5 +248,7 @@ namespace SimaticML.XMLClasses
 
             return this.ParentConfiguration is T t ? t : this.ParentConfiguration.FindParent<T>();
         }
+
+        public override string ToString() => $"Node - {base.ToString()}, Parsed: {Parsed}, Child: {this.childrenDict.Count + this.parseUnkownChilds.Count}, Attributes: {this.attributeDict.Count + this.unknownAttributes.Count}";
     }
 }

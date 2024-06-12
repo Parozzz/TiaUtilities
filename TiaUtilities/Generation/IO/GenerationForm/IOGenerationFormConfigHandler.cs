@@ -69,6 +69,10 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                          .ControlText(config.DBNumber)
                          .UIntChanged(num => config.DBNumber = num);
 
+                    mainGroup.AddCheckBox().Label("Generate defined variables").ControlNoAdapt()
+                         .Value(config.GenerateDefinedVariableAnyway)
+                         .CheckedChanged(b => config.GenerateDefinedVariableAnyway = b);
+
                     mainGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_ALIAS_DB_IN_DEFAULT")
                          .ControlText(config.DefaultDBInputVariable)
                          .TextChanged(str => config.DefaultDBInputVariable = str);

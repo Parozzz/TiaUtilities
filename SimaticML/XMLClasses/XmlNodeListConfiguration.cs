@@ -83,5 +83,7 @@ namespace SimaticML.XMLClasses
         {
             return items;
         }
+
+        public override string ToString() => $"{base.ToString()}, Items: {this.items.Count}";
     }
 }

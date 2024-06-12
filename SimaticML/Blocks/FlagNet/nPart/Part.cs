@@ -114,6 +114,6 @@ namespace SimaticML.Blocks.FlagNet.nPart
             return localObjectData;
         }*/
 
-        public override string ToString() => $"Type: {this.PartType}";
+        public override string ToString() => $"{base.ToString()}, Type: {this.PartType}";
     }
 }

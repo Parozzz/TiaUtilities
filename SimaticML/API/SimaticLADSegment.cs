@@ -11,6 +11,7 @@ using System.Globalization;
 using SimaticML.LanguageText;
 using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml.Drawing;
+using Irony.Parsing;
 
 namespace SimaticML.API
 {
@@ -38,8 +39,8 @@ namespace SimaticML.API
         public PowerrailWire Powerrail { get; init; }
         public SimaticMultilingualText Title { get; init; }
         public SimaticMultilingualText Comment { get; init; }
-        private readonly List<SegmentPart> segmentParts;
 
+        private readonly List<SegmentPart> segmentParts;
         public SimaticLADSegment()
         {
             this.Powerrail = new();
@@ -68,12 +69,27 @@ namespace SimaticML.API
 
             foreach (var simaticPart in Powerrail.PartList)
             {
-                var part = this.ComputePart(compileUnit, simaticPart);
-                ArgumentNullException.ThrowIfNull(part, nameof(part));
+                if (simaticPart is OrPart orSimaticPart)
+                {
+                    var or = this.ComputePart(compileUnit, simaticPart) ?? throw new ArgumentNullException(nameof(simaticPart));
 
-                compileUnit.Powerrail.Add(part.Part, simaticPart.InputConName);
+                    foreach (var orPreviousSimaticPart in orSimaticPart.PreviousPartAndConnections)
+                    {
+                        var loopPart = this.ComputePart(compileUnit, orPreviousSimaticPart) ?? throw new ArgumentNullException(nameof(orPreviousSimaticPart));
+                        compileUnit.Powerrail.Add(loopPart.Part, loopPart.InputConName);
 
-                ParsePart(compileUnit, part);
+                        ParsePart(compileUnit, loopPart);
+                    }
+
+                    CreateORInputWireConnections(compileUnit, or);
+                    ParsePart(compileUnit, or);
+                }
+                else
+                {
+                    var part = this.ComputePart(compileUnit, simaticPart) ?? throw new ArgumentNullException(nameof(simaticPart));
+                    compileUnit.Powerrail.Add(part.Part, simaticPart.InputConName);
+                    ParsePart(compileUnit, part);
+                }
             }
         }
 
@@ -90,7 +106,7 @@ namespace SimaticML.API
                 var or = part;
 
                 var wire = compileUnit.CreateWire().CreateNameCon(previousPart.Part, previousPart.OutputConName);
-                foreach(var previousOrPart in nextOrSimaticPart.PreviousParts)
+                foreach (var previousOrPart in nextOrSimaticPart.PreviousPartAndConnections)
                 {
                     var loopPart = this.ComputePart(compileUnit, previousOrPart) ?? throw new ArgumentNullException(nameof(previousOrPart));
                     wire.CreateNameCon(loopPart.Part, loopPart.InputConName);
@@ -99,31 +115,38 @@ namespace SimaticML.API
                     this.ParsePart(compileUnit, loopPart);
                 }
 
-                for (int i = 0; i < nextOrSimaticPart.PartList.Count; i++)
-                {
-                    var loopPart = this.ComputePart(compileUnit, nextOrSimaticPart.PartList[i].FindLast()) ?? throw new ArgumentNullException(nameof(nextOrSimaticPart));
-
-                    compileUnit.CreateWire()
-                                    .CreateNameCon(or.Part, or.InputConName + (i + 1))
-                                    .CreateNameCon(loopPart.Part, loopPart.OutputConName);
-
-                    ParsePart(compileUnit, loopPart);
-                }
+                CreateORInputWireConnections(compileUnit, or);
+                ParsePart(compileUnit, part);
             }
             else
             {
                 compileUnit.CreateWire()
                     .CreateNameCon(previousPart.Part, previousPart.OutputConName)
                     .CreateNameCon(part.Part, part.InputConName);
-            }
 
-            ParsePart(compileUnit, part);
+                ParsePart(compileUnit, part);
+            }
+        }
+
+        private void CreateORInputWireConnections(CompileUnit compileUnit, SegmentPart orPart)
+        {
+            if (orPart.SimaticPart is OrPart orSimaticPart)
+            {
+                for (int i = 0; i < orSimaticPart.PartList.Count; i++)
+                {
+                    var loopPart = this.ComputePart(compileUnit, orSimaticPart.PartList[i].FindLast()) ?? throw new ArgumentNullException();
+
+                    compileUnit.CreateWire()
+                                    .CreateNameCon(orPart.Part, orPart.InputConName + (i + 1))
+                                    .CreateNameCon(loopPart.Part, loopPart.OutputConName);
+                }
+            }
 
         }
 
         private SegmentPart? ComputePart(CompileUnit compileUnit, SimaticPart? simaticPart)
         {
-            if(simaticPart == null)
+            if (simaticPart == null)
             {
                 return null;
             }
@@ -162,42 +185,3 @@ namespace SimaticML.API
     }
 
 }
-
-
-/*
-foreach (var entry in simaticPartDict)
-{
-    var powerrailSimaticPart = entry.Key;
-
-    var powerrailPart = powerrailSimaticPart.FillCompileUnit(compileUnit);
-    if (this.Powerrail.partConnectionDict.TryGetValue(powerrailSimaticPart, out string? connectionName))
-    {
-        compileUnit.Powerrail.Add(powerrailPart, connectionName);
-    }
-
-    SimaticPart? lastSimaticPart = null;
-    Part? lastPart = null;
-
-    foreach (var simaticPart in entry.Value)
-    {
-        var part = simaticPart.FillCompileUnit(compileUnit);
-        if (lastSimaticPart == null || lastPart == null)
-        {
-            lastSimaticPart = simaticPart;
-            lastPart = part;
-            continue;
-        }
-
-        compileUnit.CreateWire()
-                        .CreateNameCon(lastPart, lastSimaticPart.OutputConName)
-                        .CreateNameCon(part, simaticPart.InputConName);
-
-        lastSimaticPart = simaticPart;
-        lastPart = part;
-    }
-
-    if (lastSimaticPart != null && lastPart != null && !lastSimaticPart.IsCloser())
-    {
-        compileUnit.CreateWire().CreateNameCon(lastPart, lastSimaticPart.OutputConName).CreateOpenCon();
-    }
-}*/

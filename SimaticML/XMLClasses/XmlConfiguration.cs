@@ -2,6 +2,7 @@
 using SimaticML.Enums;
 using System.Xml;
 using System.Globalization;
+using Irony.Parsing;
 
 namespace SimaticML.XMLClasses
 {
@@ -56,6 +57,22 @@ namespace SimaticML.XMLClasses
         public abstract void Load(XmlNode xmlNode, bool parseUnknown = true);
 
         public abstract bool IsEmpty();
+
+        public override string ToString()
+        {
+            var str = $"Name: {this.ConfigurationName}, Required: {Required}, XmlValue: \"{this.XmlValue}\"";
+            if(this is ILocalObject localObject)
+            {
+                str = $"UId={localObject.GetUId()}, {str}";
+            }
+
+            if (this is IGlobalObject globalObject)
+            {
+                str = $"ID={globalObject.GetGlobalObjectData().GetHexId()}, {str}";
+            }
+
+            return str;
+        }
     }
 
 

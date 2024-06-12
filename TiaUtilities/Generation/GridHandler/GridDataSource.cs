@@ -37,7 +37,7 @@ namespace TiaXmlReader.Generation.GridHandler
 
         public void Clear()
         {
-            foreach(var data in this.dataList)
+            foreach (var data in this.dataList)
             {
                 data.Clear();
             }
@@ -57,6 +57,10 @@ namespace TiaXmlReader.Generation.GridHandler
         public List<int> GetFirstEmptyRowIndexes(int num)
         {
             var emptyDataRowIndexList = new List<int>();
+            if (num <= 0)
+            {
+                return emptyDataRowIndexList;
+            }
 
             var emptyDataCounter = 0;
             for (int i = 0; i < this.dataList.Count; i++)

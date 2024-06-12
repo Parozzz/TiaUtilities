@@ -85,6 +85,7 @@ namespace TiaXmlReader.Generation.IO
                 string? inOutAddress = null;
                 if (!variableDefault)
                 {
+                    var member = AddMemberToDB(duplicatedAddressDict, ioData.Variable, ioData.Comment);
                     inOutAddress = $"{ioData.Variable}";
                 }
                 else
@@ -116,20 +117,7 @@ namespace TiaXmlReader.Generation.IO
                             inOutAddress = merkerVariableAddress;
                             break;
                         case IOMemoryTypeEnum.DB:
-                            if (db == null)
-                            {
-                                db = new BlockGlobalDB();
-                                db.Init();
-                                db.AttributeList.BlockName = config.DBName;
-                                db.AttributeList.BlockNumber = config.DBNumber;
-                                db.AttributeList.AutoNumber = (config.DBNumber > 0);
-                            }
-
-                            var dbMemberAddress = FixDuplicateAddress(ioData.Variable, duplicatedAddressDict);
-
-                            var member = db.AttributeList.STATIC.AddMembersFromAddress(dbMemberAddress, SimaticDataType.BOOLEAN) ?? throw new InvalidDataException();
-                            member.Comment[LocalizationVariables.CULTURE] = ioData.Comment;
-
+                            var member = AddMemberToDB(duplicatedAddressDict, ioData.Variable, ioData.Comment);
                             inOutAddress = member.GetCompleteSymbol();
 
                             break;
@@ -173,6 +161,24 @@ namespace TiaXmlReader.Generation.IO
             }
 
             segment?.Create(this.fc); //The last segment would not be generated otherwise (Since they are created during a group change!)
+        }
+
+        private Member AddMemberToDB(Dictionary<string, uint> duplicatedAddressDict, string variable, string comment)
+        {
+            if (db == null)
+            {
+                db = new BlockGlobalDB();
+                db.Init();
+                db.AttributeList.BlockName = config.DBName;
+                db.AttributeList.BlockNumber = config.DBNumber;
+                db.AttributeList.AutoNumber = (config.DBNumber > 0);
+            }
+
+            var dbMemberAddress = FixDuplicateAddress(variable, duplicatedAddressDict);
+
+            var member = db.AttributeList.STATIC.AddMembersFromAddress(dbMemberAddress, SimaticDataType.BOOLEAN) ?? throw new InvalidDataException();
+            member.Comment[LocalizationVariables.CULTURE] = comment;
+            return member;
         }
 
         private static string FixDuplicateAddress(string? address, Dictionary<string, uint> dict)

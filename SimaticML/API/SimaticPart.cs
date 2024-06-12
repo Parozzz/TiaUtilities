@@ -58,7 +58,7 @@ namespace SimaticML.API
             orPart.PartList.Add(this);
             orPart.PartList.Add(nextPart);
 
-            orPart.PreviousParts.AddRange(orPart.PartList);
+            orPart.PreviousPartAndConnections.AddRange(orPart.PartList);
 
             return orPart;
         }
@@ -77,7 +77,7 @@ namespace SimaticML.API
     public class OrPart() : SimplePart(PartType.OR)
     {//Here the InputConName will need the number of the input, it will be added later!
 
-        public List<SimaticPart> PreviousParts { get; init; } = [];
+        public List<SimaticPart> PreviousPartAndConnections { get; init; } = [];
         public List<SimaticPart> PartList { get; init; } = [];
 
         public override Part GetPart(CompileUnit compileUnit)
@@ -97,10 +97,16 @@ namespace SimaticML.API
                 return this;
             }
 
+            //Since when creating a new AND connection i always return the first in it, when adding an OR there needs to be two information:
+            //1) What is the parts involved in the OR (So the OutputConName of the parts can be added into the InputConName of the ore)
+            //2) What parts are involved in the AND connections with what comes before (Some the previous part OutputConName will be connected to multiple parts InputConName)
+            //Since the nextPart is always the first of a chain, the parts involved in the OR will be the last of this chain,
+            //while the one involved in the previous and will be the one passed directly (Since all the AND will return the first).
+
             var lastOr = this.FindLastOR();
             lastOr.PartList.Add(nextPart.FindLast());
 
-            this.PreviousParts.Add(nextPart);
+            this.PreviousPartAndConnections.Add(nextPart);
             return this;
         }
 

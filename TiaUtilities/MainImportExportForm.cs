@@ -269,6 +269,7 @@ namespace TiaXmlReader
                 fc.AttributeList.TEMP.AddMember($"tContact{i}", SimaticDataType.BOOLEAN);
             }
             fc.AttributeList.TEMP.AddMember("tCoil1", SimaticDataType.BOOLEAN);
+            fc.AttributeList.TEMP.AddMember("tCoil2", SimaticDataType.BOOLEAN);
 
             var segment = new SimaticLADSegment();
             segment.Title[LocalizationVariables.CULTURE] = "Segment Title!";
@@ -279,10 +280,11 @@ namespace TiaXmlReader
             {
                 contacts[i] = new ContactPart() { Operand = new SimaticLocalVariable($"tContact{i}") };
             }
-            var coil = new CoilPart() { Operand = new SimaticLocalVariable("tCoil1") };
+            var coil1 = new CoilPart() { Operand = new SimaticLocalVariable("tCoil1") };
+            var coil2 = new CoilPart() { Operand = new SimaticLocalVariable("tCoil2") };
 
-            var _ = segment.Powerrail & contacts[0] & (((contacts[1] | contacts[2]) & (contacts[3] | contacts[4])) | (contacts[5] & contacts[6])) & (contacts[7] | contacts[8]) & coil;
-
+            //Brackets are important! C# will prioritize & to |, so the logic might break if not using them!
+            var _ = segment.Powerrail & (contacts[0] & (((contacts[1] | contacts[2]) & (contacts[3] | contacts[4])) | (contacts[5] & contacts[6])) & (contacts[7] | contacts[8]) | contacts[9]) & coil1 & coil2;
             segment.Create(fc);
             /*
             var compileUnit = fc.AddCompileUnit();
