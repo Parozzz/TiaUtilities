@@ -5,6 +5,8 @@ using TiaXmlReader.Utility;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.AutoSave;
 using TiaXmlReader.Javascript;
+using InfoBox;
+using TiaXmlReader.Generation.IO.GenerationForm;
 
 namespace TiaXmlReader.Generation.Alarms.GenerationForm
 {
@@ -13,6 +15,8 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
         private readonly TimedSaveHandler timedSaveHandler;
         private readonly AlarmGenerationSettings settings;
         private readonly GridSettings gridSettings;
+        private AlarmGenerationProjectSave? oldProjectSave;
+
         private readonly GridHandler<AlarmConfiguration, DeviceData> deviceGridHandler;
         private readonly GridHandler<AlarmConfiguration, AlarmData> alarmGridHandler;
         private readonly AlarmGenerationFormConfigHandler configHandler;
@@ -72,6 +76,35 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
         {
             this.GridsSplitPanel.Panel1.Controls.Add(this.deviceGridHandler.DataGridView);
             this.GridsSplitPanel.Panel2.Controls.Add(this.alarmGridHandler.DataGridView);
+
+            #region FORM
+            this.FormClosing += (sender, args) =>
+            {
+                InformationBoxResult result = InformationBoxResult.None;
+                if (this.oldProjectSave == null)
+                {
+                    result = InformationBox.Show("Do you want to save this project?", title: "Project not saved", buttons: InformationBoxButtons.YesNoCancel);
+                }
+                else
+                {
+                    var projectSave = this.CreateProjectSave();
+                    if (Utils.AreDifferentObject(projectSave, this.oldProjectSave))
+                    {
+                        result = InformationBox.Show("Do you want to save this project?", title: "Project different from last save", buttons: InformationBoxButtons.YesNoCancel);
+                    }
+                }
+
+                if (result == InformationBoxResult.Yes)
+                {
+                    this.ProjectSave();
+                }
+                else if (result == InformationBoxResult.Cancel)
+                {
+                    args.Cancel = true;
+                }
+            };
+            #endregion
+
 
             #region TopMenu
             this.saveMenuItem.Click += (object sender, EventArgs args) => { this.ProjectSave(); };
@@ -205,7 +238,7 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             this.configHandler.Translate();
         }
 
-        public void ProjectSave(bool saveAs = false)
+        private AlarmGenerationProjectSave CreateProjectSave()
         {
             var projectSave = new AlarmGenerationProjectSave();
 
@@ -220,6 +253,13 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             {
                 projectSave.AddAlarmData(entry.Key, entry.Value);
             }
+
+            return projectSave;
+        }
+
+        public void ProjectSave(bool saveAs = false)
+        {
+            var projectSave = this.CreateProjectSave();
 
             var saveOK = projectSave.Save(ref lastFilePath, saveAs || !File.Exists(lastFilePath));
             if (!saveOK)

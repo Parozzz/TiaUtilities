@@ -9,12 +9,14 @@ namespace SimaticML.API
     public static class SimaticMLAPI
     {
 
+        public const string SECTIONS_NAMESPACE_V16 = "http://www.siemens.com/automation/Openness/SW/Interface/v4";
         public const string SECTIONS_NAMESPACE_V17 = "http://www.siemens.com/automation/Openness/SW/Interface/v5";
 
+        public const string FLG_NET_NAMESPACE_V16 = "http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v3";
         public const string FLG_NET_NAMESPACE_V17 = "http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v4";
         public const string FLG_NET_NAMESPACE_V19 = "http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v5";
 
-        public const string STRUCTURED_TEXT_NAMESPACE_V17 = "http://www.siemens.com/automation/Openness/SW/NetworkSource/StructuredText/v3";
+        public const string STRUCTURED_TEXT_NAMESPACE_V16 = "http://www.siemens.com/automation/Openness/SW/NetworkSource/StructuredText/v3";
         public const string STRUCTURED_TEXT_NAMESPACE_V19 = "http://www.siemens.com/automation/Openness/SW/NetworkSource/StructuredText/v4";
 
         public const string GLOBAL_ID_KEY = "ID";
@@ -37,7 +39,10 @@ namespace SimaticML.API
             {
                 return SECTIONS_NAMESPACE_V17;
             }
-
+            else if (TIA_VERSION >= 16)
+            {
+                return SECTIONS_NAMESPACE_V16;
+            }
 
             return null;
         }
@@ -52,10 +57,27 @@ namespace SimaticML.API
             {
                 return FLG_NET_NAMESPACE_V17;
             }
+            else if (TIA_VERSION >= 16)
+            {
+                return FLG_NET_NAMESPACE_V16;
+            }
 
             return null;
         }
 
+        public static string GET_STRUCTRED_TEXT_NAMESPACE()
+        {
+            if (TIA_VERSION >= 19)
+            {
+                return STRUCTURED_TEXT_NAMESPACE_V19;
+            }
+            else if (TIA_VERSION >= 16)
+            {
+                return STRUCTURED_TEXT_NAMESPACE_V16;
+            }
+
+            return null;
+        }
 
         public static XmlNodeConfiguration? ParseFile(string filePath)
         {

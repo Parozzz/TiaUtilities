@@ -108,13 +108,6 @@ namespace TiaXmlReader.Utility
             return true;
         }
 
-        public static bool AreStringDifferent(string? strOne, string? strTwo)
-        {
-            var oneEmpty = string.IsNullOrEmpty(strOne);
-            var twoEmpty = string.IsNullOrEmpty(strTwo);
-            return (oneEmpty && !twoEmpty) || (!oneEmpty && twoEmpty) || (strOne != null && strOne.Equals(strTwo));
-        }
-
         public static bool AreEqualsObject(object? valueOne, object? valueTwo)
         {
             return !AreDifferentObject(valueOne, valueTwo);
@@ -122,12 +115,28 @@ namespace TiaXmlReader.Utility
 
         public static bool AreDifferentObject(object? valueOne, object? valueTwo)
         {
-            if(valueOne is string strOne && valueOne is string strTwo)
+            if (valueOne == null && valueTwo == null)
             {
-                return AreStringDifferent(strOne, strTwo);
+                return false;
+            }
+            else if (valueOne == null && valueTwo != null || valueOne != null && valueTwo == null)
+            {
+                return true;
             }
 
-            return (valueOne == null && valueTwo != null) || (valueOne != null && valueTwo == null) || (valueOne != null && !valueOne.Equals(valueTwo));
+            if(valueOne is string strOne && valueTwo is string strTwo)
+            {
+                var oneEmpty = string.IsNullOrEmpty(strOne);
+                var twoEmpty = string.IsNullOrEmpty(strTwo);
+                return (oneEmpty && !twoEmpty) || (!oneEmpty && twoEmpty) || !strOne.SequenceEqual(strTwo);
+            }
+
+            if (valueOne is IEnumerable<object> enumerableOne && valueTwo is IEnumerable<object> enumerableTwo)
+            {
+                return !enumerableOne.SequenceEqual(enumerableTwo);
+            }
+
+            return valueOne != null && !valueOne.Equals(valueTwo);
         }
 
         public static bool ArePublicFieldDifferent<T>(T obj1, T obj2)

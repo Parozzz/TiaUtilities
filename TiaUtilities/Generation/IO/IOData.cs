@@ -205,5 +205,21 @@ namespace TiaXmlReader.Generation.IO
         {
             return SimaticTagAddress.FromAddress(Address);
         }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+
+            var equals = GenerationUtils.CompareJsonFieldsAndProperties(this, obj, out object invalid);
+            return equals;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
     }
 }

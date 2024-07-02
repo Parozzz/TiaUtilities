@@ -1,15 +1,10 @@
 ﻿using Siemens.Engineering.AddIn.Menu;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Siemens.Engineering.Hmi.Screen;
 using System.Windows.Forms;
 using SpinAddin.Utility;
 using Siemens.Engineering;
 using System.IO;
-using Siemens.Engineering.SW;
 
 namespace SpinAddIn
 {

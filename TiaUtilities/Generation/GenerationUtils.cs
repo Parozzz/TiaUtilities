@@ -140,7 +140,7 @@ namespace TiaXmlReader.Generation
             foreach (var field in fields)
             {
                 var attribute = field.GetCustomAttribute<JsonPropertyAttribute>();
-                if(attribute == null)
+                if (attribute == null)
                 {
                     continue;
                 }
@@ -150,7 +150,7 @@ namespace TiaXmlReader.Generation
             }
 
             var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public).Where(p => p.CanRead && p.CanWrite);
-            foreach(var property in properties)
+            foreach (var property in properties)
             {
                 var attribute = property.GetCustomAttribute<JsonPropertyAttribute>();
                 if (attribute == null)
@@ -161,6 +161,59 @@ namespace TiaXmlReader.Generation
                 var obj = property.GetValue(copyFrom);
                 property.SetValue(saveTo, obj);
             }
+        }
+
+        /***
+         * RETURN TRUE IF ALL EQUALS
+         * */
+        public static bool CompareJsonFieldsAndProperties(object? first, object? second, out object? firstInvalidObj)
+        {
+            firstInvalidObj = null;
+
+            if(first == null || second == null || first.GetType() != second.GetType())
+            {
+                return false;
+            }
+
+            var type = first.GetType();
+
+            var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public);
+            foreach (var field in fields)
+            {
+                var attribute = field.GetCustomAttribute<JsonPropertyAttribute>();
+                if (attribute == null)
+                {
+                    continue;
+                }
+
+                var firstFieldValue = field.GetValue(first);
+                var secondFieldValue = field.GetValue(second);
+                if (Utils.AreDifferentObject(firstFieldValue, secondFieldValue))
+                {
+                    firstInvalidObj = firstFieldValue;
+                    return false;
+                }
+            }
+
+            var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public).Where(p => p.CanRead && p.CanWrite);
+            foreach (var property in properties)
+            {
+                var attribute = property.GetCustomAttribute<JsonPropertyAttribute>();
+                if (attribute == null)
+                {
+                    continue;
+                }
+
+                var firstAttributeValue = property.GetValue(first);
+                var secondAttributeValue = property.GetValue(second);
+                if (Utils.AreDifferentObject(firstAttributeValue, secondAttributeValue))
+                {
+                    firstInvalidObj = firstAttributeValue;
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

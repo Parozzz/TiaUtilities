@@ -21,7 +21,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
         private readonly JavascriptErrorReportThread jsErrorHandlingThread;
         private readonly TimedSaveHandler autoSaveHandler;
         private readonly IOGenerationSettings settings;
-        private IOGenerationProjectSave oldProjectSave;
+        private IOGenerationProjectSave? oldProjectSave;
 
         private readonly GridSettings gridSettings;
         private readonly GridHandler<IOConfiguration, IOData> ioGridHandler;

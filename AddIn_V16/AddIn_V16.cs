@@ -9,6 +9,7 @@ using Siemens.Engineering.SW.Tags;
 using Siemens.Engineering.SW.Types;
 using Siemens.Engineering.SW.WatchAndForceTables;
 using SpinAddin.Utility;
+using Siemens.Engineering.Hmi.Screen;
 
 namespace AddIn_V16
 {
@@ -24,7 +25,8 @@ namespace AddIn_V16
         private readonly SpinAddinMenuRegistrationService plcUDTHandler;
         private readonly SpinAddinMenuRegistrationService plcWatchtableHandler;
         private readonly SpinAddinMenuRegistrationService plcSoftwareHandler;
-        //private readonly SpinAddinMenuRegistrationService hmiScreenHandler;
+        private readonly SpinAddinMenuRegistrationService hmiScreenHandler;
+        private readonly SpinAddinMenuRegistrationService hmiVariableHandler;
         //private readonly SpinAddinMenuRegistrationService hmiPopupHandler;
 
         public AddIn_V16(TiaPortal tiaPortal) : base("TiaAddIn-Spin")
@@ -121,7 +123,48 @@ namespace AddIn_V16
             this.plcWatchtableHandler = plcWatchtableHandler;
 
             plcSoftwareHandler = new PlcSoftwareHandler(plcBlockHandler, plcTagTableHandler, plcUDTHandler, plcWatchtableHandler);
-            //hmiScreenHandler = new HMIScreenHandler();
+
+            var hmiScreenHandler = new GenericImportExportHandler<Screen, ScreenFolder>(descriptiveName: "HMI Screen",
+                exportDelegateFunction: plcWatchTable => plcWatchTable.Export,
+                groupNameFunction: group => group.Name,
+                objNameFunction: plcWatchTable => plcWatchTable.Name,
+                parentFunction: plcWatchTable => (ScreenFolder)plcWatchTable.Parent,
+                containedObjsFunction: group => group.Screens,
+                containedSubGroupsFunction: group => group.Folders,
+                importPredicate: importData =>
+                {
+                    try
+                    {
+                        importData.group.Screens.Import(importData.fileInfo, importData.importOptions);
+                        return true;
+                    }
+                    catch (Exception ex)
+                    {
+                        return Util.ShowExceptionMessage(ex); //Return false if the message box is cancelled
+                    }
+                });
+            this.hmiScreenHandler = hmiScreenHandler;
+
+            var hmiVariableHandler = new GenericImportExportHandler<Siemens.Engineering.Hmi.Tag.TagTable, Siemens.Engineering.Hmi.Tag.TagFolder>(descriptiveName: "HMI Variable",
+                exportDelegateFunction: plcWatchTable => plcWatchTable.Export,
+                groupNameFunction: group => group.Name,
+                objNameFunction: plcWatchTable => plcWatchTable.Name,
+                parentFunction: plcWatchTable => (Siemens.Engineering.Hmi.Tag.TagFolder)plcWatchTable.Parent,
+                containedObjsFunction: group => group.TagTables,
+                containedSubGroupsFunction: group => group.Folders,
+                importPredicate: importData =>
+                {
+                    try
+                    {
+                        importData.group.TagTables.Import(importData.fileInfo, importData.importOptions);
+                        return true;
+                    }
+                    catch (Exception ex)
+                    {
+                        return Util.ShowExceptionMessage(ex); //Return false if the message box is cancelled
+                    }
+                });
+            this.hmiVariableHandler = hmiVariableHandler;
             //hmiPopupHandler = new HMIPopupHandler();
         }
 
@@ -129,7 +172,8 @@ namespace AddIn_V16
         {
             plcBlockHandler.Register(menuRoot);
             plcTagTableHandler.Register(menuRoot);
-            //hmiScreenHandler.Register(menuRoot);
+            hmiScreenHandler.Register(menuRoot);
+            hmiVariableHandler.Register(menuRoot);
             //hmiPopupHandler.Register(menuRoot);
             plcUDTHandler.Register(menuRoot);
             plcWatchtableHandler.Register(menuRoot);

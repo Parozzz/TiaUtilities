@@ -2,6 +2,7 @@
 using TiaXmlReader.GenerationForms;
 using TiaXmlReader.AutoSave;
 using TiaXmlReader.Languages;
+using TiaXmlReader.Generation.IO;
 
 namespace TiaXmlReader.Generation.Alarms
 {
@@ -56,5 +57,16 @@ namespace TiaXmlReader.Generation.Alarms
 
         [JsonProperty] public string AlarmTextInList = "{device_name} - {alarm_description}";
         [JsonProperty] public string EmptyAlarmTextInList = "{device_name} - SPARE";
+
+        public override bool Equals(object? obj)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+
+            var equals = GenerationUtils.CompareJsonFieldsAndProperties(this, obj, out object invalid);
+            return equals;
+        }
     }
 }

@@ -13,5 +13,8 @@
     <Compile Update="Generation\GridHandler\GridFindForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="Generation\IO\GenerationForm\IOGenerationForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
 </Project>

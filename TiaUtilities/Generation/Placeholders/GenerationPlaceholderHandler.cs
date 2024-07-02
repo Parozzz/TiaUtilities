@@ -133,7 +133,7 @@ namespace TiaXmlReader.Generation.Placeholders
             return this;
         }
 
-        public string Parse(string str)
+        public string? Parse(string? str)
         {
             if (str == null)
             {

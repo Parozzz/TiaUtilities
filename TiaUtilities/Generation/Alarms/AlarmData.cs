@@ -137,5 +137,21 @@ namespace TiaXmlReader.Generation.Alarms
                 string.IsNullOrEmpty(this.TimerAddress) && string.IsNullOrEmpty(this.TimerType) && string.IsNullOrEmpty(this.TimerValue) &&
                 string.IsNullOrEmpty(this.Description);
         }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+
+            var equals = GenerationUtils.CompareJsonFieldsAndProperties(this, obj, out object invalid);
+            return equals;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
     }
 }
