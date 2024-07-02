@@ -61,6 +61,7 @@
   "IO_GEN_CONFIG_FC": "Alias FC",
 
   "IO_GEN_CONFIG_ALIAS_DB": "Alias DB",
+  "IO_GEN_CONFIG_ALIAS_DB_GENERATED_DEFINED_VARIABLES": "Genera Defined variables",
   "IO_GEN_CONFIG_ALIAS_DB_IN_DEFAULT": "Default Input value",
   "IO_GEN_CONFIG_ALIAS_DB_OUT_DEFAULT": "Default Output value",
 

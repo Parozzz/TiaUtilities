@@ -21,6 +21,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
         private readonly JavascriptErrorReportThread jsErrorHandlingThread;
         private readonly TimedSaveHandler autoSaveHandler;
         private readonly IOGenerationSettings settings;
+        private IOGenerationProjectSave oldProjectSave;
 
         private readonly GridSettings gridSettings;
         private readonly GridHandler<IOConfiguration, IOData> ioGridHandler;
@@ -31,7 +32,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
 
         private IOGenerationExcelImportSettings ExcelImportConfig { get => settings.ExcelImportConfiguration; }
         private IOConfiguration IOConfig { get => settings.IOConfiguration; }
-
+        
 
         private string? lastFilePath;
 
@@ -87,10 +88,39 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             this.GridsSplitContainer.Panel1.Controls.Add(this.suggestionGridHandler.DataGridView);
             this.GridsSplitContainer.Panel2.Controls.Add(this.ioGridHandler.DataGridView);
 
+            #region FORM
+            this.FormClosing += (sender, args) =>
+            {
+                InformationBoxResult result = InformationBoxResult.None;
+                if(this.oldProjectSave == null)
+                {
+                    result = InformationBox.Show("Do you want to save this project?", title: "Project not saved", buttons: InformationBoxButtons.YesNoCancel);
+                }
+                else
+                {
+                    var projectSave = this.CreateProjectSave();
+                    if(Utils.AreDifferentObject(projectSave, this.oldProjectSave))
+                    {
+                        result = InformationBox.Show("Do you want to save this project?", title: "Project different from last save", buttons: InformationBoxButtons.YesNoCancel);
+                    }
+                }
+
+                if(result == InformationBoxResult.Yes)
+                {
+                    this.ProjectSave();
+                }
+                else if(result == InformationBoxResult.Cancel)
+                {
+                    args.Cancel = true;
+                }
+            };
+            #endregion
+
             #region TopMenu
             this.saveMenuItem.Click += (sender, args) => { this.ProjectSave(); };
             this.saveAsMenuItem.Click += (sender, args) => { this.ProjectSave(true); };
             this.loadMenuItem.Click += (sender, args) => { this.ProjectLoad(); };
+
             this.exportXMLMenuItem.Click += (sender, args) =>
             {
                 try
@@ -145,7 +175,6 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                     this.ioGridHandler.ChangeMultipleRows(dataDict);
                 }
             };
-
             this.importSuggestionsMenuItem.Click += (sender, args) =>
             {
                 var fileDialog = new CommonOpenFileDialog
@@ -326,7 +355,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             this.configHandler.Translate();
         }
 
-        public void ProjectSave(bool saveAs = false)
+        private IOGenerationProjectSave CreateProjectSave()
         {
             var projectSave = new IOGenerationProjectSave();
 
@@ -341,6 +370,14 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             {
                 projectSave.RowDict.Add(entry.Value, entry.Key);
             }
+
+            return projectSave;
+        }
+
+        public void ProjectSave(bool saveAs = false)
+        {
+            var projectSave = this.CreateProjectSave();
+            this.oldProjectSave = projectSave;
 
             var saveOK = projectSave.Save(ref lastFilePath, saveAs || !File.Exists(lastFilePath));
             this.Text = this.GetFormLocalizatedName() + (saveOK ? ". Project File: " + lastFilePath : "");
@@ -389,6 +426,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                 this.suggestionGridHandler.DataGridView.ResumeLayout();
 
                 this.Text = this.GetFormLocalizatedName() + ". Project File: " + lastFilePath;
+                this.oldProjectSave = loadedProjectSave;
             }
         }
 

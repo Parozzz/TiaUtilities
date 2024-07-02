@@ -61,6 +61,7 @@
   "IO_GEN_CONFIG_FC": "FC Appoggi",
 
   "IO_GEN_CONFIG_ALIAS_DB": "DB Appoggi",
+  "IO_GEN_CONFIG_ALIAS_DB_GENERATED_DEFINED_VARIABLES": "Genera Variabili Definite",
   "IO_GEN_CONFIG_ALIAS_DB_IN_DEFAULT": "Valore default Input",
   "IO_GEN_CONFIG_ALIAS_DB_OUT_DEFAULT": "Valore default Output",
 

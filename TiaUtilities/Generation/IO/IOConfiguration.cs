@@ -45,5 +45,37 @@ namespace TiaXmlReader.Generation.IO
 
         [JsonProperty] public string SegmentNameBitGrouping = "{memory_type}{byte}_{bit} - {comment}";
         [JsonProperty] public string SegmentNameByteGrouping = "{memory_type}B{byte}";
+
+        public override bool Equals(object? obj)
+        {
+            return obj is IOConfiguration compare &&
+                //FB
+                this.FCBlockName.SequenceEqual(compare.FCBlockName) &&
+                this.FCBlockNumber == compare.FCBlockNumber &&
+                //MEMORY&GROUPING TYPE
+                this.MemoryType == compare.MemoryType &&
+                this.GroupingType == compare.GroupingType &&
+                //DB
+                this.DBName.SequenceEqual(compare.DBName) &&
+                this.DBNumber == compare.DBNumber &&
+                this.GenerateDefinedVariableAnyway == compare.GenerateDefinedVariableAnyway &&
+                //VARIABLE TABLE
+                this.VariableTableName.SequenceEqual(compare.VariableTableName) &&
+                this.VariableTableInputStartAddress == compare.VariableTableInputStartAddress &&
+                this.VariableTableOutputStartAddress == compare.VariableTableOutputStartAddress &&
+                this.VariableTableSplitEvery == compare.VariableTableSplitEvery &&
+                //IO TABLE
+                this.IOTableName.SequenceEqual(compare.IOTableName) &&
+                this.IOTableSplitEvery == compare.IOTableSplitEvery &&
+                //DEFAULTS
+                this.DefaultIoName.SequenceEqual(compare.DefaultIoName) &&
+                this.DefaultDBInputVariable.SequenceEqual(compare.DefaultDBInputVariable) &&
+                this.DefaultDBOutputVariable.SequenceEqual(compare.DefaultDBOutputVariable) &&
+                this.DefaultMerkerInputVariable.SequenceEqual(compare.DefaultMerkerInputVariable) &&
+                this.DefaultMerkerOutputVariable.SequenceEqual(compare.DefaultMerkerOutputVariable) &&
+                //SEGMENT NAMES
+                this.SegmentNameBitGrouping.SequenceEqual(compare.SegmentNameBitGrouping) &&
+                this.SegmentNameByteGrouping.SequenceEqual(compare.SegmentNameByteGrouping);
+        }
     }
 }

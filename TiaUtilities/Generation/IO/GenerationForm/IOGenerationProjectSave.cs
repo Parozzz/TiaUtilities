@@ -38,5 +38,13 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
         {
             return GenerationUtils.Save(this, ref filePath, EXTENSION, showFileDialog);
         }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is IOGenerationProjectSave compare && 
+                this.IOConfiguration.Equals(compare.IOConfiguration) &&
+                this.RowDict.SequenceEqual(compare.RowDict) &&
+                this.SuggestionRowDict.SequenceEqual(compare.SuggestionRowDict);
+        }
     }
 }
