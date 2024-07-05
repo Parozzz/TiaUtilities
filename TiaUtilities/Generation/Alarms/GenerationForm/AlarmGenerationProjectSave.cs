@@ -18,14 +18,9 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
     {
         public const string EXTENSION = "json";
 
-        public class AlarmProjectSaveData
-        {
-            [JsonProperty] public Dictionary<int, AlarmData> AlarmDataDict = [];
-            [JsonProperty] public Dictionary<int, DeviceData> DeviceDataDict = [];
-        }
-
         [JsonProperty] public AlarmConfiguration AlarmConfig { get; set; } = new();
-        [JsonProperty] public AlarmProjectSaveData SaveData { get; set; } = new();
+        [JsonProperty] public Dictionary<int, AlarmData> AlarmData = [];
+        [JsonProperty] public Dictionary<int, DeviceData> DeviceData = [];
 
         public AlarmGenerationProjectSave()
         {
@@ -33,12 +28,12 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
 
         public void AddAlarmData(AlarmData alarmData, int rowIndex)
         {
-            this.SaveData.AlarmDataDict.Add(rowIndex, alarmData);
+            this.AlarmData.Add(rowIndex, alarmData);
         }
 
         public void AddDeviceData(DeviceData deviceData, int rowIndex)
         {
-            this.SaveData.DeviceDataDict.Add(rowIndex, deviceData);
+            this.DeviceData.Add(rowIndex, deviceData);
         }
 
         public static AlarmGenerationProjectSave Load(ref string? filePath)
@@ -49,6 +44,19 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
         public bool Save(ref string? filePath, bool saveAs = false)
         {
             return GenerationUtils.Save(this, ref filePath, EXTENSION, saveAs);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is AlarmGenerationProjectSave compare &&
+                this.AlarmConfig.Equals(compare.AlarmConfig) &&
+                this.AlarmData.SequenceEqual(compare.AlarmData) &&
+                this.DeviceData.SequenceEqual(compare.DeviceData);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
     }
 }

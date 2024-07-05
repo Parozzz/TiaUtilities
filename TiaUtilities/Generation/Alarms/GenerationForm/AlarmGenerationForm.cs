@@ -35,7 +35,7 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             this.gridSettings = gridSettings;
 
             this.deviceGridHandler = new GridHandler<AlarmConfiguration, DeviceData>(jsErrorHandlingThread, gridSettings, AlarmConfig) { RowCount = 499 };
-            this.alarmGridHandler = new GridHandler<AlarmConfiguration, AlarmData>(jsErrorHandlingThread, gridSettings, AlarmConfig) { RowCount = 29 };
+            this.alarmGridHandler = new GridHandler<AlarmConfiguration, AlarmData>(jsErrorHandlingThread, gridSettings, AlarmConfig) { RowCount = 64 };
 
             this.configHandler = new AlarmGenerationFormConfigHandler(this, this.AlarmConfig);
 
@@ -179,7 +179,7 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             this.deviceGridHandler.AddTextBoxColumn(DeviceData.DESCRIPTION, 0);
 
             this.alarmGridHandler.AddCheckBoxColumn(AlarmData.ENABLE, 40);
-            this.alarmGridHandler.AddTextBoxColumn(AlarmData.ALARM_VARIABLE, 80);
+            this.alarmGridHandler.AddTextBoxColumn(AlarmData.ALARM_VARIABLE, 250);
             this.alarmGridHandler.AddTextBoxColumn(AlarmData.COIL_ADDRESS, 95);
             this.alarmGridHandler.AddTextBoxColumn(AlarmData.SET_COIL_ADDRESS, 95);
             this.alarmGridHandler.AddTextBoxColumn(AlarmData.TIMER_ADDRESS, 95);
@@ -269,6 +269,7 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             }
 
             this.Text = this.GetFormLocalizatedName() + ". Project File: " + lastFilePath;
+            this.oldProjectSave = projectSave;
         }
 
         public void ProjectLoad()
@@ -284,7 +285,7 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
                 this.alarmGridHandler.DataSource.InitializeData(this.alarmGridHandler.RowCount);
                 this.deviceGridHandler.DataSource.InitializeData(this.deviceGridHandler.RowCount);
 
-                foreach (var entry in loadedProjectSave.SaveData.DeviceDataDict)
+                foreach (var entry in loadedProjectSave.DeviceData)
                 {
                     var rowIndex = entry.Key;
                     if (rowIndex >= 0 && rowIndex <= this.deviceGridHandler.RowCount)
@@ -294,7 +295,7 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
                     }
                 }
 
-                foreach (var entry in loadedProjectSave.SaveData.AlarmDataDict)
+                foreach (var entry in loadedProjectSave.AlarmData)
                 {
                     var rowIndex = entry.Key;
                     if (rowIndex >= 0 && rowIndex <= this.alarmGridHandler.RowCount)
@@ -311,6 +312,7 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
                 this.deviceGridHandler.DataGridView.ResumeLayout();
 
                 this.Text = this.GetFormLocalizatedName() + ". Project File: " + lastFilePath;
+                this.oldProjectSave = loadedProjectSave;
             }
         }
 

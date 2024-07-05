@@ -486,10 +486,27 @@ namespace TiaXmlReader.Generation.GridHandler
                     foreach (var cellChange in cellChangeList) //Accessing DataSource instead of changing value of cell is WAAAAY faster (From 3s to 22ms)
                     {
                         var data = this.DataSource[cellChange.RowIndex];
+                        if (data == null)
+                        {
+                            continue;
+                        }
 
                         var dataColumn = data.GetColumn(cellChange.ColumnIndex);
-                        cellChange.OldValue = dataColumn.GetValueFrom<object>(data);
-                        dataColumn.SetValueTo(data, cellChange.NewValue);
+
+                        var oldValue = dataColumn.GetValueFrom<object>(data);
+                        cellChange.OldValue = oldValue;
+
+                        //For CheckBox is needed since passing "True" as string does not count as a valid object!
+                        var newValue = cellChange.NewValue;
+                        if (newValue is string newValueStr)
+                        {
+                            var columnType = dataColumn.PropertyInfo.PropertyType;
+                            if (columnType == typeof(bool) && bool.TryParse(newValueStr, out bool result))
+                            {
+                                newValue = result;
+                            }
+                        }
+                        dataColumn.SetValueTo(data, newValue);
                     }
                     this.undoRedoHandler.Unlock();
                 }

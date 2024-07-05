@@ -12,7 +12,7 @@ namespace SpinAddin.Utility
     {
         public static Form CreateForm()
         {
-            Form form = new Form { Opacity = 0, ShowIcon = false };
+            Form form = new Form { Opacity = 1, ShowIcon = true, TopMost = true, StartPosition = FormStartPosition.CenterScreen, WindowState = FormWindowState.Normal };
             form.Show();
             form.TopMost = true;
             form.Activate();

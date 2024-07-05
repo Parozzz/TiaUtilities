@@ -277,7 +277,7 @@ namespace TiaXmlReader.Generation.Alarms
             if (!string.IsNullOrEmpty(alarmData.TimerAddress)
                 && !string.IsNullOrEmpty(alarmData.TimerType)
                 && !string.IsNullOrEmpty(alarmData.TimerValue)
-                && alarmData.TimerAddress != "\\")
+                && alarmData.IsTimerAddressValid())
             {
                 var partType = alarmData.TimerType.ToLower() switch
                 {

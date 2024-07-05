@@ -4,19 +4,18 @@ using TiaXmlReader.Utility;
 
 namespace TiaXmlReader.Generation.GridHandler.Data
 {
-    public class GridDataColumn
+    public class GridDataColumn(string name, string dataPropertyName, int columnIndex, PropertyInfo propertyInfo, string programmingFriendlyName)
     {
-        public static GridDataColumn GetFromReflection(Type type, int columnIndex, string propertyName, string programmingFriendlyName = null)
+        public static GridDataColumn GetFromReflection(Type type, int columnIndex, string propertyName, string? programmingFriendlyName = null)
         {
             var propertyInfo = type.GetProperty(propertyName) ?? throw new Exception("Invalid property name while creating GridDataColumn from reflection from type " + type.FullName);
-            var dataColumn = new GridDataColumn()
-            {
-                Name = propertyInfo.GetTranslation(),
-                DataPropertyName = propertyInfo.Name,
-                ColumnIndex = columnIndex,
-                PropertyInfo = propertyInfo,
-                ProgrammingFriendlyName = programmingFriendlyName ?? propertyInfo.Name.ToLower(),
-            };
+            var dataColumn = new GridDataColumn(
+                name: propertyInfo.GetTranslation(),
+                dataPropertyName:  propertyInfo.Name,
+                columnIndex:  columnIndex,
+                propertyInfo: propertyInfo,
+                programmingFriendlyName: programmingFriendlyName ?? propertyInfo.Name.ToLower()
+            );
             return dataColumn;
         }
 
@@ -41,11 +40,11 @@ namespace TiaXmlReader.Generation.GridHandler.Data
             return columnList;
         }
 
-        public string Name { get; set; }
-        public string DataPropertyName { get; set; }
-        public int ColumnIndex { get; set; }
-        public PropertyInfo PropertyInfo { get; set; }
-        public string ProgrammingFriendlyName { get; set; }
+        public string Name { get; init; } = name;
+        public string DataPropertyName { get; init; } = dataPropertyName;
+        public int ColumnIndex { get; init; } = columnIndex;
+        public PropertyInfo PropertyInfo { get; init; } = propertyInfo;
+        public string ProgrammingFriendlyName { get; init; } = programmingFriendlyName;
 
         public V? GetValueFrom<V>(object obj)
         {
@@ -83,12 +82,7 @@ namespace TiaXmlReader.Generation.GridHandler.Data
 
         public override int GetHashCode()
         {
-            int hashCode = 921909018;
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(DataPropertyName);
-            hashCode = hashCode * -1521134295 + ColumnIndex.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<PropertyInfo>.Default.GetHashCode(PropertyInfo);
-            return hashCode;
+            return HashCode.Combine(Name, DataPropertyName, ColumnIndex, PropertyInfo);
         }
 
         #region OPERATORS GridDataColumn - int

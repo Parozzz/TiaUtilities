@@ -71,14 +71,27 @@ namespace TiaXmlReader.Generation.Alarms
             return this.GetPreview(column.ColumnIndex, config);
         }
 
+        public bool IsTimerAddressValid()
+        {
+            return this.TimerAddress != "\\" && this.TimerAddress != "/";
+        }
+
         public GridDataPreview? GetPreview(int column, AlarmConfiguration config)
         {
-            if(string.IsNullOrEmpty(AlarmVariable) || this.IsEmpty())
+            if (string.IsNullOrEmpty(AlarmVariable) || this.IsEmpty())
             {
                 return null;
             }
 
-            if(column == COIL_ADDRESS)
+            if(column == ALARM_VARIABLE)
+            {
+                return new GridDataPreview()
+                {
+                    Prefix = config.AlarmAddressPrefix,
+                    Value = this.AlarmVariable
+                };
+            }
+            else if (column == COIL_ADDRESS)
             {
                 return new GridDataPreview()
                 {
@@ -87,7 +100,7 @@ namespace TiaXmlReader.Generation.Alarms
                     Value = this.CoilAddress
                 };
             }
-            else if(column == SET_COIL_ADDRESS)
+            else if (column == SET_COIL_ADDRESS)
             {
                 return new GridDataPreview()
                 {
@@ -96,7 +109,7 @@ namespace TiaXmlReader.Generation.Alarms
                     Value = this.SetCoilAddress
                 };
             }
-            else if(column == TIMER_ADDRESS)
+            else if (column == TIMER_ADDRESS)
             {
                 return new GridDataPreview()
                 {
@@ -105,22 +118,26 @@ namespace TiaXmlReader.Generation.Alarms
                     Value = this.TimerAddress
                 };
             }
-            else if (column == TIMER_TYPE && this.TimerAddress != "\\")
+            else if (this.IsTimerAddressValid())
             {
-                return new GridDataPreview()
+                if (column == TIMER_TYPE)
                 {
-                    DefaultValue = config.DefaultTimerType,
-                    Value = this.TimerType
-                };
-            }
-            else if (column == TIMER_VALUE && this.TimerAddress != "\\")
-            {
-                return new GridDataPreview()
+                    return new GridDataPreview()
+                    {
+                        DefaultValue = config.DefaultTimerType,
+                        Value = this.TimerType
+                    };
+                }
+                else if (column == TIMER_VALUE)
                 {
-                    DefaultValue = config.DefaultTimerValue,
-                    Value = this.TimerValue
-                };
+                    return new GridDataPreview()
+                    {
+                        DefaultValue = config.DefaultTimerValue,
+                        Value = this.TimerValue
+                    };
+                }
             }
+
 
             return null;
         }

@@ -131,15 +131,21 @@ namespace TiaXmlReader.Generation.GridHandler
             Clipboard.SetText(clipboardText, TextDataFormat.UnicodeText);
         }
 
-        public static List<GridCellChange> PasteAsExcel(DataGridView dataGridView)
+        public static List<GridCellChange>? PasteAsExcel(DataGridView dataGridView)
         {
-            var clipboardDataObject = (DataObject)Clipboard.GetDataObject();
-            if (!clipboardDataObject.GetDataPresent(DataFormats.Text))
+            var cliboardObj = (DataObject?)Clipboard.GetDataObject();
+            if (cliboardObj == null || !cliboardObj.GetDataPresent(DataFormats.Text))
             {
                 return null;
             }
 
-            var pasteString = clipboardDataObject.GetData(DataFormats.Text).ToString();
+            var clipboardData = cliboardObj.GetData(DataFormats.Text);
+            if(clipboardData == null)
+            {
+                return null;
+            }
+
+            var pasteString = (string) clipboardData;
 
             bool containsExcelChars = pasteString.Contains("\r\n") || pasteString.Contains('\t');
             if (!containsExcelChars)
