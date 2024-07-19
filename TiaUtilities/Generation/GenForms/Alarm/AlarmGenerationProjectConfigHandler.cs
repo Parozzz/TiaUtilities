@@ -1,39 +1,29 @@
-﻿using System;
-using System.Windows.Forms;
-using TiaUtilities.Generation.Configuration.Utility;
+﻿using TiaUtilities.Generation.Configuration.Utility;
+using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation.Configuration;
-using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Languages;
+using TiaUtilities.Generation.GenForms.Alarm;
 
-namespace TiaXmlReader.Generation.Alarms.GenerationForm
+namespace TiaUtilities.Generation.GenForms.Alarm
 {
-    public class AlarmGenerationFormConfigHandler
+    public class AlarmGenerationProjectConfigHandler(AlarmConfigControl configControl, AlarmConfiguration config)
     {
-        private readonly AlarmGenerationForm form;
-        private readonly AlarmConfiguration config;
-
-        public AlarmGenerationFormConfigHandler(AlarmGenerationForm form, AlarmConfiguration config)
-        {
-            this.form = form;
-            this.config = config;
-        }
-
         public void Init()
         {
             {
-                var comboBox = form.partitionTypeComboBox;
+                var comboBox = configControl.partitionTypeComboBox;
                 comboBox.SelectedValue = config.PartitionType;
                 comboBox.SelectionChangeCommitted += (sender, args) => config.PartitionType = (AlarmPartitionType)(comboBox.SelectedValue ?? default(AlarmPartitionType));
             }
 
             {
-                var comboBox = form.groupingTypeComboBox;
+                var comboBox = configControl.groupingTypeComboBox;
                 comboBox.SelectedValue = config.GroupingType;
                 comboBox.SelectionChangeCommitted += (sender, args) => config.GroupingType = (AlarmGroupingType)(comboBox.SelectedValue ?? default(AlarmGroupingType));
             }
 
             {
-                var button = form.fcConfigButton;
+                var button = configControl.fcConfigButton;
                 button.Click += (sender, args) =>
                 {
                     var configForm = new ConfigForm(button.Text);
@@ -47,16 +37,12 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
                         .ControlText(config.FCBlockNumber)
                         .UIntChanged(v => config.FCBlockNumber = v);
 
-                    mainGroup.AddCheckBox().LocalizedLabel("ALARM_CONFIG_FC_COIL_FIRST").ControlNoAdapt()
-                        .Value(config.CoilFirst)
-                        .CheckedChanged(v => config.CoilFirst = v);
-
                     SetupConfigForm(button, configForm);
                 };
             }
 
             {
-                var button = form.alarmGenerationConfigButton;
+                var button = configControl.alarmGenerationConfigButton;
                 button.Click += (sender, args) =>
                 {
                     var configForm = new ConfigForm(button.Text) { ControlWidth = 300 };
@@ -71,6 +57,16 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
                     mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_GENERATION_SKIP")
                          .ControlText(config.SkipNumberAfterGroup)
                          .UIntChanged(v => config.SkipNumberAfterGroup = v);
+                    mainGroup.AddComboBox().LocalizedLabel("ALARM_CONFIG_COIL1_TYPE")
+                        .DisableEdit()
+                        .TranslatableEnumItems<AlarmCoilType>()
+                        .SelectedValue(config.Coil1Type)
+                        .SelectedValueChanged<AlarmCoilType>(type => config.Coil1Type = type);
+                    mainGroup.AddComboBox().LocalizedLabel("ALARM_CONFIG_COIL2_TYPE")
+                        .DisableEdit()
+                        .TranslatableEnumItems<AlarmCoilType>()
+                        .SelectedValue(config.Coil2Type)
+                        .SelectedValueChanged<AlarmCoilType>(type => config.Coil2Type = type);
 
                     mainGroup.AddSeparator().Height(15);
 
@@ -113,19 +109,19 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             }
 
             {
-                var button = form.fieldDefaultValueConfigButton;
+                var button = configControl.fieldDefaultValueConfigButton;
                 button.Click += (sender, args) =>
                 {
                     var configForm = new ConfigForm(button.Text);
 
                     var mainGroup = configForm.Init();
                     mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_DEFAULTS_COIL")
-                         .ControlText(config.DefaultCoilAddress)
-                         .TextChanged(v => config.DefaultCoilAddress = v);
+                         .ControlText(config.DefaultCoil1Address)
+                         .TextChanged(v => config.DefaultCoil1Address = v);
 
                     mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_DEFAULTS_SET_COIL")
-                         .ControlText(config.DefaultSetCoilAddress)
-                         .TextChanged(v => config.DefaultSetCoilAddress = v);
+                         .ControlText(config.DefaultCoil2Address)
+                         .TextChanged(v => config.DefaultCoil2Address = v);
 
                     var timerGroup = mainGroup.AddGroup().ControlWidth(225).NoAdapt();
 
@@ -149,7 +145,7 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             }
 
             {
-                var button = form.fieldPrefixConfigButton;
+                var button = configControl.fieldPrefixConfigButton;
                 button.Click += (sender, args) =>
                 {
                     var configForm = new ConfigForm(button.Text);
@@ -176,7 +172,7 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             }
 
             {
-                var button = form.segmentNameConfigButton;
+                var button = configControl.segmentNameConfigButton;
                 button.Click += (sender, args) =>
                 {
                     var configForm = new ConfigForm(button.Text) { ControlWidth = 500 };
@@ -203,7 +199,7 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             }
 
             {
-                var button = form.textListConfigButton;
+                var button = configControl.textListConfigButton;
                 button.Click += (sender, args) =>
                 {
                     var configForm = new ConfigForm(Localization.Get("ALARM_CONFIG_TEXT_LIST"));
@@ -222,24 +218,11 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             }
         }
 
-        private void SetupConfigForm(Control button, ConfigForm configForm)
+        private static void SetupConfigForm(Control button, ConfigForm configForm)
         {
             configForm.StartShowingAtControl(button);
             //configForm.Init();
-            configForm.Show(form);
-        }
-
-        public void Translate()
-        {
-            form.partitionTypeLabel.Text = Localization.Get("ALARM_CONFIG_PARTITION_TYPE");
-            form.groupingTypeLabel.Text = Localization.Get("ALARM_CONFIG_GROUPING_TYPE");
-
-            form.fcConfigButton.Text = Localization.Get("ALARM_CONFIG_FC");
-            form.alarmGenerationConfigButton.Text = Localization.Get("ALARM_CONFIG_GENERATION");
-            form.fieldDefaultValueConfigButton.Text = Localization.Get("ALARM_CONFIG_DEFAULTS");
-            form.fieldPrefixConfigButton.Text = Localization.Get("ALARM_CONFIG_PREFIX");
-            form.segmentNameConfigButton.Text = Localization.Get("ALARM_CONFIG_SEGMENT_NAME");
-            form.textListConfigButton.Text = Localization.Get("ALARM_CONFIG_TEXT_LIST");
+            configForm.Show(button.FindForm());
         }
     }
 }

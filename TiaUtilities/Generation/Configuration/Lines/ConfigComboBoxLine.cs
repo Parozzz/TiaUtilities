@@ -7,7 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using TiaXmlReader.CustomControls;
+using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation.Configuration;
+using TiaXmlReader.Languages;
 
 namespace TiaUtilities.Generation.Configuration.Lines
 {
@@ -18,6 +20,7 @@ namespace TiaUtilities.Generation.Configuration.Lines
         private bool numericOnly;
         private Action<string>? textChangedAction;
         private Action<uint>? uintChangedAction;
+        private Action<object?>? selectedValueChangedAction;
 
         public ConfigComboBoxLine()
         {
@@ -33,8 +36,14 @@ namespace TiaUtilities.Generation.Configuration.Lines
                 UnderlineColor = ConfigStyle.UNDERLINE_COLOR,
             };
 
+            comboBox.OnSelectedIndexChanged += OnSelectedIndexChanged;
             comboBox.TextChanged += TextChangedEventHandler;
             comboBox.KeyPress += KeyPressEventHandler;
+        }
+
+        private void OnSelectedIndexChanged(object? sender, EventArgs e)
+        {
+            selectedValueChangedAction?.Invoke(comboBox.SelectedValue);
         }
 
         private void KeyPressEventHandler(object? sender, KeyPressEventArgs args)
@@ -68,9 +77,42 @@ namespace TiaUtilities.Generation.Configuration.Lines
             return this;
         }
 
-        public ConfigComboBoxLine SelectecItem(object item)
+        public ConfigComboBoxLine TranslatableEnumItems<T>() where T : Enum
         {
-            comboBox.SelectedItem = item;
+            this.comboBox.DisplayMember = "Text";
+            this.comboBox.ValueMember = "Value";
+
+            var dataSourceItems = new List<object>();
+            foreach (Enum enumItem in Enum.GetValues(typeof(T)))
+            {
+                dataSourceItems.Add(new { Text = enumItem.GetTranslation(), Value = enumItem });
+            }
+            this.comboBox.DataSource = dataSourceItems;
+
+            return this;
+        }
+
+        public ConfigComboBoxLine SelectedValue(object item)
+        {
+            comboBox.SelectedValue = item;
+            return this;
+        }
+
+        public ConfigComboBoxLine SelectedValueChanged(Action<object?> action)
+        {
+            this.selectedValueChangedAction = action;
+            return this;
+        }
+
+        public ConfigComboBoxLine SelectedValueChanged<T>(Action<T> action)
+        {
+            this.selectedValueChangedAction = obj =>
+            {
+                if (obj is T t)
+                {
+                    action(t);
+                }
+            };
             return this;
         }
 

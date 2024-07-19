@@ -13,8 +13,10 @@ using TiaXmlReader.Utility;
 using InfoBox;
 using TiaXmlReader.Javascript;
 using TiaUtilities.Generation.Configuration.Utility;
+using TiaUtilities.Generation.GenForms.IO;
+using TiaUtilities.Generation.GenForms.IO.ExcelImporter;
 
-namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
+namespace TiaUtilities.Generation.GenForms.IO.ExcelImporter
 {
     public partial class IOGenerationExcelImportForm : Form
     {

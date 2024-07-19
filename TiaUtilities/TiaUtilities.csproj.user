@@ -1,6 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <Compile Update="CustomControls\InteractableTabControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Update="CustomControls\RJComboBox.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -10,10 +13,22 @@
     <Compile Update="CustomControls\RJToggleButton.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Update="Generation\GenForms\Alarm\AlarmConfigControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Generation\GenForms\Alarm\AlarmTabbedView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Generation\GenForms\Alarm\DeviceAlarmGridControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Generation\GenForms\GenerationProjectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="Generation\GridHandler\GridFindForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Generation\IO\GenerationForm\IOGenerationForm.cs">
+    <Compile Update="Generation\GenForms\IO\IOGenerationForm.cs">
       <SubType>Form</SubType>
     </Compile>
   </ItemGroup>

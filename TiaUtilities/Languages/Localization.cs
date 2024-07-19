@@ -84,7 +84,7 @@ namespace TiaXmlReader.Languages
         {
             return enumValue.GetType().GetMember(enumValue.ToString())
                 .Select(m => m.GetTranslation())
-                .FirstOrElse(() => "unkown");
+                .FirstOrElse(() => Enum.GetName(enumValue.GetType(), enumValue) ?? "unknown");
         }
 
         public static bool TryGetEnumByTranslation<T>(string displayString, out T enumValue) where T : Enum

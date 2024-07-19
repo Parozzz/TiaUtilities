@@ -32,7 +32,8 @@ namespace TiaXmlReader.Generation.Configuration
 
         public LINE LocalizedLabel(string jsonKey, string append = "")
         {
-            this.labelText = Localization.Get(jsonKey, append);
+            var localizedString = Localization.Get(jsonKey, append);
+            this.labelText = string.IsNullOrEmpty(localizedString) ? jsonKey : localizedString;
             return (LINE)this;
         }
 

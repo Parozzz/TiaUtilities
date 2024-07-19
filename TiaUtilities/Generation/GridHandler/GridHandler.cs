@@ -29,11 +29,11 @@ namespace TiaXmlReader.Generation.GridHandler
         private readonly GridExcelDragHandler excelDragHandler;
         private readonly GridSortHandler<C, T> sortHandler;
 
-        public DataGridView DataGridView { get; private set; }
-        public GridDataHandler<C, T> DataHandler { get; private set; }
-        public GridDataSource<C, T> DataSource { get; private set; }
-        public GridScript<C, T> Script { get; private set; }
-        public GridEvents Events { get; private set; }
+        public DataGridView DataGridView { get; init; }
+        public GridDataHandler<C, T> DataHandler { get; init; }
+        public GridDataSource<C, T> DataSource { get; init; }
+        public GridScript<C, T> Script { get; init; }
+        public GridEvents Events { get; init; }
 
         public FindData<C, T>? FindData { get; set; }
 
@@ -295,6 +295,8 @@ namespace TiaXmlReader.Generation.GridHandler
                     var oldValue = (bool)(checkBoxCell.Value ?? false); //In this case the value is still the old one. For checkBox, been boolean value, i can predict the next!
                     var newValue = !oldValue;
                     ChangeCell(new GridCellChange(checkBoxCell) { OldValue = oldValue, NewValue = newValue }, applyChanges: false);
+
+                    DataGridView.EndEdit(); //If a checkbox is clicked, it goes in edit mode. I do not want that, is confusing. This fixes it.
                 }
             };
             #endregion

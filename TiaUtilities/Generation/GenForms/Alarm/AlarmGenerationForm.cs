@@ -6,9 +6,13 @@ using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.AutoSave;
 using TiaXmlReader.Javascript;
 using InfoBox;
-using TiaXmlReader.Generation.IO.GenerationForm;
+using TiaXmlReader.Generation.Alarms;
+using TiaXmlReader.Generation;
+using TiaUtilities.Generation.GenForms.Alarm;
+using System.Diagnostics;
+using TiaXmlReader.Generation.GridHandler.Events;
 
-namespace TiaXmlReader.Generation.Alarms.GenerationForm
+namespace TiaUtilities.Generation.GenForms.Alarm
 {
     public partial class AlarmGenerationForm : Form
     {
@@ -105,12 +109,11 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             };
             #endregion
 
-
             #region TopMenu
-            this.saveMenuItem.Click += (object sender, EventArgs args) => { this.ProjectSave(); };
-            this.saveAsMenuItem.Click += (object sender, EventArgs args) => { this.ProjectSave(true); };
-            this.loadMenuItem.Click += (object sender, EventArgs args) => { this.ProjectLoad(); };
-            this.exportXMLMenuItem.Click += (object sender, EventArgs args) =>
+            this.saveMenuItem.Click += (sender, args) => { this.ProjectSave(); };
+            this.saveAsMenuItem.Click += (sender, args) => { this.ProjectSave(true); };
+            this.loadMenuItem.Click += (sender, args) => { this.ProjectLoad(); };
+            this.exportXMLMenuItem.Click += (sender, args) =>
             {
                 try
                 {
@@ -119,7 +122,6 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
                         IsFolderPicker = true,
                         EnsurePathExists = true,
                         EnsureValidNames = true,
-                        InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
                     };
 
                     if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
@@ -130,6 +132,8 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
                         var ioXmlGenerator = new AlarmXmlGenerator(this.AlarmConfig, alarmDataList, deviceDataList);
                         ioXmlGenerator.GenerateBlocks();
                         ioXmlGenerator.ExportXML(fileDialog.FileName);
+
+                        Process.Start("explorer.exe", fileDialog.FileName);
                     }
                 }
                 catch (Exception ex)
@@ -137,7 +141,7 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
                     Utils.ShowExceptionMessage(ex);
                 }
             };
-            this.preferencesMenuItem.Click += (object sender, EventArgs args) => this.gridSettings.ShowConfigForm(this);
+            this.preferencesMenuItem.Click += (sender, args) => this.gridSettings.ShowConfigForm(this);
             #endregion
 
             #region PartitionType ComboBox
@@ -180,8 +184,8 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
 
             this.alarmGridHandler.AddCheckBoxColumn(AlarmData.ENABLE, 40);
             this.alarmGridHandler.AddTextBoxColumn(AlarmData.ALARM_VARIABLE, 250);
-            this.alarmGridHandler.AddTextBoxColumn(AlarmData.COIL_ADDRESS, 95);
-            this.alarmGridHandler.AddTextBoxColumn(AlarmData.SET_COIL_ADDRESS, 95);
+            this.alarmGridHandler.AddTextBoxColumn(AlarmData.COIL1_ADDRESS, 95);
+            this.alarmGridHandler.AddTextBoxColumn(AlarmData.COIL2_ADDRESS, 95);
             this.alarmGridHandler.AddTextBoxColumn(AlarmData.TIMER_ADDRESS, 95);
             this.alarmGridHandler.AddComboBoxColumn(AlarmData.TIMER_TYPE, 55, items);
             this.alarmGridHandler.AddTextBoxColumn(AlarmData.TIMER_VALUE, 50);
@@ -191,6 +195,29 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
             this.deviceGridHandler.Init();
             this.alarmGridHandler.Init();
             this.configHandler.Init();
+
+            this.alarmGridHandler.Events.CellChange += args =>
+            {
+                if(args.CellChangeList == null)
+                {
+                    return;
+                }
+
+                foreach(var cellChange in args.CellChangeList)
+                {
+                    if(AlarmData.ALARM_VARIABLE == cellChange.ColumnIndex)
+                    {//If an alarm variable is filled (Before empty and now full) i will automatically set the enable to be true. The opposite removes the enable. QOL
+                        if(cellChange.IsOldValueEmptyString() && cellChange.IsNewValueFullString())
+                        {
+                            alarmGridHandler.DataSource[cellChange.RowIndex].Enable = true;
+                        }
+                        else if(cellChange.IsOldValueFullString() && cellChange.IsNewValueEmptyString())
+                        {
+                            alarmGridHandler.DataSource[cellChange.RowIndex].Enable = false;
+                        }
+                    }
+                }
+            };
 
             #region GRIDS_JSCRIPT_EVENTS
             this.deviceGridHandler.Events.ScriptLoad += args => args.Script = settings.DeviceJSScript;
@@ -319,6 +346,11 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
         private string GetFormLocalizatedName()
         {
             return Localization.Get("ALARM_GEN_FORM");
+        }
+
+        private void PlaceholdersLabel_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

@@ -59,16 +59,16 @@
     <Compile Update="DBDuplicationForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Generation\Alarms\GenerationForm\AlarmGenerationForm.cs">
+    <Compile Update="Generation\GenForms\Alarm\AlarmGenerationForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="Generation\Configuration\ConfigForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Generation\IO\GenerationForm\ExcelImporter\IOGenerationExcelImportForm.cs">
+    <Compile Update="Generation\GenForms\IO\ExcelImporter\IOGenerationExcelImportForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Generation\IO\GenerationForm\IOGenerationForm.cs" />
+    <Compile Update="Generation\GenForms\IO\IOGenerationForm.cs" />
     <Compile Update="MainImportExportForm.cs">
       <SubType>Form</SubType>
     </Compile>

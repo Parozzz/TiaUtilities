@@ -1,9 +1,7 @@
-﻿
-using Microsoft.WindowsAPICodePack.Dialogs;
+﻿using Microsoft.WindowsAPICodePack.Dialogs;
 using TiaXmlReader.Languages;
 using TiaXmlReader.Utility;
 using TiaXmlReader.Generation.GridHandler;
-using TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter;
 using TiaXmlReader.AutoSave;
 using TiaXmlReader.Javascript;
 using TiaXmlReader.Generation.GridHandler.CustomColumns;
@@ -11,8 +9,11 @@ using InfoBox;
 using SimaticML.TagTable;
 using SimaticML.Blocks;
 using SimaticML.API;
+using TiaXmlReader.Generation.IO;
+using TiaXmlReader.Generation;
+using TiaUtilities.Generation.GenForms.IO.ExcelImporter;
 
-namespace TiaXmlReader.Generation.IO.GenerationForm
+namespace TiaUtilities.Generation.GenForms.IO
 {
     public partial class IOGenerationForm : Form
     {

@@ -84,20 +84,33 @@ namespace TiaXmlReader.Generation.Alarms
                         var lastAlarmNum = nextAlarmNum - 1;
                         var alarmCount = (lastAlarmNum - startAlarmNum) + 1;
 
-                        var slippingAlarmCount = alarmCount == 0 ? 0 : config.AntiSlipNumber % alarmCount;
-                        if (config.AntiSlipNumber > 0 && slippingAlarmCount > 0)
+                        if(config.AntiSlipNumber > 0)
                         {
-                            nextAlarmNum += slippingAlarmCount;
-
-                            if (config.GenerateEmptyAlarmAntiSlip)
+                            uint slippingAlarmCount = 0;
+                            if (alarmCount < config.AntiSlipNumber)
                             {
-                                GenerateEmptyAlarms(config.GroupingType, config.PartitionType, lastAlarmNum + 1, slippingAlarmCount, segment); //CompileUnit only used for group division
-                                lastAlarmNum += slippingAlarmCount;
+                                slippingAlarmCount = config.AntiSlipNumber - alarmCount;
+                            }
+                            else
+                            {
+                                slippingAlarmCount = config.AntiSlipNumber % alarmCount;
                             }
 
-                            for (var x = 0; x < slippingAlarmCount; x++)
+                            if(slippingAlarmCount > 0)
                             {
-                                fullAlarmList += placeholderHandler.Parse(this.config.EmptyAlarmTextInList) + '\n';
+                                nextAlarmNum += slippingAlarmCount;
+
+                                for (var x = 0; x < slippingAlarmCount; x++)
+                                {
+                                    placeholderHandler.SetAlarmNum((uint)(lastAlarmNum + x + 1), config.AlarmNumFormat);
+                                    fullAlarmList += placeholderHandler.Parse(this.config.EmptyAlarmTextInList) + '\n';
+                                }
+
+                                if (config.GenerateEmptyAlarmAntiSlip)
+                                {
+                                    GenerateEmptyAlarms(config.GroupingType, config.PartitionType, lastAlarmNum + 1, slippingAlarmCount, segment); //CompileUnit only used for group division
+                                    lastAlarmNum += slippingAlarmCount;
+                                }
                             }
                         }
 
@@ -157,21 +170,33 @@ namespace TiaXmlReader.Generation.Alarms
 
                         var lastAlarmNum = nextAlarmNum - 1;
                         var alarmCount = (lastAlarmNum - startAlarmNum) + 1;
-
-                        var slippingAlarmCount = config.AntiSlipNumber % alarmCount;
-                        if (config.AntiSlipNumber > 0 && slippingAlarmCount > 0)
+                        if (config.AntiSlipNumber > 0)
                         {
-                            nextAlarmNum += slippingAlarmCount;
-
-                            if (config.GenerateEmptyAlarmAntiSlip)
+                            uint slippingAlarmCount = 0;
+                            if (alarmCount < config.AntiSlipNumber)
                             {
-                                GenerateEmptyAlarms(config.GroupingType, config.PartitionType, lastAlarmNum + 1, slippingAlarmCount, segment); //CompileUnit only used for group division
-                                lastAlarmNum += slippingAlarmCount;
+                                slippingAlarmCount = alarmCount - config.AntiSlipNumber;
+                            }
+                            else
+                            {
+                                slippingAlarmCount = config.AntiSlipNumber % alarmCount;
                             }
 
-                            for (var x = 0; x < slippingAlarmCount; x++)
+                            if (slippingAlarmCount > 0)
                             {
-                                fullAlarmList += placeholderHandler.Parse(this.config.EmptyAlarmTextInList) + '\n';
+                                nextAlarmNum += slippingAlarmCount;
+
+                                for (var x = 0; x < slippingAlarmCount; x++)
+                                {
+                                    placeholderHandler.SetAlarmNum((uint)(lastAlarmNum + x + 1), config.AlarmNumFormat);
+                                    fullAlarmList += placeholderHandler.Parse(this.config.EmptyAlarmTextInList) + '\n';
+                                }
+
+                                if (config.GenerateEmptyAlarmAntiSlip)
+                                {
+                                    GenerateEmptyAlarms(config.GroupingType, config.PartitionType, lastAlarmNum + 1, slippingAlarmCount, segment); //CompileUnit only used for group division
+                                    lastAlarmNum += slippingAlarmCount;
+                                }
                             }
                         }
 
@@ -200,8 +225,8 @@ namespace TiaXmlReader.Generation.Alarms
             var emptyAlarmData = new AlarmData()
             {
                 AlarmVariable = config.EmptyAlarmContactAddress,
-                CoilAddress = config.DefaultCoilAddress,
-                SetCoilAddress = config.DefaultSetCoilAddress,
+                Coil1Address = config.DefaultCoil1Address,
+                Coil2Address = config.DefaultCoil2Address,
                 TimerAddress = config.EmptyAlarmTimerAddress,
                 TimerType = config.EmptyAlarmTimerType,
                 TimerValue = config.EmptyAlarmTimerValue,
@@ -242,8 +267,8 @@ namespace TiaXmlReader.Generation.Alarms
             return new AlarmData()
             {
                 AlarmVariable = config.AlarmAddressPrefix + alarmData.AlarmVariable,
-                CoilAddress = string.IsNullOrEmpty(alarmData.CoilAddress) ? config.DefaultCoilAddress : (config.CoilAddressPrefix + alarmData.CoilAddress),
-                SetCoilAddress = string.IsNullOrEmpty(alarmData.SetCoilAddress) ? config.DefaultSetCoilAddress : (config.SetCoilAddressPrefix + alarmData.SetCoilAddress),
+                Coil1Address = string.IsNullOrEmpty(alarmData.Coil1Address) ? config.DefaultCoil1Address : (config.CoilAddressPrefix + alarmData.Coil1Address),
+                Coil2Address = string.IsNullOrEmpty(alarmData.Coil2Address) ? config.DefaultCoil2Address : (config.SetCoilAddressPrefix + alarmData.Coil2Address),
                 TimerAddress = string.IsNullOrEmpty(alarmData.TimerAddress) ? config.DefaultTimerAddress : (config.TimerAddressPrefix + alarmData.TimerAddress),
                 TimerType = string.IsNullOrEmpty(alarmData.TimerType) ? config.DefaultTimerType : alarmData.TimerType,
                 TimerValue = string.IsNullOrEmpty(alarmData.TimerValue) ? config.DefaultTimerValue : alarmData.TimerValue,
@@ -277,7 +302,7 @@ namespace TiaXmlReader.Generation.Alarms
             if (!string.IsNullOrEmpty(alarmData.TimerAddress)
                 && !string.IsNullOrEmpty(alarmData.TimerType)
                 && !string.IsNullOrEmpty(alarmData.TimerValue)
-                && alarmData.IsTimerAddressValid())
+                && alarmData.IsAddressValid(alarmData.TimerAddress))
             {
                 var partType = alarmData.TimerType.ToLower() switch
                 {
@@ -294,26 +319,26 @@ namespace TiaXmlReader.Generation.Alarms
                 };
             }
 
-            SetCoilPart? setCoil = null;
-            if (!string.IsNullOrEmpty(alarmData.SetCoilAddress) && alarmData.SetCoilAddress != "\\")
+            SimaticPart? coil1 = null;
+            if (!string.IsNullOrEmpty(alarmData.Coil1Address) && alarmData.IsAddressValid(alarmData.Coil1Address))
             {
-                var setCoilVariable = new SimaticGlobalVariable(placeholders.Parse(alarmData.SetCoilAddress));
-                setCoil = new SetCoilPart() { Operand = setCoilVariable };
+                var coil1Variable = new SimaticGlobalVariable(placeholders.Parse(alarmData.Coil1Address));
+                coil1 = CreateCoil(config.Coil1Type, coil1Variable);
             }
 
-            CoilPart? coil = null;
-            if (!string.IsNullOrEmpty(alarmData.CoilAddress) && alarmData.CoilAddress != "\\")
+            SimaticPart? coil2 = null;
+            if (!string.IsNullOrEmpty(alarmData.Coil2Address) && alarmData.IsAddressValid(alarmData.Coil2Address))
             {
-                var coilVariable = new SimaticGlobalVariable(placeholders.Parse(alarmData.CoilAddress));
-                coil = new CoilPart() { Operand = coilVariable };
+                var coil2Variable = new SimaticGlobalVariable(placeholders.Parse(alarmData.Coil2Address));
+                coil2 = CreateCoil(config.Coil1Type, coil2Variable);
             }
 
             var simaticPartList = new List<SimaticPart?>
             {
                 contact,
                 timer,
-                config.CoilFirst ? coil : setCoil,
-                config.CoilFirst ? setCoil : coil
+                coil1,
+                coil2
             };
 
             SimaticPart? lastPart = null;
@@ -334,6 +359,17 @@ namespace TiaXmlReader.Generation.Alarms
                 lastPart.AND(simaticPart);
                 lastPart = simaticPart;
             }
+        }
+        
+        private static SimaticPart? CreateCoil(AlarmCoilType coilType, SimaticVariable simaticVariable)
+        {
+            return coilType switch
+            {
+                AlarmCoilType.COIL => new CoilPart() { Operand = simaticVariable },
+                AlarmCoilType.SET => new SetCoilPart() { Operand = simaticVariable },
+                AlarmCoilType.RESET => new ResetCoilPart() { Operand = simaticVariable },
+                _ => null,
+            };
         }
 
         public void ExportXML(string exportPath)

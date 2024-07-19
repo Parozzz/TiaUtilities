@@ -8,7 +8,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TiaXmlReader.Utility;
-using TiaXmlReader.Generation.Alarms.GenerationForm;
 using System.Reflection;
 using Newtonsoft.Json.Serialization;
 
@@ -61,6 +60,7 @@ namespace TiaXmlReader.Generation
                 }
 
                 FixExtesion(ref filePath, extension);
+
                 var directoryName = Path.GetDirectoryName(filePath);
                 if (string.IsNullOrEmpty(directoryName))
                 {
@@ -91,37 +91,51 @@ namespace TiaXmlReader.Generation
             return false;
         }
 
-        public static C? Load<C>(ref string? filePath, string extension, bool showFileDialog = true)
+        private static bool LoadSetup(out JsonSerializer? serializer, ref string? filePath, string extension, bool showFileDialog = true)
+        {
+            serializer = null;
+
+            if (showFileDialog)
+            {
+                var fileDialog = CreateFileDialog(true, filePath, extension);
+                if (fileDialog.ShowDialog() != CommonFileDialogResult.Ok)
+                {
+                    return false;
+                }
+
+                filePath = fileDialog.FileName;
+            }
+
+            if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
+            {
+                return false;
+            }
+
+            FixExtesion(ref filePath, extension);
+
+            serializer = new JsonSerializer();
+            serializer.Converters.Add(new JavaScriptDateTimeConverter());
+            serializer.NullValueHandling = NullValueHandling.Ignore;
+            serializer.DefaultValueHandling = DefaultValueHandling.Include;
+            serializer.Formatting = Formatting.Indented;
+
+            return true;
+        }
+
+        public static C? Deserialize<C>(ref string? filePath, string extension, bool showFileDialog = true)
         {
             try
             {
-                if (showFileDialog)
-                {
-                    var fileDialog = CreateFileDialog(true, filePath, extension);
-                    if (fileDialog.ShowDialog() != CommonFileDialogResult.Ok)
-                    {
-                        return default;
-                    }
-
-                    filePath = fileDialog.FileName;
-                }
-
-                if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
+                var loadOK = LoadSetup(out JsonSerializer? serializer, ref filePath, extension, showFileDialog);
+                if (!loadOK || serializer == null || string.IsNullOrEmpty(filePath))
                 {
                     return default;
                 }
 
-                FixExtesion(ref filePath, extension);
-
-                var serializer = new JsonSerializer();
-                serializer.Converters.Add(new JavaScriptDateTimeConverter());
-                serializer.NullValueHandling = NullValueHandling.Ignore;
-                serializer.DefaultValueHandling = DefaultValueHandling.Include;
-                serializer.Formatting = Formatting.Indented;
-
                 using var sr = new StreamReader(filePath);
                 using var reader = new JsonTextReader(sr);
                 var deserialized = serializer.Deserialize<C>(reader);
+
                 return deserialized;
             }
             catch (Exception ex)
@@ -130,6 +144,30 @@ namespace TiaXmlReader.Generation
             }
 
             return default;
+        }
+
+        public static bool Populate(object obj, ref string? filePath, string extension, bool showFileDialog = true)
+        {
+            try
+            {
+                var loadOK = LoadSetup(out JsonSerializer? serializer, ref filePath, extension, showFileDialog);
+                if (!loadOK || serializer == null || string.IsNullOrEmpty(filePath) || obj == null)
+                {
+                    return false;
+                }
+
+                using var sr = new StreamReader(filePath);
+                using var reader = new JsonTextReader(sr);
+                serializer.Populate(reader, obj);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Utils.ShowExceptionMessage(ex);
+            }
+
+            return false;
         }
 
         public static void CopyJsonFieldsAndProperties<T>(T copyFrom, T saveTo)
@@ -170,7 +208,7 @@ namespace TiaXmlReader.Generation
         {
             firstInvalidObj = null;
 
-            if(first == null || second == null || first.GetType() != second.GetType())
+            if (first == null || second == null || first.GetType() != second.GetType())
             {
                 return false;
             }

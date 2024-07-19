@@ -2,10 +2,10 @@
 using TiaXmlReader.Generation;
 using TiaXmlReader.Utility;
 using TiaXmlReader.AutoSave;
-using TiaXmlReader.Generation.IO.GenerationForm;
-using TiaXmlReader.Generation.Alarms.GenerationForm;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Languages;
+using TiaUtilities.Generation.GenForms.Alarm;
+using TiaUtilities.Generation.GenForms.IO;
 
 namespace TiaXmlReader
 {
@@ -34,18 +34,24 @@ namespace TiaXmlReader
 
         public static string GetFilePath()
         {
-            return Directory.GetCurrentDirectory() + @"\" + FILE_NAME;
+            return Directory.GetCurrentDirectory() + @"/" + FILE_NAME;
         }
 
         public static ProgramSettings Load()
         {
             var filePath = ProgramSettings.GetFilePath();
-            return GenerationUtils.Load<ProgramSettings>(ref filePath, EXTENSION, showFileDialog: false) ?? new ProgramSettings();
+            return GenerationUtils.Deserialize<ProgramSettings>(ref filePath, EXTENSION, showFileDialog: false) ?? new ProgramSettings();
         }
 
         public bool Save()
         {
             var filePath = ProgramSettings.GetFilePath();
+            if(!File.Exists(filePath))
+            {
+                var fileStream = File.Create(filePath);
+                fileStream.Close();
+            }
+
             return GenerationUtils.Save(this, ref filePath, EXTENSION, showFileDialog: false);
         }
     }

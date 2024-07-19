@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using TiaXmlReader.Generation.IO;
+﻿using TiaXmlReader.Generation.IO;
 using TiaXmlReader.Generation.Configuration;
-using TiaXmlReader.Generation.IO.GenerationForm;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Generation.Placeholders;
 using TiaUtilities.Generation.Configuration.Utility;
 using TiaXmlReader.Languages;
+using TiaUtilities.Generation.GenForms.IO;
 
-namespace TiaXmlReader.Generation.IO.GenerationForm
+namespace TiaUtilities.Generation.GenForms.IO
 {
     public class IOGenerationFormConfigHandler(IOGenerationForm form, IOConfiguration config, GridHandler<IOConfiguration, IOData> gridHandler)
     {

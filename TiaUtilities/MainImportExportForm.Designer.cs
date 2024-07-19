@@ -44,6 +44,7 @@
             importXMLToolStripMenuItem = new ToolStripMenuItem();
             jSToolStripMenuItem = new ToolStripMenuItem();
             sampleXMLMenuItem = new ToolStripMenuItem();
+            testProjectMenuItem = new ToolStripMenuItem();
             languageLabel = new Label();
             languageComboBox = new ComboBox();
             LogWorker = new System.ComponentModel.BackgroundWorker();
@@ -156,7 +157,7 @@
             // 
             // testToolStripMenuItem
             // 
-            testToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { importXMLToolStripMenuItem, jSToolStripMenuItem, sampleXMLMenuItem });
+            testToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { importXMLToolStripMenuItem, jSToolStripMenuItem, sampleXMLMenuItem, testProjectMenuItem });
             testToolStripMenuItem.Font = new Font("Segoe UI", 12F);
             testToolStripMenuItem.Name = "testToolStripMenuItem";
             testToolStripMenuItem.Size = new Size(48, 25);
@@ -182,6 +183,13 @@
             sampleXMLMenuItem.Size = new Size(167, 26);
             sampleXMLMenuItem.Text = "Sample XML";
             sampleXMLMenuItem.Click += SampleXMLMenuItem_Click;
+            // 
+            // testProjectMenuItem
+            // 
+            testProjectMenuItem.Name = "testProjectMenuItem";
+            testProjectMenuItem.Size = new Size(167, 26);
+            testProjectMenuItem.Text = "Project";
+            testProjectMenuItem.Click += testProjectMenuItem_Click;
             // 
             // languageLabel
             // 
@@ -289,6 +297,7 @@
         private ToolStripTextBox autoSaveTimeTextBox;
         private ToolStripSeparator toolStripSeparator1;
         private ToolStripMenuItem sampleXMLMenuItem;
+        private ToolStripMenuItem testProjectMenuItem;
     }
 }
 

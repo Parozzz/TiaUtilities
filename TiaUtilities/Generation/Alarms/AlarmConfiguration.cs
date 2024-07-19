@@ -18,11 +18,18 @@ namespace TiaXmlReader.Generation.Alarms
         [Localization("ALARM_CONFIG_PARTITION_TYPE_DEVICE")] DEVICE
     }
 
+    public enum AlarmCoilType
+    {
+        [Localization("ALARM_CONFIG_COIL_TYPE_NONE")] NONE,
+        [Localization("ALARM_CONFIG_COIL_TYPE_COIL")] COIL,
+        [Localization("ALARM_CONFIG_COIL_TYPE_SET")] SET,
+        [Localization("ALARM_CONFIG_COIL_TYPE_RESET")] RESET
+    }
+
     public class AlarmConfiguration : IGenerationConfiguration, ISettingsAutoSave
     {
         [JsonProperty] public string FCBlockName = "fcAlarmGeneration";
         [JsonProperty] public uint FCBlockNumber = 100;
-        [JsonProperty] public bool CoilFirst = true;
 
         [JsonProperty] public AlarmPartitionType PartitionType = AlarmPartitionType.DEVICE;
         [JsonProperty] public AlarmGroupingType GroupingType = AlarmGroupingType.GROUP;
@@ -31,6 +38,8 @@ namespace TiaXmlReader.Generation.Alarms
         [JsonProperty] public string AlarmNumFormat = "000.###";
         [JsonProperty] public uint AntiSlipNumber = 0;
         [JsonProperty] public uint SkipNumberAfterGroup = 0;
+        [JsonProperty] public AlarmCoilType Coil1Type = AlarmCoilType.COIL;
+        [JsonProperty] public AlarmCoilType Coil2Type = AlarmCoilType.SET;
 
         [JsonProperty] public bool GenerateEmptyAlarmAntiSlip = false;
         [JsonProperty] public uint EmptyAlarmAtEnd = 0;
@@ -39,9 +48,9 @@ namespace TiaXmlReader.Generation.Alarms
         [JsonProperty] public string EmptyAlarmTimerType = "TON";
         [JsonProperty] public string EmptyAlarmTimerValue = "T#0s";
 
-        [JsonProperty] public string DefaultCoilAddress = "Alm.Act.Alm{alarm_num}";
-        [JsonProperty] public string DefaultSetCoilAddress = "Alm.Mem.Alm{alarm_num}";
-        [JsonProperty] public string DefaultTimerAddress = "AlmTimers.Alm[{alarm_num}]";
+        [JsonProperty] public string DefaultCoil1Address = "Alm.Act.Alm{alarm_num}";
+        [JsonProperty] public string DefaultCoil2Address = "Alm.Mem.Alm{alarm_num}";
+        [JsonProperty] public string DefaultTimerAddress = "/";
         [JsonProperty] public string DefaultTimerType = "TON";
         [JsonProperty] public string DefaultTimerValue = "T#0s";
 

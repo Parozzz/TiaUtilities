@@ -1,8 +1,6 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Globalization;
 using TiaXmlReader.Utility;
-using TiaXmlReader.Generation.Alarms.GenerationForm;
-using TiaXmlReader.Generation.IO.GenerationForm;
 using TiaXmlReader.AutoSave;
 using System.Xml;
 using TiaXmlReader.Generation.Configuration;
@@ -19,6 +17,9 @@ using SimaticML.Blocks.FlagNet;
 using SimaticML.Blocks.FlagNet.nPart;
 using SimaticML.API;
 using TiaXmlReader.Generation;
+using TiaUtilities.Generation.GenForms.Alarm;
+using TiaUtilities.Generation.GenForms.IO;
+using TiaUtilities.Generation.GenForms;
 
 namespace TiaXmlReader
 {
@@ -264,7 +265,7 @@ namespace TiaXmlReader
 
             //Add two temp variables to the specific section.
 
-            for(int i = 0; i < 10; i++)
+            for (int i = 0; i < 10; i++)
             {
                 fc.AttributeList.TEMP.AddMember($"tContact{i}", SimaticDataType.BOOLEAN);
             }
@@ -312,6 +313,26 @@ namespace TiaXmlReader
 
             //Save the file.
             //xmlDocument.Save(Directory.GetCurrentDirectory() + "/fc.xml");
+        }
+
+        private void testProjectMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var alarmGenProject = new AlarmGenerationProject(jsErrorHandlingThread, programSettings.AlarmSettings, programSettings.GridSettings);
+
+                var projectForm = new GenerationProjectForm(alarmGenProject, autoSaveHandler, programSettings.GridSettings)
+                {
+                    Width = 1400,
+                    Height = 850
+                };
+                projectForm.Show();
+            }
+            catch (Exception ex)
+            {
+                Utils.ShowExceptionMessage(ex);
+            }
+
         }
     }
 }

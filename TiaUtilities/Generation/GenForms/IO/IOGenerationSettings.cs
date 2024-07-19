@@ -1,18 +1,9 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TiaXmlReader.Generation.IO;
-using TiaXmlReader.Generation.GridHandler;
-using TiaXmlReader.Generation.IO.GenerationForm;
-using TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter;
 using TiaXmlReader.AutoSave;
+using TiaUtilities.Generation.GenForms.IO.ExcelImporter;
 
-namespace TiaXmlReader.Generation.IO.GenerationForm
+namespace TiaUtilities.Generation.GenForms.IO
 {
     public class IOGenerationSettings : ISettingsAutoSave
     {
@@ -20,7 +11,5 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
         [JsonProperty] public IOGenerationExcelImportSettings ExcelImportConfiguration { get; set; } = new IOGenerationExcelImportSettings();
         [JsonProperty] public string JSScript { get; set; } = "";
         [JsonProperty] public string SuggestionJSScript { get; set; } = "";
-
-        public IOGenerationSettings() { }
     }
 }

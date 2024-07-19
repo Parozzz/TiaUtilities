@@ -1,13 +1,8 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TiaXmlReader.AutoSave;
 using TiaXmlReader.GenerationForms;
 
-namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
+namespace TiaUtilities.Generation.GenForms.IO.ExcelImporter
 {
     public class IOGenerationExcelImportSettings : IGenerationConfiguration, ISettingsAutoSave
     {

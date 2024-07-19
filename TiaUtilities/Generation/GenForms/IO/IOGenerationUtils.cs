@@ -4,8 +4,9 @@ using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.GenerationForms;
 using SimaticML;
 using SimaticML.Enums;
+using TiaXmlReader.Generation.IO;
 
-namespace TiaXmlReader.Generation.IO.GenerationForm
+namespace TiaUtilities.Generation.GenForms.IO
 {
     public static class IOGenerationUtils
     {
@@ -36,7 +37,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             if (data.DraggedColumn == IOData.ADDRESS)
             {
                 var startString = dataGridView.Rows[data.StartingRow]?.Cells[data.DraggedColumn].Value?.ToString();
-                if(string.IsNullOrEmpty(startString))
+                if (string.IsNullOrEmpty(startString))
                 {
                     return;
                 }
@@ -70,7 +71,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                 GridUtils.DragMouseUp(data, gridHandler);
             }
 
-            
+
         }
     }
 }

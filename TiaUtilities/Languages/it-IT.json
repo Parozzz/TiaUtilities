@@ -83,8 +83,8 @@
   //ALARM GENERATION
   "ALARM_DATA_ENABLE": "Abilita",
   "ALARM_DATA_ALM_VARIABLE": "Variabile allarme",
-  "ALARM_DATA_COIL_ADDRESS": "Indirizzo bobina",
-  "ALARM_DATA_SET_COIL_ADDRESS": "Indirizzo set",
+  "ALARM_DATA_COIL1_ADDRESS": "Indirizzo bobina1",
+  "ALARM_DATA_COIL2_ADDRESS": "Indirizzo bobina2",
   "ALARM_DATA_TIMER_ADDRESS": "Indirizzo timer",
   "ALARM_DATA_TIMER_TYPE": "Tipo",
   "ALARM_DATA_TIMER_VALUE": "Tempo",
@@ -104,8 +104,14 @@
   "ALARM_CONFIG_PARTITION_TYPE_ALARM_TYPE": "PerTipoAllarme",
   "ALARM_CONFIG_PARTITION_TYPE_DEVICE": "PerUtenza",
 
+  "ALARM_CONFIG_COIL1_TYPE": "Tipo Bobina 1",
+  "ALARM_CONFIG_COIL2_TYPE": "Tipo Bobina 2",
+  "ALARM_CONFIG_COIL_TYPE_NONE": "Ignora",
+  "ALARM_CONFIG_COIL_TYPE_COIL": "Bobina",
+  "ALARM_CONFIG_COIL_TYPE_SET": "Set",
+  "ALARM_CONFIG_COIL_TYPE_RESET": "Reset",
+
   "ALARM_CONFIG_FC": "FC",
-  "ALARM_CONFIG_FC_COIL_FIRST": "Genera prima bobina",
 
   "ALARM_CONFIG_GENERATION": "Generazione",
   "ALARM_CONFIG_GENERATION_START_NUM": "Num. partenza",

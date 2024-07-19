@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TiaXmlReader.Generation.IO;
-using TiaXmlReader.Generation.GridHandler.Data;
-using TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter;
+﻿using TiaXmlReader.Generation.GridHandler.Data;
+using TiaUtilities.Generation.GenForms.IO.ExcelImporter;
 
-namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
+namespace TiaUtilities.Generation.GenForms.IO.ExcelImporter
 {
     public class IOGenerationExcelImportData : IGridData<IOGenerationExcelImportSettings>
     {
@@ -21,9 +15,9 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
         static IOGenerationExcelImportData()
         {
             var type = typeof(IOGenerationExcelImportData);
-            ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOGenerationExcelImportData.Address));
-            IO_NAME = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOGenerationExcelImportData.IOName));
-            COMMENT = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOGenerationExcelImportData.Comment));
+            ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(Address));
+            IO_NAME = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOName));
+            COMMENT = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(Comment));
 
             var columnList = GridDataColumn.GetStaticColumnList(type);
             columnList.Sort((x, y) => x.ColumnIndex.CompareTo(y.ColumnIndex));
@@ -58,7 +52,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
 
         public GridDataPreview? GetPreview(GridDataColumn column, IOGenerationExcelImportSettings config)
         {
-            return this.GetPreview(column.ColumnIndex, config);
+            return GetPreview(column.ColumnIndex, config);
         }
 
         public GridDataPreview? GetPreview(int column, IOGenerationExcelImportSettings config)
@@ -68,7 +62,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm.ExcelImporter
 
         public void Clear()
         {
-            this.Address = this.IOName = this.Comment = null;
+            Address = IOName = Comment = null;
         }
 
         public bool IsEmpty()

@@ -1,8 +1,10 @@
 ﻿using Newtonsoft.Json;
 using TiaXmlReader.Generation.GridHandler.Data;
+using TiaXmlReader.Generation.IO;
 using TiaXmlReader.Languages;
+using TiaUtilities.Generation.GenForms.IO;
 
-namespace TiaXmlReader.Generation.IO.GenerationForm
+namespace TiaUtilities.Generation.GenForms.IO
 {
     public class IOSuggestionData : IGridData<IOConfiguration>
     {
@@ -14,7 +16,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
         static IOSuggestionData()
         {
             var type = typeof(IOSuggestionData);
-            VALUE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOSuggestionData.Value), "suggestion");
+            VALUE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(Value), "suggestion");
 
             var columnList = GridDataColumn.GetStaticColumnList(type);
             columnList.Sort((x, y) => x.ColumnIndex.CompareTo(y.ColumnIndex));
@@ -43,19 +45,19 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
         {
             return COLUMN_LIST[column];
         }
-        public GridDataPreview GetPreview(GridDataColumn column, IOConfiguration config)
+        public GridDataPreview? GetPreview(GridDataColumn column, IOConfiguration config)
         {
-            return this.GetPreview(column.ColumnIndex, config);
+            return GetPreview(column.ColumnIndex, config);
         }
 
-        public GridDataPreview GetPreview(int column, IOConfiguration config)
+        public GridDataPreview? GetPreview(int column, IOConfiguration config)
         {
             return null;
         }
 
         public void Clear()
         {
-            this.Value = "";
+            Value = "";
         }
 
         public bool IsEmpty()

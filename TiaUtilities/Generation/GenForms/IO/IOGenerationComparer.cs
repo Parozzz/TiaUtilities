@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.IO;
 using TiaXmlReader.Generation.GridHandler;
 
-namespace TiaXmlReader.Generation.IO.GenerationForm
+namespace TiaUtilities.Generation.GenForms.IO
 {
 
     public class IOGenerationComparer : IGridRowComparer<IOConfiguration, IOData>
@@ -33,7 +32,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
 
         public void SetSortedColumn(int column)
         {
-            this.sortedColumn = column;
+            sortedColumn = column;
         }
 
         private int GetModifier() //This is required to avoid the values to go bottom and top when sorting. I want the empty lines always at the bottom!.
@@ -41,7 +40,7 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
             return sortOrder == SortOrder.Ascending ? -1 : 1;
         }
 
-        public int Compare(IOData x, IOData y)
+        public int Compare(IOData? x, IOData? y)
         {
             if (sortedColumn == IOData.ADDRESS.ColumnIndex)
             {
@@ -53,11 +52,11 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                 }
                 else if (tagX == null)
                 {
-                    return -1 * this.GetModifier();
+                    return -1 * GetModifier();
                 }
                 else if (tagY == null)
                 {
-                    return 1 * this.GetModifier(); ;
+                    return 1 * GetModifier(); ;
                 }
                 else
                 {
@@ -78,11 +77,11 @@ namespace TiaXmlReader.Generation.IO.GenerationForm
                 }
                 else if (xValue == null || !xIsString)
                 {
-                    return -1 * this.GetModifier();
+                    return -1 * GetModifier();
                 }
                 else if (yValue == null || !yIsString)
                 {
-                    return 1 * this.GetModifier(); ;
+                    return 1 * GetModifier(); ;
                 }
                 else
                 {

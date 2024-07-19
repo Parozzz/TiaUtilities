@@ -9,12 +9,12 @@ using System.Text;
 using System.Threading.Tasks;
 using TiaXmlReader.Utility;
 using TiaXmlReader.Generation.Alarms;
-using TiaXmlReader.Generation.Alarms.GenerationForm;
-using TiaXmlReader.Generation.IO.GenerationForm;
+using TiaXmlReader.Generation;
+using TiaUtilities.Generation.GenForms.Alarm;
 
-namespace TiaXmlReader.Generation.Alarms.GenerationForm
+namespace TiaUtilities.Generation.GenForms.Alarm
 {
-    public class AlarmGenerationProjectSave
+    public class AlarmGenerationProjectSave : IGenerationProjectSave
     {
         public const string EXTENSION = "json";
 
@@ -28,17 +28,22 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
 
         public void AddAlarmData(AlarmData alarmData, int rowIndex)
         {
-            this.AlarmData.Add(rowIndex, alarmData);
+            AlarmData.Add(rowIndex, alarmData);
         }
 
         public void AddDeviceData(DeviceData deviceData, int rowIndex)
         {
-            this.DeviceData.Add(rowIndex, deviceData);
+            DeviceData.Add(rowIndex, deviceData);
         }
 
         public static AlarmGenerationProjectSave Load(ref string? filePath)
         {
-            return GenerationUtils.Load<AlarmGenerationProjectSave>(ref filePath, EXTENSION) ?? new AlarmGenerationProjectSave();
+            return GenerationUtils.Deserialize<AlarmGenerationProjectSave>(ref filePath, EXTENSION) ?? new AlarmGenerationProjectSave();
+        }
+
+        public bool Populate(ref string? filePath)
+        {
+            return GenerationUtils.Populate(this, ref filePath, EXTENSION);
         }
 
         public bool Save(ref string? filePath, bool saveAs = false)
@@ -49,9 +54,9 @@ namespace TiaXmlReader.Generation.Alarms.GenerationForm
         public override bool Equals(object? obj)
         {
             return obj is AlarmGenerationProjectSave compare &&
-                this.AlarmConfig.Equals(compare.AlarmConfig) &&
-                this.AlarmData.SequenceEqual(compare.AlarmData) &&
-                this.DeviceData.SequenceEqual(compare.DeviceData);
+                AlarmConfig.Equals(compare.AlarmConfig) &&
+                AlarmData.SequenceEqual(compare.AlarmData) &&
+                DeviceData.SequenceEqual(compare.DeviceData);
         }
 
         public override int GetHashCode()

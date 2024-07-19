@@ -1,4 +1,6 @@
-﻿namespace TiaXmlReader.Generation.Alarms.GenerationForm
+﻿using TiaXmlReader.CustomControls;
+
+namespace TiaUtilities.Generation.GenForms.Alarm
 {
     partial class AlarmGenerationForm
     {
@@ -47,9 +49,9 @@
             fieldPrefixConfigButton = new Button();
             segmentNameConfigButton = new Button();
             textListConfigButton = new Button();
-            groupingTypeComboBox = new CustomControls.FlatComboBox();
+            groupingTypeComboBox = new FlatComboBox();
             groupingTypeLabel = new Label();
-            partitionTypeComboBox = new CustomControls.FlatComboBox();
+            partitionTypeComboBox = new FlatComboBox();
             partitionTypeLabel = new Label();
             GridsSplitPanel = new SplitContainer();
             mainPanel.SuspendLayout();
@@ -164,6 +166,7 @@
             PlaceholdersLabel.Size = new Size(3658, 16);
             PlaceholdersLabel.TabIndex = 9;
             PlaceholdersLabel.Text = "Placeholders: {device_name} {device_address} {device_description} {alarm_num_start} {alarm_num_end} {alarm_num} {alarm_description}";
+            PlaceholdersLabel.Click += PlaceholdersLabel_Click;
             // 
             // configPanel
             // 
@@ -359,8 +362,8 @@
 
         private System.Windows.Forms.TableLayoutPanel mainPanel;
         private System.Windows.Forms.Panel configPanel;
-        public CustomControls.FlatComboBox groupingTypeComboBox;
-        public CustomControls.FlatComboBox partitionTypeComboBox;
+        public FlatComboBox groupingTypeComboBox;
+        public FlatComboBox partitionTypeComboBox;
         private System.Windows.Forms.Label PlaceholdersLabel;
         public System.Windows.Forms.Button fcConfigButton;
         public System.Windows.Forms.Button alarmGenerationConfigButton;

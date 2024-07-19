@@ -1,4 +1,6 @@
-﻿namespace TiaXmlReader.Generation.IO.GenerationForm
+﻿using TiaXmlReader.CustomControls;
+
+namespace TiaUtilities.Generation.GenForms.IO
 {
     partial class IOGenerationForm
     {
@@ -48,9 +50,9 @@
             variableTableConfigButton = new Button();
             ioTableConfigButton = new Button();
             segmentNameConfigButton = new Button();
-            groupingTypeComboBox = new CustomControls.FlatComboBox();
+            groupingTypeComboBox = new FlatComboBox();
             groupingTypeLabel = new Label();
-            memoryTypeComboBox = new CustomControls.FlatComboBox();
+            memoryTypeComboBox = new FlatComboBox();
             memoryTypeLabel = new Label();
             GridsSplitContainer = new SplitContainer();
             mainPanel.SuspendLayout();
@@ -355,9 +357,9 @@
 
         private System.Windows.Forms.TableLayoutPanel mainPanel;
         private System.Windows.Forms.Panel configPanel;
-        public CustomControls.FlatComboBox groupingTypeComboBox;
+        public FlatComboBox groupingTypeComboBox;
         private System.Windows.Forms.Label divisionTypeLabel;
-        public CustomControls.FlatComboBox memoryTypeComboBox;
+        public FlatComboBox memoryTypeComboBox;
         private System.Windows.Forms.Label PlaceholdersLabel;
         public System.Windows.Forms.Button fcConfigButton;
         public System.Windows.Forms.Button dbConfigButton;
