@@ -7,15 +7,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TiaUtilities.Generation.GenForms.Alarm;
 using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Languages;
 
-namespace TiaUtilities.Generation.GenForms.Alarm
+namespace TiaUtilities.Generation.GenForms.Alarm.Controls
 {
-    public partial class AlarmConfigControl : UserControl
+    public partial class DeviceAlarmTabControl : UserControl
     {
-        public AlarmConfigControl()
+        private readonly DataGridView dataGridViewLeft;
+        private readonly DataGridView dataGridViewRight;
+
+        public DeviceAlarmTabControl(DataGridView dataGridViewLeft, DataGridView dataGridViewRight)
         {
+            this.dataGridViewLeft = dataGridViewLeft;
+            this.dataGridViewRight = dataGridViewRight;
+
             InitializeComponent();
 
             //This is a subordinated control. Init is called in the class that add this.
@@ -23,7 +30,11 @@ namespace TiaUtilities.Generation.GenForms.Alarm
 
         public void Init()
         {
+            this.AutoSize = true; //AutoSize set here otherwise while doing the UI, everything will be shrinked to minimun (So useless)
             this.Dock = DockStyle.Fill;
+
+            this.gridSplitContainer.Panel1.Controls.Add(this.dataGridViewLeft);
+            this.gridSplitContainer.Panel2.Controls.Add(this.dataGridViewRight);
 
             #region PartitionType ComboBox
             this.partitionTypeComboBox.DisplayMember = "Text";
@@ -48,18 +59,13 @@ namespace TiaUtilities.Generation.GenForms.Alarm
             }
             this.groupingTypeComboBox.DataSource = gropingTypeItems;
             #endregion
-
-            Translate();
         }
 
-        private void Translate()
+        public void Translate()
         {
-            this.fcConfigButton.Text = Localization.Get("ALARM_CONFIG_FC");
-            this.alarmGenerationConfigButton.Text = Localization.Get("ALARM_CONFIG_GENERATION");
-            this.fieldDefaultValueConfigButton.Text = Localization.Get("ALARM_CONFIG_DEFAULTS");
-            this.fieldPrefixConfigButton.Text = Localization.Get("ALARM_CONFIG_PREFIX");
-            this.segmentNameConfigButton.Text = Localization.Get("ALARM_CONFIG_SEGMENT_NAME");
-            this.textListConfigButton.Text = Localization.Get("ALARM_CONFIG_TEXT_LIST");
+            this.generationConfigButton.Text = Localization.Get("ALARM_CONFIG_GENERATION");
+            this.defaultValuesConfigButton.Text = Localization.Get("ALARM_CONFIG_DEFAULTS");
+            this.valuesPrefixesConfigButton.Text = Localization.Get("ALARM_CONFIG_PREFIX");
         }
     }
 }

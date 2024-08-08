@@ -59,9 +59,6 @@
     <Compile Update="DBDuplicationForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Generation\GenForms\Alarm\AlarmGenerationForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Update="Generation\Configuration\ConfigForm.cs">
       <SubType>Form</SubType>
     </Compile>

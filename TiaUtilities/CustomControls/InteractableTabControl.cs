@@ -1,18 +1,22 @@
 ﻿
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
+using TiaUtilities.Utility;
 
 namespace TiaUtilities.CustomControls
 {
     public class InteractableTabControl : TabControl
     {
+
         [DllImport("user32.dll")]
         private static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wp, IntPtr lp);
         private const int TCM_SETMINTABWIDTH = 0x1300 + 49;
 
-        public event TabPreRemovedEventHandler TabPreRemoved = delegate { };
-        public event TabPreAddEventHandler TabPreAdd = delegate { };
-        private readonly NewTabPage newTabPage;
+        public event InteractableTabPreRemovedEventHandler TabPreRemoved = delegate { };
+        public event InteractableTabPreAddEventHandler TabPreAdded = delegate { };
+
+        private readonly InteractableNewTabPage newTabPage;
 
         private bool tabClosed;
 
@@ -28,27 +32,9 @@ namespace TiaUtilities.CustomControls
 
             this.Selecting += (sender, args) =>
             {
-                if(tabClosed)
-                {//If i remove a tab while mouse clicking, seems that selecting is done twice! This will avoid clicking the wrong page while closing another (Like closing the first one!) and fixes the flicker.
+                if (tabClosed || args.TabPage is InteractableNewTabPage)
+                { //If i remove a tab while mouse clicking, seems that selecting is done twice! This will avoid clicking the wrong page while closing another (Like closing the first one!) and fixes the flicker.
                     tabClosed = false;
-                    args.Cancel = true;
-
-                    return;
-                }
-
-                Debug.WriteLine("SELECTING!");
-                if (args.TabPage is NewTabPage)
-                {
-                    var page = new TabPage();
-
-                    var eventArgs = new TabPreAddEventArgs(page);
-                    TabPreAdd(this, eventArgs);
-
-                    if(!eventArgs.Cancel)
-                    {
-                        this.TabPages.Add(page);
-                    }
-
                     args.Cancel = true;
                 }
             };
@@ -69,14 +55,14 @@ namespace TiaUtilities.CustomControls
         protected override void OnDrawItem(DrawItemEventArgs e)
         {
             var tab = this.TabPages[e.Index];
-            var isNewTagPage = tab is NewTabPage;
+            var isNewTagPage = tab is InteractableNewTabPage;
 
             var tabRect = GetTabRect(e.Index);
             tabRect.Width += this.Padding.X;
             tabRect.Height = this.Padding.Y;
 
             var textRect = new Rectangle(tabRect.Location, tabRect.Size);
-            if(!isNewTagPage)
+            if (!isNewTagPage)
             { //The cross to close is not drawn, so no need to offset!
                 textRect.Offset(4, 2);
             }
@@ -98,35 +84,77 @@ namespace TiaUtilities.CustomControls
             {
                 e.Graphics.DrawString(title, font, textBrush, new PointF(textRect.X + this.Padding.X / 2 + 2, textRect.Y));
             }
-            /*
-            if (e.Index == TabPages.Count - 1)
+        }
+
+        protected override void OnMouseDoubleClick(MouseEventArgs e)
+        {
+            var index = GetLocationTabRectIndex(e.Location);
+            if (index == -1)
             {
-                var plusRect = GetTabRect(e.Index);
-                plusRect.Offset(plusRect.Width + 5, plusRect.Height / 2);
-                plusRect.Height = plusRect.Width = 8;
+                return;
+            }
 
-                using var plusPen = new Pen(new SolidBrush(Color.Green), 2);
-
-                e.Graphics.DrawLine(plusPen, plusRect.X, plusRect.Y, plusRect.X + plusRect.Width, plusRect.Y);
-                e.Graphics.DrawLine(plusPen, plusRect.X + plusRect.Width / 2, plusRect.Y - plusRect.Height / 2, plusRect.X + plusRect.Width / 2, plusRect.Y + plusRect.Height / 2);
-            }*/
+            var tabPage = this.TabPages[index];
+            if(tabPage is not InteractableNewTabPage)
+            {
+                var floatingTextBox = new FloatingTextBox()
+                {
+                    StartPosition = FormStartPosition.Manual,
+                    Location = tabPage.PointToScreen(e.Location),
+                    InputText = tabPage.Text,
+                };
+                floatingTextBox.Size = floatingTextBox.Size with { Width = 250 };
+                if(floatingTextBox.ShowDialog(this) == DialogResult.OK)
+                {
+                    tabPage.Text = floatingTextBox.InputText;
+                }
+            }
         }
 
         protected override void OnMouseDown(MouseEventArgs e)
         {
-            Debug.WriteLine("MOUSE DOWN!");
-            Point p = e.Location;
-            for (int i = 0; i < TabCount; i++)
+            var index = GetLocationTabRectIndex(e.Location);
+            if (index == -1)
             {
-                var tabRect = GetCloseCrossRect(i);
-                tabRect.Inflate(2, 2); //Make a little bit bigger so is easier to click.
-                if (tabRect.Contains(p))
-                {
-                    CloseTab(i);
+                return;
+            }
 
+            var tabPage = this.TabPages[index];
+            if (tabPage is InteractableNewTabPage)
+            {
+                var page = new TabPage();
+
+                var eventArgs = new InteractableTabPreAddEventArgs(page);
+                TabPreAdded(this, eventArgs);
+                if (!eventArgs.Cancel)
+                {
+                    this.TabPages.Add(page);
+                }
+            }
+            else
+            {
+                var tabRect = GetCloseCrossRect(index);
+                tabRect.Inflate(2, 2); //Make a little bit bigger so is easier to click.
+                if (tabRect.Contains(e.Location))
+                {
+                    CloseTab(tabPage, index);
                     tabClosed = true;
                 }
             }
+        }
+
+        private int GetLocationTabRectIndex(Point p)
+        {
+            for (int i = 0; i < TabCount; i++)
+            {
+                var tabRect = this.GetTabRect(i);
+                if (tabRect.Contains(p))
+                {
+                    return i;
+                }
+            }
+
+            return -1;
         }
 
         protected override void OnKeyDown(KeyEventArgs args)
@@ -136,49 +164,47 @@ namespace TiaUtilities.CustomControls
 
         private Rectangle GetCloseCrossRect(int index)
         {
-            var crossRect = GetTabRect(index);
+            var crossRect = this.GetTabRect(index);
             crossRect.Offset(2, 2);
             crossRect.Width = 7;
             crossRect.Height = 7;
             return crossRect;
         }
 
-        private void CloseTab(int i)
+        private void CloseTab(TabPage tabPage, int index)
         {
-            if (TabPages[i] is NewTabPage)
+            if (tabPage is InteractableNewTabPage)
             {
                 return;
             }
 
-            var args = new TabPreRemoveEventArgs(i);
+            var args = new InteractableTabPreRemoveEventArgs(tabPage, index);
             TabPreRemoved(this, args);
-
-            if (!args.Handled)
+            if (!args.Cancel)
             {
-                TabPages.Remove(TabPages[i]);
+                TabPages.Remove(tabPage);
             }
         }
     }
 
-    public delegate void TabPreRemovedEventHandler(object? sender, TabPreRemoveEventArgs args);
-
-    public class TabPreRemoveEventArgs(int tabIndex) : EventArgs
+    public delegate void InteractableTabPreRemovedEventHandler(object? sender, InteractableTabPreRemoveEventArgs args);
+    public class InteractableTabPreRemoveEventArgs(TabPage tabPage, int tabIndex) : EventArgs
     {
+        public TabPage TabPage { get; set; } = tabPage;
         public int TabIndex { get; set; } = tabIndex;
-        public bool Handled { get; set; }
-    }
-
-    public delegate void TabPreAddEventHandler(object? sender, TabPreAddEventArgs args);
-
-    public class TabPreAddEventArgs(TabPage tabPage) : EventArgs
-    {
-        public TabPage Page { get; set; } = tabPage;
         public bool Cancel { get; set; }
     }
 
-    public class NewTabPage : TabPage
+    public delegate void InteractableTabPreAddEventHandler(object? sender, InteractableTabPreAddEventArgs args);
+    public class InteractableTabPreAddEventArgs(TabPage tabPage) : EventArgs
     {
-        public NewTabPage() : base()
+        public TabPage TabPage { get; set; } = tabPage;
+        public bool Cancel { get; set; }
+    }
+
+    public class InteractableNewTabPage : TabPage
+    {
+        public InteractableNewTabPage() : base()
         {
             this.Text = "+";
             this.Width = 5;
@@ -188,7 +214,6 @@ namespace TiaUtilities.CustomControls
             this.BorderStyle = BorderStyle.None;
             this.ForeColor = Color.Green;
             this.Font = new Font(Font.SystemFontName, 15f, FontStyle.Regular);
-
         }
 
         protected override void OnPaint(PaintEventArgs e) { }

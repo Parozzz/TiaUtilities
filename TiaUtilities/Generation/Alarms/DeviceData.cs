@@ -1,11 +1,12 @@
 ﻿using Newtonsoft.Json;
+using TiaUtilities.Generation.Alarms;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.Generation.Placeholders;
 using TiaXmlReader.Languages;
 
 namespace TiaXmlReader.Generation.Alarms
 {
-    public class DeviceData : IGridData<AlarmConfiguration>
+    public class DeviceData : IGridData<AlarmTabConfiguration>
     {
         private readonly static int COLUMN_COUNT = 0;
         //THESE IS THE ORDER IN WHICH THEY APPEAR!
@@ -52,12 +53,12 @@ namespace TiaXmlReader.Generation.Alarms
             return COLUMN_LIST[column];
         }
 
-        public GridDataPreview? GetPreview(GridDataColumn column, AlarmConfiguration config)
+        public GridDataPreview? GetPreview(GridDataColumn column, AlarmTabConfiguration config)
         {
             return this.GetPreview(column.ColumnIndex, config);
         }
 
-        public GridDataPreview? GetPreview(int column, AlarmConfiguration config)
+        public GridDataPreview? GetPreview(int column, AlarmTabConfiguration config)
         {
             return null;
         }

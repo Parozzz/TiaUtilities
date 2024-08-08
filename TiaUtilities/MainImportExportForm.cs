@@ -14,7 +14,6 @@ using SimaticML;
 using SimaticML.Blocks;
 using SimaticML.Enums;
 using SimaticML.Blocks.FlagNet;
-using SimaticML.Blocks.FlagNet.nPart;
 using SimaticML.API;
 using TiaXmlReader.Generation;
 using TiaUtilities.Generation.GenForms.Alarm;
@@ -93,6 +92,9 @@ namespace TiaXmlReader
                 if (int.TryParse(autoSaveTimeTextBox.Text, out int time))
                 {
                     this.autoSaveHandler.SetIntervalAndStart(time * 1000);
+                    programSettings.TimedSaveTime = time;
+
+                    programSettings.Save();
                 }
             };
             this.autoSaveTimeTextBox.Text = "" + programSettings.TimedSaveTime; //Call this after so it start auto save
@@ -153,7 +155,14 @@ namespace TiaXmlReader
 
         private void GenerateAlarmsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            new AlarmGenerationForm(this.jsErrorHandlingThread, this.autoSaveHandler, this.programSettings.AlarmSettings, this.programSettings.GridSettings).Show(this);
+            var alarmGenProject = new AlarmGenProject(jsErrorHandlingThread, programSettings.GridSettings);
+
+            var projectForm = new GenerationProjectForm(alarmGenProject, autoSaveHandler, programSettings.GridSettings)
+            {
+                Width = 1400,
+                Height = 850
+            };
+            projectForm.Show(this);
         }
 
         private void ImportXMLToolStripMenuItem_Click(object sender, EventArgs e)
@@ -317,21 +326,6 @@ namespace TiaXmlReader
 
         private void testProjectMenuItem_Click(object sender, EventArgs e)
         {
-            try
-            {
-                var alarmGenProject = new AlarmGenerationProject(jsErrorHandlingThread, programSettings.AlarmSettings, programSettings.GridSettings);
-
-                var projectForm = new GenerationProjectForm(alarmGenProject, autoSaveHandler, programSettings.GridSettings)
-                {
-                    Width = 1400,
-                    Height = 850
-                };
-                projectForm.Show();
-            }
-            catch (Exception ex)
-            {
-                Utils.ShowExceptionMessage(ex);
-            }
 
         }
     }

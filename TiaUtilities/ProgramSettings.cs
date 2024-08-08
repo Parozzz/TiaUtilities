@@ -30,7 +30,7 @@ namespace TiaXmlReader
 
         [JsonProperty] public GridSettings GridSettings { get; set; } = new GridSettings();
         [JsonProperty] public IOGenerationSettings IOSettings { get; set; } = new IOGenerationSettings();
-        [JsonProperty] public AlarmGenerationSettings AlarmSettings { get; set; } = new AlarmGenerationSettings();
+        [JsonProperty] public AlarmGenSettings AlarmSettings { get; set; } = new AlarmGenSettings();
 
         public static string GetFilePath()
         {

@@ -1,6 +1,7 @@
-﻿namespace TiaUtilities.Generation.GenForms.Alarm
+﻿using TiaUtilities.Generation.GenForms.Alarm;
+namespace TiaUtilities.Generation.GenForms.Alarm.Controls
 {
-    partial class AlarmTabbedView
+    partial class TabbedView
     {
         /// <summary> 
         /// Variabile di progettazione necessaria.
@@ -29,13 +30,11 @@
         private void InitializeComponent()
         {
             gridsTabControl = new CustomControls.InteractableTabControl();
-            defaultTabPage = new TabPage();
-            gridsTabControl.SuspendLayout();
+            tabPage9 = new TabPage();
             SuspendLayout();
             // 
             // gridsTabControl
             // 
-            gridsTabControl.Controls.Add(defaultTabPage);
             gridsTabControl.Dock = DockStyle.Fill;
             gridsTabControl.DrawMode = TabDrawMode.OwnerDrawFixed;
             gridsTabControl.Location = new Point(0, 0);
@@ -46,15 +45,13 @@
             gridsTabControl.Size = new Size(1480, 600);
             gridsTabControl.TabIndex = 0;
             // 
-            // defaultTabPage
+            // tabPage9
             // 
-            defaultTabPage.Location = new Point(4, 28);
-            defaultTabPage.Name = "defaultTabPage";
-            defaultTabPage.Padding = new Padding(3);
-            defaultTabPage.Size = new Size(1472, 568);
-            defaultTabPage.TabIndex = 0;
-            defaultTabPage.Text = "tabPage1";
-            defaultTabPage.UseVisualStyleBackColor = true;
+            tabPage9.Location = new Point(4, 28);
+            tabPage9.Name = "tabPage9";
+            tabPage9.Size = new Size(1472, 568);
+            tabPage9.TabIndex = 1;
+            tabPage9.Visible = false;
             // 
             // AlarmTabbedView
             // 
@@ -64,13 +61,12 @@
             Controls.Add(gridsTabControl);
             Name = "AlarmTabbedView";
             Size = new Size(1480, 600);
-            gridsTabControl.ResumeLayout(false);
             ResumeLayout(false);
         }
 
         #endregion
 
         private CustomControls.InteractableTabControl gridsTabControl;
-        private TabPage defaultTabPage;
+        private TabPage tabPage9;
     }
 }
