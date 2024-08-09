@@ -13,12 +13,12 @@ using TiaXmlReader.Languages;
 
 namespace TiaUtilities.Generation.GenForms.Alarm.Controls
 {
-    public partial class DeviceAlarmTabControl : UserControl
+    public partial class AlarmGenTabControl : UserControl
     {
         private readonly DataGridView dataGridViewLeft;
         private readonly DataGridView dataGridViewRight;
 
-        public DeviceAlarmTabControl(DataGridView dataGridViewLeft, DataGridView dataGridViewRight)
+        public AlarmGenTabControl(DataGridView dataGridViewLeft, DataGridView dataGridViewRight)
         {
             this.dataGridViewLeft = dataGridViewLeft;
             this.dataGridViewRight = dataGridViewRight;

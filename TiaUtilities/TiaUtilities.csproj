@@ -62,10 +62,18 @@
     <Compile Update="Generation\Configuration\ConfigForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="Generation\GenForms\IO\Controls\IOGenBottomControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Generation\GenForms\IO\Controls\IOGenConfigTopControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Update="Generation\GenForms\IO\ExcelImporter\IOGenerationExcelImportForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Generation\GenForms\IO\IOGenerationForm.cs" />
+    <Compile Update="Generation\GenForms\IO\Tab\IOGenTabControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Update="MainImportExportForm.cs">
       <SubType>Form</SubType>
     </Compile>

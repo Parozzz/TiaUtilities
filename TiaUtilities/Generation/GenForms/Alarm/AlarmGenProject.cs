@@ -6,6 +6,7 @@ using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Javascript;
 using TiaXmlReader.Languages;
+using TiaUtilities.Generation.GenForms.IO;
 
 namespace TiaUtilities.Generation.GenForms.Alarm
 {
@@ -17,10 +18,10 @@ namespace TiaUtilities.Generation.GenForms.Alarm
         private readonly GridSettings gridSettings;
 
 
-        private readonly AlarmConfigControl configControlTop;
+        private readonly AlarmGenConfigTopControl configControlTop;
         private readonly TabbedView tabbedViewBottom;
 
-        private readonly AlarmConfiguration alarmConfig;
+        private readonly AlarmMainConfiguration mainConfig;
         private readonly AlarmGenConfigHandler configHandler;
 
         private readonly List<AlarmGenTab> genTabList;
@@ -33,17 +34,14 @@ namespace TiaUtilities.Generation.GenForms.Alarm
             this.configControlTop = new();
             this.tabbedViewBottom = new();
 
-            this.alarmConfig = new();
-            this.configHandler = new AlarmGenConfigHandler(this.configControlTop, this.alarmConfig);
+            this.mainConfig = new();
+            this.configHandler = new AlarmGenConfigHandler(this.configControlTop, this.mainConfig);
 
             this.genTabList = [];
         }
 
         public void Init(GenerationProjectForm form)
         {
-            this.configControlTop.Init();
-            this.tabbedViewBottom.Init();
-
             this.tabbedViewBottom.TabAdded += (sender, args) =>
             {
                 var tabPage = args.TabPage;
@@ -51,7 +49,6 @@ namespace TiaUtilities.Generation.GenForms.Alarm
 
                 AlarmGenTab alarmGenTab = new(jsErrorHandlingThread, this.gridSettings, tabPage);
                 alarmGenTab.Init();
-                alarmGenTab.TabControl.Tag = alarmGenTab;
                 this.genTabList.Add(alarmGenTab);
 
                 tabPage.Tag = alarmGenTab;
@@ -63,7 +60,7 @@ namespace TiaUtilities.Generation.GenForms.Alarm
                 if (args.TabPage.Tag is AlarmGenTab alarmGenTab)
                 {
                     var result = InformationBox.Show($"Are you sure you want to close {args.TabPage.Text}?", buttons: InformationBoxButtons.YesNo);
-                    if(result == InformationBoxResult.No)
+                    if (result == InformationBoxResult.No)
                     {
                         args.Handled = true;
                         return;
@@ -82,7 +79,7 @@ namespace TiaUtilities.Generation.GenForms.Alarm
         {
             var projectSave = new AlarmGenSave();
 
-            GenerationUtils.CopyJsonFieldsAndProperties(this.alarmConfig, projectSave.AlarmConfig);
+            GenerationUtils.CopyJsonFieldsAndProperties(this.mainConfig, projectSave.AlarmMainConfig);
 
             foreach (var tab in genTabList)
             {
@@ -92,12 +89,13 @@ namespace TiaUtilities.Generation.GenForms.Alarm
 
             return projectSave;
         }
+
         public IGenerationProjectSave? Load(ref string? filePath)
         {
             var loadedProjectSave = AlarmGenSave.Load(ref filePath);
             if (loadedProjectSave != null)
             {
-                GenerationUtils.CopyJsonFieldsAndProperties(loadedProjectSave.AlarmConfig, this.alarmConfig);
+                GenerationUtils.CopyJsonFieldsAndProperties(loadedProjectSave.AlarmMainConfig, this.mainConfig);
 
                 this.tabbedViewBottom.ClearAllTabs();
                 foreach (var tabSave in loadedProjectSave.TabSaves)
@@ -107,7 +105,6 @@ namespace TiaUtilities.Generation.GenForms.Alarm
                     AlarmGenTab alarmGenTab = new(jsErrorHandlingThread, this.gridSettings, tabPage);
                     alarmGenTab.Init();
                     alarmGenTab.LoadSave(tabSave);
-                    alarmGenTab.TabControl.Tag = alarmGenTab;
                     this.genTabList.Add(alarmGenTab);
 
                     tabPage.Tag = alarmGenTab;
@@ -119,7 +116,7 @@ namespace TiaUtilities.Generation.GenForms.Alarm
 
         public void ExportXML(string folderPath)
         {
-            var ioXmlGenerator = new AlarmXmlGenerator(this.alarmConfig);
+            var ioXmlGenerator = new AlarmXmlGenerator(this.mainConfig);
             ioXmlGenerator.Init();
             foreach (var tab in genTabList)
             {

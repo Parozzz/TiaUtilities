@@ -26,7 +26,7 @@ namespace TiaXmlReader.Generation.Alarms
         [Localization("ALARM_CONFIG_COIL_TYPE_RESET")] RESET
     }
 
-    public class AlarmConfiguration : IGenerationConfiguration, ISettingsAutoSave
+    public class AlarmMainConfiguration : IGenerationConfiguration, ISettingsAutoSave
     {
         [JsonProperty] public string FCBlockName = "fcAlarmGeneration";
         [JsonProperty] public uint FCBlockNumber = 100;

@@ -27,10 +27,7 @@ namespace TiaUtilities.Generation.GenForms.Alarm.Controls
         public TabbedView()
         {
             InitializeComponent();
-        }
 
-        public void Init()
-        {
             this.AutoSize = true; //AutoSize set here otherwise while doing the UI, everything will be shrinked to minimun (So useless)
             this.Dock = DockStyle.Fill;
 

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TiaUtilities.Generation.Alarms;
 using TiaUtilities.Generation.GenForms.Alarm.Controls;
+using TiaUtilities.Generation.GenForms.IO.Tab;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation.GridHandler;
@@ -21,7 +22,7 @@ namespace TiaUtilities.Generation.GenForms.Alarm.Tab
         public AlarmGenTabSettings TabSettings { get; init; }
         private readonly GridHandler<AlarmTabConfiguration, DeviceData> deviceGridHandler;
         private readonly GridHandler<AlarmTabConfiguration, AlarmData> alarmGridHandler;
-        public DeviceAlarmTabControl TabControl { get; init; }
+        public AlarmGenTabControl TabControl { get; init; }
         private readonly AlarmGenTabConfigHandler configHandler;
 
         public List<DeviceData> DeviceDataList { get => new(this.deviceGridHandler.DataSource.GetNotEmptyClonedDataDict().Keys); } //Return CLONED data, otherwise operations on the xml generation will affect the table!
@@ -118,7 +119,7 @@ namespace TiaUtilities.Generation.GenForms.Alarm.Tab
         
         public AlarmGenTabSave CreateSave()
         {
-            var save = new AlarmGenTabSave() 
+            AlarmGenTabSave save = new() 
             {
                 TabConfig = this.TabConfig,
                 Name = TabPage.Text,

@@ -13,9 +13,9 @@ using TiaUtilities.Generation.Alarms;
 namespace TiaXmlReader.Generation.Alarms
 {
 
-    public class AlarmXmlGenerator(AlarmConfiguration config)
+    public class AlarmXmlGenerator(AlarmMainConfiguration mainConfig)
     {
-        private readonly AlarmConfiguration config = config;
+        private readonly AlarmMainConfiguration mainConfig = mainConfig;
         private readonly Dictionary<string, string> alarmListDict = [];
 
         private BlockFC? fc;
@@ -24,9 +24,9 @@ namespace TiaXmlReader.Generation.Alarms
         {
             fc = new();
             fc.Init();
-            fc.AttributeList.BlockName = config.FCBlockName;
-            fc.AttributeList.BlockNumber = config.FCBlockNumber;
-            fc.AttributeList.AutoNumber = (config.FCBlockNumber > 0);
+            fc.AttributeList.BlockName = mainConfig.FCBlockName;
+            fc.AttributeList.BlockNumber = mainConfig.FCBlockNumber;
+            fc.AttributeList.AutoNumber = (mainConfig.FCBlockNumber > 0);
         }
 
         public void GenerateAlarms(string name, AlarmTabConfiguration tabConfig, List<AlarmData> alarmDataList, List<DeviceData> deviceDataList)
@@ -66,12 +66,12 @@ namespace TiaXmlReader.Generation.Alarms
                             placeholderHandler.SetDeviceData(deviceData)
                                 .SetAlarmData(parsedAlarmData)
                                 .SetAlarmNum(nextAlarmNum++, tabConfig.AlarmNumFormat);
-                            fullAlarmList += placeholderHandler.Parse(this.config.AlarmTextInList) + '\n';
+                            fullAlarmList += placeholderHandler.Parse(this.mainConfig.AlarmTextInList) + '\n';
 
                             if (tabConfig.GroupingType == AlarmGroupingType.ONE)
                             {
                                 segment = new SimaticLADSegment();
-                                segment.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(config.OneEachSegmentName);
+                                segment.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(mainConfig.OneEachSegmentName);
                             }
 
                             FillAlarmSegment(tabConfig, segment, placeholderHandler, parsedAlarmData);
@@ -104,7 +104,7 @@ namespace TiaXmlReader.Generation.Alarms
                                 for (var x = 0; x < slippingAlarmCount; x++)
                                 {
                                     placeholderHandler.SetAlarmNum((uint)(lastAlarmNum + x + 1), tabConfig.AlarmNumFormat);
-                                    fullAlarmList += placeholderHandler.Parse(this.config.EmptyAlarmTextInList) + '\n';
+                                    fullAlarmList += placeholderHandler.Parse(this.mainConfig.EmptyAlarmTextInList) + '\n';
                                 }
 
                                 if (tabConfig.GenerateEmptyAlarmAntiSlip)
@@ -119,7 +119,7 @@ namespace TiaXmlReader.Generation.Alarms
                         {
                             placeholderHandler.SetStartEndAlarmNum(startAlarmNum, lastAlarmNum, tabConfig.AlarmNumFormat);
 
-                            segment.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(config.GroupSegmentName);
+                            segment.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(mainConfig.GroupSegmentName);
                             segment.Create(this.fc);
                         }
 
@@ -153,12 +153,12 @@ namespace TiaXmlReader.Generation.Alarms
                             placeholderHandler.SetDeviceData(deviceData)
                                     .SetAlarmData(parsedAlarmData)
                                     .SetAlarmNum(nextAlarmNum++, tabConfig.AlarmNumFormat);
-                            fullAlarmList += placeholderHandler.Parse(this.config.AlarmTextInList) + '\n';
+                            fullAlarmList += placeholderHandler.Parse(this.mainConfig.AlarmTextInList) + '\n';
 
                             if (tabConfig.GroupingType == AlarmGroupingType.ONE)
                             {
                                 segment = new SimaticLADSegment();
-                                segment.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(config.OneEachSegmentName);
+                                segment.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(mainConfig.OneEachSegmentName);
                             }
 
                             FillAlarmSegment(tabConfig, segment, placeholderHandler, parsedAlarmData);
@@ -190,7 +190,7 @@ namespace TiaXmlReader.Generation.Alarms
                                 for (var x = 0; x < slippingAlarmCount; x++)
                                 {
                                     placeholderHandler.SetAlarmNum((uint)(lastAlarmNum + x + 1), tabConfig.AlarmNumFormat);
-                                    fullAlarmList += placeholderHandler.Parse(this.config.EmptyAlarmTextInList) + '\n';
+                                    fullAlarmList += placeholderHandler.Parse(this.mainConfig.EmptyAlarmTextInList) + '\n';
                                 }
 
                                 if (tabConfig.GenerateEmptyAlarmAntiSlip)
@@ -205,7 +205,7 @@ namespace TiaXmlReader.Generation.Alarms
                         {
                             placeholderHandler.SetStartEndAlarmNum(startAlarmNum, lastAlarmNum, tabConfig.AlarmNumFormat);
 
-                            segment.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(config.GroupSegmentName);
+                            segment.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(mainConfig.GroupSegmentName);
                             segment.Create(this.fc);
                         }
 
@@ -247,7 +247,7 @@ namespace TiaXmlReader.Generation.Alarms
                     .SetStartEndAlarmNum(alarmNum, alarmNum + (alarmCount - 1), tabConfig.AlarmNumFormat);
 
                 segment = new SimaticLADSegment();
-                segment.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(config.GroupEmptyAlarmSegmentName);
+                segment.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(mainConfig.GroupEmptyAlarmSegmentName);
             }
 
             for (int j = 0; j < alarmCount; j++)
@@ -257,7 +257,7 @@ namespace TiaXmlReader.Generation.Alarms
                 if (tabConfig.GroupingType == AlarmGroupingType.ONE)
                 {
                     segment = new SimaticLADSegment();
-                    segment.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(config.OneEachEmptyAlarmSegmentName);
+                    segment.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(mainConfig.OneEachEmptyAlarmSegmentName);
                 }
 
                 ArgumentNullException.ThrowIfNull(segment, nameof(segment));

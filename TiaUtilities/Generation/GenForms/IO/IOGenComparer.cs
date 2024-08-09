@@ -7,11 +7,11 @@ using TiaXmlReader.Generation.GridHandler;
 namespace TiaUtilities.Generation.GenForms.IO
 {
 
-    public class IOGenerationComparer : IGridRowComparer<IOConfiguration, IOData>
+    public class IOGenComparer : IGridRowComparer<IOMainConfiguration, IOData>
     {
         private SortOrder sortOrder;
         private int sortedColumn;
-        public IOGenerationComparer()
+        public IOGenComparer()
         {
         }
 

@@ -4,10 +4,11 @@ using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Languages;
 using TiaUtilities.Generation.GenForms.Alarm;
 using TiaUtilities.Generation.GenForms.Alarm.Controls;
+using TiaUtilities.Generation.GenForms.IO;
 
 namespace TiaUtilities.Generation.GenForms.Alarm
 {
-    public class AlarmGenConfigHandler(AlarmConfigControl configControl, AlarmConfiguration config)
+    public class AlarmGenConfigHandler(AlarmGenConfigTopControl configControl, AlarmMainConfiguration config)
     {
         public void Init()
         {

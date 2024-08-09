@@ -6,7 +6,7 @@ using TiaXmlReader.Generation.Configuration;
 
 namespace TiaUtilities.Generation.GenForms.Alarm.Tab
 {
-    public class AlarmGenTabConfigHandler(AlarmTabConfiguration tabConfig, DeviceAlarmTabControl tabControl)
+    public class AlarmGenTabConfigHandler(AlarmTabConfiguration tabConfig, AlarmGenTabControl tabControl)
     {
         public void Init()
         {

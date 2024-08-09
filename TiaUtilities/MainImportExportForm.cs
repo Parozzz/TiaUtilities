@@ -150,7 +150,7 @@ namespace TiaXmlReader
 
         private void GenerateIOMenuItem_Click(object sender, EventArgs e)
         {
-            new IOGenerationForm(this.jsErrorHandlingThread, this.autoSaveHandler, this.programSettings.IOSettings, this.programSettings.GridSettings).Show(this);
+            //new IOGenerationForm(this.jsErrorHandlingThread, this.autoSaveHandler, this.programSettings.IOSettings, this.programSettings.GridSettings).Show(this);
         }
 
         private void GenerateAlarmsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -326,7 +326,14 @@ namespace TiaXmlReader
 
         private void testProjectMenuItem_Click(object sender, EventArgs e)
         {
+            var ioGenProject = new IOGenProject(jsErrorHandlingThread, programSettings.GridSettings);
 
+            var projectForm = new GenerationProjectForm(ioGenProject, autoSaveHandler, programSettings.GridSettings)
+            {
+                Width = 1400,
+                Height = 850
+            };
+            projectForm.Show(this);
         }
     }
 }

@@ -19,7 +19,7 @@ namespace TiaUtilities.Generation.GenForms.Alarm
     {
         public const string EXTENSION = "json";
 
-        [JsonProperty] public AlarmConfiguration AlarmConfig { get; set; } = new();
+        [JsonProperty] public AlarmMainConfiguration AlarmMainConfig { get; set; } = new();
         [JsonProperty] public List<AlarmGenTabSave> TabSaves { get; set; } = [];
 
         public static AlarmGenSave Load(ref string? filePath)

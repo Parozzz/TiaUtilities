@@ -1,7 +1,7 @@
 ﻿using TiaUtilities.Generation.GenForms.Alarm;
 namespace TiaUtilities.Generation.GenForms.Alarm.Controls
 {
-    partial class AlarmConfigControl
+    partial class AlarmGenConfigTopControl
     {
         /// <summary> 
         /// Variabile di progettazione necessaria.
@@ -66,15 +66,16 @@ namespace TiaUtilities.Generation.GenForms.Alarm.Controls
             // 
             // configButtonPanel
             // 
+            configButtonPanel.AutoSize = true;
             configButtonPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             configButtonPanel.Controls.Add(fcConfigButton);
             configButtonPanel.Controls.Add(segmentNameConfigButton);
             configButtonPanel.Controls.Add(textListConfigButton);
-            configButtonPanel.Dock = DockStyle.Fill;
+            configButtonPanel.Dock = DockStyle.Left;
             configButtonPanel.Location = new Point(0, 19);
             configButtonPanel.Margin = new Padding(0, 3, 0, 0);
             configButtonPanel.Name = "configButtonPanel";
-            configButtonPanel.Size = new Size(1400, 31);
+            configButtonPanel.Size = new Size(350, 31);
             configButtonPanel.TabIndex = 15;
             // 
             // fcConfigButton
@@ -119,15 +120,16 @@ namespace TiaUtilities.Generation.GenForms.Alarm.Controls
             textListConfigButton.Text = "Lista testi";
             textListConfigButton.UseVisualStyleBackColor = true;
             // 
-            // AlarmConfigControl
+            // AlarmGenConfigControl
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             AutoSizeMode = AutoSizeMode.GrowAndShrink;
             Controls.Add(mainTableLayout);
-            Name = "AlarmConfigControl";
+            Name = "AlarmGenConfigControl";
             Size = new Size(1400, 50);
             mainTableLayout.ResumeLayout(false);
+            mainTableLayout.PerformLayout();
             configButtonPanel.ResumeLayout(false);
             configButtonPanel.PerformLayout();
             ResumeLayout(false);

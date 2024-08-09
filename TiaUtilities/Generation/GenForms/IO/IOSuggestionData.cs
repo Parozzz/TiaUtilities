@@ -6,7 +6,7 @@ using TiaUtilities.Generation.GenForms.IO;
 
 namespace TiaUtilities.Generation.GenForms.IO
 {
-    public class IOSuggestionData : IGridData<IOConfiguration>
+    public class IOSuggestionData : IGridData<IOMainConfiguration>
     {
         private readonly static int COLUMN_COUNT = 0;
         //THESE IS THE ORDER IN WHICH THEY APPEAR!
@@ -45,12 +45,12 @@ namespace TiaUtilities.Generation.GenForms.IO
         {
             return COLUMN_LIST[column];
         }
-        public GridDataPreview? GetPreview(GridDataColumn column, IOConfiguration config)
+        public GridDataPreview? GetPreview(GridDataColumn column, IOMainConfiguration config)
         {
             return GetPreview(column.ColumnIndex, config);
         }
 
-        public GridDataPreview? GetPreview(int column, IOConfiguration config)
+        public GridDataPreview? GetPreview(int column, IOMainConfiguration config)
         {
             return null;
         }

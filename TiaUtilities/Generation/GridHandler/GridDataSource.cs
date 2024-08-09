@@ -18,15 +18,15 @@ namespace TiaXmlReader.Generation.GridHandler
         private readonly List<T> dataList;
         private readonly BindingList<T> bindingList;
 
-        public int Count { get => dataList.Count(); }
+        public int Count { get => dataList.Count; }
 
         public GridDataSource(DataGridView dataGridView, GridDataHandler<C, T> dataHandler)
         {
             this.dataGridView = dataGridView;
             this.dataHandler = dataHandler;
 
-            dataList = new List<T>();
-            bindingList = new BindingList<T>(dataList);
+            dataList = [];
+            bindingList = new(dataList);
         }
 
         public T this[int i]

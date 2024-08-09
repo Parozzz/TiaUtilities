@@ -1,7 +1,7 @@
 ﻿using TiaUtilities.Generation.GenForms.Alarm;
 namespace TiaUtilities.Generation.GenForms.Alarm.Controls
 {
-    partial class DeviceAlarmTabControl
+    partial class AlarmGenTabControl
     {
         /// <summary> 
         /// Variabile di progettazione necessaria.
@@ -98,9 +98,9 @@ namespace TiaUtilities.Generation.GenForms.Alarm.Controls
             generationConfigButton.Location = new Point(3, 3);
             generationConfigButton.Name = "generationConfigButton";
             generationConfigButton.Padding = new Padding(3);
-            generationConfigButton.Size = new Size(131, 36);
+            generationConfigButton.Size = new Size(195, 36);
             generationConfigButton.TabIndex = 0;
-            generationConfigButton.Text = "Generazione";
+            generationConfigButton.Text = "Generazione Codice";
             generationConfigButton.UseVisualStyleBackColor = true;
             // 
             // defaultValuesConfigButton
@@ -108,7 +108,7 @@ namespace TiaUtilities.Generation.GenForms.Alarm.Controls
             defaultValuesConfigButton.AutoSize = true;
             defaultValuesConfigButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             defaultValuesConfigButton.Font = new Font("Microsoft Sans Serif", 12.75F, FontStyle.Bold);
-            defaultValuesConfigButton.Location = new Point(140, 3);
+            defaultValuesConfigButton.Location = new Point(204, 3);
             defaultValuesConfigButton.Name = "defaultValuesConfigButton";
             defaultValuesConfigButton.Padding = new Padding(3);
             defaultValuesConfigButton.Size = new Size(162, 36);
@@ -121,7 +121,7 @@ namespace TiaUtilities.Generation.GenForms.Alarm.Controls
             valuesPrefixesConfigButton.AutoSize = true;
             valuesPrefixesConfigButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             valuesPrefixesConfigButton.Font = new Font("Microsoft Sans Serif", 12.75F, FontStyle.Bold);
-            valuesPrefixesConfigButton.Location = new Point(308, 3);
+            valuesPrefixesConfigButton.Location = new Point(372, 3);
             valuesPrefixesConfigButton.Name = "valuesPrefixesConfigButton";
             valuesPrefixesConfigButton.Padding = new Padding(3);
             valuesPrefixesConfigButton.Size = new Size(145, 36);
@@ -139,7 +139,7 @@ namespace TiaUtilities.Generation.GenForms.Alarm.Controls
             partitionTypeTableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             partitionTypeTableLayout.Controls.Add(partitionTypeLabel, 0, 0);
             partitionTypeTableLayout.Controls.Add(partitionTypeComboBox, 1, 0);
-            partitionTypeTableLayout.Location = new Point(459, 3);
+            partitionTypeTableLayout.Location = new Point(523, 3);
             partitionTypeTableLayout.Name = "partitionTypeTableLayout";
             partitionTypeTableLayout.RowCount = 1;
             partitionTypeTableLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
@@ -163,8 +163,6 @@ namespace TiaUtilities.Generation.GenForms.Alarm.Controls
             // 
             partitionTypeComboBox.Anchor = AnchorStyles.None;
             partitionTypeComboBox.BackColor = SystemColors.Control;
-            partitionTypeComboBox.BorderColor = SystemColors.Control;
-            partitionTypeComboBox.ButtonColor = Color.Gray;
             partitionTypeComboBox.Font = new Font("Microsoft Sans Serif", 11.25F);
             partitionTypeComboBox.FormattingEnabled = true;
             partitionTypeComboBox.Location = new Point(99, 5);
@@ -182,7 +180,7 @@ namespace TiaUtilities.Generation.GenForms.Alarm.Controls
             groupingTypeTableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             groupingTypeTableLayout.Controls.Add(groupingTypeLabel, 0, 0);
             groupingTypeTableLayout.Controls.Add(groupingTypeComboBox, 1, 0);
-            groupingTypeTableLayout.Location = new Point(697, 3);
+            groupingTypeTableLayout.Location = new Point(761, 3);
             groupingTypeTableLayout.Name = "groupingTypeTableLayout";
             groupingTypeTableLayout.RowCount = 1;
             groupingTypeTableLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
@@ -206,8 +204,6 @@ namespace TiaUtilities.Generation.GenForms.Alarm.Controls
             // 
             groupingTypeComboBox.Anchor = AnchorStyles.None;
             groupingTypeComboBox.BackColor = SystemColors.Control;
-            groupingTypeComboBox.BorderColor = SystemColors.Control;
-            groupingTypeComboBox.ButtonColor = Color.DarkGray;
             groupingTypeComboBox.Font = new Font("Microsoft Sans Serif", 11.25F);
             groupingTypeComboBox.FormattingEnabled = true;
             groupingTypeComboBox.Location = new Point(135, 5);
@@ -215,13 +211,13 @@ namespace TiaUtilities.Generation.GenForms.Alarm.Controls
             groupingTypeComboBox.Size = new Size(180, 26);
             groupingTypeComboBox.TabIndex = 0;
             // 
-            // DeviceAlarmTabControl
+            // AlarmGenDeviceTabControl
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             AutoSizeMode = AutoSizeMode.GrowAndShrink;
             Controls.Add(mainTableLayout);
-            Name = "DeviceAlarmTabControl";
+            Name = "AlarmGenDeviceTabControl";
             Size = new Size(1480, 600);
             ((System.ComponentModel.ISupportInitialize)gridSplitContainer).EndInit();
             gridSplitContainer.ResumeLayout(false);

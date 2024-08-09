@@ -18,11 +18,8 @@ namespace TiaXmlReader.Generation.IO
         [Localization("IO_CONFIG_MEMORY_TYPE_MERKER")] MERKER
     }
 
-    public class IOConfiguration : IGenerationConfiguration, ISettingsAutoSave
+    public class IOMainConfiguration : IGenerationConfiguration, ISettingsAutoSave
     {
-        [JsonProperty] public string FCBlockName = "fcTest_IO";
-        [JsonProperty] public uint FCBlockNumber = 195;
-
         [JsonProperty] public IOMemoryTypeEnum MemoryType = IOMemoryTypeEnum.DB;
         [JsonProperty] public IOGroupingTypeEnum GroupingType = IOGroupingTypeEnum.PER_BYTE;
 
@@ -44,9 +41,6 @@ namespace TiaXmlReader.Generation.IO
         [JsonProperty] public string DefaultMerkerInputVariable = "MI_{byte}_{bit}";
         [JsonProperty] public string DefaultMerkerOutputVariable = "MO_{byte}_{bit}";
 
-        [JsonProperty] public string SegmentNameBitGrouping = "{memory_type}{byte}_{bit} - {comment}";
-        [JsonProperty] public string SegmentNameByteGrouping = "{memory_type}B{byte}";
-
         public override bool Equals(object? obj)
         {
             if (obj == null)
@@ -54,7 +48,7 @@ namespace TiaXmlReader.Generation.IO
                 return false;
             }
 
-            var equals = GenerationUtils.CompareJsonFieldsAndProperties(this, obj, out object invalid);
+            var equals = GenerationUtils.CompareJsonFieldsAndProperties(this, obj, out _);
             return equals;
         }
 

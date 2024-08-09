@@ -30,7 +30,7 @@ namespace TiaXmlReader.Generation.Placeholders
             {
                 return this.SetAlarmData(alarmData);
             }
-            else if (gridData is IOData ioData && configuration is IOConfiguration ioConfig)
+            else if (gridData is IOData ioData && configuration is IOMainConfiguration ioConfig)
             {
                 return this.SetIOData(ioData, ioConfig);
             }
@@ -77,7 +77,7 @@ namespace TiaXmlReader.Generation.Placeholders
             });
         }
 
-        public GenerationPlaceholderHandler SetIOData(IOData ioData, IOConfiguration config)
+        public GenerationPlaceholderHandler SetIOData(IOData ioData, IOMainConfiguration config)
         {
             if(config == null)
             {

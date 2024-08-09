@@ -7,7 +7,7 @@ using SimaticML.Enums;
 
 namespace TiaXmlReader.Generation.IO
 {
-    public class IOData : IGridData<IOConfiguration>
+    public class IOData : IGridData<IOMainConfiguration>
     {
         private readonly static int COLUMN_COUNT = 0;
         //THESE IS THE ORDER IN WHICH THEY APPEAR!
@@ -61,12 +61,12 @@ namespace TiaXmlReader.Generation.IO
             return COLUMN_LIST[column];
         }
 
-        public GridDataPreview? GetPreview(GridDataColumn column, IOConfiguration config)
+        public GridDataPreview? GetPreview(GridDataColumn column, IOMainConfiguration config)
         {
             return GetPreview(column.ColumnIndex, config);
         }
 
-        public GridDataPreview? GetPreview(int column, IOConfiguration config)
+        public GridDataPreview? GetPreview(int column, IOMainConfiguration config)
         {
             var addressTag = SimaticTagAddress.FromAddress(this.Address);
             if (string.IsNullOrEmpty(this.Address) || this.IsEmpty() || addressTag == null)
@@ -129,7 +129,7 @@ namespace TiaXmlReader.Generation.IO
             return null;
         }
 
-        public void LoadDefaults(IOConfiguration config, out bool ioNameDefault, out bool variableDefault, out bool merkerAddressDefault)
+        public void LoadDefaults(IOMainConfiguration config, out bool ioNameDefault, out bool variableDefault, out bool merkerAddressDefault)
         {
             ioNameDefault = variableDefault = merkerAddressDefault = false;
 

@@ -29,8 +29,6 @@ namespace TiaXmlReader
         [JsonProperty] public string ietfLanguage = LocalizationVariables.LANG;
 
         [JsonProperty] public GridSettings GridSettings { get; set; } = new GridSettings();
-        [JsonProperty] public IOGenerationSettings IOSettings { get; set; } = new IOGenerationSettings();
-        [JsonProperty] public AlarmGenSettings AlarmSettings { get; set; } = new AlarmGenSettings();
 
         public static string GetFilePath()
         {

@@ -13,22 +13,19 @@
     <Compile Update="CustomControls\RJToggleButton.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Update="Generation\GenForms\Alarm\Controls\AlarmConfigControl.cs">
+    <Compile Update="Generation\GenForms\Alarm\AlarmGenConfigTopControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Update="Generation\GenForms\Controls\TabbedView.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Update="Generation\GenForms\Alarm\Controls\DeviceAlarmTabControl.cs">
+    <Compile Update="Generation\GenForms\Alarm\Tab\AlarmGenTabControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Update="Generation\GenForms\GenerationProjectForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="Generation\GridHandler\GridFindForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="Generation\GenForms\IO\IOGenerationForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="CustomControls\FloatingTextBox.cs">

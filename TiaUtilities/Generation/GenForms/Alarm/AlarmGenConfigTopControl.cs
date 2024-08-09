@@ -13,19 +13,13 @@ using TiaUtilities.Generation.GenForms.Alarm;
 
 namespace TiaUtilities.Generation.GenForms.Alarm.Controls
 {
-    public partial class AlarmConfigControl : UserControl
+    public partial class AlarmGenConfigTopControl : UserControl
     {
-        public AlarmConfigControl()
-        {
+        public AlarmGenConfigTopControl()
+        { //This is a subordinated control. Init is called in the class that add this.
             InitializeComponent();
 
-            //This is a subordinated control. Init is called in the class that add this.
-        }
-
-        public void Init()
-        {
             this.Dock = DockStyle.Fill;
-
             Translate();
         }
 

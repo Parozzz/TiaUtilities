@@ -61,19 +61,19 @@
             // saveMenuItem
             // 
             saveMenuItem.Name = "saveMenuItem";
-            saveMenuItem.Size = new Size(111, 22);
+            saveMenuItem.Size = new Size(180, 22);
             saveMenuItem.Text = "Save";
             // 
             // saveAsMenuItem
             // 
             saveAsMenuItem.Name = "saveAsMenuItem";
-            saveAsMenuItem.Size = new Size(111, 22);
+            saveAsMenuItem.Size = new Size(180, 22);
             saveAsMenuItem.Text = "SaveAs";
             // 
             // loadMenuItem
             // 
             loadMenuItem.Name = "loadMenuItem";
-            loadMenuItem.Size = new Size(111, 22);
+            loadMenuItem.Size = new Size(180, 22);
             loadMenuItem.Text = "Load";
             // 
             // importExportMenuItem
@@ -86,7 +86,7 @@
             // exportXMLMenuItem
             // 
             exportXMLMenuItem.Name = "exportXMLMenuItem";
-            exportXMLMenuItem.Size = new Size(135, 22);
+            exportXMLMenuItem.Size = new Size(180, 22);
             exportXMLMenuItem.Text = "Export XML";
             // 
             // preferencesMenuItem
@@ -147,10 +147,10 @@
         private ToolStripMenuItem saveMenuItem;
         private ToolStripMenuItem saveAsMenuItem;
         private ToolStripMenuItem loadMenuItem;
-        private ToolStripMenuItem importExportMenuItem;
         private ToolStripMenuItem exportXMLMenuItem;
         private ToolStripMenuItem preferencesMenuItem;
         private TableLayoutPanel projectTableLayout;
         private TableLayoutPanel formTableLayout;
+        public ToolStripMenuItem importExportMenuItem;
     }
 }
