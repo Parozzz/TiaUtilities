@@ -69,7 +69,7 @@ namespace TiaXmlReader.Generation.GridHandler
         private void ColumnSort(SortOrder oldSortOrder, int columnIndex)
         {
             var preSortEventArgs = new GridPreSortEventArgs(oldSortOrder, this.sortOrder, columnIndex);
-            this.gridHandler.Events.PreSortEvent(preSortEventArgs);
+            this.gridHandler.Events.PreSortEvent(this.gridHandler.DataGridView, preSortEventArgs);
 
             if(preSortEventArgs.Handled)
             {
@@ -113,7 +113,7 @@ namespace TiaXmlReader.Generation.GridHandler
             });
 
             var postSortEventArgs = new GridPostSortEventArgs(oldSortOrder, this.sortOrder, columnIndex);
-            this.gridHandler.Events.PostSortEvent(postSortEventArgs);
+            this.gridHandler.Events.PostSortEvent(this.gridHandler.DataGridView,postSortEventArgs);
         }
 
         private void ClearAllSortGlyphDirection()

@@ -11,17 +11,17 @@ namespace TiaUtilities.Generation.Configuration.Lines
     public class ConfigJavascriptLine : ConfigLine<ConfigJavascriptLine>
     {
 
-        private readonly JavascriptFCTB jsFCTB;
+        private readonly JavascriptEditor jsFCTB;
         private readonly FastColoredTextBox control;
 
         private Action<string>? textChangedAction;
 
         public ConfigJavascriptLine()
         {
-            jsFCTB = new JavascriptFCTB();
+            jsFCTB = new JavascriptEditor();
             jsFCTB.InitControl();
 
-            control = jsFCTB.GetFCTB();
+            control = jsFCTB.GetTextBox();
             control.TextChanged += TextChangedEventHandler;
         }
 
@@ -44,7 +44,7 @@ namespace TiaUtilities.Generation.Configuration.Lines
             return this;
         }
 
-        public JavascriptFCTB GetJavascriptFCTB()
+        public JavascriptEditor GetJavascriptFCTB()
         {
             return jsFCTB;
         }

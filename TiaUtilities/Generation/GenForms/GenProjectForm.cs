@@ -1,35 +1,23 @@
 ﻿using InfoBox;
 using Microsoft.WindowsAPICodePack.Dialogs;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using TiaUtilities.Generation.GenForms.Alarm;
-using TiaXmlReader.AutoSave;
-using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Languages;
 using TiaXmlReader.Utility;
 
 namespace TiaUtilities.Generation.GenForms
 {
-    public partial class GenerationProjectForm : Form
+    public partial class GenProjectForm : Form
     {
-        private readonly IGenerationProject generationProject;
+        private readonly IGenProject project;
         private readonly TimedSaveHandler autoSaveHandler;
         private readonly GridSettings gridSettings;
 
-        private IGenerationProjectSave? oldProjectSave;
+        private IGenProjectSave? oldProjectSave;
         private string? lastFilePath;
 
-        public GenerationProjectForm(IGenerationProject generationProject, TimedSaveHandler autoSaveHandler, GridSettings gridSettings)
+        public GenProjectForm(IGenProject generationProject, TimedSaveHandler autoSaveHandler, GridSettings gridSettings)
         {
-            this.generationProject = generationProject;
+            this.project = generationProject;
             this.autoSaveHandler = autoSaveHandler;
             this.gridSettings = gridSettings;
 
@@ -50,7 +38,7 @@ namespace TiaUtilities.Generation.GenForms
                 }
                 else
                 {
-                    var projectSave = this.generationProject.CreateProjectSave();
+                    var projectSave = this.project.CreateSave();
                     if (Utils.AreDifferentObject(projectSave, this.oldProjectSave))
                     {
                         result = InformationBox.Show("Do you want to save this project?", title: "Project different from last save", buttons: InformationBoxButtons.YesNoCancel);
@@ -91,7 +79,7 @@ namespace TiaUtilities.Generation.GenForms
                             return;
                         }
 
-                        this.generationProject.ExportXML(folderName);
+                        this.project.ExportXML(folderName);
                     }
                 }
                 catch (Exception ex)
@@ -114,17 +102,17 @@ namespace TiaUtilities.Generation.GenForms
             this.FormClosed += (sender, args) => this.autoSaveHandler.RemoveTickEventHandler(eventHandler);
             #endregion
 
-            generationProject.Init(this);
+            project.Init(this);
 
-            this.projectTableLayout.Controls.Add(this.generationProject.GetTopControl());
-            this.projectTableLayout.Controls.Add(this.generationProject.GetBottomControl());
+            this.projectTableLayout.Controls.Add(this.project.GetTopControl());
+            this.projectTableLayout.Controls.Add(this.project.GetBottomControl());
 
             Translate();
         }
 
         private void Translate()
         {
-            this.Text = this.generationProject.GetFormLocalizatedName();
+            this.Text = this.project.GetFormLocalizatedName();
 
             this.fileMenuItem.Text = Localization.Get("GENERICS_FILE");
             this.saveMenuItem.Text = Localization.Get("GENERICS_SAVE");
@@ -151,7 +139,7 @@ namespace TiaUtilities.Generation.GenForms
                         return true; //Return required otherwise will write the letter.
                 }
 
-                if(this.generationProject.ProcessCmdKey(ref msg, keyData))
+                if(this.project.ProcessCmdKey(ref msg, keyData))
                 {
                     return true;
                 }
@@ -167,7 +155,7 @@ namespace TiaUtilities.Generation.GenForms
 
         private void ProjectSave(bool saveAs = false)
         {
-            var projectSave = this.generationProject.CreateProjectSave();
+            var projectSave = this.project.CreateSave();
 
             var saveOK = projectSave.Save(ref lastFilePath, saveAs || !File.Exists(lastFilePath));
             if (!saveOK)
@@ -175,16 +163,16 @@ namespace TiaUtilities.Generation.GenForms
                 return;
             }
 
-            this.Text = this.generationProject.GetFormLocalizatedName() + ". Project File: " + lastFilePath;
+            this.Text = this.project.GetFormLocalizatedName() + ". Project File: " + lastFilePath;
             this.oldProjectSave = projectSave;
         }
 
         private void ProjectLoad()
         {
-            var projectSave = this.generationProject.Load(ref lastFilePath);
+            var projectSave = this.project.LoadSave(ref lastFilePath);
             if (projectSave != null)
             {
-                this.Text = this.generationProject.GetFormLocalizatedName() + ". Project File: " + lastFilePath;
+                this.Text = this.project.GetFormLocalizatedName() + ". Project File: " + lastFilePath;
                 this.oldProjectSave = projectSave;
             }
         }

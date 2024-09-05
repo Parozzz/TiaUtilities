@@ -1,6 +1,6 @@
-﻿using Esprima.Ast;
-using Newtonsoft.Json;
-using TiaXmlReader.AutoSave;
+﻿using Newtonsoft.Json;
+using System.ComponentModel;
+using TiaUtilities.Configuration;
 using TiaXmlReader.GenerationForms;
 using TiaXmlReader.Languages;
 
@@ -18,28 +18,54 @@ namespace TiaXmlReader.Generation.IO
         [Localization("IO_CONFIG_MEMORY_TYPE_MERKER")] MERKER
     }
 
-    public class IOMainConfiguration : IGenerationConfiguration, ISettingsAutoSave
+    public class IOMainConfiguration : ObservableConfiguration, IGenerationConfiguration
     {
-        [JsonProperty] public IOMemoryTypeEnum MemoryType = IOMemoryTypeEnum.DB;
-        [JsonProperty] public IOGroupingTypeEnum GroupingType = IOGroupingTypeEnum.PER_BYTE;
+        [JsonProperty] public IOMemoryTypeEnum MemoryType { get => this.GetAs<IOMemoryTypeEnum>(); set => this.Set(value); }
+        [JsonProperty] public IOGroupingTypeEnum GroupingType { get => this.GetAs<IOGroupingTypeEnum>(); set => this.Set(value); }
 
-        [JsonProperty] public string DBName = "TestIO_DB";
-        [JsonProperty] public uint DBNumber = 196;
-        [JsonProperty] public bool GenerateDefinedVariableAnyway = false;
+        [JsonProperty] public string DBName { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public uint DBNumber { get => this.GetAs<uint>(); set => this.Set(value); }
+        [JsonProperty] public bool GenerateDefinedVariableAnyway { get => this.GetAs<bool>(); set => this.Set(value); }
 
-        [JsonProperty] public string VariableTableName = "VariableTable";
-        [JsonProperty] public uint VariableTableInputStartAddress = 100;
-        [JsonProperty] public uint VariableTableOutputStartAddress = 1000;
-        [JsonProperty] public uint VariableTableSplitEvery = 250;
+        [JsonProperty] public string VariableTableName { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public uint VariableTableInputStartAddress { get => this.GetAs<uint>(); set => this.Set(value); }
+        [JsonProperty] public uint VariableTableOutputStartAddress { get => this.GetAs<uint>(); set => this.Set(value); }
+        [JsonProperty] public uint VariableTableSplitEvery { get => this.GetAs<uint>(); set => this.Set(value); }
 
-        [JsonProperty] public string IOTableName = "IOTags";
-        [JsonProperty] public uint IOTableSplitEvery = 250;
+        [JsonProperty] public string IOTableName { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public uint IOTableSplitEvery { get => this.GetAs<uint>(); set => this.Set(value); }
 
-        [JsonProperty] public string DefaultIoName = "{memory_type}{byte}_{bit}";
-        [JsonProperty] public string DefaultDBInputVariable = "{config_db_name}.IN.{io_name}";
-        [JsonProperty] public string DefaultDBOutputVariable = "{config_db_name}.OUT.{io_name}";
-        [JsonProperty] public string DefaultMerkerInputVariable = "MI_{byte}_{bit}";
-        [JsonProperty] public string DefaultMerkerOutputVariable = "MO_{byte}_{bit}";
+        [JsonProperty] public string DefaultIoName { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public string DefaultDBInputVariable { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public string DefaultDBOutputVariable { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public string DefaultMerkerInputVariable { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public string DefaultMerkerOutputVariable { get => this.GetAs<string>(); set => this.Set(value); }
+
+        public IOMainConfiguration()
+        {
+            this.MemoryType = IOMemoryTypeEnum.DB;
+            this.GroupingType = IOGroupingTypeEnum.PER_BYTE;
+
+            this.DBName = "TestIO_DB";
+            this.DBNumber = 196;
+            this.GenerateDefinedVariableAnyway = false;
+
+            this.VariableTableName = "VariableTable";
+            this.VariableTableInputStartAddress = 100;
+            this.VariableTableOutputStartAddress = 1000;
+            this.VariableTableSplitEvery = 250;
+
+            this.IOTableName = "IOTags";
+            this.IOTableSplitEvery = 250;
+
+            this.DefaultIoName = "{memory_type}{byte}_{bit}";
+            this.DefaultDBInputVariable = "{config_db_name}.IN.{io_name}";
+            this.DefaultDBOutputVariable = "{config_db_name}.OUT.{io_name}";
+            this.DefaultMerkerInputVariable = "MI_{byte}_{bit}";
+            this.DefaultMerkerOutputVariable = "MO_{byte}_{bit}";
+
+            Subscribe(() => IOTableName, v => v.PadLeft(0));
+        }
 
         public override bool Equals(object? obj)
         {
@@ -48,7 +74,7 @@ namespace TiaXmlReader.Generation.IO
                 return false;
             }
 
-            var equals = GenerationUtils.CompareJsonFieldsAndProperties(this, obj, out _);
+            var equals = GenUtils.CompareJsonFieldsAndProperties(this, obj, out _);
             return equals;
         }
 

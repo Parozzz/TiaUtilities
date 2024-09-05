@@ -1,29 +1,12 @@
-﻿using System;
-using System.Drawing;
-using System.Windows.Forms;
-using static TiaXmlReader.Generation.GridHandler.GridCellPaintHandler;
-using TiaXmlReader.Generation.GridHandler;
+﻿using static TiaXmlReader.Generation.GridHandler.GridCellPaintHandler;
+using TiaXmlReader.Generation.GridHandler.Events;
+using TiaUtilities.Generation.GridHandler.Events;
 
 namespace TiaXmlReader.Generation.GridHandler
 {
-    public class GridExcelDragHandler : IGridCellPainter
+    public class GridExcelDragHandler(DataGridView dataGridView, GridEvents gridEvents, GridSettings settings) : IGridCellPainter
     {
         public const int TRIANGLE_SIZE = 13;
-        public class DragData
-        {
-            public DataGridView DataGridView { get; set; }
-            public int StartingRow { get; set; }
-            public int ActualRow { get; set; }
-            public uint SelectedRowCount { get; set; }
-            public int DraggedColumn { get; set; }
-            public bool DraggingDown { get; set; }
-            public int TopSelectedRow { get; set; } //Lowest index number
-            public int BottomSelectedRow { get; set; } //Highest index number
-            public string TooltipString { get; set; } //Only used for preview
-        }
-
-        private readonly DataGridView dataGridView;
-        private readonly GridSettings settings;
 
         private bool started = false;
         private int rowIndexStart = -1;
@@ -33,18 +16,9 @@ namespace TiaXmlReader.Generation.GridHandler
         private int bottomSelectionRowIndex = -1; //Highest
         private uint SelectedRows { get => (uint)(bottomSelectionRowIndex - topSelectionRowIndex) + 1; }
 
-        private Action<DragData> previewAction;
-        private Action<DragData> mouseUpAction;
-
-        private ToolTip dragToolTip;
+        private ToolTip? dragToolTip;
 
         public bool DraggingDown { get => topSelectionRowIndex == rowIndexStart; }
-
-        public GridExcelDragHandler(DataGridView dataGridView, GridSettings settings)
-        {
-            this.dataGridView = dataGridView;
-            this.settings = settings;
-        }
 
         public bool IsStarted()
         {
@@ -68,9 +42,9 @@ namespace TiaXmlReader.Generation.GridHandler
                 }
             };
 
-            this.dataGridView.LostFocus += delegate { this.Clear(); };
+            dataGridView.LostFocus += (sender, args) => this.Clear();
 
-            this.dataGridView.MouseDown += (sender, args) =>
+            dataGridView.MouseDown += (sender, args) =>
             {
                 var hitTest = dataGridView.HitTest(args.X, args.Y);
                 if (hitTest.Type == DataGridViewHitTestType.Cell && args.Button == MouseButtons.Left)
@@ -85,17 +59,14 @@ namespace TiaXmlReader.Generation.GridHandler
                 }
             };
 
-            this.dataGridView.MouseUp += (sender, args) =>
+            dataGridView.MouseUp += (sender, args) =>
             {
                 if (started)
                 {
                     started = false;
 
-                    if (this.mouseUpAction != null)
-                    {
-                        var data = CreateDragData();
-                        mouseUpAction.Invoke(data);
-                    }
+                    var eventArgs = this.CreateDragEventArgs();
+                    gridEvents.ExcelDragDoneEvent(dataGridView, eventArgs);
 
                     this.Clear();
                 }
@@ -128,34 +99,27 @@ namespace TiaXmlReader.Generation.GridHandler
                 topSelectionRowIndex = lowestRowIndex;
                 bottomSelectionRowIndex = highestRowIndex;
 
-                if (dragToolTip == null)
+                dragToolTip ??= new ToolTip
                 {
-                    dragToolTip = new ToolTip
-                    {
-                        Active = true,
-                        BackColor = Color.DarkGray,
-                        ForeColor = Color.Black,
-                        ShowAlways = true,
-                    };
-                }
+                    Active = true,
+                    BackColor = Color.DarkGray,
+                    ForeColor = Color.Black,
+                    ShowAlways = true,
+                };
 
-                if (this.previewAction != null)
+                var eventArgs = this.CreateDragEventArgs();
+                gridEvents.ExcelDragPreviewEvent(dataGridView, eventArgs);
+                if (!string.IsNullOrEmpty(eventArgs.TooltipString) && dataGridView.FindForm() is Form form)
                 {
-                    var data = CreateDragData();
-                    previewAction.Invoke(data);
-                    if (!string.IsNullOrEmpty(data.TooltipString))
-                    {
-                        dragToolTip.Show(data.TooltipString, dataGridView.FindForm(), dataGridView.FindForm().PointToClient(Cursor.Position));
-                    }
+                    dragToolTip.Show(eventArgs.TooltipString, form, form.PointToClient(Cursor.Position));
                 }
             };
         }
 
-        private DragData CreateDragData()
+        private GridExcelDragEventArgs CreateDragEventArgs()
         {
-            return new DragData()
+            return new()
             {
-                DataGridView = this.dataGridView,
                 StartingRow = this.rowIndexStart,
                 SelectedRowCount = this.SelectedRows,
                 DraggedColumn = this.draggedColumnIndex,
@@ -164,18 +128,6 @@ namespace TiaXmlReader.Generation.GridHandler
                 BottomSelectedRow = this.bottomSelectionRowIndex,
                 TooltipString = ""
             };
-        }
-
-        public GridExcelDragHandler SetPreviewAction(Action<DragData> action)
-        {
-            this.previewAction = action;
-            return this;
-        }
-
-        public GridExcelDragHandler SetMouseUpAction(Action<DragData> action)
-        {
-            this.mouseUpAction = action;
-            return this;
         }
 
         public PaintRequest PaintCellRequest(DataGridViewCellPaintingEventArgs args)
@@ -217,13 +169,18 @@ namespace TiaXmlReader.Generation.GridHandler
 
             var style = args.CellStyle;
 
+            if (graphics == null || style == null)
+            {
+                return;
+            }
+
             if (rowIndex < 0 || columnIndex < 0)
             {
                 return;
             }
             else if (started)
             {
-                style.SelectionBackColor = this.settings.DragSelectedCellBorderColor;
+                style.SelectionBackColor = settings.DragSelectedCellBorderColor;
 
                 args.PaintBackground(bounds, true);
                 return;
@@ -235,32 +192,33 @@ namespace TiaXmlReader.Generation.GridHandler
                 args.PaintBackground(bounds, true);
 
                 //args.Paint(bounds, DataGridViewPaintParts.All & ~DataGridViewPaintParts.Border);
-                using (var pen = new Pen(this.settings.SingleSelectedCellBorderColor, 2))
-                {//Border
-                    Rectangle rect = args.CellBounds;
-                    rect.Width -= 1;
-                    rect.Height -= 1;
-                    graphics.DrawRectangle(pen, rect);
-                }
+                using var borderPen = new Pen(settings.SingleSelectedCellBorderColor, 2);
+
+                //Border
+                Rectangle rect = args.CellBounds;
+                rect.Width -= 1;
+                rect.Height -= 1;
+                graphics.DrawRectangle(borderPen, rect);
+
 
                 if (currentCell is DataGridViewTextBoxCell)
                 {
-                    using (var brush = new SolidBrush(this.settings.SelectedCellTriangleColor))
-                    {//Little triangle in the lower part only for current cell
-                        var point1 = new Point(bounds.Right - 1, bounds.Bottom - TRIANGLE_SIZE);
-                        var point2 = new Point(bounds.Right - 1, bounds.Bottom - 1);
-                        var point3 = new Point(bounds.Right - TRIANGLE_SIZE, bounds.Bottom - 1);
+                    using var triangleBrush = new SolidBrush(settings.SelectedCellTriangleColor);
 
-                        Point[] pt = new Point[] { point1, point2, point3 };
-                        graphics.FillPolygon(brush, pt);
-                    }
+                    //Little triangle in the lower part only for current cell
+                    var point1 = new Point(bounds.Right - 1, bounds.Bottom - TRIANGLE_SIZE);
+                    var point2 = new Point(bounds.Right - 1, bounds.Bottom - 1);
+                    var point3 = new Point(bounds.Right - TRIANGLE_SIZE, bounds.Bottom - 1);
+
+                    Point[] pt = [point1, point2, point3];
+                    graphics.FillPolygon(triangleBrush, pt);
                 }
             }
         }
 
         public bool IsInsideTriangle(int x, int y, DataGridViewCell cell)
         {
-            if (cell == null || !(cell is DataGridViewTextBoxCell))
+            if (cell is not DataGridViewTextBoxCell)
             {
                 return false;
             }

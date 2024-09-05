@@ -1,19 +1,13 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TiaXmlReader.Utility;
 using System.Reflection;
-using Newtonsoft.Json.Serialization;
+using TiaXmlReader.Languages;
 
 namespace TiaXmlReader.Generation
 {
-    public static class GenerationUtils
+    public static class GenUtils
     {
         public static CommonOpenFileDialog CreateFileDialog(bool ensureFileExists, string? filePath, string extension)
         {
@@ -252,6 +246,19 @@ namespace TiaXmlReader.Generation
             }
 
             return true;
+        }
+
+        public static void FillComboBoxWithEnumTranslation(ComboBox comboBox, Type enumType)
+        {
+            comboBox.DisplayMember = "Text";
+            comboBox.ValueMember = "Value";
+
+            var memoryTypeItems = new List<object>();
+            foreach (Enum enumValue in Enum.GetValues(enumType))
+            {
+                memoryTypeItems.Add(new { Text = enumValue.GetTranslation(), Value = enumValue });
+            }
+            comboBox.DataSource = memoryTypeItems;
         }
     }
 }

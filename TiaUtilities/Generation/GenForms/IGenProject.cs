@@ -1,13 +1,15 @@
 ﻿namespace TiaUtilities.Generation.GenForms
 {
-    public interface IGenerationProject
+    public interface IGenProject
     {
 
-        public void Init(GenerationProjectForm form);
+        public void Init(GenProjectForm form);
 
-        public IGenerationProjectSave CreateProjectSave();
+        public bool IsDirty(bool clear = false);
 
-        public IGenerationProjectSave? Load(ref string? filePath);
+        public IGenProjectSave CreateSave();
+
+        public IGenProjectSave? LoadSave(ref string? filePath);
 
         public void ExportXML(string folderPath);
 

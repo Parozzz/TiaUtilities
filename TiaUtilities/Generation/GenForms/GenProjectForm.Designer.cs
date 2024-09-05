@@ -1,6 +1,6 @@
 ﻿namespace TiaUtilities.Generation.GenForms
 {
-    partial class GenerationProjectForm
+    partial class GenProjectForm
     {
         /// <summary>
         /// Required designer variable.

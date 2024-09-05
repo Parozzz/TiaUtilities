@@ -1,7 +1,9 @@
 ﻿
+using InfoBox;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using TiaUtilities.Generation.GenForms.IO.Tab;
 using TiaUtilities.Utility;
 
 namespace TiaUtilities.CustomControls
@@ -15,6 +17,9 @@ namespace TiaUtilities.CustomControls
 
         public event InteractableTabPreRemovedEventHandler TabPreRemoved = delegate { };
         public event InteractableTabPreAddEventHandler TabPreAdded = delegate { };
+        public event InteractableTabNameChangedEventHandler TabNameUserChanged = delegate { };
+
+        public bool RequireConfirmationBeforeClosing { get; set; } = false;
 
         private readonly InteractableNewTabPage newTabPage;
 
@@ -95,7 +100,7 @@ namespace TiaUtilities.CustomControls
             }
 
             var tabPage = this.TabPages[index];
-            if(tabPage is not InteractableNewTabPage)
+            if (tabPage is not InteractableNewTabPage)
             {
                 var floatingTextBox = new FloatingTextBox()
                 {
@@ -104,9 +109,14 @@ namespace TiaUtilities.CustomControls
                     InputText = tabPage.Text,
                 };
                 floatingTextBox.Size = floatingTextBox.Size with { Width = 250 };
-                if(floatingTextBox.ShowDialog(this) == DialogResult.OK)
+                if (floatingTextBox.ShowDialog(this) == DialogResult.OK)
                 {
-                    tabPage.Text = floatingTextBox.InputText;
+                    InteractableTabNameChangedEventArgs args = new(tabPage, tabPage.Text, floatingTextBox.InputText);
+                    TabNameUserChanged(this, args);
+                    if (!args.Cancel)
+                    {
+                        tabPage.Text = args.NewName;
+                    }
                 }
             }
         }
@@ -122,13 +132,13 @@ namespace TiaUtilities.CustomControls
             var tabPage = this.TabPages[index];
             if (tabPage is InteractableNewTabPage)
             {
-                var page = new TabPage();
+                var addedTabPage = new TabPage();
 
-                var eventArgs = new InteractableTabPreAddEventArgs(page);
+                var eventArgs = new InteractableTabPreAddEventArgs(addedTabPage);
                 TabPreAdded(this, eventArgs);
                 if (!eventArgs.Cancel)
                 {
-                    this.TabPages.Add(page);
+                    this.TabPages.Add(addedTabPage);
                 }
             }
             else
@@ -178,6 +188,15 @@ namespace TiaUtilities.CustomControls
                 return;
             }
 
+            if(this.RequireConfirmationBeforeClosing)
+            {
+                var result = InformationBox.Show($"Are you sure you want to close {tabPage.Text}?", buttons: InformationBoxButtons.YesNo);
+                if (result == InformationBoxResult.No)
+                {
+                    return;
+                }
+            }
+
             var args = new InteractableTabPreRemoveEventArgs(tabPage, index);
             TabPreRemoved(this, args);
             if (!args.Cancel)
@@ -190,15 +209,24 @@ namespace TiaUtilities.CustomControls
     public delegate void InteractableTabPreRemovedEventHandler(object? sender, InteractableTabPreRemoveEventArgs args);
     public class InteractableTabPreRemoveEventArgs(TabPage tabPage, int tabIndex) : EventArgs
     {
-        public TabPage TabPage { get; set; } = tabPage;
-        public int TabIndex { get; set; } = tabIndex;
+        public TabPage TabPage { get; init; } = tabPage;
+        public int TabIndex { get; init; } = tabIndex;
         public bool Cancel { get; set; }
     }
 
     public delegate void InteractableTabPreAddEventHandler(object? sender, InteractableTabPreAddEventArgs args);
     public class InteractableTabPreAddEventArgs(TabPage tabPage) : EventArgs
     {
-        public TabPage TabPage { get; set; } = tabPage;
+        public TabPage TabPage { get; init; } = tabPage;
+        public bool Cancel { get; set; }
+    }
+
+    public delegate void InteractableTabNameChangedEventHandler(object? sender, InteractableTabNameChangedEventArgs args);
+    public class InteractableTabNameChangedEventArgs(TabPage tabPage, string oldName, string newName) : EventArgs
+    {
+        public TabPage TabPage { get; init; } = tabPage;
+        public string OldName { get; init; } = oldName;
+        public string NewName { get; set; } = newName;
         public bool Cancel { get; set; }
     }
 

@@ -1,5 +1,7 @@
 ﻿using InfoBox;
 using TiaUtilities.Generation.GridHandler;
+using TiaUtilities.Generation.GridHandler.Events;
+using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaXmlReader.Generation.GridHandler.CustomColumns;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.Generation.GridHandler.Events;
@@ -25,6 +27,9 @@ namespace TiaXmlReader.Generation.GridHandler
 
         private readonly GridSettings settings;
         private readonly C configuration;
+
+        public GridEvents Events { get; init; }
+
         private readonly UndoRedoHandler undoRedoHandler;
         private readonly GridExcelDragHandler excelDragHandler;
         private readonly GridSortHandler<C, T> sortHandler;
@@ -33,13 +38,14 @@ namespace TiaXmlReader.Generation.GridHandler
         public GridDataHandler<C, T> DataHandler { get; init; }
         public GridDataSource<C, T> DataSource { get; init; }
         public GridScript<C, T> Script { get; init; }
-        public GridEvents Events { get; init; }
-
+        
         public FindData<C, T>? FindData { get; set; }
 
         private readonly List<ColumnInfo> columnInfoList;
         private readonly List<IGridCellPainter> cellPainterList;
         private bool init;
+
+        private bool dirty;
 
         public uint RowCount { get; set; } = 9;
         public bool AddRowIndexToRowHeader { get; set; } = true;
@@ -47,20 +53,22 @@ namespace TiaXmlReader.Generation.GridHandler
         public bool EnableRowSelectionFromRowHeaderClick { get; set; } = true;
         public bool ShowJSContextMenuTopLeft { get; set; } = true;
 
-        public GridHandler(JavascriptErrorReportThread jsErrorThread, GridSettings settings, C configuration, IGridRowComparer<C, T> comparer = null)
+        public GridHandler(JavascriptErrorReportThread jsErrorThread, GridSettings settings, C configuration, GridScriptContainer scriptContainer, IGridRowComparer<C, T> comparer = null)
         {
             this.DataGridView = new MyGrid();
 
             this.settings = settings;
             this.configuration = configuration;
+            this.Events = new GridEvents();
+
             this.undoRedoHandler = new UndoRedoHandler();
-            this.excelDragHandler = new GridExcelDragHandler(this.DataGridView, settings);
+            this.excelDragHandler = new GridExcelDragHandler(this.DataGridView, this.Events, settings);
 
             this.DataHandler = new GridDataHandler<C, T>(this.DataGridView);
             this.DataSource = new GridDataSource<C, T>(this.DataGridView, this.DataHandler);
             this.sortHandler = new GridSortHandler<C, T>(this, this.undoRedoHandler, comparer);
-            this.Script = new GridScript<C, T>(this, jsErrorThread);
-            this.Events = new GridEvents();
+            this.Script = new GridScript<C, T>(this, jsErrorThread, scriptContainer);
+            
 
             this.columnInfoList = [];
             this.cellPainterList = [];
@@ -69,16 +77,6 @@ namespace TiaXmlReader.Generation.GridHandler
         public void AddCellPainter(IGridCellPainter cellPainter)
         {
             cellPainterList.Add(cellPainter);
-        }
-
-        public void SetDragPreviewAction(Action<DragData> action)
-        {
-            this.excelDragHandler.SetPreviewAction(action);
-        }
-
-        public void SetDragMouseUpAction(Action<DragData> action)
-        {
-            this.excelDragHandler.SetMouseUpAction(action);
         }
 
         public void Refresh()
@@ -178,7 +176,7 @@ namespace TiaXmlReader.Generation.GridHandler
                         this.DeleteSelectedCells();
                         break;
                     case Keys.Escape:
-                        this.ResetShownCell();
+                        this.ResetSelectedCell();
                         break;
                     case Keys.F5:
                         this.DataGridView.Refresh();
@@ -254,7 +252,7 @@ namespace TiaXmlReader.Generation.GridHandler
             #endregion
 
             #region CellEdit Begin-End
-            GridCellChange editCellChange = null;
+            GridCellChange? editCellChange = null;
             DataGridView.CellBeginEdit += (sender, args) =>
             {
                 editCellChange = null;
@@ -322,7 +320,30 @@ namespace TiaXmlReader.Generation.GridHandler
 
             this.DataGridView.ResumeLayout();
 
+            #region IS_DIRTY
+            this.Events.CellChange += (sender, args) => this.dirty = true;
+            this.Events.PostSort += (sender, args) => this.dirty = true;
+            #endregion
+
             init = true;
+        }
+
+        public GridSave<C, T> CreateSave()
+        {
+            return new()
+            {
+                RowData = this.DataSource.CreateSave()
+            };
+        }
+
+        public void LoadSave(GridSave<C, T> gridSave)
+        {
+            this.DataGridView.SuspendLayout();
+
+            this.DataSource.LoadSave(gridSave.RowData);
+            
+            this.DataGridView.Refresh();
+            this.DataGridView.ResumeLayout();
         }
 
         private void DataErrorEventHandler(object sender, DataGridViewDataErrorEventArgs args)
@@ -332,6 +353,16 @@ namespace TiaXmlReader.Generation.GridHandler
             {
                 comboBoxCell.Value = "";
             }
+        }
+
+        public bool IsDirty(bool clear = false)
+        {
+            var t = this.dirty;
+            if(clear)
+            {
+                this.dirty = false;
+            }
+            return t;
         }
 
         public DataGridViewTextBoxColumn AddTextBoxColumn(GridDataColumn dataColumn, int width)
@@ -363,22 +394,29 @@ namespace TiaXmlReader.Generation.GridHandler
             return column;
         }
 
-        public void ShowColumn(GridDataColumn dataColumn)
+        public void ChangeColumnVisibility(GridDataColumn dataColumn, bool visible, bool init = false)
         {
             var columnInfo = columnInfoList.Where(i => i.DataColumn == dataColumn).FirstOrDefault();
-            if (columnInfo != null)
+            if(columnInfo == null)
             {
-                columnInfo.Visible = true;
+                return;
             }
+
+            columnInfo.Visible = visible;
+            if(init)
+            {
+                this.InitColumns();
+            }
+        }
+
+        public void ShowColumn(GridDataColumn dataColumn)
+        {
+            this.ChangeColumnVisibility(dataColumn, visible: true);
         }
 
         public void HideColumn(GridDataColumn dataColumn)
         {
-            var columnInfo = columnInfoList.Where(i => i.DataColumn == dataColumn).FirstOrDefault();
-            if (columnInfo != null)
-            {
-                columnInfo.Visible = false;
-            }
+            this.ChangeColumnVisibility(dataColumn, visible: false);
         }
 
         public void InitColumns()
@@ -471,7 +509,7 @@ namespace TiaXmlReader.Generation.GridHandler
             ChangeCells(Utils.SingletonList(cell), applyChanges);
         }
 
-        public void ChangeCells(List<GridCellChange> cellChangeList, bool applyChanges = true)
+        public void ChangeCells(List<GridCellChange>? cellChangeList, bool applyChanges = true)
         {
             if (cellChangeList == null || cellChangeList.Count == 0)
             {
@@ -513,7 +551,7 @@ namespace TiaXmlReader.Generation.GridHandler
                     this.undoRedoHandler.Unlock();
                 }
 
-                this.Events.CellChangeEvent(new GridCellChangeEventArgs() { CellChangeList = cellChangeList });
+                this.Events.CellChangeEvent(this.DataGridView, new() { CellChangeList = cellChangeList });
                 undoRedoHandler.AddUndo(() => UndoChangeCells(cellChangeList));
             }
             catch (Exception ex)
@@ -543,16 +581,16 @@ namespace TiaXmlReader.Generation.GridHandler
                 this.undoRedoHandler.Unlock();
 
                 var lastCellChange = cellChangeList[cellChangeList.Count - 1];
-                ShowCell(lastCellChange);  //Setting se current cell already center the grid to it.
+                SelectCell(lastCellChange);  //Setting se current cell already center the grid to it.
 
-                this.Events.CellChangeEvent(new GridCellChangeEventArgs() { CellChangeList = cellChangeList, IsUndo = true });
+                this.Events.CellChangeEvent(this.DataGridView, new() { CellChangeList = cellChangeList, IsUndo = true });
 
                 undoRedoHandler.AddRedo(() =>
                 {
                     ChangeCells(cellChangeList);
 
                     var firstCellChange = cellChangeList[0];
-                    ShowCell(firstCellChange);  //Setting se current cell already center the grid to it.
+                    SelectCell(firstCellChange);  //Setting se current cell already center the grid to it.
                 });
             }
             catch (Exception ex)
@@ -585,22 +623,22 @@ namespace TiaXmlReader.Generation.GridHandler
             this.ChangeMultipleRows(dataDict);
         }
 
-        public void ResetShownCell()
+        public void ResetSelectedCell()
         {
-            this.ShowCell(cell: null);
+            this.SelectCell(cell: null);
         }
 
-        private void ShowCell(GridCellChange cellChange)
+        private void SelectCell(GridCellChange cellChange)
         {
-            this.ShowCell(cellChange.RowIndex, cellChange.ColumnIndex);
+            this.SelectCell(cellChange.RowIndex, cellChange.ColumnIndex);
         }
 
-        public void ShowCell(int rowIndex, int columnIndex)
+        public void SelectCell(int rowIndex, int columnIndex)
         {
-            this.ShowCell(this.DataGridView.Rows[rowIndex].Cells[columnIndex]);
+            this.SelectCell(this.DataGridView.Rows[rowIndex].Cells[columnIndex]);
         }
 
-        private void ShowCell(DataGridViewCell? cell)
+        private void SelectCell(DataGridViewCell? cell)
         {
             DataGridView.RefreshEdit(); //This is required to refresh checkbox otherwise, if the undo is in a selected cell, it will not update visually (DATA IS CHANGED!)
             DataGridView.Refresh();

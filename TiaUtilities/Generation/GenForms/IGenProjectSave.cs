@@ -8,7 +8,7 @@ using TiaXmlReader.Generation;
 
 namespace TiaUtilities.Generation.GenForms
 {
-    public interface IGenerationProjectSave
+    public interface IGenProjectSave
     {
         public bool Populate(ref string? filePath);
         public bool Save(ref string? filePath, bool showFileDialog = false);

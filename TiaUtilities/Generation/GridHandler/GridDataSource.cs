@@ -29,6 +29,31 @@ namespace TiaXmlReader.Generation.GridHandler
             bindingList = new(dataList);
         }
 
+        public Dictionary<int, T> CreateSave()
+        {
+            Dictionary<int, T> saveDict = [];
+            foreach (var entry in this.GetNotEmptyDataDict())
+            {
+                saveDict.Add(entry.Value, entry.Key);
+            }
+            return saveDict;
+        }
+
+        public void LoadSave(Dictionary<int, T> saveDict)
+        {
+            this.Clear();
+
+            foreach (var entry in saveDict)
+            {
+                var rowIndex = entry.Key;
+                var data = entry.Value;
+                if (rowIndex >= 0 && rowIndex <= this.Count)
+                {
+                    this.dataHandler.CopyValues(data, this[rowIndex]);
+                }
+            }
+        }
+
         public T this[int i]
         {
             get { return dataList[i]; }

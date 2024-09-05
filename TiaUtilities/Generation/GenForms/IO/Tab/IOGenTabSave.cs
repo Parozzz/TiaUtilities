@@ -10,6 +10,7 @@ using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.IO;
 using TiaUtilities.Generation.IO;
+using TiaUtilities.Generation.GridHandler;
 
 namespace TiaUtilities.Generation.GenForms.IO.Tab
 {
@@ -19,27 +20,21 @@ namespace TiaUtilities.Generation.GenForms.IO.Tab
 
         [JsonProperty] public string Name { get; set; } = "IOGenTab";
         [JsonProperty] public IOTabConfiguration TabConfig { get; set; } = new();
-        [JsonProperty] public string JSScript { get; set; } = "";
-        [JsonProperty] public Dictionary<int, IOData> IOData { get; set; } = [];
-
-        public void AddIOData(IOData ioData, int rowIndex)
-        {
-            IOData.Add(rowIndex, ioData);
-        }
+        [JsonProperty] public GridSave<IOMainConfiguration, IOData> IOGrid { get; set; } = new();
 
         public static IOGenTabSave Load(ref string? filePath)
         {
-            return GenerationUtils.Deserialize<IOGenTabSave>(ref filePath, EXTENSION) ?? new IOGenTabSave();
+            return GenUtils.Deserialize<IOGenTabSave>(ref filePath, EXTENSION) ?? new IOGenTabSave();
         }
 
         public bool Populate(ref string? filePath)
         {
-            return GenerationUtils.Populate(this, ref filePath, EXTENSION);
+            return GenUtils.Populate(this, ref filePath, EXTENSION);
         }
 
         public bool Save(ref string? filePath, bool saveAs = false)
         {
-            return GenerationUtils.Save(this, ref filePath, EXTENSION, saveAs);
+            return GenUtils.Save(this, ref filePath, EXTENSION, saveAs);
         }
 
         public override bool Equals(object? obj)
@@ -47,8 +42,7 @@ namespace TiaUtilities.Generation.GenForms.IO.Tab
             return obj is IOGenTabSave compare &&
                 Name.Equals(compare.Name) &&
                 TabConfig.Equals(compare.TabConfig) &&
-                JSScript.Equals(compare.JSScript) &&
-                IOData.SequenceEqual(compare.IOData);
+                IOGrid.Equals(compare.IOGrid);
         }
 
         public override int GetHashCode()

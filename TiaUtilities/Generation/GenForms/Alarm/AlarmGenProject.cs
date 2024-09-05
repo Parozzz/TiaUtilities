@@ -7,19 +7,22 @@ using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Javascript;
 using TiaXmlReader.Languages;
 using TiaUtilities.Generation.GenForms.IO;
+using TiaUtilities.Generation.GridHandler.JSScript;
+using TiaUtilities.CustomControls;
 
 namespace TiaUtilities.Generation.GenForms.Alarm
 {
-    public class AlarmGenProject : IGenerationProject
+    public class AlarmGenProject : IGenProject
     {
         private static readonly string[] TIMERS_TYPES_ITEMS = ["TON", "TOF"];
 
         private readonly JavascriptErrorReportThread jsErrorHandlingThread;
         private readonly GridSettings gridSettings;
 
+        private readonly GridScriptContainer scriptContainer;
 
         private readonly AlarmGenConfigTopControl configControlTop;
-        private readonly TabbedView tabbedViewBottom;
+        private readonly InteractableTabControl controlControlBottom;
 
         private readonly AlarmMainConfiguration mainConfig;
         private readonly AlarmGenConfigHandler configHandler;
@@ -31,8 +34,10 @@ namespace TiaUtilities.Generation.GenForms.Alarm
             this.jsErrorHandlingThread = jsErrorHandlingThread;
             this.gridSettings = gridSettings;
 
+            this.scriptContainer = new();
+
             this.configControlTop = new();
-            this.tabbedViewBottom = new();
+            this.controlControlBottom = new() { RequireConfirmationBeforeClosing = true };
 
             this.mainConfig = new();
             this.configHandler = new AlarmGenConfigHandler(this.configControlTop, this.mainConfig);
@@ -40,32 +45,25 @@ namespace TiaUtilities.Generation.GenForms.Alarm
             this.genTabList = [];
         }
 
-        public void Init(GenerationProjectForm form)
+        public void Init(GenProjectForm form)
         {
-            this.tabbedViewBottom.TabAdded += (sender, args) =>
+            this.controlControlBottom.TabPreAdded += (sender, args) =>
             {
                 var tabPage = args.TabPage;
                 tabPage.Text = "AlarmGen";
 
-                AlarmGenTab alarmGenTab = new(jsErrorHandlingThread, this.gridSettings, tabPage);
+                AlarmGenTab alarmGenTab = new(jsErrorHandlingThread, this.gridSettings, tabPage, scriptContainer);
                 alarmGenTab.Init();
                 this.genTabList.Add(alarmGenTab);
 
-                tabPage.Tag = alarmGenTab;
                 tabPage.Controls.Add(alarmGenTab.TabControl);
+                tabPage.Tag = alarmGenTab;
             };
 
-            this.tabbedViewBottom.TabRemoved += (sender, args) =>
+            this.controlControlBottom.TabPreRemoved += (sender, args) =>
             {
                 if (args.TabPage.Tag is AlarmGenTab alarmGenTab)
                 {
-                    var result = InformationBox.Show($"Are you sure you want to close {args.TabPage.Text}?", buttons: InformationBoxButtons.YesNo);
-                    if (result == InformationBoxResult.No)
-                    {
-                        args.Handled = true;
-                        return;
-                    }
-
                     this.genTabList.Remove(alarmGenTab);
                 }
             };
@@ -75,11 +73,24 @@ namespace TiaUtilities.Generation.GenForms.Alarm
             Translate();
         }
 
-        public IGenerationProjectSave CreateProjectSave()
+        public bool IsDirty(bool clear = false)
         {
-            var projectSave = new AlarmGenSave();
+            var dirty = this.mainConfig.IsDirty(clear);
+            foreach(var genTab in this.genTabList)
+            {
+                dirty |= genTab.IsDirty(clear);
+            }
+            return dirty;
+        }
 
-            GenerationUtils.CopyJsonFieldsAndProperties(this.mainConfig, projectSave.AlarmMainConfig);
+        public IGenProjectSave CreateSave()
+        {
+            var projectSave = new AlarmGenSave()
+            {
+                ScriptContainer = this.scriptContainer.CreateSave()
+            };
+
+            GenUtils.CopyJsonFieldsAndProperties(this.mainConfig, projectSave.AlarmMainConfig);
 
             foreach (var tab in genTabList)
             {
@@ -90,19 +101,25 @@ namespace TiaUtilities.Generation.GenForms.Alarm
             return projectSave;
         }
 
-        public IGenerationProjectSave? Load(ref string? filePath)
+        public IGenProjectSave? LoadSave(ref string? filePath)
         {
-            var loadedProjectSave = AlarmGenSave.Load(ref filePath);
-            if (loadedProjectSave != null)
+            var loadedSave = AlarmGenSave.Load(ref filePath);
+            if (loadedSave != null)
             {
-                GenerationUtils.CopyJsonFieldsAndProperties(loadedProjectSave.AlarmMainConfig, this.mainConfig);
+                this.scriptContainer.LoadSave(loadedSave.ScriptContainer);
 
-                this.tabbedViewBottom.ClearAllTabs();
-                foreach (var tabSave in loadedProjectSave.TabSaves)
+                GenUtils.CopyJsonFieldsAndProperties(loadedSave.AlarmMainConfig, this.mainConfig);
+
+                this.controlControlBottom.TabPages.Clear();
+                foreach (var tabSave in loadedSave.TabSaves)
                 {
-                    var tabPage = this.tabbedViewBottom.AddTab();
+                    TabPage tabPage = new()
+                    {
+                        Text = tabSave.Name
+                    };
+                    this.controlControlBottom.TabPages.Add(tabPage);
 
-                    AlarmGenTab alarmGenTab = new(jsErrorHandlingThread, this.gridSettings, tabPage);
+                    AlarmGenTab alarmGenTab = new(jsErrorHandlingThread, this.gridSettings, tabPage, scriptContainer);
                     alarmGenTab.Init();
                     alarmGenTab.LoadSave(tabSave);
                     this.genTabList.Add(alarmGenTab);
@@ -111,7 +128,7 @@ namespace TiaUtilities.Generation.GenForms.Alarm
                     tabPage.Controls.Add(alarmGenTab.TabControl);
                 }
             }
-            return loadedProjectSave;
+            return loadedSave;
         }
 
         public void ExportXML(string folderPath)
@@ -132,7 +149,7 @@ namespace TiaUtilities.Generation.GenForms.Alarm
 
         public Control? GetBottomControl()
         {
-            return tabbedViewBottom;
+            return controlControlBottom;
         }
 
         public string GetFormLocalizatedName()
@@ -142,8 +159,8 @@ namespace TiaUtilities.Generation.GenForms.Alarm
 
         public bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            var visibleTag = this.tabbedViewBottom.GetVisibleTab();
-            if (visibleTag != null && visibleTag.Tag is AlarmGenTab alarmGenTab)
+            var selectedTab = this.controlControlBottom.SelectedTab;
+            if (selectedTab != null && selectedTab.Tag is AlarmGenTab alarmGenTab)
             {
                 return alarmGenTab.ProcessCmdKey(ref msg, keyData);
             }

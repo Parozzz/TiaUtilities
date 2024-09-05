@@ -36,7 +36,7 @@ namespace TiaUtilities.Generation.GenForms.IO.ExcelImporter
             InitializeComponent();
 
             this.settings = settings;
-            this.gridHandler = new GridHandler<IOGenerationExcelImportSettings, IOGenerationExcelImportData>(jsErrorHandlingThread, gridSettings, settings)
+            this.gridHandler = new GridHandler<IOGenerationExcelImportSettings, IOGenerationExcelImportData>(jsErrorHandlingThread, gridSettings, settings, new())
             {
                 RowCount = 1999
             };
@@ -74,8 +74,8 @@ namespace TiaUtilities.Generation.GenForms.IO.ExcelImporter
             #endregion
 
             #region DRAG
-            this.gridHandler.SetDragPreviewAction(data => { IOGenerationUtils.DragPreview(data, this.gridHandler); });
-            this.gridHandler.SetDragMouseUpAction(data => { IOGenerationUtils.DragMouseUp(data, this.gridHandler); });
+            this.gridHandler.Events.ExcelDragPreview += (sender, args) => IOGenUtils.DragPreview(args, this.gridHandler);
+            this.gridHandler.Events.ExcelDragDone += (sender, args) => IOGenUtils.DragDone(args, this.gridHandler);
             #endregion
 
             #region COLUMNS
@@ -85,9 +85,6 @@ namespace TiaUtilities.Generation.GenForms.IO.ExcelImporter
             #endregion
 
             gridHandler.Init();
-
-            this.gridHandler.Events.ScriptLoad += args => args.Script = settings.JSScript;
-            this.gridHandler.Events.ScriptChanged += args => settings.JSScript = args.Script;
 
             this.ConfigButton.Click += (sender, args) =>
             {

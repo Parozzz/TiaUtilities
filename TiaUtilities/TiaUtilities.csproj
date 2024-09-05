@@ -34,12 +34,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ClosedXML" Version="0.102.2" />
+    <PackageReference Include="ClosedXML" Version="0.102.3" />
     <PackageReference Include="FastColoredTextBox.Net6" Version="1.0.0" />
     <PackageReference Include="InformationBox" Version="1.3.0.152" />
-    <PackageReference Include="Jint" Version="3.1.1" />
+    <PackageReference Include="Jint" Version="4.0.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="WindowsAPICodePack" Version="7.0.4" />
+    <PackageReference Include="WindowsAPICodePack" Version="8.0.4" />
   </ItemGroup>
 
   <ItemGroup>
@@ -71,9 +71,7 @@
     <Compile Update="Generation\GenForms\IO\ExcelImporter\IOGenerationExcelImportForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Generation\GenForms\IO\Tab\IOGenTabControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Update="Generation\GenForms\IO\Tab\IOGenTabControl.cs" />
     <Compile Update="MainImportExportForm.cs">
       <SubType>Form</SubType>
     </Compile>

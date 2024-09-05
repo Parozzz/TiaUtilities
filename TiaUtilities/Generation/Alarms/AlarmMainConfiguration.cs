@@ -1,8 +1,7 @@
 ﻿using Newtonsoft.Json;
+using TiaUtilities.Configuration;
 using TiaXmlReader.GenerationForms;
-using TiaXmlReader.AutoSave;
 using TiaXmlReader.Languages;
-using TiaXmlReader.Generation.IO;
 
 namespace TiaXmlReader.Generation.Alarms
 {
@@ -26,18 +25,32 @@ namespace TiaXmlReader.Generation.Alarms
         [Localization("ALARM_CONFIG_COIL_TYPE_RESET")] RESET
     }
 
-    public class AlarmMainConfiguration : IGenerationConfiguration, ISettingsAutoSave
+    public class AlarmMainConfiguration : ObservableConfiguration, IGenerationConfiguration
     {
-        [JsonProperty] public string FCBlockName = "fcAlarmGeneration";
-        [JsonProperty] public uint FCBlockNumber = 100;
+        [JsonProperty] public string FCBlockName { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public uint FCBlockNumber { get => this.GetAs<uint>(); set => this.Set(value); }
 
-        [JsonProperty] public string OneEachSegmentName = "Alm{alarm_num} - {device_description} {alarm_description}";
-        [JsonProperty] public string OneEachEmptyAlarmSegmentName = "Alm{alarm_num} - SPARE";
-        [JsonProperty] public string GroupSegmentName = "Alm{alarm_num_start} ~ {alarm_num_end} - {device_description}";
-        [JsonProperty] public string GroupEmptyAlarmSegmentName = "Alm{alarm_num_start} ~ {alarm_num_end} - SPARE";
+        [JsonProperty] public string OneEachSegmentName { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public string OneEachEmptyAlarmSegmentName { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public string GroupSegmentName { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public string GroupEmptyAlarmSegmentName { get => this.GetAs<string>(); set => this.Set(value); }
 
-        [JsonProperty] public string AlarmTextInList = "{device_name} - {alarm_description}";
-        [JsonProperty] public string EmptyAlarmTextInList = "{device_name} - SPARE";
+        [JsonProperty] public string AlarmTextInList { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public string EmptyAlarmTextInList { get => this.GetAs<string>(); set => this.Set(value); }
+
+        public AlarmMainConfiguration()
+        {
+            FCBlockName = "fcAlarmGeneration";
+            FCBlockNumber = 100;
+
+            OneEachSegmentName = "Alm{alarm_num} - {device_description} {alarm_description}";
+            OneEachEmptyAlarmSegmentName = "Alm{alarm_num} - SPARE";
+            GroupSegmentName = "Alm{alarm_num_start} ~ {alarm_num_end} - {device_description}";
+            GroupEmptyAlarmSegmentName = "Alm{alarm_num_start} ~ {alarm_num_end} - SPARE";
+
+            AlarmTextInList = "{device_name} - {alarm_description}";
+            EmptyAlarmTextInList = "{device_name} - SPARE";
+        }
 
         public override bool Equals(object? obj)
         {
@@ -46,7 +59,7 @@ namespace TiaXmlReader.Generation.Alarms
                 return false;
             }
 
-            var equals = GenerationUtils.CompareJsonFieldsAndProperties(this, obj, out object invalid);
+            var equals = GenUtils.CompareJsonFieldsAndProperties(this, obj, out object invalid);
             return equals;
         }
 

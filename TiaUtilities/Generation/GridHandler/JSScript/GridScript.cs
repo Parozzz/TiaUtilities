@@ -1,42 +1,33 @@
-﻿using DocumentFormat.OpenXml.Vml.Office;
-using Esprima.Ast;
-using InfoBox;
+﻿using Acornima.Ast;
 using Jint;
-using Jint.Native;
-using Jint.Native.ShadowRealm;
 using TiaUtilities.Generation.Configuration;
 using TiaUtilities.Generation.Configuration.Lines;
 using TiaUtilities.Generation.Configuration.Utility;
 using TiaUtilities.Generation.GridHandler.Events;
 using TiaXmlReader.Generation.Configuration;
+using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Generation.GridHandler.Data;
-using TiaXmlReader.Generation.GridHandler.Events;
 using TiaXmlReader.GenerationForms;
 using TiaXmlReader.Javascript;
 using TiaXmlReader.Utility;
 using TiaXmlReader.Utility.Extensions;
 
-namespace TiaXmlReader.Generation.GridHandler
+namespace TiaUtilities.Generation.GridHandler.JSScript
 {
-    public class GridScript<C, T> where C : IGenerationConfiguration where T : IGridData<C>
+    public class GridScript<C, T>(GridHandler<C, T> gridHandler, JavascriptErrorReportThread jsErrorThread, GridScriptContainer scriptContainer)
+        where C : IGenerationConfiguration where T : IGridData<C>
     {
+        private record TabPageScriptRecord(GridScriptContainer.ScriptInfo ScriptInfo, JavascriptEditor JavascriptEditor);
+
         private const string ENGINE_LOG_FUNCTION = "log";
         private const string ENGINE_ROW_VARIABLE = "row";
 
-        private readonly GridHandler<C, T> gridHandler;
-        private readonly JavascriptErrorReportThread jsErrorHandlingThread;
-
         private ConfigTextBoxLine? logTextBoxLine;
-        private ConfigJavascriptLine? javascriptLine;
         private ConfigJSONLine? jsonLine;
 
-        private int singleExecutionLastRow = -1;
+        private TabPageScriptRecord? record;
 
-        public GridScript(GridHandler<C, T> gridHandler, JavascriptErrorReportThread jsErrorThread)
-        {
-            this.gridHandler = gridHandler;
-            this.jsErrorHandlingThread = jsErrorThread;
-        }
+        private int singleExecutionLastRow = -1;
 
         public void ShowConfigForm(IWin32Window window)
         {
@@ -48,13 +39,13 @@ namespace TiaXmlReader.Generation.GridHandler
                 CloseOnEnter = false,
             };
 
-            var showVariableEventArgs = new GridScriptShowVariableEventArgs();
+            GridScriptShowVariableEventArgs showVariableEventArgs = new();
 
             var variableList = showVariableEventArgs.VariableList;
             variableList.AddRange(gridHandler.DataHandler.DataColumns.Select(c => c.ProgrammingFriendlyName + " [" + c.PropertyInfo.PropertyType.Name + "]"));
             variableList.Add(ENGINE_ROW_VARIABLE + " [int]");
 
-            gridHandler.Events.ScriptShowVariableEvent(showVariableEventArgs);
+            gridHandler.Events.ScriptShowVariableEvent(gridHandler.DataGridView, showVariableEventArgs);
 
             var mainGroup = configForm.Init();
             mainGroup.AddLabel()
@@ -62,53 +53,102 @@ namespace TiaXmlReader.Generation.GridHandler
                 .LabelFont(ConfigStyle.LABEL_FONT.Copy(9f, FontStyle.Regular));
 
             var debugGroup = mainGroup.AddVerticalGroup().Height(150).SplitterDistance(95);
-            this.logTextBoxLine = debugGroup.AddTextBox()
+            logTextBoxLine = debugGroup.AddTextBox()
                 .Label("Log > " + ENGINE_LOG_FUNCTION + "(string)").LabelFont(ConfigStyle.LABEL_FONT.Copy(9f, FontStyle.Regular)).LabelOnTop()
                 .Readonly().Multiline();
 
-            this.jsonLine = debugGroup.AddJSON().Readonly()
+            jsonLine = debugGroup.AddJSON().Readonly()
                 .Label("Context Json").LabelFont(ConfigStyle.LABEL_FONT.Copy(9f, FontStyle.Regular)).LabelOnTop();
 
-            var loadScriptArgs = new GridScriptEventArgs();
-            this.gridHandler.Events.ScriptLoadEvent(loadScriptArgs);
-            this.javascriptLine = mainGroup.AddJavascript().Height(350)
-                .ControlText(loadScriptArgs.Script)
-                .TextChanged(str =>
+            var tabLine = mainGroup.AddInteractableTab()
+                .Height(500)
+                .Label("Espressione JS").LabelOnTop()
+                .RequireConfirmationBeforeClosing()
+                .TabAdded(tabPage =>
                 {
-                    var scriptChangedArgs = new GridScriptEventArgs() { Script = str };
-                    this.gridHandler.Events.ScriptChangedEvent(scriptChangedArgs);
+                    var scriptInfo = scriptContainer.AddScript();
+                    AddJavascriptControl(tabPage, scriptInfo);
+                }).TabRemoved(tabPage =>
+                {
+                    if (tabPage.Tag is not TabPageScriptRecord record)
+                    {
+                        return;
+                    }
+
+                    scriptContainer.RemoveScript(record.ScriptInfo);
+                }).TabChanged(tabPage =>
+                {
+                    this.record?.JavascriptEditor.UnregisterErrorReport(jsErrorThread);
+                    this.record = null;
+
+                    if (tabPage?.Tag is not TabPageScriptRecord record)
+                    {
+                        return;
+                    }
+
+                    this.record = record;
+                    this.record.JavascriptEditor.RegisterErrorReport(jsErrorThread);
+                }).TabNameUserChanged((tabPage, newName) =>
+                {
+                    if (tabPage.Tag is not TabPageScriptRecord record)
+                    {
+                        return;
+                    }
+
+                    record.ScriptInfo.Name = newName;
                 });
 
+            foreach (var scriptInfo in scriptContainer.Scripts)
+            {
+                var tabPage = tabLine.AddTabPage();
+                AddJavascriptControl(tabPage, scriptInfo);
+            }
 
             mainGroup.AddButtonPanel()
-                 .AddButton("AutoFormattazione", () => this.javascriptLine?.GetJavascriptFCTB().GetFCTB().DoAutoIndent())
-                 .AddButton("Esegui", () => this.ParseJS())
-                 .AddButton("Esegui per Riga", () => this.ParseJS(singleExecution: true))
-                 .AddButton("Esegui in DebugMode", () => this.ParseJS(debugRun: true));
-
-            configForm.Shown += (sender, args) =>
-            {
-                this.javascriptLine.GetJavascriptFCTB().RegisterErrorReport(this.jsErrorHandlingThread);
-
-                this.ParseJS(ignoreLog: true, debugRun: true);
-            };
+                 .AddButton("AutoFormattazione", () => record?.JavascriptEditor.GetTextBox().DoAutoIndent())
+                 .AddButton("Esegui", () => ParseJS())
+                 .AddButton("Esegui per Riga", () => ParseJS(singleExecution: true))
+                 .AddButton("Esegui in DebugMode", () => ParseJS(debugRun: true));
 
             configForm.FormClosed += (sender, args) =>
             {
-                this.javascriptLine.GetJavascriptFCTB().UnregisterErrorReport(this.jsErrorHandlingThread);
-                this.javascriptLine = null;
+                record?.JavascriptEditor.UnregisterErrorReport(jsErrorThread);
+                record = null;
             };
 
-            configForm.Init();
             configForm.StartShowingAtCursor();
             configForm.Show(window);
         }
 
+        private static void AddJavascriptControl(TabPage tabPage, GridScriptContainer.ScriptInfo scriptInfo)
+        {
+            var jsTabMainGroup = new ConfigGroup(null);
+
+            JavascriptEditor javascriptEditor = new();
+            javascriptEditor.InitControl();
+
+            var fctb = javascriptEditor.GetTextBox();
+            fctb.AutoSize = true;
+            fctb.Dock = DockStyle.Fill;
+            fctb.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+
+            tabPage.Text = scriptInfo.Name;
+            fctb.Text = scriptInfo.Text;
+            fctb.TextChanged += (sender, args) =>
+            {
+                scriptInfo.Text = javascriptEditor.GetTextBox().Text;
+            };
+
+            tabPage.Controls.Add(fctb);
+
+            tabPage.Tag = new TabPageScriptRecord(scriptInfo, javascriptEditor);
+        }
+
         private void Log(string logString)
         {
-            if (this.logTextBoxLine != null)
+            if (logTextBoxLine != null)
             {
-                var control = this.logTextBoxLine.GetControl();
+                var control = logTextBoxLine.GetControl();
                 if (control != null)
                 {
                     var timeString = DateTime.Now.ToString("HH:mm:ss fff") + "ms";
@@ -124,17 +164,17 @@ namespace TiaXmlReader.Generation.GridHandler
         {
             if (!singleExecution)
             {
-                this.singleExecutionLastRow = -1;
+                singleExecutionLastRow = -1;
             }
 
-            if (javascriptLine == null)
+            if (record == null)
             {
                 return false;
             }
 
             try
             {
-                var tableScript = this.javascriptLine.GetControl().Text;
+                var tableScript = record.JavascriptEditor.GetTextBox().Text;
 
                 var scriptTimer = new ScriptTimer();
 
@@ -153,7 +193,7 @@ namespace TiaXmlReader.Generation.GridHandler
                 engine.SetValue(ENGINE_LOG_FUNCTION, logAction);
 
                 var addVariablesArgs = new GridScriptAddVariableEventArgs();
-                this.gridHandler.Events.ScriptAddVariablesEvent(addVariablesArgs);
+                gridHandler.Events.ScriptAddVariablesEvent(gridHandler.DataGridView, addVariablesArgs);
                 foreach (var entry in addVariablesArgs.VariableDict)
                 {
                     engine.SetValue(entry.Key, entry.Value);
@@ -161,13 +201,13 @@ namespace TiaXmlReader.Generation.GridHandler
 
                 if (debugRun)
                 {
-                    var newData = this.gridHandler.DataHandler.CreateInstance();
+                    var newData = gridHandler.DataHandler.CreateInstance();
                     engine.SetValue(ENGINE_ROW_VARIABLE, 0);
                     ExecuteTimedJS(scriptTimer, engine, preparedScript, newData);
                 }
-                else if(!singleExecution)
+                else if (!singleExecution)
                 {
-                    this.singleExecutionLastRow = - 1;
+                    singleExecutionLastRow = -1;
 
                     var changedDataDict = new Dictionary<int, T>();
 
@@ -186,11 +226,11 @@ namespace TiaXmlReader.Generation.GridHandler
                         }
                     }
 
-                    this.gridHandler.ChangeMultipleRows(changedDataDict);
+                    gridHandler.ChangeMultipleRows(changedDataDict);
                 }
                 else
                 {
-                    var dataEnumerable = gridHandler.DataSource.GetNotEmptyDataDict().Where(e => e.Value > this.singleExecutionLastRow);
+                    var dataEnumerable = gridHandler.DataSource.GetNotEmptyDataDict().Where(e => e.Value > singleExecutionLastRow);
 
                     var anyFound = dataEnumerable.Any();
                     if (anyFound)
@@ -205,19 +245,19 @@ namespace TiaXmlReader.Generation.GridHandler
                         var newIOData = ExecuteTimedJS(scriptTimer, engine, preparedScript, data);
                         if (newIOData != null)
                         {
-                            this.gridHandler.ChangeRow(rowIndex, newIOData);
+                            gridHandler.ChangeRow(rowIndex, newIOData);
                         }
 
-                        this.singleExecutionLastRow = rowIndex;
+                        singleExecutionLastRow = rowIndex;
                     }
-                    
-                    if(!anyFound || (anyFound && dataEnumerable.Count() == 1))
+
+                    if (!anyFound || anyFound && dataEnumerable.Count() == 1)
                     {
-                        this.singleExecutionLastRow = -1;
+                        singleExecutionLastRow = -1;
                     }
                 }
 
-                this.UpdateJsonContext(engine);
+                UpdateJsonContext(engine);
 
                 scriptTimer.Log(tableScript, typeof(T).Name);
 
@@ -234,7 +274,7 @@ namespace TiaXmlReader.Generation.GridHandler
         private T? ExecuteTimedJS(ScriptTimer scriptTimer, Engine engine, Prepared<Script> script, T data)
         {
             scriptTimer.Restart();
-            var ret = this.ExecuteJS(engine, script, data);
+            var ret = ExecuteJS(engine, script, data);
             scriptTimer.StopAndSave();
             return ret;
         }

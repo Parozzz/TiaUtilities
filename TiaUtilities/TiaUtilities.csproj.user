@@ -16,13 +16,13 @@
     <Compile Update="Generation\GenForms\Alarm\AlarmGenConfigTopControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Update="Generation\GenForms\Controls\TabbedView.cs">
+    <Compile Update="Generation\GenForms\IO\Tab\IOGenTabControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Update="Generation\GenForms\Alarm\Tab\AlarmGenTabControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Update="Generation\GenForms\GenerationProjectForm.cs">
+    <Compile Update="Generation\GenForms\GenProjectForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="Generation\GridHandler\GridFindForm.cs">

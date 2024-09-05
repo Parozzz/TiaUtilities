@@ -160,7 +160,7 @@ namespace TiaUtilities.Generation.GridHandler
 
                         if (showFoundCell)
                         {
-                            gridHandler.ShowCell(row, column.ColumnIndex);
+                            gridHandler.SelectCell(row, column.ColumnIndex);
                         }
                         break;
                     }

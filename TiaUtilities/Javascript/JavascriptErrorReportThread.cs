@@ -1,10 +1,6 @@
-﻿using Esprima;
-using Irony.Parsing;
-using Jint;
+﻿using Acornima;
 using System.ComponentModel;
 using TiaXmlReader.Utility;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using static TiaXmlReader.Javascript.JavascriptErrorReportThread;
 using Timer = System.Windows.Forms.Timer;
 
 namespace TiaXmlReader.Javascript
@@ -120,27 +116,30 @@ namespace TiaXmlReader.Javascript
             foreach (var scriptReport in asyncScriptReportList)
             {
                 scriptReport.JSError = null;
+                if(scriptReport.Script == null)
+                {
+                    continue;
+                }
 
                 try
                 {
-                    var errorHandler = new CollectingErrorHandler();
+                    Acornima.ParseErrorCollector errorCollector = new();
                     var parsingOptions = new ParserOptions()
                     {
                         AllowReturnOutsideFunction = true,
-                        Tokens = true,
                         Tolerant = false,
-                        Comments = true,
-                        ErrorHandler = errorHandler
+                        CheckPrivateFields = true,
+                        ErrorHandler = errorCollector,
                     };
 
-                    var program = new JavaScriptParser(parsingOptions).ParseScript(scriptReport.Script, strict: true);
-                    foreach (var error in errorHandler.Errors)
+                    var parsedScript = new Acornima.Parser(parsingOptions).ParseScript(scriptReport.Script, strict: true);
+                    foreach (var error in errorCollector.Errors)
                     {
                         scriptReport.JSError = this.CreateError(error);
                         break;
                     }
                 }
-                catch (ParserException parseEx)
+                catch (Acornima.ParseErrorException parseEx)
                 {
                     scriptReport.JSError = this.CreateError(parseEx.Error);
                 }

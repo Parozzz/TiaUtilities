@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TiaUtilities.Generation.Alarms;
 using TiaUtilities.Generation.GenForms.Alarm.Controls;
 using TiaUtilities.Generation.GenForms.IO.Tab;
+using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation.GridHandler;
@@ -29,28 +30,27 @@ namespace TiaUtilities.Generation.GenForms.Alarm.Tab
         public List<AlarmData> AlarmDataList { get => new(this.alarmGridHandler.DataSource.GetNotEmptyClonedDataDict().Keys); } //Return CLONED data, otherwise operations on the xml generation will affect the table!
         public AlarmTabConfiguration TabConfig { get => TabSettings.TabConfiguration; }
 
-        public AlarmGenTab(JavascriptErrorReportThread jsErrorHandlingThread, GridSettings gridSettings, TabPage tabPage)
+        public AlarmGenTab(JavascriptErrorReportThread jsErrorHandlingThread, GridSettings gridSettings, TabPage tabPage, GridScriptContainer scriptContainer)
         {
             this.TabPage = tabPage;
 
             this.TabSettings = new();
 
-            this.deviceGridHandler = new GridHandler<AlarmTabConfiguration, DeviceData>(jsErrorHandlingThread, gridSettings, TabConfig) { RowCount = 499 };
-            this.alarmGridHandler = new GridHandler<AlarmTabConfiguration, AlarmData>(jsErrorHandlingThread, gridSettings, TabConfig) { RowCount = 199 };
+            this.deviceGridHandler = new GridHandler<AlarmTabConfiguration, DeviceData>(jsErrorHandlingThread, gridSettings, TabConfig, scriptContainer) { RowCount = 499 };
+            this.alarmGridHandler = new GridHandler<AlarmTabConfiguration, AlarmData>(jsErrorHandlingThread, gridSettings, TabConfig, scriptContainer) { RowCount = 199 };
 
             this.TabControl = new(deviceGridHandler.DataGridView, alarmGridHandler.DataGridView);
             this.configHandler = new(this.TabConfig, TabControl);
         }
 
         public void Init()
-        { 
-
+        {
             #region DRAG
-            this.deviceGridHandler.SetDragPreviewAction(data => { GridUtils.DragPreview(data, this.deviceGridHandler); });
-            this.deviceGridHandler.SetDragMouseUpAction(data => { GridUtils.DragMouseUp(data, this.deviceGridHandler); });
+            this.deviceGridHandler.Events.ExcelDragPreview += (sender, args) => GridUtils.DragPreview(args, this.deviceGridHandler);
+            this.deviceGridHandler.Events.ExcelDragDone += (sender, args) => GridUtils.DragDone(args, this.deviceGridHandler);
 
-            this.alarmGridHandler.SetDragPreviewAction(data => { GridUtils.DragPreview(data, this.alarmGridHandler); });
-            this.alarmGridHandler.SetDragMouseUpAction(data => { GridUtils.DragMouseUp(data, this.alarmGridHandler); });
+            this.alarmGridHandler.Events.ExcelDragPreview += (sender, args) => GridUtils.DragPreview(args, this.alarmGridHandler);
+            this.alarmGridHandler.Events.ExcelDragDone += (sender, args) => GridUtils.DragDone(args, this.alarmGridHandler);
             #endregion 
 
             //Column initialization before gridHandler.Init()
@@ -75,7 +75,7 @@ namespace TiaUtilities.Generation.GenForms.Alarm.Tab
             this.TabControl.Init(); //This before configHandler.
             this.configHandler.Init();
 
-            this.alarmGridHandler.Events.CellChange += args =>
+            this.alarmGridHandler.Events.CellChange += (sender, args) =>
             {
                 if (args.CellChangeList == null)
                 {
@@ -98,14 +98,6 @@ namespace TiaUtilities.Generation.GenForms.Alarm.Tab
                 }
             };
 
-            #region GRIDS_JSCRIPT_EVENTS
-            this.deviceGridHandler.Events.ScriptLoad += args => args.Script = TabSettings.DeviceJSScript;
-            this.deviceGridHandler.Events.ScriptChanged += args => TabSettings.DeviceJSScript = args.Script;
-
-            this.alarmGridHandler.Events.ScriptLoad += args => args.Script = TabSettings.AlarmJSScript;
-            this.alarmGridHandler.Events.ScriptChanged += args => TabSettings.AlarmJSScript = args.Script;
-            #endregion
-
             this.alarmGridHandler.DataGridView.AutoResizeColumnHeadersHeight();
             this.deviceGridHandler.DataGridView.AutoResizeColumnHeadersHeight();
 
@@ -116,66 +108,35 @@ namespace TiaUtilities.Generation.GenForms.Alarm.Tab
         {
             this.TabControl.Translate();
         }
-        
+        public bool IsDirty(bool clear = false)
+        {
+            var dirty = this.TabConfig.IsDirty(clear);
+            dirty |= deviceGridHandler.IsDirty(clear);
+            dirty |= alarmGridHandler.IsDirty(clear);
+            return dirty;
+        }
+
         public AlarmGenTabSave CreateSave()
         {
             AlarmGenTabSave save = new() 
             {
                 TabConfig = this.TabConfig,
                 Name = TabPage.Text,
+                DeviceGrid = this.deviceGridHandler.CreateSave(),
+                AlarmGrid = this.alarmGridHandler.CreateSave()
             };
 
-            GenerationUtils.CopyJsonFieldsAndProperties(this.TabConfig, save.TabConfig);
-
-            foreach (var entry in this.deviceGridHandler.DataSource.GetNotEmptyDataDict())
-            {
-                save.AddDeviceData(entry.Key, entry.Value);
-            }
-
-            foreach (var entry in this.alarmGridHandler.DataSource.GetNotEmptyDataDict())
-            {
-                save.AddAlarmData(entry.Key, entry.Value);
-            }
-
+            GenUtils.CopyJsonFieldsAndProperties(this.TabConfig, save.TabConfig);
             return save;
         }
 
         public void LoadSave(AlarmGenTabSave save)
         {
             this.TabPage.Text = save.Name;
-            GenerationUtils.CopyJsonFieldsAndProperties(save.TabConfig, this.TabConfig);
+            GenUtils.CopyJsonFieldsAndProperties(save.TabConfig, this.TabConfig);
 
-            this.alarmGridHandler.DataGridView.SuspendLayout();
-            this.deviceGridHandler.DataGridView.SuspendLayout();
-
-            this.alarmGridHandler.DataSource.InitializeData(this.alarmGridHandler.RowCount);
-            this.deviceGridHandler.DataSource.InitializeData(this.deviceGridHandler.RowCount);
-
-            foreach (var entry in save.DeviceData)
-            {
-                var rowIndex = entry.Key;
-                if (rowIndex >= 0 && rowIndex <= this.deviceGridHandler.RowCount)
-                {
-                    var data = this.deviceGridHandler.DataSource[rowIndex];
-                    this.deviceGridHandler.DataHandler.CopyValues(entry.Value, data);
-                }
-            }
-
-            foreach (var entry in save.AlarmData)
-            {
-                var rowIndex = entry.Key;
-                if (rowIndex >= 0 && rowIndex <= this.alarmGridHandler.RowCount)
-                {
-                    var data = this.alarmGridHandler.DataSource[rowIndex];
-                    this.alarmGridHandler.DataHandler.CopyValues(entry.Value, data);
-                }
-            }
-
-            this.alarmGridHandler.DataGridView.Refresh();
-            this.deviceGridHandler.DataGridView.Refresh();
-
-            this.alarmGridHandler.DataGridView.ResumeLayout();
-            this.deviceGridHandler.DataGridView.ResumeLayout();
+            this.alarmGridHandler.LoadSave(save.AlarmGrid);
+            this.deviceGridHandler.LoadSave(save.DeviceGrid);
         }
 
         public bool ProcessCmdKey(ref Message msg, Keys keyData)

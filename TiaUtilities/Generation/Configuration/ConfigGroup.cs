@@ -1,16 +1,23 @@
-﻿using TiaUtilities.Generation.Configuration.Lines;
+﻿using TiaUtilities.Generation.Configuration;
+using TiaUtilities.Generation.Configuration.Lines;
 
 namespace TiaXmlReader.Generation.Configuration
 {
-    public class ConfigGroup(ConfigForm configForm) : IConfigGroup
+    public class ConfigGroup(ConfigForm? configForm) : IConfigGroup
     {
-        private readonly ConfigForm configForm = configForm;
         private readonly List<IConfigObject> configObjectList = [];
 
         private int controlWidth = 0;
         private bool noAdapt = false;
 
         public bool IsSubGroup { get; set; } = false;
+
+        /*
+                 public Font LabelFont { get; set; } = ConfigStyle.LABEL_FONT;
+        public Font ControlFont { get; set; } = ConfigStyle.CONTROL_FONT;
+        public int ControlWidth { get; set; } = 300;
+        public int ControlHeight { get; set; } = 30;
+         */
 
         public ConfigForm GetConfigForm()
         {
@@ -88,10 +95,10 @@ namespace TiaXmlReader.Generation.Configuration
                             Text = labelText,
                             Padding = Padding.Empty,
                             Margin = Padding.Empty,
-                            Font = line.GetLabelFont() ?? this.configForm.LabelFont
+                            Font = line.GetLabelFont() ?? configForm?.LabelFont ?? ConfigStyle.LABEL_FONT
                         });
 
-                        var size = TextRenderer.MeasureText(labelText, this.configForm.LabelFont);
+                        var size = TextRenderer.MeasureText(labelText, label.Font);
                         size.Width += 4; //Padding
                         if (size.Width > biggestTitleLength)
                         {
@@ -125,10 +132,10 @@ namespace TiaXmlReader.Generation.Configuration
                             linePanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50f));
                         }
 
-                        control.Width = this.controlWidth == 0 ? this.configForm.ControlWidth : this.controlWidth;
-                        control.Height = line.GetHeight() == 0 ? this.configForm.ControlHeight : line.GetHeight();
+                        control.Width = this.controlWidth == 0 ? (configForm?.ControlWidth ?? 300) : this.controlWidth;
+                        control.Height = line.GetHeight() == 0 ? (configForm?.ControlHeight ?? 30) : line.GetHeight();
                         control.Dock = line.IsControlNoAdapt() ? DockStyle.None : DockStyle.Fill;
-                        control.Font = this.configForm.ControlFont;
+                        control.Font = configForm?.ControlFont ?? ConfigStyle.CONTROL_FONT;
                         linePanel.Controls.Add(control);
                     }
                 }

@@ -30,7 +30,7 @@ namespace TiaUtilities.Generation.GenForms.Alarm.Controls
         private void InitializeComponent()
         {
             mainSplitContainer = new SplitContainer();
-            gridsTabbedView = new TabbedView();
+            gridsTabControl = new CustomControls.InteractableTabControl();
             ((System.ComponentModel.ISupportInitialize)mainSplitContainer).BeginInit();
             mainSplitContainer.Panel2.SuspendLayout();
             mainSplitContainer.SuspendLayout();
@@ -44,21 +44,23 @@ namespace TiaUtilities.Generation.GenForms.Alarm.Controls
             // 
             // mainSplitContainer.Panel2
             // 
-            mainSplitContainer.Panel2.Controls.Add(gridsTabbedView);
+            mainSplitContainer.Panel2.Controls.Add(gridsTabControl);
             mainSplitContainer.Size = new Size(1480, 600);
             mainSplitContainer.SplitterDistance = 250;
             mainSplitContainer.SplitterWidth = 20;
             mainSplitContainer.TabIndex = 0;
             // 
-            // gridsTabbedView
+            // gridsTabControl
             // 
-            gridsTabbedView.AutoSize = true;
-            gridsTabbedView.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            gridsTabbedView.Dock = DockStyle.Fill;
-            gridsTabbedView.Location = new Point(0, 0);
-            gridsTabbedView.Name = "gridsTabbedView";
-            gridsTabbedView.Size = new Size(1210, 600);
-            gridsTabbedView.TabIndex = 0;
+            gridsTabControl.Dock = DockStyle.Fill;
+            gridsTabControl.DrawMode = TabDrawMode.OwnerDrawFixed;
+            gridsTabControl.Location = new Point(0, 0);
+            gridsTabControl.Name = "gridsTabControl";
+            gridsTabControl.Padding = new Point(12, 5);
+            gridsTabControl.RequireConfirmationBeforeClosing = false;
+            gridsTabControl.SelectedIndex = 0;
+            gridsTabControl.Size = new Size(1210, 600);
+            gridsTabControl.TabIndex = 0;
             // 
             // IOGenBottomControl
             // 
@@ -69,7 +71,6 @@ namespace TiaUtilities.Generation.GenForms.Alarm.Controls
             Name = "IOGenBottomControl";
             Size = new Size(1480, 600);
             mainSplitContainer.Panel2.ResumeLayout(false);
-            mainSplitContainer.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)mainSplitContainer).EndInit();
             mainSplitContainer.ResumeLayout(false);
             ResumeLayout(false);
@@ -77,6 +78,6 @@ namespace TiaUtilities.Generation.GenForms.Alarm.Controls
 
         #endregion
         private SplitContainer mainSplitContainer;
-        public TabbedView gridsTabbedView;
+        public CustomControls.InteractableTabControl gridsTabControl;
     }
 }

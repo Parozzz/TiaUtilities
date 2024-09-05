@@ -1,7 +1,6 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Globalization;
 using TiaXmlReader.Utility;
-using TiaXmlReader.AutoSave;
 using System.Xml;
 using TiaXmlReader.Generation.Configuration;
 using Jint;
@@ -19,6 +18,7 @@ using TiaXmlReader.Generation;
 using TiaUtilities.Generation.GenForms.Alarm;
 using TiaUtilities.Generation.GenForms.IO;
 using TiaUtilities.Generation.GenForms;
+using TiaUtilities;
 
 namespace TiaXmlReader
 {
@@ -28,6 +28,8 @@ namespace TiaXmlReader
         private readonly TimedSaveHandler autoSaveHandler;
         private readonly JavascriptErrorReportThread jsErrorHandlingThread;
 
+        private ProgramSettings? oldProgramSettings;
+
         public MainImportExportForm()
         {
             InitializeComponent();
@@ -35,7 +37,7 @@ namespace TiaXmlReader
             this.programSettings = ProgramSettings.Load();
             this.programSettings.Save(); //To create file if not exist!
 
-            this.autoSaveHandler = new TimedSaveHandler(programSettings);
+            this.autoSaveHandler = new TimedSaveHandler();
             this.jsErrorHandlingThread = new JavascriptErrorReportThread();
 
             Init();
@@ -86,31 +88,31 @@ namespace TiaXmlReader
 
             ignoreLanguageBoxAtStartup = false;
 
-            #region SETTINGS_SAVE_TICK + AUTO_SAVE
+            #region AUTO_SAVE_TIME
             this.autoSaveTimeTextBox.TextChanged += (sender, args) =>
             {
                 if (int.TryParse(autoSaveTimeTextBox.Text, out int time))
                 {
-                    this.autoSaveHandler.SetIntervalAndStart(time * 1000);
+                    this.autoSaveHandler.Start(time * 1000);
                     programSettings.TimedSaveTime = time;
 
                     programSettings.Save();
                 }
             };
             this.autoSaveTimeTextBox.Text = "" + programSettings.TimedSaveTime; //Call this after so it start auto save
+            #endregion
 
-            var settingsWrapper = new AutoSaveSettingsWrapper(this.programSettings);
-            settingsWrapper.Scan();
-
-            var timer = new Timer { Interval = 1000 };
-            timer.Start();
-            timer.Tick += (sender, e) =>
+            #region PROGRAM_SETTINGS_AUTO_SAVE
+            void eventHandler(object? sender, EventArgs args)
             {
-                if (!settingsWrapper.CompareSnapshot())
+                if (this.oldProgramSettings == null || !this.oldProgramSettings.Equals(this.programSettings))
                 {
+                    this.oldProgramSettings = this.programSettings;
+
                     this.programSettings.Save();
                 }
-            };
+            }
+            this.autoSaveHandler.AddTickEventHandler(eventHandler);
             #endregion
 
             Translate();
@@ -157,7 +159,7 @@ namespace TiaXmlReader
         {
             var alarmGenProject = new AlarmGenProject(jsErrorHandlingThread, programSettings.GridSettings);
 
-            var projectForm = new GenerationProjectForm(alarmGenProject, autoSaveHandler, programSettings.GridSettings)
+            var projectForm = new GenProjectForm(alarmGenProject, autoSaveHandler, programSettings.GridSettings)
             {
                 Width = 1400,
                 Height = 850
@@ -314,7 +316,7 @@ namespace TiaXmlReader
             //Create skeleton for the XML Document and add the FC to it.
             var xmlDocument = SimaticMLAPI.CreateDocument(fc);
 
-            var fileDialog = GenerationUtils.CreateFileDialog(false, null, "xml");
+            var fileDialog = GenUtils.CreateFileDialog(false, null, "xml");
             if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok && !string.IsNullOrEmpty(fileDialog.FileName))
             {
                 xmlDocument.Save(fileDialog.FileName);
@@ -328,7 +330,7 @@ namespace TiaXmlReader
         {
             var ioGenProject = new IOGenProject(jsErrorHandlingThread, programSettings.GridSettings);
 
-            var projectForm = new GenerationProjectForm(ioGenProject, autoSaveHandler, programSettings.GridSettings)
+            var projectForm = new GenProjectForm(ioGenProject, autoSaveHandler, programSettings.GridSettings)
             {
                 Width = 1400,
                 Height = 850

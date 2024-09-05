@@ -80,7 +80,7 @@ namespace TiaXmlReader.Generation.Alarms
                 return false;
             }
 
-            var equals = GenerationUtils.CompareJsonFieldsAndProperties(this, obj, out object invalid);
+            var equals = GenUtils.CompareJsonFieldsAndProperties(this, obj, out object invalid);
             return equals;
         }
 

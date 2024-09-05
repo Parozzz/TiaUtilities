@@ -4,17 +4,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TiaUtilities.Configuration;
 using TiaXmlReader.Generation;
+using TiaXmlReader.Generation.IO;
+using TiaXmlReader.GenerationForms;
 
 namespace TiaUtilities.Generation.IO
 {
-    public class IOTabConfiguration
+    public class IOTabConfiguration : ObservableConfiguration, IGenerationConfiguration
     {
-        [JsonProperty] public string FCBlockName = "fcTest_IO";
-        [JsonProperty] public uint FCBlockNumber = 195;
+        [JsonProperty] public string FCBlockName { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public uint FCBlockNumber { get => this.GetAs<uint>(); set => this.Set(value); }
 
-        [JsonProperty] public string SegmentNameBitGrouping = "{memory_type}{byte}_{bit} - {comment}";
-        [JsonProperty] public string SegmentNameByteGrouping = "{memory_type}B{byte}";
+        [JsonProperty] public string SegmentNameBitGrouping { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public string SegmentNameByteGrouping { get => this.GetAs<string>(); set => this.Set(value); }
+
+        public IOTabConfiguration()
+        {
+            FCBlockName = "fcTest_IO";
+            FCBlockNumber = 195;
+
+            SegmentNameBitGrouping = "{memory_type}{byte}_{bit} - {comment}";
+            SegmentNameByteGrouping = "{memory_type}B{byte}";
+        }
 
         public override bool Equals(object? obj)
         {
@@ -23,7 +35,7 @@ namespace TiaUtilities.Generation.IO
                 return false;
             }
 
-            var equals = GenerationUtils.CompareJsonFieldsAndProperties(this, obj, out _);
+            var equals = GenUtils.CompareJsonFieldsAndProperties(this, obj, out _);
             return equals;
         }
 

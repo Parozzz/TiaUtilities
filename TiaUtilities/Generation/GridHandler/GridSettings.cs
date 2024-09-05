@@ -1,14 +1,11 @@
 ﻿using Newtonsoft.Json;
-using System.Drawing;
-using System.Windows.Forms;
 using TiaUtilities.Generation.Configuration.Utility;
-using TiaXmlReader.AutoSave;
 using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Languages;
 
 namespace TiaXmlReader.Generation.GridHandler
 {
-    public class GridSettings : ISettingsAutoSave
+    public class GridSettings
     {
         [JsonProperty] public Color DragSelectedCellBorderColor = Color.FromArgb(0x40, 0x80, 0x80);
         [JsonProperty] public Color SingleSelectedCellBorderColor = Color.LightYellow;

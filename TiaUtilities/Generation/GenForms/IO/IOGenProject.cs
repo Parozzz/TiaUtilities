@@ -11,10 +11,11 @@ using SimaticML.API;
 using SimaticML.Blocks;
 using SimaticML.TagTable;
 using TiaUtilities.Generation.GenForms.IO.Tab;
+using TiaUtilities.Generation.GridHandler.JSScript;
 
 namespace TiaUtilities.Generation.GenForms.IO
 {
-    public class IOGenProject : IGenerationProject
+    public class IOGenProject : IGenProject
     {
         private record GenTabRowRecord(IOGenTab GenTab, IOData IOData, int Row);
 
@@ -22,6 +23,8 @@ namespace TiaUtilities.Generation.GenForms.IO
 
         private readonly JavascriptErrorReportThread jsErrorHandlingThread;
         private readonly GridSettings gridSettings;
+
+        private readonly GridScriptContainer scriptContainer;
 
         private readonly IOMainConfiguration mainConfig;
         private readonly IOGenerationExcelImportSettings excelImportConfig;
@@ -31,31 +34,27 @@ namespace TiaUtilities.Generation.GenForms.IO
         private readonly IOGenConfigTopControl configControlTop;
         private readonly IOGenBottomControl tabControlBottom;
 
-        private readonly IOGenConfigHandler genConfigHandler;
-
         private readonly List<IOGenTab> genTabList;
-
-        private string suggestionJSScript = "";
 
         public IOGenProject(JavascriptErrorReportThread jsErrorHandlingThread, GridSettings gridSettings)
         {
             this.jsErrorHandlingThread = jsErrorHandlingThread;
             this.gridSettings = gridSettings;
 
+            this.scriptContainer = new();
+
             this.mainConfig = new();
             this.excelImportConfig = new();
 
-            this.suggestionGridHandler = new GridHandler<IOMainConfiguration, IOSuggestionData>(jsErrorHandlingThread, gridSettings, mainConfig) { RowCount = 1999, };
+            this.suggestionGridHandler = new GridHandler<IOMainConfiguration, IOSuggestionData>(jsErrorHandlingThread, gridSettings, mainConfig, scriptContainer) { RowCount = 1999 };
 
             this.configControlTop = new();
             this.tabControlBottom = new(this.suggestionGridHandler.DataGridView);
 
-            this.genConfigHandler = new(this.configControlTop, this.mainConfig);
-
             this.genTabList = [];
         }
 
-        public void Init(GenerationProjectForm form)
+        public void Init(GenProjectForm form)
         {
             #region IMPORT_EXPORT_MENU_ITEMS
             ToolStripMenuItem importExcelMenuItem = new(Localization.Get("IO_GEN_FORM_IMPEXP_IMPORT_EXCEL"));
@@ -77,8 +76,8 @@ namespace TiaUtilities.Generation.GenForms.IO
                         });
                     }
 
-                    var visibleTab = this.tabControlBottom.gridsTabbedView.GetVisibleTab();
-                    if (visibleTab != null && visibleTab.Tag is IOGenTab genTab)
+                    var selectedTab = this.tabControlBottom.gridsTabControl.SelectedTab;
+                    if (selectedTab != null && selectedTab.Tag is IOGenTab genTab)
                     {
                         var gridHandler = genTab.GridHandler;
 
@@ -143,8 +142,8 @@ namespace TiaUtilities.Generation.GenForms.IO
             #endregion
 
             #region DRAG
-            this.suggestionGridHandler.SetDragPreviewAction(data => { GridUtils.DragPreview(data, this.suggestionGridHandler); });
-            this.suggestionGridHandler.SetDragMouseUpAction(data => { GridUtils.DragMouseUp(data, this.suggestionGridHandler); });
+            this.suggestionGridHandler.Events.ExcelDragPreview += (sender, args) => GridUtils.DragPreview(args, this.suggestionGridHandler);
+            this.suggestionGridHandler.Events.ExcelDragDone += (sender, args) => GridUtils.DragDone(args, this.suggestionGridHandler);
             #endregion
             //Column initialization before gridHandler.Init()
             #region COLUMNS
@@ -152,12 +151,7 @@ namespace TiaUtilities.Generation.GenForms.IO
             #endregion
 
             this.suggestionGridHandler.Init();
-            this.genConfigHandler.Init();
-
-            #region GRIDS_JSSCRIPT_EVENTS
-            this.suggestionGridHandler.Events.ScriptLoad += args => args.Script = this.suggestionJSScript;
-            this.suggestionGridHandler.Events.ScriptChanged += args => this.suggestionJSScript = args.Script;
-            #endregion
+            this.configControlTop.BindConfig(this.mainConfig);
 
             #region SUGGESTION_GRIDS_EVENTS
             this.suggestionGridHandler.DataGridView.CellToolTipTextNeeded += (sender, args) =>
@@ -191,38 +185,26 @@ namespace TiaUtilities.Generation.GenForms.IO
                 }
             };
 
-            this.suggestionGridHandler.Events.CellChange += args => UpdateSuggestionColors();
+            this.suggestionGridHandler.Events.CellChange += (sender, args) => UpdateSuggestionColors();
             #endregion
 
-            this.configControlTop.MemoryTypeChanged += (sender, args) =>
-            {
-
-            };
-
-            this.tabControlBottom.gridsTabbedView.TabAdded += (sender, args) =>
+            this.tabControlBottom.gridsTabControl.TabPreAdded += (sender, args) =>
             {
                 var tabPage = args.TabPage;
                 tabPage.Text = "IOGen";
 
-                IOGenTab ioGenTab = new(this, tabPage, this.mainConfig, jsErrorHandlingThread, this.gridSettings);
+                IOGenTab ioGenTab = new(this, tabPage, this.mainConfig, this.jsErrorHandlingThread, this.gridSettings, this.scriptContainer);
                 ioGenTab.Init();
                 this.genTabList.Add(ioGenTab);
 
+                tabPage.Controls.Add(ioGenTab.TabControl);
                 tabPage.Tag = ioGenTab;
-                tabPage.Controls.Add(ioGenTab.GenTabControl);
             };
 
-            this.tabControlBottom.gridsTabbedView.TabRemoved += (sender, args) =>
+            this.tabControlBottom.gridsTabControl.TabPreRemoved += (sender, args) =>
             {
                 if (args.TabPage.Tag is IOGenTab ioGenTab)
                 {
-                    var result = InformationBox.Show($"Are you sure you want to close {args.TabPage.Text}?", buttons: InformationBoxButtons.YesNo);
-                    if (result == InformationBoxResult.No)
-                    {
-                        args.Handled = true;
-                        return;
-                    }
-
                     this.genTabList.Remove(ioGenTab);
                 }
             };
@@ -232,6 +214,17 @@ namespace TiaUtilities.Generation.GenForms.IO
             {
                 this.suggestionGridHandler.DataGridView.AutoResizeColumnHeadersHeight();
             };
+        }
+
+        public bool IsDirty(bool clear = false)
+        {
+            var dirty = this.mainConfig.IsDirty(clear);
+            dirty |= this.suggestionGridHandler.IsDirty(clear);
+            foreach(var genTab in genTabList)
+            {
+                dirty |= genTab.IsDirty(clear); 
+            }
+            return dirty;
         }
 
         public Control? GetTopControl()
@@ -258,20 +251,16 @@ namespace TiaUtilities.Generation.GenForms.IO
             ioXmlGenerator.ExportXML(folderPath);
         }
 
-        public IGenerationProjectSave CreateProjectSave()
+        public IGenProjectSave CreateSave()
         {
             IOGenSave save = new()
             {
-                SuggestionJSScript = this.suggestionJSScript
+                SuggestionGrid = this.suggestionGridHandler.CreateSave(),
+                ScriptContainer = this.scriptContainer.CreateSave()
             };
 
-            GenerationUtils.CopyJsonFieldsAndProperties(this.mainConfig, save.MainConfig);
-            GenerationUtils.CopyJsonFieldsAndProperties(this.excelImportConfig, save.ExcelImportConfiguration);
-
-            foreach (var entry in suggestionGridHandler.DataSource.GetNotEmptyDataDict())
-            {
-                save.SuggestionData.Add(entry.Value, entry.Key);
-            }
+            GenUtils.CopyJsonFieldsAndProperties(this.mainConfig, save.MainConfig);
+            GenUtils.CopyJsonFieldsAndProperties(this.excelImportConfig, save.ExcelImportConfiguration);
 
             foreach (var genTab in genTabList)
             {
@@ -282,42 +271,43 @@ namespace TiaUtilities.Generation.GenForms.IO
             return save;
         }
 
-        public IGenerationProjectSave? Load(ref string? filePath)
+        public IGenProjectSave? LoadSave(ref string? filePath)
         {
             var loadedSave = IOGenSave.Load(ref filePath);
             if (loadedSave != null)
             {
-                this.suggestionJSScript = loadedSave.SuggestionJSScript;
+                this.scriptContainer.LoadSave(loadedSave.ScriptContainer);
+                this.suggestionGridHandler.LoadSave(loadedSave.SuggestionGrid);
 
-                GenerationUtils.CopyJsonFieldsAndProperties(loadedSave.MainConfig, this.mainConfig);
-                GenerationUtils.CopyJsonFieldsAndProperties(loadedSave.ExcelImportConfiguration, this.excelImportConfig);
+                GenUtils.CopyJsonFieldsAndProperties(loadedSave.MainConfig, this.mainConfig);
+                GenUtils.CopyJsonFieldsAndProperties(loadedSave.ExcelImportConfiguration, this.excelImportConfig);
 
                 foreach (var tabSave in loadedSave.TabSaves)
                 {
-                    var tabPage = this.tabControlBottom.gridsTabbedView.AddTab();
-                    tabPage.Text = "IOGen";
+                    var tabPage = new TabPage()
+                    {
+                        Text = "IOGen"
+                    };
+                    this.tabControlBottom.gridsTabControl.TabPages.Add(tabPage);
 
-                    IOGenTab ioGenTab = new(this, tabPage, this.mainConfig, jsErrorHandlingThread, this.gridSettings);
+                    IOGenTab ioGenTab = new(this, tabPage, this.mainConfig, this.jsErrorHandlingThread, this.gridSettings, this.scriptContainer);
                     ioGenTab.Init();
                     ioGenTab.LoadSave(tabSave);
                     this.genTabList.Add(ioGenTab);
 
                     tabPage.Tag = ioGenTab;
-                    tabPage.Controls.Add(ioGenTab.GenTabControl);
+                    tabPage.Controls.Add(ioGenTab.TabControl);
                 }
 
                 this.UpdateSuggestionColors();
-
-                this.suggestionGridHandler.DataGridView.Refresh();
-                this.suggestionGridHandler.DataGridView.ResumeLayout();
             }
             return loadedSave;
         }
 
         public bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            var visibleTab = this.tabControlBottom.gridsTabbedView.GetVisibleTab();
-            if (visibleTab != null && visibleTab.Tag is IOGenTab ioGenTab)
+            var selectedTab = this.tabControlBottom.gridsTabControl.SelectedTab;
+            if (selectedTab != null && selectedTab.Tag is IOGenTab ioGenTab)
             {
                 return ioGenTab.ProcessCmdKey(ref msg, keyData);
             }
@@ -368,7 +358,6 @@ namespace TiaUtilities.Generation.GenForms.IO
 
             this.suggestionGridHandler.DataGridView.ResumeLayout();
         }
-
     }
 }
 

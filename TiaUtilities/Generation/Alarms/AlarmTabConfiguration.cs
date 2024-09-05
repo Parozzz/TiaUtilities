@@ -1,45 +1,71 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TiaXmlReader.AutoSave;
+using TiaUtilities.Configuration;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.GenerationForms;
 
 namespace TiaUtilities.Generation.Alarms
 {
-    public class AlarmTabConfiguration : IGenerationConfiguration, ISettingsAutoSave
+    public class AlarmTabConfiguration : ObservableConfiguration, IGenerationConfiguration
     {
-        [JsonProperty] public AlarmPartitionType PartitionType = AlarmPartitionType.DEVICE;
-        [JsonProperty] public AlarmGroupingType GroupingType = AlarmGroupingType.GROUP;
+        [JsonProperty] public AlarmPartitionType PartitionType { get => this.GetAs<AlarmPartitionType>(); set => this.Set(value); }
+        [JsonProperty] public AlarmGroupingType GroupingType { get => this.GetAs<AlarmGroupingType>(); set => this.Set(value); }
 
-        [JsonProperty] public uint StartingAlarmNum = 1000;
-        [JsonProperty] public string AlarmNumFormat = "000.###";
-        [JsonProperty] public uint AntiSlipNumber = 0;
-        [JsonProperty] public uint SkipNumberAfterGroup = 0;
-        [JsonProperty] public AlarmCoilType Coil1Type = AlarmCoilType.COIL;
-        [JsonProperty] public AlarmCoilType Coil2Type = AlarmCoilType.SET;
+        [JsonProperty] public uint StartingAlarmNum { get => this.GetAs<uint>(); set => this.Set(value); }
+        [JsonProperty] public string AlarmNumFormat { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public uint AntiSlipNumber { get => this.GetAs<uint>(); set => this.Set(value); }
+        [JsonProperty] public uint SkipNumberAfterGroup { get => this.GetAs<uint>(); set => this.Set(value); }
+        [JsonProperty] public AlarmCoilType Coil1Type { get => this.GetAs<AlarmCoilType>(); set => this.Set(value); }
+        [JsonProperty] public AlarmCoilType Coil2Type { get => this.GetAs<AlarmCoilType>(); set => this.Set(value); }
 
-        [JsonProperty] public bool GenerateEmptyAlarmAntiSlip = false;
-        [JsonProperty] public uint EmptyAlarmAtEnd = 0;
-        [JsonProperty] public string EmptyAlarmContactAddress = "FALSE";
-        [JsonProperty] public string EmptyAlarmTimerAddress = "\\";
-        [JsonProperty] public string EmptyAlarmTimerType = "TON";
-        [JsonProperty] public string EmptyAlarmTimerValue = "T#0s";
+        [JsonProperty] public bool GenerateEmptyAlarmAntiSlip { get => this.GetAs<bool>(); set => this.Set(value); }
+        [JsonProperty] public uint EmptyAlarmAtEnd { get => this.GetAs<uint>(); set => this.Set(value); }
+        [JsonProperty] public string EmptyAlarmContactAddress { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public string EmptyAlarmTimerAddress { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public string EmptyAlarmTimerType { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public string EmptyAlarmTimerValue { get => this.GetAs<string>(); set => this.Set(value); }
 
-        [JsonProperty] public string DefaultCoil1Address = "Alm.Act.Alm{alarm_num}";
-        [JsonProperty] public string DefaultCoil2Address = "Alm.Mem.Alm{alarm_num}";
-        [JsonProperty] public string DefaultTimerAddress = "/";
-        [JsonProperty] public string DefaultTimerType = "TON";
-        [JsonProperty] public string DefaultTimerValue = "T#0s";
+        [JsonProperty] public string DefaultCoil1Address { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public string DefaultCoil2Address { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public string DefaultTimerAddress { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public string DefaultTimerType { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public string DefaultTimerValue { get => this.GetAs<string>(); set => this.Set(value); }
 
-        [JsonProperty] public string AlarmAddressPrefix = "{device_address}.";
-        [JsonProperty] public string CoilAddressPrefix = "";
-        [JsonProperty] public string SetCoilAddressPrefix = "";
-        [JsonProperty] public string TimerAddressPrefix = "";
+        [JsonProperty] public string AlarmAddressPrefix { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public string CoilAddressPrefix { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public string SetCoilAddressPrefix { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public string TimerAddressPrefix { get => this.GetAs<string>(); set => this.Set(value); }
+
+        public AlarmTabConfiguration()
+        {
+            PartitionType = AlarmPartitionType.DEVICE;
+            GroupingType = AlarmGroupingType.GROUP;
+
+            StartingAlarmNum = 1000;
+            AlarmNumFormat = "000.###";
+            AntiSlipNumber = 0;
+            SkipNumberAfterGroup = 0;
+            Coil1Type = AlarmCoilType.COIL;
+            Coil2Type = AlarmCoilType.SET;
+
+            GenerateEmptyAlarmAntiSlip = false;
+            EmptyAlarmAtEnd = 0;
+            EmptyAlarmContactAddress = "FALSE";
+            EmptyAlarmTimerAddress = "\\";
+            EmptyAlarmTimerType = "TON";
+            EmptyAlarmTimerValue = "T#0s";
+
+            DefaultCoil1Address = "Alm.Act.Alm{alarm_num}";
+            DefaultCoil2Address = "Alm.Mem.Alm{alarm_num}";
+            DefaultTimerAddress = "/";
+            DefaultTimerType = "TON";
+            DefaultTimerValue = "T#0s";
+
+            AlarmAddressPrefix = "{device_address}.";
+            CoilAddressPrefix = "";
+            SetCoilAddressPrefix = "";
+            TimerAddressPrefix = "";
+        }
 
         public override bool Equals(object? obj)
         {
@@ -48,7 +74,7 @@ namespace TiaUtilities.Generation.Alarms
                 return false;
             }
 
-            var equals = GenerationUtils.CompareJsonFieldsAndProperties(this, obj, out object invalid);
+            var equals = GenUtils.CompareJsonFieldsAndProperties(this, obj, out _);
             return equals;
         }
 

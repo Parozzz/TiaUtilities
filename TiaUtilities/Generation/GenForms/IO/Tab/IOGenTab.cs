@@ -1,4 +1,5 @@
-﻿using TiaUtilities.Generation.IO;
+﻿using TiaUtilities.Generation.GridHandler.JSScript;
+using TiaUtilities.Generation.IO;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Generation.GridHandler.CustomColumns;
@@ -13,34 +14,36 @@ namespace TiaUtilities.Generation.GenForms.IO.Tab
 
         private readonly IOGenProject ioGenProject;
         public TabPage TabPage { get; init; }
+        private readonly IOMainConfiguration mainConfig;
 
         public GridHandler<IOMainConfiguration, IOData> GridHandler { get; init; }
+
         private readonly SuggestionTextBoxColumn variableAddressColumn;
 
-        public IOGenTabControl GenTabControl { get; init; }
+        public IOGenTabControl TabControl { get; init; }
         public IOTabConfiguration TabConfig { get; init; }
-        private readonly IOGenTabConfigHandler genTabConfigHandler;
 
         private string jsScript = "";
 
-        public IOGenTab(IOGenProject ioGenProject, TabPage tabPage, IOMainConfiguration mainConfig, JavascriptErrorReportThread jsErrorHandlingThread, GridSettings gridSettings)
+        public IOGenTab(IOGenProject ioGenProject, TabPage tabPage, IOMainConfiguration mainConfig, JavascriptErrorReportThread jsErrorHandlingThread, 
+            GridSettings gridSettings, GridScriptContainer scriptContainer)
         {
             this.ioGenProject = ioGenProject;
             this.TabPage = tabPage;
+            this.mainConfig = mainConfig;
 
-            this.GridHandler = new GridHandler<IOMainConfiguration, IOData>(jsErrorHandlingThread, gridSettings, mainConfig, new IOGenComparer()) { RowCount = 2999 };
+            this.GridHandler = new GridHandler<IOMainConfiguration, IOData>(jsErrorHandlingThread, gridSettings, mainConfig, scriptContainer, new IOGenComparer()) { RowCount = 2999 };
             this.variableAddressColumn = new();
-
-            this.GenTabControl = new(GridHandler.DataGridView);
+            
+            this.TabControl = new(GridHandler.DataGridView);
             this.TabConfig = new();
-            this.genTabConfigHandler = new(GenTabControl, TabConfig);
         }
 
         public void Init()
         {
             #region DRAG
-            this.GridHandler.SetDragPreviewAction(data => { IOGenerationUtils.DragPreview(data, this.GridHandler); });
-            this.GridHandler.SetDragMouseUpAction(data => { IOGenerationUtils.DragMouseUp(data, this.GridHandler); });
+            this.GridHandler.Events.ExcelDragPreview += (sender, args) => IOGenUtils.DragPreview(args, this.GridHandler);
+            this.GridHandler.Events.ExcelDragDone += (sender, args) => IOGenUtils.DragDone(args, this.GridHandler);
             #endregion
 
             //Column initialization before gridHandler.Init()
@@ -56,25 +59,23 @@ namespace TiaUtilities.Generation.GenForms.IO.Tab
                 var suggestionEnumerable = this.ioGenProject.Suggestions;
 
                 var notAddedSuggestionEnumerable = suggestionEnumerable.Select(k => k.Value).Except(ioVariableEnumerable).ToArray();
-                return notAddedSuggestionEnumerable;
+                return notAddedSuggestionEnumerable ?? [];
             });
 
             this.GridHandler.AddTextBoxColumn(IOData.MERKER_ADDRESS, MERKER_ADDRESS_COLUMN_SIZE);
             this.GridHandler.AddTextBoxColumn(IOData.COMMENT, 0);
+
+            this.mainConfig.Subscribe(() => this.mainConfig.MemoryType, UpdateMerkerColumn);
+            UpdateMerkerColumn(this.mainConfig.MemoryType);
             #endregion
 
-            this.GenTabControl.Init();
+            this.TabControl.Init();
 
             this.GridHandler.Init();
-            this.genTabConfigHandler.Init();
-
-            #region GRIDS_JSSCRIPT_EVENTS
-            this.GridHandler.Events.ScriptLoad += args => args.Script = this.jsScript;
-            this.GridHandler.Events.ScriptChanged += args => this.jsScript = args.Script;
-            #endregion
+            this.TabControl.BindConfig(this.TabConfig);
 
             #region SUGGESTION_GRIDS_EVENTS
-            this.GridHandler.Events.CellChange += args =>
+            this.GridHandler.Events.CellChange += (sender, args) =>
             {
                 if (args.CellChangeList == null)
                 {
@@ -91,7 +92,7 @@ namespace TiaUtilities.Generation.GenForms.IO.Tab
                     this.UpdateDuplicatedIOValues();
                 }
             };
-            this.GridHandler.Events.PostSort += args =>
+            this.GridHandler.Events.PostSort += (sender, args) =>
             {
                 ioGenProject.UpdateSuggestionColors();
                 this.UpdateDuplicatedIOValues();
@@ -99,9 +100,21 @@ namespace TiaUtilities.Generation.GenForms.IO.Tab
             #endregion
 
             #region JS_SCRIPT_EVENTS
-            this.GridHandler.Events.ScriptShowVariable += args => args.VariableList.Add("suggestions [array]");
-            this.GridHandler.Events.ScriptAddVariables += args => args.VariableDict.Add("suggestions", this.ioGenProject.Suggestions.Select(s => s.Value).ToArray());
+            this.GridHandler.Events.ScriptShowVariable += (sender, args) => args.VariableList.Add("suggestions [array]");
+            this.GridHandler.Events.ScriptAddVariables += (sender, args) => args.VariableDict.Add("suggestions", this.ioGenProject.Suggestions.Select(s => s.Value).ToArray());
             #endregion
+        }
+
+        public bool IsDirty(bool clear = false)
+        {
+            var dirty = this.TabConfig.IsDirty(clear);
+            dirty |= this.GridHandler.IsDirty(clear);
+            return dirty;
+        }
+
+        private void UpdateMerkerColumn(IOMemoryTypeEnum memoryType)
+        {
+            this.GridHandler.ChangeColumnVisibility(IOData.MERKER_ADDRESS, visible: memoryType == IOMemoryTypeEnum.MERKER, init: true);
         }
 
         public IOGenTabSave CreateSave()
@@ -109,42 +122,19 @@ namespace TiaUtilities.Generation.GenForms.IO.Tab
             var save = new IOGenTabSave()
             {
                 Name = TabPage.Text,
-                JSScript = this.jsScript,
+                IOGrid = this.GridHandler.CreateSave(),
             };
 
-            GenerationUtils.CopyJsonFieldsAndProperties(this.TabConfig, save.TabConfig);
-
-            foreach (var entry in this.GridHandler.DataSource.GetNotEmptyClonedDataDict())
-            {
-                save.AddIOData(entry.Key, entry.Value);
-            }
-
+            GenUtils.CopyJsonFieldsAndProperties(this.TabConfig, save.TabConfig);
             return save;
         }
 
         public void LoadSave(IOGenTabSave save)
         {
-            this.GridHandler.DataGridView.SuspendLayout();
-
             this.TabPage.Text = save.Name;
 
-            this.jsScript = save.JSScript;
-            GenerationUtils.CopyJsonFieldsAndProperties(save.TabConfig, this.TabConfig);
-
-            this.GridHandler.DataSource.Clear();
-
-            foreach (var entry in save.IOData)
-            {
-                var rowIndex = entry.Key;
-                var data = entry.Value;
-                if (rowIndex >= 0 && rowIndex <= this.GridHandler.RowCount)
-                {
-                    this.GridHandler.DataHandler.CopyValues(data, this.GridHandler.DataSource[rowIndex]);
-                }
-            }
-
-            this.GridHandler.DataGridView.Refresh();
-            this.GridHandler.DataGridView.ResumeLayout();
+            this.GridHandler.LoadSave(save.IOGrid);
+            GenUtils.CopyJsonFieldsAndProperties(save.TabConfig, this.TabConfig);
 
             this.UpdateDuplicatedIOValues();
         }
@@ -211,6 +201,5 @@ namespace TiaUtilities.Generation.GenForms.IO.Tab
 
             this.GridHandler.DataGridView.ResumeLayout();
         }
-
     }
 }

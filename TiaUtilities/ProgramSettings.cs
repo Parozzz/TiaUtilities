@@ -1,15 +1,12 @@
 ﻿using Newtonsoft.Json;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Utility;
-using TiaXmlReader.AutoSave;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Languages;
-using TiaUtilities.Generation.GenForms.Alarm;
-using TiaUtilities.Generation.GenForms.IO;
 
 namespace TiaXmlReader
 {
-    public class ProgramSettings : ISettingsAutoSave
+    public class ProgramSettings
     {
         public const string EXTENSION = "json";
         public const string FILE_NAME = "settings/ProgramSettings." + EXTENSION;
@@ -38,7 +35,7 @@ namespace TiaXmlReader
         public static ProgramSettings Load()
         {
             var filePath = ProgramSettings.GetFilePath();
-            return GenerationUtils.Deserialize<ProgramSettings>(ref filePath, EXTENSION, showFileDialog: false) ?? new ProgramSettings();
+            return GenUtils.Deserialize<ProgramSettings>(ref filePath, EXTENSION, showFileDialog: false) ?? new ProgramSettings();
         }
 
         public bool Save()
@@ -50,7 +47,23 @@ namespace TiaXmlReader
                 fileStream.Close();
             }
 
-            return GenerationUtils.Save(this, ref filePath, EXTENSION, showFileDialog: false);
+            return GenUtils.Save(this, ref filePath, EXTENSION, showFileDialog: false);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+
+            var equals = GenUtils.CompareJsonFieldsAndProperties(this, obj, out _);
+            return equals;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
     }
 }

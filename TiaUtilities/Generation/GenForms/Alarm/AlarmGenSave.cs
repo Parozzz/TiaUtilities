@@ -12,29 +12,32 @@ using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation;
 using TiaUtilities.Generation.GenForms.Alarm;
 using TiaUtilities.Generation.GenForms.Alarm.Tab;
+using TiaUtilities.Generation.GridHandler.JSScript;
 
 namespace TiaUtilities.Generation.GenForms.Alarm
 {
-    public class AlarmGenSave : IGenerationProjectSave
+    public class AlarmGenSave : IGenProjectSave
     {
         public const string EXTENSION = "json";
+
+        [JsonProperty] public GridScriptContainer.ContainerSave ScriptContainer { get; set; } = new();
 
         [JsonProperty] public AlarmMainConfiguration AlarmMainConfig { get; set; } = new();
         [JsonProperty] public List<AlarmGenTabSave> TabSaves { get; set; } = [];
 
         public static AlarmGenSave Load(ref string? filePath)
         {
-            return GenerationUtils.Deserialize<AlarmGenSave>(ref filePath, EXTENSION) ?? new AlarmGenSave();
+            return GenUtils.Deserialize<AlarmGenSave>(ref filePath, EXTENSION) ?? new AlarmGenSave();
         }
 
         public bool Populate(ref string? filePath)
         {
-            return GenerationUtils.Populate(this, ref filePath, EXTENSION);
+            return GenUtils.Populate(this, ref filePath, EXTENSION);
         }
 
         public bool Save(ref string? filePath, bool saveAs = false)
         {
-            return GenerationUtils.Save(this, ref filePath, EXTENSION, saveAs);
+            return GenUtils.Save(this, ref filePath, EXTENSION, saveAs);
         }
 
         public override bool Equals(object? obj)

@@ -7,14 +7,15 @@ using System.Windows.Forms;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.GenerationForms;
 using System.Text.RegularExpressions;
+using TiaUtilities.Generation.GridHandler.Events;
 
 namespace TiaXmlReader.Generation.GridHandler
 {
     public static class GridUtils
     {
-        public static void DragPreview<C, T>(DragData data, GridHandler<C, T> gridHandler) where C : IGenerationConfiguration where T : IGridData<C>
+        public static void DragPreview<C, T>(GridExcelDragEventArgs eventArgs, GridHandler<C, T> gridHandler) where C : IGenerationConfiguration where T : IGridData<C>
         {
-            var startCell = data.DataGridView.Rows[data.StartingRow]?.Cells[data.DraggedColumn];
+            var startCell = gridHandler.DataGridView.Rows[eventArgs.StartingRow]?.Cells[eventArgs.DraggedColumn];
             if (!(startCell is DataGridViewTextBoxCell))
             {
                 return;
@@ -23,7 +24,7 @@ namespace TiaXmlReader.Generation.GridHandler
             var startString = startCell.Value?.ToString();
             if (Utils.SplitStringFromNumberFromRight(startString, out string before, out string numString, out string after) && int.TryParse(numString, out int num))
             {
-                var nextNum = num + (data.SelectedRowCount - 1) * (data.DraggingDown ? 1 : -1);
+                var nextNum = num + (eventArgs.SelectedRowCount - 1) * (eventArgs.DraggingDown ? 1 : -1);
 
                 var nextNumString = nextNum.ToString();
                 if (numString.Length > nextNumString.Length)
@@ -34,24 +35,24 @@ namespace TiaXmlReader.Generation.GridHandler
                         nextNumString = '0' + nextNumString;
                     }
                 }
-                data.TooltipString = before + nextNumString + after;
+                eventArgs.TooltipString = before + nextNumString + after;
             }
             else
             {
-                data.TooltipString = startString; //If it does not contains number, i simply copy the starting value!
+                eventArgs.TooltipString = startString; //If it does not contains number, i simply copy the starting value!
             }
         }
 
-        public static void DragMouseUp<C, T>(DragData data, GridHandler<C, T> gridHandler) where C : IGenerationConfiguration where T : IGridData<C>
+        public static void DragDone<C, T>(GridExcelDragEventArgs eventArgs, GridHandler<C, T> gridHandler) where C : IGenerationConfiguration where T : IGridData<C>
         {
-            var startCell = data.DataGridView.Rows[data.StartingRow]?.Cells[data.DraggedColumn];
-            if (!(startCell is DataGridViewTextBoxCell))
+            var startCell = gridHandler.DataGridView.Rows[eventArgs.StartingRow]?.Cells[eventArgs.DraggedColumn];
+            if (startCell is not DataGridViewTextBoxCell)
             {
                 return;
             }
 
-            var rowIndexEnumeration = Enumerable.Range(data.TopSelectedRow, (int)data.SelectedRowCount);
-            if (!data.DraggingDown)
+            var rowIndexEnumeration = Enumerable.Range(eventArgs.TopSelectedRow, (int)eventArgs.SelectedRowCount);
+            if (!eventArgs.DraggingDown)
             {
                 rowIndexEnumeration = rowIndexEnumeration.Reverse();
             }
@@ -64,7 +65,7 @@ namespace TiaXmlReader.Generation.GridHandler
                 var x = 0;
                 foreach (var rowIndex in rowIndexEnumeration)
                 {
-                    var nextNum = num + (x++ * (data.DraggingDown ? 1 : -1));
+                    var nextNum = num + (x++ * (eventArgs.DraggingDown ? 1 : -1));
 
                     var nextNumString = nextNum.ToString();
                     if (numString.Length > nextNumString.Length)
@@ -76,7 +77,7 @@ namespace TiaXmlReader.Generation.GridHandler
                         }
                     }
 
-                    var cellChange = new GridCellChange(data.DraggedColumn, rowIndex) { NewValue = (before + nextNumString + after) };
+                    var cellChange = new GridCellChange(eventArgs.DraggedColumn, rowIndex) { NewValue = (before + nextNumString + after) };
                     cellChangeList.Add(cellChange);
                 }
             }
@@ -84,7 +85,7 @@ namespace TiaXmlReader.Generation.GridHandler
             {
                 foreach (var rowIndex in rowIndexEnumeration)
                 {
-                    var cellChange = new GridCellChange(data.DraggedColumn, rowIndex) { NewValue = startString };
+                    var cellChange = new GridCellChange(eventArgs.DraggedColumn, rowIndex) { NewValue = startString };
                     cellChangeList.Add(cellChange);
                 }
             }

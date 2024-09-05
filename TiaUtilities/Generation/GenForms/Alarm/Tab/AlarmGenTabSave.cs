@@ -7,49 +7,40 @@ using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation;
 using Newtonsoft.Json;
 using TiaUtilities.Generation.Alarms;
+using TiaUtilities.Generation.GridHandler;
 
 namespace TiaUtilities.Generation.GenForms.Alarm.Tab
 {
-    public class AlarmGenTabSave : IGenerationProjectSave
+    public class AlarmGenTabSave : IGenProjectSave
     {
         public const string EXTENSION = "json";
 
         [JsonProperty] public string Name { get; set; } = "AlarmGenTab";
         [JsonProperty] public AlarmTabConfiguration TabConfig { get; set; } = new();
-        [JsonProperty] public Dictionary<int, AlarmData> AlarmData = [];
-        [JsonProperty] public Dictionary<int, DeviceData> DeviceData = [];
-
-        public void AddAlarmData(AlarmData alarmData, int rowIndex)
-        {
-            AlarmData.Add(rowIndex, alarmData);
-        }
-
-        public void AddDeviceData(DeviceData deviceData, int rowIndex)
-        {
-            DeviceData.Add(rowIndex, deviceData);
-        }
+        [JsonProperty] public GridSave<AlarmTabConfiguration, AlarmData> AlarmGrid { get; set; } = new();
+        [JsonProperty] public GridSave<AlarmTabConfiguration, DeviceData> DeviceGrid { get; set; } = new();
 
         public static AlarmGenSave Load(ref string? filePath)
         {
-            return GenerationUtils.Deserialize<AlarmGenSave>(ref filePath, EXTENSION) ?? new AlarmGenSave();
+            return GenUtils.Deserialize<AlarmGenSave>(ref filePath, EXTENSION) ?? new AlarmGenSave();
         }
 
         public bool Populate(ref string? filePath)
         {
-            return GenerationUtils.Populate(this, ref filePath, EXTENSION);
+            return GenUtils.Populate(this, ref filePath, EXTENSION);
         }
 
         public bool Save(ref string? filePath, bool saveAs = false)
         {
-            return GenerationUtils.Save(this, ref filePath, EXTENSION, saveAs);
+            return GenUtils.Save(this, ref filePath, EXTENSION, saveAs);
         }
 
         public override bool Equals(object? obj)
         {
             return obj is AlarmGenTabSave compare &&
                 TabConfig.Equals(compare.TabConfig) &&
-                AlarmData.SequenceEqual(compare.AlarmData) &&
-                DeviceData.SequenceEqual(compare.DeviceData);
+                AlarmGrid.Equals(compare.AlarmGrid) &&
+                DeviceGrid.Equals(compare.DeviceGrid);
         }
 
         public override int GetHashCode()

@@ -35,7 +35,7 @@ namespace TiaXmlReader
             {
                 AppDomain.CurrentDomain.FirstChanceException += (sender, args) =>
                 {
-                    if (args.Exception is Esprima.ParserException)
+                    if (args.Exception.Source == "Jint" || args.Exception.Source == "Acornima")
                     {
                         return;
                     }

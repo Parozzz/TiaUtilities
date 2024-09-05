@@ -23,6 +23,8 @@ namespace TiaUtilities.Generation.GenForms.Alarm.Controls
 
             InitializeComponent();
 
+            this.gridsTabControl.RequireConfirmationBeforeClosing = true;
+
             this.AutoSize = true; //AutoSize set here otherwise while doing the UI, everything will be shrinked to minimun (So useless)
             this.Dock = DockStyle.Fill;
 
