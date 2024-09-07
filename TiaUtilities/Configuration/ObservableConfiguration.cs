@@ -5,7 +5,7 @@ using TiaXmlReader.Utility;
 
 namespace TiaUtilities.Configuration
 {
-    public abstract class ObservableConfiguration
+    public abstract class ObservableConfiguration : ICleanable
     {
         private class ConfigurationObject(ObservableConfiguration configuration, string propertyName, object startValue)
         {
@@ -54,15 +54,8 @@ namespace TiaUtilities.Configuration
             this.objectChangedDict = [];
         }
 
-        public bool IsDirty(bool clear = false)
-        {
-            var t = dirty;
-            if (clear)
-            {
-                dirty = false;
-            }
-            return t;
-        }
+        public bool IsDirty() => this.dirty;
+        public void Wash() => this.dirty = false;
 
         public Action Subscribe<T>(Expression<Func<T>> property, Action<T> valueChagedAction)
         {
@@ -101,9 +94,9 @@ namespace TiaUtilities.Configuration
 
         private void PropertyChanged(string propertyName)
         {
-            if(objectChangedDict.TryGetValue(propertyName, out var actionList))
+            this.dirty = true;
+            if (objectChangedDict.TryGetValue(propertyName, out var actionList))
             {
-                this.dirty = true;
                 foreach (var action in actionList)
                 {
                     action.Invoke();

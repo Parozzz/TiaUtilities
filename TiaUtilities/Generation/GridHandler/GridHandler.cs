@@ -1,6 +1,5 @@
-﻿using InfoBox;
+﻿using TiaUtilities;
 using TiaUtilities.Generation.GridHandler;
-using TiaUtilities.Generation.GridHandler.Events;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaXmlReader.Generation.GridHandler.CustomColumns;
 using TiaXmlReader.Generation.GridHandler.Data;
@@ -11,11 +10,10 @@ using TiaXmlReader.UndoRedo;
 using TiaXmlReader.Utility;
 using TiaXmlReader.Utility.Extensions;
 using static TiaUtilities.Generation.GridHandler.GridFindForm;
-using static TiaXmlReader.Generation.GridHandler.GridExcelDragHandler;
 
 namespace TiaXmlReader.Generation.GridHandler
 {
-    public class GridHandler<C, T> where C : IGenerationConfiguration where T : IGridData<C>
+    public class GridHandler<C, T> : ICleanable where C : IGenerationConfiguration where T : IGridData<C>
     {
         private class ColumnInfo(DataGridViewColumn column, GridDataColumn dataColumn, int width)
         {
@@ -328,6 +326,9 @@ namespace TiaXmlReader.Generation.GridHandler
             init = true;
         }
 
+        public bool IsDirty() => this.dirty;
+        public void Wash() => this.dirty = false;
+
         public GridSave<C, T> CreateSave()
         {
             return new()
@@ -353,16 +354,6 @@ namespace TiaXmlReader.Generation.GridHandler
             {
                 comboBoxCell.Value = "";
             }
-        }
-
-        public bool IsDirty(bool clear = false)
-        {
-            var t = this.dirty;
-            if(clear)
-            {
-                this.dirty = false;
-            }
-            return t;
         }
 
         public DataGridViewTextBoxColumn AddTextBoxColumn(GridDataColumn dataColumn, int width)

@@ -1,15 +1,14 @@
-﻿namespace TiaUtilities.Generation.GenForms
+﻿using TiaUtilities.Configuration;
+namespace TiaUtilities.Generation.GenForms
 {
-    public interface IGenProject
+    public interface IGenProject : ICleanable
     {
 
         public void Init(GenProjectForm form);
 
-        public bool IsDirty(bool clear = false);
+        public object CreateSave();
 
-        public IGenProjectSave CreateSave();
-
-        public IGenProjectSave? LoadSave(ref string? filePath);
+        public void LoadSave(object? saveObject);
 
         public void ExportXML(string folderPath);
 

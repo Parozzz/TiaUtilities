@@ -34,7 +34,7 @@ namespace TiaUtilities.Generation.GenForms.IO.Tab
 
         public bool Save(ref string? filePath, bool saveAs = false)
         {
-            return GenUtils.Save(this, ref filePath, EXTENSION, saveAs);
+            return SavesLoader.Save(this, ref filePath, EXTENSION, saveAs);
         }
 
         public override bool Equals(object? obj)

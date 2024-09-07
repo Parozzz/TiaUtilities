@@ -1,5 +1,6 @@
 ﻿using InfoBox;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using TiaUtilities.Configuration;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Languages;
 using TiaXmlReader.Utility;
@@ -12,7 +13,7 @@ namespace TiaUtilities.Generation.GenForms
         private readonly TimedSaveHandler autoSaveHandler;
         private readonly GridSettings gridSettings;
 
-        private IGenProjectSave? oldProjectSave;
+        private object? oldSave;
         private string? lastFilePath;
 
         public GenProjectForm(IGenProject generationProject, TimedSaveHandler autoSaveHandler, GridSettings gridSettings)
@@ -32,21 +33,18 @@ namespace TiaUtilities.Generation.GenForms
             this.FormClosing += (sender, args) =>
             {
                 InformationBoxResult result = InformationBoxResult.None;
-                if (this.oldProjectSave == null)
+                if (this.oldSave == null)
                 {
                     result = InformationBox.Show("Do you want to save this project?", title: "Project not saved", buttons: InformationBoxButtons.YesNoCancel);
                 }
-                else
+                else if (this.project.IsDirty())
                 {
-                    var projectSave = this.project.CreateSave();
-                    if (Utils.AreDifferentObject(projectSave, this.oldProjectSave))
-                    {
-                        result = InformationBox.Show("Do you want to save this project?", title: "Project different from last save", buttons: InformationBoxButtons.YesNoCancel);
-                    }
+                    result = InformationBox.Show("Do you want to save this project?", title: "Project different from last save", buttons: InformationBoxButtons.YesNoCancel);
                 }
 
                 if (result == InformationBoxResult.Yes)
                 {
+                    this.project.Wash();
                     this.ProjectSave();
                 }
                 else if (result == InformationBoxResult.Cancel)
@@ -74,7 +72,7 @@ namespace TiaUtilities.Generation.GenForms
                     if (folderDialog.ShowDialog() == CommonFileDialogResult.Ok)
                     {
                         var folderName = folderDialog.FileName;
-                        if (string.IsNullOrEmpty(folderName) || !Directory.Exists(folderName)) 
+                        if (string.IsNullOrEmpty(folderName) || !Directory.Exists(folderName))
                         {
                             return;
                         }
@@ -139,7 +137,7 @@ namespace TiaUtilities.Generation.GenForms
                         return true; //Return required otherwise will write the letter.
                 }
 
-                if(this.project.ProcessCmdKey(ref msg, keyData))
+                if (this.project.ProcessCmdKey(ref msg, keyData))
                 {
                     return true;
                 }
@@ -157,23 +155,28 @@ namespace TiaUtilities.Generation.GenForms
         {
             var projectSave = this.project.CreateSave();
 
-            var saveOK = projectSave.Save(ref lastFilePath, saveAs || !File.Exists(lastFilePath));
+            var saveOK = SavesLoader.Save(projectSave, ref lastFilePath, "json", saveAs || !File.Exists(lastFilePath));
             if (!saveOK)
             {
                 return;
             }
 
+            this.project.Wash();
+
             this.Text = this.project.GetFormLocalizatedName() + ". Project File: " + lastFilePath;
-            this.oldProjectSave = projectSave;
+            this.oldSave = projectSave;
         }
 
         private void ProjectLoad()
         {
-            var projectSave = this.project.LoadSave(ref lastFilePath);
-            if (projectSave != null)
+            var saveObject = SavesLoader.LoadWithDialog(ref lastFilePath, "json");
+            if (saveObject != null)
             {
+                this.project.LoadSave(saveObject);
+                this.project.Wash();
+
                 this.Text = this.project.GetFormLocalizatedName() + ". Project File: " + lastFilePath;
-                this.oldProjectSave = projectSave;
+                this.oldSave = saveObject;
             }
         }
     }

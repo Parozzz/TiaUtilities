@@ -1,12 +1,10 @@
-﻿using InfoBox;
-using TiaUtilities.Generation.GenForms.Alarm.Controls;
+﻿using TiaUtilities.Generation.GenForms.Alarm.Controls;
 using TiaUtilities.Generation.GenForms.Alarm.Tab;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Javascript;
 using TiaXmlReader.Languages;
-using TiaUtilities.Generation.GenForms.IO;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.CustomControls;
 
@@ -73,17 +71,26 @@ namespace TiaUtilities.Generation.GenForms.Alarm
             Translate();
         }
 
-        public bool IsDirty(bool clear = false)
+        public bool IsDirty()
         {
-            var dirty = this.mainConfig.IsDirty(clear);
-            foreach(var genTab in this.genTabList)
+            var dirty = this.mainConfig.IsDirty();
+            foreach (var genTab in this.genTabList)
             {
-                dirty |= genTab.IsDirty(clear);
+                dirty |= genTab.IsDirty();
             }
             return dirty;
         }
 
-        public IGenProjectSave CreateSave()
+        public void Wash()
+        {
+            this.mainConfig.Wash();
+            foreach (var genTab in this.genTabList)
+            {
+                genTab.Wash();
+            }
+        }
+
+        public object CreateSave()
         {
             var projectSave = new AlarmGenSave()
             {
@@ -101,34 +108,34 @@ namespace TiaUtilities.Generation.GenForms.Alarm
             return projectSave;
         }
 
-        public IGenProjectSave? LoadSave(ref string? filePath)
+        public void LoadSave(object? saveObject)
         {
-            var loadedSave = AlarmGenSave.Load(ref filePath);
-            if (loadedSave != null)
+            if (saveObject is not AlarmGenSave loadedSave)
             {
-                this.scriptContainer.LoadSave(loadedSave.ScriptContainer);
-
-                GenUtils.CopyJsonFieldsAndProperties(loadedSave.AlarmMainConfig, this.mainConfig);
-
-                this.controlControlBottom.TabPages.Clear();
-                foreach (var tabSave in loadedSave.TabSaves)
-                {
-                    TabPage tabPage = new()
-                    {
-                        Text = tabSave.Name
-                    };
-                    this.controlControlBottom.TabPages.Add(tabPage);
-
-                    AlarmGenTab alarmGenTab = new(jsErrorHandlingThread, this.gridSettings, tabPage, scriptContainer);
-                    alarmGenTab.Init();
-                    alarmGenTab.LoadSave(tabSave);
-                    this.genTabList.Add(alarmGenTab);
-
-                    tabPage.Tag = alarmGenTab;
-                    tabPage.Controls.Add(alarmGenTab.TabControl);
-                }
+                return;
             }
-            return loadedSave;
+
+            this.scriptContainer.LoadSave(loadedSave.ScriptContainer);
+
+            GenUtils.CopyJsonFieldsAndProperties(loadedSave.AlarmMainConfig, this.mainConfig);
+
+            this.controlControlBottom.TabPages.Clear();
+            foreach (var tabSave in loadedSave.TabSaves)
+            {
+                TabPage tabPage = new()
+                {
+                    Text = tabSave.Name
+                };
+                this.controlControlBottom.TabPages.Add(tabPage);
+
+                AlarmGenTab alarmGenTab = new(jsErrorHandlingThread, this.gridSettings, tabPage, scriptContainer);
+                alarmGenTab.Init();
+                alarmGenTab.LoadSave(tabSave);
+                this.genTabList.Add(alarmGenTab);
+
+                tabPage.Tag = alarmGenTab;
+                tabPage.Controls.Add(alarmGenTab.TabControl);
+            }
         }
 
         public void ExportXML(string folderPath)

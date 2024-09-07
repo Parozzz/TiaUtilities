@@ -3,13 +3,16 @@ using TiaXmlReader.Generation;
 using TiaXmlReader.Utility;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Languages;
+using TiaUtilities;
 
 namespace TiaXmlReader
 {
     public class ProgramSettings
     {
-        public const string EXTENSION = "json";
-        public const string FILE_NAME = "settings/ProgramSettings." + EXTENSION;
+        static ProgramSettings()
+        {
+            SavesLoader.RegisterType(typeof(ProgramSettings), "ProgramSettings");
+        }
 
         [JsonProperty] public string lastDBDuplicationFileName = "";
 
@@ -29,25 +32,12 @@ namespace TiaXmlReader
 
         public static string GetFilePath()
         {
-            return Directory.GetCurrentDirectory() + @"/" + FILE_NAME;
+            return Directory.GetCurrentDirectory() + @"/settings/ProgramSettings.json";
         }
 
-        public static ProgramSettings Load()
+        public void Save()
         {
-            var filePath = ProgramSettings.GetFilePath();
-            return GenUtils.Deserialize<ProgramSettings>(ref filePath, EXTENSION, showFileDialog: false) ?? new ProgramSettings();
-        }
-
-        public bool Save()
-        {
-            var filePath = ProgramSettings.GetFilePath();
-            if(!File.Exists(filePath))
-            {
-                var fileStream = File.Create(filePath);
-                fileStream.Close();
-            }
-
-            return GenUtils.Save(this, ref filePath, EXTENSION, showFileDialog: false);
+            SavesLoader.Save(this, ProgramSettings.GetFilePath(), "json"); //To create file if not exist!
         }
 
         public override bool Equals(object? obj)

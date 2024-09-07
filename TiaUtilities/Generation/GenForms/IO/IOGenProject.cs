@@ -156,7 +156,7 @@ namespace TiaUtilities.Generation.GenForms.IO
             #region SUGGESTION_GRIDS_EVENTS
             this.suggestionGridHandler.DataGridView.CellToolTipTextNeeded += (sender, args) =>
             {
-                if(args.RowIndex < 0 || args.RowIndex > this.suggestionGridHandler.RowCount)
+                if (args.RowIndex < 0 || args.RowIndex > this.suggestionGridHandler.RowCount)
                 {
                     return;
                 }
@@ -216,15 +216,25 @@ namespace TiaUtilities.Generation.GenForms.IO
             };
         }
 
-        public bool IsDirty(bool clear = false)
+        public bool IsDirty()
         {
-            var dirty = this.mainConfig.IsDirty(clear);
-            dirty |= this.suggestionGridHandler.IsDirty(clear);
-            foreach(var genTab in genTabList)
+            var dirty = this.mainConfig.IsDirty();
+            dirty |= this.suggestionGridHandler.IsDirty();
+            foreach (var genTab in genTabList)
             {
-                dirty |= genTab.IsDirty(clear); 
+                dirty |= genTab.IsDirty();
             }
             return dirty;
+        }
+
+        public void Wash()
+        {
+            this.mainConfig.Wash();
+            this.suggestionGridHandler.Wash();
+            foreach (var genTab in genTabList)
+            {
+                genTab.Wash();
+            }
         }
 
         public Control? GetTopControl()
@@ -251,7 +261,7 @@ namespace TiaUtilities.Generation.GenForms.IO
             ioXmlGenerator.ExportXML(folderPath);
         }
 
-        public IGenProjectSave CreateSave()
+        public object CreateSave()
         {
             IOGenSave save = new()
             {
@@ -271,37 +281,37 @@ namespace TiaUtilities.Generation.GenForms.IO
             return save;
         }
 
-        public IGenProjectSave? LoadSave(ref string? filePath)
+        public void LoadSave(object? saveObject)
         {
-            var loadedSave = IOGenSave.Load(ref filePath);
-            if (loadedSave != null)
+            if (saveObject is not IOGenSave loadedSave)
             {
-                this.scriptContainer.LoadSave(loadedSave.ScriptContainer);
-                this.suggestionGridHandler.LoadSave(loadedSave.SuggestionGrid);
-
-                GenUtils.CopyJsonFieldsAndProperties(loadedSave.MainConfig, this.mainConfig);
-                GenUtils.CopyJsonFieldsAndProperties(loadedSave.ExcelImportConfiguration, this.excelImportConfig);
-
-                foreach (var tabSave in loadedSave.TabSaves)
-                {
-                    var tabPage = new TabPage()
-                    {
-                        Text = "IOGen"
-                    };
-                    this.tabControlBottom.gridsTabControl.TabPages.Add(tabPage);
-
-                    IOGenTab ioGenTab = new(this, tabPage, this.mainConfig, this.jsErrorHandlingThread, this.gridSettings, this.scriptContainer);
-                    ioGenTab.Init();
-                    ioGenTab.LoadSave(tabSave);
-                    this.genTabList.Add(ioGenTab);
-
-                    tabPage.Tag = ioGenTab;
-                    tabPage.Controls.Add(ioGenTab.TabControl);
-                }
-
-                this.UpdateSuggestionColors();
+                return;
             }
-            return loadedSave;
+
+            this.scriptContainer.LoadSave(loadedSave.ScriptContainer);
+            this.suggestionGridHandler.LoadSave(loadedSave.SuggestionGrid);
+
+            GenUtils.CopyJsonFieldsAndProperties(loadedSave.MainConfig, this.mainConfig);
+            GenUtils.CopyJsonFieldsAndProperties(loadedSave.ExcelImportConfiguration, this.excelImportConfig);
+
+            foreach (var tabSave in loadedSave.TabSaves)
+            {
+                var tabPage = new TabPage()
+                {
+                    Text = "IOGen"
+                };
+                this.tabControlBottom.gridsTabControl.TabPages.Add(tabPage);
+
+                IOGenTab ioGenTab = new(this, tabPage, this.mainConfig, this.jsErrorHandlingThread, this.gridSettings, this.scriptContainer);
+                ioGenTab.Init();
+                ioGenTab.LoadSave(tabSave);
+                this.genTabList.Add(ioGenTab);
+
+                tabPage.Tag = ioGenTab;
+                tabPage.Controls.Add(ioGenTab.TabControl);
+            }
+
+            this.UpdateSuggestionColors();
         }
 
         public bool ProcessCmdKey(ref Message msg, Keys keyData)

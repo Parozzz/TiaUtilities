@@ -28,7 +28,7 @@ namespace TiaXmlReader.Generation
                 filePath += "." + extension;
             }
         }
-
+        /*
         public static bool Save(object obj, ref string? filePath, string extension, bool showFileDialog = false)
         {
             try
@@ -84,7 +84,7 @@ namespace TiaXmlReader.Generation
 
             return false;
         }
-
+        */
         private static bool LoadSetup(out JsonSerializer? serializer, ref string? filePath, string extension, bool showFileDialog = true)
         {
             serializer = null;

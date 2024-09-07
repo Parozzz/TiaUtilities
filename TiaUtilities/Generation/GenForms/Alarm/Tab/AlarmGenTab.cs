@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TiaUtilities.Generation.Alarms;
+﻿using TiaUtilities.Generation.Alarms;
 using TiaUtilities.Generation.GenForms.Alarm.Controls;
-using TiaUtilities.Generation.GenForms.IO.Tab;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.Alarms;
@@ -14,7 +8,7 @@ using TiaXmlReader.Javascript;
 
 namespace TiaUtilities.Generation.GenForms.Alarm.Tab
 {
-    public class AlarmGenTab
+    public class AlarmGenTab : ICleanable
     {
         private static readonly string[] TIMERS_TYPES_ITEMS = ["TON", "TOF"];
 
@@ -108,12 +102,13 @@ namespace TiaUtilities.Generation.GenForms.Alarm.Tab
         {
             this.TabControl.Translate();
         }
-        public bool IsDirty(bool clear = false)
+
+        public bool IsDirty() => this.TabConfig.IsDirty() || this.deviceGridHandler.IsDirty() || this.alarmGridHandler.IsDirty();
+        public void Wash()
         {
-            var dirty = this.TabConfig.IsDirty(clear);
-            dirty |= deviceGridHandler.IsDirty(clear);
-            dirty |= alarmGridHandler.IsDirty(clear);
-            return dirty;
+            this.TabConfig.Wash();
+            this.deviceGridHandler.Wash();
+            this.alarmGridHandler.Wash();
         }
 
         public AlarmGenTabSave CreateSave()

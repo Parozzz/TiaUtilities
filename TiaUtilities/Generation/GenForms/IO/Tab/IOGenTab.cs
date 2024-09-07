@@ -8,7 +8,7 @@ using TiaXmlReader.Javascript;
 
 namespace TiaUtilities.Generation.GenForms.IO.Tab
 {
-    public class IOGenTab
+    public class IOGenTab : ICleanable
     {
         private const int MERKER_ADDRESS_COLUMN_SIZE = 80;
 
@@ -22,8 +22,6 @@ namespace TiaUtilities.Generation.GenForms.IO.Tab
 
         public IOGenTabControl TabControl { get; init; }
         public IOTabConfiguration TabConfig { get; init; }
-
-        private string jsScript = "";
 
         public IOGenTab(IOGenProject ioGenProject, TabPage tabPage, IOMainConfiguration mainConfig, JavascriptErrorReportThread jsErrorHandlingThread, 
             GridSettings gridSettings, GridScriptContainer scriptContainer)
@@ -105,11 +103,11 @@ namespace TiaUtilities.Generation.GenForms.IO.Tab
             #endregion
         }
 
-        public bool IsDirty(bool clear = false)
+        public bool IsDirty() => this.TabConfig.IsDirty() || this.GridHandler.IsDirty();
+        public void Wash()
         {
-            var dirty = this.TabConfig.IsDirty(clear);
-            dirty |= this.GridHandler.IsDirty(clear);
-            return dirty;
+            this.TabConfig.Wash();
+            this.GridHandler.Wash();
         }
 
         private void UpdateMerkerColumn(IOMemoryTypeEnum memoryType)

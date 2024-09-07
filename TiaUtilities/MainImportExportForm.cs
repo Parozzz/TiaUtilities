@@ -34,7 +34,7 @@ namespace TiaXmlReader
         {
             InitializeComponent();
 
-            this.programSettings = ProgramSettings.Load();
+            this.programSettings = SavesLoader.LoadWithoutDialog(ProgramSettings.GetFilePath(), "json") is ProgramSettings loadedSave ? loadedSave : new();
             this.programSettings.Save(); //To create file if not exist!
 
             this.autoSaveHandler = new TimedSaveHandler();
@@ -72,7 +72,8 @@ namespace TiaXmlReader
                     var result = InformationBox.Show("Do you want to restart application?", "Restart to change language", buttons: InformationBoxButtons.YesNo);
                     if (result == InformationBoxResult.Yes)
                     {
-                        this.programSettings.Save(); //Without save, after restart it would restore the old (Meaning it would be useless)
+                        //Without save, after restart it would restore the old (Meaning it would be useless)
+                        this.programSettings.Save();
 
                         Application.Restart();
                         Environment.Exit(0);
@@ -96,7 +97,7 @@ namespace TiaXmlReader
                     this.autoSaveHandler.Start(time * 1000);
                     programSettings.TimedSaveTime = time;
 
-                    programSettings.Save();
+                    this.programSettings.Save(); //To create file if not exist!
                 }
             };
             this.autoSaveTimeTextBox.Text = "" + programSettings.TimedSaveTime; //Call this after so it start auto save
