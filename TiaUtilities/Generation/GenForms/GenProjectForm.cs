@@ -13,7 +13,7 @@ namespace TiaUtilities.Generation.GenForms
         private readonly TimedSaveHandler autoSaveHandler;
         private readonly GridSettings gridSettings;
 
-        private object? oldSave;
+        private bool projectLoading = false;
         private string? lastFilePath;
 
         public GenProjectForm(IGenProject generationProject, TimedSaveHandler autoSaveHandler, GridSettings gridSettings)
@@ -29,11 +29,11 @@ namespace TiaUtilities.Generation.GenForms
 
         public void Init()
         {
-            #region FORM_CLOSING_PROJECT_COMPARE
+            #region FORM_CLOSING_INFO_BOX_PROJECT_DIRTY
             this.FormClosing += (sender, args) =>
             {
                 InformationBoxResult result = InformationBoxResult.None;
-                if (this.oldSave == null)
+                if (string.IsNullOrEmpty(lastFilePath))
                 {
                     result = InformationBox.Show("Do you want to save this project?", title: "Project not saved", buttons: InformationBoxButtons.YesNoCancel);
                 }
@@ -130,7 +130,7 @@ namespace TiaUtilities.Generation.GenForms
                 switch (keyData)
                 {
                     case Keys.S | Keys.Control:
-                        this.ProjectSave();
+                        this.ProjectSave(force: true);
                         return true; //Return required otherwise will write the letter.
                     case Keys.L | Keys.Control:
                         this.ProjectLoad();
@@ -151,8 +151,19 @@ namespace TiaUtilities.Generation.GenForms
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
-        private void ProjectSave(bool saveAs = false)
+        private void ProjectSave(bool force = false, bool saveAs = false)
         {
+            if(projectLoading)
+            { //This is to avoid that autosave will save and empty file while selected file with dialog
+                return;
+            }
+
+            var isDirty = this.project.IsDirty();
+            if(!isDirty && !force && !saveAs)
+            {
+                return;
+            }
+
             var projectSave = this.project.CreateSave();
 
             var saveOK = SavesLoader.Save(projectSave, ref lastFilePath, "json", saveAs || !File.Exists(lastFilePath));
@@ -164,11 +175,12 @@ namespace TiaUtilities.Generation.GenForms
             this.project.Wash();
 
             this.Text = this.project.GetFormLocalizatedName() + ". Project File: " + lastFilePath;
-            this.oldSave = projectSave;
         }
 
         private void ProjectLoad()
         {
+            projectLoading = true;
+
             var saveObject = SavesLoader.LoadWithDialog(ref lastFilePath, "json");
             if (saveObject != null)
             {
@@ -176,8 +188,9 @@ namespace TiaUtilities.Generation.GenForms
                 this.project.Wash();
 
                 this.Text = this.project.GetFormLocalizatedName() + ". Project File: " + lastFilePath;
-                this.oldSave = saveObject;
             }
+
+            projectLoading = false;
         }
     }
 }

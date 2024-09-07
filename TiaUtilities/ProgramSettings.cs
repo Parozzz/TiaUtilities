@@ -9,11 +9,6 @@ namespace TiaXmlReader
 {
     public class ProgramSettings
     {
-        static ProgramSettings()
-        {
-            SavesLoader.RegisterType(typeof(ProgramSettings), "ProgramSettings");
-        }
-
         [JsonProperty] public string lastDBDuplicationFileName = "";
 
         [JsonProperty] public string DBDuplicationNewMemberName = "{replacement1}{replacement2}{replacement3}";

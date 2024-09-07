@@ -11,11 +11,6 @@ namespace TiaUtilities.Generation.GenForms.IO
 {
     public class IOGenSave
     {
-        static IOGenSave()
-        {
-            SavesLoader.RegisterType(typeof(IOGenSave), "IOGeneration");
-        }
-
         [JsonProperty] public IOMainConfiguration MainConfig { get; set; } = new IOMainConfiguration();
         [JsonProperty] public IOGenerationExcelImportSettings ExcelImportConfiguration { get; set; } = new();
 

@@ -1,17 +1,27 @@
 ﻿using Newtonsoft.Json;
+using TiaUtilities.Configuration;
 using TiaUtilities.Generation.Configuration.Utility;
 using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Languages;
 
 namespace TiaXmlReader.Generation.GridHandler
 {
-    public class GridSettings
+    public class GridSettings : ObservableConfiguration
     {
-        [JsonProperty] public Color DragSelectedCellBorderColor = Color.FromArgb(0x40, 0x80, 0x80);
-        [JsonProperty] public Color SingleSelectedCellBorderColor = Color.LightYellow;
-        [JsonProperty] public Color SelectedCellTriangleColor = Color.Green;
-        [JsonProperty] public Color PreviewColor = Color.MediumPurple;
-        [JsonProperty] public Font GridFont = SystemFonts.DefaultFont;
+        [JsonProperty] public Color DragSelectedCellBorderColor { get => this.GetAs<Color>(); set => this.Set(value); }
+        [JsonProperty] public Color SingleSelectedCellBorderColor { get => this.GetAs<Color>(); set => this.Set(value); }
+        [JsonProperty] public Color SelectedCellTriangleColor { get => this.GetAs<Color>(); set => this.Set(value); }
+        [JsonProperty] public Color PreviewColor { get => this.GetAs<Color>(); set => this.Set(value); }
+        [JsonProperty] public Font GridFont { get => this.GetAs<Font>(); set => this.Set(value); }
+
+        public GridSettings()
+        {
+            this.DragSelectedCellBorderColor = Color.FromArgb(0x40, 0x80, 0x80);
+            this.SingleSelectedCellBorderColor = Color.Blue;
+            this.SelectedCellTriangleColor = Color.Green;
+            this.PreviewColor = Color.MediumPurple;
+            this.GridFont = SystemFonts.DefaultFont;
+        }
 
         public void ShowConfigForm(IWin32Window owner)
         {

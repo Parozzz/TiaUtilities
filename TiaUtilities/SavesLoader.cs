@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using System.Linq;
 using TiaUtilities.Generation.GenForms.Alarm;
 using TiaUtilities.Generation.GenForms.IO;
+using TiaXmlReader;
 using TiaXmlReader.Utility;
 
 namespace TiaUtilities
@@ -21,7 +22,7 @@ namespace TiaUtilities
 
         private static readonly Dictionary<Type, string> TYPE_TO_ID_DICT = [];
         private static readonly Dictionary<string, Type> ID_TO_TYPE_DICT = [];
-        public static void RegisterType(Type type, string ID)
+        private static void RegisterType(Type type, string ID)
         {
             if (ID_TO_TYPE_DICT.ContainsKey(ID) || TYPE_TO_ID_DICT.ContainsKey(type))
             {
@@ -30,6 +31,13 @@ namespace TiaUtilities
 
             TYPE_TO_ID_DICT.Add(type, ID);
             ID_TO_TYPE_DICT.Add(ID, type);
+        }
+
+        static SavesLoader()
+        {
+            SavesLoader.RegisterType(typeof(ProgramSettings), "ProgramSettings");
+            SavesLoader.RegisterType(typeof(AlarmGenSave), "AlarmGeneration");
+            SavesLoader.RegisterType(typeof(IOGenSave), "IOGeneration");
         }
 
         public static CommonOpenFileDialog CreateFileDialog(bool ensureFileExists, string? filePath, string extension)
@@ -211,20 +219,10 @@ namespace TiaUtilities
 
             if (!ID_TO_TYPE_DICT.TryGetValue(saveFile.Type, out Type? type) || type == null)
             {
-                return default;
+                throw new InvalidOperationException("Trying to Load a Save that has not been registered");
             }
 
-            var jObject = (JObject)saveFile.Object;
-            if (type == typeof(IOGenSave))
-            {
-                return jObject.ToObject<IOGenSave>();
-            }
-            else if (type == typeof(AlarmGenSave))
-            {
-                return jObject.ToObject<AlarmGenSave>();
-            }
-
-            return default;
+            return ((JObject)saveFile.Object).ToObject(type);
         }
     }
 }

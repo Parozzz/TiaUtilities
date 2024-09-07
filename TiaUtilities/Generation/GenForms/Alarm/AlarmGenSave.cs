@@ -8,11 +8,6 @@ namespace TiaUtilities.Generation.GenForms.Alarm
 {
     public class AlarmGenSave
     {
-        static AlarmGenSave()
-        {
-            SavesLoader.RegisterType(typeof(AlarmGenSave), "AlarmGeneration");
-        }
-
         [JsonProperty] public GridScriptContainer.ContainerSave ScriptContainer { get; set; } = new();
 
         [JsonProperty] public AlarmMainConfiguration AlarmMainConfig { get; set; } = new();
