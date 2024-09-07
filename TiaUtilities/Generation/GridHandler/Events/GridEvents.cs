@@ -1,8 +1,10 @@
 ﻿using TiaUtilities.Generation.GridHandler.Events;
+using TiaXmlReader.Generation.GridHandler.Data;
+using TiaXmlReader.GenerationForms;
 
 namespace TiaXmlReader.Generation.GridHandler.Events
 {
-    public class GridEvents
+    public class GridEvents<T> where T : IGridData
     {
         public event GridCellChangeEventHandler CellChange = delegate { };
 

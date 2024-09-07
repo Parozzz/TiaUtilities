@@ -10,7 +10,7 @@ using TiaXmlReader.GenerationForms;
 
 namespace TiaUtilities.Generation.GridHandler
 {
-    public class GridSave<C, T> where C : IGenerationConfiguration where T : IGridData<C>
+    public class GridSave<T> where T : IGridData
     {
         [JsonProperty] public Dictionary<int, T> RowData { get; set; } = [];
     }

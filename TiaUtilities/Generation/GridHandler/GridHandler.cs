@@ -1,9 +1,13 @@
 ﻿using TiaUtilities;
 using TiaUtilities.Generation.GridHandler;
+using TiaUtilities.Generation.GridHandler.Data;
+using TiaUtilities.Generation.GridHandler.Events;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaXmlReader.Generation.GridHandler.CustomColumns;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.Generation.GridHandler.Events;
+using TiaXmlReader.Generation.IO;
+using TiaXmlReader.Generation.Placeholders;
 using TiaXmlReader.GenerationForms;
 using TiaXmlReader.Javascript;
 using TiaXmlReader.UndoRedo;
@@ -13,7 +17,7 @@ using static TiaUtilities.Generation.GridHandler.GridFindForm;
 
 namespace TiaXmlReader.Generation.GridHandler
 {
-    public class GridHandler<C, T> : ICleanable where C : IGenerationConfiguration where T : IGridData<C>
+    public class GridHandler<T> : ICleanable where T : IGridData
     {
         private class ColumnInfo(DataGridViewColumn column, GridDataColumn dataColumn, int width)
         {
@@ -24,20 +28,21 @@ namespace TiaXmlReader.Generation.GridHandler
         }
 
         private readonly GridSettings settings;
-        private readonly C configuration;
 
-        public GridEvents Events { get; init; }
+        public GridEvents<T> Events { get; init; }
 
         private readonly UndoRedoHandler undoRedoHandler;
-        private readonly GridExcelDragHandler excelDragHandler;
-        private readonly GridSortHandler<C, T> sortHandler;
+        private readonly GridExcelDragHandler<T> excelDragHandler;
+        private readonly GridSortHandler<T> sortHandler;
+        private readonly GridDataPreviewer<T> previewer;
+        private readonly GenPlaceholderHandler placeholderHandler;
 
         public DataGridView DataGridView { get; init; }
-        public GridDataHandler<C, T> DataHandler { get; init; }
-        public GridDataSource<C, T> DataSource { get; init; }
-        public GridScript<C, T> Script { get; init; }
-        
-        public FindData<C, T>? FindData { get; set; }
+        public GridDataHandler<T> DataHandler { get; init; }
+        public GridDataSource<T> DataSource { get; init; }
+        public GridScript<T> Script { get; init; }
+
+        public FindData<T>? FindData { get; set; }
 
         private readonly List<ColumnInfo> columnInfoList;
         private readonly List<IGridCellPainter> cellPainterList;
@@ -51,22 +56,26 @@ namespace TiaXmlReader.Generation.GridHandler
         public bool EnableRowSelectionFromRowHeaderClick { get; set; } = true;
         public bool ShowJSContextMenuTopLeft { get; set; } = true;
 
-        public GridHandler(JavascriptErrorReportThread jsErrorThread, GridSettings settings, C configuration, GridScriptContainer scriptContainer, IGridRowComparer<C, T> comparer = null)
+        public GridHandler(JavascriptErrorReportThread jsErrorThread, GridSettings settings, GridScriptContainer scriptContainer,
+                    GridDataPreviewer<T> previewer, GenPlaceholderHandler placeholderHandler, IGridRowComparer<T>? comparer = null)
         {
             this.DataGridView = new MyGrid();
 
             this.settings = settings;
-            this.configuration = configuration;
-            this.Events = new GridEvents();
+            this.Events = new();
 
-            this.undoRedoHandler = new UndoRedoHandler();
-            this.excelDragHandler = new GridExcelDragHandler(this.DataGridView, this.Events, settings);
+            this.undoRedoHandler = new();
+            this.excelDragHandler = new(this.DataGridView, this.Events, settings);
 
-            this.DataHandler = new GridDataHandler<C, T>(this.DataGridView);
-            this.DataSource = new GridDataSource<C, T>(this.DataGridView, this.DataHandler);
-            this.sortHandler = new GridSortHandler<C, T>(this, this.undoRedoHandler, comparer);
-            this.Script = new GridScript<C, T>(this, jsErrorThread, scriptContainer);
-            
+            this.DataHandler = new(this.DataGridView);
+            this.DataSource = new(this.DataGridView, this.DataHandler);
+            this.sortHandler = new(this, this.undoRedoHandler, comparer);
+
+            this.previewer = previewer;
+            this.placeholderHandler = placeholderHandler;
+
+            this.Script = new(this, jsErrorThread, scriptContainer);
+
 
             this.columnInfoList = [];
             this.cellPainterList = [];
@@ -118,7 +127,7 @@ namespace TiaXmlReader.Generation.GridHandler
             var paintHandler = new GridCellPaintHandler(this.DataGridView);
             paintHandler.AddPainter(this.sortHandler); //ORDER IS IMPORTANT!
             paintHandler.AddPainter(this.excelDragHandler);
-            paintHandler.AddPainter(new GridCellPreview<C, T>(this.DataSource, this.configuration, this.settings));
+            paintHandler.AddPainter(new GridCellPreviewCellPainter<T>(this.placeholderHandler, this.previewer, this.DataSource, this.settings));
             paintHandler.AddPainterRange(cellPainterList);
             paintHandler.Init();
             #endregion
@@ -331,7 +340,7 @@ namespace TiaXmlReader.Generation.GridHandler
         public bool IsDirty() => this.dirty;
         public void Wash() => this.dirty = false;
 
-        public GridSave<C, T> CreateSave()
+        public GridSave<T> CreateSave()
         {
             return new()
             {
@@ -339,17 +348,17 @@ namespace TiaXmlReader.Generation.GridHandler
             };
         }
 
-        public void LoadSave(GridSave<C, T> gridSave)
+        public void LoadSave(GridSave<T> gridSave)
         {
             this.DataGridView.SuspendLayout();
 
             this.DataSource.LoadSave(gridSave.RowData);
-            
+
             this.DataGridView.Refresh();
             this.DataGridView.ResumeLayout();
         }
 
-        private void DataErrorEventHandler(object sender, DataGridViewDataErrorEventArgs args)
+        private void DataErrorEventHandler(object? sender, DataGridViewDataErrorEventArgs args)
         {
             var cell = this.DataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex];
             if (cell is DataGridViewComboBoxCell comboBoxCell)
@@ -390,13 +399,13 @@ namespace TiaXmlReader.Generation.GridHandler
         public void ChangeColumnVisibility(GridDataColumn dataColumn, bool visible, bool init = false)
         {
             var columnInfo = columnInfoList.Where(i => i.DataColumn == dataColumn).FirstOrDefault();
-            if(columnInfo == null)
+            if (columnInfo == null)
             {
                 return;
             }
 
             columnInfo.Visible = visible;
-            if(init)
+            if (init)
             {
                 this.InitColumns();
             }

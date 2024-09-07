@@ -8,6 +8,8 @@ using SimaticML.Enums;
 using SimaticML.Blocks.FlagNet;
 using SimaticML.API;
 using TiaUtilities.Generation.Alarms;
+using TiaUtilities.Generation.Placeholders;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace TiaXmlReader.Generation.Alarms
 {
@@ -35,6 +37,8 @@ namespace TiaXmlReader.Generation.Alarms
                 return;
             }
 
+            AlarmGenPlaceholdersHandler placeholdersHandler = new(this.mainConfig, tabConfig);
+
             var fullAlarmList = "";
 
             var segment = new SimaticLADSegment();
@@ -50,7 +54,8 @@ namespace TiaXmlReader.Generation.Alarms
                             segment = new SimaticLADSegment();
                         }
 
-                        var placeholderHandler = new GenerationPlaceholderHandler();
+                        placeholdersHandler.Clear();
+                        placeholdersHandler.TabName = name;
 
                         var startAlarmNum = nextAlarmNum;
                         foreach (var alarmData in alarmDataList)
@@ -62,18 +67,18 @@ namespace TiaXmlReader.Generation.Alarms
 
                             var parsedAlarmData = ReplaceAlarmDataWithDefaultAndPrefix(tabConfig, alarmData);
 
-                            placeholderHandler.SetDeviceData(deviceData)
-                                .SetAlarmData(parsedAlarmData)
-                                .SetAlarmNum(nextAlarmNum++, tabConfig.AlarmNumFormat);
-                            fullAlarmList += placeholderHandler.Parse(this.mainConfig.AlarmTextInList) + '\n';
+                            placeholdersHandler.DeviceData = deviceData;
+                            placeholdersHandler.AlarmData = parsedAlarmData;
+                            placeholdersHandler.SetAlarmNum(nextAlarmNum++, tabConfig.AlarmNumFormat);
+                            fullAlarmList += placeholdersHandler.Parse(this.mainConfig.AlarmTextInList) + '\n';
 
                             if (tabConfig.GroupingType == AlarmGroupingType.ONE)
                             {
                                 segment = new SimaticLADSegment();
-                                segment.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(mainConfig.OneEachSegmentName);
+                                segment.Title[LocalizationVariables.CULTURE] = placeholdersHandler.Parse(mainConfig.OneEachSegmentName);
                             }
 
-                            FillAlarmSegment(tabConfig, segment, placeholderHandler, parsedAlarmData);
+                            FillAlarmSegment(tabConfig, segment, placeholdersHandler, parsedAlarmData);
 
                             if(tabConfig.GroupingType == AlarmGroupingType.ONE)
                             {
@@ -102,13 +107,13 @@ namespace TiaXmlReader.Generation.Alarms
 
                                 for (var x = 0; x < slippingAlarmCount; x++)
                                 {
-                                    placeholderHandler.SetAlarmNum((uint)(lastAlarmNum + x + 1), tabConfig.AlarmNumFormat);
-                                    fullAlarmList += placeholderHandler.Parse(this.mainConfig.EmptyAlarmTextInList) + '\n';
+                                    placeholdersHandler.SetAlarmNum((uint)(lastAlarmNum + x + 1), tabConfig.AlarmNumFormat);
+                                    fullAlarmList += placeholdersHandler.Parse(this.mainConfig.EmptyAlarmTextInList) + '\n';
                                 }
 
                                 if (tabConfig.GenerateEmptyAlarmAntiSlip)
                                 {
-                                    GenerateEmptyAlarms(tabConfig, lastAlarmNum + 1, slippingAlarmCount, segment); //CompileUnit only used for group division
+                                    GenerateEmptyAlarms(placeholdersHandler, tabConfig, lastAlarmNum + 1, slippingAlarmCount, segment); //CompileUnit only used for group division
                                     lastAlarmNum += slippingAlarmCount;
                                 }
                             }
@@ -116,9 +121,9 @@ namespace TiaXmlReader.Generation.Alarms
 
                         if (tabConfig.GroupingType == AlarmGroupingType.GROUP)
                         {
-                            placeholderHandler.SetStartEndAlarmNum(startAlarmNum, lastAlarmNum, tabConfig.AlarmNumFormat);
+                            placeholdersHandler.SetStartEndAlarmNum(startAlarmNum, lastAlarmNum, tabConfig.AlarmNumFormat);
 
-                            segment.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(mainConfig.GroupSegmentName);
+                            segment.Title[LocalizationVariables.CULTURE] = placeholdersHandler.Parse(mainConfig.GroupSegmentName);
                             segment.Create(this.fc);
                         }
 
@@ -144,23 +149,24 @@ namespace TiaXmlReader.Generation.Alarms
                             segment = new SimaticLADSegment();
                         }
 
-                        var placeholderHandler = new GenerationPlaceholderHandler();
+                        placeholdersHandler.Clear();
+                        placeholdersHandler.TabName = name;
 
                         var startAlarmNum = nextAlarmNum;
                         foreach (var deviceData in deviceDataList)
                         {
-                            placeholderHandler.SetDeviceData(deviceData)
-                                    .SetAlarmData(parsedAlarmData)
-                                    .SetAlarmNum(nextAlarmNum++, tabConfig.AlarmNumFormat);
-                            fullAlarmList += placeholderHandler.Parse(this.mainConfig.AlarmTextInList) + '\n';
+                            placeholdersHandler.DeviceData = deviceData;
+                            placeholdersHandler.AlarmData = parsedAlarmData;
+                            placeholdersHandler.SetAlarmNum(nextAlarmNum++, tabConfig.AlarmNumFormat);
+                            fullAlarmList += placeholdersHandler.Parse(this.mainConfig.AlarmTextInList) + '\n';
 
                             if (tabConfig.GroupingType == AlarmGroupingType.ONE)
                             {
                                 segment = new SimaticLADSegment();
-                                segment.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(mainConfig.OneEachSegmentName);
+                                segment.Title[LocalizationVariables.CULTURE] = placeholdersHandler.Parse(mainConfig.OneEachSegmentName);
                             }
 
-                            FillAlarmSegment(tabConfig, segment, placeholderHandler, parsedAlarmData);
+                            FillAlarmSegment(tabConfig, segment, placeholdersHandler, parsedAlarmData);
 
                             if (tabConfig.GroupingType == AlarmGroupingType.ONE)
                             {
@@ -188,13 +194,13 @@ namespace TiaXmlReader.Generation.Alarms
 
                                 for (var x = 0; x < slippingAlarmCount; x++)
                                 {
-                                    placeholderHandler.SetAlarmNum((uint)(lastAlarmNum + x + 1), tabConfig.AlarmNumFormat);
-                                    fullAlarmList += placeholderHandler.Parse(this.mainConfig.EmptyAlarmTextInList) + '\n';
+                                    placeholdersHandler.SetAlarmNum((uint)(lastAlarmNum + x + 1), tabConfig.AlarmNumFormat);
+                                    fullAlarmList += placeholdersHandler.Parse(this.mainConfig.EmptyAlarmTextInList) + '\n';
                                 }
 
                                 if (tabConfig.GenerateEmptyAlarmAntiSlip)
                                 {
-                                    GenerateEmptyAlarms(tabConfig, lastAlarmNum + 1, slippingAlarmCount, segment); //CompileUnit only used for group division
+                                    GenerateEmptyAlarms(placeholdersHandler, tabConfig, lastAlarmNum + 1, slippingAlarmCount, segment); //CompileUnit only used for group division
                                     lastAlarmNum += slippingAlarmCount;
                                 }
                             }
@@ -202,9 +208,9 @@ namespace TiaXmlReader.Generation.Alarms
 
                         if (tabConfig.GroupingType == AlarmGroupingType.GROUP)
                         {
-                            placeholderHandler.SetStartEndAlarmNum(startAlarmNum, lastAlarmNum, tabConfig.AlarmNumFormat);
+                            placeholdersHandler.SetStartEndAlarmNum(startAlarmNum, lastAlarmNum, tabConfig.AlarmNumFormat);
 
-                            segment.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(mainConfig.GroupSegmentName);
+                            segment.Title[LocalizationVariables.CULTURE] = placeholdersHandler.Parse(mainConfig.GroupSegmentName);
                             segment.Create(this.fc);
                         }
 
@@ -217,12 +223,12 @@ namespace TiaXmlReader.Generation.Alarms
                     break;
             }
 
-            GenerateEmptyAlarms(tabConfig, nextAlarmNum, tabConfig.EmptyAlarmAtEnd);
+            GenerateEmptyAlarms(placeholdersHandler, tabConfig, nextAlarmNum, tabConfig.EmptyAlarmAtEnd);
 
             alarmListDict.Add(name, fullAlarmList);
         }
 
-        private void GenerateEmptyAlarms(AlarmTabConfiguration tabConfig,  uint startAlarmNum, uint alarmCount, SimaticLADSegment? externalGroupSegment = null)
+        private void GenerateEmptyAlarms(AlarmGenPlaceholdersHandler placeholdersHandler, AlarmTabConfiguration tabConfig,  uint startAlarmNum, uint alarmCount, SimaticLADSegment? externalGroupSegment = null)
         {
             var emptyAlarmData = new AlarmData()
             {
@@ -241,36 +247,50 @@ namespace TiaXmlReader.Generation.Alarms
             SimaticLADSegment? segment = externalGroupSegment;
             if (segment == null && tabConfig.GroupingType == AlarmGroupingType.GROUP)
             {
-                var placeholderHandler = new GenerationPlaceholderHandler()
-                    .SetAlarmData(emptyAlarmData)
-                    .SetStartEndAlarmNum(alarmNum, alarmNum + (alarmCount - 1), tabConfig.AlarmNumFormat);
+                placeholdersHandler.AlarmData = emptyAlarmData;
+                placeholdersHandler.SetStartEndAlarmNum(alarmNum, alarmNum + (alarmCount - 1), tabConfig.AlarmNumFormat);
 
                 segment = new SimaticLADSegment();
-                segment.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(mainConfig.GroupEmptyAlarmSegmentName);
+                segment.Title[LocalizationVariables.CULTURE] = placeholdersHandler.Parse(mainConfig.GroupEmptyAlarmSegmentName);
             }
 
             for (int j = 0; j < alarmCount; j++)
             {
-                var placeholderHandler = new GenerationPlaceholderHandler().SetAlarmData(emptyAlarmData).SetAlarmNum(alarmNum++, tabConfig.AlarmNumFormat);
+                placeholdersHandler.AlarmData = emptyAlarmData;
+                placeholdersHandler.SetAlarmNum(alarmNum++, tabConfig.AlarmNumFormat);
 
                 if (tabConfig.GroupingType == AlarmGroupingType.ONE)
                 {
                     segment = new SimaticLADSegment();
-                    segment.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(mainConfig.OneEachEmptyAlarmSegmentName);
+                    segment.Title[LocalizationVariables.CULTURE] = placeholdersHandler.Parse(mainConfig.OneEachEmptyAlarmSegmentName);
                 }
 
                 ArgumentNullException.ThrowIfNull(segment, nameof(segment));
-                FillAlarmSegment(tabConfig, segment, placeholderHandler, emptyAlarmData);
+                FillAlarmSegment(tabConfig, segment, placeholdersHandler, emptyAlarmData);
             }
         }
 
         private AlarmData ReplaceAlarmDataWithDefaultAndPrefix(AlarmTabConfiguration tabConfig, AlarmData alarmData)
         {
+            AlarmCoilType coil1Type = tabConfig.DefaultCoil1Type;
+            if(Enum.TryParse(alarmData.Coil1Type, out AlarmCoilType res1))
+            {
+                coil1Type = res1;
+            }
+
+            AlarmCoilType coil2Type = tabConfig.DefaultCoil2Type;
+            if(Enum.TryParse(alarmData.Coil2Type, out AlarmCoilType res2))
+            {
+                coil2Type = res2;
+            }
+
             return new AlarmData()
             {
                 AlarmVariable = tabConfig.AlarmAddressPrefix + alarmData.AlarmVariable,
                 Coil1Address = string.IsNullOrEmpty(alarmData.Coil1Address) ? tabConfig.DefaultCoil1Address : (tabConfig.CoilAddressPrefix + alarmData.Coil1Address),
+                Coil1Type = coil1Type.ToString(),
                 Coil2Address = string.IsNullOrEmpty(alarmData.Coil2Address) ? tabConfig.DefaultCoil2Address : (tabConfig.SetCoilAddressPrefix + alarmData.Coil2Address),
+                Coil2Type = coil2Type.ToString(),
                 TimerAddress = string.IsNullOrEmpty(alarmData.TimerAddress) ? tabConfig.DefaultTimerAddress : (tabConfig.TimerAddressPrefix + alarmData.TimerAddress),
                 TimerType = string.IsNullOrEmpty(alarmData.TimerType) ? tabConfig.DefaultTimerType : alarmData.TimerType,
                 TimerValue = string.IsNullOrEmpty(alarmData.TimerValue) ? tabConfig.DefaultTimerValue : alarmData.TimerValue,
@@ -280,7 +300,7 @@ namespace TiaXmlReader.Generation.Alarms
 
         }
 
-        private void FillAlarmSegment(AlarmTabConfiguration tabConfig, SimaticLADSegment segment, GenerationPlaceholderHandler placeholders, AlarmData alarmData)
+        private static void FillAlarmSegment(AlarmTabConfiguration tabConfig, SimaticLADSegment segment, GenPlaceholderHandler placeholders, AlarmData alarmData)
         {
             if (string.IsNullOrEmpty(alarmData.AlarmVariable))
             {
@@ -304,7 +324,7 @@ namespace TiaXmlReader.Generation.Alarms
             if (!string.IsNullOrEmpty(alarmData.TimerAddress)
                 && !string.IsNullOrEmpty(alarmData.TimerType)
                 && !string.IsNullOrEmpty(alarmData.TimerValue)
-                && alarmData.IsAddressValid(alarmData.TimerAddress))
+                && AlarmData.IsAddressValid(alarmData.TimerAddress))
             {
                 var partType = alarmData.TimerType.ToLower() switch
                 {
@@ -322,17 +342,31 @@ namespace TiaXmlReader.Generation.Alarms
             }
 
             SimaticPart? coil1 = null;
-            if (!string.IsNullOrEmpty(alarmData.Coil1Address) && alarmData.IsAddressValid(alarmData.Coil1Address))
+            if (!string.IsNullOrEmpty(alarmData.Coil1Address) && AlarmData.IsAddressValid(alarmData.Coil1Address))
             {
-                var coil1Variable = new SimaticGlobalVariable(placeholders.Parse(alarmData.Coil1Address));
-                coil1 = CreateCoil(tabConfig.Coil1Type, coil1Variable);
+                var coilVariable = new SimaticGlobalVariable(placeholders.Parse(alarmData.Coil1Address));
+
+                AlarmCoilType coilType = tabConfig.DefaultCoil1Type;
+                if (Enum.TryParse(alarmData.Coil1Type, ignoreCase: true, out AlarmCoilType result))
+                {
+                    coilType = result;
+                }
+
+                coil1 = CreateCoil(coilType, coilVariable);
             }
 
             SimaticPart? coil2 = null;
-            if (!string.IsNullOrEmpty(alarmData.Coil2Address) && alarmData.IsAddressValid(alarmData.Coil2Address))
+            if (!string.IsNullOrEmpty(alarmData.Coil2Address) && AlarmData.IsAddressValid(alarmData.Coil2Address))
             {
-                var coil2Variable = new SimaticGlobalVariable(placeholders.Parse(alarmData.Coil2Address));
-                coil2 = CreateCoil(tabConfig.Coil1Type, coil2Variable);
+                var coilVariable = new SimaticGlobalVariable(placeholders.Parse(alarmData.Coil2Address));
+
+                AlarmCoilType coilType = tabConfig.DefaultCoil2Type;
+                if (Enum.TryParse(alarmData.Coil2Type, ignoreCase: true, out AlarmCoilType result))
+                {
+                    coilType = result;
+                }
+
+                coil2 = CreateCoil(coilType, coilVariable);
             }
 
             var simaticPartList = new List<SimaticPart?>
@@ -384,7 +418,7 @@ namespace TiaXmlReader.Generation.Alarms
             ArgumentNullException.ThrowIfNull(fc, nameof(fc));
 
             var xmlDocument = SimaticMLAPI.CreateDocument(fc);
-            xmlDocument.Save(exportPath + "/fcExport_" + fc.AttributeList.BlockName + ".xml");
+            xmlDocument.Save(exportPath + $"/[FC]{fc.AttributeList.BlockName}.xml");
 
             foreach(var entry in alarmListDict)
             {

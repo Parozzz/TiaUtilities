@@ -5,7 +5,6 @@ using System.Xml;
 using TiaXmlReader.Generation.Configuration;
 using Jint;
 using TiaXmlReader.Javascript;
-using Timer = System.Windows.Forms.Timer;
 using TiaUtilities.Generation.Configuration.Utility;
 using InfoBox;
 using TiaXmlReader.Languages;
@@ -17,8 +16,8 @@ using SimaticML.API;
 using TiaXmlReader.Generation;
 using TiaUtilities;
 using TiaUtilities.Generation.GenModules;
-using TiaUtilities.Generation.GenModules.Alarm;
-using TiaUtilities.Generation.GenModules.IO;
+using TiaUtilities.Generation.Alarms.Module;
+using TiaUtilities.Generation.IO.Module;
 
 namespace TiaXmlReader
 {
@@ -153,14 +152,21 @@ namespace TiaXmlReader
 
         private void GenerateIOMenuItem_Click(object sender, EventArgs e)
         {
-            //new IOGenerationForm(this.jsErrorHandlingThread, this.autoSaveHandler, this.programSettings.IOSettings, this.programSettings.GridSettings).Show(this);
+            IOGenModule ioGenProject = new(jsErrorHandlingThread, programSettings.GridSettings);
+
+            GenModuleForm projectForm = new(ioGenProject, autoSaveHandler, programSettings.GridSettings)
+            {
+                Width = 1400,
+                Height = 850
+            };
+            projectForm.Show(this);
         }
 
         private void GenerateAlarmsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var alarmGenProject = new AlarmGenModule(jsErrorHandlingThread, programSettings.GridSettings);
+            AlarmGenModule alarmGenProject = new(jsErrorHandlingThread, programSettings.GridSettings);
 
-            var projectForm = new GenModuleForm(alarmGenProject, autoSaveHandler, programSettings.GridSettings)
+            GenModuleForm projectForm = new(alarmGenProject, autoSaveHandler, programSettings.GridSettings)
             {
                 Width = 1400,
                 Height = 850
@@ -327,17 +333,6 @@ namespace TiaXmlReader
             //xmlDocument.Save(Directory.GetCurrentDirectory() + "/fc.xml");
         }
 
-        private void testProjectMenuItem_Click(object sender, EventArgs e)
-        {
-            var ioGenProject = new IOGenModule(jsErrorHandlingThread, programSettings.GridSettings);
-
-            var projectForm = new GenModuleForm(ioGenProject, autoSaveHandler, programSettings.GridSettings)
-            {
-                Width = 1400,
-                Height = 850
-            };
-            projectForm.Show(this);
-        }
     }
 }
 

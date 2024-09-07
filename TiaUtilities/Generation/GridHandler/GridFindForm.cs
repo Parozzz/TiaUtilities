@@ -10,7 +10,7 @@ namespace TiaUtilities.Generation.GridHandler
 {
     public partial class GridFindForm : Form
     {
-        public class FindData<C, T>(T data, GridDataColumn column, int row, string findText) where C : IGenerationConfiguration where T : IGridData<C>
+        public class FindData<T>(T data, GridDataColumn column, int row, string findText) where T : IGridData
         {
             public T Data { get; init; } = data;
             public GridDataColumn Column { get; init; } = column;
@@ -18,7 +18,7 @@ namespace TiaUtilities.Generation.GridHandler
             public string FindText { get; init; } = findText;
         }
 
-        public static void StartFind<C, T>(GridHandler<C, T> gridHandler) where C : IGenerationConfiguration where T : IGridData<C>
+        public static void StartFind<T>(GridHandler<T> gridHandler) where T : IGridData
         {
             var form = gridHandler.DataGridView.FindForm();
             if (form == null)
@@ -91,7 +91,7 @@ namespace TiaUtilities.Generation.GridHandler
         }
 
 
-        private static GridCellChange? CreateReplaceCellChange<C, T>(FindData<C, T>? findData, string replaceText) where C : IGenerationConfiguration where T : IGridData<C>
+        private static GridCellChange? CreateReplaceCellChange<T>(FindData<T>? findData, string replaceText) where T : IGridData
         {
             if (findData == null)
             {
@@ -108,7 +108,7 @@ namespace TiaUtilities.Generation.GridHandler
             return new GridCellChange(findData.Column.ColumnIndex, findData.Row) { NewValue = replacedText };
         }
 
-        private static bool TryFindText<C, T>(GridHandler<C, T> gridHandler, GridFindForm findForm, bool showFoundCell = true, bool showInfoAndClearOnFail = true) where C : IGenerationConfiguration where T : IGridData<C>
+        private static bool TryFindText<T>(GridHandler<T> gridHandler, GridFindForm findForm, bool showFoundCell = true, bool showInfoAndClearOnFail = true) where T : IGridData
         {
             var matchCase = findForm.MatchCaseCheckBox.Checked;
             var findText = findForm.FindTextBox.Text;
@@ -155,7 +155,7 @@ namespace TiaUtilities.Generation.GridHandler
                             }
                         }
 
-                        gridHandler.FindData = new FindData<C, T>(data, column, row, findText);
+                        gridHandler.FindData = new FindData<T>(data, column, row, findText);
                         found = true;
 
                         if (showFoundCell)

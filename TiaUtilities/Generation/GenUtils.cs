@@ -9,6 +9,7 @@ namespace TiaXmlReader.Generation
 {
     public static class GenUtils
     {
+        public static readonly List<string?> DATA_INVALID_CHARS = ["\\", "/", "-", "_", ".", ","];
         public static CommonOpenFileDialog CreateFileDialog(bool ensureFileExists, string? filePath, string extension)
         {
             return new CommonOpenFileDialog

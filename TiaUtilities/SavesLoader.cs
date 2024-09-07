@@ -7,8 +7,8 @@ using Newtonsoft.Json.Linq;
 using System.Linq;
 using TiaXmlReader;
 using TiaXmlReader.Utility;
-using TiaUtilities.Generation.GenModules.Alarm;
-using TiaUtilities.Generation.GenModules.IO;
+using TiaUtilities.Generation.IO.Module;
+using TiaUtilities.Generation.Alarms.Module;
 
 namespace TiaUtilities
 {

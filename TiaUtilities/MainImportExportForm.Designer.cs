@@ -189,7 +189,6 @@
             testProjectMenuItem.Name = "testProjectMenuItem";
             testProjectMenuItem.Size = new Size(167, 26);
             testProjectMenuItem.Text = "Project";
-            testProjectMenuItem.Click += testProjectMenuItem_Click;
             // 
             // languageLabel
             // 

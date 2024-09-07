@@ -15,8 +15,8 @@ namespace TiaUtilities.Generation.Alarms
         [JsonProperty] public string AlarmNumFormat { get => this.GetAs<string>(); set => this.Set(value); }
         [JsonProperty] public uint AntiSlipNumber { get => this.GetAs<uint>(); set => this.Set(value); }
         [JsonProperty] public uint SkipNumberAfterGroup { get => this.GetAs<uint>(); set => this.Set(value); }
-        [JsonProperty] public AlarmCoilType Coil1Type { get => this.GetAs<AlarmCoilType>(); set => this.Set(value); }
-        [JsonProperty] public AlarmCoilType Coil2Type { get => this.GetAs<AlarmCoilType>(); set => this.Set(value); }
+        [JsonProperty] public AlarmCoilType DefaultCoil1Type { get => this.GetAs<AlarmCoilType>(); set => this.Set(value); }
+        [JsonProperty] public AlarmCoilType DefaultCoil2Type { get => this.GetAs<AlarmCoilType>(); set => this.Set(value); }
 
         [JsonProperty] public bool GenerateEmptyAlarmAntiSlip { get => this.GetAs<bool>(); set => this.Set(value); }
         [JsonProperty] public uint EmptyAlarmAtEnd { get => this.GetAs<uint>(); set => this.Set(value); }
@@ -45,8 +45,8 @@ namespace TiaUtilities.Generation.Alarms
             AlarmNumFormat = "000.###";
             AntiSlipNumber = 0;
             SkipNumberAfterGroup = 0;
-            Coil1Type = AlarmCoilType.COIL;
-            Coil2Type = AlarmCoilType.SET;
+            DefaultCoil1Type = AlarmCoilType.COIL;
+            DefaultCoil2Type = AlarmCoilType.SET;
 
             GenerateEmptyAlarmAntiSlip = false;
             EmptyAlarmAtEnd = 0;
@@ -61,7 +61,7 @@ namespace TiaUtilities.Generation.Alarms
             DefaultTimerType = "TON";
             DefaultTimerValue = "T#0s";
 
-            AlarmAddressPrefix = "{device_address}.";
+            AlarmAddressPrefix = "{device_name}.";
             CoilAddressPrefix = "";
             SetCoilAddressPrefix = "";
             TimerAddressPrefix = "";

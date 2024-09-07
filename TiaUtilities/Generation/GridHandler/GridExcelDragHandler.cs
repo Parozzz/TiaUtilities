@@ -1,10 +1,12 @@
 ﻿using static TiaXmlReader.Generation.GridHandler.GridCellPaintHandler;
 using TiaXmlReader.Generation.GridHandler.Events;
 using TiaUtilities.Generation.GridHandler.Events;
+using TiaXmlReader.Generation.GridHandler.Data;
+using TiaXmlReader.GenerationForms;
 
 namespace TiaXmlReader.Generation.GridHandler
 {
-    public class GridExcelDragHandler(DataGridView dataGridView, GridEvents gridEvents, GridSettings settings) : IGridCellPainter
+    public class GridExcelDragHandler<T>(DataGridView dataGridView, GridEvents<T> gridEvents, GridSettings settings) : IGridCellPainter where T : IGridData
     {
         public const int TRIANGLE_SIZE = 13;
 

@@ -3,14 +3,13 @@ using TiaXmlReader.Languages;
 using SimaticML.TagTable;
 using SimaticML.Blocks;
 using SimaticML.Enums;
-using SimaticML.Blocks.FlagNet.nPart;
-using SimaticML.Blocks.FlagNet.nAccess;
 using SimaticML;
 using SimaticML.nBlockAttributeList;
 using SimaticML.Blocks.FlagNet;
 using SimaticML.API;
-using System.Net.Mail;
 using TiaUtilities.Generation.IO;
+using TiaUtilities.Generation.Placeholders;
+using TiaUtilities.Generation.GridHandler.Data;
 
 namespace TiaXmlReader.Generation.IO
 {
@@ -21,8 +20,7 @@ namespace TiaXmlReader.Generation.IO
         private readonly Dictionary<string, BlockFC> fcDict = [];
         private BlockGlobalDB? db;
 
-        private XMLTagTable? ioTagTable;
-        private readonly List<XMLTagTable> ioTagTableList = [];
+        private readonly Dictionary<string, List<XMLTagTable>> ioTagTableDict = [];
 
         private XMLTagTable? variableTagTable;
         private readonly List<XMLTagTable> variableTagTableList = [];
@@ -31,11 +29,14 @@ namespace TiaXmlReader.Generation.IO
         {
         }
 
-        public void GenerateAlias(string name, IOTabConfiguration tabConfig, List<IOData> ioDataList)
+        public void GenerateAlias(string name, GridDataPreviewer<IOData> previewer, IOTabConfiguration tabConfig, List<IOData> ioDataList)
         {
-            var fc = new BlockFC();
+            IOGenPlaceholderHandler placeholderHandler = new(previewer, this.mainConfig, tabConfig);
+            placeholderHandler.TabName = name;
+
+            BlockFC fc = new();
             fc.Init();
-            fc.AttributeList.BlockName = tabConfig.FCBlockName;
+            fc.AttributeList.BlockName = placeholderHandler.Parse(tabConfig.FCBlockName) ?? "INVALID_NAME";
             fc.AttributeList.BlockNumber = tabConfig.FCBlockNumber;
             fc.AttributeList.AutoNumber = (tabConfig.FCBlockNumber > 0);
 
@@ -48,25 +49,34 @@ namespace TiaXmlReader.Generation.IO
             var ioAddressDict = new Dictionary<string, uint>();
             var duplicatedAddressDict = new Dictionary<string, uint>();
 
+            List<XMLTagTable> ioTagTableList = new();
+            ioTagTableDict.Add(name, ioTagTableList);
+
+            XMLTagTable ioTagTable = new() { TableName = $"{placeholderHandler.Parse(mainConfig.IOTableName)}_{tagCounter}" };
+            ioTagTableList.Add(ioTagTable);
+
             SimaticLADSegment? segment = null;
 
             //Order list by ADRESS TYPE - BYTE - BIT 
             foreach (var ioData in ioDataList.OrderBy(x => ((int)x.GetAddressMemoryArea()) * Math.Pow(10, 9) + x.GetAddressByte() * Math.Pow(10, 3) + x.GetAddressBit()).ToList())
             {
                 //If name of variable is \ i will ignore everything and skip to the next
-                if (ioData.Variable == "\\" || ioData.IOName == "\\")
+                if (GenUtils.DATA_INVALID_CHARS.Contains(ioData.Variable) || GenUtils.DATA_INVALID_CHARS.Contains(ioData.IOName))
                 {
                     continue;
                 }
 
-                ioData.LoadDefaults(mainConfig, out bool ioNameDefault, out bool variableDefault, out bool merkerAddressDefault);
+                ioData.LoadDefaults(previewer, mainConfig, out bool ioNameDefault, out bool variableDefault, out bool merkerAddressDefault);
 
-                var placeholderHandler = new GenerationPlaceholderHandler().SetIOData(ioData, this.mainConfig);
+                placeholderHandler.Clear();
+                placeholderHandler.TabName = name;
+                placeholderHandler.IOData = ioData;
+
                 ioData.ParsePlaceholders(placeholderHandler);
 
-                if (ioTagTable == null || (mainConfig.IOTableSplitEvery > 0 && tagCounter % mainConfig.IOTableSplitEvery == 0))
+                if (tagCounter > 0 && mainConfig.IOTableSplitEvery > 0 && (tagCounter % mainConfig.IOTableSplitEvery == 0))
                 {
-                    ioTagTable = new XMLTagTable { TableName = mainConfig.IOTableName + "_" + tagCounter };
+                    ioTagTable = new() { TableName = $"{placeholderHandler.Parse(mainConfig.IOTableName)}_{tagCounter}" };
                     ioTagTableList.Add(ioTagTable);
                 }
                 tagCounter++;
@@ -90,8 +100,7 @@ namespace TiaXmlReader.Generation.IO
                         case IOMemoryTypeEnum.MERKER:
                             if (variableTagTable == null || (mainConfig.VariableTableSplitEvery > 0 && merkerCounter % mainConfig.VariableTableSplitEvery == 0))
                             {
-                                variableTagTable = new XMLTagTable();
-                                variableTagTable.TableName = mainConfig.VariableTableName + "_" + merkerCounter;
+                                variableTagTable = new() { TableName = mainConfig.VariableTableName + "_" + merkerCounter };
                                 variableTagTableList.Add(variableTagTable);
                             }
                             merkerCounter++;
@@ -99,7 +108,7 @@ namespace TiaXmlReader.Generation.IO
                             var merkerVariableAddress = FixDuplicateAddress(ioData.Variable, duplicatedAddressDict);
 
                             var merkerVariableTag = SimaticTagAddress.FromAddress(ioData.MerkerAddress);
-                            if(merkerVariableAddress == null)
+                            if(merkerVariableAddress == null || merkerVariableTag == null)
                             {
                                 throw new Exception("Cannot parse Merker VariableAddress for " + ioData.MerkerAddress);
                             }
@@ -200,7 +209,7 @@ namespace TiaXmlReader.Generation.IO
 
         public void ExportXML(string exportPath)
         {
-            if (string.IsNullOrEmpty(exportPath) || fcDict.Count == 0 || (this.db == null && ioTagTable == null))
+            if (string.IsNullOrEmpty(exportPath) || fcDict.Count == 0 || (this.db == null && this.ioTagTableDict.Count == 0))
             {
                 return;
             }
@@ -211,26 +220,31 @@ namespace TiaXmlReader.Generation.IO
                 var fc = entry.Value;
 
                 var xmlDocument = SimaticMLAPI.CreateDocument(fc);
-                xmlDocument.Save(exportPath + $"/Export_FC_{name}_{fc.AttributeList.BlockName}.xml");
+                xmlDocument.Save(exportPath + $"/[FC]{name}_{fc.AttributeList.BlockName}.xml");
             }
 
-
-            foreach (var ioTagTable in ioTagTableList)
+            foreach (var entry in ioTagTableDict)
             {
-                var xmlDocument = SimaticMLAPI.CreateDocument(ioTagTable);
-                xmlDocument.Save(exportPath + $"/Export_IOTagTable_{ioTagTable.TableName}.xml");
+                var name = entry.Key;
+                var ioTagTableList = entry.Value;
+
+                foreach(var ioTagTable in ioTagTableList)
+                {
+                    var xmlDocument = SimaticMLAPI.CreateDocument(ioTagTable);
+                    xmlDocument.Save(exportPath + $"/[TagTable]{name}_{ioTagTable.TableName}.xml");
+                }
             }
 
             foreach(var variableTagTable in variableTagTableList)
             {
                 var xmlDocument = SimaticMLAPI.CreateDocument(variableTagTable);
-                xmlDocument.Save(exportPath + $"/Export_AliasTagTable_{variableTagTable.TableName}.xml");
+                xmlDocument.Save(exportPath + $"/[TagTable]Alias_{variableTagTable.TableName}.xml");
             }
 
             if (db != null)
             {
                 var xmlDocument = SimaticMLAPI.CreateDocument(db);
-                xmlDocument.Save(exportPath + $"/Export_AliasDB_{db.AttributeList.BlockName}.xml");
+                xmlDocument.Save(exportPath + $"/[DB]Alias_{db.AttributeList.BlockName}.xml");
             }
         }
     }

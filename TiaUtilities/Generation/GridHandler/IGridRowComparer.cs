@@ -9,7 +9,7 @@ using TiaXmlReader.GenerationForms;
 
 namespace TiaXmlReader.Generation.GridHandler
 {
-    public interface IGridRowComparer<C, T> : IComparer<T> where C : IGenerationConfiguration where T : IGridData<C>
+    public interface IGridRowComparer<T> : IComparer<T> where T : IGridData
     {
         void SetSortOrder(SortOrder sortOrder);
 

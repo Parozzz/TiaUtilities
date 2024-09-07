@@ -14,8 +14,7 @@ using TiaXmlReader.Utility.Extensions;
 
 namespace TiaUtilities.Generation.GridHandler.JSScript
 {
-    public class GridScript<C, T>(GridHandler<C, T> gridHandler, JavascriptErrorReportThread jsErrorThread, GridScriptContainer scriptContainer)
-        where C : IGenerationConfiguration where T : IGridData<C>
+    public class GridScript<T>(GridHandler<T> gridHandler, JavascriptErrorReportThread jsErrorThread, GridScriptContainer scriptContainer) where T : IGridData
     {
         private record TabPageScriptRecord(GridScriptContainer.ScriptInfo ScriptInfo, JavascriptEditor JavascriptEditor);
 

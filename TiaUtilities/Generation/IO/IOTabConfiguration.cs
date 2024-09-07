@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using TiaUtilities.Configuration;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.IO;
+using TiaXmlReader.Generation.Placeholders;
 using TiaXmlReader.GenerationForms;
 
 namespace TiaUtilities.Generation.IO
@@ -21,7 +22,7 @@ namespace TiaUtilities.Generation.IO
 
         public IOTabConfiguration()
         {
-            FCBlockName = "fcTest_IO";
+            FCBlockName = $"fc{GenPlaceholders.Generation.TAB_NAME}";
             FCBlockNumber = 195;
 
             SegmentNameBitGrouping = "{memory_type}{byte}_{bit} - {comment}";

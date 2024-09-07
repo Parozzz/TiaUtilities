@@ -10,17 +10,17 @@ using TiaXmlReader.GenerationForms;
 
 namespace TiaXmlReader.Generation.GridHandler
 {
-    public class GridDataSource<C, T> where C : IGenerationConfiguration where T : IGridData<C>
+    public class GridDataSource<T> where T : IGridData
     {
         private readonly DataGridView dataGridView;
-        private readonly GridDataHandler<C, T> dataHandler;
+        private readonly GridDataHandler<T> dataHandler;
 
         private readonly List<T> dataList;
         private readonly BindingList<T> bindingList;
 
         public int Count { get => dataList.Count; }
 
-        public GridDataSource(DataGridView dataGridView, GridDataHandler<C, T> dataHandler)
+        public GridDataSource(DataGridView dataGridView, GridDataHandler<T> dataHandler)
         {
             this.dataGridView = dataGridView;
             this.dataHandler = dataHandler;

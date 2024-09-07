@@ -6,12 +6,11 @@ using TiaXmlReader.Languages;
 
 namespace TiaXmlReader.Generation.Alarms
 {
-    public class DeviceData : IGridData<AlarmTabConfiguration>
+    public class DeviceData : IGridData
     {
         private readonly static int COLUMN_COUNT = 0;
         //THESE IS THE ORDER IN WHICH THEY APPEAR!
         public static readonly GridDataColumn NAME;
-        public static readonly GridDataColumn ADDRESS;
         public static readonly GridDataColumn DESCRIPTION;
         public static readonly IReadOnlyList<GridDataColumn> COLUMN_LIST;
 
@@ -19,7 +18,6 @@ namespace TiaXmlReader.Generation.Alarms
         {
             var type = typeof(DeviceData);
             NAME = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(DeviceData.Name));
-            ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(DeviceData.Address));
             DESCRIPTION = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(DeviceData.Description));
 
             var columnList = GridDataColumn.GetStaticColumnList(type);
@@ -27,9 +25,8 @@ namespace TiaXmlReader.Generation.Alarms
             COLUMN_LIST = columnList.AsReadOnly();
         }
 
-        [JsonProperty][Localization("DEVICE_DATA_NAME", append: " > " + GenerationPlaceholders.Alarms.DEVICE_NAME)] public string? Name { get; set; }
-        [JsonProperty][Localization("DEVICE_DATA_ADDRESS", append: " > " + GenerationPlaceholders.Alarms.DEVICE_ADDRESS)] public string? Address { get; set; }
-        [JsonProperty][Localization("DEVICE_DATA_DESCRIPTION", append: " > " + GenerationPlaceholders.Alarms.DEVICE_DESCRIPTION)] public string? Description { get; set; }
+        [JsonProperty][Localization("DEVICE_DATA_NAME", append: " > " + GenPlaceholders.Alarms.DEVICE_NAME)] public string? Name { get; set; }
+        [JsonProperty][Localization("DEVICE_DATA_DESCRIPTION", append: " > " + GenPlaceholders.Alarms.DEVICE_DESCRIPTION)] public string? Description { get; set; }
         public object? this[int column]
         {
             get
@@ -53,24 +50,14 @@ namespace TiaXmlReader.Generation.Alarms
             return COLUMN_LIST[column];
         }
 
-        public GridDataPreview? GetPreview(GridDataColumn column, AlarmTabConfiguration config)
-        {
-            return this.GetPreview(column.ColumnIndex, config);
-        }
-
-        public GridDataPreview? GetPreview(int column, AlarmTabConfiguration config)
-        {
-            return null;
-        }
-
         public void Clear()
         {
-            this.Address = this.Description = "";
+            this.Name = this.Description = null;
         }
 
         public bool IsEmpty()
         {
-            return string.IsNullOrEmpty(this.Address) && string.IsNullOrEmpty(this.Description);
+            return string.IsNullOrEmpty(this.Name) && string.IsNullOrEmpty(this.Description);
         }
 
         public override bool Equals(object? obj)

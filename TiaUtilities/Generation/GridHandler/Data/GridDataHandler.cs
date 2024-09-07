@@ -1,18 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using TiaXmlReader.Utility;
-using TiaXmlReader.Generation.GridHandler;
-using TiaXmlReader.Generation.GridHandler.Data;
-using TiaXmlReader.GenerationForms;
+﻿using System.Reflection;
 
 namespace TiaXmlReader.Generation.GridHandler.Data
 {
-    public class GridDataHandler<C, T> where C : IGenerationConfiguration where T : IGridData<C>
+    public class GridDataHandler<T> where T : IGridData
     {
         private readonly DataGridView dataGridView;
         public IReadOnlyList<GridDataColumn> DataColumns { get; private set; }
@@ -29,12 +19,12 @@ namespace TiaXmlReader.Generation.GridHandler.Data
             var fieldInfo = type.GetField("COLUMN_LIST", BindingFlags.Static | BindingFlags.Public);
             if(fieldInfo == null)
             {
-                throw new MissingFieldException("IGridData must have a public static List<GridDataColumn> COLUMN_LIST field for " + type.Name);
+                throw new MissingFieldException($"IGridData must have a public static List<GridDataColumn> COLUMN_LIST field for {type.Name}");
             }
 
             if(fieldInfo.FieldType != typeof(IReadOnlyList<GridDataColumn>))
             {
-                throw new MissingFieldException("IGridData must have a public static List<GridDataColumn> COLUMN_LIST field for " + type.Name);
+                throw new MissingFieldException($"IGridData must have a public static List<GridDataColumn> COLUMN_LIST field for {type.Name}");
             }
 
             return (IReadOnlyList<GridDataColumn>) fieldInfo.GetValue(null);
