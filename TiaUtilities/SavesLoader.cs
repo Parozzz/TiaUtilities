@@ -5,10 +5,10 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using System.Linq;
-using TiaUtilities.Generation.GenForms.Alarm;
-using TiaUtilities.Generation.GenForms.IO;
 using TiaXmlReader;
 using TiaXmlReader.Utility;
+using TiaUtilities.Generation.GenModules.Alarm;
+using TiaUtilities.Generation.GenModules.IO;
 
 namespace TiaUtilities
 {
@@ -51,6 +51,17 @@ namespace TiaUtilities
                 InitialDirectory = !string.IsNullOrEmpty(filePath) && File.Exists(filePath) ? Path.GetDirectoryName(filePath) : null,// : Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
             };
         }
+
+        private static JsonSerializer CreateJSONSerializer()
+        {
+            JsonSerializer serializer = new();
+            serializer.Converters.Add(new JavaScriptDateTimeConverter());
+            serializer.NullValueHandling = NullValueHandling.Ignore;
+            serializer.DefaultValueHandling = DefaultValueHandling.Ignore;
+            serializer.Formatting = Formatting.Indented;
+            return serializer;
+        }
+
         private static void FixExtesion(ref string filePath, string extension)
         {
             var filePathExtension = Path.GetExtension(filePath);
@@ -108,19 +119,9 @@ namespace TiaUtilities
                 Directory.CreateDirectory(directoryName);
                 File.Create(filePath).Close(); //This is just to throw an exception in case the path is wrong!
 
-                JsonSerializer serializer = new();
-                serializer.Converters.Add(new JavaScriptDateTimeConverter());
-                serializer.NullValueHandling = NullValueHandling.Ignore;
-                serializer.DefaultValueHandling = DefaultValueHandling.Include;
-                serializer.Formatting = Formatting.Indented;
+                SaveFile saveFile = new() { Type = typeID, Object = obj, };
 
-                SaveFile saveFile = new()
-                {
-                    Type = typeID,
-                    Object = obj,
-                };
-
-                var jObject = JObject.FromObject(saveFile, serializer);
+                var jObject = JObject.FromObject(saveFile, SavesLoader.CreateJSONSerializer());
                 File.WriteAllText(filePath, jObject.ToString());
 
                 return true;
@@ -133,10 +134,8 @@ namespace TiaUtilities
             return false;
         }
 
-        private static bool LoadSetup(out JsonSerializer? serializer, ref string? filePath, string extension, bool showFileDialog = true)
+        private static bool LoadSetup(ref string? filePath, string extension, bool showFileDialog = true)
         {
-            serializer = null;
-
             if (showFileDialog)
             {
                 var fileDialog = CreateFileDialog(true, filePath, extension);
@@ -155,12 +154,6 @@ namespace TiaUtilities
 
             FixExtesion(ref filePath, extension);
 
-            serializer = new JsonSerializer();
-            serializer.Converters.Add(new JavaScriptDateTimeConverter());
-            serializer.NullValueHandling = NullValueHandling.Ignore;
-            serializer.DefaultValueHandling = DefaultValueHandling.Include;
-            serializer.Formatting = Formatting.Indented;
-
             return true;
         }
 
@@ -168,13 +161,13 @@ namespace TiaUtilities
         {
             try
             {
-                var loadOK = LoadSetup(out JsonSerializer? serializer, ref filePath, extension, true);
-                if (!loadOK || serializer == null || string.IsNullOrEmpty(filePath))
+                var loadOK = LoadSetup(ref filePath, extension, true);
+                if (!loadOK || string.IsNullOrEmpty(filePath))
                 {
                     return default;
                 }
 
-                return Load(filePath, serializer);
+                return Load(filePath);
             }
             catch (Exception ex)
             {
@@ -190,13 +183,13 @@ namespace TiaUtilities
             {
                 var localFilePath = filePath;
 
-                var loadOK = LoadSetup(out JsonSerializer? serializer, ref localFilePath, extension, showFileDialog: false);
-                if (!loadOK || serializer == null || string.IsNullOrEmpty(filePath))
+                var loadOK = LoadSetup(ref localFilePath, extension, showFileDialog: false);
+                if (!loadOK || string.IsNullOrEmpty(filePath))
                 {
                     return default;
                 }
 
-                return Load(filePath, serializer);
+                return Load(filePath);
             }
             catch (Exception ex)
             {
@@ -206,12 +199,12 @@ namespace TiaUtilities
             return default;
         }
 
-        private static object? Load(string filePath, JsonSerializer serializer)
+        private static object? Load(string filePath)
         {
             using StreamReader sr = new(filePath);
             using JsonTextReader jReader = new(sr);
 
-            var saveFile = serializer.Deserialize<SaveFile>(jReader);
+            var saveFile = SavesLoader.CreateJSONSerializer().Deserialize<SaveFile>(jReader);
             if (saveFile == null || saveFile.Type == null || saveFile.Object == null)
             {
                 return default;

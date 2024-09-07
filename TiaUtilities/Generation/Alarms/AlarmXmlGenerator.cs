@@ -7,7 +7,6 @@ using SimaticML.Blocks.FlagNet.nAccess;
 using SimaticML.Enums;
 using SimaticML.Blocks.FlagNet;
 using SimaticML.API;
-using TiaUtilities.Generation.GenForms.Alarm.Tab;
 using TiaUtilities.Generation.Alarms;
 
 namespace TiaXmlReader.Generation.Alarms

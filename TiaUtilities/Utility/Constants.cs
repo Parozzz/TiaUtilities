@@ -9,11 +9,10 @@ namespace TiaXmlReader.Utility
 {
     public static class Constants
     {
-        public static uint VERSION = 17;
-        public static string GET_STRING_VERSION()
-        {
-            return "V" + VERSION;
-        }
+        public static uint VERSION { get; set; } = 17;
+        public static string VERSION_STRING { get => "V" + VERSION; }
+
+        public static readonly string SAVE_FILE_EXTENSION = "json";
 
         public const string SECTIONS_NAMESPACE_V17 = "http://www.siemens.com/automation/Openness/SW/Interface/v5";
         public const string FLG_NET_NAMESPACE_V17 = "http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v4";
@@ -22,18 +21,17 @@ namespace TiaXmlReader.Utility
         public const string STRUCTURED_TEXT_NAMESPACE_V17 = "http://www.siemens.com/automation/Openness/SW/NetworkSource/StructuredText/v3";
         public const string STRUCTURED_TEXT_NAMESPACE_V19 = "http://www.siemens.com/automation/Openness/SW/NetworkSource/StructuredText/v4";
 
-        public static string GET_SECTIONS_NAMESPACE()
+        public static string? GET_SECTIONS_NAMESPACE()
         {            
             if(VERSION >= 17)
             {
                 return SECTIONS_NAMESPACE_V17;
             }
-            
 
             return null;
         }
 
-        public static string GET_FLAG_NET_NAMESPACE()
+        public static string? GET_FLAG_NET_NAMESPACE()
         {
             if(VERSION >= 19)
             {

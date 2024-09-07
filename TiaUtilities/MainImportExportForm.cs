@@ -15,10 +15,10 @@ using SimaticML.Enums;
 using SimaticML.Blocks.FlagNet;
 using SimaticML.API;
 using TiaXmlReader.Generation;
-using TiaUtilities.Generation.GenForms.Alarm;
-using TiaUtilities.Generation.GenForms.IO;
-using TiaUtilities.Generation.GenForms;
 using TiaUtilities;
+using TiaUtilities.Generation.GenModules;
+using TiaUtilities.Generation.GenModules.Alarm;
+using TiaUtilities.Generation.GenModules.IO;
 
 namespace TiaXmlReader
 {
@@ -158,9 +158,9 @@ namespace TiaXmlReader
 
         private void GenerateAlarmsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var alarmGenProject = new AlarmGenProject(jsErrorHandlingThread, programSettings.GridSettings);
+            var alarmGenProject = new AlarmGenModule(jsErrorHandlingThread, programSettings.GridSettings);
 
-            var projectForm = new GenProjectForm(alarmGenProject, autoSaveHandler, programSettings.GridSettings)
+            var projectForm = new GenModuleForm(alarmGenProject, autoSaveHandler, programSettings.GridSettings)
             {
                 Width = 1400,
                 Height = 850
@@ -329,9 +329,9 @@ namespace TiaXmlReader
 
         private void testProjectMenuItem_Click(object sender, EventArgs e)
         {
-            var ioGenProject = new IOGenProject(jsErrorHandlingThread, programSettings.GridSettings);
+            var ioGenProject = new IOGenModule(jsErrorHandlingThread, programSettings.GridSettings);
 
-            var projectForm = new GenProjectForm(ioGenProject, autoSaveHandler, programSettings.GridSettings)
+            var projectForm = new GenModuleForm(ioGenProject, autoSaveHandler, programSettings.GridSettings)
             {
                 Width = 1400,
                 Height = 850

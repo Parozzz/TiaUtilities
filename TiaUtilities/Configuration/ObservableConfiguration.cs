@@ -1,11 +1,12 @@
-﻿using System.Linq.Expressions;
+﻿using System.ComponentModel;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using TiaXmlReader.Utility;
 
 namespace TiaUtilities.Configuration
 {
-    public abstract class ObservableConfiguration : ICleanable
+    public abstract class ObservableConfiguration : ICleanable, INotifyPropertyChanged
     {
         private class ConfigurationObject(ObservableConfiguration configuration, string propertyName, object startValue)
         {
@@ -27,7 +28,7 @@ namespace TiaUtilities.Configuration
 
                     if(differentObjects)
                     {
-                        configuration.PropertyChanged(this.PropertyName);
+                        configuration.ConfigurationObjectChanged(this.PropertyName);
                     }
                 }
             }
@@ -43,7 +44,9 @@ namespace TiaUtilities.Configuration
                 return t;
             }
         }
-      
+
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+
         private readonly Dictionary<string, ConfigurationObject> objectDict;
         private readonly Dictionary<string, List<Action>> objectChangedDict;
         private bool dirty;
@@ -53,6 +56,8 @@ namespace TiaUtilities.Configuration
             this.objectDict = [];
             this.objectChangedDict = [];
         }
+
+        
 
         public bool IsDirty() => this.dirty;
         public void Wash() => this.dirty = false;
@@ -92,8 +97,10 @@ namespace TiaUtilities.Configuration
             }
         }
 
-        private void PropertyChanged(string propertyName)
+        private void ConfigurationObjectChanged(string propertyName)
         {
+            PropertyChanged(this, new(propertyName));
+
             this.dirty = true;
             if (objectChangedDict.TryGetValue(propertyName, out var actionList))
             {

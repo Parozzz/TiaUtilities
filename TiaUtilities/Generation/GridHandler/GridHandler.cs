@@ -313,6 +313,8 @@ namespace TiaXmlReader.Generation.GridHandler
             };
             #endregion
 
+            this.settings.PropertyChanged += (sender, args) => this.DataGridView.Refresh();
+
             this.excelDragHandler.Init();
             this.sortHandler.Init();
 
