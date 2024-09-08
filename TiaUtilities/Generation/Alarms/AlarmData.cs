@@ -83,12 +83,15 @@ namespace TiaXmlReader.Generation.Alarms
         public void Clear()
         {
             this.Enable = false;
-            this.AlarmVariable = this.Coil1Address = this.Coil2Address = this.TimerAddress = this.TimerType = this.TimerValue = this.Description = null;
+            this.AlarmVariable = this.Coil1Address = this.Coil1Type = this.Coil2Address = this.Coil2Type =
+                    this.TimerAddress = this.TimerType = this.TimerValue = this.Description = null;
         }
 
         public bool IsEmpty()
         {
-            return string.IsNullOrEmpty(this.AlarmVariable) && string.IsNullOrEmpty(this.Coil1Address) && string.IsNullOrEmpty(this.Coil2Address) &&
+            return string.IsNullOrEmpty(this.AlarmVariable) && 
+                string.IsNullOrEmpty(this.Coil1Address) && string.IsNullOrEmpty(this.Coil1Type) && 
+                string.IsNullOrEmpty(this.Coil2Address) && string.IsNullOrEmpty(this.Coil2Type) &&
                 string.IsNullOrEmpty(this.TimerAddress) && string.IsNullOrEmpty(this.TimerType) && string.IsNullOrEmpty(this.TimerValue) &&
                 string.IsNullOrEmpty(this.Description);
         }

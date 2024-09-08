@@ -49,7 +49,7 @@ namespace TiaUtilities.Generation.GenModules.Alarm
             PlaceholdersLabel.Name = "PlaceholdersLabel";
             PlaceholdersLabel.Size = new Size(1394, 16);
             PlaceholdersLabel.TabIndex = 10;
-            PlaceholdersLabel.Text = "Placeholders: {device_name} {device_description} {alarm_num_start} {alarm_num_end} {alarm_num} {alarm_description}";
+            PlaceholdersLabel.Text = "Placeholders: {tab_name} {device_name} {device_description} {alarm_num_start} {alarm_num_end} {alarm_num} {alarm_description}";
             // 
             // mainTableLayout
             // 

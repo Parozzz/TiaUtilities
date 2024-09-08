@@ -29,8 +29,6 @@
         private void InitializeComponent()
         {
             mainTableLayout = new TableLayoutPanel();
-            mainSplitContainer = new SplitContainer();
-            gridsTabControl = new CustomControls.InteractableTabControl();
             tableLayoutPanel1 = new TableLayoutPanel();
             PlaceholdersLabel = new Label();
             configButtonPanel = new FlowLayoutPanel();
@@ -43,14 +41,16 @@
             ioTableConfigButton = new Button();
             dbConfigButton = new Button();
             variableTableConfigButton = new Button();
+            mainSplitContainer = new SplitContainer();
+            gridsTabControl = new CustomControls.InteractableTabControl();
             mainTableLayout.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)mainSplitContainer).BeginInit();
-            mainSplitContainer.Panel2.SuspendLayout();
-            mainSplitContainer.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
             configButtonPanel.SuspendLayout();
             memoryTypeTableLayout.SuspendLayout();
             groupingTypeTableLayout.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)mainSplitContainer).BeginInit();
+            mainSplitContainer.Panel2.SuspendLayout();
+            mainSplitContainer.SuspendLayout();
             SuspendLayout();
             // 
             // mainTableLayout
@@ -69,32 +69,6 @@
             mainTableLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             mainTableLayout.Size = new Size(1069, 727);
             mainTableLayout.TabIndex = 0;
-            // 
-            // mainSplitContainer
-            // 
-            mainSplitContainer.Dock = DockStyle.Fill;
-            mainSplitContainer.Location = new Point(3, 66);
-            mainSplitContainer.Name = "mainSplitContainer";
-            // 
-            // mainSplitContainer.Panel2
-            // 
-            mainSplitContainer.Panel2.Controls.Add(gridsTabControl);
-            mainSplitContainer.Size = new Size(1063, 658);
-            mainSplitContainer.SplitterDistance = 179;
-            mainSplitContainer.SplitterWidth = 20;
-            mainSplitContainer.TabIndex = 1;
-            // 
-            // gridsTabControl
-            // 
-            gridsTabControl.Dock = DockStyle.Fill;
-            gridsTabControl.DrawMode = TabDrawMode.OwnerDrawFixed;
-            gridsTabControl.Location = new Point(0, 0);
-            gridsTabControl.Name = "gridsTabControl";
-            gridsTabControl.Padding = new Point(12, 5);
-            gridsTabControl.RequireConfirmationBeforeClosing = false;
-            gridsTabControl.SelectedIndex = 0;
-            gridsTabControl.Size = new Size(864, 658);
-            gridsTabControl.TabIndex = 0;
             // 
             // tableLayoutPanel1
             // 
@@ -121,7 +95,7 @@
             PlaceholdersLabel.Name = "PlaceholdersLabel";
             PlaceholdersLabel.Size = new Size(1057, 16);
             PlaceholdersLabel.TabIndex = 10;
-            PlaceholdersLabel.Text = "Placeholders: {device_name} {device_address} {device_description} {alarm_num_start} {alarm_num_end} {alarm_num} {alarm_description}";
+            PlaceholdersLabel.Text = "Placeholders: [tab_name] {device_name} {device_address} {device_description} {alarm_num_start} {alarm_num_end} {alarm_num} {alarm_description}";
             // 
             // configButtonPanel
             // 
@@ -153,7 +127,7 @@
             memoryTypeTableLayout.Name = "memoryTypeTableLayout";
             memoryTypeTableLayout.RowCount = 1;
             memoryTypeTableLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            memoryTypeTableLayout.Size = new Size(232, 32);
+            memoryTypeTableLayout.Size = new Size(187, 32);
             memoryTypeTableLayout.TabIndex = 20;
             // 
             // memoryTypeLabel
@@ -178,7 +152,7 @@
             memoryTypeComboBox.FormattingEnabled = true;
             memoryTypeComboBox.Location = new Point(99, 3);
             memoryTypeComboBox.Name = "memoryTypeComboBox";
-            memoryTypeComboBox.Size = new Size(130, 26);
+            memoryTypeComboBox.Size = new Size(85, 26);
             memoryTypeComboBox.TabIndex = 0;
             // 
             // groupingTypeTableLayout
@@ -191,11 +165,11 @@
             groupingTypeTableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             groupingTypeTableLayout.Controls.Add(groupingTypeLabel, 0, 0);
             groupingTypeTableLayout.Controls.Add(groupingTypeComboBox, 1, 0);
-            groupingTypeTableLayout.Location = new Point(241, 3);
+            groupingTypeTableLayout.Location = new Point(196, 3);
             groupingTypeTableLayout.Name = "groupingTypeTableLayout";
             groupingTypeTableLayout.RowCount = 1;
             groupingTypeTableLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            groupingTypeTableLayout.Size = new Size(318, 32);
+            groupingTypeTableLayout.Size = new Size(288, 32);
             groupingTypeTableLayout.TabIndex = 21;
             // 
             // groupingTypeLabel
@@ -220,7 +194,7 @@
             groupingTypeComboBox.FormattingEnabled = true;
             groupingTypeComboBox.Location = new Point(135, 3);
             groupingTypeComboBox.Name = "groupingTypeComboBox";
-            groupingTypeComboBox.Size = new Size(180, 26);
+            groupingTypeComboBox.Size = new Size(150, 26);
             groupingTypeComboBox.TabIndex = 0;
             // 
             // ioTableConfigButton
@@ -229,7 +203,7 @@
             ioTableConfigButton.AutoSize = true;
             ioTableConfigButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             ioTableConfigButton.Font = new Font("Microsoft Sans Serif", 12.75F, FontStyle.Bold);
-            ioTableConfigButton.Location = new Point(565, 4);
+            ioTableConfigButton.Location = new Point(490, 4);
             ioTableConfigButton.Margin = new Padding(3, 0, 0, 0);
             ioTableConfigButton.Name = "ioTableConfigButton";
             ioTableConfigButton.Padding = new Padding(8, 0, 8, 0);
@@ -244,7 +218,7 @@
             dbConfigButton.AutoSize = true;
             dbConfigButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             dbConfigButton.Font = new Font("Microsoft Sans Serif", 12.75F, FontStyle.Bold);
-            dbConfigButton.Location = new Point(689, 4);
+            dbConfigButton.Location = new Point(614, 4);
             dbConfigButton.Margin = new Padding(3, 0, 0, 0);
             dbConfigButton.Name = "dbConfigButton";
             dbConfigButton.Padding = new Padding(8, 0, 8, 0);
@@ -259,7 +233,7 @@
             variableTableConfigButton.AutoSize = true;
             variableTableConfigButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             variableTableConfigButton.Font = new Font("Microsoft Sans Serif", 12.75F, FontStyle.Bold);
-            variableTableConfigButton.Location = new Point(827, 4);
+            variableTableConfigButton.Location = new Point(752, 4);
             variableTableConfigButton.Margin = new Padding(3, 0, 0, 0);
             variableTableConfigButton.Name = "variableTableConfigButton";
             variableTableConfigButton.Padding = new Padding(8, 0, 8, 0);
@@ -267,6 +241,32 @@
             variableTableConfigButton.TabIndex = 17;
             variableTableConfigButton.Text = "Tabella Appoggi";
             variableTableConfigButton.UseVisualStyleBackColor = true;
+            // 
+            // mainSplitContainer
+            // 
+            mainSplitContainer.Dock = DockStyle.Fill;
+            mainSplitContainer.Location = new Point(3, 66);
+            mainSplitContainer.Name = "mainSplitContainer";
+            // 
+            // mainSplitContainer.Panel2
+            // 
+            mainSplitContainer.Panel2.Controls.Add(gridsTabControl);
+            mainSplitContainer.Size = new Size(1063, 658);
+            mainSplitContainer.SplitterDistance = 179;
+            mainSplitContainer.SplitterWidth = 20;
+            mainSplitContainer.TabIndex = 1;
+            // 
+            // gridsTabControl
+            // 
+            gridsTabControl.Dock = DockStyle.Fill;
+            gridsTabControl.DrawMode = TabDrawMode.OwnerDrawFixed;
+            gridsTabControl.Location = new Point(0, 0);
+            gridsTabControl.Name = "gridsTabControl";
+            gridsTabControl.Padding = new Point(12, 5);
+            gridsTabControl.RequireConfirmationBeforeClosing = false;
+            gridsTabControl.SelectedIndex = 0;
+            gridsTabControl.Size = new Size(864, 658);
+            gridsTabControl.TabIndex = 0;
             // 
             // IOGenControl
             // 
@@ -278,9 +278,6 @@
             Size = new Size(1069, 727);
             mainTableLayout.ResumeLayout(false);
             mainTableLayout.PerformLayout();
-            mainSplitContainer.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)mainSplitContainer).EndInit();
-            mainSplitContainer.ResumeLayout(false);
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
             configButtonPanel.ResumeLayout(false);
@@ -289,6 +286,9 @@
             memoryTypeTableLayout.PerformLayout();
             groupingTypeTableLayout.ResumeLayout(false);
             groupingTypeTableLayout.PerformLayout();
+            mainSplitContainer.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)mainSplitContainer).EndInit();
+            mainSplitContainer.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }

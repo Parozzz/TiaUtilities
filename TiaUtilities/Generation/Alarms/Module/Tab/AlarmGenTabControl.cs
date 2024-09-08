@@ -84,16 +84,6 @@ namespace TiaUtilities.Generation.GenModules.Alarm.Tab
                     mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_GENERATION_SKIP")
                          .ControlText(tabConfig.SkipNumberAfterGroup)
                          .UIntChanged(v => tabConfig.SkipNumberAfterGroup = v);
-                   mainGroup.AddComboBox().LocalizedLabel("ALARM_CONFIG_COIL1_TYPE")
-                        .DisableEdit()
-                        .TranslatableEnumItems<AlarmCoilType>()
-                        .SelectedValue(tabConfig.DefaultCoil1Type)
-                        .SelectedValueChanged<AlarmCoilType>(type => tabConfig.DefaultCoil1Type = type);
-                    mainGroup.AddComboBox().LocalizedLabel("ALARM_CONFIG_COIL2_TYPE")
-                        .DisableEdit()
-                        .TranslatableEnumItems<AlarmCoilType>()
-                        .SelectedValue(tabConfig.DefaultCoil2Type)
-                        .SelectedValueChanged<AlarmCoilType>(type => tabConfig.DefaultCoil2Type = type);
 
                     mainGroup.AddSeparator().Height(15);
 
@@ -146,9 +136,22 @@ namespace TiaUtilities.Generation.GenModules.Alarm.Tab
                          .ControlText(tabConfig.DefaultCoil1Address)
                          .TextChanged(v => tabConfig.DefaultCoil1Address = v);
 
+                    mainGroup.AddComboBox().LocalizedLabel("ALARM_CONFIG_COIL1_TYPE")
+                        .DisableEdit()
+                        .TranslatableEnumItems<AlarmCoilType>()
+                        .SelectedValue(tabConfig.DefaultCoil1Type)
+                        .SelectedValueChanged<AlarmCoilType>(type => tabConfig.DefaultCoil1Type = type);
+
                     mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_DEFAULTS_SET_COIL")
                          .ControlText(tabConfig.DefaultCoil2Address)
                          .TextChanged(v => tabConfig.DefaultCoil2Address = v);
+
+                    mainGroup.AddComboBox().LocalizedLabel("ALARM_CONFIG_COIL2_TYPE")
+                        .DisableEdit()
+                        .TranslatableEnumItems<AlarmCoilType>()
+                        .SelectedValue(tabConfig.DefaultCoil2Type)
+                        .SelectedValueChanged<AlarmCoilType>(type => tabConfig.DefaultCoil2Type = type);
+
 
                     var timerGroup = mainGroup.AddGroup().ControlWidth(225).NoAdapt();
 

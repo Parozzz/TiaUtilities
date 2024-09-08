@@ -175,6 +175,7 @@ namespace TiaXmlReader.Generation.GridHandler
                     case Keys.Insert | Keys.Shift:
                     case Keys.V | Keys.Control:
                         ChangeCells(GridUtils.PasteAsExcel(this.DataGridView));
+                        this.Refresh(); //This is required since for some special column type (Like checkbox) is needed.
                         break;
                     case Keys.F | Keys.Control:
                         GridFindForm.StartFind(this);
@@ -518,7 +519,10 @@ namespace TiaXmlReader.Generation.GridHandler
                 return;
             }
 
-            this.DataGridView.SuspendLayout();
+            if (applyChanges)
+            {
+                this.DataGridView.SuspendLayout();
+            }
 
             try
             {
@@ -560,11 +564,16 @@ namespace TiaXmlReader.Generation.GridHandler
             {
                 Utils.ShowExceptionMessage(ex);
             }
+            finally
+            { //This is just in case something goes wrong and i won't leave a lock undoRedo
+                undoRedoHandler.Unlock();
+            }
 
-            this.DataGridView.Refresh();
-            this.DataGridView.ResumeLayout();
-
-            undoRedoHandler.Unlock(); //And a locked undoRedo
+            if (applyChanges)
+            {
+                this.DataGridView.Refresh();
+                this.DataGridView.ResumeLayout();
+            }
         }
 
         private void UndoChangeCells(List<GridCellChange> cellChangeList)
@@ -575,24 +584,30 @@ namespace TiaXmlReader.Generation.GridHandler
             try
             {
                 this.undoRedoHandler.Lock();
+
+                List<GridCellChange> invertedCellChangeList = [];
+
                 foreach (var cellChange in cellChangeList) //Accessing DataSource instead of changing value of cell is WAAAAY faster (From 3s to 22ms)
                 {
                     var data = this.DataSource[cellChange.RowIndex];
-                    data.GetColumn(cellChange.ColumnIndex).SetValueTo(data, cellChange.OldValue);
+                    var column = data.GetColumn(cellChange.ColumnIndex);
+
+                    var actualValue = column.GetValueFrom<object>(data);
+                    var restoreValue = cellChange.OldValue;
+
+                    column.SetValueTo(data, cellChange.OldValue);
+
+                    invertedCellChangeList.Add(new(cellChange.ColumnIndex, cellChange.RowIndex) { OldValue = actualValue, NewValue = restoreValue });
                 }
                 this.undoRedoHandler.Unlock();
 
-                var lastCellChange = cellChangeList[cellChangeList.Count - 1];
-                SelectCell(lastCellChange);  //Setting se current cell already center the grid to it.
-
-                this.Events.CellChangeEvent(this.DataGridView, new() { CellChangeList = cellChangeList, IsUndo = true });
+                SelectCell(cellChangeList[^1]);  //Setting se current cell already center the grid to it.
+                this.Events.CellChangeEvent(this.DataGridView, new() { CellChangeList = invertedCellChangeList, IsUndo = true });
 
                 undoRedoHandler.AddRedo(() =>
                 {
                     ChangeCells(cellChangeList);
-
-                    var firstCellChange = cellChangeList[0];
-                    SelectCell(firstCellChange);  //Setting se current cell already center the grid to it.
+                    SelectCell(cellChangeList[0]);  //Setting se current cell already center the grid to it.
                 });
             }
             catch (Exception ex)
@@ -602,6 +617,7 @@ namespace TiaXmlReader.Generation.GridHandler
 
             this.DataGridView.Refresh();
             this.DataGridView.ResumeLayout();
+
             undoRedoHandler.Unlock(); //And a locked undoRedo
         }
 

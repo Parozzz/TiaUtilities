@@ -28,6 +28,8 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
         public List<DeviceData> DeviceDataList { get => new(deviceGridHandler.DataSource.GetNotEmptyClonedDataDict().Keys); } //Return CLONED data, otherwise operations on the xml generation will affect the table!
         public List<AlarmData> AlarmDataList { get => new(alarmGridHandler.DataSource.GetNotEmptyClonedDataDict().Keys); } //Return CLONED data, otherwise operations on the xml generation will affect the table!
 
+        private bool dirty = false;
+
         public AlarmGenTab(JavascriptErrorReportThread jsErrorHandlingThread, GridSettings gridSettings, GridScriptContainer scriptContainer, AlarmGenModule module, AlarmMainConfiguration mainConfig, TabPage tabPage)
         {
             this.module = module;
@@ -61,9 +63,9 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
 
             alarmGridHandler.AddCheckBoxColumn(AlarmData.ENABLE, 40);
             alarmGridHandler.AddTextBoxColumn(AlarmData.ALARM_VARIABLE, 200);
-            alarmGridHandler.AddTextBoxColumn(AlarmData.COIL1_ADDRESS, 115);
+            alarmGridHandler.AddTextBoxColumn(AlarmData.COIL1_ADDRESS, 145);
             alarmGridHandler.AddComboBoxColumn(AlarmData.COIL1_TYPE, 55, ALARM_COIL_TYPE_ITEMS);
-            alarmGridHandler.AddTextBoxColumn(AlarmData.COIL2_ADDRESS, 115);
+            alarmGridHandler.AddTextBoxColumn(AlarmData.COIL2_ADDRESS, 145);
             alarmGridHandler.AddComboBoxColumn(AlarmData.COIL2_TYPE, 55, ALARM_COIL_TYPE_ITEMS);
             alarmGridHandler.AddTextBoxColumn(AlarmData.TIMER_ADDRESS, 95);
             alarmGridHandler.AddComboBoxColumn(AlarmData.TIMER_TYPE, 55, TIMERS_TYPES_ITEMS);
@@ -93,7 +95,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
                 {
                     return new() { Prefix = TabConfig.CoilAddressPrefix, DefaultValue = TabConfig.DefaultCoil1Address, Value = alarmData.Coil1Address };
                 }
-                else if (column == AlarmData.COIL1_TYPE)
+                else if (column == AlarmData.COIL1_TYPE && AlarmData.IsAddressValid(alarmData.Coil1Address))
                 {
                     return new() { DefaultValue = TabConfig.DefaultCoil1Type.ToString(), Value = alarmData.Coil1Type };
                 }
@@ -101,7 +103,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
                 {
                     return new() { Prefix = TabConfig.SetCoilAddressPrefix, DefaultValue = TabConfig.DefaultCoil2Address, Value = alarmData.Coil2Address };
                 }
-                else if (column == AlarmData.COIL2_TYPE)
+                else if (column == AlarmData.COIL2_TYPE && AlarmData.IsAddressValid(alarmData.Coil2Address))
                 {
                     return new() { DefaultValue = TabConfig.DefaultCoil2Type.ToString(), Value = alarmData.Coil2Type };
                 }
@@ -152,6 +154,10 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             };
             #endregion
 
+            #region DIRTY
+            this.TabPage.TextChanged += (sender, args) => this.dirty = true;
+            #endregion
+
             alarmGridHandler.DataGridView.AutoResizeColumnHeadersHeight();
             deviceGridHandler.DataGridView.AutoResizeColumnHeadersHeight();
 
@@ -163,9 +169,10 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             TabControl.Translate();
         }
 
-        public bool IsDirty() => TabConfig.IsDirty() || deviceGridHandler.IsDirty() || alarmGridHandler.IsDirty();
+        public bool IsDirty() => this.dirty || TabConfig.IsDirty() || deviceGridHandler.IsDirty() || alarmGridHandler.IsDirty();
         public void Wash()
         {
+            this.dirty = false;
             TabConfig.Wash();
             deviceGridHandler.Wash();
             alarmGridHandler.Wash();

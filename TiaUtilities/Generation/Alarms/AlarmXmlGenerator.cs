@@ -1,15 +1,12 @@
-﻿using TiaXmlReader.Utility;
-using TiaXmlReader.Generation.Placeholders;
+﻿using TiaXmlReader.Generation.Placeholders;
 using TiaXmlReader.Languages;
 using SimaticML.Blocks;
 using SimaticML.Blocks.FlagNet.nPart;
-using SimaticML.Blocks.FlagNet.nAccess;
 using SimaticML.Enums;
 using SimaticML.Blocks.FlagNet;
 using SimaticML.API;
 using TiaUtilities.Generation.Alarms;
 using TiaUtilities.Generation.Placeholders;
-using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace TiaXmlReader.Generation.Alarms
 {
@@ -17,27 +14,23 @@ namespace TiaXmlReader.Generation.Alarms
     public class AlarmXmlGenerator(AlarmMainConfiguration mainConfig)
     {
         private readonly AlarmMainConfiguration mainConfig = mainConfig;
-        private readonly Dictionary<string, string> alarmListDict = [];
 
-        private BlockFC? fc;
+        private readonly Dictionary<string, BlockFC> fcDict = [];
+        private readonly Dictionary<string, string> alarmListDict = [];
 
         public void Init()
         {
-            fc = new();
-            fc.Init();
-            fc.AttributeList.BlockName = mainConfig.FCBlockName;
-            fc.AttributeList.BlockNumber = mainConfig.FCBlockNumber;
-            fc.AttributeList.AutoNumber = (mainConfig.FCBlockNumber > 0);
         }
 
         public void GenerateAlarms(string name, AlarmTabConfiguration tabConfig, List<AlarmData> alarmDataList, List<DeviceData> deviceDataList)
         {
-            if(fc == null)
-            {
-                return;
-            }
-
             AlarmGenPlaceholdersHandler placeholdersHandler = new(this.mainConfig, tabConfig);
+
+            BlockFC fc = new();
+            fc.Init();
+            fc.AttributeList.BlockName = placeholdersHandler.ParseNotNull(mainConfig.FCBlockName);
+            fc.AttributeList.BlockNumber = mainConfig.FCBlockNumber;
+            fc.AttributeList.AutoNumber = (mainConfig.FCBlockNumber > 0);
 
             var fullAlarmList = "";
 
@@ -80,16 +73,16 @@ namespace TiaXmlReader.Generation.Alarms
 
                             FillAlarmSegment(tabConfig, segment, placeholdersHandler, parsedAlarmData);
 
-                            if(tabConfig.GroupingType == AlarmGroupingType.ONE)
+                            if (tabConfig.GroupingType == AlarmGroupingType.ONE)
                             {
-                                segment.Create(this.fc);
+                                segment.Create(fc);
                             }
                         }
 
                         var lastAlarmNum = nextAlarmNum - 1;
                         var alarmCount = (lastAlarmNum - startAlarmNum) + 1;
 
-                        if(tabConfig.AntiSlipNumber > 0)
+                        if (tabConfig.AntiSlipNumber > 0)
                         {
                             uint slippingAlarmCount = 0;
                             if (alarmCount < tabConfig.AntiSlipNumber)
@@ -101,7 +94,7 @@ namespace TiaXmlReader.Generation.Alarms
                                 slippingAlarmCount = tabConfig.AntiSlipNumber % alarmCount;
                             }
 
-                            if(slippingAlarmCount > 0)
+                            if (slippingAlarmCount > 0)
                             {
                                 nextAlarmNum += slippingAlarmCount;
 
@@ -124,7 +117,7 @@ namespace TiaXmlReader.Generation.Alarms
                             placeholdersHandler.SetStartEndAlarmNum(startAlarmNum, lastAlarmNum, tabConfig.AlarmNumFormat);
 
                             segment.Title[LocalizationVariables.CULTURE] = placeholdersHandler.Parse(mainConfig.GroupSegmentName);
-                            segment.Create(this.fc);
+                            segment.Create(fc);
                         }
 
                         nextAlarmNum += tabConfig.SkipNumberAfterGroup;
@@ -170,7 +163,7 @@ namespace TiaXmlReader.Generation.Alarms
 
                             if (tabConfig.GroupingType == AlarmGroupingType.ONE)
                             {
-                                segment.Create(this.fc);
+                                segment.Create(fc);
                             }
                         }
 
@@ -211,7 +204,7 @@ namespace TiaXmlReader.Generation.Alarms
                             placeholdersHandler.SetStartEndAlarmNum(startAlarmNum, lastAlarmNum, tabConfig.AlarmNumFormat);
 
                             segment.Title[LocalizationVariables.CULTURE] = placeholdersHandler.Parse(mainConfig.GroupSegmentName);
-                            segment.Create(this.fc);
+                            segment.Create(fc);
                         }
 
                         nextAlarmNum += tabConfig.SkipNumberAfterGroup;
@@ -225,16 +218,19 @@ namespace TiaXmlReader.Generation.Alarms
 
             GenerateEmptyAlarms(placeholdersHandler, tabConfig, nextAlarmNum, tabConfig.EmptyAlarmAtEnd);
 
+            fcDict.Add(name, fc);
             alarmListDict.Add(name, fullAlarmList);
         }
 
-        private void GenerateEmptyAlarms(AlarmGenPlaceholdersHandler placeholdersHandler, AlarmTabConfiguration tabConfig,  uint startAlarmNum, uint alarmCount, SimaticLADSegment? externalGroupSegment = null)
+        private void GenerateEmptyAlarms(AlarmGenPlaceholdersHandler placeholdersHandler, AlarmTabConfiguration tabConfig, uint startAlarmNum, uint alarmCount, SimaticLADSegment? externalGroupSegment = null)
         {
             var emptyAlarmData = new AlarmData()
             {
                 AlarmVariable = tabConfig.EmptyAlarmContactAddress,
                 Coil1Address = tabConfig.DefaultCoil1Address,
+                Coil1Type = tabConfig.DefaultCoil1Type.ToString(),
                 Coil2Address = tabConfig.DefaultCoil2Address,
+                Coil2Type = tabConfig.DefaultCoil2Type.ToString(),
                 TimerAddress = tabConfig.EmptyAlarmTimerAddress,
                 TimerType = tabConfig.EmptyAlarmTimerType,
                 TimerValue = tabConfig.EmptyAlarmTimerValue,
@@ -270,16 +266,16 @@ namespace TiaXmlReader.Generation.Alarms
             }
         }
 
-        private AlarmData ReplaceAlarmDataWithDefaultAndPrefix(AlarmTabConfiguration tabConfig, AlarmData alarmData)
+        private static AlarmData ReplaceAlarmDataWithDefaultAndPrefix(AlarmTabConfiguration tabConfig, AlarmData alarmData)
         {
             AlarmCoilType coil1Type = tabConfig.DefaultCoil1Type;
-            if(Enum.TryParse(alarmData.Coil1Type, out AlarmCoilType res1))
+            if (Enum.TryParse(alarmData.Coil1Type, out AlarmCoilType res1))
             {
                 coil1Type = res1;
             }
 
             AlarmCoilType coil2Type = tabConfig.DefaultCoil2Type;
-            if(Enum.TryParse(alarmData.Coil2Type, out AlarmCoilType res2))
+            if (Enum.TryParse(alarmData.Coil2Type, out AlarmCoilType res2))
             {
                 coil2Type = res2;
             }
@@ -380,7 +376,7 @@ namespace TiaXmlReader.Generation.Alarms
             SimaticPart? lastPart = null;
             foreach (var simaticPart in simaticPartList)
             {
-                if(simaticPart == null)
+                if (simaticPart == null)
                 {
                     continue;
                 }
@@ -396,7 +392,7 @@ namespace TiaXmlReader.Generation.Alarms
                 lastPart = simaticPart;
             }
         }
-        
+
         private static SimaticPart? CreateCoil(AlarmCoilType coilType, SimaticVariable simaticVariable)
         {
             return coilType switch
@@ -415,12 +411,16 @@ namespace TiaXmlReader.Generation.Alarms
                 return;
             }
 
-            ArgumentNullException.ThrowIfNull(fc, nameof(fc));
+            foreach (var entry in fcDict)
+            {
+                var name = entry.Key;
+                var fc = entry.Value;
 
-            var xmlDocument = SimaticMLAPI.CreateDocument(fc);
-            xmlDocument.Save(exportPath + $"/[FC]{fc.AttributeList.BlockName}.xml");
+                var xmlDocument = SimaticMLAPI.CreateDocument(fc);
+                xmlDocument.Save(exportPath + $"/[FC]{name}_{fc.AttributeList.BlockName}.xml");
+            }
 
-            foreach(var entry in alarmListDict)
+            foreach (var entry in alarmListDict)
             {
                 var alarmTextPath = exportPath + $"/Texts_{entry.Key.Replace("\\", "_").Replace("/", "_")}.txt";
 

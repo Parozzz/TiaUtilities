@@ -14,6 +14,7 @@ namespace TiaXmlReader.Generation.IO
         private readonly static int COLUMN_COUNT = 0;
         //THESE IS THE ORDER IN WHICH THEY APPEAR!
         public static readonly GridDataColumn ADDRESS;
+        public static readonly GridDataColumn NEGATED;
         public static readonly GridDataColumn IO_NAME;
         public static readonly GridDataColumn VARIABLE;
         public static readonly GridDataColumn MERKER_ADDRESS;
@@ -24,6 +25,7 @@ namespace TiaXmlReader.Generation.IO
         {
             var type = typeof(IOData);
             ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.Address));
+            NEGATED = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.Negated));
             IO_NAME = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.IOName), "ioName");
             VARIABLE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.Variable));
             MERKER_ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOData.MerkerAddress), "merkerAddress");
@@ -35,6 +37,7 @@ namespace TiaXmlReader.Generation.IO
         }
 
         [JsonProperty][Localization("IO_DATA_ADDRESS")] public string? Address { get; set; }
+        [JsonProperty] public bool Negated { get; set; }
         [JsonProperty][Localization("IO_DATA_IO_NAME", append: " > " + GenPlaceholders.IO.IONAME)] public string? IOName { get; set; }
         [JsonProperty][Localization("IO_DATA_VARIABLE", append: " > " + GenPlaceholders.IO.VARIABLE)] public string? Variable { get; set; }
         [JsonProperty][Localization("IO_DATA_MERKER_ADDRESS")] public string? MerkerAddress { get; set; }
@@ -109,6 +112,7 @@ namespace TiaXmlReader.Generation.IO
 
         public void Clear()
         {
+            this.Negated = false;
             this.Address = this.IOName = this.Variable = this.Comment = null;
         }
 

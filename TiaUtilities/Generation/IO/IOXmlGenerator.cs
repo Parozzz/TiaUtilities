@@ -153,10 +153,10 @@ namespace TiaXmlReader.Generation.IO
                     switch (ioData.GetAddressMemoryArea())
                     {
                         case SimaticMemoryArea.INPUT:
-                            FillOutSegment(segment, ioTag.TagName, inOutAddress);
+                            FillOutSegment(segment, ioTag.TagName, ioData.Negated, inOutAddress);
                             break;
                         case SimaticMemoryArea.OUTPUT:
-                            FillOutSegment(segment, inOutAddress, ioTag.TagName);
+                            FillOutSegment(segment, inOutAddress, ioData.Negated, ioTag.TagName);
                             break;
                         default:
                             throw new ArgumentException("Invalid IOData MemoryArea");
@@ -200,9 +200,9 @@ namespace TiaXmlReader.Generation.IO
             return address + (count <= 1 ? "" : $"({count})");
         }
 
-        private static void FillOutSegment(SimaticLADSegment segment, string contactAddress, string coilAddress)
+        private static void FillOutSegment(SimaticLADSegment segment, string contactAddress, bool negated, string coilAddress)
         {
-            var contact = new ContactPart() { Operand = new SimaticGlobalVariable(contactAddress) };
+            var contact = new ContactPart() { Operand = new SimaticGlobalVariable(contactAddress), Negated = negated };
             var coil = new CoilPart() { Operand = new SimaticGlobalVariable(coilAddress) };
             var _ = segment.Powerrail & contact & coil;
         }

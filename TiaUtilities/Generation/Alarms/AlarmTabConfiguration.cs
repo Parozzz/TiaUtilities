@@ -2,6 +2,7 @@
 using TiaUtilities.Configuration;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.Alarms;
+using TiaXmlReader.Generation.Placeholders;
 using TiaXmlReader.GenerationForms;
 
 namespace TiaUtilities.Generation.Alarms
@@ -15,8 +16,6 @@ namespace TiaUtilities.Generation.Alarms
         [JsonProperty] public string AlarmNumFormat { get => this.GetAs<string>(); set => this.Set(value); }
         [JsonProperty] public uint AntiSlipNumber { get => this.GetAs<uint>(); set => this.Set(value); }
         [JsonProperty] public uint SkipNumberAfterGroup { get => this.GetAs<uint>(); set => this.Set(value); }
-        [JsonProperty] public AlarmCoilType DefaultCoil1Type { get => this.GetAs<AlarmCoilType>(); set => this.Set(value); }
-        [JsonProperty] public AlarmCoilType DefaultCoil2Type { get => this.GetAs<AlarmCoilType>(); set => this.Set(value); }
 
         [JsonProperty] public bool GenerateEmptyAlarmAntiSlip { get => this.GetAs<bool>(); set => this.Set(value); }
         [JsonProperty] public uint EmptyAlarmAtEnd { get => this.GetAs<uint>(); set => this.Set(value); }
@@ -26,7 +25,9 @@ namespace TiaUtilities.Generation.Alarms
         [JsonProperty] public string EmptyAlarmTimerValue { get => this.GetAs<string>(); set => this.Set(value); }
 
         [JsonProperty] public string DefaultCoil1Address { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public AlarmCoilType DefaultCoil1Type { get => this.GetAs<AlarmCoilType>(); set => this.Set(value); }
         [JsonProperty] public string DefaultCoil2Address { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public AlarmCoilType DefaultCoil2Type { get => this.GetAs<AlarmCoilType>(); set => this.Set(value); }
         [JsonProperty] public string DefaultTimerAddress { get => this.GetAs<string>(); set => this.Set(value); }
         [JsonProperty] public string DefaultTimerType { get => this.GetAs<string>(); set => this.Set(value); }
         [JsonProperty] public string DefaultTimerValue { get => this.GetAs<string>(); set => this.Set(value); }
@@ -38,33 +39,33 @@ namespace TiaUtilities.Generation.Alarms
 
         public AlarmTabConfiguration()
         {
-            PartitionType = AlarmPartitionType.DEVICE;
-            GroupingType = AlarmGroupingType.GROUP;
-
-            StartingAlarmNum = 1000;
-            AlarmNumFormat = "000.###";
-            AntiSlipNumber = 0;
-            SkipNumberAfterGroup = 0;
-            DefaultCoil1Type = AlarmCoilType.COIL;
-            DefaultCoil2Type = AlarmCoilType.SET;
-
-            GenerateEmptyAlarmAntiSlip = false;
-            EmptyAlarmAtEnd = 0;
-            EmptyAlarmContactAddress = "FALSE";
-            EmptyAlarmTimerAddress = "\\";
-            EmptyAlarmTimerType = "TON";
-            EmptyAlarmTimerValue = "T#0s";
-
-            DefaultCoil1Address = "Alm.Act.Alm{alarm_num}";
-            DefaultCoil2Address = "Alm.Mem.Alm{alarm_num}";
-            DefaultTimerAddress = "/";
-            DefaultTimerType = "TON";
-            DefaultTimerValue = "T#0s";
-
-            AlarmAddressPrefix = "{device_name}.";
-            CoilAddressPrefix = "";
-            SetCoilAddressPrefix = "";
-            TimerAddressPrefix = "";
+            this.PartitionType = AlarmPartitionType.DEVICE;
+            this.GroupingType = AlarmGroupingType.GROUP;
+            
+            this.StartingAlarmNum = 1000;
+            this.AlarmNumFormat = "000.###";
+            this.AntiSlipNumber = 0;
+            this.SkipNumberAfterGroup = 0;
+            
+            this.GenerateEmptyAlarmAntiSlip = false;
+            this.EmptyAlarmAtEnd = 0;
+            this.EmptyAlarmContactAddress = "FALSE";
+            this.EmptyAlarmTimerAddress = "\\";
+            this.EmptyAlarmTimerType = "TON";
+            this.EmptyAlarmTimerValue = "T#0s";
+            
+            this.DefaultCoil1Address = $"Alm.Act.Alm{GenPlaceholders.Alarms.ALARM_NUM}";
+            this.DefaultCoil1Type = AlarmCoilType.COIL;
+            this.DefaultCoil2Address = $"Alm.Mem.Alm{GenPlaceholders.Alarms.ALARM_NUM}";
+            this.DefaultCoil2Type = AlarmCoilType.SET;
+            this.DefaultTimerAddress = "/";
+            this.DefaultTimerType = "TON";
+            this.DefaultTimerValue = "T#0s";
+            
+            this.AlarmAddressPrefix = $"{GenPlaceholders.Alarms.DEVICE_NAME}.";
+            this.CoilAddressPrefix = "";
+            this.SetCoilAddressPrefix = "";
+            this.TimerAddressPrefix = "";
         }
 
         public override bool Equals(object? obj)

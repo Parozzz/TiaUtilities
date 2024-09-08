@@ -1,15 +1,12 @@
 ﻿using TiaUtilities.Generation.GridHandler.JSScript;
-using TiaUtilities.Generation.IO;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Generation.GridHandler.CustomColumns;
 using TiaXmlReader.Generation.IO;
 using TiaXmlReader.Javascript;
 using TiaUtilities.Generation.GenModules.IO.Tab;
-using TiaUtilities.Generation.IO.Module;
 using SimaticML.Enums;
 using SimaticML;
-using TiaXmlReader.Generation.GridHandler.Data;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Generation.GridHandler.Data;
 
@@ -19,35 +16,37 @@ namespace TiaUtilities.Generation.IO.Module.Tab
     {
         private const int MERKER_ADDRESS_COLUMN_SIZE = 80;
 
-        private readonly IOGenModule ioGenProject;
-        public TabPage TabPage { get; init; }
+        private readonly IOGenModule module;
+        
         private readonly IOMainConfiguration mainConfig;
-        public GridDataPreviewer<IOData> Previewer { get; init; }
-
-        public IOTabConfiguration TabConfig { get; init; }
         private readonly SuggestionTextBoxColumn variableAddressColumn;
 
+        public TabPage TabPage { get; init; }
+
+        public IOTabConfiguration TabConfig { get; init; }
+
+        public GridDataPreviewer<IOData> Previewer { get; init; }
         public GridHandler<IOData> GridHandler { get; init; }
 
         public IOGenTabControl TabControl { get; init; }
 
+        private bool dirty = false;
 
         public IOGenTab(JavascriptErrorReportThread jsErrorHandlingThread, GridSettings gridSettings, GridScriptContainer scriptContainer,
-                IOGenModule ioGenProject, TabPage tabPage, IOMainConfiguration mainConfig)
+                IOGenModule module, TabPage tabPage, IOMainConfiguration mainConfig)
         {
-            this.ioGenProject = ioGenProject;
+            this.module = module;
             this.TabPage = tabPage;
             this.mainConfig = mainConfig;
 
-            this.Previewer = new();
-            this.TabConfig = new();
             this.variableAddressColumn = new();
+            this.TabConfig = new();
+            this.Previewer = new();
 
             IOGenPlaceholderHandler placeholdersHandler = new(this.Previewer, this.mainConfig, TabConfig);
             this.GridHandler = new(jsErrorHandlingThread, gridSettings, scriptContainer, this.Previewer, placeholdersHandler, new IOGenComparer()) { RowCount = 2999 };
 
             this.TabControl = new(this.GridHandler.DataGridView);
-
         }
 
         public void Init()
@@ -62,27 +61,29 @@ namespace TiaUtilities.Generation.IO.Module.Tab
             var addressColumn = GridHandler.AddTextBoxColumn(IOData.ADDRESS, 65);
             addressColumn.MaxInputLength = 10;
 
-            GridHandler.AddTextBoxColumn(IOData.IO_NAME, 110);
-            GridHandler.AddCustomColumn(variableAddressColumn, IOData.VARIABLE, 200);
+            this.GridHandler.AddCheckBoxColumn(IOData.NEGATED, 50);
+
+            this.GridHandler.AddTextBoxColumn(IOData.IO_NAME, 110);
+            this.GridHandler.AddCustomColumn(variableAddressColumn, IOData.VARIABLE, 200);
             variableAddressColumn.SetGetItemsFunc(() =>
             {
                 var ioVariableEnumerable = GridHandler.DataSource.GetNotEmptyDataDict().Keys.Select(i => i.Variable);
-                var suggestionEnumerable = ioGenProject.Suggestions;
+                var suggestionEnumerable = module.Suggestions;
 
                 var notAddedSuggestionEnumerable = suggestionEnumerable.Select(k => k.Value).Except(ioVariableEnumerable).ToArray();
-                return notAddedSuggestionEnumerable ?? [];
+                return notAddedSuggestionEnumerable;
             });
 
-            GridHandler.AddTextBoxColumn(IOData.MERKER_ADDRESS, MERKER_ADDRESS_COLUMN_SIZE);
-            GridHandler.AddTextBoxColumn(IOData.COMMENT, 0);
+            this.GridHandler.AddTextBoxColumn(IOData.MERKER_ADDRESS, MERKER_ADDRESS_COLUMN_SIZE);
+            this.GridHandler.AddTextBoxColumn(IOData.COMMENT, 0);
 
             mainConfig.Subscribe(() => mainConfig.MemoryType, UpdateMerkerColumn);
             UpdateMerkerColumn(mainConfig.MemoryType);
             #endregion
 
-            TabControl.Init();
-
             GridHandler.Init();
+
+            TabControl.Init();
             TabControl.BindConfig(TabConfig);
 
             #region SUGGESTION_GRIDS_EVENTS
@@ -95,7 +96,7 @@ namespace TiaUtilities.Generation.IO.Module.Tab
 
                 if (args.CellChangeList.Where(c => c.ColumnIndex == IOData.VARIABLE).Any())
                 {
-                    ioGenProject.UpdateSuggestionColors();
+                    module.UpdateSuggestionColors();
                 }
 
                 if (args.CellChangeList.Where(c => c.ColumnIndex == IOData.ADDRESS || c.ColumnIndex == IOData.IO_NAME).Any())
@@ -105,7 +106,7 @@ namespace TiaUtilities.Generation.IO.Module.Tab
             };
             GridHandler.Events.PostSort += (sender, args) =>
             {
-                ioGenProject.UpdateSuggestionColors();
+                module.UpdateSuggestionColors();
                 UpdateDuplicatedIOValues();
             };
             #endregion
@@ -166,13 +167,18 @@ namespace TiaUtilities.Generation.IO.Module.Tab
 
             #region JS_SCRIPT_EVENTS
             GridHandler.Events.ScriptShowVariable += (sender, args) => args.VariableList.Add("suggestions [array]");
-            GridHandler.Events.ScriptAddVariables += (sender, args) => args.VariableDict.Add("suggestions", ioGenProject.Suggestions.Select(s => s.Value).ToArray());
+            GridHandler.Events.ScriptAddVariables += (sender, args) => args.VariableDict.Add("suggestions", module.Suggestions.Select(s => s.Value).ToArray());
+            #endregion
+
+            #region DIRTY
+            this.TabPage.TextChanged += (sender, args) => dirty = true;
             #endregion
         }
 
-        public bool IsDirty() => TabConfig.IsDirty() || GridHandler.IsDirty();
+        public bool IsDirty() => this.dirty || TabConfig.IsDirty() || GridHandler.IsDirty();
         public void Wash()
         {
+            this.dirty = false;
             TabConfig.Wash();
             GridHandler.Wash();
         }
