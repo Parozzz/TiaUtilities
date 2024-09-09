@@ -12,7 +12,7 @@ namespace TiaXmlReader.Utility
         public static uint VERSION { get; set; } = 17;
         public static string VERSION_STRING { get => "V" + VERSION; }
 
-        public static readonly string SAVE_FILE_EXTENSION = "json";
+        public static readonly string SAVE_FILE_EXTENSION = "json"; //Extension for program saving file (Will still be json). DO NOT PUT A DOT!
 
         public const string SECTIONS_NAMESPACE_V17 = "http://www.siemens.com/automation/Openness/SW/Interface/v5";
         public const string FLG_NET_NAMESPACE_V17 = "http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v4";
@@ -44,11 +44,6 @@ namespace TiaXmlReader.Utility
 
             return null;
         }
-
-        public const string GLOBAL_ID_KEY = "ID";
-        public const string COMPOSITION_NAME_KEY = "CompositionName";
-        public const string ATTRIBUTE_LIST_KEY = "AttributeList";
-        public const string OBJECT_LIST_KEY = "ObjectList";
 
         public const string DEFAULT_EMPTY_STRUCT_NAME = "_";
 

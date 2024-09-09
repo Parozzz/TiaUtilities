@@ -71,10 +71,15 @@ namespace TiaUtilities
             }
         }
 
-        public static bool Save(object obj, string? filePath, string extension, bool showFileDialog = false)
+        public static bool CreateFileAndSave(object obj, string filePath, string extension)
         {
+            if (!CreateFileWithDirectory(filePath))
+            {
+                return false;
+            }
+
             var localFilePath = filePath;
-            return Save(obj, ref localFilePath, extension, showFileDialog);
+            return Save(obj, ref localFilePath, extension);
         }
 
         public static bool Save(object obj, ref string? filePath, string extension, bool showFileDialog = false)
@@ -109,15 +114,10 @@ namespace TiaUtilities
                 }
 
                 FixExtesion(ref filePath, extension);
-
-                var directoryName = Path.GetDirectoryName(filePath);
-                if (string.IsNullOrEmpty(directoryName))
+                if(!CreateFileWithDirectory(filePath)) //This is just to throw an exception in case the path is wrong!
                 {
                     return false;
                 }
-
-                Directory.CreateDirectory(directoryName);
-                File.Create(filePath).Close(); //This is just to throw an exception in case the path is wrong!
 
                 SaveFile saveFile = new() { Type = typeID, Object = obj, };
 
@@ -130,6 +130,25 @@ namespace TiaUtilities
             {
                 Utils.ShowExceptionMessage(ex);
             }
+
+            return false;
+        }
+
+        private static bool CreateFileWithDirectory(string filePath)
+        {
+            try
+            {
+                var directoryName = Path.GetDirectoryName(filePath);
+                if (string.IsNullOrEmpty(directoryName))
+                {
+                    return false;
+                }
+
+                Directory.CreateDirectory(directoryName);
+                File.Create(filePath).Close();
+                return true;
+            }
+            catch { }
 
             return false;
         }
@@ -205,6 +224,10 @@ namespace TiaUtilities
             using JsonTextReader jReader = new(sr);
 
             var saveFile = SavesLoader.CreateJSONSerializer().Deserialize<SaveFile>(jReader);
+
+            jReader.Close();
+            sr.Close();
+
             if (saveFile == null || saveFile.Type == null || saveFile.Object == null)
             {
                 return default;

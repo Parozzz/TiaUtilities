@@ -475,6 +475,24 @@ namespace TiaXmlReader.Generation.GridHandler
 
         public bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
+            if (keyData == Keys.Enter || keyData == Keys.Space)
+            {
+                var currentCell = this.DataGridView.CurrentCell;
+                if (currentCell is DataGridViewCheckBoxCell checkBoxCell && checkBoxCell.Value is bool boolValue)
+                {
+                    this.ChangeCell(new GridCellChange(currentCell) { OldValue = boolValue, NewValue = !boolValue });
+                    this.Refresh(); //Needed for checkbox cell
+
+                    if(currentCell.RowIndex < this.DataGridView.RowCount)
+                    {//Move the cursor to the next cell below, same as default behaviour that i am overriding
+                        this.DataGridView.CurrentCell = this.DataGridView.Rows[currentCell.RowIndex + 1].Cells[currentCell.ColumnIndex];
+                    }
+
+                    return true; //Stop all other cmd to be executed
+                }
+            }
+
+
             foreach (var column in this.DataGridView.Columns)
             {//This is required for some special actions! (Like arrows for Suggestions!)
                 if (column is IGridCustomColumn customColumn && customColumn.ProcessCmdKey(ref msg, keyData))

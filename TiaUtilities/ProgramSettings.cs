@@ -27,12 +27,12 @@ namespace TiaXmlReader
 
         public static string GetFilePath()
         {
-            return Directory.GetCurrentDirectory() + @"/settings/ProgramSettings.json";
+            return Directory.GetCurrentDirectory() + $@"/settings/ProgramSettings.{Constants.SAVE_FILE_EXTENSION}";
         }
 
         public void Save()
         {
-            SavesLoader.Save(this, ProgramSettings.GetFilePath(), "json"); //To create file if not exist!
+            SavesLoader.CreateFileAndSave(this, ProgramSettings.GetFilePath(), Constants.SAVE_FILE_EXTENSION); //To create file if not exist!
         }
 
         public override bool Equals(object? obj)
