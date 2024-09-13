@@ -464,6 +464,11 @@ namespace TiaXmlReader.Generation.GridHandler
 
         public bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
+            if(!this.DataGridView.Focused)
+            {
+                return false;
+            }
+
             if (keyData == Keys.Enter)
             {
                 var currentCell = this.DataGridView.CurrentCell;
