@@ -1,5 +1,6 @@
 ﻿using InfoBox;
 using System.Data;
+using TiaUtilities.Languages;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.GenerationForms;
@@ -78,8 +79,8 @@ namespace TiaUtilities.Generation.GridHandler
                 }
                 gridHandler.ChangeCells(cellChangeList);
 
-                var title = Localization.Get("FIND_FORM");
-                var searchCompletedText = Localization.Get("FIND_FORM_REPLACE_ALL_COMPLETED").Replace("{count}", cellChangeList.Count.ToString());
+                var title = Locale.GRID_FIND_FORM_NAME;
+                var searchCompletedText = Locale.GRID_FIND_REPLACE_ALL_COMPLETED.Replace("{count}", cellChangeList.Count.ToString());
                 InformationBox.Show(searchCompletedText, title,
                         buttons: InformationBoxButtons.OK,
                         icon: InformationBoxIcon.Information,
@@ -174,8 +175,8 @@ namespace TiaUtilities.Generation.GridHandler
 
             if (!found && showInfoAndClearOnFail)
             {
-                var title = Localization.Get("FIND_FORM");
-                var searchCompletedText = Localization.Get("FIND_FORM_SEARCH_COMPLETED");
+                var title = Locale.GRID_FIND_FORM_NAME;
+                var searchCompletedText = Locale.GRID_FIND_SEARCH_COMPLETED;
 
                 InformationBox.Show(searchCompletedText, title,
                         buttons: InformationBoxButtons.OK,
@@ -202,11 +203,11 @@ namespace TiaUtilities.Generation.GridHandler
 
         private void Translate()
         {
-            this.Text = Localization.Get("FIND_FORM");
-            this.FindLabel.Text = this.FindButton.Text = Localization.Get("FIND_FORM_FIND");
-            this.ReplaceLabel.Text = this.ReplaceButton.Text = Localization.Get("FIND_FORM_REPLACE");
-            this.ReplaceAllButton.Text = Localization.Get("FIND_FORM_REPLACE_ALL");
-            this.MatchCaseCheckBox.Text = Localization.Get("FIND_FORM_MATCH_CASE");
+            this.Text = Locale.GRID_FIND_FORM_NAME;
+            this.FindLabel.Text = this.FindButton.Text = Locale.GRID_FIND_FIND_BUTTON;
+            this.ReplaceLabel.Text = this.ReplaceButton.Text = Locale.GRID_FIND_REPLACE_BUTTON;
+            this.ReplaceAllButton.Text = Locale.GRID_FIND_REPLACE_ALL_BUTTON;
+            this.MatchCaseCheckBox.Text = Locale.GRID_FIND_MATCH_CASE_CHECKBOX;
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)

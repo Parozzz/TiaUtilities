@@ -33,8 +33,8 @@ namespace TiaUtilities.Generation.Alarms
         [JsonProperty] public string DefaultTimerValue { get => this.GetAs<string>(); set => this.Set(value); }
 
         [JsonProperty] public string AlarmAddressPrefix { get => this.GetAs<string>(); set => this.Set(value); }
-        [JsonProperty] public string CoilAddressPrefix { get => this.GetAs<string>(); set => this.Set(value); }
-        [JsonProperty] public string SetCoilAddressPrefix { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public string Coil1AddressPrefix { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public string Coil2AddressPrefix { get => this.GetAs<string>(); set => this.Set(value); }
         [JsonProperty] public string TimerAddressPrefix { get => this.GetAs<string>(); set => this.Set(value); }
 
         public AlarmTabConfiguration()
@@ -63,8 +63,8 @@ namespace TiaUtilities.Generation.Alarms
             this.DefaultTimerValue = "T#0s";
             
             this.AlarmAddressPrefix = $"{GenPlaceholders.Alarms.DEVICE_NAME}.";
-            this.CoilAddressPrefix = "";
-            this.SetCoilAddressPrefix = "";
+            this.Coil1AddressPrefix = "";
+            this.Coil2AddressPrefix = "";
             this.TimerAddressPrefix = "";
         }
 

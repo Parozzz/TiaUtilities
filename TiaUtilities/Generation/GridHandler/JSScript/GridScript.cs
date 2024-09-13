@@ -4,6 +4,7 @@ using TiaUtilities.Generation.Configuration;
 using TiaUtilities.Generation.Configuration.Lines;
 using TiaUtilities.Generation.Configuration.Utility;
 using TiaUtilities.Generation.GridHandler.Events;
+using TiaUtilities.Languages;
 using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Generation.GridHandler.Data;
@@ -11,6 +12,7 @@ using TiaXmlReader.GenerationForms;
 using TiaXmlReader.Javascript;
 using TiaXmlReader.Utility;
 using TiaXmlReader.Utility.Extensions;
+using static TiaUtilities.Generation.GridHandler.JSScript.GridScriptContainer;
 
 namespace TiaUtilities.Generation.GridHandler.JSScript
 {
@@ -30,7 +32,7 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
 
         public void ShowConfigForm(IWin32Window window)
         {
-            var configForm = new ConfigForm("Espressione JS")
+            var configForm = new ConfigForm(Locale.GRID_SCRIPT_JS_EXPRESSION)
             {
                 ControlWidth = 750,
                 CloseOnOutsideClick = false,
@@ -48,7 +50,7 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
 
             var mainGroup = configForm.Init();
             mainGroup.AddLabel()
-                .Label("Variables: " + showVariableEventArgs.VariableList.Aggregate((a, b) => a + ", " + b))
+                .Label($"{Locale.GRID_SCRIPT_VARIABLES} {showVariableEventArgs.VariableList.Aggregate((a, b) => a + ", " + b)}")
                 .LabelFont(ConfigStyle.LABEL_FONT.Copy(9f, FontStyle.Regular));
 
             var debugGroup = mainGroup.AddVerticalGroup().Height(150).SplitterDistance(95);
@@ -57,11 +59,13 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                 .Readonly().Multiline();
 
             jsonLine = debugGroup.AddJSON().Readonly()
-                .Label("Context Json").LabelFont(ConfigStyle.LABEL_FONT.Copy(9f, FontStyle.Regular)).LabelOnTop();
+                .Label(Locale.GRID_SCRIPT_JSON_CONTEXT)
+                .LabelFont(ConfigStyle.LABEL_FONT.Copy(9f, FontStyle.Regular))
+                .LabelOnTop();
 
             var tabLine = mainGroup.AddInteractableTab()
                 .Height(500)
-                .Label("Espressione JS").LabelOnTop()
+                .LabelOnTop()
                 .RequireConfirmationBeforeClosing()
                 .TabAdded(tabPage =>
                 {
@@ -97,6 +101,12 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                     record.ScriptInfo.Name = newName;
                 });
 
+
+            if(scriptContainer.Count == 0)
+            {
+                scriptContainer.AddScript();
+            }
+
             foreach (var scriptInfo in scriptContainer.Scripts)
             {
                 var tabPage = tabLine.AddTabPage();
@@ -104,10 +114,10 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
             }
 
             mainGroup.AddButtonPanel()
-                 .AddButton("AutoFormattazione", () => record?.JavascriptEditor.GetTextBox().DoAutoIndent())
-                 .AddButton("Esegui", () => ParseJS())
-                 .AddButton("Esegui per Riga", () => ParseJS(singleExecution: true))
-                 .AddButton("Esegui in DebugMode", () => ParseJS(debugRun: true));
+                 .AddButton(Locale.GRID_SCRIPT_AUTO_FORMAT, () => record?.JavascriptEditor.GetTextBox().DoAutoIndent())
+                 .AddButton(Locale.GRID_SCRIPT_EXECUTE_ALL, () => ParseJS())
+                 .AddButton(Locale.GRID_SCRIPT_EXECUTE_ONE_LINE, () => ParseJS(singleExecution: true))
+                 .AddButton(Locale.GRID_SCRIPT_EXECUTE_DEBUG, () => ParseJS(debugRun: true));
 
             configForm.FormClosed += (sender, args) =>
             {
@@ -229,6 +239,32 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                 }
                 else
                 {
+                    int rowIndex = gridHandler.DataGridView.CurrentCell?.RowIndex ?? 0;
+                    if (rowIndex >= 0 && rowIndex <= gridHandler.RowCount)
+                    {
+                        var data = gridHandler.DataSource[rowIndex];
+                        if(!data.IsEmpty())
+                        {
+                            engine.SetValue(ENGINE_ROW_VARIABLE, rowIndex);
+
+                            var newIOData = ExecuteTimedJS(scriptTimer, engine, preparedScript, data);
+                            if (newIOData != null)
+                            {
+                                gridHandler.ChangeRow(rowIndex, newIOData);
+                            }
+
+                            singleExecutionLastRow = rowIndex;
+                        }
+
+                        var nextRow = gridHandler.DataSource.GetFirstNotEmptyIndexStartingFrom(rowIndex + 1);
+                        //If there is no next row, start from top (and now we are here).
+                        nextRow = nextRow < 0 ? gridHandler.DataSource.GetFirstNotEmptyIndexStartingFrom(0) : nextRow;
+                        if (nextRow >= 0)
+                        {
+                            gridHandler.SelectRow(nextRow);
+                        }
+                    }
+/*
                     var dataEnumerable = gridHandler.DataSource.GetNotEmptyDataDict().Where(e => e.Value > singleExecutionLastRow);
 
                     var anyFound = dataEnumerable.Any();
@@ -248,12 +284,13 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                         }
 
                         singleExecutionLastRow = rowIndex;
+                        gridHandler.SelectRow(rowIndex);
                     }
 
                     if (!anyFound || anyFound && dataEnumerable.Count() == 1)
                     {
                         singleExecutionLastRow = -1;
-                    }
+                    }*/
                 }
 
                 UpdateJsonContext(engine);

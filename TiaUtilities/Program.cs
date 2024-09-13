@@ -21,7 +21,7 @@ namespace TiaXmlReader
         [STAThread]
         static void Main()
         {
-            LocalizationVariables.INIT();
+            LocaleVariables.INIT();
 
             var _ = typeof(InformationBox); //InformationBox
             _ = typeof(Engine); //Jint

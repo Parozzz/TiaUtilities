@@ -8,6 +8,8 @@ using TiaUtilities.CustomControls;
 using TiaUtilities.Generation.GenModules;
 using TiaUtilities.Generation.GenModules.Alarm;
 using TiaUtilities.Generation.Alarms.Module.Tab;
+using TiaUtilities.Languages;
+using TiaUtilities.Generation.IO.Module.Tab;
 
 namespace TiaUtilities.Generation.Alarms.Module
 {
@@ -43,20 +45,7 @@ namespace TiaUtilities.Generation.Alarms.Module
         {
             this.control.BindConfig(this.mainConfig);
 
-            this.control.tabControl.TabPreAdded += (sender, args) =>
-            {
-                var tabPage = args.TabPage;
-                tabPage.Text = "AlarmGen";
-
-                AlarmGenTab alarmGenTab = new(this.jsErrorHandlingThread, this.gridSettings, this.scriptContainer, this, this.mainConfig, tabPage);
-                genTabList.Add(alarmGenTab);
-
-                alarmGenTab.Init();
-                tabPage.Tag = alarmGenTab;
-
-                tabPage.Controls.Add(alarmGenTab.TabControl);
-            };
-
+            this.control.tabControl.TabPreAdded += (sender, args) => TabCreation(args.TabPage);
             this.control.tabControl.TabPreRemoved += (sender, args) =>
             {
                 if (args.TabPage.Tag is AlarmGenTab alarmGenTab)
@@ -65,7 +54,29 @@ namespace TiaUtilities.Generation.Alarms.Module
                 }
             };
 
-            Translate();
+            form.Shown += (sender, args) =>
+            {
+                TabPage tabPage = new();
+                TabCreation(tabPage);
+                this.control.tabControl.TabPages.Add(tabPage);
+            };
+        }
+
+        private void TabCreation(TabPage tabPage, AlarmGenTabSave? save = null)
+        {
+            tabPage.Text = save?.Name ?? "AlarmGen";
+
+            AlarmGenTab alarmGenTab = new(this.jsErrorHandlingThread, this.gridSettings, this.scriptContainer, this, this.mainConfig, tabPage);
+            genTabList.Add(alarmGenTab);
+
+            alarmGenTab.Init();
+            if(save != null)
+            {
+                alarmGenTab.LoadSave(save);
+            }
+            tabPage.Tag = alarmGenTab;
+
+            tabPage.Controls.Add(alarmGenTab.TabControl);
         }
 
         public void Clear()
@@ -74,14 +85,15 @@ namespace TiaUtilities.Generation.Alarms.Module
             this.control.tabControl.TabPages.Clear();
         }
 
-        public bool IsDirty() => mainConfig.IsDirty() || genTabList.Any(x => x.IsDirty());
+        public bool IsDirty() => this.mainConfig.IsDirty() || this.genTabList.Any(x => x.IsDirty()) || this.scriptContainer.IsDirty();
         public void Wash()
         {
-            mainConfig.Wash();
-            foreach (var tab in genTabList)
+            this.mainConfig.Wash();
+            foreach (var tab in this.genTabList)
             {
                 tab.Wash();
             }
+            this.scriptContainer.Wash();
         }
 
         public object CreateSave()
@@ -117,17 +129,8 @@ namespace TiaUtilities.Generation.Alarms.Module
 
             foreach (var tabSave in loadedSave.TabSaves)
             {
-                TabPage tabPage = new() { Text = tabSave.Name };
-
-                AlarmGenTab alarmGenTab = new(this.jsErrorHandlingThread, this.gridSettings, this.scriptContainer, this, this.mainConfig, tabPage);
-                genTabList.Add(alarmGenTab);
-
-                alarmGenTab.Init();
-                alarmGenTab.LoadSave(tabSave);
-                tabPage.Tag = alarmGenTab;
-
-                tabPage.Controls.Add(alarmGenTab.TabControl);
-
+                TabPage tabPage = new();
+                TabCreation(tabPage, tabSave);
                 this.control.tabControl.TabPages.Add(tabPage);
             }
         }
@@ -150,7 +153,7 @@ namespace TiaUtilities.Generation.Alarms.Module
 
         public string GetFormLocalizatedName()
         {
-            return Localization.Get("ALARM_GEN_FORM");
+            return Locale.ALARM_GEN_FORM;
         }
 
         public bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -162,10 +165,6 @@ namespace TiaUtilities.Generation.Alarms.Module
             }
 
             return false;
-        }
-
-        private void Translate()
-        {
         }
     }
 }

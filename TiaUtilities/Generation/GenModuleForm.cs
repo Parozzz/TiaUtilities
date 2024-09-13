@@ -1,6 +1,7 @@
 ﻿using InfoBox;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using TiaUtilities.Configuration;
+using TiaUtilities.Languages;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Languages;
 using TiaXmlReader.Utility;
@@ -111,15 +112,15 @@ namespace TiaUtilities.Generation.GenModules
         {
             this.Text = this.module.GetFormLocalizatedName();
 
-            this.fileMenuItem.Text = Localization.Get("GENERICS_FILE");
-            this.saveMenuItem.Text = Localization.Get("GENERICS_SAVE");
-            this.saveAsMenuItem.Text = Localization.Get("GENERICS_SAVE_AS");
-            this.loadMenuItem.Text = Localization.Get("GENERICS_LOAD");
+            this.fileMenuItem.Text = Locale.GENERICS_FILE;
+            this.saveMenuItem.Text = Locale.GENERICS_SAVE;
+            this.saveAsMenuItem.Text = Locale.GENERICS_SAVE_AS;
+            this.loadMenuItem.Text = Locale.GENERICS_LOAD;
 
-            this.importExportMenuItem.Text = Localization.Get("IO_GEN_FORM_IMPEXP");
-            this.exportXMLMenuItem.Text = Localization.Get("IO_GEN_FORM_IMPEXP_EXPORT_XML");
+            this.importExportMenuItem.Text = Locale.IO_GEN_FORM_IMPEXP;
+            this.exportXMLMenuItem.Text = Locale.IO_GEN_FORM_IMPEXP_EXPORT_XML;
 
-            this.preferencesMenuItem.Text = Localization.Get("GRID_PREFERENCES");
+            this.preferencesMenuItem.Text = Locale.GRID_PREFERENCES;
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -152,13 +153,13 @@ namespace TiaUtilities.Generation.GenModules
 
         private void ModuleSave(bool force = false, bool saveAs = false)
         {
-            if(projectLoading)
+            if (projectLoading)
             { //This is to avoid that autosave will save and empty file while selected file with dialog
                 return;
             }
 
             var isDirty = this.module.IsDirty();
-            if(!isDirty && !force && !saveAs)
+            if (!isDirty && !force && !saveAs)
             {
                 return;
             }
@@ -173,7 +174,7 @@ namespace TiaUtilities.Generation.GenModules
 
             this.module.Wash();
 
-            this.Text = this.module.GetFormLocalizatedName() + ". Project File: " + lastFilePath;
+            this.Text = this.module.GetFormLocalizatedName().Replace("{file_path}", lastFilePath);
         }
 
         private void ModuleLoad()
@@ -186,7 +187,7 @@ namespace TiaUtilities.Generation.GenModules
                 this.module.LoadSave(saveObject);
                 this.module.Wash();
 
-                this.Text = this.module.GetFormLocalizatedName() + ". Project File: " + lastFilePath;
+                this.Text = this.module.GetFormLocalizatedName().Replace("{file_path}", lastFilePath);
             }
 
             projectLoading = false;

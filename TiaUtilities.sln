@@ -15,9 +15,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddIn_V19", "AddIn_V19\AddI
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TiaUtilities", "TiaUtilities\TiaUtilities.csproj", "{9BDD4DBB-26F5-4D29-BE15-B830FB8DF258}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimaticML", "SimaticML\SimaticML.csproj", "{9B661768-8973-4223-A14B-152699BCBF78}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimaticML", "SimaticML\SimaticML.csproj", "{9B661768-8973-4223-A14B-152699BCBF78}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AddIn", "AddIn", "{AB5273D0-AC91-4472-B457-9AC9E98E6F0A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F9502F63-BC98-4AFA-B254-C1E8E64CABAF}"
+	ProjectSection(SolutionItems) = preProject
+		Resources.Designer.t4 = Resources.Designer.t4
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

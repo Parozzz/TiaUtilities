@@ -18,6 +18,7 @@ using TiaUtilities;
 using TiaUtilities.Generation.GenModules;
 using TiaUtilities.Generation.Alarms.Module;
 using TiaUtilities.Generation.IO.Module;
+using TiaUtilities.Languages;
 
 namespace TiaXmlReader
 {
@@ -60,20 +61,21 @@ namespace TiaXmlReader
                 try
                 {
                     var culture = CultureInfo.GetCultureInfo(this.languageComboBox.Text);
-                    LocalizationVariables.LANG = programSettings.ietfLanguage = culture.IetfLanguageTag;
+                    LocaleVariables.LANG = culture.IetfLanguageTag;
 
                     if (ignoreLanguageBoxAtStartup)
                     {
                         return;
                     }
 
+                    //Without save, after restart it would restore the old (Meaning it would be useless)
+                    this.programSettings.ietfLanguage = culture.IetfLanguageTag;
+                    this.programSettings.Save();
+
                     //This should stay always in english. In case someone set an unkown language, this will be neautral.
                     var result = InformationBox.Show("Do you want to restart application?", "Restart to change language", buttons: InformationBoxButtons.YesNo);
                     if (result == InformationBoxResult.Yes)
                     {
-                        //Without save, after restart it would restore the old (Meaning it would be useless)
-                        this.programSettings.Save();
-
                         Application.Restart();
                         Environment.Exit(0);
                     }
@@ -120,17 +122,17 @@ namespace TiaXmlReader
 
         private void Translate()
         {
-            this.Text = Localization.Get("MAIN_FORM");
+            this.Text = Locale.MAIN_FORM;
 
-            this.fileToolStripMenuItem.Text = Localization.Get("GENERICS_FILE");
-            this.autoSaveMenuItem.Text = Localization.Get("MAIN_FORM_TOP_FILE_AUTO_SAVE");
+            this.fileToolStripMenuItem.Text = Locale.GENERICS_FILE;
+            this.autoSaveMenuItem.Text = Locale.MAIN_FORM_TOP_FILE_AUTO_SAVE;
 
-            this.dbDuplicationMenuItem.Text = Localization.Get("MAIN_FORM_TOP_DB_DUPLICATION");
-            this.generateIOMenuItem.Text = Localization.Get("MAIN_FORM_TOP_IO_GENERATION");
-            this.generateAlarmsMenuItem.Text = Localization.Get("MAIN_FORM_TOP_ALARM_GENERATOR");
+            this.dbDuplicationMenuItem.Text = Locale.MAIN_FORM_TOP_DB_DUPLICATION;
+            this.generateIOMenuItem.Text = Locale.MAIN_FORM_TOP_IO_GENERATION;
+            this.generateAlarmsMenuItem.Text = Locale.MAIN_FORM_TOP_ALARM_GENERATOR;
 
-            this.tiaVersionLabel.Text = Localization.Get("MAIN_FORM_TIA_VERSION");
-            this.languageLabel.Text = Localization.Get("MAIN_FORM_LANGUAGE");
+            this.tiaVersionLabel.Text = Locale.MAIN_FORM_TIA_VERSION;
+            this.languageLabel.Text = Locale.MAIN_FORM_LANGUAGE;
         }
 
         private void TiaVersionComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -291,8 +293,8 @@ namespace TiaXmlReader
             fc.AttributeList.TEMP.AddMember("tCoil2", SimaticDataType.BOOLEAN);
 
             var segment = new SimaticLADSegment();
-            segment.Title[LocalizationVariables.CULTURE] = "Segment Title!";
-            segment.Comment[LocalizationVariables.CULTURE] = "Segment Comment! Much information here ...";
+            segment.Title[LocaleVariables.CULTURE] = "Segment Title!";
+            segment.Comment[LocaleVariables.CULTURE] = "Segment Comment! Much information here ...";
 
             ContactPart[] contacts = new ContactPart[10];
             for (int i = 0; i < 10; i++)

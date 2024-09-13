@@ -2,6 +2,7 @@
 using TiaUtilities.Generation.IO;
 using TiaXmlReader.Generation.Configuration;
 using TiaUtilities.Generation.Configuration.Utility;
+using TiaUtilities.Languages;
 
 namespace TiaUtilities.Generation.GenModules.IO.Tab
 {
@@ -28,8 +29,8 @@ namespace TiaUtilities.Generation.GenModules.IO.Tab
 
         private void Translate()
         {
-            this.fcConfigButton.Text = Localization.Get("IO_GEN_CONFIG_FC");
-            this.segmentNameConfigButton.Text = Localization.Get("IO_GEN_CONFIG_SEGMENT");
+            this.fcConfigButton.Text = Locale.IO_GEN_CONFIG_FC;
+            this.segmentNameConfigButton.Text = Locale.IO_GEN_CONFIG_SEGMENT;
         }
 
         public void BindConfig(IOTabConfiguration tabConfig)
@@ -41,11 +42,11 @@ namespace TiaUtilities.Generation.GenModules.IO.Tab
                     var configForm = new ConfigForm(button.Text) { ControlWidth = 150 };
 
                     var mainGroup = configForm.Init();
-                    mainGroup.AddTextBox().LocalizedLabel("GENERICS_NAME")
+                    mainGroup.AddTextBox().Label(Locale.GENERICS_NAME)
                          .ControlText(tabConfig.FCBlockName)
                          .TextChanged(str => tabConfig.FCBlockName = str);
 
-                    mainGroup.AddTextBox().LocalizedLabel("GENERICS_NUMBER")
+                    mainGroup.AddTextBox().Label(Locale.GENERICS_NUMBER)
                          .ControlText(tabConfig.FCBlockNumber)
                          .UIntChanged(num => tabConfig.FCBlockNumber = num);
 
@@ -60,11 +61,11 @@ namespace TiaUtilities.Generation.GenModules.IO.Tab
                     var configForm = new ConfigForm(button.Text) { ControlWidth = 400 };
 
                     var mainGroup = configForm.Init();
-                    mainGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_SEGMENT_BIT_DIVISION")
+                    mainGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_SEGMENT_BIT_DIVISION)
                          .ControlText(tabConfig.SegmentNameBitGrouping)
                          .TextChanged(str => tabConfig.SegmentNameBitGrouping = str);
 
-                    mainGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_SEGMENT_BYTE_DIVISION")
+                    mainGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_SEGMENT_BYTE_DIVISION)
                          .ControlText(tabConfig.SegmentNameByteGrouping)
                          .TextChanged(str => tabConfig.SegmentNameByteGrouping = str);
 

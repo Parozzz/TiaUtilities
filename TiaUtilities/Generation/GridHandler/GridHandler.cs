@@ -1,14 +1,12 @@
 ﻿using TiaUtilities;
 using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.Data;
-using TiaUtilities.Generation.GridHandler.Events;
 using TiaUtilities.Generation.GridHandler.JSScript;
+using TiaUtilities.Languages;
 using TiaXmlReader.Generation.GridHandler.CustomColumns;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.Generation.GridHandler.Events;
-using TiaXmlReader.Generation.IO;
 using TiaXmlReader.Generation.Placeholders;
-using TiaXmlReader.GenerationForms;
 using TiaXmlReader.Javascript;
 using TiaXmlReader.UndoRedo;
 using TiaXmlReader.Utility;
@@ -180,6 +178,9 @@ namespace TiaXmlReader.Generation.GridHandler
                     case Keys.F | Keys.Control:
                         GridFindForm.StartFind(this);
                         break;
+                    case Keys.J | Keys.Control:
+                        this.Script.ShowConfigForm(this.DataGridView);
+                        break;
                     case Keys.Delete:
                         this.DeleteSelectedCells();
                         break;
@@ -236,19 +237,7 @@ namespace TiaXmlReader.Generation.GridHandler
                             }
                             else
                             {
-                                this.DataGridView.ClearSelection();
-
-                                var hitRow = this.DataGridView.Rows[hitTest.RowIndex];
-                                if (hitRow.Cells.Count > 0)
-                                {
-                                    //I need to set the current cell, because i use the CurrentRow as a "starting row"
-                                    //Do not cancel current cell! It might select the first cell in the grid and mess up selection.
-                                    this.DataGridView.CurrentCell = hitRow.Cells[0];
-                                    foreach (DataGridViewCell cell in hitRow.Cells)
-                                    {
-                                        cell.Selected = true;
-                                    }
-                                }
+                                SelectRow(hitTest.RowIndex);
                             }
 
                             break;
@@ -312,7 +301,7 @@ namespace TiaXmlReader.Generation.GridHandler
             {
                 if (args.RowIndex == -1 && args.ColumnIndex == -1 && args.Button == MouseButtons.Right)
                 {
-                    var menuItem = new ToolStripMenuItem { Text = "Execute Javascript" };
+                    var menuItem = new ToolStripMenuItem { Text = Locale.GRID_SCRIPT_OPEN_JAVASCRIPT_CONTEXT };
                     menuItem.Click += (s, a) => this.Script.ShowConfigForm(this.DataGridView);
 
                     var contextMenu = new ContextMenuStrip();
@@ -475,7 +464,7 @@ namespace TiaXmlReader.Generation.GridHandler
 
         public bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            if (keyData == Keys.Enter || keyData == Keys.Space)
+            if (keyData == Keys.Enter)
             {
                 var currentCell = this.DataGridView.CurrentCell;
                 if (currentCell is DataGridViewCheckBoxCell checkBoxCell && checkBoxCell.Value is bool boolValue)
@@ -483,7 +472,7 @@ namespace TiaXmlReader.Generation.GridHandler
                     this.ChangeCell(new GridCellChange(currentCell) { OldValue = boolValue, NewValue = !boolValue });
                     this.Refresh(); //Needed for checkbox cell
 
-                    if(currentCell.RowIndex < this.DataGridView.RowCount)
+                    if (currentCell.RowIndex < this.DataGridView.RowCount)
                     {//Move the cursor to the next cell below, same as default behaviour that i am overriding
                         this.DataGridView.CurrentCell = this.DataGridView.Rows[currentCell.RowIndex + 1].Cells[currentCell.ColumnIndex];
                     }
@@ -662,6 +651,23 @@ namespace TiaXmlReader.Generation.GridHandler
         public void ResetSelectedCell()
         {
             this.SelectCell(cell: null);
+        }
+
+        public void SelectRow(int rowIndex)
+        {
+            this.DataGridView.ClearSelection();
+
+            var row = this.DataGridView.Rows[rowIndex];
+            if (row.Cells.Count > 0)
+            {
+                //I need to set the current cell, because i use the CurrentRow as a "starting row"
+                //Do not cancel current cell! It might select the first cell in the grid and mess up selection.
+                this.DataGridView.CurrentCell = row.Cells[0];
+                foreach (DataGridViewCell cell in row.Cells)
+                {
+                    cell.Selected = true;
+                }
+            }
         }
 
         private void SelectCell(GridCellChange cellChange)

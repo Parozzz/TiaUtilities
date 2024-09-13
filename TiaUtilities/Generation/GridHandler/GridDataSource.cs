@@ -142,6 +142,25 @@ namespace TiaXmlReader.Generation.GridHandler
             dataGridView.Refresh();
         }
 
+        public int GetFirstNotEmptyIndexStartingFrom(int indexStart)
+        {
+            if (indexStart < 0 || indexStart > this.Count)
+            {
+                return -1;
+            }
+
+            for (var x = indexStart; x < dataList.Count; x++)
+            {
+                var data = dataList[x];
+                if (!data.IsEmpty())
+                {
+                    return x;
+                }
+            }
+
+            return -1;
+        }
+
         public Dictionary<T, int> GetNotEmptyDataDict()
         {
             var notEmptyDict = new Dictionary<T, int>();

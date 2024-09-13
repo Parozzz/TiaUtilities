@@ -21,7 +21,7 @@ namespace TiaXmlReader
 
         [JsonProperty] public int TimedSaveTime = 2; //Seconds
         [JsonProperty] public uint lastTIAVersion = Constants.VERSION;
-        [JsonProperty] public string ietfLanguage = LocalizationVariables.LANG;
+        [JsonProperty] public string ietfLanguage = LocaleVariables.LANG;
 
         [JsonProperty] public GridSettings GridSettings { get; set; } = new GridSettings();
 

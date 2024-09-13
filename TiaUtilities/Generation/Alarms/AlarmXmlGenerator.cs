@@ -68,7 +68,7 @@ namespace TiaXmlReader.Generation.Alarms
                             if (tabConfig.GroupingType == AlarmGroupingType.ONE)
                             {
                                 segment = new SimaticLADSegment();
-                                segment.Title[LocalizationVariables.CULTURE] = placeholdersHandler.Parse(mainConfig.OneEachSegmentName);
+                                segment.Title[LocaleVariables.CULTURE] = placeholdersHandler.Parse(mainConfig.OneEachSegmentName);
                             }
 
                             FillAlarmSegment(tabConfig, segment, placeholdersHandler, parsedAlarmData);
@@ -116,7 +116,7 @@ namespace TiaXmlReader.Generation.Alarms
                         {
                             placeholdersHandler.SetStartEndAlarmNum(startAlarmNum, lastAlarmNum, tabConfig.AlarmNumFormat);
 
-                            segment.Title[LocalizationVariables.CULTURE] = placeholdersHandler.Parse(mainConfig.GroupSegmentName);
+                            segment.Title[LocaleVariables.CULTURE] = placeholdersHandler.Parse(mainConfig.GroupSegmentName);
                             segment.Create(fc);
                         }
 
@@ -156,7 +156,7 @@ namespace TiaXmlReader.Generation.Alarms
                             if (tabConfig.GroupingType == AlarmGroupingType.ONE)
                             {
                                 segment = new SimaticLADSegment();
-                                segment.Title[LocalizationVariables.CULTURE] = placeholdersHandler.Parse(mainConfig.OneEachSegmentName);
+                                segment.Title[LocaleVariables.CULTURE] = placeholdersHandler.Parse(mainConfig.OneEachSegmentName);
                             }
 
                             FillAlarmSegment(tabConfig, segment, placeholdersHandler, parsedAlarmData);
@@ -203,7 +203,7 @@ namespace TiaXmlReader.Generation.Alarms
                         {
                             placeholdersHandler.SetStartEndAlarmNum(startAlarmNum, lastAlarmNum, tabConfig.AlarmNumFormat);
 
-                            segment.Title[LocalizationVariables.CULTURE] = placeholdersHandler.Parse(mainConfig.GroupSegmentName);
+                            segment.Title[LocaleVariables.CULTURE] = placeholdersHandler.Parse(mainConfig.GroupSegmentName);
                             segment.Create(fc);
                         }
 
@@ -247,7 +247,7 @@ namespace TiaXmlReader.Generation.Alarms
                 placeholdersHandler.SetStartEndAlarmNum(alarmNum, alarmNum + (alarmCount - 1), tabConfig.AlarmNumFormat);
 
                 segment = new SimaticLADSegment();
-                segment.Title[LocalizationVariables.CULTURE] = placeholdersHandler.Parse(mainConfig.GroupEmptyAlarmSegmentName);
+                segment.Title[LocaleVariables.CULTURE] = placeholdersHandler.Parse(mainConfig.GroupEmptyAlarmSegmentName);
             }
 
             for (int j = 0; j < alarmCount; j++)
@@ -258,7 +258,7 @@ namespace TiaXmlReader.Generation.Alarms
                 if (tabConfig.GroupingType == AlarmGroupingType.ONE)
                 {
                     segment = new SimaticLADSegment();
-                    segment.Title[LocalizationVariables.CULTURE] = placeholdersHandler.Parse(mainConfig.OneEachEmptyAlarmSegmentName);
+                    segment.Title[LocaleVariables.CULTURE] = placeholdersHandler.Parse(mainConfig.OneEachEmptyAlarmSegmentName);
                 }
 
                 ArgumentNullException.ThrowIfNull(segment, nameof(segment));
@@ -283,9 +283,9 @@ namespace TiaXmlReader.Generation.Alarms
             return new AlarmData()
             {
                 AlarmVariable = tabConfig.AlarmAddressPrefix + alarmData.AlarmVariable,
-                Coil1Address = string.IsNullOrEmpty(alarmData.Coil1Address) ? tabConfig.DefaultCoil1Address : (tabConfig.CoilAddressPrefix + alarmData.Coil1Address),
+                Coil1Address = string.IsNullOrEmpty(alarmData.Coil1Address) ? tabConfig.DefaultCoil1Address : (tabConfig.Coil1AddressPrefix + alarmData.Coil1Address),
                 Coil1Type = coil1Type.ToString(),
-                Coil2Address = string.IsNullOrEmpty(alarmData.Coil2Address) ? tabConfig.DefaultCoil2Address : (tabConfig.SetCoilAddressPrefix + alarmData.Coil2Address),
+                Coil2Address = string.IsNullOrEmpty(alarmData.Coil2Address) ? tabConfig.DefaultCoil2Address : (tabConfig.Coil2AddressPrefix + alarmData.Coil2Address),
                 Coil2Type = coil2Type.ToString(),
                 TimerAddress = string.IsNullOrEmpty(alarmData.TimerAddress) ? tabConfig.DefaultTimerAddress : (tabConfig.TimerAddressPrefix + alarmData.TimerAddress),
                 TimerType = string.IsNullOrEmpty(alarmData.TimerType) ? tabConfig.DefaultTimerType : alarmData.TimerType,

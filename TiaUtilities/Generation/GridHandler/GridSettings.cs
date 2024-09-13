@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using TiaUtilities.Configuration;
 using TiaUtilities.Generation.Configuration.Utility;
+using TiaUtilities.Languages;
 using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Languages;
 
@@ -25,22 +26,22 @@ namespace TiaXmlReader.Generation.GridHandler
 
         public void ShowConfigForm(IWin32Window owner)
         {
-            var configForm = new ConfigForm(Localization.Get("GRID_PREFERENCES")) { ControlWidth = 300 };
+            var configForm = new ConfigForm(Locale.GRID_PREFERENCES) { ControlWidth = 300 };
 
             var mainGroup = configForm.Init();
-            mainGroup.AddColorPicker().LocalizedLabel("GRID_PREFERENCES_SELECTED_CELL_BORDER")
+            mainGroup.AddColorPicker().Label(Locale.GRID_PREFERENCES_SELECTED_CELL_BORDER)
                 .ApplyColor(this.SingleSelectedCellBorderColor)
                 .ColorChanged(color => this.SingleSelectedCellBorderColor = color);
 
-            mainGroup.AddColorPicker().LocalizedLabel("GRID_PREFERENCES_DRAGGED_CELL_BACK")
+            mainGroup.AddColorPicker().Label(Locale.GRID_PREFERENCES_DRAGGED_CELL_BACK)
                  .ApplyColor(this.DragSelectedCellBorderColor)
                  .ColorChanged(color => this.DragSelectedCellBorderColor = color);
 
-            mainGroup.AddColorPicker().LocalizedLabel("GRID_PREFERENCES_DRAG_TRIANGLE_COLOR")
+            mainGroup.AddColorPicker().Label(Locale.GRID_PREFERENCES_DRAG_TRIANGLE_COLOR)
                  .ApplyColor(this.SelectedCellTriangleColor)
                  .ColorChanged(color => this.SelectedCellTriangleColor = color);
 
-            mainGroup.AddColorPicker().LocalizedLabel("GRID_PREFERENCES_PREVIEW_FORE")
+            mainGroup.AddColorPicker().Label(Locale.GRID_PREFERENCES_PREVIEW_FORE)
                  .ApplyColor(this.PreviewColor)
                  .ColorChanged(color => this.PreviewColor = color);
 

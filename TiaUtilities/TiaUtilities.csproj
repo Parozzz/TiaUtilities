@@ -16,21 +16,10 @@
 
   <ItemGroup>
     <None Remove="!!TO-DO!!.txt" />
-    <None Remove="Languages\en-US.json" />
-    <None Remove="Languages\it-IT.json" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="!!TO-DO!!.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Languages\en-US.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Languages\it-IT.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
@@ -72,9 +61,26 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="Generation\IO\Module\Tab\IOGenTabControl.cs" />
+    <Compile Update="Languages\Locale.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Locale.resx</DependentUpon>
+    </Compile>
     <Compile Update="MainImportExportForm.cs">
       <SubType>Form</SubType>
     </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Languages\Locale.it.resx">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Languages\Locale.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Locale.Designer.cs</LastGenOutput>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

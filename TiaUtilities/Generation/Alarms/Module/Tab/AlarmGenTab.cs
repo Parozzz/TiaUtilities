@@ -6,6 +6,7 @@ using TiaXmlReader.Javascript;
 using TiaUtilities.Generation.GenModules.Alarm.Tab;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Generation.GridHandler.Data;
+using TiaUtilities.Generation.GenModules;
 
 namespace TiaUtilities.Generation.Alarms.Module.Tab
 {
@@ -93,7 +94,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
                 }
                 else if (column == AlarmData.COIL1_ADDRESS)
                 {
-                    return new() { Prefix = TabConfig.CoilAddressPrefix, DefaultValue = TabConfig.DefaultCoil1Address, Value = alarmData.Coil1Address };
+                    return new() { Prefix = TabConfig.Coil1AddressPrefix, DefaultValue = TabConfig.DefaultCoil1Address, Value = alarmData.Coil1Address };
                 }
                 else if (column == AlarmData.COIL1_TYPE && AlarmData.IsAddressValid(alarmData.Coil1Address))
                 {
@@ -101,7 +102,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
                 }
                 else if (column == AlarmData.COIL2_ADDRESS)
                 {
-                    return new() { Prefix = TabConfig.SetCoilAddressPrefix, DefaultValue = TabConfig.DefaultCoil2Address, Value = alarmData.Coil2Address };
+                    return new() { Prefix = TabConfig.Coil2AddressPrefix, DefaultValue = TabConfig.DefaultCoil2Address, Value = alarmData.Coil2Address };
                 }
                 else if (column == AlarmData.COIL2_TYPE && AlarmData.IsAddressValid(alarmData.Coil2Address))
                 {

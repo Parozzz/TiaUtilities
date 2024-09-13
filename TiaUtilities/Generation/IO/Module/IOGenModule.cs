@@ -17,6 +17,7 @@ using TiaUtilities.Generation.IO.Module.ExcelImporter;
 using TiaUtilities.Generation.GridHandler.Data;
 using SimaticML.Enums;
 using SimaticML;
+using TiaUtilities.Languages;
 
 namespace TiaUtilities.Generation.IO.Module
 {
@@ -56,13 +57,13 @@ namespace TiaUtilities.Generation.IO.Module
 
             this.control = new(suggestionGridHandler.DataGridView);
 
-            genTabList = [];
+            this.genTabList = [];
         }
 
         public void Init(GenModuleForm form)
         {
             #region IMPORT_EXPORT_MENU_ITEMS
-            ToolStripMenuItem importExcelMenuItem = new(Localization.Get("IO_GEN_FORM_IMPEXP_IMPORT_EXCEL"));
+            ToolStripMenuItem importExcelMenuItem = new(Locale.IO_GEN_FORM_IMPEXP_IMPORT_EXCEL);
             importExcelMenuItem.Click += (sender, args) =>
             {
                 IOGenerationExcelImportForm excelImportForm = new(this.jsErrorHandlingThread, this.gridSettings, this.scriptContainer, this.excelImportConfig);
@@ -99,7 +100,7 @@ namespace TiaUtilities.Generation.IO.Module
             };
             form.importExportMenuItem.DropDownItems.Add(importExcelMenuItem);
 
-            ToolStripMenuItem importSuggestionsMenuItem = new(Localization.Get("IO_GEN_FORM_IMPEXP_IMPORT_SUGGESTION"));
+            ToolStripMenuItem importSuggestionsMenuItem = new(Locale.IO_GEN_FORM_IMPEXP_IMPORT_SUGGESTION);
             importSuggestionsMenuItem.Click += (sender, args) =>
             {
                 var fileDialog = new CommonOpenFileDialog
@@ -197,19 +198,7 @@ namespace TiaUtilities.Generation.IO.Module
             this.suggestionPreviewer.Function = (column, ioData) => null;
             #endregion
 
-            this.control.gridsTabControl.TabPreAdded += (sender, args) =>
-            {
-                var tabPage = args.TabPage;
-                tabPage.Text = "IOGen";
-
-                IOGenTab ioGenTab = new(this.jsErrorHandlingThread, this.gridSettings, this.scriptContainer, this, tabPage, this.mainConfig);
-                genTabList.Add(ioGenTab);
-
-                ioGenTab.Init();
-                tabPage.Tag = ioGenTab;
-
-                tabPage.Controls.Add(ioGenTab.TabControl);
-            };
+            this.control.gridsTabControl.TabPreAdded += (sender, args) => TabCreation(args.TabPage);
 
             this.control.gridsTabControl.TabPreRemoved += (sender, args) =>
             {
@@ -223,7 +212,28 @@ namespace TiaUtilities.Generation.IO.Module
             form.Shown += (sender, args) =>
             {
                 suggestionGridHandler.DataGridView.AutoResizeColumnHeadersHeight();
+
+                TabPage tabPage = new();
+                TabCreation(tabPage);
+                this.control.gridsTabControl.TabPages.Add(tabPage);
             };
+        }
+
+        private void TabCreation(TabPage tabPage, IOGenTabSave? save = null)
+        {
+            tabPage.Text = save?.Name ?? "IOGen";
+
+            IOGenTab ioGenTab = new(this.jsErrorHandlingThread, this.gridSettings, this.scriptContainer, this, tabPage, this.mainConfig);
+            genTabList.Add(ioGenTab);
+
+            ioGenTab.Init();
+            if(save != null)
+            {
+                ioGenTab.LoadSave(save);
+            }
+            tabPage.Tag = ioGenTab;
+
+            tabPage.Controls.Add(ioGenTab.TabControl);
         }
 
         public void Clear()
@@ -232,15 +242,16 @@ namespace TiaUtilities.Generation.IO.Module
             this.control.gridsTabControl.TabPages.Clear();
         }
 
-        public bool IsDirty() => mainConfig.IsDirty() || suggestionGridHandler.IsDirty() || genTabList.Any(x => x.IsDirty());
+        public bool IsDirty() => mainConfig.IsDirty() || suggestionGridHandler.IsDirty() || genTabList.Any(x => x.IsDirty()) || this.scriptContainer.IsDirty();
         public void Wash()
         {
-            mainConfig.Wash();
-            suggestionGridHandler.Wash();
+            this.mainConfig.Wash();
+            this.suggestionGridHandler.Wash();
             foreach (var tab in genTabList)
             {
                 tab.Wash();
             }
+            this.scriptContainer.Wash();
         }
 
         public Control? GetControl()
@@ -299,17 +310,8 @@ namespace TiaUtilities.Generation.IO.Module
 
             foreach (var tabSave in loadedSave.TabSaves)
             {
-                var tabPage = new TabPage() { Text = "IOGen" };
-
-                IOGenTab ioGenTab = new(this.jsErrorHandlingThread, this.gridSettings, this.scriptContainer, this, tabPage, this.mainConfig);
-                genTabList.Add(ioGenTab);
-
-                ioGenTab.Init();
-                ioGenTab.LoadSave(tabSave);
-                tabPage.Tag = ioGenTab;
-
-                tabPage.Controls.Add(ioGenTab.TabControl);
-
+                TabPage tabPage = new();
+                TabCreation(tabPage, tabSave);
                 this.control.gridsTabControl.TabPages.Add(tabPage);
             }
 
@@ -329,7 +331,7 @@ namespace TiaUtilities.Generation.IO.Module
 
         public string GetFormLocalizatedName()
         {
-            return Localization.Get("IO_GEN_FORM");
+            return Locale.IO_GEN_FORM_NAME;
         }
 
         public void UpdateSuggestionColors()

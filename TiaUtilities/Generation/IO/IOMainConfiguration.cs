@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.ComponentModel;
 using TiaUtilities.Configuration;
+using TiaUtilities.Languages;
 using TiaXmlReader.Generation.Placeholders;
 using TiaXmlReader.GenerationForms;
 using TiaXmlReader.Languages;
@@ -9,14 +10,14 @@ namespace TiaXmlReader.Generation.IO
 {
     public enum IOGroupingTypeEnum
     {
-        [Localization("IO_CONFIG_GROUPING_TYPE_BIT")] PER_BIT = 0, //DEFAULT
-        [Localization("IO_CONFIG_GROUPING_TYPE_BYTE")] PER_BYTE
+        [Locale(nameof(Locale.IO_CONFIG_GROUPING_TYPE_BIT))] PER_BIT = 0, //DEFAULT
+        [Locale(nameof(Locale.IO_CONFIG_GROUPING_TYPE_BYTE))] PER_BYTE
     }
 
     public enum IOMemoryTypeEnum
     {
-        [Localization("IO_CONFIG_MEMORY_TYPE_DB")] DB = 0, //DEFAULT
-        [Localization("IO_CONFIG_MEMORY_TYPE_MERKER")] MERKER
+        [Locale(nameof(Locale.IO_CONFIG_MEMORY_TYPE_DB))] DB = 0, //DEFAULT
+        [Locale(nameof(Locale.IO_CONFIG_MEMORY_TYPE_MERKER))] MERKER
     }
 
     public class IOMainConfiguration : ObservableConfiguration, IGenerationConfiguration

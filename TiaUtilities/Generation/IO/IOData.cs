@@ -6,6 +6,7 @@ using SimaticML;
 using SimaticML.Enums;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Generation.GridHandler.Data;
+using TiaUtilities.Languages;
 
 namespace TiaXmlReader.Generation.IO
 {
@@ -36,12 +37,12 @@ namespace TiaXmlReader.Generation.IO
             COLUMN_LIST = columnList.AsReadOnly();
         }
 
-        [JsonProperty][Localization("IO_DATA_ADDRESS")] public string? Address { get; set; }
-        [JsonProperty] public bool Negated { get; set; }
-        [JsonProperty][Localization("IO_DATA_IO_NAME", append: " > " + GenPlaceholders.IO.IONAME)] public string? IOName { get; set; }
-        [JsonProperty][Localization("IO_DATA_VARIABLE", append: " > " + GenPlaceholders.IO.VARIABLE)] public string? Variable { get; set; }
-        [JsonProperty][Localization("IO_DATA_MERKER_ADDRESS")] public string? MerkerAddress { get; set; }
-        [JsonProperty][Localization("IO_DATA_COMMENT", append: " > " + GenPlaceholders.IO.COMMENT)] public string? Comment { get; set; }
+        [JsonProperty][Locale(nameof(Locale.IO_DATA_ADDRESS))] public string? Address { get; set; }
+        [JsonProperty][Locale(nameof(Locale.IO_DATA_NEGATED))] public bool Negated { get; set; }
+        [JsonProperty][Locale(nameof(Locale.IO_DATA_IO_NAME), append: " > " + GenPlaceholders.IO.IONAME)] public string? IOName { get; set; }
+        [JsonProperty][Locale(nameof(Locale.IO_DATA_VARIABLE), append: " > " + GenPlaceholders.IO.VARIABLE)] public string? Variable { get; set; }
+        [JsonProperty][Locale(nameof(Locale.IO_DATA_MERKER_ADDRESS))] public string? MerkerAddress { get; set; }
+        [JsonProperty][Locale(nameof(Locale.IO_DATA_COMMENT), append: " > " + GenPlaceholders.IO.COMMENT)] public string? Comment { get; set; }
 
         public object? this[int column]
         {

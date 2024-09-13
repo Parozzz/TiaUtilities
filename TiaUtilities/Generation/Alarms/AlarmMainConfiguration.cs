@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using TiaUtilities.Configuration;
+using TiaUtilities.Languages;
 using TiaXmlReader.GenerationForms;
 using TiaXmlReader.Languages;
 
@@ -7,22 +8,22 @@ namespace TiaXmlReader.Generation.Alarms
 {
     public enum AlarmGroupingType
     {
-        [Localization("ALARM_CONFIG_GROUPING_TYPE_GROUP")] GROUP,
-        [Localization("ALARM_CONFIG_GROUPING_TYPE_ONE")] ONE
+        [Locale(nameof(Locale.ALARM_CONFIG_GROUPING_TYPE_GROUP))] GROUP,
+        [Locale(nameof(Locale.ALARM_CONFIG_GROUPING_TYPE_ONE))] ONE
     }
 
     public enum AlarmPartitionType
     {
-        [Localization("ALARM_CONFIG_PARTITION_TYPE_ALARM_TYPE")] ALARM_TYPE,
-        [Localization("ALARM_CONFIG_PARTITION_TYPE_DEVICE")] DEVICE
+        [Locale(nameof(Locale.ALARM_CONFIG_PARTITION_TYPE_ALARM_TYPE))] ALARM_TYPE,
+        [Locale(nameof(Locale.ALARM_CONFIG_PARTITION_TYPE_DEVICE))] DEVICE
     }
 
     public enum AlarmCoilType
     {
-        [Localization("ALARM_CONFIG_COIL_TYPE_NONE")] NONE,
-        [Localization("ALARM_CONFIG_COIL_TYPE_COIL")] COIL,
-        [Localization("ALARM_CONFIG_COIL_TYPE_SET")] SET,
-        [Localization("ALARM_CONFIG_COIL_TYPE_RESET")] RESET
+        [Locale(nameof(Locale.ALARM_CONFIG_COIL_TYPE_NONE))] NONE,
+        [Locale(nameof(Locale.ALARM_CONFIG_COIL_TYPE_COIL))] COIL,
+        [Locale(nameof(Locale.ALARM_CONFIG_COIL_TYPE_SET))] SET,
+        [Locale(nameof(Locale.ALARM_CONFIG_COIL_TYPE_RESET))] RESET
     }
 
     public class AlarmMainConfiguration : ObservableConfiguration, IGenerationConfiguration

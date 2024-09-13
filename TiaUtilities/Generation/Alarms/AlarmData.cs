@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using TiaUtilities.Generation.Alarms;
+using TiaUtilities.Languages;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.Generation.Placeholders;
 using TiaXmlReader.Languages;
@@ -41,16 +41,16 @@ namespace TiaXmlReader.Generation.Alarms
             COLUMN_LIST = columnList.AsReadOnly();
         }
 
-        [JsonProperty][Localization("ALARM_DATA_ENABLE")] public bool Enable { get; set; }
-        [JsonProperty][Localization("ALARM_DATA_ALM_VARIABLE")] public string? AlarmVariable { get; set; }
-        [JsonProperty][Localization("ALARM_DATA_COIL1_ADDRESS")] public string? Coil1Address { get; set; }
-        [JsonProperty] public string? Coil1Type { get; set; }
-        [JsonProperty][Localization("ALARM_DATA_COIL2_ADDRESS")] public string? Coil2Address { get; set; }
-        [JsonProperty] public string? Coil2Type { get; set; }
-        [JsonProperty][Localization("ALARM_DATA_TIMER_ADDRESS")] public string? TimerAddress { get; set; }
-        [JsonProperty][Localization("ALARM_DATA_TIMER_TYPE")] public string? TimerType { get; set; }
-        [JsonProperty][Localization("ALARM_DATA_TIMER_VALUE")] public string? TimerValue { get; set; }
-        [JsonProperty][Localization("ALARM_DATA_DESCRIPTION", append: " > " + GenPlaceholders.Alarms.ALARM_DESCRIPTION)] public string? Description { get; set; }
+        [JsonProperty][Locale(nameof(Locale.ALARM_DATA_ENABLE))] public bool Enable { get; set; }
+        [JsonProperty][Locale(nameof(Locale.ALARM_DATA_ALM_VARIABLE))] public string? AlarmVariable { get; set; }
+        [JsonProperty][Locale(nameof(Locale.ALARM_DATA_COIL1_ADDRESS))] public string? Coil1Address { get; set; }
+        [JsonProperty][Locale(nameof(Locale.ALARM_DATA_COIL1_TYPE))] public string? Coil1Type { get; set; }
+        [JsonProperty][Locale(nameof(Locale.ALARM_DATA_COIL2_ADDRESS))] public string? Coil2Address { get; set; }
+        [JsonProperty][Locale(nameof(Locale.ALARM_DATA_COIL2_TYPE))] public string? Coil2Type { get; set; }
+        [JsonProperty][Locale(nameof(Locale.ALARM_DATA_TIMER_ADDRESS))] public string? TimerAddress { get; set; }
+        [JsonProperty][Locale(nameof(Locale.ALARM_DATA_TIMER_TYPE))] public string? TimerType { get; set; }
+        [JsonProperty][Locale(nameof(Locale.ALARM_DATA_TIMER_VALUE))] public string? TimerValue { get; set; }
+        [JsonProperty][Locale(nameof(Locale.ALARM_DATA_DESCRIPTION), append: " > " + GenPlaceholders.Alarms.ALARM_DESCRIPTION)] public string? Description { get; set; }
 
         public object? this[int column]
         {

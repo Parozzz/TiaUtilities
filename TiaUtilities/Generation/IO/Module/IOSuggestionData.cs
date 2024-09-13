@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using TiaUtilities.Languages;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.Generation.IO;
 using TiaXmlReader.Languages;
@@ -22,7 +23,7 @@ namespace TiaUtilities.Generation.IO.Module
             COLUMN_LIST = columnList.AsReadOnly();
         }
 
-        [JsonProperty][Localization("IO_SUGGESTION_DATA_VALUE")] public string? Value { get; set; }
+        [JsonProperty][Locale(nameof(Locale.IO_SUGGESTION_DATA_VALUE))] public string? Value { get; set; }
 
         public object? this[int column]
         {

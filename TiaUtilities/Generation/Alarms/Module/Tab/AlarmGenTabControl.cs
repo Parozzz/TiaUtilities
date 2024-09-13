@@ -1,5 +1,6 @@
 ﻿using TiaUtilities.Generation.Alarms;
 using TiaUtilities.Generation.Configuration.Utility;
+using TiaUtilities.Languages;
 using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Languages;
@@ -75,24 +76,24 @@ namespace TiaUtilities.Generation.GenModules.Alarm.Tab
                     var configForm = new ConfigForm(button.Text) { ControlWidth = 300 };
 
                     var mainGroup = configForm.Init().ControlWidth(150);
-                    mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_GENERATION_START_NUM")
+                    mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_GENERATION_START_NUM)
                          .ControlText(tabConfig.StartingAlarmNum)
                          .UIntChanged(v => tabConfig.StartingAlarmNum = v);
-                    mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_GENERATION_FORMAT")
+                    mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_GENERATION_FORMAT)
                          .ControlText(tabConfig.AlarmNumFormat)
                          .TextChanged(v => tabConfig.AlarmNumFormat = v);
-                    mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_GENERATION_SKIP")
+                    mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_GENERATION_SKIP)
                          .ControlText(tabConfig.SkipNumberAfterGroup)
                          .UIntChanged(v => tabConfig.SkipNumberAfterGroup = v);
 
                     mainGroup.AddSeparator().Height(15);
 
                     var antiSlipGroup = mainGroup.AddGroup().ControlWidth(175).NoAdapt();
-                    antiSlipGroup.AddLabel().LocalizedLabel("ALARM_CONFIG_GENERATION_ANTI_SLIP");
-                    antiSlipGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_GENERATION_ANTI_SLIP_AMOUNT")
+                    antiSlipGroup.AddLabel().Label(Locale.ALARM_CONFIG_GENERATION_ANTI_SLIP);
+                    antiSlipGroup.AddTextBox().Label(Locale.ALARM_CONFIG_GENERATION_ANTI_SLIP_AMOUNT)
                          .ControlText(tabConfig.AntiSlipNumber)
                          .UIntChanged(v => tabConfig.AntiSlipNumber = v);
-                    antiSlipGroup.AddCheckBox().LocalizedLabel("ALARM_CONFIG_GENERATION_ANTI_SLIP_GEN_EMPTY")
+                    antiSlipGroup.AddCheckBox().Label(Locale.ALARM_CONFIG_GENERATION_ANTI_SLIP_GEN_EMPTY)
                         .ControlNoAdapt()
                         .Value(tabConfig.GenerateEmptyAlarmAntiSlip)
                         .CheckedChanged(v => tabConfig.GenerateEmptyAlarmAntiSlip = v);
@@ -101,23 +102,23 @@ namespace TiaUtilities.Generation.GenModules.Alarm.Tab
 
                     var emptyAlarmGroup = mainGroup.AddGroup().ControlWidth(175).NoAdapt();
                     emptyAlarmGroup.AddLabel().Label("Empty Alarms");
-                    emptyAlarmGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_GENERATION_EMPTY_NUM")
+                    emptyAlarmGroup.AddTextBox().Label(Locale.ALARM_CONFIG_GENERATION_EMPTY_NUM)
                          .ControlText(tabConfig.EmptyAlarmAtEnd)
                          .UIntChanged(v => tabConfig.EmptyAlarmAtEnd = v);
-                    emptyAlarmGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_GENERATION_EMPTY_ALARM_ADDRESS")
+                    emptyAlarmGroup.AddTextBox().Label(Locale.ALARM_CONFIG_GENERATION_EMPTY_ALARM_ADDRESS)
                          .ControlText(tabConfig.EmptyAlarmContactAddress)
                          .TextChanged(v => tabConfig.EmptyAlarmContactAddress = v);
 
                     var timerGroup = emptyAlarmGroup.AddGroup().ControlWidth(175);
-                    timerGroup.AddLabel().LocalizedLabel("ALARM_CONFIG_GENERATION_EMPTY_TIMER");
-                    timerGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_GENERATION_EMPTY_TIMER_ADDRESS")
+                    timerGroup.AddLabel().Label(Locale.ALARM_CONFIG_GENERATION_EMPTY_TIMER);
+                    timerGroup.AddTextBox().Label(Locale.ALARM_CONFIG_GENERATION_EMPTY_TIMER_ADDRESS)
                          .ControlText(tabConfig.EmptyAlarmTimerAddress)
                          .TextChanged(v => tabConfig.EmptyAlarmTimerAddress = v);
-                    timerGroup.AddComboBox().LocalizedLabel("ALARM_CONFIG_GENERATION_EMPTY_TIMER_TYPE")
+                    timerGroup.AddComboBox().Label(Locale.ALARM_CONFIG_GENERATION_EMPTY_TIMER_TYPE)
                          .Items(["TON", "TOF"]).DisableEdit()
                          .ControlText(tabConfig.EmptyAlarmTimerType)
                          .TextChanged(v => tabConfig.EmptyAlarmTimerType = v);
-                    timerGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_GENERATION_EMPTY_TIMER_VALUE")
+                    timerGroup.AddTextBox().Label(Locale.ALARM_CONFIG_GENERATION_EMPTY_TIMER_VALUE)
                          .ControlText(tabConfig.EmptyAlarmTimerValue)
                          .TextChanged(v => tabConfig.EmptyAlarmTimerValue = v);
 
@@ -132,21 +133,29 @@ namespace TiaUtilities.Generation.GenModules.Alarm.Tab
                     var configForm = new ConfigForm(button.Text);
 
                     var mainGroup = configForm.Init();
-                    mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_DEFAULTS_COIL")
+
+                    var coil1Group = mainGroup.AddGroup().ControlWidth(225).NoAdapt();
+                    coil1Group.AddLabel().Label(Locale.ALARM_CONFIG_DEFAULTS_COIL1);
+
+                    coil1Group.AddTextBox().Label(Locale.GENERICS_ADDRESS)
                          .ControlText(tabConfig.DefaultCoil1Address)
                          .TextChanged(v => tabConfig.DefaultCoil1Address = v);
 
-                    mainGroup.AddComboBox().LocalizedLabel("ALARM_CONFIG_COIL1_TYPE")
+                    coil1Group.AddComboBox().Label(Locale.GENERICS_TYPE)
                         .DisableEdit()
                         .TranslatableEnumItems<AlarmCoilType>()
                         .SelectedValue(tabConfig.DefaultCoil1Type)
                         .SelectedValueChanged<AlarmCoilType>(type => tabConfig.DefaultCoil1Type = type);
 
-                    mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_DEFAULTS_SET_COIL")
+
+                    var coil2Group = mainGroup.AddGroup().ControlWidth(225).NoAdapt();
+                    coil2Group.AddLabel().Label(Locale.ALARM_CONFIG_DEFAULTS_COIL2);
+
+                    coil2Group.AddTextBox().Label(Locale.GENERICS_ADDRESS)
                          .ControlText(tabConfig.DefaultCoil2Address)
                          .TextChanged(v => tabConfig.DefaultCoil2Address = v);
 
-                    mainGroup.AddComboBox().LocalizedLabel("ALARM_CONFIG_COIL2_TYPE")
+                    coil2Group.AddComboBox().Label(Locale.GENERICS_TYPE)
                         .DisableEdit()
                         .TranslatableEnumItems<AlarmCoilType>()
                         .SelectedValue(tabConfig.DefaultCoil2Type)
@@ -155,18 +164,18 @@ namespace TiaUtilities.Generation.GenModules.Alarm.Tab
 
                     var timerGroup = mainGroup.AddGroup().ControlWidth(225).NoAdapt();
 
-                    timerGroup.AddLabel().LocalizedLabel("ALARM_CONFIG_DEFAULTS_TIMER");
+                    timerGroup.AddLabel().Label(Locale.ALARM_CONFIG_DEFAULTS_TIMER);
 
-                    timerGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_DEFAULTS_TIMER_ADDRESS")
+                    timerGroup.AddTextBox().Label(Locale.GENERICS_ADDRESS)
                          .ControlText(tabConfig.DefaultTimerAddress)
                          .TextChanged(v => tabConfig.DefaultTimerAddress = v);
 
-                    timerGroup.AddComboBox().LocalizedLabel("ALARM_CONFIG_DEFAULTS_TIMER_TYPE")
+                    timerGroup.AddComboBox().Label(Locale.GENERICS_TYPE)
                          .Items(["TON", "TOF"]).DisableEdit()
                          .ControlText(tabConfig.DefaultTimerType)
                          .TextChanged(v => tabConfig.DefaultTimerType = v);
 
-                    timerGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_DEFAULTS_TIMER_VALUE")
+                    timerGroup.AddTextBox().Label(Locale.GENERICS_VALUE)
                          .ControlText(tabConfig.DefaultTimerValue)
                          .TextChanged(v => tabConfig.DefaultTimerValue = v);
 
@@ -181,19 +190,19 @@ namespace TiaUtilities.Generation.GenModules.Alarm.Tab
                     var configForm = new ConfigForm(button.Text);
 
                     var mainGroup = configForm.Init();
-                    mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_PREFIX_ALARM_ADDRESS")
+                    mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_PREFIX_ALARM)
                          .ControlText(tabConfig.AlarmAddressPrefix)
                          .TextChanged(v => tabConfig.AlarmAddressPrefix = v);
 
-                    mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_PREFIX_COIL_ADDRESS")
-                         .ControlText(tabConfig.CoilAddressPrefix)
-                         .TextChanged(v => tabConfig.CoilAddressPrefix = v);
+                    mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_PREFIX_COIL1)
+                         .ControlText(tabConfig.Coil1AddressPrefix)
+                         .TextChanged(v => tabConfig.Coil1AddressPrefix = v);
 
-                    mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_PREFIX_SET_COIL_ADDRESS")
-                         .ControlText(tabConfig.SetCoilAddressPrefix)
-                         .TextChanged(v => tabConfig.SetCoilAddressPrefix = v);
+                    mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_PREFIX_COIL2)
+                         .ControlText(tabConfig.Coil2AddressPrefix)
+                         .TextChanged(v => tabConfig.Coil2AddressPrefix = v);
 
-                    mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_PREFIX_TIMER_ADDRESS")
+                    mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_PREFIX_TIMER)
                          .ControlText(tabConfig.TimerAddressPrefix)
                          .TextChanged(v => tabConfig.TimerAddressPrefix = v);
 
@@ -204,9 +213,9 @@ namespace TiaUtilities.Generation.GenModules.Alarm.Tab
 
         public void Translate()
         {
-            this.generationConfigButton.Text = Localization.Get("ALARM_CONFIG_GENERATION");
-            this.defaultValuesConfigButton.Text = Localization.Get("ALARM_CONFIG_DEFAULTS");
-            this.valuesPrefixesConfigButton.Text = Localization.Get("ALARM_CONFIG_PREFIX");
+            this.generationConfigButton.Text = Locale.ALARM_CONFIG_GENERATION;
+            this.defaultValuesConfigButton.Text = Locale.ALARM_CONFIG_DEFAULTS;
+            this.valuesPrefixesConfigButton.Text = Locale.ALARM_CONFIG_PREFIX;
         }
 
         private static void SetupConfigForm(Control button, ConfigForm configForm)

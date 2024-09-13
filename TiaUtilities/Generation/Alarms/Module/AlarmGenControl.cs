@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using TiaUtilities.Generation.Configuration.Utility;
+using TiaUtilities.Languages;
 using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Languages;
@@ -28,9 +29,9 @@ namespace TiaUtilities.Generation.GenModules.Alarm
 
         private void Translate()
         {
-            this.fcConfigButton.Text = Localization.Get("ALARM_CONFIG_FC");
-            this.segmentNameConfigButton.Text = Localization.Get("ALARM_CONFIG_SEGMENT_NAME");
-            this.textListConfigButton.Text = Localization.Get("ALARM_CONFIG_TEXT_LIST");
+            this.fcConfigButton.Text = Locale.ALARM_CONFIG_FC;
+            this.segmentNameConfigButton.Text = Locale.ALARM_CONFIG_SEGMENT_NAME;
+            this.textListConfigButton.Text = Locale.ALARM_CONFIG_TEXT_LIST;
         }
 
         public void BindConfig(AlarmMainConfiguration mainConfig)
@@ -42,11 +43,11 @@ namespace TiaUtilities.Generation.GenModules.Alarm
                     var configForm = new ConfigForm(button.Text);
 
                     var mainGroup = configForm.Init().ControlWidth(185);
-                    mainGroup.AddTextBox().LocalizedLabel("GENERICS_NAME")
+                    mainGroup.AddTextBox().Label(Locale.GENERICS_NAME)
                         .ControlText(mainConfig.FCBlockName)
                         .TextChanged(v => mainConfig.FCBlockName = v);
 
-                    mainGroup.AddTextBox().LocalizedLabel("GENERICS_NUMBER")
+                    mainGroup.AddTextBox().Label(Locale.GENERICS_NUMBER)
                         .ControlText(mainConfig.FCBlockNumber)
                         .UIntChanged(v => mainConfig.FCBlockNumber = v);
 
@@ -61,19 +62,19 @@ namespace TiaUtilities.Generation.GenModules.Alarm
                     var configForm = new ConfigForm(button.Text) { ControlWidth = 500 };
 
                     var mainGroup = configForm.Init();
-                    mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_SEGMENT_NAME_ONE_EACH")
+                    mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_SEGMENT_NAME_ONE_EACH)
                          .ControlText(mainConfig.OneEachSegmentName)
                          .TextChanged(v => mainConfig.OneEachSegmentName = v);
 
-                    mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_SEGMENT_NAME_ONE_EACH_EMPTY")
+                    mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_SEGMENT_NAME_ONE_EACH_EMPTY)
                          .ControlText(mainConfig.OneEachEmptyAlarmSegmentName)
                          .TextChanged(v => mainConfig.OneEachEmptyAlarmSegmentName = v);
 
-                    mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_SEGMENT_NAME_GROUP_EACH")
+                    mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_SEGMENT_NAME_GROUP_EACH)
                          .ControlText(mainConfig.GroupSegmentName)
                          .TextChanged(v => mainConfig.GroupSegmentName = v);
 
-                    mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_SEGMENT_NAME_GROUP_EACH_EMPTY")
+                    mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_SEGMENT_NAME_GROUP_EACH_EMPTY)
                          .ControlText(mainConfig.GroupEmptyAlarmSegmentName)
                          .TextChanged(v => mainConfig.GroupEmptyAlarmSegmentName = v);
 
@@ -85,14 +86,14 @@ namespace TiaUtilities.Generation.GenModules.Alarm
                 var button = this.textListConfigButton;
                 button.Click += (sender, args) =>
                 {
-                    var configForm = new ConfigForm(Localization.Get("ALARM_CONFIG_TEXT_LIST"));
+                    var configForm = new ConfigForm(Locale.ALARM_CONFIG_TEXT_LIST);
 
                     var mainGroup = configForm.Init();
-                    mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_TEXT_LIST_FULL")
+                    mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_TEXT_LIST_FULL)
                          .ControlText(mainConfig.AlarmTextInList)
                          .TextChanged(v => mainConfig.AlarmTextInList = v);
 
-                    mainGroup.AddTextBox().LocalizedLabel("ALARM_CONFIG_TEXT_LIST_EMPTY")
+                    mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_TEXT_LIST_EMPTY)
                          .ControlText(mainConfig.EmptyAlarmTextInList)
                          .TextChanged(v => mainConfig.EmptyAlarmTextInList = v);
 

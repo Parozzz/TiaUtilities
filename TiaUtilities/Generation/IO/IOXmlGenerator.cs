@@ -85,7 +85,7 @@ namespace TiaXmlReader.Generation.IO
                 var ioTag = ioTagTable.AddTag()
                     .SetBoolean(ioData.GetAddressMemoryArea(), ioData.GetAddressByte(), ioData.GetAddressBit());
                 ioTag.TagName = FixDuplicateAddress(ioData.IOName, ioAddressDict);
-                ioTag.Comment[LocalizationVariables.CULTURE] = ioData.Comment;
+                ioTag.Comment[LocaleVariables.CULTURE] = ioData.Comment;
 
                 string? inOutAddress = null;
                 if (!variableDefault)
@@ -115,7 +115,7 @@ namespace TiaXmlReader.Generation.IO
 
                             var tag = variableTagTable.AddTag();
                             tag.TagName = merkerVariableAddress;
-                            tag.Comment[LocalizationVariables.CULTURE] = ioData.Comment;
+                            tag.Comment[LocaleVariables.CULTURE] = ioData.Comment;
                             tag.SetBoolean(SimaticMemoryArea.MERKER, merkerVariableTag.ByteOffset, merkerVariableTag.BitOffset);
 
                             inOutAddress = merkerVariableAddress;
@@ -133,7 +133,7 @@ namespace TiaXmlReader.Generation.IO
                     segment?.Create(fc);
 
                     segment = new SimaticLADSegment();
-                    segment.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(tabConfig.SegmentNameBitGrouping);
+                    segment.Title[LocaleVariables.CULTURE] = placeholderHandler.Parse(tabConfig.SegmentNameBitGrouping);
                 }
                 else if (mainConfig.GroupingType == IOGroupingTypeEnum.PER_BYTE && (ioData.GetAddressByte() != lastByteAddress || ioData.GetAddressMemoryArea() != lastMemoryArea || segment == null))
                 {
@@ -143,7 +143,7 @@ namespace TiaXmlReader.Generation.IO
                     lastMemoryArea = ioData.GetAddressMemoryArea();
 
                     segment = new SimaticLADSegment();
-                    segment.Title[LocalizationVariables.CULTURE] = placeholderHandler.Parse(tabConfig.SegmentNameByteGrouping);
+                    segment.Title[LocaleVariables.CULTURE] = placeholderHandler.Parse(tabConfig.SegmentNameByteGrouping);
                 }
 
                 if (inOutAddress != null) 
@@ -183,7 +183,7 @@ namespace TiaXmlReader.Generation.IO
             var dbMemberAddress = FixDuplicateAddress(variable, duplicatedAddressDict);
 
             var member = db.AttributeList.STATIC.AddMembersFromAddress(dbMemberAddress, SimaticDataType.BOOLEAN) ?? throw new InvalidDataException();
-            member.Comment[LocalizationVariables.CULTURE] = comment;
+            member.Comment[LocaleVariables.CULTURE] = comment;
             return member;
         }
 

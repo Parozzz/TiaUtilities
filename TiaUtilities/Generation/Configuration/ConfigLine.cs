@@ -30,13 +30,6 @@ namespace TiaXmlReader.Generation.Configuration
             return (LINE)this;
         }
 
-        public LINE LocalizedLabel(string jsonKey, string append = "")
-        {
-            var localizedString = Localization.Get(jsonKey, append);
-            this.labelText = string.IsNullOrEmpty(localizedString) ? jsonKey : localizedString;
-            return (LINE)this;
-        }
-
         public LINE LabelFont(Font labelFont)
         {
             this.labelFont = labelFont;

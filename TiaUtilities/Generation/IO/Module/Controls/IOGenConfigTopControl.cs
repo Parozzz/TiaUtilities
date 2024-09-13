@@ -4,7 +4,8 @@ using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.Configuration;
 using TiaUtilities.Generation.Configuration.Utility;
 using TiaXmlReader.Generation.Placeholders;
-using TiaUtilities.Generation.GenModules.IO.Controls;
+using TiaUtilities.Languages;
+
 
 namespace TiaUtilities.Generation.GenModules.IO.Controls
 {
@@ -46,23 +47,24 @@ namespace TiaUtilities.Generation.GenModules.IO.Controls
                     var configForm = new ConfigForm(button.Text) { ControlWidth = 250 };
 
                     var mainGroup = configForm.Init();
-                    mainGroup.AddTextBox().LocalizedLabel("GENERICS_NAME", " > " + GenPlaceholders.IO.CONFIG_DB_NAME)
+
+                    mainGroup.AddTextBox().Label($"{Locale.GENERICS_NAME} > {GenPlaceholders.IO.CONFIG_DB_NAME}")
                          .ControlText(mainConfig.DBName)
                          .TextChanged(str => mainConfig.DBName = str);
 
-                    mainGroup.AddTextBox().LocalizedLabel("GENERICS_NUMBER", " > " + GenPlaceholders.IO.CONFIG_DB_NUMBER)
+                    mainGroup.AddTextBox().Label($"{Locale.GENERICS_NUMBER} > {GenPlaceholders.IO.CONFIG_DB_NUMBER}")
                          .ControlText(mainConfig.DBNumber)
                          .UIntChanged(num => mainConfig.DBNumber = num);
 
-                    mainGroup.AddCheckBox().LocalizedLabel("IO_GEN_CONFIG_ALIAS_DB_GENERATED_DEFINED_VARIABLES").ControlNoAdapt()
+                    mainGroup.AddCheckBox().Label(Locale.IO_GEN_CONFIG_ALIAS_DB_GENERATED_DEFINED_VARIABLES).ControlNoAdapt()
                          .Value(mainConfig.GenerateDefinedVariableAnyway)
                          .CheckedChanged(b => mainConfig.GenerateDefinedVariableAnyway = b);
 
-                    mainGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_ALIAS_DB_IN_DEFAULT")
+                    mainGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_ALIAS_DB_IN_DEFAULT)
                          .ControlText(mainConfig.DefaultDBInputVariable)
                          .TextChanged(str => mainConfig.DefaultDBInputVariable = str);
 
-                    mainGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_ALIAS_DB_OUT_DEFAULT")
+                    mainGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_ALIAS_DB_OUT_DEFAULT)
                          .ControlText(mainConfig.DefaultDBOutputVariable)
                          .TextChanged(str => mainConfig.DefaultDBOutputVariable = str);
 
@@ -77,15 +79,15 @@ namespace TiaUtilities.Generation.GenModules.IO.Controls
                     var configForm = new ConfigForm(button.Text) { ControlWidth = 285 };
 
                     var mainGroup = configForm.Init();
-                    mainGroup.AddTextBox().LocalizedLabel("GENERICS_NAME")
+                    mainGroup.AddTextBox().Label(Locale.GENERICS_NAME)
                          .ControlText(mainConfig.IOTableName)
                          .TextChanged(str => mainConfig.IOTableName = str);
 
-                    mainGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_IO_TABLE_NEW_EVERY")
+                    mainGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_IO_TABLE_NEW_EVERY)
                          .ControlText(mainConfig.IOTableSplitEvery)
                          .UIntChanged(num => mainConfig.IOTableSplitEvery = num);
 
-                    mainGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_IO_TABLE_DEFAULT_NAME")
+                    mainGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_IO_TABLE_DEFAULT_NAME)
                          .ControlText(mainConfig.DefaultIoName)
                          .TextChanged(str => mainConfig.DefaultIoName = str);
 
@@ -101,33 +103,33 @@ namespace TiaUtilities.Generation.GenModules.IO.Controls
                     var configForm = new ConfigForm(button.Text) { ControlWidth = 250 };
 
                     var mainGroup = configForm.Init();
-                    mainGroup.AddTextBox().LocalizedLabel("GENERICS_NAME")
+                    mainGroup.AddTextBox().Label(Locale.GENERICS_NAME)
                          .ControlText(mainConfig.VariableTableName)
                          .TextChanged(str => mainConfig.VariableTableName = str);
 
-                    mainGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_ALIAS_TABLE_NEW_EVERY")
+                    mainGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_ALIAS_TABLE_NEW_EVERY)
                          .ControlText(mainConfig.VariableTableSplitEvery)
                          .UIntChanged(num => mainConfig.VariableTableSplitEvery = num);
 
                     var inputGroup = mainGroup.AddGroup();
-                    inputGroup.AddLabel().LocalizedLabel("IO_GEN_CONFIG_ALIAS_TABLE_INPUT_VARIABLE");
+                    inputGroup.AddLabel().Label(Locale.IO_GEN_CONFIG_ALIAS_TABLE_INPUT_VARIABLE);
 
-                    inputGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_START_ADDRESS")
+                    inputGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_START_ADDRESS)
                          .ControlText(mainConfig.VariableTableInputStartAddress)
                          .UIntChanged(num => mainConfig.VariableTableInputStartAddress = num);
 
-                    inputGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_DEFAULT")
+                    inputGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_DEFAULT)
                          .ControlText(mainConfig.DefaultMerkerInputVariable)
                          .TextChanged(str => mainConfig.DefaultMerkerInputVariable = str);
 
                     var outputGroup = mainGroup.AddGroup();
-                    outputGroup.AddLabel().LocalizedLabel("IO_GEN_CONFIG_ALIAS_TABLE_OUTPUT_VARIABLE");
+                    outputGroup.AddLabel().Label(Locale.IO_GEN_CONFIG_ALIAS_TABLE_OUTPUT_VARIABLE);
 
-                    outputGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_START_ADDRESS")
+                    outputGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_START_ADDRESS)
                          .ControlText(mainConfig.VariableTableOutputStartAddress)
                          .UIntChanged(num => mainConfig.VariableTableOutputStartAddress = num);
 
-                    outputGroup.AddTextBox().LocalizedLabel("IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_DEFAULT")
+                    outputGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_DEFAULT)
                          .ControlText(mainConfig.DefaultMerkerOutputVariable)
                          .TextChanged(str => mainConfig.DefaultMerkerOutputVariable = str);
 
@@ -141,12 +143,12 @@ namespace TiaUtilities.Generation.GenModules.IO.Controls
 
         private void Translate()
         {
-            this.memoryTypeLabel.Text = Localization.Get("IO_CONFIG_MEMORY_TYPE");
-            this.groupingTypeLabel.Text = Localization.Get("IO_CONFIG_GROUPING_TYPE");
+            this.memoryTypeLabel.Text = Locale.IO_CONFIG_MEMORY_TYPE;
+            this.groupingTypeLabel.Text = Locale.IO_CONFIG_GROUPING_TYPE;
 
-            this.ioTableConfigButton.Text = Localization.Get("IO_GEN_CONFIG_IO_TABLE");
-            this.dbConfigButton.Text = Localization.Get("IO_GEN_CONFIG_ALIAS_DB");
-            this.variableTableConfigButton.Text = Localization.Get("IO_GEN_CONFIG_ALIAS_TABLE");
+            this.ioTableConfigButton.Text = Locale.IO_GEN_CONFIG_IO_TABLE;
+            this.dbConfigButton.Text = Locale.IO_GEN_CONFIG_ALIAS_DB;
+            this.variableTableConfigButton.Text = Locale.IO_GEN_CONFIG_ALIAS_TABLE;
         }
 
         private void UpdateConfigPanel(IOMemoryTypeEnum memoryType)
