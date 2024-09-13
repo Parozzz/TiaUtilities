@@ -1,60 +1,55 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TiaUtilities.Generation.GridHandler.Events;
+﻿using TiaUtilities.Generation.GridHandler.Events;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.GenerationForms;
 
 namespace TiaXmlReader.Generation.GridHandler.Events
 {
-    public class GridEvents
+    public class GridEvents<T> where T : IGridData
     {
         public event GridCellChangeEventHandler CellChange = delegate { };
 
         public event GridScriptShowVariableEventHandler ScriptShowVariable = delegate {};
         public event GridScriptAddVariableEventHandler ScriptAddVariables = delegate { };
 
-        public event GridScriptLoadEventHandlers ScriptLoad = delegate { };
-        public event GridScriptChangedEventHandlers ScriptChanged = delegate { };
-
         public event GridPreSortEventHandler PreSort = delegate { };
         public event GridPostSortEventHandler PostSort = delegate { };
 
-        public void CellChangeEvent(GridCellChangeEventArgs args)
+        public event GridExcelDragPreviewEventHandler ExcelDragPreview = delegate { };
+        public event GridExcelDragDoneEventHandler ExcelDragDone = delegate { };
+
+        public void CellChangeEvent(object? sender, GridCellChangeEventArgs args)
         {
-            CellChange(args);
+            CellChange(sender, args);
         }
 
-        public void ScriptShowVariableEvent(GridScriptShowVariableEventArgs args)
+        public void ScriptShowVariableEvent(object? sender, GridScriptShowVariableEventArgs args)
         {
-            ScriptShowVariable(args);
+            ScriptShowVariable(sender, args);
         }
 
-        public void ScriptAddVariablesEvent(GridScriptAddVariableEventArgs args)
+        public void ScriptAddVariablesEvent(object? sender, GridScriptAddVariableEventArgs args)
         {
-            ScriptAddVariables(args);
+            ScriptAddVariables(sender, args);
         }
 
-        public void ScriptLoadEvent(GridScriptEventArgs args)
+        public void PreSortEvent(object? sender, GridPreSortEventArgs args)
         {
-            ScriptLoad(args);
+            PreSort(sender, args);
         }
 
-        public void ScriptChangedEvent(GridScriptEventArgs args)
+        public void PostSortEvent(object? sender, GridPostSortEventArgs args)
         {
-            ScriptChanged(args);
+            PostSort(sender, args);
         }
 
-        public void PreSortEvent(GridPreSortEventArgs args)
+        public void ExcelDragPreviewEvent(object? sender, GridExcelDragEventArgs args)
         {
-            PreSort(args);
+            ExcelDragPreview(sender, args);
         }
 
-        public void PostSortEvent(GridPostSortEventArgs args)
+        public void ExcelDragDoneEvent(object? sender, GridExcelDragEventArgs args)
         {
-            PostSort(args);
+            ExcelDragDone(sender, args);
         }
     }
 }

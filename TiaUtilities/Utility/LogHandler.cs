@@ -6,13 +6,9 @@ namespace TiaXmlReader.Utility
 {
     public class LogHandler
     {
-        private class Log
-        {
-            public string Message { get; set; }
-            public string FileName { get; set; }
-        }
+        private record Log(string Message, string FileName);
 
-        public static readonly LogHandler INSTANCE = new LogHandler();
+        public static readonly LogHandler INSTANCE = new();
 
         private readonly BackgroundWorker worker;
         private readonly Timer timer;
@@ -26,7 +22,7 @@ namespace TiaXmlReader.Utility
             this.worker = new BackgroundWorker();
             this.timer = new Timer() { Interval = 1000 };
 
-            messages = new ConcurrentBag<Log>();
+            messages = [];
         }
 
         public void Init()
@@ -77,26 +73,22 @@ namespace TiaXmlReader.Utility
             var timeString = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss fff") + "[ms]";
 
             var timeHeader = "============================================= ^^^^^ " + timeString + " ^^^^^ =============================================";
-            messages.Add(new Log()
-            {
-                Message = message + '\n' + timeHeader + '\n',
-                FileName = fileName,
-            });
+            messages.Add(new Log(Message: $"{message}\n{timeHeader}\n", FileName: fileName));
         }
 
         public void WriteToFile()
         {
             try
             {
-                if (!messages.TryTake(out Log log))
+                if (!messages.TryTake(out Log? log) || log == null)
                 {
                     return;
                 }
 
                 var filePath = this.GetFilePath(log.FileName);
-                if (!File.Exists(filePath))
+                if (!File.Exists(filePath) && Path.GetDirectoryName(filePath) is string directoryName)
                 {
-                    Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+                    Directory.CreateDirectory(directoryName);
                 }
 
                 File.AppendAllText(filePath, log.Message);

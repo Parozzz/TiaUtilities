@@ -214,10 +214,10 @@ namespace CustomControls.RJControls
         [Bindable(true)]
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public object? SelectedItem
+        public object? SelectedValue
         {
-            get => this.comboBox.SelectedItem;
-            set => this.comboBox.SelectedItem = value;
+            get => this.comboBox.SelectedValue;
+            set => this.comboBox.SelectedValue = value;
         }
 
         [Category("RJ Code - Data")]
@@ -255,7 +255,7 @@ namespace CustomControls.RJControls
         private readonly Button button;
 
         //Events
-        public event EventHandler OnSelectedIndexChanged = delegate { };//Default event
+        public event EventHandler OnSelectedIndexChanged = delegate { }; //Default event
 
         public RJComboBox()
         {

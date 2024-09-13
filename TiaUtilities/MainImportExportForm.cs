@@ -1,14 +1,10 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Globalization;
 using TiaXmlReader.Utility;
-using TiaXmlReader.Generation.Alarms.GenerationForm;
-using TiaXmlReader.Generation.IO.GenerationForm;
-using TiaXmlReader.AutoSave;
 using System.Xml;
 using TiaXmlReader.Generation.Configuration;
 using Jint;
 using TiaXmlReader.Javascript;
-using Timer = System.Windows.Forms.Timer;
 using TiaUtilities.Generation.Configuration.Utility;
 using InfoBox;
 using TiaXmlReader.Languages;
@@ -16,9 +12,13 @@ using SimaticML;
 using SimaticML.Blocks;
 using SimaticML.Enums;
 using SimaticML.Blocks.FlagNet;
-using SimaticML.Blocks.FlagNet.nPart;
 using SimaticML.API;
 using TiaXmlReader.Generation;
+using TiaUtilities;
+using TiaUtilities.Generation.GenModules;
+using TiaUtilities.Generation.Alarms.Module;
+using TiaUtilities.Generation.IO.Module;
+using TiaUtilities.Languages;
 
 namespace TiaXmlReader
 {
@@ -28,14 +28,16 @@ namespace TiaXmlReader
         private readonly TimedSaveHandler autoSaveHandler;
         private readonly JavascriptErrorReportThread jsErrorHandlingThread;
 
+        private ProgramSettings? oldProgramSettings;
+
         public MainImportExportForm()
         {
             InitializeComponent();
 
-            this.programSettings = ProgramSettings.Load();
+            this.programSettings = SavesLoader.LoadWithoutDialog(ProgramSettings.GetFilePath(), "json") is ProgramSettings loadedSave ? loadedSave : new();
             this.programSettings.Save(); //To create file if not exist!
 
-            this.autoSaveHandler = new TimedSaveHandler(programSettings);
+            this.autoSaveHandler = new TimedSaveHandler();
             this.jsErrorHandlingThread = new JavascriptErrorReportThread();
 
             Init();
@@ -59,19 +61,21 @@ namespace TiaXmlReader
                 try
                 {
                     var culture = CultureInfo.GetCultureInfo(this.languageComboBox.Text);
-                    LocalizationVariables.LANG = programSettings.ietfLanguage = culture.IetfLanguageTag;
+                    LocaleVariables.LANG = culture.IetfLanguageTag;
 
                     if (ignoreLanguageBoxAtStartup)
                     {
                         return;
                     }
 
+                    //Without save, after restart it would restore the old (Meaning it would be useless)
+                    this.programSettings.ietfLanguage = culture.IetfLanguageTag;
+                    this.programSettings.Save();
+
                     //This should stay always in english. In case someone set an unkown language, this will be neautral.
                     var result = InformationBox.Show("Do you want to restart application?", "Restart to change language", buttons: InformationBoxButtons.YesNo);
                     if (result == InformationBoxResult.Yes)
                     {
-                        this.programSettings.Save(); //Without save, after restart it would restore the old (Meaning it would be useless)
-
                         Application.Restart();
                         Environment.Exit(0);
                     }
@@ -86,28 +90,31 @@ namespace TiaXmlReader
 
             ignoreLanguageBoxAtStartup = false;
 
-            #region SETTINGS_SAVE_TICK + AUTO_SAVE
+            #region AUTO_SAVE_TIME
             this.autoSaveTimeTextBox.TextChanged += (sender, args) =>
             {
                 if (int.TryParse(autoSaveTimeTextBox.Text, out int time))
                 {
-                    this.autoSaveHandler.SetIntervalAndStart(time * 1000);
+                    this.autoSaveHandler.Start(time * 1000);
+                    programSettings.TimedSaveTime = time;
+
+                    this.programSettings.Save(); //To create file if not exist!
                 }
             };
             this.autoSaveTimeTextBox.Text = "" + programSettings.TimedSaveTime; //Call this after so it start auto save
+            #endregion
 
-            var settingsWrapper = new AutoSaveSettingsWrapper(this.programSettings);
-            settingsWrapper.Scan();
-
-            var timer = new Timer { Interval = 1000 };
-            timer.Start();
-            timer.Tick += (sender, e) =>
+            #region PROGRAM_SETTINGS_AUTO_SAVE
+            void eventHandler(object? sender, EventArgs args)
             {
-                if (!settingsWrapper.CompareSnapshot())
+                if (this.oldProgramSettings == null || !this.oldProgramSettings.Equals(this.programSettings))
                 {
+                    this.oldProgramSettings = this.programSettings;
+
                     this.programSettings.Save();
                 }
-            };
+            }
+            this.autoSaveHandler.AddTickEventHandler(eventHandler);
             #endregion
 
             Translate();
@@ -115,17 +122,17 @@ namespace TiaXmlReader
 
         private void Translate()
         {
-            this.Text = Localization.Get("MAIN_FORM");
+            this.Text = Locale.MAIN_FORM;
 
-            this.fileToolStripMenuItem.Text = Localization.Get("GENERICS_FILE");
-            this.autoSaveMenuItem.Text = Localization.Get("MAIN_FORM_TOP_FILE_AUTO_SAVE");
+            this.fileToolStripMenuItem.Text = Locale.GENERICS_FILE;
+            this.autoSaveMenuItem.Text = Locale.MAIN_FORM_TOP_FILE_AUTO_SAVE;
 
-            this.dbDuplicationMenuItem.Text = Localization.Get("MAIN_FORM_TOP_DB_DUPLICATION");
-            this.generateIOMenuItem.Text = Localization.Get("MAIN_FORM_TOP_IO_GENERATION");
-            this.generateAlarmsMenuItem.Text = Localization.Get("MAIN_FORM_TOP_ALARM_GENERATOR");
+            this.dbDuplicationMenuItem.Text = Locale.MAIN_FORM_TOP_DB_DUPLICATION;
+            this.generateIOMenuItem.Text = Locale.MAIN_FORM_TOP_IO_GENERATION;
+            this.generateAlarmsMenuItem.Text = Locale.MAIN_FORM_TOP_ALARM_GENERATOR;
 
-            this.tiaVersionLabel.Text = Localization.Get("MAIN_FORM_TIA_VERSION");
-            this.languageLabel.Text = Localization.Get("MAIN_FORM_LANGUAGE");
+            this.tiaVersionLabel.Text = Locale.MAIN_FORM_TIA_VERSION;
+            this.languageLabel.Text = Locale.MAIN_FORM_LANGUAGE;
         }
 
         private void TiaVersionComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -147,12 +154,26 @@ namespace TiaXmlReader
 
         private void GenerateIOMenuItem_Click(object sender, EventArgs e)
         {
-            new IOGenerationForm(this.jsErrorHandlingThread, this.autoSaveHandler, this.programSettings.IOSettings, this.programSettings.GridSettings).Show(this);
+            IOGenModule ioGenProject = new(jsErrorHandlingThread, programSettings.GridSettings);
+
+            GenModuleForm projectForm = new(ioGenProject, autoSaveHandler, programSettings.GridSettings)
+            {
+                Width = 1400,
+                Height = 850
+            };
+            projectForm.Show(this);
         }
 
         private void GenerateAlarmsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            new AlarmGenerationForm(this.jsErrorHandlingThread, this.autoSaveHandler, this.programSettings.AlarmSettings, this.programSettings.GridSettings).Show(this);
+            AlarmGenModule alarmGenProject = new(jsErrorHandlingThread, programSettings.GridSettings);
+
+            GenModuleForm projectForm = new(alarmGenProject, autoSaveHandler, programSettings.GridSettings)
+            {
+                Width = 1400,
+                Height = 850
+            };
+            projectForm.Show(this);
         }
 
         private void ImportXMLToolStripMenuItem_Click(object sender, EventArgs e)
@@ -264,7 +285,7 @@ namespace TiaXmlReader
 
             //Add two temp variables to the specific section.
 
-            for(int i = 0; i < 10; i++)
+            for (int i = 0; i < 10; i++)
             {
                 fc.AttributeList.TEMP.AddMember($"tContact{i}", SimaticDataType.BOOLEAN);
             }
@@ -272,8 +293,8 @@ namespace TiaXmlReader
             fc.AttributeList.TEMP.AddMember("tCoil2", SimaticDataType.BOOLEAN);
 
             var segment = new SimaticLADSegment();
-            segment.Title[LocalizationVariables.CULTURE] = "Segment Title!";
-            segment.Comment[LocalizationVariables.CULTURE] = "Segment Comment! Much information here ...";
+            segment.Title[LocaleVariables.CULTURE] = "Segment Title!";
+            segment.Comment[LocaleVariables.CULTURE] = "Segment Comment! Much information here ...";
 
             ContactPart[] contacts = new ContactPart[10];
             for (int i = 0; i < 10; i++)
@@ -304,7 +325,7 @@ namespace TiaXmlReader
             //Create skeleton for the XML Document and add the FC to it.
             var xmlDocument = SimaticMLAPI.CreateDocument(fc);
 
-            var fileDialog = GenerationUtils.CreateFileDialog(false, null, "xml");
+            var fileDialog = GenUtils.CreateFileDialog(false, null, "xml");
             if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok && !string.IsNullOrEmpty(fileDialog.FileName))
             {
                 xmlDocument.Save(fileDialog.FileName);
@@ -313,6 +334,7 @@ namespace TiaXmlReader
             //Save the file.
             //xmlDocument.Save(Directory.GetCurrentDirectory() + "/fc.xml");
         }
+
     }
 }
 

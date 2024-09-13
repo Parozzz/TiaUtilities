@@ -2,10 +2,8 @@
 
 namespace TiaXmlReader.Generation.GridHandler.Data
 {
-    public interface IGridData<C> where C : IGenerationConfiguration
+    public interface IGridData
     { //CLASS THAT IMPLEMENT THIS MUST HAVE AN EMPTY CONSTRUCTOR!
-        GridDataPreview? GetPreview(GridDataColumn column, C config);
-        GridDataPreview? GetPreview(int column, C config);
         void Clear();
         bool IsEmpty();
         IReadOnlyList<GridDataColumn> GetColumns();

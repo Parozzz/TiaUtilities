@@ -16,8 +16,6 @@
 
   <ItemGroup>
     <None Remove="!!TO-DO!!.txt" />
-    <None Remove="Languages\en-US.json" />
-    <None Remove="Languages\it-IT.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,21 +23,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Languages\en-US.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Languages\it-IT.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="ClosedXML" Version="0.102.2" />
+    <PackageReference Include="ClosedXML" Version="0.102.3" />
     <PackageReference Include="FastColoredTextBox.Net6" Version="1.0.0" />
     <PackageReference Include="InformationBox" Version="1.3.0.152" />
-    <PackageReference Include="Jint" Version="3.1.1" />
+    <PackageReference Include="Jint" Version="4.0.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="WindowsAPICodePack" Version="7.0.4" />
+    <PackageReference Include="WindowsAPICodePack" Version="8.0.4" />
   </ItemGroup>
 
   <ItemGroup>
@@ -59,19 +48,39 @@
     <Compile Update="DBDuplicationForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Generation\Alarms\GenerationForm\AlarmGenerationForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Update="Generation\Configuration\ConfigForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Generation\IO\GenerationForm\ExcelImporter\IOGenerationExcelImportForm.cs">
+    <Compile Update="Generation\IO\Module\Controls\IOGenBottomControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Generation\IO\Module\Controls\IOGenConfigTopControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Generation\IO\Module\ExcelImporter\IOGenerationExcelImportForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Generation\IO\GenerationForm\IOGenerationForm.cs" />
+    <Compile Update="Generation\IO\Module\Tab\IOGenTabControl.cs" />
+    <Compile Update="Languages\Locale.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Locale.resx</DependentUpon>
+    </Compile>
     <Compile Update="MainImportExportForm.cs">
       <SubType>Form</SubType>
     </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Languages\Locale.it.resx">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Languages\Locale.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Locale.Designer.cs</LastGenOutput>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

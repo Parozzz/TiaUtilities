@@ -1,5 +1,6 @@
 ﻿using InfoBox;
 using System.Data;
+using TiaUtilities.Languages;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.GenerationForms;
@@ -10,7 +11,7 @@ namespace TiaUtilities.Generation.GridHandler
 {
     public partial class GridFindForm : Form
     {
-        public class FindData<C, T>(T data, GridDataColumn column, int row, string findText) where C : IGenerationConfiguration where T : IGridData<C>
+        public class FindData<T>(T data, GridDataColumn column, int row, string findText) where T : IGridData
         {
             public T Data { get; init; } = data;
             public GridDataColumn Column { get; init; } = column;
@@ -18,7 +19,7 @@ namespace TiaUtilities.Generation.GridHandler
             public string FindText { get; init; } = findText;
         }
 
-        public static void StartFind<C, T>(GridHandler<C, T> gridHandler) where C : IGenerationConfiguration where T : IGridData<C>
+        public static void StartFind<T>(GridHandler<T> gridHandler) where T : IGridData
         {
             var form = gridHandler.DataGridView.FindForm();
             if (form == null)
@@ -78,8 +79,8 @@ namespace TiaUtilities.Generation.GridHandler
                 }
                 gridHandler.ChangeCells(cellChangeList);
 
-                var title = Localization.Get("FIND_FORM");
-                var searchCompletedText = Localization.Get("FIND_FORM_REPLACE_ALL_COMPLETED").Replace("{count}", cellChangeList.Count.ToString());
+                var title = Locale.GRID_FIND_FORM_NAME;
+                var searchCompletedText = Locale.GRID_FIND_REPLACE_ALL_COMPLETED.Replace("{count}", cellChangeList.Count.ToString());
                 InformationBox.Show(searchCompletedText, title,
                         buttons: InformationBoxButtons.OK,
                         icon: InformationBoxIcon.Information,
@@ -91,7 +92,7 @@ namespace TiaUtilities.Generation.GridHandler
         }
 
 
-        private static GridCellChange? CreateReplaceCellChange<C, T>(FindData<C, T>? findData, string replaceText) where C : IGenerationConfiguration where T : IGridData<C>
+        private static GridCellChange? CreateReplaceCellChange<T>(FindData<T>? findData, string replaceText) where T : IGridData
         {
             if (findData == null)
             {
@@ -108,7 +109,7 @@ namespace TiaUtilities.Generation.GridHandler
             return new GridCellChange(findData.Column.ColumnIndex, findData.Row) { NewValue = replacedText };
         }
 
-        private static bool TryFindText<C, T>(GridHandler<C, T> gridHandler, GridFindForm findForm, bool showFoundCell = true, bool showInfoAndClearOnFail = true) where C : IGenerationConfiguration where T : IGridData<C>
+        private static bool TryFindText<T>(GridHandler<T> gridHandler, GridFindForm findForm, bool showFoundCell = true, bool showInfoAndClearOnFail = true) where T : IGridData
         {
             var matchCase = findForm.MatchCaseCheckBox.Checked;
             var findText = findForm.FindTextBox.Text;
@@ -155,12 +156,12 @@ namespace TiaUtilities.Generation.GridHandler
                             }
                         }
 
-                        gridHandler.FindData = new FindData<C, T>(data, column, row, findText);
+                        gridHandler.FindData = new FindData<T>(data, column, row, findText);
                         found = true;
 
                         if (showFoundCell)
                         {
-                            gridHandler.ShowCell(row, column.ColumnIndex);
+                            gridHandler.SelectCell(row, column.ColumnIndex);
                         }
                         break;
                     }
@@ -174,8 +175,8 @@ namespace TiaUtilities.Generation.GridHandler
 
             if (!found && showInfoAndClearOnFail)
             {
-                var title = Localization.Get("FIND_FORM");
-                var searchCompletedText = Localization.Get("FIND_FORM_SEARCH_COMPLETED");
+                var title = Locale.GRID_FIND_FORM_NAME;
+                var searchCompletedText = Locale.GRID_FIND_SEARCH_COMPLETED;
 
                 InformationBox.Show(searchCompletedText, title,
                         buttons: InformationBoxButtons.OK,
@@ -202,11 +203,11 @@ namespace TiaUtilities.Generation.GridHandler
 
         private void Translate()
         {
-            this.Text = Localization.Get("FIND_FORM");
-            this.FindLabel.Text = this.FindButton.Text = Localization.Get("FIND_FORM_FIND");
-            this.ReplaceLabel.Text = this.ReplaceButton.Text = Localization.Get("FIND_FORM_REPLACE");
-            this.ReplaceAllButton.Text = Localization.Get("FIND_FORM_REPLACE_ALL");
-            this.MatchCaseCheckBox.Text = Localization.Get("FIND_FORM_MATCH_CASE");
+            this.Text = Locale.GRID_FIND_FORM_NAME;
+            this.FindLabel.Text = this.FindButton.Text = Locale.GRID_FIND_FIND_BUTTON;
+            this.ReplaceLabel.Text = this.ReplaceButton.Text = Locale.GRID_FIND_REPLACE_BUTTON;
+            this.ReplaceAllButton.Text = Locale.GRID_FIND_REPLACE_ALL_BUTTON;
+            this.MatchCaseCheckBox.Text = Locale.GRID_FIND_MATCH_CASE_CHECKBOX;
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)

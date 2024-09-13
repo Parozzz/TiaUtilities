@@ -1,19 +1,14 @@
 ﻿using Newtonsoft.Json;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Utility;
-using TiaXmlReader.AutoSave;
-using TiaXmlReader.Generation.IO.GenerationForm;
-using TiaXmlReader.Generation.Alarms.GenerationForm;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Languages;
+using TiaUtilities;
 
 namespace TiaXmlReader
 {
-    public class ProgramSettings : ISettingsAutoSave
+    public class ProgramSettings
     {
-        public const string EXTENSION = "json";
-        public const string FILE_NAME = "settings/ProgramSettings." + EXTENSION;
-
         [JsonProperty] public string lastDBDuplicationFileName = "";
 
         [JsonProperty] public string DBDuplicationNewMemberName = "{replacement1}{replacement2}{replacement3}";
@@ -26,27 +21,34 @@ namespace TiaXmlReader
 
         [JsonProperty] public int TimedSaveTime = 2; //Seconds
         [JsonProperty] public uint lastTIAVersion = Constants.VERSION;
-        [JsonProperty] public string ietfLanguage = LocalizationVariables.LANG;
+        [JsonProperty] public string ietfLanguage = LocaleVariables.LANG;
 
         [JsonProperty] public GridSettings GridSettings { get; set; } = new GridSettings();
-        [JsonProperty] public IOGenerationSettings IOSettings { get; set; } = new IOGenerationSettings();
-        [JsonProperty] public AlarmGenerationSettings AlarmSettings { get; set; } = new AlarmGenerationSettings();
 
         public static string GetFilePath()
         {
-            return Directory.GetCurrentDirectory() + @"\" + FILE_NAME;
+            return Directory.GetCurrentDirectory() + $@"/settings/ProgramSettings.{Constants.SAVE_FILE_EXTENSION}";
         }
 
-        public static ProgramSettings Load()
+        public void Save()
         {
-            var filePath = ProgramSettings.GetFilePath();
-            return GenerationUtils.Load<ProgramSettings>(ref filePath, EXTENSION, showFileDialog: false) ?? new ProgramSettings();
+            SavesLoader.CreateFileAndSave(this, ProgramSettings.GetFilePath(), Constants.SAVE_FILE_EXTENSION); //To create file if not exist!
         }
 
-        public bool Save()
+        public override bool Equals(object? obj)
         {
-            var filePath = ProgramSettings.GetFilePath();
-            return GenerationUtils.Save(this, ref filePath, EXTENSION, showFileDialog: false);
+            if (obj == null)
+            {
+                return false;
+            }
+
+            var equals = GenUtils.CompareJsonFieldsAndProperties(this, obj, out _);
+            return equals;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
     }
 }

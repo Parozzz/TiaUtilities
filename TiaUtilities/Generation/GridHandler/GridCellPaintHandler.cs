@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using static TiaXmlReader.Generation.GridHandler.GridCellPaintHandler;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Generation.GridHandler.Data;
+using TiaUtilities.Generation.GridHandler.Data;
 
 namespace TiaXmlReader.Generation.GridHandler
 {
@@ -36,7 +37,7 @@ namespace TiaXmlReader.Generation.GridHandler
 
         public void Init()
         {
-            this.dataGridView.CellPainting += (object sender, DataGridViewCellPaintingEventArgs args) =>
+            this.dataGridView.CellPainting += (sender, args) =>
             {
 
                 bool backgroundDone = false, contentDone = false;
@@ -97,7 +98,7 @@ namespace TiaXmlReader.Generation.GridHandler
             private bool content;
             private bool executed;
             public object data;
-            public GridDataPreview dataPreview;
+            public Preview dataPreview;
 
             public PaintRequest Background()
             {

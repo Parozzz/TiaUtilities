@@ -22,5 +22,6 @@ namespace TiaUtilities.Generation.Configuration.Utility
         public static ConfigColorPickerLine AddColorPicker(this IConfigGroup group) => group.Add(new ConfigColorPickerLine());
         public static ConfigJavascriptLine AddJavascript(this IConfigGroup group) => group.Add(new ConfigJavascriptLine());
         public static ConfigJSONLine AddJSON(this IConfigGroup group) => group.Add(new ConfigJSONLine());
+        public static ConfigInteractableTabLine AddInteractableTab(this IConfigGroup group) => group.Add(new ConfigInteractableTabLine());
     }
 }

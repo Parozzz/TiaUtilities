@@ -1,0 +1,507 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ALARM_CONFIG_COIL2_TYPE" xml:space="preserve">
+    <value>Tipo Bobina 2</value>
+  </data>
+  <data name="ALARM_CONFIG_COIL_TYPE_COIL" xml:space="preserve">
+    <value>Bobina</value>
+  </data>
+  <data name="ALARM_CONFIG_COIL_TYPE_NONE" xml:space="preserve">
+    <value>Ignora</value>
+  </data>
+  <data name="ALARM_CONFIG_COIL_TYPE_RESET" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="ALARM_CONFIG_COIL_TYPE_SET" xml:space="preserve">
+    <value>Set</value>
+  </data>
+  <data name="ALARM_CONFIG_DEFAULTS" xml:space="preserve">
+    <value>Valori default campi</value>
+  </data>
+  <data name="ALARM_CONFIG_DEFAULTS_COIL1" xml:space="preserve">
+    <value>Bobina 1</value>
+  </data>
+  <data name="ALARM_CONFIG_DEFAULTS_COIL2" xml:space="preserve">
+    <value>Bobina 2</value>
+  </data>
+  <data name="ALARM_CONFIG_DEFAULTS_TIMER" xml:space="preserve">
+    <value>Timer</value>
+  </data>
+  <data name="GENERICS_ADDRESS" xml:space="preserve">
+    <value>Indirizzo</value>
+  </data>
+  <data name="GENERICS_TYPE" xml:space="preserve">
+    <value>Tipo</value>
+  </data>
+  <data name="GENERICS_VALUE" xml:space="preserve">
+    <value>Valore</value>
+  </data>
+  <data name="GENERICS_FILE" xml:space="preserve">
+    <value>File</value>
+  </data>
+  <data name="GENERICS_LOAD" xml:space="preserve">
+    <value>Apri</value>
+  </data>
+  <data name="GENERICS_NAME" xml:space="preserve">
+    <value>Nome</value>
+  </data>
+  <data name="GENERICS_NUMBER" xml:space="preserve">
+    <value>Numero</value>
+  </data>
+  <data name="GENERICS_SAVE" xml:space="preserve">
+    <value>Salva</value>
+  </data>
+  <data name="GENERICS_SAVE_AS" xml:space="preserve">
+    <value>Salva Come</value>
+  </data>
+  <data name="ALARM_CONFIG_FC" xml:space="preserve">
+    <value>FC</value>
+  </data>
+  <data name="ALARM_CONFIG_GENERATION" xml:space="preserve">
+    <value>Generazione</value>
+  </data>
+  <data name="ALARM_CONFIG_GENERATION_ANTI_SLIP" xml:space="preserve">
+    <value>Anti-Slip</value>
+  </data>
+  <data name="ALARM_CONFIG_GENERATION_ANTI_SLIP_AMOUNT" xml:space="preserve">
+    <value>Dimensioni Gruppo</value>
+  </data>
+  <data name="ALARM_CONFIG_GENERATION_ANTI_SLIP_GEN_EMPTY" xml:space="preserve">
+    <value>Genera Vuoti</value>
+  </data>
+  <data name="ALARM_CONFIG_GENERATION_EMPTY" xml:space="preserve">
+    <value>Generazione Vuoti</value>
+  </data>
+  <data name="ALARM_CONFIG_GENERATION_EMPTY_ALARM_ADDRESS" xml:space="preserve">
+    <value>Indirizzo Allarme</value>
+  </data>
+  <data name="ALARM_CONFIG_GENERATION_EMPTY_NUM" xml:space="preserve">
+    <value>Quantità alla fine</value>
+  </data>
+  <data name="ALARM_CONFIG_GENERATION_EMPTY_TIMER" xml:space="preserve">
+    <value>Timer</value>
+  </data>
+  <data name="ALARM_CONFIG_GENERATION_EMPTY_TIMER_ADDRESS" xml:space="preserve">
+    <value>Indirizzo</value>
+  </data>
+  <data name="ALARM_CONFIG_GENERATION_EMPTY_TIMER_TYPE" xml:space="preserve">
+    <value>Tipo</value>
+  </data>
+  <data name="ALARM_CONFIG_GENERATION_EMPTY_TIMER_VALUE" xml:space="preserve">
+    <value>Tempo</value>
+  </data>
+  <data name="ALARM_CONFIG_GENERATION_FORMAT" xml:space="preserve">
+    <value>Formato</value>
+  </data>
+  <data name="ALARM_CONFIG_GENERATION_SKIP" xml:space="preserve">
+    <value>Salta a fine gruppo</value>
+  </data>
+  <data name="ALARM_CONFIG_GENERATION_START_NUM" xml:space="preserve">
+    <value>Num. partenza</value>
+  </data>
+  <data name="ALARM_CONFIG_GROUPING_TYPE" xml:space="preserve">
+    <value>Tipo raggruppamento</value>
+  </data>
+  <data name="ALARM_CONFIG_GROUPING_TYPE_GROUP" xml:space="preserve">
+    <value>GruppoPerSegmento</value>
+  </data>
+  <data name="ALARM_CONFIG_GROUPING_TYPE_ONE" xml:space="preserve">
+    <value>UnoPerSegmento</value>
+  </data>
+  <data name="ALARM_CONFIG_PARTITION_TYPE" xml:space="preserve">
+    <value>Tipo ripartizione</value>
+  </data>
+  <data name="ALARM_CONFIG_PARTITION_TYPE_ALARM_TYPE" xml:space="preserve">
+    <value>PerTipoAllarme</value>
+  </data>
+  <data name="ALARM_CONFIG_PARTITION_TYPE_DEVICE" xml:space="preserve">
+    <value>PerUtenza</value>
+  </data>
+  <data name="ALARM_CONFIG_PREFIX" xml:space="preserve">
+    <value>Prefissi Campi</value>
+  </data>
+  <data name="ALARM_CONFIG_PREFIX_ALARM" xml:space="preserve">
+    <value>Indirizzo Allarme</value>
+  </data>
+  <data name="ALARM_CONFIG_PREFIX_COIL1" xml:space="preserve">
+    <value>Indirizzo Bobina 1</value>
+  </data>
+  <data name="ALARM_CONFIG_PREFIX_COIL2" xml:space="preserve">
+    <value>Indirizzo Bobina 2</value>
+  </data>
+  <data name="ALARM_CONFIG_PREFIX_TIMER" xml:space="preserve">
+    <value>Indirizzo Timer</value>
+  </data>
+  <data name="ALARM_CONFIG_SEGMENT_NAME" xml:space="preserve">
+    <value>Nomi segmenti</value>
+  </data>
+  <data name="ALARM_CONFIG_SEGMENT_NAME_GROUP_EACH" xml:space="preserve">
+    <value>Raggruppati</value>
+  </data>
+  <data name="ALARM_CONFIG_SEGMENT_NAME_GROUP_EACH_EMPTY" xml:space="preserve">
+    <value>Raggruppati(Vuoti)</value>
+  </data>
+  <data name="ALARM_CONFIG_SEGMENT_NAME_ONE_EACH" xml:space="preserve">
+    <value>Singoli</value>
+  </data>
+  <data name="ALARM_CONFIG_SEGMENT_NAME_ONE_EACH_EMPTY" xml:space="preserve">
+    <value>Singoli(Vuoti)</value>
+  </data>
+  <data name="ALARM_CONFIG_TEXT_LIST" xml:space="preserve">
+    <value>Lista Testi Allarmi</value>
+  </data>
+  <data name="ALARM_CONFIG_TEXT_LIST_EMPTY" xml:space="preserve">
+    <value>Vuoto</value>
+  </data>
+  <data name="ALARM_CONFIG_TEXT_LIST_FULL" xml:space="preserve">
+    <value>Pieno</value>
+  </data>
+  <data name="ALARM_DATA_ALM_VARIABLE" xml:space="preserve">
+    <value>Variabile allarme</value>
+  </data>
+  <data name="ALARM_DATA_COIL1_ADDRESS" xml:space="preserve">
+    <value>Indirizzo bobina1</value>
+  </data>
+  <data name="ALARM_DATA_COIL2_ADDRESS" xml:space="preserve">
+    <value>Indirizzo bobina2</value>
+  </data>
+  <data name="ALARM_DATA_DESCRIPTION" xml:space="preserve">
+    <value>Descrizione</value>
+  </data>
+  <data name="ALARM_DATA_ENABLE" xml:space="preserve">
+    <value>Abilita</value>
+  </data>
+  <data name="ALARM_DATA_TIMER_ADDRESS" xml:space="preserve">
+    <value>Indirizzo timer</value>
+  </data>
+  <data name="ALARM_DATA_TIMER_TYPE" xml:space="preserve">
+    <value>Tipo</value>
+  </data>
+  <data name="ALARM_DATA_TIMER_VALUE" xml:space="preserve">
+    <value>Tempo</value>
+  </data>
+  <data name="ALARM_GEN_FORM" xml:space="preserve">
+    <value>Generazione Allarmi</value>
+  </data>
+  <data name="DEVICE_DATA_DESCRIPTION" xml:space="preserve">
+    <value>Descrizione</value>
+  </data>
+  <data name="DEVICE_DATA_NAME" xml:space="preserve">
+    <value>Nome</value>
+  </data>
+  <data name="ALARM_CONFIG_COIL1_TYPE" xml:space="preserve">
+    <value>Tipo Bobina 1</value>
+  </data>
+  <data name="GRID_PREFERENCES" xml:space="preserve">
+    <value>Preferenze Griglia</value>
+  </data>
+  <data name="GRID_PREFERENCES_DRAGGED_CELL_BACK" xml:space="preserve">
+    <value>Sfondo cella trascinamento</value>
+  </data>
+  <data name="GRID_PREFERENCES_DRAG_TRIANGLE_COLOR" xml:space="preserve">
+    <value>Triangolo trascinamento</value>
+  </data>
+  <data name="GRID_PREFERENCES_PREVIEW_FORE" xml:space="preserve">
+    <value>Anteprima</value>
+  </data>
+  <data name="GRID_PREFERENCES_SELECTED_CELL_BORDER" xml:space="preserve">
+    <value>Bordo cella selezionata</value>
+  </data>
+  <data name="GRID_SCRIPT_JS_EXPRESSION" xml:space="preserve">
+    <value>Espressione Javascript</value>
+  </data>
+  <data name="GRID_SCRIPT_JSON_CONTEXT" xml:space="preserve">
+    <value>Contesto JSON</value>
+  </data>
+  <data name="GRID_SCRIPT_VARIABLES" xml:space="preserve">
+    <value>Variabili: </value>
+  </data>
+  <data name="GRID_SCRIPT_EXECUTE_DEBUG" xml:space="preserve">
+    <value>Esegui in debug</value>
+  </data>
+  <data name="GRID_SCRIPT_EXECUTE_ONE_LINE" xml:space="preserve">
+    <value>Esegui su riga selezionata</value>
+  </data>
+  <data name="GRID_SCRIPT_EXECUTE_ALL" xml:space="preserve">
+    <value>Esegui su tabella</value>
+  </data>
+  <data name="GRID_SCRIPT_AUTO_FORMAT" xml:space="preserve">
+    <value>Auto Formattazione</value>
+  </data>
+  <data name="GRID_FIND_SEARCH_COMPLETED" xml:space="preserve">
+    <value>Operazione completata</value>
+  </data>
+  <data name="GRID_FIND_REPLACE_ALL_COMPLETED" xml:space="preserve">
+    <value>Operazione completata. Sostituiti {count} valori.</value>
+  </data>
+  <data name="GRID_FIND_REPLACE_ALL_BUTTON" xml:space="preserve">
+    <value>Sostituisci Tutti</value>
+  </data>
+  <data name="GRID_FIND_REPLACE_BUTTON" xml:space="preserve">
+    <value>Sostituisci</value>
+  </data>
+  <data name="GRID_FIND_MATCH_CASE_CHECKBOX" xml:space="preserve">
+    <value>Rispetta Maiuscole</value>
+  </data>
+  <data name="GRID_FIND_FIND_BUTTON" xml:space="preserve">
+    <value>Cerca</value>
+  </data>
+  <data name="GRID_FIND_FORM_NAME" xml:space="preserve">
+    <value>Grid - Trova e Sostituisci</value>
+  </data>
+  <data name="IO_CONFIG_GROUPING_TYPE" xml:space="preserve">
+    <value>Tipo Raggruppamento</value>
+  </data>
+  <data name="IO_CONFIG_GROUPING_TYPE_BIT" xml:space="preserve">
+    <value>RaggruppaPerBit</value>
+  </data>
+  <data name="IO_CONFIG_GROUPING_TYPE_BYTE" xml:space="preserve">
+    <value>RaggruppoPerByte</value>
+  </data>
+  <data name="IO_CONFIG_MEMORY_TYPE" xml:space="preserve">
+    <value>Tipo memoria</value>
+  </data>
+  <data name="IO_CONFIG_MEMORY_TYPE_DB" xml:space="preserve">
+    <value>DB</value>
+  </data>
+  <data name="IO_CONFIG_MEMORY_TYPE_MERKER" xml:space="preserve">
+    <value>Merker</value>
+  </data>
+  <data name="IO_DATA_ADDRESS" xml:space="preserve">
+    <value>Indirizzo</value>
+  </data>
+  <data name="IO_DATA_COMMENT" xml:space="preserve">
+    <value>Commento</value>
+  </data>
+  <data name="IO_DATA_IO_NAME" xml:space="preserve">
+    <value>Merker IO</value>
+  </data>
+  <data name="IO_DATA_MERKER_ADDRESS" xml:space="preserve">
+    <value>Assoluto</value>
+  </data>
+  <data name="IO_DATA_VARIABLE" xml:space="preserve">
+    <value>Appoggio</value>
+  </data>
+  <data name="IO_GEN_CONFIG_ALIAS_DB" xml:space="preserve">
+    <value>DB Appoggi</value>
+  </data>
+  <data name="IO_GEN_CONFIG_ALIAS_DB_GENERATED_DEFINED_VARIABLES" xml:space="preserve">
+    <value>Genera Variabili Definite</value>
+  </data>
+  <data name="IO_GEN_CONFIG_ALIAS_DB_IN_DEFAULT" xml:space="preserve">
+    <value>Valore default Input</value>
+  </data>
+  <data name="IO_GEN_CONFIG_ALIAS_DB_OUT_DEFAULT" xml:space="preserve">
+    <value>Valore default Output</value>
+  </data>
+  <data name="IO_GEN_CONFIG_ALIAS_TABLE" xml:space="preserve">
+    <value>Tabella Appoggi</value>
+  </data>
+  <data name="IO_GEN_CONFIG_ALIAS_TABLE_INPUT_VARIABLE" xml:space="preserve">
+    <value>Variable Input</value>
+  </data>
+  <data name="IO_GEN_CONFIG_ALIAS_TABLE_NEW_EVERY" xml:space="preserve">
+    <value>Nuova ogni n° bit</value>
+  </data>
+  <data name="IO_GEN_CONFIG_ALIAS_TABLE_OUTPUT_VARIABLE" xml:space="preserve">
+    <value>Variabile Output</value>
+  </data>
+  <data name="IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_DEFAULT" xml:space="preserve">
+    <value>Valore di Default</value>
+  </data>
+  <data name="IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_START_ADDRESS" xml:space="preserve">
+    <value>Indirizzo di Partenza</value>
+  </data>
+  <data name="IO_GEN_CONFIG_FC" xml:space="preserve">
+    <value>FC Appoggi</value>
+  </data>
+  <data name="IO_GEN_CONFIG_IO_TABLE" xml:space="preserve">
+    <value>Tabella IN/OUT</value>
+  </data>
+  <data name="IO_GEN_CONFIG_IO_TABLE_DEFAULT_NAME" xml:space="preserve">
+    <value>Nome default tag</value>
+  </data>
+  <data name="IO_GEN_CONFIG_IO_TABLE_NEW_EVERY" xml:space="preserve">
+    <value>Nuova ogni n° bit</value>
+  </data>
+  <data name="IO_GEN_CONFIG_SEGMENT" xml:space="preserve">
+    <value>Nomi Segmenti</value>
+  </data>
+  <data name="IO_GEN_CONFIG_SEGMENT_BIT_DIVISION" xml:space="preserve">
+    <value>Divisione per bit</value>
+  </data>
+  <data name="IO_GEN_CONFIG_SEGMENT_BYTE_DIVISION" xml:space="preserve">
+    <value>Divisione per byte</value>
+  </data>
+  <data name="IO_GEN_FORM_NAME" xml:space="preserve">
+    <value>Generatore Appoggi Input/Output. Percorso progetto: {file_path}</value>
+  </data>
+  <data name="IO_GEN_FORM_IMPEXP" xml:space="preserve">
+    <value>Import/Export</value>
+  </data>
+  <data name="IO_GEN_FORM_IMPEXP_EXPORT_XML" xml:space="preserve">
+    <value>Esporta XML</value>
+  </data>
+  <data name="IO_GEN_FORM_IMPEXP_IMPORT_EXCEL" xml:space="preserve">
+    <value>Importa Excel</value>
+  </data>
+  <data name="IO_GEN_FORM_IMPEXP_IMPORT_SUGGESTION" xml:space="preserve">
+    <value>Importa Suggerimenti da DB/Tabella</value>
+  </data>
+  <data name="IO_SUGGESTION_DATA_VALUE" xml:space="preserve">
+    <value>Suggerimento</value>
+  </data>
+  <data name="MAIN_FORM" xml:space="preserve">
+    <value>Tia Utilities</value>
+  </data>
+  <data name="MAIN_FORM_LANGUAGE" xml:space="preserve">
+    <value>Lingua</value>
+  </data>
+  <data name="MAIN_FORM_TIA_VERSION" xml:space="preserve">
+    <value>Versione TIA Portal</value>
+  </data>
+  <data name="MAIN_FORM_TOP_ALARM_GENERATOR" xml:space="preserve">
+    <value>Generatore Allarmi</value>
+  </data>
+  <data name="MAIN_FORM_TOP_DB_DUPLICATION" xml:space="preserve">
+    <value>Duplicazione DB</value>
+  </data>
+  <data name="MAIN_FORM_TOP_FILE_AUTO_SAVE" xml:space="preserve">
+    <value>AutoSalvataggio (s)</value>
+  </data>
+  <data name="MAIN_FORM_TOP_IO_GENERATION" xml:space="preserve">
+    <value>Generatore Appoggi</value>
+  </data>
+  <data name="ALARM_CONFIG_GENERATION_EMPTY_ANTI_SLIP" xml:space="preserve">
+    <value>Genera durante anti-slip</value>
+  </data>
+  <data name="IO_DATA_NEGATED" xml:space="preserve">
+    <value>Negato</value>
+  </data>
+  <data name="ALARM_DATA_COIL1_TYPE" xml:space="preserve">
+    <value>Tipo</value>
+  </data>
+  <data name="ALARM_DATA_COIL2_TYPE" xml:space="preserve">
+    <value>Tipo</value>
+  </data>
+  <data name="GRID_SCRIPT_OPEN_JAVASCRIPT_CONTEXT" xml:space="preserve">
+    <value>Apri esecutore Javascript</value>
+  </data>
+</root>

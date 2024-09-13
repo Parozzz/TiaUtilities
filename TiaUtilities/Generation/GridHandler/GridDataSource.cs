@@ -10,23 +10,48 @@ using TiaXmlReader.GenerationForms;
 
 namespace TiaXmlReader.Generation.GridHandler
 {
-    public class GridDataSource<C, T> where C : IGenerationConfiguration where T : IGridData<C>
+    public class GridDataSource<T> where T : IGridData
     {
         private readonly DataGridView dataGridView;
-        private readonly GridDataHandler<C, T> dataHandler;
+        private readonly GridDataHandler<T> dataHandler;
 
         private readonly List<T> dataList;
         private readonly BindingList<T> bindingList;
 
-        public int Count { get => dataList.Count(); }
+        public int Count { get => dataList.Count; }
 
-        public GridDataSource(DataGridView dataGridView, GridDataHandler<C, T> dataHandler)
+        public GridDataSource(DataGridView dataGridView, GridDataHandler<T> dataHandler)
         {
             this.dataGridView = dataGridView;
             this.dataHandler = dataHandler;
 
-            dataList = new List<T>();
-            bindingList = new BindingList<T>(dataList);
+            dataList = [];
+            bindingList = new(dataList);
+        }
+
+        public Dictionary<int, T> CreateSave()
+        {
+            Dictionary<int, T> saveDict = [];
+            foreach (var entry in this.GetNotEmptyDataDict())
+            {
+                saveDict.Add(entry.Value, entry.Key);
+            }
+            return saveDict;
+        }
+
+        public void LoadSave(Dictionary<int, T> saveDict)
+        {
+            this.Clear();
+
+            foreach (var entry in saveDict)
+            {
+                var rowIndex = entry.Key;
+                var data = entry.Value;
+                if (rowIndex >= 0 && rowIndex <= this.Count)
+                {
+                    this.dataHandler.CopyValues(data, this[rowIndex]);
+                }
+            }
         }
 
         public T this[int i]
@@ -115,6 +140,25 @@ namespace TiaXmlReader.Generation.GridHandler
                 return dict[x].CompareTo(dict[y]);
             });
             dataGridView.Refresh();
+        }
+
+        public int GetFirstNotEmptyIndexStartingFrom(int indexStart)
+        {
+            if (indexStart < 0 || indexStart > this.Count)
+            {
+                return -1;
+            }
+
+            for (var x = indexStart; x < dataList.Count; x++)
+            {
+                var data = dataList[x];
+                if (!data.IsEmpty())
+                {
+                    return x;
+                }
+            }
+
+            return -1;
         }
 
         public Dictionary<T, int> GetNotEmptyDataDict()

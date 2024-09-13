@@ -10,37 +10,26 @@ using TiaUtilities.Generation.GridHandler.Events;
 
 namespace TiaXmlReader.Generation.GridHandler
 {
-    public class GridSortHandler<C, T> : IGridCellPainter where C : IGenerationConfiguration where T : IGridData<C>
+    public class GridSortHandler<T> (GridHandler<T> gridHandler, UndoRedoHandler undoRedoHandler, IGridRowComparer<T>? comparer) : IGridCellPainter where T : IGridData
     {
-        private readonly GridHandler<C, T> gridHandler;
-        private readonly UndoRedoHandler undoRedoHandler;
-        private readonly IGridRowComparer<C, T> comparer;
-
         private SortOrder sortOrder = SortOrder.None;
         private Dictionary<T, int>? noSortIndexSnapshot;
 
         private DataGridView DataGridView { get => gridHandler.DataGridView; }
-        private GridDataSource<C, T> DataSource { get => gridHandler.DataSource; }
+        private GridDataSource<T> DataSource { get => gridHandler.DataSource; }
 
         public Color SortIconColor { get; set; } = Color.Green;
-
-        public GridSortHandler(GridHandler<C, T> gridHandler, UndoRedoHandler undoRedoHandler, IGridRowComparer<C, T> comparer)
-        {
-            this.gridHandler = gridHandler;
-            this.undoRedoHandler = undoRedoHandler;
-            this.comparer = comparer;
-        }
 
         public void Init()
         {
             this.DataGridView.ColumnHeaderMouseClick += (sender, args) =>
             {
-                if (this.comparer == null || args.Button == MouseButtons.Right)
+                if (comparer == null || args.Button == MouseButtons.Right)
                 {
                     return;
                 }
 
-                if (this.comparer.CanSortColumn(args.ColumnIndex))
+                if (comparer.CanSortColumn(args.ColumnIndex))
                 {
                     NextColumnSort(args.ColumnIndex);
                 }
@@ -69,7 +58,7 @@ namespace TiaXmlReader.Generation.GridHandler
         private void ColumnSort(SortOrder oldSortOrder, int columnIndex)
         {
             var preSortEventArgs = new GridPreSortEventArgs(oldSortOrder, this.sortOrder, columnIndex);
-            this.gridHandler.Events.PreSortEvent(preSortEventArgs);
+            gridHandler.Events.PreSortEvent(gridHandler.DataGridView, preSortEventArgs);
 
             if(preSortEventArgs.Handled)
             {
@@ -113,7 +102,7 @@ namespace TiaXmlReader.Generation.GridHandler
             });
 
             var postSortEventArgs = new GridPostSortEventArgs(oldSortOrder, this.sortOrder, columnIndex);
-            this.gridHandler.Events.PostSortEvent(postSortEventArgs);
+            gridHandler.Events.PostSortEvent(gridHandler.DataGridView,postSortEventArgs);
         }
 
         private void ClearAllSortGlyphDirection()
@@ -127,7 +116,7 @@ namespace TiaXmlReader.Generation.GridHandler
         public PaintRequest PaintCellRequest(DataGridViewCellPaintingEventArgs args)
         {
             var paintResult = new PaintRequest();
-            if (this.comparer == null)
+            if (comparer == null)
             {
                 return paintResult;
             }

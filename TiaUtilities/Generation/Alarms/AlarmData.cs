@@ -1,18 +1,21 @@
 ﻿using Newtonsoft.Json;
+using TiaUtilities.Languages;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.Generation.Placeholders;
 using TiaXmlReader.Languages;
 
 namespace TiaXmlReader.Generation.Alarms
 {
-    public class AlarmData : IGridData<AlarmConfiguration>
+    public class AlarmData : IGridData
     {
         private readonly static int COLUMN_COUNT = 0;
         //THESE IS THE ORDER IN WHICH THEY APPEAR!
         public static readonly GridDataColumn ENABLE;
         public static readonly GridDataColumn ALARM_VARIABLE;
-        public static readonly GridDataColumn COIL_ADDRESS;
-        public static readonly GridDataColumn SET_COIL_ADDRESS;
+        public static readonly GridDataColumn COIL1_ADDRESS;
+        public static readonly GridDataColumn COIL1_TYPE;
+        public static readonly GridDataColumn COIL2_ADDRESS;
+        public static readonly GridDataColumn COIL2_TYPE;
         public static readonly GridDataColumn TIMER_ADDRESS;
         public static readonly GridDataColumn TIMER_TYPE;
         public static readonly GridDataColumn TIMER_VALUE;
@@ -24,8 +27,10 @@ namespace TiaXmlReader.Generation.Alarms
             var type = typeof(AlarmData);
             ENABLE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.Enable));
             ALARM_VARIABLE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.AlarmVariable), "alarmVariable");
-            COIL_ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.CoilAddress), "coilAddress");
-            SET_COIL_ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.SetCoilAddress), "setCoilAddress");
+            COIL1_ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.Coil1Address), "coil1Address");
+            COIL1_TYPE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.Coil1Type), "coil1Type");
+            COIL2_ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.Coil2Address), "coil2Address");
+            COIL2_TYPE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.Coil2Type), "coil2Type");
             TIMER_ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.TimerAddress), "timerAddress");
             TIMER_TYPE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.TimerType), "timerType");
             TIMER_VALUE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.TimerValue), "timerValue");
@@ -36,14 +41,16 @@ namespace TiaXmlReader.Generation.Alarms
             COLUMN_LIST = columnList.AsReadOnly();
         }
 
-        [JsonProperty][Localization("ALARM_DATA_ENABLE")] public bool Enable { get; set; }
-        [JsonProperty][Localization("ALARM_DATA_ALM_VARIABLE")] public string? AlarmVariable { get; set; }
-        [JsonProperty][Localization("ALARM_DATA_COIL_ADDRESS")] public string? CoilAddress { get; set; }
-        [JsonProperty][Localization("ALARM_DATA_SET_COIL_ADDRESS")] public string? SetCoilAddress { get; set; }
-        [JsonProperty][Localization("ALARM_DATA_TIMER_ADDRESS")] public string? TimerAddress { get; set; }
-        [JsonProperty][Localization("ALARM_DATA_TIMER_TYPE")] public string? TimerType { get; set; }
-        [JsonProperty][Localization("ALARM_DATA_TIMER_VALUE")] public string? TimerValue { get; set; }
-        [JsonProperty][Localization("ALARM_DATA_DESCRIPTION", append: " > " + GenerationPlaceholders.Alarms.ALARM_DESCRIPTION)] public string? Description { get; set; }
+        [JsonProperty][Locale(nameof(Locale.ALARM_DATA_ENABLE))] public bool Enable { get; set; }
+        [JsonProperty][Locale(nameof(Locale.ALARM_DATA_ALM_VARIABLE))] public string? AlarmVariable { get; set; }
+        [JsonProperty][Locale(nameof(Locale.ALARM_DATA_COIL1_ADDRESS))] public string? Coil1Address { get; set; }
+        [JsonProperty][Locale(nameof(Locale.ALARM_DATA_COIL1_TYPE))] public string? Coil1Type { get; set; }
+        [JsonProperty][Locale(nameof(Locale.ALARM_DATA_COIL2_ADDRESS))] public string? Coil2Address { get; set; }
+        [JsonProperty][Locale(nameof(Locale.ALARM_DATA_COIL2_TYPE))] public string? Coil2Type { get; set; }
+        [JsonProperty][Locale(nameof(Locale.ALARM_DATA_TIMER_ADDRESS))] public string? TimerAddress { get; set; }
+        [JsonProperty][Locale(nameof(Locale.ALARM_DATA_TIMER_TYPE))] public string? TimerType { get; set; }
+        [JsonProperty][Locale(nameof(Locale.ALARM_DATA_TIMER_VALUE))] public string? TimerValue { get; set; }
+        [JsonProperty][Locale(nameof(Locale.ALARM_DATA_DESCRIPTION), append: " > " + GenPlaceholders.Alarms.ALARM_DESCRIPTION)] public string? Description { get; set; }
 
         public object? this[int column]
         {
@@ -57,6 +64,7 @@ namespace TiaXmlReader.Generation.Alarms
                 return COLUMN_LIST[column].PropertyInfo.GetValue(this);
             }
         }
+
         public IReadOnlyList<GridDataColumn> GetColumns()
         {
             return COLUMN_LIST;
@@ -66,91 +74,24 @@ namespace TiaXmlReader.Generation.Alarms
         {
             return COLUMN_LIST[column];
         }
-        public GridDataPreview? GetPreview(GridDataColumn column, AlarmConfiguration config)
+
+        public static bool IsAddressValid(string? str)
         {
-            return this.GetPreview(column.ColumnIndex, config);
-        }
-
-        public bool IsTimerAddressValid()
-        {
-            return this.TimerAddress != "\\" && this.TimerAddress != "/";
-        }
-
-        public GridDataPreview? GetPreview(int column, AlarmConfiguration config)
-        {
-            if (string.IsNullOrEmpty(AlarmVariable) || this.IsEmpty())
-            {
-                return null;
-            }
-
-            if(column == ALARM_VARIABLE)
-            {
-                return new GridDataPreview()
-                {
-                    Prefix = config.AlarmAddressPrefix,
-                    Value = this.AlarmVariable
-                };
-            }
-            else if (column == COIL_ADDRESS)
-            {
-                return new GridDataPreview()
-                {
-                    Prefix = config.CoilAddressPrefix,
-                    DefaultValue = config.DefaultCoilAddress,
-                    Value = this.CoilAddress
-                };
-            }
-            else if (column == SET_COIL_ADDRESS)
-            {
-                return new GridDataPreview()
-                {
-                    Prefix = config.SetCoilAddressPrefix,
-                    DefaultValue = config.DefaultSetCoilAddress,
-                    Value = this.SetCoilAddress
-                };
-            }
-            else if (column == TIMER_ADDRESS)
-            {
-                return new GridDataPreview()
-                {
-                    Prefix = config.TimerAddressPrefix,
-                    DefaultValue = config.DefaultTimerAddress,
-                    Value = this.TimerAddress
-                };
-            }
-            else if (this.IsTimerAddressValid())
-            {
-                if (column == TIMER_TYPE)
-                {
-                    return new GridDataPreview()
-                    {
-                        DefaultValue = config.DefaultTimerType,
-                        Value = this.TimerType
-                    };
-                }
-                else if (column == TIMER_VALUE)
-                {
-                    return new GridDataPreview()
-                    {
-                        DefaultValue = config.DefaultTimerValue,
-                        Value = this.TimerValue
-                    };
-                }
-            }
-
-
-            return null;
+            return !GenUtils.DATA_INVALID_CHARS.Contains(str);
         }
 
         public void Clear()
         {
-            this.AlarmVariable = this.CoilAddress = this.SetCoilAddress = this.TimerAddress = this.TimerType = this.TimerValue = this.Description = "";
-            this.Enable = true;
+            this.Enable = false;
+            this.AlarmVariable = this.Coil1Address = this.Coil1Type = this.Coil2Address = this.Coil2Type =
+                    this.TimerAddress = this.TimerType = this.TimerValue = this.Description = null;
         }
 
         public bool IsEmpty()
         {
-            return string.IsNullOrEmpty(this.AlarmVariable) && string.IsNullOrEmpty(this.CoilAddress) && string.IsNullOrEmpty(this.SetCoilAddress) &&
+            return string.IsNullOrEmpty(this.AlarmVariable) && 
+                string.IsNullOrEmpty(this.Coil1Address) && string.IsNullOrEmpty(this.Coil1Type) && 
+                string.IsNullOrEmpty(this.Coil2Address) && string.IsNullOrEmpty(this.Coil2Type) &&
                 string.IsNullOrEmpty(this.TimerAddress) && string.IsNullOrEmpty(this.TimerType) && string.IsNullOrEmpty(this.TimerValue) &&
                 string.IsNullOrEmpty(this.Description);
         }
@@ -162,7 +103,7 @@ namespace TiaXmlReader.Generation.Alarms
                 return false;
             }
 
-            var equals = GenerationUtils.CompareJsonFieldsAndProperties(this, obj, out object invalid);
+            var equals = GenUtils.CompareJsonFieldsAndProperties(this, obj, out object invalid);
             return equals;
         }
 
