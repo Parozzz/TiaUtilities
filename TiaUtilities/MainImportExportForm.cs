@@ -28,8 +28,6 @@ namespace TiaXmlReader
         private readonly TimedSaveHandler autoSaveHandler;
         private readonly JavascriptErrorReportThread jsErrorHandlingThread;
 
-        private ProgramSettings? oldProgramSettings;
-
         public MainImportExportForm()
         {
             InitializeComponent();
@@ -45,15 +43,28 @@ namespace TiaXmlReader
 
         private void Init()
         {
+            var ignoreSettingsAtStartup = true;
+
             LogHandler.INSTANCE.Init();
             LogHandler.INSTANCE.Start();
 
             jsErrorHandlingThread.Init();
             jsErrorHandlingThread.Start();
 
-            tiaVersionComboBox.Text = "" + programSettings.lastTIAVersion;
+            this.tiaVersionComboBox.SelectedIndexChanged += (sender, args) =>
+            {
+                if (uint.TryParse(tiaVersionComboBox.Text, out var version))
+                {
+                    SimaticMLAPI.TIA_VERSION = version;
 
-            var ignoreLanguageBoxAtStartup = true;
+                    if (!ignoreSettingsAtStartup)
+                    {
+                        this.programSettings.TIAVersion = version;
+                        this.programSettings.Save();
+                    }
+                }
+            };
+            this.tiaVersionComboBox.Text = "" + programSettings.TIAVersion; //After the event so is applied!
 
             this.languageComboBox.Items.AddRange(["it-IT", "en-US"]);
             this.languageComboBox.TextChanged += (sender, args) =>
@@ -63,13 +74,13 @@ namespace TiaXmlReader
                     var culture = CultureInfo.GetCultureInfo(this.languageComboBox.Text);
                     LocaleVariables.LANG = culture.IetfLanguageTag;
 
-                    if (ignoreLanguageBoxAtStartup)
+                    if (ignoreSettingsAtStartup)
                     {
                         return;
                     }
 
                     //Without save, after restart it would restore the old (Meaning it would be useless)
-                    this.programSettings.ietfLanguage = culture.IetfLanguageTag;
+                    this.programSettings.IetfLanguage = culture.IetfLanguageTag;
                     this.programSettings.Save();
 
                     //This should stay always in english. In case someone set an unkown language, this will be neautral.
@@ -86,38 +97,27 @@ namespace TiaXmlReader
                     Utils.ShowExceptionMessage(ex);
                 }
             };
-            this.languageComboBox.Text = programSettings.ietfLanguage; //Call this after so the text changed event changes the system lang.
+            this.languageComboBox.Text = programSettings.IetfLanguage; //Call this after so the text changed event changes the system lang.
 
-            ignoreLanguageBoxAtStartup = false;
-
-            #region AUTO_SAVE_TIME
             this.autoSaveTimeTextBox.TextChanged += (sender, args) =>
             {
                 if (int.TryParse(autoSaveTimeTextBox.Text, out int time))
                 {
                     this.autoSaveHandler.Start(time * 1000);
-                    programSettings.TimedSaveTime = time;
-
-                    this.programSettings.Save(); //To create file if not exist!
+                    if(!ignoreSettingsAtStartup)
+                    {
+                        this.programSettings.AutoSaveTime = time;
+                        this.programSettings.Save(); //To create file if not exist!
+                    }
                 }
             };
-            this.autoSaveTimeTextBox.Text = "" + programSettings.TimedSaveTime; //Call this after so it start auto save
-            #endregion
+            this.autoSaveTimeTextBox.Text = "" + programSettings.AutoSaveTime; //Call this after so it start auto save
 
-            #region PROGRAM_SETTINGS_AUTO_SAVE
-            void eventHandler(object? sender, EventArgs args)
-            {
-                if (this.oldProgramSettings == null || !this.oldProgramSettings.Equals(this.programSettings))
-                {
-                    this.oldProgramSettings = this.programSettings;
-
-                    this.programSettings.Save();
-                }
-            }
-            this.autoSaveHandler.AddTickEventHandler(eventHandler);
-            #endregion
+            this.programSettings.PropertyChanged += (sender, args) => this.programSettings.Save();
 
             Translate();
+
+            ignoreSettingsAtStartup = false;
         }
 
         private void Translate()
@@ -133,14 +133,6 @@ namespace TiaXmlReader
 
             this.tiaVersionLabel.Text = Locale.MAIN_FORM_TIA_VERSION;
             this.languageLabel.Text = Locale.MAIN_FORM_LANGUAGE;
-        }
-
-        private void TiaVersionComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (uint.TryParse(tiaVersionComboBox.Text, out var version))
-            {
-                SimaticMLAPI.TIA_VERSION = programSettings.lastTIAVersion = version;
-            }
         }
 
         private void DbDuplicationMenuItem_Click(object sender, EventArgs e)

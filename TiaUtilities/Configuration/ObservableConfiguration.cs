@@ -57,10 +57,8 @@ namespace TiaUtilities.Configuration
             this.objectChangedDict = [];
         }
 
-
-
-        public bool IsDirty() => this.dirty;
-        public void Wash() => this.dirty = false;
+        public virtual bool IsDirty() => this.dirty;
+        public virtual void Wash() => this.dirty = false;
 
         public Action Subscribe<T>(Expression<Func<T>> property, Action<T> valueChagedAction)
         {
@@ -99,9 +97,8 @@ namespace TiaUtilities.Configuration
 
         private void ConfigurationObjectChanged(string propertyName)
         {
-            PropertyChanged(this, new(propertyName));
-
             this.dirty = true;
+            PropertyChanged(this, new(propertyName));
             if (objectChangedDict.TryGetValue(propertyName, out var actionList))
             {
                 foreach (var action in actionList)

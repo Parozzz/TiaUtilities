@@ -67,7 +67,6 @@
             tiaVersionComboBox.Name = "tiaVersionComboBox";
             tiaVersionComboBox.Size = new Size(56, 32);
             tiaVersionComboBox.TabIndex = 8;
-            tiaVersionComboBox.SelectedIndexChanged += TiaVersionComboBox_SelectedIndexChanged;
             // 
             // tiaVersionLabel
             // 

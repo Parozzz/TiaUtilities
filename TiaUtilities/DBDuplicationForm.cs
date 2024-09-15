@@ -13,7 +13,7 @@ namespace TiaXmlReader
         {
             InitializeComponent();
             this.programSettings = saveData;
-            this.dbXMLPathTextBox.Text = saveData.lastDBDuplicationFileName;
+            this.dbXMLPathTextBox.Text = saveData.LastDBDuplicationFileName;
             this.replaceDBNameCheckBox.Checked = saveData.DBDuplicationReplaceDBName;
             this.startingDBNumberTextBox.Text = "" + saveData.DBDuplicationStartingNum;
             this.newNameTextBox.Text = saveData.DBDuplicationNewDBName;
@@ -31,13 +31,13 @@ namespace TiaXmlReader
             {
                 Filter = "XML Files (*.xml)|*.xml",
                 CheckFileExists = true,
-                FileName = programSettings.lastDBDuplicationFileName
+                FileName = programSettings.LastDBDuplicationFileName
             };
 
             var result = fileDialog.ShowDialog();
             if (result == DialogResult.OK || result == DialogResult.Yes)
             {
-                dbXMLPathTextBox.Text = programSettings.lastDBDuplicationFileName = fileDialog.FileName;
+                dbXMLPathTextBox.Text = programSettings.LastDBDuplicationFileName = fileDialog.FileName;
             }
         }
 
