@@ -6,32 +6,14 @@ using TiaXmlReader.Utility;
 
 namespace TiaUtilities.Configuration
 {
-    public abstract class ObservableConfiguration : ICleanable, INotifyPropertyChanged
+    public abstract class ObservableConfiguration() : ICleanable, INotifyPropertyChanged
     {
         private class ConfigurationObject(ObservableConfiguration configuration, string propertyName, object startValue)
         {
             public string PropertyName { get; init; } = propertyName;
             public Type Type { get; init; } = startValue.GetType();
 
-            public object Value
-            {
-                get => _value;
-                set
-                {
-                    if (value == null || value.GetType() != Type)
-                    {
-                        return;
-                    }
-
-                    var differentObjects = Utils.AreDifferentObject(this._value, value);
-                    this._value = value;
-
-                    if (differentObjects)
-                    {
-                        configuration.ConfigurationObjectChanged(this.PropertyName);
-                    }
-                }
-            }
+            public object Value { get => _value; set => UpdateValue(value); }
             private object _value = startValue;
 
             public T GetAs<T>()
@@ -43,22 +25,47 @@ namespace TiaUtilities.Configuration
 
                 return t;
             }
+
+            public void UpdateValue(object value)
+            {
+                if (value == null || value.GetType() != Type)
+                {
+                    return;
+                }
+
+                if (_value is ObservableConfiguration oldObservableConfiguration)
+                {
+                    configuration.subConfigurationList.Remove(oldObservableConfiguration);
+                }
+
+                if (value is ObservableConfiguration newObservableConfiguration)
+                {
+                    configuration.subConfigurationList.Remove(newObservableConfiguration);
+                }
+
+                var differentObjects = Utils.AreDifferentObject(this._value, value);
+                this._value = value;
+                if (differentObjects)
+                {
+                    configuration.ConfigurationObjectChanged(this.PropertyName);
+                }
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-        private readonly Dictionary<string, ConfigurationObject> objectDict;
-        private readonly Dictionary<string, List<Action>> objectChangedDict;
-        private bool dirty;
+        private readonly Dictionary<string, ConfigurationObject> objectDict = [];
+        private readonly Dictionary<string, List<Action>> objectChangedDict = [];
+        private readonly List<ObservableConfiguration> subConfigurationList = [];
 
-        public ObservableConfiguration()
+        private bool dirty; //When initializing object, the dirty state might be set!
+
+        public virtual bool IsDirty() => this.dirty || this.subConfigurationList.Any(x => x.IsDirty());
+        public virtual void Wash()
         {
-            this.objectDict = [];
-            this.objectChangedDict = [];
+            this.dirty = false;
+            this.subConfigurationList.ForEach(x => x.Wash());
         }
-
-        public virtual bool IsDirty() => this.dirty;
-        public virtual void Wash() => this.dirty = false;
 
         public Action Subscribe<T>(Expression<Func<T>> property, Action<T> valueChagedAction)
         {
@@ -115,7 +122,9 @@ namespace TiaUtilities.Configuration
                 return;
             }
 
-            objectDict.Add(key, new(this, key, startValue));
+            ConfigurationObject obj = new(this, key, startValue);
+            obj.UpdateValue(startValue);
+            objectDict.Add(key, obj);
         }
 
         public void Set(object value, [CallerMemberName] string key = "")

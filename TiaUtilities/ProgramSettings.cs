@@ -42,14 +42,7 @@ namespace TiaXmlReader
             this.TIAVersion = Constants.VERSION;
             this.IetfLanguage = LocaleVariables.LANG;
 
-            this.GridSettings = new GridSettings();
-        }
-
-        public override bool IsDirty() => base.IsDirty() || this.GridSettings.IsDirty();
-        public override void Wash()
-        {
-            base.Wash();
-            this.GridSettings.Wash();
+            this.GridSettings = new();
         }
 
         public static string GetFilePath()
