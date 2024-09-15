@@ -28,152 +28,151 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.MainTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
-            this.TopPanel = new System.Windows.Forms.TableLayoutPanel();
-            this.ImportExcelButton = new System.Windows.Forms.Button();
-            this.ConfigButton = new System.Windows.Forms.Button();
-            this.BottomPanel = new System.Windows.Forms.TableLayoutPanel();
-            this.CancelButton = new System.Windows.Forms.Button();
-            this.AcceptButton = new System.Windows.Forms.Button();
-            this.MainTableLayoutPanel.SuspendLayout();
-            this.TopPanel.SuspendLayout();
-            this.BottomPanel.SuspendLayout();
-            this.SuspendLayout();
+            MainTableLayoutPanel = new TableLayoutPanel();
+            TopPanel = new TableLayoutPanel();
+            importExcelButton = new Button();
+            configButton = new Button();
+            BottomPanel = new TableLayoutPanel();
+            cancelButton = new Button();
+            acceptButton = new Button();
+            MainTableLayoutPanel.SuspendLayout();
+            TopPanel.SuspendLayout();
+            BottomPanel.SuspendLayout();
+            SuspendLayout();
             // 
             // MainTableLayoutPanel
             // 
-            this.MainTableLayoutPanel.AutoSize = true;
-            this.MainTableLayoutPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.MainTableLayoutPanel.ColumnCount = 1;
-            this.MainTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.MainTableLayoutPanel.Controls.Add(this.TopPanel, 0, 0);
-            this.MainTableLayoutPanel.Controls.Add(this.BottomPanel, 0, 2);
-            this.MainTableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.MainTableLayoutPanel.Location = new System.Drawing.Point(0, 0);
-            this.MainTableLayoutPanel.Name = "MainTableLayoutPanel";
-            this.MainTableLayoutPanel.RowCount = 3;
-            this.MainTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.MainTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.MainTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.MainTableLayoutPanel.Size = new System.Drawing.Size(800, 385);
-            this.MainTableLayoutPanel.TabIndex = 0;
+            MainTableLayoutPanel.AutoSize = true;
+            MainTableLayoutPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            MainTableLayoutPanel.ColumnCount = 1;
+            MainTableLayoutPanel.ColumnStyles.Add(new ColumnStyle());
+            MainTableLayoutPanel.Controls.Add(TopPanel, 0, 0);
+            MainTableLayoutPanel.Controls.Add(BottomPanel, 0, 2);
+            MainTableLayoutPanel.Dock = DockStyle.Fill;
+            MainTableLayoutPanel.Location = new Point(0, 0);
+            MainTableLayoutPanel.Name = "MainTableLayoutPanel";
+            MainTableLayoutPanel.RowCount = 3;
+            MainTableLayoutPanel.RowStyles.Add(new RowStyle());
+            MainTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            MainTableLayoutPanel.RowStyles.Add(new RowStyle());
+            MainTableLayoutPanel.Size = new Size(800, 385);
+            MainTableLayoutPanel.TabIndex = 0;
             // 
             // TopPanel
             // 
-            this.TopPanel.AutoSize = true;
-            this.TopPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.TopPanel.ColumnCount = 2;
-            this.TopPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.TopPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.TopPanel.Controls.Add(this.ImportExcelButton, 0, 0);
-            this.TopPanel.Controls.Add(this.ConfigButton, 0, 0);
-            this.TopPanel.Dock = System.Windows.Forms.DockStyle.Top;
-            this.TopPanel.Location = new System.Drawing.Point(3, 3);
-            this.TopPanel.Name = "TopPanel";
-            this.TopPanel.RowCount = 1;
-            this.TopPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.TopPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 41F));
-            this.TopPanel.Size = new System.Drawing.Size(794, 41);
-            this.TopPanel.TabIndex = 1;
+            TopPanel.AutoSize = true;
+            TopPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            TopPanel.ColumnCount = 2;
+            TopPanel.ColumnStyles.Add(new ColumnStyle());
+            TopPanel.ColumnStyles.Add(new ColumnStyle());
+            TopPanel.Controls.Add(importExcelButton, 0, 0);
+            TopPanel.Controls.Add(configButton, 0, 0);
+            TopPanel.Dock = DockStyle.Top;
+            TopPanel.Location = new Point(3, 3);
+            TopPanel.Name = "TopPanel";
+            TopPanel.RowCount = 1;
+            TopPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            TopPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 41F));
+            TopPanel.Size = new Size(794, 41);
+            TopPanel.TabIndex = 1;
             // 
-            // ImportExcelButton
+            // importExcelButton
             // 
-            this.ImportExcelButton.AutoSize = true;
-            this.ImportExcelButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ImportExcelButton.Location = new System.Drawing.Point(190, 3);
-            this.ImportExcelButton.Name = "ImportExcelButton";
-            this.ImportExcelButton.Size = new System.Drawing.Size(181, 35);
-            this.ImportExcelButton.TabIndex = 0;
-            this.ImportExcelButton.Text = "Importa Excel";
-            this.ImportExcelButton.UseVisualStyleBackColor = true;
+            importExcelButton.AutoSize = true;
+            importExcelButton.Font = new Font("Microsoft Sans Serif", 15.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            importExcelButton.Location = new Point(190, 3);
+            importExcelButton.Name = "importExcelButton";
+            importExcelButton.Size = new Size(181, 35);
+            importExcelButton.TabIndex = 0;
+            importExcelButton.Text = "Importa Excel";
+            importExcelButton.UseVisualStyleBackColor = true;
             // 
-            // ConfigButton
+            // configButton
             // 
-            this.ConfigButton.AutoSize = true;
-            this.ConfigButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ConfigButton.Location = new System.Drawing.Point(3, 3);
-            this.ConfigButton.Name = "ConfigButton";
-            this.ConfigButton.Size = new System.Drawing.Size(181, 35);
-            this.ConfigButton.TabIndex = 1;
-            this.ConfigButton.Text = "Configurazione";
-            this.ConfigButton.UseVisualStyleBackColor = true;
+            configButton.AutoSize = true;
+            configButton.Font = new Font("Microsoft Sans Serif", 15.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            configButton.Location = new Point(3, 3);
+            configButton.Name = "configButton";
+            configButton.Size = new Size(181, 35);
+            configButton.TabIndex = 1;
+            configButton.Text = "Configurazione";
+            configButton.UseVisualStyleBackColor = true;
             // 
             // BottomPanel
             // 
-            this.BottomPanel.AutoSize = true;
-            this.BottomPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.BottomPanel.ColumnCount = 3;
-            this.BottomPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 40F));
-            this.BottomPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this.BottomPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 40F));
-            this.BottomPanel.Controls.Add(this.CancelButton, 2, 0);
-            this.BottomPanel.Controls.Add(this.AcceptButton, 0, 0);
-            this.BottomPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.BottomPanel.Location = new System.Drawing.Point(3, 341);
-            this.BottomPanel.Name = "BottomPanel";
-            this.BottomPanel.RowCount = 1;
-            this.BottomPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.BottomPanel.Size = new System.Drawing.Size(794, 41);
-            this.BottomPanel.TabIndex = 1;
+            BottomPanel.AutoSize = true;
+            BottomPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            BottomPanel.ColumnCount = 3;
+            BottomPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40F));
+            BottomPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            BottomPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40F));
+            BottomPanel.Controls.Add(cancelButton, 2, 0);
+            BottomPanel.Controls.Add(acceptButton, 0, 0);
+            BottomPanel.Dock = DockStyle.Bottom;
+            BottomPanel.Location = new Point(3, 341);
+            BottomPanel.Name = "BottomPanel";
+            BottomPanel.RowCount = 1;
+            BottomPanel.RowStyles.Add(new RowStyle());
+            BottomPanel.Size = new Size(794, 41);
+            BottomPanel.TabIndex = 1;
             // 
-            // CancelButton
+            // cancelButton
             // 
-            this.CancelButton.AutoSize = true;
-            this.CancelButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.CancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.CancelButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.CancelButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.CancelButton.Location = new System.Drawing.Point(478, 3);
-            this.CancelButton.Name = "CancelButton";
-            this.CancelButton.Size = new System.Drawing.Size(313, 35);
-            this.CancelButton.TabIndex = 1;
-            this.CancelButton.Text = "Cancella";
-            this.CancelButton.UseVisualStyleBackColor = true;
+            cancelButton.AutoSize = true;
+            cancelButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            cancelButton.DialogResult = DialogResult.Cancel;
+            cancelButton.Dock = DockStyle.Fill;
+            cancelButton.Font = new Font("Microsoft Sans Serif", 15.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            cancelButton.Location = new Point(478, 3);
+            cancelButton.Name = "cancelButton";
+            cancelButton.Size = new Size(313, 35);
+            cancelButton.TabIndex = 1;
+            cancelButton.Text = "Cancella";
+            cancelButton.UseVisualStyleBackColor = true;
             // 
-            // AcceptButton
+            // acceptButton
             // 
-            this.AcceptButton.AutoSize = true;
-            this.AcceptButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.AcceptButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.AcceptButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AcceptButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold);
-            this.AcceptButton.Location = new System.Drawing.Point(3, 3);
-            this.AcceptButton.Name = "AcceptButton";
-            this.AcceptButton.Size = new System.Drawing.Size(311, 35);
-            this.AcceptButton.TabIndex = 0;
-            this.AcceptButton.Text = "Accetta";
-            this.AcceptButton.UseVisualStyleBackColor = true;
+            acceptButton.AutoSize = true;
+            acceptButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            acceptButton.DialogResult = DialogResult.Cancel;
+            acceptButton.Dock = DockStyle.Fill;
+            acceptButton.Font = new Font("Microsoft Sans Serif", 15.75F, FontStyle.Bold);
+            acceptButton.Location = new Point(3, 3);
+            acceptButton.Name = "acceptButton";
+            acceptButton.Size = new Size(311, 35);
+            acceptButton.TabIndex = 0;
+            acceptButton.Text = "Accetta";
+            acceptButton.UseVisualStyleBackColor = true;
             // 
             // IOGenerationExcelImportForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(800, 385);
-            this.ControlBox = false;
-            this.Controls.Add(this.MainTableLayoutPanel);
-            this.Name = "IOGenerationExcelImportForm";
-            this.ShowIcon = false;
-            this.ShowInTaskbar = false;
-            this.Text = "IO Generation Excel Importer";
-            this.MainTableLayoutPanel.ResumeLayout(false);
-            this.MainTableLayoutPanel.PerformLayout();
-            this.TopPanel.ResumeLayout(false);
-            this.TopPanel.PerformLayout();
-            this.BottomPanel.ResumeLayout(false);
-            this.BottomPanel.PerformLayout();
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
+            ClientSize = new Size(800, 385);
+            ControlBox = false;
+            Controls.Add(MainTableLayoutPanel);
+            Name = "IOGenerationExcelImportForm";
+            ShowIcon = false;
+            ShowInTaskbar = false;
+            Text = "IO Generation Excel Importer";
+            MainTableLayoutPanel.ResumeLayout(false);
+            MainTableLayoutPanel.PerformLayout();
+            TopPanel.ResumeLayout(false);
+            TopPanel.PerformLayout();
+            BottomPanel.ResumeLayout(false);
+            BottomPanel.PerformLayout();
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
 
         private System.Windows.Forms.TableLayoutPanel MainTableLayoutPanel;
         private System.Windows.Forms.TableLayoutPanel TopPanel;
-        private System.Windows.Forms.Button ImportExcelButton;
+        private System.Windows.Forms.Button importExcelButton;
         private System.Windows.Forms.TableLayoutPanel BottomPanel;
-        private System.Windows.Forms.Button CancelButton;
-        private System.Windows.Forms.Button AcceptButton;
-        private System.Windows.Forms.Button ConfigButton;
+        private System.Windows.Forms.Button cancelButton;
+        private System.Windows.Forms.Button acceptButton;
+        private System.Windows.Forms.Button configButton;
     }
 }

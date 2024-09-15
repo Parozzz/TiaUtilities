@@ -504,4 +504,29 @@
   <data name="GRID_SCRIPT_OPEN_JAVASCRIPT_CONTEXT" xml:space="preserve">
     <value>Apri esecutore Javascript</value>
   </data>
+  <data name="GENERICS_COMMENT" xml:space="preserve">
+    <value>Commento</value>
+  </data>
+  <data name="GENERICS_CONFIGURATION" xml:space="preserve">
+    <value>Configurazione</value>
+  </data>
+  <data name="IO_GEN_EXCELIMPORT_IO_NAME" xml:space="preserve">
+    <value>Nome IO</value>
+  </data>
+  <data name="IO_GEN_EXCELIMPORT_STARTING_ROW" xml:space="preserve">
+    <value>Riga di partenza</value>
+  </data>
+  <data name="IO_GEN_EXCELIMPORT_EXPRESSION" xml:space="preserve">
+    <value>Espressione JS
+validità riga</value>
+  </data>
+  <data name="IO_GEN_EXCELIMPORT_IMPORT" xml:space="preserve">
+    <value>Importa Excel</value>
+  </data>
+  <data name="GENERICS_ACCEPT" xml:space="preserve">
+    <value>Accetta</value>
+  </data>
+  <data name="GENERICS_CANCEL" xml:space="preserve">
+    <value>Cancella</value>
+  </data>
 </root>

@@ -583,11 +583,47 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Accept.
+        /// </summary>
+        internal static string GENERICS_ACCEPT {
+            get {
+                return ResourceManager.GetString("GENERICS_ACCEPT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Address.
         /// </summary>
         internal static string GENERICS_ADDRESS {
             get {
                 return ResourceManager.GetString("GENERICS_ADDRESS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Cancel.
+        /// </summary>
+        internal static string GENERICS_CANCEL {
+            get {
+                return ResourceManager.GetString("GENERICS_CANCEL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Comment.
+        /// </summary>
+        internal static string GENERICS_COMMENT {
+            get {
+                return ResourceManager.GetString("GENERICS_COMMENT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Configuration.
+        /// </summary>
+        internal static string GENERICS_CONFIGURATION {
+            get {
+                return ResourceManager.GetString("GENERICS_CONFIGURATION", resourceCulture);
             }
         }
         
@@ -1101,6 +1137,43 @@ namespace TiaUtilities.Languages {
         internal static string IO_GEN_CONFIG_SEGMENT_BYTE_DIVISION {
             get {
                 return ResourceManager.GetString("IO_GEN_CONFIG_SEGMENT_BYTE_DIVISION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a JS Expressione
+        ///for row validation.
+        /// </summary>
+        internal static string IO_GEN_EXCELIMPORT_EXPRESSION {
+            get {
+                return ResourceManager.GetString("IO_GEN_EXCELIMPORT_EXPRESSION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Import Excel.
+        /// </summary>
+        internal static string IO_GEN_EXCELIMPORT_IMPORT {
+            get {
+                return ResourceManager.GetString("IO_GEN_EXCELIMPORT_IMPORT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a IO Name.
+        /// </summary>
+        internal static string IO_GEN_EXCELIMPORT_IO_NAME {
+            get {
+                return ResourceManager.GetString("IO_GEN_EXCELIMPORT_IO_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Starting row.
+        /// </summary>
+        internal static string IO_GEN_EXCELIMPORT_STARTING_ROW {
+            get {
+                return ResourceManager.GetString("IO_GEN_EXCELIMPORT_STARTING_ROW", resourceCulture);
             }
         }
         

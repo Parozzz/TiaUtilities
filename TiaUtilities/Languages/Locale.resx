@@ -171,6 +171,31 @@
   <data name="GENERICS_SAVE_AS" xml:space="preserve">
     <value>SaveAs</value>
   </data>
+  <data name="GENERICS_COMMENT" xml:space="preserve">
+    <value>Comment</value>
+  </data>
+  <data name="GENERICS_CONFIGURATION" xml:space="preserve">
+    <value>Configuration</value>
+  </data>
+  <data name="GENERICS_ACCEPT" xml:space="preserve">
+    <value>Accept</value>
+  </data>
+  <data name="GENERICS_CANCEL" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="IO_GEN_EXCELIMPORT_IO_NAME" xml:space="preserve">
+    <value>IO Name</value>
+  </data>
+  <data name="IO_GEN_EXCELIMPORT_STARTING_ROW" xml:space="preserve">
+    <value>Starting row</value>
+  </data>
+  <data name="IO_GEN_EXCELIMPORT_EXPRESSION" xml:space="preserve">
+    <value>JS Expressione
+for row validation</value>
+  </data>
+  <data name="IO_GEN_EXCELIMPORT_IMPORT" xml:space="preserve">
+    <value>Import Excel</value>
+  </data>
   <data name="ALARM_CONFIG_FC" xml:space="preserve">
     <value>FC</value>
   </data>

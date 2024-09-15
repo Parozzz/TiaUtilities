@@ -7,6 +7,7 @@ using TiaUtilities.Generation.Configuration.Utility;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.IO.Module;
 using TiaUtilities.Generation.IO.Module.ExcelImporter;
+using TiaUtilities.Languages;
 using TiaXmlReader;
 using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Generation.GridHandler;
@@ -39,7 +40,7 @@ namespace TiaUtilities.Generation.GenModules.IO.ExcelImporter
         {
             if (keyData == Keys.Cancel || keyData == Keys.Escape)
             {
-                this.CancelButton.PerformClick();
+                this.cancelButton.PerformClick();
                 return true;    // indicate that you handled this keystroke
             }
 
@@ -52,12 +53,12 @@ namespace TiaUtilities.Generation.GenModules.IO.ExcelImporter
             this.MainTableLayoutPanel.Controls.Add(this.gridHandler.DataGridView);
 
             #region FORM
-            this.AcceptButton.Click += (object sender, EventArgs args) =>
+            this.acceptButton.Click += (object sender, EventArgs args) =>
             {
                 this.DialogResult = DialogResult.OK;
                 this.Close();
             };
-            this.CancelButton.Click += (object sender, EventArgs args) =>
+            this.cancelButton.Click += (object sender, EventArgs args) =>
             {
                 this.DialogResult = DialogResult.Cancel;
                 this.Close();
@@ -77,24 +78,24 @@ namespace TiaUtilities.Generation.GenModules.IO.ExcelImporter
 
             gridHandler.Init();
 
-            this.ConfigButton.Click += (sender, args) =>
+            this.configButton.Click += (sender, args) =>
             {
-                var configForm = new ConfigForm("Configurazione") { ControlWidth = 500 };
+                var configForm = new ConfigForm(Locale.GENERICS_CONFIGURATION) { ControlWidth = 500 };
                 configForm.SetConfiguration(this.importConfig, MainForm.Settings.PresetIOExcelImportConfiguration);
 
                 var mainGroup = configForm.Init();
-                mainGroup.AddTextBox().Label("Indirizzo").BindText(() => importConfig.AddressCellConfig);
-                mainGroup.AddTextBox().Label("Nome IO").BindText(() => importConfig.IONameCellConfig);
-                mainGroup.AddTextBox().Label("Commento").BindText(() => importConfig.CommentCellConfig);
-                mainGroup.AddTextBox().Label("Riga di partenza").BindUInt(() => importConfig.StartingRow);
-                mainGroup.AddJavascript().Label("Espressione\nvalidità riga").Height(200).BindText(() => importConfig.IgnoreRowExpressionConfig);
+                mainGroup.AddTextBox().Label(Locale.GENERICS_ADDRESS).BindText(() => importConfig.AddressCellConfig);
+                mainGroup.AddTextBox().Label(Locale.IO_GEN_EXCELIMPORT_IO_NAME).BindText(() => importConfig.IONameCellConfig);
+                mainGroup.AddTextBox().Label(Locale.GENERICS_COMMENT).BindText(() => importConfig.CommentCellConfig);
+                mainGroup.AddTextBox().Label(Locale.IO_GEN_EXCELIMPORT_STARTING_ROW).BindUInt(() => importConfig.StartingRow);
+                mainGroup.AddJavascript().Label(Locale.IO_GEN_EXCELIMPORT_EXPRESSION).BindText(() => importConfig.IgnoreRowExpressionConfig).Height(200);
 
-                configForm.StartShowingAtControl(this.ConfigButton);
+                configForm.StartShowingAtControl(this.configButton);
                 configForm.Init();
                 configForm.Show(this);
             };
 
-            this.ImportExcelButton.Click += (sender, args) =>
+            this.importExcelButton.Click += (sender, args) =>
             {
                 var fileDialog = new CommonOpenFileDialog
                 {
@@ -112,6 +113,16 @@ namespace TiaUtilities.Generation.GenModules.IO.ExcelImporter
                     }
                 }
             };
+
+            this.Translate();
+        }
+
+        private void Translate()
+        {
+            this.importExcelButton.Text = Locale.IO_GEN_FORM_IMPEXP_IMPORT_EXCEL;
+            this.configButton.Text = Locale.GENERICS_CONFIGURATION;
+            this.acceptButton.Text = Locale.GENERICS_ACCEPT;
+            this.cancelButton.Text = Locale.GENERICS_CANCEL;
         }
 
         private void ImportExcel(string filePath)
