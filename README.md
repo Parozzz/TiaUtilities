@@ -9,8 +9,9 @@ At the moment, this is what exists:
    - Javascript support for better customization
    - Many specific tools to improve QOL
    - Grids support CTRL+Z / CTRL+Y
-   - Localization (Still WIP, mixed language for now)
+   - Fully Localized (IT - EN)
 3) AddIn for TIA to import / export blocks to .xml files.
+4) Supports version of TIA from V16 up to V19 (Previous version are very different and will not be implemented)
 
 ## SimaticML API
 Still WIP, but adds the ability to create segments programmatically. Still needs quite a grasp on how siemens generate .xml files since names are taken from there.
