@@ -1,18 +1,23 @@
 ﻿using CustomControls.RJControls;
+using System.Linq.Expressions;
+using System.Reflection;
+using TiaUtilities.Generation.Configuration.Utility;
 using TiaXmlReader.Generation.Configuration;
 
 namespace TiaUtilities.Generation.Configuration.Lines
 {
     public class ConfigTextBoxLine : ConfigLine<ConfigTextBoxLine>
     {
+        private readonly IConfigGroup configGroup;
         private readonly RJTextBox textBox;
 
         private bool numericOnly;
         private Action<string?>? textChangedAction;
         private Action<uint>? uintChangedAction;
 
-        public ConfigTextBoxLine()
+        public ConfigTextBoxLine(IConfigGroup group)
         {
+            this.configGroup = group;
             this.textBox = new RJTextBox()
             {
                 Margin = new Padding(0),
@@ -61,13 +66,19 @@ namespace TiaUtilities.Generation.Configuration.Lines
             this.textBox.ScrollBars = ScrollBars.Both;
             return this;
         }
-
+        
         public ConfigTextBoxLine TextChanged(Action<string?> action)
         {
             textChangedAction = action;
             return this;
         }
 
+        public ConfigTextBoxLine TextChangedNotNull(Action<string> action)
+        {
+            textChangedAction = str => action.Invoke(str ?? "");
+            return this;
+        }
+        
         public ConfigTextBoxLine UIntChanged(Action<uint> action)
         {
             numericOnly = true;
@@ -75,6 +86,24 @@ namespace TiaUtilities.Generation.Configuration.Lines
             return this;
         }
 
+        public ConfigTextBoxLine BindText(Expression<Func<string>> propertyExpression, bool nullable = false)
+        {
+            var propertyInfo = ConfigLineUtils.ValidateBindExpression(this.configGroup, propertyExpression.Body, out object configuration);
+
+            this.ControlText(propertyExpression.Compile().Invoke());
+            textChangedAction = str => propertyInfo.SetValue(configuration, nullable ? str : (str ?? ""));
+            return this;
+        }
+
+        public ConfigTextBoxLine BindUInt(Expression<Func<uint>> propertyExpression)
+        {
+            var propertyInfo = ConfigLineUtils.ValidateBindExpression(this.configGroup,propertyExpression.Body, out object configuration);
+
+            this.ControlText(propertyExpression.Compile().Invoke());
+            uintChangedAction = uintValue => propertyInfo.SetValue(configuration, uintValue);
+            return this;
+        }
+        
         public override Control GetControl()
         {
             return this.textBox;

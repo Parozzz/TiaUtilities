@@ -10,13 +10,13 @@ namespace TiaUtilities.Generation.Configuration.Utility
 
         public static ConfigLabelLine AddLabel(this IConfigGroup group) => group.Add(new ConfigLabelLine());
         public static ConfigSeparatorLine AddSeparator(this IConfigGroup group) => group.Add(new ConfigSeparatorLine());
-        public static ConfigTextBoxLine AddTextBox(this IConfigGroup group) => group.Add(new ConfigTextBoxLine());
-        public static ConfigCheckBoxLine AddCheckBox(this IConfigGroup group) => group.Add(new ConfigCheckBoxLine());
-        public static ConfigComboBoxLine AddComboBox(this IConfigGroup group) => group.Add(new ConfigComboBoxLine());
+        public static ConfigTextBoxLine AddTextBox(this IConfigGroup group) => group.Add(new ConfigTextBoxLine(group));
+        public static ConfigCheckBoxLine AddCheckBox(this IConfigGroup group) => group.Add(new ConfigCheckBoxLine(group));
+        public static ConfigComboBoxLine AddComboBox(this IConfigGroup group) => group.Add(new ConfigComboBoxLine(group));
         public static ConfigButtonPanelLine AddButtonPanel(this IConfigGroup group) => group.Add(new ConfigButtonPanelLine());
-        public static ConfigColorPickerLine AddColorPicker(this IConfigGroup group) => group.Add(new ConfigColorPickerLine());
-        public static ConfigJavascriptLine AddJavascript(this IConfigGroup group) => group.Add(new ConfigJavascriptLine());
-        public static ConfigJSONLine AddJSON(this IConfigGroup group) => group.Add(new ConfigJSONLine());
+        public static ConfigColorPickerLine AddColorPicker(this IConfigGroup group) => group.Add(new ConfigColorPickerLine(group));
+        public static ConfigJavascriptLine AddJavascript(this IConfigGroup group) => group.Add(new ConfigJavascriptLine(group));
+        public static ConfigJSONLine AddJSON(this IConfigGroup group) => group.Add(new ConfigJSONLine(group));
         public static ConfigInteractableTabLine AddInteractableTab(this IConfigGroup group) => group.Add(new ConfigInteractableTabLine());
     }
 }

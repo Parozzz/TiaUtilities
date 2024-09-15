@@ -78,31 +78,14 @@ namespace TiaUtilities.Generation.GenModules.IO.ExcelImporter
 
             this.ConfigButton.Click += (sender, args) =>
             {
-                var configForm = new ConfigForm("Configurazione")
-                {
-                    ControlWidth = 500
-                };
+                var configForm = new ConfigForm("Configurazione", this.importConfig) { ControlWidth = 500 };
 
                 var mainGroup = configForm.Init();
-                mainGroup.AddTextBox().Label("Indirizzo")
-                    .ControlText(importConfig.AddressCellConfig)
-                    .TextChanged(str => importConfig.AddressCellConfig = str);
-
-                mainGroup.AddTextBox().Label("Nome IO")
-                     .ControlText(importConfig.IONameCellConfig)
-                     .TextChanged(str => importConfig.IONameCellConfig = str);
-
-                mainGroup.AddTextBox().Label("Commento")
-                     .ControlText(importConfig.CommentCellConfig)
-                     .TextChanged(str => importConfig.CommentCellConfig = str);
-
-                mainGroup.AddTextBox().Label("Riga di partenza")
-                     .ControlText(importConfig.StartingRow)
-                     .UIntChanged(num => importConfig.StartingRow = num);
-
-                mainGroup.AddJavascript().Label("Espressione\nvalidità riga").Height(200)
-                     .ControlText(importConfig.IgnoreRowExpressionConfig)
-                     .TextChanged(str => importConfig.IgnoreRowExpressionConfig = str);
+                mainGroup.AddTextBox().Label("Indirizzo").BindText(() => importConfig.AddressCellConfig);
+                mainGroup.AddTextBox().Label("Nome IO").BindText(() => importConfig.IONameCellConfig);
+                mainGroup.AddTextBox().Label("Commento").BindText(() => importConfig.CommentCellConfig);
+                mainGroup.AddTextBox().Label("Riga di partenza").BindUInt(() => importConfig.StartingRow);
+                mainGroup.AddJavascript().Label("Espressione\nvalidità riga").Height(200).BindText(() => importConfig.IgnoreRowExpressionConfig);
 
                 configForm.StartShowingAtControl(this.ConfigButton);
                 configForm.Init();

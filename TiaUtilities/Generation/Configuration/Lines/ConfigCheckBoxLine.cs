@@ -1,16 +1,20 @@
 ﻿using CustomControls.RJControls;
+using System.Linq.Expressions;
+using TiaUtilities.Generation.Configuration.Utility;
 using TiaXmlReader.Generation.Configuration;
 
 namespace TiaUtilities.Generation.Configuration.Lines
 {
     public class ConfigCheckBoxLine : ConfigLine<ConfigCheckBoxLine>
     {
+        private readonly IConfigGroup configGroup;
         private readonly RJToggleButton control;
 
         private Action<bool>? checkedChangedAction;
 
-        public ConfigCheckBoxLine()
+        public ConfigCheckBoxLine(IConfigGroup configGroup)
         {
+            this.configGroup = configGroup;
             control = new RJToggleButton
             {
                 FlatStyle = FlatStyle.Flat,
@@ -35,10 +39,19 @@ namespace TiaUtilities.Generation.Configuration.Lines
             control.Checked = value;
             return this;
         }
-
+        /*
         public ConfigCheckBoxLine CheckedChanged(Action<bool> action)
         {
             checkedChangedAction = action;
+            return this;
+        }
+        */
+        public ConfigCheckBoxLine BindChecked(Expression<Func<bool>> propertyExpression)
+        {
+            var propertyInfo = ConfigLineUtils.ValidateBindExpression(this.configGroup, propertyExpression.Body, out object configuration);
+
+            this.ControlText(propertyExpression.Compile().Invoke());
+            checkedChangedAction = boolValue => propertyInfo.SetValue(configuration, boolValue);
             return this;
         }
 

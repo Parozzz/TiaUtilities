@@ -1,17 +1,21 @@
 ﻿using FastColoredTextBoxNS;
+using System.Linq.Expressions;
+using TiaUtilities.Generation.Configuration.Utility;
 using TiaXmlReader.Generation.Configuration;
 
 namespace TiaUtilities.Generation.Configuration.Lines
 {
     public class ConfigJSONLine : ConfigLine<ConfigJSONLine>
     {
+        private readonly IConfigGroup configGroup;
         private readonly FastColoredTextBox control;
 
         private Action<string>? textChangedAction;
 
-        public ConfigJSONLine()
+        public ConfigJSONLine(IConfigGroup configGroup)
         {
-            control = new FastColoredTextBox
+            this.configGroup = configGroup;
+            this.control = new FastColoredTextBox
             {
                 Language = Language.JSON,
                 // == INDENTATION ==
@@ -45,6 +49,7 @@ namespace TiaUtilities.Generation.Configuration.Lines
             var text = control.Text;
             textChangedAction?.Invoke(text);
         }
+
         public ConfigJSONLine Readonly()
         {
             control.ReadOnly = true;
@@ -62,6 +67,15 @@ namespace TiaUtilities.Generation.Configuration.Lines
         public ConfigJSONLine TextChanged(Action<string> action)
         {
             textChangedAction = action;
+            return this;
+        }
+
+        public ConfigJSONLine BindText(Expression<Func<string>> propertyExpression, bool nullable = false)
+        {
+            var propertyInfo = ConfigLineUtils.ValidateBindExpression(this.configGroup, propertyExpression.Body, out object configuration);
+
+            this.ControlText(propertyExpression.Compile().Invoke());
+            textChangedAction = str => propertyInfo.SetValue(configuration, nullable ? str : (str ?? ""));
             return this;
         }
 

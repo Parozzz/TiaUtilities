@@ -1,13 +1,6 @@
 ﻿using CustomControls.RJControls;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using TiaXmlReader.CustomControls;
-using TiaXmlReader.Generation.Alarms;
+using System.Linq.Expressions;
+using TiaUtilities.Generation.Configuration.Utility;
 using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Languages;
 
@@ -15,6 +8,7 @@ namespace TiaUtilities.Generation.Configuration.Lines
 {
     public class ConfigComboBoxLine : ConfigLine<ConfigComboBoxLine>
     {
+        private readonly IConfigGroup configGroup;
         private readonly RJComboBox comboBox;
 
         private bool numericOnly;
@@ -22,8 +16,9 @@ namespace TiaUtilities.Generation.Configuration.Lines
         private Action<uint>? uintChangedAction;
         private Action<object?>? selectedValueChangedAction;
 
-        public ConfigComboBoxLine()
+        public ConfigComboBoxLine(IConfigGroup configGroup)
         {
+            this.configGroup = configGroup;
             this.comboBox = new RJComboBox()
             {
                 Margin = Padding.Empty,
@@ -103,7 +98,7 @@ namespace TiaUtilities.Generation.Configuration.Lines
             this.selectedValueChangedAction = action;
             return this;
         }
-
+        
         public ConfigComboBoxLine SelectedValueChanged<T>(Action<T> action)
         {
             this.selectedValueChangedAction = obj =>
@@ -115,7 +110,7 @@ namespace TiaUtilities.Generation.Configuration.Lines
             };
             return this;
         }
-
+        
         public ConfigComboBoxLine TextChanged(Action<string> action)
         {
             textChangedAction = action;
@@ -125,6 +120,39 @@ namespace TiaUtilities.Generation.Configuration.Lines
         public ConfigComboBoxLine UIntChanged(Action<uint> action)
         {
             uintChangedAction = action;
+            return this;
+        }
+        
+        public ConfigComboBoxLine BindText(Expression<Func<string>> propertyExpression, bool nullable = false)
+        {
+            var propertyInfo = ConfigLineUtils.ValidateBindExpression(this.configGroup, propertyExpression.Body, out object configuration);
+
+            this.ControlText(propertyExpression.Compile().Invoke());
+            this.textChangedAction = str => propertyInfo.SetValue(configuration, nullable ? str : (str ?? ""));
+            return this;
+        }
+
+        public ConfigComboBoxLine BindUInt(Expression<Func<uint>> propertyExpression)
+        {
+            var propertyInfo = ConfigLineUtils.ValidateBindExpression(this.configGroup, propertyExpression.Body, out object configuration);
+
+            this.ControlText(propertyExpression.Compile().Invoke());
+            this.uintChangedAction = uintValue => propertyInfo.SetValue(configuration, uintValue);
+            return this;
+        }
+
+        public ConfigComboBoxLine BindValue<T>(Expression<Func<T>> propertyExpression)
+        {
+            var propertyInfo = ConfigLineUtils.ValidateBindExpression(this.configGroup, propertyExpression.Body, out object configuration);
+
+            this.comboBox.SelectedValue = propertyExpression.Compile().Invoke();
+            this.selectedValueChangedAction = obj =>
+            {
+                if (obj is T tValue)
+                {
+                    propertyInfo.SetValue(configuration, tValue);
+                }
+            };
             return this;
         }
 

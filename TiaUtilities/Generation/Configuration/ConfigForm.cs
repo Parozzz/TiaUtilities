@@ -7,6 +7,8 @@ namespace TiaXmlReader.Generation.Configuration
     {
         private readonly string title;
 
+        public object? Configuration { get; init; }
+
         public Font LabelFont { get; set; } = ConfigStyle.LABEL_FONT;
         public Font ControlFont { get; set; } = ConfigStyle.CONTROL_FONT;
         public int ControlWidth { get; set; } = 300;
@@ -15,11 +17,12 @@ namespace TiaXmlReader.Generation.Configuration
         public bool CloseOnEnter { get; set; } = true;
         public bool ShowControlBox { get; set; } = false;
 
-        public ConfigForm(string title)
+        public ConfigForm(string title, object? configuration = null)
         {
             InitializeComponent();
 
             this.title = title;
+            this.Configuration = configuration;
         }
 
         public void StartShowingAtCursor()

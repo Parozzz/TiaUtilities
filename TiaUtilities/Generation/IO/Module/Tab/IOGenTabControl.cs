@@ -38,17 +38,11 @@ namespace TiaUtilities.Generation.GenModules.IO.Tab
                 var button = this.fcConfigButton;
                 button.Click += (sender, args) =>
                 {
-                    var configForm = new ConfigForm(button.Text) { ControlWidth = 150 };
+                    var configForm = new ConfigForm(button.Text, tabConfig) { ControlWidth = 150 };
 
                     var mainGroup = configForm.Init();
-                    mainGroup.AddTextBox().Label(Locale.GENERICS_NAME)
-                         .ControlText(tabConfig.FCBlockName)
-                         .TextChanged(str => tabConfig.FCBlockName = str);
-
-                    mainGroup.AddTextBox().Label(Locale.GENERICS_NUMBER)
-                         .ControlText(tabConfig.FCBlockNumber)
-                         .UIntChanged(num => tabConfig.FCBlockNumber = num);
-
+                    mainGroup.AddTextBox().Label(Locale.GENERICS_NAME).BindText(() => tabConfig.FCBlockName);
+                    mainGroup.AddTextBox().Label(Locale.GENERICS_NUMBER).BindUInt(() => tabConfig.FCBlockNumber);
                     SetupConfigForm(button, configForm);
                 };
             }
@@ -57,17 +51,11 @@ namespace TiaUtilities.Generation.GenModules.IO.Tab
                 var button = this.segmentNameConfigButton;
                 button.Click += (sender, args) =>
                 {
-                    var configForm = new ConfigForm(button.Text) { ControlWidth = 400 };
+                    var configForm = new ConfigForm(button.Text, tabConfig) { ControlWidth = 400 };
 
                     var mainGroup = configForm.Init();
-                    mainGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_SEGMENT_BIT_DIVISION)
-                         .ControlText(tabConfig.SegmentNameBitGrouping)
-                         .TextChanged(str => tabConfig.SegmentNameBitGrouping = str);
-
-                    mainGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_SEGMENT_BYTE_DIVISION)
-                         .ControlText(tabConfig.SegmentNameByteGrouping)
-                         .TextChanged(str => tabConfig.SegmentNameByteGrouping = str);
-
+                    mainGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_SEGMENT_BIT_DIVISION).BindText(() => tabConfig.SegmentNameBitGrouping);
+                    mainGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_SEGMENT_BYTE_DIVISION).BindText(() => tabConfig.SegmentNameByteGrouping);
                     SetupConfigForm(button, configForm);
                 };
             }

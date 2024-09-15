@@ -43,30 +43,14 @@ namespace TiaUtilities.Generation.GenModules.IO.Controls
                 var button = this.dbConfigButton;
                 button.Click += (sender, args) =>
                 {
-                    var configForm = new ConfigForm(button.Text) { ControlWidth = 250 };
+                    var configForm = new ConfigForm(button.Text, mainConfig) { ControlWidth = 250 };
 
                     var mainGroup = configForm.Init();
-
-                    mainGroup.AddTextBox().Label($"{Locale.GENERICS_NAME} > {GenPlaceholders.IO.CONFIG_DB_NAME}")
-                         .ControlText(mainConfig.DBName)
-                         .TextChanged(str => mainConfig.DBName = str);
-
-                    mainGroup.AddTextBox().Label($"{Locale.GENERICS_NUMBER} > {GenPlaceholders.IO.CONFIG_DB_NUMBER}")
-                         .ControlText(mainConfig.DBNumber)
-                         .UIntChanged(num => mainConfig.DBNumber = num);
-
-                    mainGroup.AddCheckBox().Label(Locale.IO_GEN_CONFIG_ALIAS_DB_GENERATED_DEFINED_VARIABLES).ControlNoAdapt()
-                         .Value(mainConfig.GenerateDefinedVariableAnyway)
-                         .CheckedChanged(b => mainConfig.GenerateDefinedVariableAnyway = b);
-
-                    mainGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_ALIAS_DB_IN_DEFAULT)
-                         .ControlText(mainConfig.DefaultDBInputVariable)
-                         .TextChanged(str => mainConfig.DefaultDBInputVariable = str);
-
-                    mainGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_ALIAS_DB_OUT_DEFAULT)
-                         .ControlText(mainConfig.DefaultDBOutputVariable)
-                         .TextChanged(str => mainConfig.DefaultDBOutputVariable = str);
-
+                    mainGroup.AddTextBox().Label($"{Locale.GENERICS_NAME} > {GenPlaceholders.IO.CONFIG_DB_NAME}").BindText(() => mainConfig.DBName);
+                    mainGroup.AddTextBox().Label($"{Locale.GENERICS_NUMBER} > {GenPlaceholders.IO.CONFIG_DB_NUMBER}").BindUInt(() => mainConfig.DBNumber);
+                    mainGroup.AddCheckBox().Label(Locale.IO_GEN_CONFIG_ALIAS_DB_GENERATED_DEFINED_VARIABLES).BindChecked(() => mainConfig.GenerateDefinedVariableAnyway).ControlNoAdapt();
+                    mainGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_ALIAS_DB_IN_DEFAULT).BindText(() => mainConfig.DefaultDBInputVariable);
+                    mainGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_ALIAS_DB_OUT_DEFAULT).BindText(() => mainConfig.DefaultDBOutputVariable);
                     SetupConfigForm(button, configForm);
                 };
             }
@@ -75,21 +59,12 @@ namespace TiaUtilities.Generation.GenModules.IO.Controls
                 var button = this.ioTableConfigButton;
                 button.Click += (sender, args) =>
                 {
-                    var configForm = new ConfigForm(button.Text) { ControlWidth = 285 };
+                    var configForm = new ConfigForm(button.Text, mainConfig) { ControlWidth = 285 };
 
                     var mainGroup = configForm.Init();
-                    mainGroup.AddTextBox().Label(Locale.GENERICS_NAME)
-                         .ControlText(mainConfig.IOTableName)
-                         .TextChanged(str => mainConfig.IOTableName = str);
-
-                    mainGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_IO_TABLE_NEW_EVERY)
-                         .ControlText(mainConfig.IOTableSplitEvery)
-                         .UIntChanged(num => mainConfig.IOTableSplitEvery = num);
-
-                    mainGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_IO_TABLE_DEFAULT_NAME)
-                         .ControlText(mainConfig.DefaultIoName)
-                         .TextChanged(str => mainConfig.DefaultIoName = str);
-
+                    mainGroup.AddTextBox().Label(Locale.GENERICS_NAME).BindText(() => mainConfig.IOTableName);
+                    mainGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_IO_TABLE_NEW_EVERY).BindUInt(() => mainConfig.IOTableSplitEvery);
+                    mainGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_IO_TABLE_DEFAULT_NAME).BindText(() => mainConfig.DefaultIoName);
                     SetupConfigForm(button, configForm);
                 };
             }
@@ -99,38 +74,21 @@ namespace TiaUtilities.Generation.GenModules.IO.Controls
                 var button = this.variableTableConfigButton;
                 button.Click += (sender, args) =>
                 {
-                    var configForm = new ConfigForm(button.Text) { ControlWidth = 250 };
+                    var configForm = new ConfigForm(button.Text, mainConfig) { ControlWidth = 250 };
 
                     var mainGroup = configForm.Init();
-                    mainGroup.AddTextBox().Label(Locale.GENERICS_NAME)
-                         .ControlText(mainConfig.VariableTableName)
-                         .TextChanged(str => mainConfig.VariableTableName = str);
-
-                    mainGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_ALIAS_TABLE_NEW_EVERY)
-                         .ControlText(mainConfig.VariableTableSplitEvery)
-                         .UIntChanged(num => mainConfig.VariableTableSplitEvery = num);
+                    mainGroup.AddTextBox().Label(Locale.GENERICS_NAME).BindText(() => mainConfig.VariableTableName);
+                    mainGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_ALIAS_TABLE_NEW_EVERY).BindUInt(() => mainConfig.VariableTableSplitEvery);
 
                     var inputGroup = mainGroup.AddGroup();
                     inputGroup.AddLabel().Label(Locale.IO_GEN_CONFIG_ALIAS_TABLE_INPUT_VARIABLE);
-
-                    inputGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_START_ADDRESS)
-                         .ControlText(mainConfig.VariableTableInputStartAddress)
-                         .UIntChanged(num => mainConfig.VariableTableInputStartAddress = num);
-
-                    inputGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_DEFAULT)
-                         .ControlText(mainConfig.DefaultMerkerInputVariable)
-                         .TextChanged(str => mainConfig.DefaultMerkerInputVariable = str);
+                    inputGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_START_ADDRESS).BindUInt(() => mainConfig.VariableTableInputStartAddress);
+                    inputGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_DEFAULT).BindText(() => mainConfig.DefaultMerkerInputVariable);
 
                     var outputGroup = mainGroup.AddGroup();
                     outputGroup.AddLabel().Label(Locale.IO_GEN_CONFIG_ALIAS_TABLE_OUTPUT_VARIABLE);
-
-                    outputGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_START_ADDRESS)
-                         .ControlText(mainConfig.VariableTableOutputStartAddress)
-                         .UIntChanged(num => mainConfig.VariableTableOutputStartAddress = num);
-
-                    outputGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_DEFAULT)
-                         .ControlText(mainConfig.DefaultMerkerOutputVariable)
-                         .TextChanged(str => mainConfig.DefaultMerkerOutputVariable = str);
+                    outputGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_START_ADDRESS).BindUInt(() => mainConfig.VariableTableOutputStartAddress);
+                    outputGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_DEFAULT).BindText(() => mainConfig.DefaultMerkerOutputVariable);
 
                     SetupConfigForm(button, configForm);
                 };

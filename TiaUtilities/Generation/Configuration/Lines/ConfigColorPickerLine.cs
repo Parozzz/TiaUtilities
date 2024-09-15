@@ -1,4 +1,6 @@
 ﻿using CustomControls.RJControls;
+using System.Linq.Expressions;
+using TiaUtilities.Generation.Configuration.Utility;
 using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Utility;
 using TiaXmlReader.Utility.Extensions;
@@ -7,14 +9,16 @@ namespace TiaUtilities.Generation.Configuration.Lines
 {
     public class ConfigColorPickerLine : ConfigLine<ConfigColorPickerLine>
     {
+        private readonly IConfigGroup configGroup;
         private readonly RJTextBox colorTextBox;
         private readonly Button colorPickerButton;
 
         private Action<Color>? colorAction;
         private Color lastColor = Color.White;
 
-        public ConfigColorPickerLine()
+        public ConfigColorPickerLine(IConfigGroup configGroup)
         {
+            this.configGroup = configGroup;
             this.colorTextBox = new RJTextBox()
             {
                 ForeColor = ConfigStyle.FORE_COLOR,
@@ -76,10 +80,19 @@ namespace TiaUtilities.Generation.Configuration.Lines
             colorAction?.Invoke(color);
             return this;
         }
-
+        
         public ConfigColorPickerLine ColorChanged(Action<Color> action)
         {
             colorAction = action;
+            return this;
+        }
+        
+        public ConfigColorPickerLine BindColor(Expression<Func<Color>> propertyExpression)
+        {
+            var propertyInfo = ConfigLineUtils.ValidateBindExpression(this.configGroup, propertyExpression.Body, out object configuration);
+
+            this.ApplyColor(propertyExpression.Compile().Invoke());
+            colorAction = colorValue => propertyInfo.SetValue(configuration, colorValue);
             return this;
         }
 

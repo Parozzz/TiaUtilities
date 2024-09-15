@@ -30,16 +30,14 @@ namespace TiaUtilities.Generation.GenModules.Alarm
                 var button = this.fcConfigButton;
                 button.Click += (sender, args) =>
                 {
-                    var configForm = new ConfigForm(button.Text);
+                    var configForm = new ConfigForm(button.Text, mainConfig);
 
                     var mainGroup = configForm.Init().ControlWidth(185);
                     mainGroup.AddTextBox().Label(Locale.GENERICS_NAME)
-                        .ControlText(mainConfig.FCBlockName)
-                        .TextChanged(v => mainConfig.FCBlockName = v);
+                        .BindText(() => mainConfig.FCBlockName);
 
                     mainGroup.AddTextBox().Label(Locale.GENERICS_NUMBER)
-                        .ControlText(mainConfig.FCBlockNumber)
-                        .UIntChanged(v => mainConfig.FCBlockNumber = v);
+                        .BindUInt(() => mainConfig.FCBlockNumber);
 
                     SetupConfigForm(button, configForm);
                 };
@@ -49,24 +47,20 @@ namespace TiaUtilities.Generation.GenModules.Alarm
                 var button = this.segmentNameConfigButton;
                 button.Click += (sender, args) =>
                 {
-                    var configForm = new ConfigForm(button.Text) { ControlWidth = 500 };
+                    var configForm = new ConfigForm(button.Text, mainConfig) { ControlWidth = 500 };
 
                     var mainGroup = configForm.Init();
                     mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_SEGMENT_NAME_ONE_EACH)
-                         .ControlText(mainConfig.OneEachSegmentName)
-                         .TextChanged(v => mainConfig.OneEachSegmentName = v);
+                         .BindText(() => mainConfig.OneEachSegmentName);
 
                     mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_SEGMENT_NAME_ONE_EACH_EMPTY)
-                         .ControlText(mainConfig.OneEachEmptyAlarmSegmentName)
-                         .TextChanged(v => mainConfig.OneEachEmptyAlarmSegmentName = v);
+                         .BindText(() => mainConfig.OneEachEmptyAlarmSegmentName);
 
                     mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_SEGMENT_NAME_GROUP_EACH)
-                         .ControlText(mainConfig.GroupSegmentName)
-                         .TextChanged(v => mainConfig.GroupSegmentName = v);
+                         .BindText(() => mainConfig.GroupSegmentName);
 
                     mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_SEGMENT_NAME_GROUP_EACH_EMPTY)
-                         .ControlText(mainConfig.GroupEmptyAlarmSegmentName)
-                         .TextChanged(v => mainConfig.GroupEmptyAlarmSegmentName = v);
+                         .BindText(() => mainConfig.GroupEmptyAlarmSegmentName);
 
                     SetupConfigForm(button, configForm);
                 };
@@ -76,16 +70,13 @@ namespace TiaUtilities.Generation.GenModules.Alarm
                 var button = this.textListConfigButton;
                 button.Click += (sender, args) =>
                 {
-                    var configForm = new ConfigForm(Locale.ALARM_CONFIG_TEXT_LIST);
+                    var configForm = new ConfigForm(button.Text, mainConfig);
 
                     var mainGroup = configForm.Init();
                     mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_TEXT_LIST_FULL)
-                         .ControlText(mainConfig.AlarmTextInList)
-                         .TextChanged(v => mainConfig.AlarmTextInList = v);
-
+                        .BindText(() => mainConfig.AlarmTextInList);
                     mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_TEXT_LIST_EMPTY)
-                         .ControlText(mainConfig.EmptyAlarmTextInList)
-                         .TextChanged(v => mainConfig.EmptyAlarmTextInList = v);
+                        .BindText(() => mainConfig.EmptyAlarmTextInList);
 
                     SetupConfigForm(button, configForm);
                 };
