@@ -1,10 +1,95 @@
-﻿using System;
+﻿
+/* Modifica senza merge dal progetto 'AddIn_V16'
+Prima:
+using System;
 using System.Diagnostics;
 using System.IO;
 using Siemens.Engineering;
+Dopo:
+using Siemens.Engineering;
 using Siemens.Engineering.SW.Blocks;
-using System.Windows.Forms;
 using Siemens.Engineering.SW.Tags;
+using System;
+*/
+
+/* Modifica senza merge dal progetto 'AddIn_V17'
+Prima:
+using System;
+using System.Diagnostics;
+using System.IO;
+using Siemens.Engineering;
+Dopo:
+using Siemens.Engineering;
+using Siemens.Engineering.SW.Blocks;
+using Siemens.Engineering.SW.Tags;
+using System;
+*/
+
+/* Modifica senza merge dal progetto 'AddIn_V18'
+Prima:
+using System;
+using System.Diagnostics;
+using System.IO;
+using Siemens.Engineering;
+Dopo:
+using Siemens.Engineering;
+using Siemens.Engineering.SW.Blocks;
+using Siemens.Engineering.SW.Tags;
+using System;
+*/
+
+/* Modifica senza merge dal progetto 'AddIn_V19'
+Prima:
+using System;
+using System.Diagnostics;
+using System.IO;
+using Siemens.Engineering;
+Dopo:
+using Siemens.Engineering;
+using Siemens.Engineering.SW.Blocks;
+using Siemens.Engineering.SW.Tags;
+using System;
+*/
+using Siemens.Engineering;
+
+/* Modifica senza merge dal progetto 'AddIn_V16'
+Prima:
+using System.Diagnostics;
+using System;
+Dopo:
+using System;
+using System.Diagnostics;
+*/
+
+/* Modifica senza merge dal progetto 'AddIn_V17'
+Prima:
+using System.Diagnostics;
+using System;
+Dopo:
+using System;
+using System.Diagnostics;
+*/
+
+/* Modifica senza merge dal progetto 'AddIn_V18'
+Prima:
+using System.Diagnostics;
+using System;
+Dopo:
+using System;
+using System.Diagnostics;
+*/
+
+/* Modifica senza merge dal progetto 'AddIn_V19'
+Prima:
+using System.Diagnostics;
+using System;
+Dopo:
+using System;
+using System.Diagnostics;
+*/
+using System;
+using System.IO;
+using System.Windows.Forms;
 
 namespace SpinAddin.Utility
 {

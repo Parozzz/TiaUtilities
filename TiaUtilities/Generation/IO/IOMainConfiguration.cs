@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System.ComponentModel;
 using TiaUtilities.Configuration;
 using TiaUtilities.Languages;
 using TiaXmlReader.Generation.Placeholders;
@@ -66,22 +65,6 @@ namespace TiaXmlReader.Generation.IO
             this.DefaultDBOutputVariable = "{config_db_name}.OUT.{io_name}";
             this.DefaultMerkerInputVariable = "MI_{byte}_{bit}";
             this.DefaultMerkerOutputVariable = "MO_{byte}_{bit}";
-        }
-
-        public override bool Equals(object? obj)
-        {
-            if (obj == null)
-            {
-                return false;
-            }
-
-            var equals = GenUtils.CompareJsonFieldsAndProperties(this, obj, out _);
-            return equals;
-        }
-
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
         }
     }
 }

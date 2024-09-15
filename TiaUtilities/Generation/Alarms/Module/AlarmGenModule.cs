@@ -1,29 +1,23 @@
-﻿using TiaXmlReader.Generation;
+﻿using TiaUtilities.Generation.Alarms.Module.Tab;
+using TiaUtilities.Generation.GenModules;
+using TiaUtilities.Generation.GenModules.Alarm;
+using TiaUtilities.Generation.GridHandler.JSScript;
+using TiaUtilities.Languages;
+using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Javascript;
-using TiaXmlReader.Languages;
-using TiaUtilities.Generation.GridHandler.JSScript;
-using TiaUtilities.CustomControls;
-using TiaUtilities.Generation.GenModules;
-using TiaUtilities.Generation.GenModules.Alarm;
-using TiaUtilities.Generation.Alarms.Module.Tab;
-using TiaUtilities.Languages;
-using TiaUtilities.Generation.IO.Module.Tab;
 
 namespace TiaUtilities.Generation.Alarms.Module
 {
     public class AlarmGenModule : IGenModule
     {
-        private static readonly string[] TIMERS_TYPES_ITEMS = ["TON", "TOF"];
-
         private readonly JavascriptErrorReportThread jsErrorHandlingThread;
         private readonly GridSettings gridSettings;
 
         private readonly GridScriptContainer scriptContainer;
 
         private readonly AlarmGenControl control;
-
         private readonly AlarmMainConfiguration mainConfig;
 
         private readonly List<AlarmGenTab> genTabList;
@@ -70,12 +64,11 @@ namespace TiaUtilities.Generation.Alarms.Module
             genTabList.Add(alarmGenTab);
 
             alarmGenTab.Init();
-            if(save != null)
+            if (save != null)
             {
                 alarmGenTab.LoadSave(save);
             }
             tabPage.Tag = alarmGenTab;
-
             tabPage.Controls.Add(alarmGenTab.TabControl);
         }
 
@@ -124,7 +117,7 @@ namespace TiaUtilities.Generation.Alarms.Module
             this.Clear();
 
             scriptContainer.LoadSave(loadedSave.ScriptContainer);
-            
+
             GenUtils.CopyJsonFieldsAndProperties(loadedSave.AlarmMainConfig, mainConfig);
 
             foreach (var tabSave in loadedSave.TabSaves)

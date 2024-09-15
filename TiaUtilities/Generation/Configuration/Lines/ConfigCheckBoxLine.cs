@@ -1,7 +1,4 @@
 ﻿using CustomControls.RJControls;
-using System;
-using System.Drawing;
-using System.Windows.Forms;
 using TiaXmlReader.Generation.Configuration;
 
 namespace TiaUtilities.Generation.Configuration.Lines

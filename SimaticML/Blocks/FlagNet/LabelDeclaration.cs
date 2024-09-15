@@ -1,8 +1,5 @@
-﻿using System;
+﻿using SimaticML.XMLClasses;
 using System.Xml;
-using SimaticML;
-using SimaticML.Blocks.FlagNet;
-using SimaticML.XMLClasses;
 
 namespace SimaticML.Blocks.FlagNet
 {
@@ -21,7 +18,7 @@ namespace SimaticML.Blocks.FlagNet
         private readonly XmlNodeConfiguration label;
         private readonly XmlAttributeConfiguration labelName;
 
-        public LabelDeclaration() : base(NODE_NAME) 
+        public LabelDeclaration() : base(NODE_NAME)
         {
             //==== INIT CONFIGURATION ====
             uid = this.AddAttribute("UId", required: true);

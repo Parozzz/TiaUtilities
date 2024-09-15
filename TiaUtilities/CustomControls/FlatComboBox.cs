@@ -1,8 +1,5 @@
-﻿using System;
-using System.ComponentModel;
-using System.Drawing;
+﻿using System.ComponentModel;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 
 namespace TiaXmlReader.CustomControls
 {
@@ -111,7 +108,7 @@ namespace TiaXmlReader.CustomControls
             else
             {
                 base.WndProc(ref m);
-            }   
+            }
         }
 
         private const int WM_PAINT = 0xF;

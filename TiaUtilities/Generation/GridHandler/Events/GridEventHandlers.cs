@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TiaXmlReader.Generation.GridHandler;
-using TiaXmlReader.Generation.GridHandler.Data;
-using TiaXmlReader.GenerationForms;
+﻿using TiaXmlReader.Generation.GridHandler;
 
 namespace TiaUtilities.Generation.GridHandler.Events
 {

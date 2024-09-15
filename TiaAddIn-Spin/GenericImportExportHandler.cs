@@ -1,7 +1,6 @@
 ﻿using Siemens.Engineering;
 using Siemens.Engineering.AddIn.Menu;
 using Siemens.Engineering.SW;
-using Siemens.Engineering.SW.Blocks;
 using SpinAddin.Utility;
 using System;
 using System.Collections.Generic;
@@ -271,7 +270,7 @@ namespace SpinAddIn
                 try
                 {
                     var importData = new ImportData<GROUP>(group,
-                        new FileInfo(fileName), 
+                        new FileInfo(fileName),
                         ImportOptions.Override,
                         SWImportOptions.IgnoreMissingReferencedObjects |
                         SWImportOptions.IgnoreStructuralChanges |

@@ -1,8 +1,7 @@
-﻿using TiaXmlReader.Languages;
+﻿using TiaUtilities.Generation.Configuration.Utility;
 using TiaUtilities.Generation.IO;
-using TiaXmlReader.Generation.Configuration;
-using TiaUtilities.Generation.Configuration.Utility;
 using TiaUtilities.Languages;
+using TiaXmlReader.Generation.Configuration;
 
 namespace TiaUtilities.Generation.GenModules.IO.Tab
 {

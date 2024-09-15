@@ -1,15 +1,7 @@
-﻿using DocumentFormat.OpenXml.Office2010.PowerPoint;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using TiaXmlReader.Utility;
+﻿using CustomControls.RJControls;
 using TiaXmlReader.Generation.Configuration;
+using TiaXmlReader.Utility;
 using TiaXmlReader.Utility.Extensions;
-using CustomControls.RJControls;
 
 namespace TiaUtilities.Generation.Configuration.Lines
 {

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TiaXmlReader.Generation.Placeholders
+﻿namespace TiaXmlReader.Generation.Placeholders
 {
     public static class GenPlaceholders
     {
@@ -26,7 +20,7 @@ namespace TiaXmlReader.Generation.Placeholders
             public const string CONFIG_DB_NUMBER = "{config_db_number}";
         }
 
-        public static class  Alarms
+        public static class Alarms
         {
             public const string DEVICE_NAME = "{device_name}";
             public const string DEVICE_ADDRESS = "{device_address}";

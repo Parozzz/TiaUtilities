@@ -1,9 +1,5 @@
-﻿using System;
-using System.ComponentModel;
-using System.Drawing;
+﻿using System.ComponentModel;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
-using static TiaXmlReader.CustomControls.FlatComboBox;
 
 namespace TiaXmlReader.CustomControls
 {

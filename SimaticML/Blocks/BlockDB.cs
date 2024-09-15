@@ -1,13 +1,7 @@
 ﻿using SimaticML.API;
-using SimaticML.Enums;
 using SimaticML.LanguageText;
 using SimaticML.nBlockAttributeList;
 using SimaticML.XMLClasses;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 
 namespace SimaticML.Blocks

@@ -1,8 +1,6 @@
 ﻿
 using InfoBox;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 using TiaUtilities.Utility;
 
 namespace TiaUtilities.CustomControls
@@ -187,7 +185,7 @@ namespace TiaUtilities.CustomControls
                 return;
             }
 
-            if(this.RequireConfirmationBeforeClosing)
+            if (this.RequireConfirmationBeforeClosing)
             {
                 var result = InformationBox.Show($"Are you sure you want to close {tabPage.Text}?", buttons: InformationBoxButtons.YesNo);
                 if (result == InformationBoxResult.No)

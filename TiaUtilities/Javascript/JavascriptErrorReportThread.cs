@@ -116,7 +116,7 @@ namespace TiaXmlReader.Javascript
             foreach (var scriptReport in asyncScriptReportList)
             {
                 scriptReport.JSError = null;
-                if(scriptReport.Script == null)
+                if (scriptReport.Script == null)
                 {
                     continue;
                 }

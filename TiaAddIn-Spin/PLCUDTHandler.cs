@@ -1,12 +1,7 @@
-﻿using Siemens.Engineering;
-using Siemens.Engineering.AddIn.Menu;
-using Siemens.Engineering.SW;
-using Siemens.Engineering.SW.Blocks;
-using SpinAddin.Utility;
+﻿using SpinAddin.Utility;
 using System;
 using System.IO;
 using System.Windows.Forms;
-using Siemens.Engineering.SW.Types;
 
 namespace SpinAddIn
 {
@@ -109,7 +104,7 @@ namespace SpinAddIn
         {
             foreach (PlcType type in selectionProvider.GetSelection())
             {
-                var group = (PlcTypeGroup) type.Parent;
+                var group = (PlcTypeGroup)type.Parent;
 
                 var fileDialog = new OpenFileDialog
                 {
@@ -135,7 +130,7 @@ namespace SpinAddIn
         {
             foreach (PlcType type in selectionProvider.GetSelection())
             {
-                var group = (PlcTypeGroup) type.Parent;
+                var group = (PlcTypeGroup)type.Parent;
 
                 var folderDialog = new FolderBrowserDialog();
                 if (folderDialog.ShowDialog(Util.CreateForm()) == DialogResult.OK)
@@ -151,7 +146,7 @@ namespace SpinAddIn
         {
             foreach (PlcType type in selectionProvider.GetSelection())
             {
-                var group = (PlcTypeGroup) type.Parent;
+                var group = (PlcTypeGroup)type.Parent;
 
                 var folderDialog = new FolderBrowserDialog();
                 if (folderDialog.ShowDialog(Util.CreateForm()) == DialogResult.OK)
@@ -169,7 +164,7 @@ namespace SpinAddIn
             {
                 foreach (var directoryName in Directory.GetDirectories(folderName))
                 {
-                    if(!this.ImportBlocksFromFolder(group, directoryName, true))
+                    if (!this.ImportBlocksFromFolder(group, directoryName, true))
                     {
                         return false;
                     }
@@ -178,7 +173,7 @@ namespace SpinAddIn
 
             foreach (var fileName in Directory.GetFiles(folderName))
             {
-                if(!ImportBlock(group, fileName))
+                if (!ImportBlock(group, fileName))
                 {
                     return false;
                 }

@@ -1,10 +1,9 @@
-﻿using TiaXmlReader.Languages;
-using TiaXmlReader.Generation.IO;
+﻿using TiaUtilities.Generation.Configuration.Utility;
+using TiaUtilities.Languages;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.Configuration;
-using TiaUtilities.Generation.Configuration.Utility;
+using TiaXmlReader.Generation.IO;
 using TiaXmlReader.Generation.Placeholders;
-using TiaUtilities.Languages;
 
 
 namespace TiaUtilities.Generation.GenModules.IO.Controls

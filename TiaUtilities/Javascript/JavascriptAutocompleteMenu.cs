@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TiaXmlReader.Javascript
+﻿namespace TiaXmlReader.Javascript
 {
     public static class JavascriptAutocompleteMenu
     {
-        public static Dictionary<string, string> GLOBAL_FUNCTION_PROPERTIES = new Dictionary<string, string>()         
+        public static Dictionary<string, string> GLOBAL_FUNCTION_PROPERTIES = new Dictionary<string, string>()
         {
             { "eval(x)", "" },
             { "parseInt(string, radix)", "" },

@@ -1,17 +1,12 @@
 ﻿using SimaticML.LanguageText;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SimaticML.API
 {
     public class SimaticMultilingualText(ICulturedText culturedText) : ICulturedText
     {
 
-        public SimaticMultilingualText() : this(new CulturedTextImpl()) {  }
+        public SimaticMultilingualText() : this(new CulturedTextImpl()) { }
 
         public string? this[CultureInfo culture]
         {
@@ -37,11 +32,11 @@ namespace SimaticML.API
                 get => this.dict.TryGetValue(culture, out var value) ? value : null;
                 set
                 {
-                    if(value == null)
+                    if (value == null)
                     {
                         this.dict.Remove(culture);
                     }
-                    else if(!this.dict.TryAdd(culture, value))
+                    else if (!this.dict.TryAdd(culture, value))
                     {
                         this.dict[culture] = value;
                     }

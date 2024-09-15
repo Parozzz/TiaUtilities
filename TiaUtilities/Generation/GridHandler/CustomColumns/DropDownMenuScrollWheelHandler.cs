@@ -1,11 +1,4 @@
-﻿using DocumentFormat.OpenXml.Drawing.Charts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using System.Reflection;
 using TiaUtilities.Utility;
 
 namespace TiaXmlReader.Generation.GridHandler.CustomColumns
@@ -53,7 +46,7 @@ namespace TiaXmlReader.Generation.GridHandler.CustomColumns
         }
 
         public static readonly Action<ToolStrip, int> ScrollInternal
-            = (Action<ToolStrip, int>) Delegate.CreateDelegate(typeof(Action<ToolStrip, int>), typeof(ToolStrip).GetMethod("ScrollInternal", BindingFlags.NonPublic | BindingFlags.Instance));
+            = (Action<ToolStrip, int>)Delegate.CreateDelegate(typeof(Action<ToolStrip, int>), typeof(ToolStrip).GetMethod("ScrollInternal", BindingFlags.NonPublic | BindingFlags.Instance));
 
         private const int MARGIN_TOP_BOTTOM = 20;
 
@@ -63,14 +56,14 @@ namespace TiaXmlReader.Generation.GridHandler.CustomColumns
             {
                 return;
             }
-                
+
             var firstItem = dropDown.Items[0];
             var lastItem = dropDown.Items[dropDown.Items.Count - 1];
             if (lastItem.Bounds.Bottom < dropDown.Height && firstItem.Bounds.Top > 0)
             {
                 return;
             }
-                
+
             delta /= -4;
             if (delta < 0 && firstItem.Bounds.Top - delta > MARGIN_TOP_BOTTOM)
             {

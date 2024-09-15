@@ -11,8 +11,8 @@ namespace TiaXmlReader.Generation.GridHandler.Data
             var propertyInfo = type.GetProperty(propertyName) ?? throw new Exception("Invalid property name while creating GridDataColumn from reflection from type " + type.FullName);
             var dataColumn = new GridDataColumn(
                 name: propertyInfo.GetTranslation(),
-                dataPropertyName:  propertyInfo.Name,
-                columnIndex:  columnIndex,
+                dataPropertyName: propertyInfo.Name,
+                columnIndex: columnIndex,
                 propertyInfo: propertyInfo,
                 programmingFriendlyName: programmingFriendlyName ?? propertyInfo.Name.ToLower()
             );
@@ -27,7 +27,7 @@ namespace TiaXmlReader.Generation.GridHandler.Data
                 if (field.IsStatic && field.FieldType == typeof(GridDataColumn))
                 {
                     var fieldValue = field.GetValue(null);
-                    if(fieldValue == null)
+                    if (fieldValue == null)
                     {
                         Utils.ShowExceptionMessage(new Exception("GridDataColumn is null inside " + type.Name));
                         continue;

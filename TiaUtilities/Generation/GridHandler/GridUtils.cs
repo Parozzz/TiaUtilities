@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using static TiaXmlReader.Generation.GridHandler.GridExcelDragHandler;
-using TiaXmlReader.Utility;
-using System.Windows.Forms;
-using TiaXmlReader.Generation.GridHandler.Data;
-using TiaXmlReader.GenerationForms;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using TiaUtilities.Generation.GridHandler.Events;
+using TiaXmlReader.Generation.GridHandler.Data;
+using TiaXmlReader.Utility;
 
 namespace TiaXmlReader.Generation.GridHandler
 {
@@ -132,7 +126,7 @@ namespace TiaXmlReader.Generation.GridHandler
                 }
 
                 //The clipboard cannot have an empty string as text
-                if(string.IsNullOrEmpty(clipboardText))
+                if (string.IsNullOrEmpty(clipboardText))
                 {
                     Clipboard.Clear();
                 }

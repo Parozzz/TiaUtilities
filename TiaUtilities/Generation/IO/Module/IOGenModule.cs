@@ -1,23 +1,19 @@
-﻿using TiaXmlReader.Generation.GridHandler;
-using TiaXmlReader.Generation.IO;
-using TiaXmlReader.Javascript;
-using TiaXmlReader.Languages;
-using TiaXmlReader.Generation;
-using InfoBox;
+﻿using InfoBox;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using SimaticML.API;
 using SimaticML.Blocks;
 using SimaticML.TagTable;
-using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.GenModules;
-using TiaUtilities.Generation.GenModules.IO.Controls;
 using TiaUtilities.Generation.GenModules.IO.ExcelImporter;
-using TiaUtilities.Generation.IO.Module.Tab;
-using TiaUtilities.Generation.IO.Module.ExcelImporter;
 using TiaUtilities.Generation.GridHandler.Data;
-using SimaticML.Enums;
-using SimaticML;
+using TiaUtilities.Generation.GridHandler.JSScript;
+using TiaUtilities.Generation.IO.Module.ExcelImporter;
+using TiaUtilities.Generation.IO.Module.Tab;
 using TiaUtilities.Languages;
+using TiaXmlReader.Generation;
+using TiaXmlReader.Generation.GridHandler;
+using TiaXmlReader.Generation.IO;
+using TiaXmlReader.Javascript;
 
 namespace TiaUtilities.Generation.IO.Module
 {
@@ -31,9 +27,9 @@ namespace TiaUtilities.Generation.IO.Module
         private readonly GridSettings gridSettings;
 
         private readonly GridScriptContainer scriptContainer;
-        
+
         private readonly IOMainConfiguration mainConfig;
-        private readonly IOGenerationExcelImportConfiguration excelImportConfig;
+        private readonly IOGenExcelImportConfiguration excelImportConfig;
 
         private readonly GridDataPreviewer<IOSuggestionData> suggestionPreviewer;
         private readonly GridHandler<IOSuggestionData> suggestionGridHandler;
@@ -227,7 +223,7 @@ namespace TiaUtilities.Generation.IO.Module
             genTabList.Add(ioGenTab);
 
             ioGenTab.Init();
-            if(save != null)
+            if (save != null)
             {
                 ioGenTab.LoadSave(save);
             }

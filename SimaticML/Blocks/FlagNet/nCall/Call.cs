@@ -37,7 +37,7 @@ namespace SimaticML.Blocks.FlagNet.nCall
 
         public void SetUId(uint uid)
         {
-            this.uid.AsUInt =  uid;
+            this.uid.AsUInt = uid;
         }
 
         public uint GetUId()

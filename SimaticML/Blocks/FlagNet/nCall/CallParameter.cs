@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SimaticML.Blocks.FlagNet.nCall;
-using SimaticML.XMLClasses;
+﻿using SimaticML.XMLClasses;
 
 namespace SimaticML.Blocks.FlagNet.nCall
 {

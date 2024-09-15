@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using SimaticML.XMLClasses;
+﻿using System.Xml;
 
 namespace SimaticML.XMLClasses
 {
@@ -35,7 +29,7 @@ namespace SimaticML.XMLClasses
 
         public override void Load(XmlNode xmlNode, bool parseUnknown = true)
         {
-            if(xmlNode is XmlAttribute xmlAttribute) 
+            if (xmlNode is XmlAttribute xmlAttribute)
             {
                 this.value = xmlAttribute.Value;
                 this.Parsed = !this.Required || requiredValue == "" || requiredValue == this.value;

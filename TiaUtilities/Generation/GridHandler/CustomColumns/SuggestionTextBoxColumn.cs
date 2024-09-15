@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Windows.Forms;
-using TiaUtilities.Utility;
+﻿using TiaUtilities.Utility;
 
 namespace TiaXmlReader.Generation.GridHandler.CustomColumns
 {
@@ -181,7 +174,7 @@ namespace TiaXmlReader.Generation.GridHandler.CustomColumns
 
         private void EditingControlShowingEvent(object? sender, DataGridViewEditingControlShowingEventArgs args)
         {
-            if(sender is DataGridView == false)
+            if (sender is DataGridView == false)
             {
                 return;
             }

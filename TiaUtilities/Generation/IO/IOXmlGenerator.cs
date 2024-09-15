@@ -1,15 +1,14 @@
-﻿using TiaXmlReader.Generation.Placeholders;
-using TiaXmlReader.Languages;
-using SimaticML.TagTable;
-using SimaticML.Blocks;
-using SimaticML.Enums;
-using SimaticML;
-using SimaticML.nBlockAttributeList;
-using SimaticML.Blocks.FlagNet;
+﻿using SimaticML;
 using SimaticML.API;
+using SimaticML.Blocks;
+using SimaticML.Blocks.FlagNet;
+using SimaticML.Enums;
+using SimaticML.nBlockAttributeList;
+using SimaticML.TagTable;
+using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.IO;
 using TiaUtilities.Generation.Placeholders;
-using TiaUtilities.Generation.GridHandler.Data;
+using TiaXmlReader.Languages;
 
 namespace TiaXmlReader.Generation.IO
 {
@@ -108,7 +107,7 @@ namespace TiaXmlReader.Generation.IO
                             var merkerVariableAddress = FixDuplicateAddress(ioData.Variable, duplicatedAddressDict);
 
                             var merkerVariableTag = SimaticTagAddress.FromAddress(ioData.MerkerAddress);
-                            if(merkerVariableAddress == null || merkerVariableTag == null)
+                            if (merkerVariableAddress == null || merkerVariableTag == null)
                             {
                                 throw new Exception("Cannot parse Merker VariableAddress for " + ioData.MerkerAddress);
                             }
@@ -146,7 +145,7 @@ namespace TiaXmlReader.Generation.IO
                     segment.Title[LocaleVariables.CULTURE] = placeholderHandler.Parse(tabConfig.SegmentNameByteGrouping);
                 }
 
-                if (inOutAddress != null) 
+                if (inOutAddress != null)
                 {
                     ArgumentNullException.ThrowIfNull(segment, nameof(segment));
 
@@ -228,14 +227,14 @@ namespace TiaXmlReader.Generation.IO
                 var name = entry.Key;
                 var ioTagTableList = entry.Value;
 
-                foreach(var ioTagTable in ioTagTableList)
+                foreach (var ioTagTable in ioTagTableList)
                 {
                     var xmlDocument = SimaticMLAPI.CreateDocument(ioTagTable);
                     xmlDocument.Save(exportPath + $"/[TagTable]{name}_{ioTagTable.TableName}.xml");
                 }
             }
 
-            foreach(var variableTagTable in variableTagTableList)
+            foreach (var variableTagTable in variableTagTableList)
             {
                 var xmlDocument = SimaticMLAPI.CreateDocument(variableTagTable);
                 xmlDocument.Save(exportPath + $"/[TagTable]Alias_{variableTagTable.TableName}.xml");

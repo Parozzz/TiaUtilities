@@ -1,8 +1,7 @@
-﻿using System.Globalization;
-using System.Xml;
-using SimaticML.API;
-using SimaticML.LanguageText;
+﻿using SimaticML.API;
 using SimaticML.XMLClasses;
+using System.Globalization;
+using System.Xml;
 
 namespace SimaticML.LanguageText
 {
@@ -44,7 +43,7 @@ namespace SimaticML.LanguageText
         public Dictionary<CultureInfo, string> GetDictionary()
         {
             var dict = new Dictionary<CultureInfo, string>();
-            foreach(var item in this.GetItems())
+            foreach (var item in this.GetItems())
             {
                 dict.Add(item.Lang, item.LangText);
             }

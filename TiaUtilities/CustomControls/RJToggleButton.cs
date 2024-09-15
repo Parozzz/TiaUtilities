@@ -1,13 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using System.Windows.Forms;
-using System.Drawing;
+﻿using System.ComponentModel;
 using System.Drawing.Drawing2D;
-using System.ComponentModel;
 
 namespace CustomControls.RJControls
 {
@@ -130,7 +122,7 @@ namespace CustomControls.RJControls
         protected override void OnPaint(PaintEventArgs args)
         {
             int toggleHeight = this.Height - 5;
-            int toggleWidth = (int) Math.Floor(this.Width * this.toggleWidthPercentage / 100d);
+            int toggleWidth = (int)Math.Floor(this.Width * this.toggleWidthPercentage / 100d);
             args.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
             args.Graphics.Clear(this.Parent.BackColor);
 

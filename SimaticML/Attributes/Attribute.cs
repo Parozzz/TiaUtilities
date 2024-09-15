@@ -1,6 +1,5 @@
-﻿using System.Xml;
-using SimaticML.Attributes;
-using SimaticML.XMLClasses;
+﻿using SimaticML.XMLClasses;
+using System.Xml;
 
 namespace SimaticML.Attributes
 {

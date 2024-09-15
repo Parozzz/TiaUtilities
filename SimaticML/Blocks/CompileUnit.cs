@@ -1,13 +1,12 @@
-﻿using System.Xml;
-using SimaticML.Enums;
-using SimaticML.Enums.Utility;
+﻿using SimaticML.API;
 using SimaticML.Blocks.FlagNet;
 using SimaticML.Blocks.FlagNet.nAccess;
 using SimaticML.Blocks.FlagNet.nCall;
 using SimaticML.Blocks.FlagNet.nPart;
+using SimaticML.Enums;
 using SimaticML.LanguageText;
 using SimaticML.XMLClasses;
-using SimaticML.API;
+using System.Xml;
 
 namespace SimaticML.Blocks
 {
@@ -140,7 +139,7 @@ namespace SimaticML.Blocks
         private MultilingualText ComputeMultilingualText(MultilingualTextType type)
         {
             var multilingualText = this.objectList.GetItems().Where(i => i.TextType == type).FirstOrDefault();
-            if(multilingualText == null)
+            if (multilingualText == null)
             {
                 multilingualText = new MultilingualText(type);
                 this.objectList.GetItems().Add(multilingualText);

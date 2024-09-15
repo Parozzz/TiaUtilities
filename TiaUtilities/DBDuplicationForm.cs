@@ -1,13 +1,6 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Windows.Forms;
-using System.Xml;
-using TiaXmlReader.Generation;
-using System;
-using SimaticML.nBlockAttributeList;
+﻿using SimaticML.API;
 using SimaticML.Blocks;
-using SimaticML.API;
+using SimaticML.nBlockAttributeList;
 
 namespace TiaXmlReader
 {
@@ -56,7 +49,7 @@ namespace TiaXmlReader
                 throw new Exception("Imported xml is not a DB or is invalid.");
             }
 
-            return ((BlockDB) xmlConfiguration).AttributeList;
+            return ((BlockDB)xmlConfiguration).AttributeList;
         }
 
         private void AnalyzeFileButton_MouseClick(object sender, MouseEventArgs e)
@@ -168,7 +161,7 @@ namespace TiaXmlReader
 
         private void StartingDBNumberTextBox_TextChanged(object sender, System.EventArgs e)
         {
-            if(uint.TryParse(startingDBNumberTextBox.Text, out uint num))
+            if (uint.TryParse(startingDBNumberTextBox.Text, out uint num))
             {
                 programSettings.DBDuplicationStartingNum = num;
             }

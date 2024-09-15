@@ -1,7 +1,4 @@
-﻿using Siemens.Engineering;
-using Siemens.Engineering.AddIn.Menu;
-using Siemens.Engineering.SW.Tags;
-using SpinAddin.Utility;
+﻿using SpinAddin.Utility;
 using System;
 using System.IO;
 using System.Windows.Forms;
@@ -160,11 +157,11 @@ namespace SpinAddIn
 
         private bool ImportTagTableFromFolder(PlcTagTableGroup group, string folderName, bool searchSubFolders)
         {
-            if(searchSubFolders)
+            if (searchSubFolders)
             {
                 foreach (var directoryName in Directory.GetDirectories(folderName))
                 {
-                    if(!this.ImportTagTableFromFolder(group, directoryName, true))
+                    if (!this.ImportTagTableFromFolder(group, directoryName, true))
                     {
                         return false;
                     }
@@ -174,7 +171,7 @@ namespace SpinAddIn
 
             foreach (var fileName in Directory.GetFiles(folderName))
             {
-                if(!ImportTagTable(group, fileName))
+                if (!ImportTagTable(group, fileName))
                 {
                     return false;
                 }

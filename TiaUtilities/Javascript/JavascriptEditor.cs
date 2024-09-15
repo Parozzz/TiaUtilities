@@ -76,7 +76,7 @@ namespace TiaXmlReader.Javascript
 
             fctb.ToolTipNeeded += (sender, args) =>
             {
-                if(currentError != null)
+                if (currentError != null)
                 {
                     var errorLine = currentError.Line;
                     var errorColumn = currentError.Column;
@@ -84,14 +84,14 @@ namespace TiaXmlReader.Javascript
                     var lineEnd = this.fctb.GetLine(errorLine).End;
 
                     var place = args.Place;
-                    if(place.iLine == errorLine && (errorColumn >= lineEnd.iChar || place.iChar >= errorColumn))
+                    if (place.iLine == errorLine && (errorColumn >= lineEnd.iChar || place.iChar >= errorColumn))
                     {  //Display the error after the error column ONLY if valid, otherwise while hovering the whole line!
                         args.ToolTipTitle = "Error";
                         args.ToolTipText = this.currentError.Description;
                         args.ToolTipIcon = ToolTipIcon.Error;
                     }
                 }
-                else if(args.HoveredWord == "JSON")
+                else if (args.HoveredWord == "JSON")
                 {
                     args.ToolTipTitle = "JSON";
                     args.ToolTipText = "The JSON namespace object contains static methods for parsing values from and converting values to JavaScript Object Notation (JSON).\nhttps://devdocs.io/javascript/global_objects/json";
@@ -127,7 +127,7 @@ namespace TiaXmlReader.Javascript
 
         public void UnregisterErrorReport(JavascriptErrorReportThread errorReportingThread)
         {
-            if(scriptReport != null)
+            if (scriptReport != null)
             {
                 errorReportingThread.RemoveScript(this.scriptReport);
                 this.scriptReport = null;
@@ -142,9 +142,9 @@ namespace TiaXmlReader.Javascript
             }
 
             var jsError = this.scriptReport.JSError;
-            if(jsError == null)
+            if (jsError == null)
             {
-                if(currentError != null)
+                if (currentError != null)
                 {
                     this.ClearError();
                 }
@@ -158,7 +158,7 @@ namespace TiaXmlReader.Javascript
                     Description = jsError.Description,
                 };
 
-                if(this.AreErrorLimitValid(newError) && Utils.AreDifferentObject(this.currentError, newError))
+                if (this.AreErrorLimitValid(newError) && Utils.AreDifferentObject(this.currentError, newError))
                 {
                     this.ClearError();
 
@@ -170,7 +170,7 @@ namespace TiaXmlReader.Javascript
 
         private void UpdateCurrentError()
         {
-            if(this.currentError == null || !this.AreErrorLimitValid(currentError))
+            if (this.currentError == null || !this.AreErrorLimitValid(currentError))
             {
                 return;
             }
@@ -221,7 +221,8 @@ namespace TiaXmlReader.Javascript
                         r.SetStyle(SAME_WORDS_STYLE);
                     }
                 }
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 Utils.ShowExceptionMessage(ex);
             }

@@ -1,16 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Drawing;
-using System.Windows.Forms;
+﻿using TiaUtilities.Generation.GridHandler.Events;
+using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.UndoRedo;
 using static TiaXmlReader.Generation.GridHandler.GridCellPaintHandler;
-using TiaXmlReader.Generation.GridHandler;
-using TiaXmlReader.Generation.GridHandler.Data;
-using TiaXmlReader.GenerationForms;
-using TiaUtilities.Generation.GridHandler.Events;
 
 namespace TiaXmlReader.Generation.GridHandler
 {
-    public class GridSortHandler<T> (GridHandler<T> gridHandler, UndoRedoHandler undoRedoHandler, IGridRowComparer<T>? comparer) : IGridCellPainter where T : IGridData
+    public class GridSortHandler<T>(GridHandler<T> gridHandler, UndoRedoHandler undoRedoHandler, IGridRowComparer<T>? comparer) : IGridCellPainter where T : IGridData
     {
         private SortOrder sortOrder = SortOrder.None;
         private Dictionary<T, int>? noSortIndexSnapshot;
@@ -60,7 +55,7 @@ namespace TiaXmlReader.Generation.GridHandler
             var preSortEventArgs = new GridPreSortEventArgs(oldSortOrder, this.sortOrder, columnIndex);
             gridHandler.Events.PreSortEvent(gridHandler.DataGridView, preSortEventArgs);
 
-            if(preSortEventArgs.Handled)
+            if (preSortEventArgs.Handled)
             {
                 return;
             }
@@ -102,7 +97,7 @@ namespace TiaXmlReader.Generation.GridHandler
             });
 
             var postSortEventArgs = new GridPostSortEventArgs(oldSortOrder, this.sortOrder, columnIndex);
-            gridHandler.Events.PostSortEvent(gridHandler.DataGridView,postSortEventArgs);
+            gridHandler.Events.PostSortEvent(gridHandler.DataGridView, postSortEventArgs);
         }
 
         private void ClearAllSortGlyphDirection()

@@ -1,7 +1,7 @@
 ﻿using SimaticML.Enums;
-using System.Xml;
-using SimaticML.XMLClasses;
 using SimaticML.Enums.Utility;
+using SimaticML.XMLClasses;
+using System.Xml;
 
 namespace SimaticML.Blocks.FlagNet.nAccess
 {

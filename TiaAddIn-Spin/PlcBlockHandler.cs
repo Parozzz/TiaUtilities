@@ -1,13 +1,8 @@
-﻿using Siemens.Engineering;
-using Siemens.Engineering.AddIn.Menu;
-using Siemens.Engineering.SW;
-using Siemens.Engineering.SW.Blocks;
-using SpinAddin.Utility;
+﻿using SpinAddin.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
-using static SpinAddin.Utility.ExportUtil;
 
 namespace SpinAddIn
 {
@@ -87,7 +82,7 @@ namespace SpinAddIn
                 if (fileDialog.ShowDialog(Util.CreateForm()) == DialogResult.OK)
                 {
                     var exportSuccessful = ExportSingle(block, fileDialog.FileName);
-                    if(!exportSuccessful)
+                    if (!exportSuccessful)
                     {
                         return;
                     }
@@ -171,7 +166,7 @@ namespace SpinAddIn
             {
                 foreach (var directoryName in Directory.GetDirectories(folderName))
                 {
-                    if(!this.ImportBlocksFromFolder(group, directoryName, true))
+                    if (!this.ImportBlocksFromFolder(group, directoryName, true))
                     {
                         return false;
                     }
@@ -180,7 +175,7 @@ namespace SpinAddIn
 
             foreach (var fileName in Directory.GetFiles(folderName))
             {
-                if(!ImportBlock(group, fileName))
+                if (!ImportBlock(group, fileName))
                 {
                     return false;
                 }

@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using System.ComponentModel;
 using System.Drawing.Drawing2D;
 
 namespace CustomControls.RJControls
@@ -199,7 +191,7 @@ namespace CustomControls.RJControls
                 this.textBox.Anchor = value;
             }
         }
-        public HorizontalAlignment TextAlign 
+        public HorizontalAlignment TextAlign
         {
             get => this.textBox.TextAlign;
             set => this.textBox.TextAlign = value;

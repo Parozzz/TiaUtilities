@@ -1,16 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using TiaXmlReader.Generation.Alarms;
-using TiaXmlReader.Languages;
-
-namespace TiaUtilities.Generation.GenModules.IO.Controls
+﻿namespace TiaUtilities.Generation.GenModules.IO.Controls
 {
     public partial class IOGenBottomControl : UserControl
     {

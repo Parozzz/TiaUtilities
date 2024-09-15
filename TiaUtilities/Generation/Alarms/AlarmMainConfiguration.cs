@@ -52,21 +52,5 @@ namespace TiaXmlReader.Generation.Alarms
             AlarmTextInList = "{device_name} - {alarm_description}";
             EmptyAlarmTextInList = "{device_name} - SPARE";
         }
-
-        public override bool Equals(object? obj)
-        {
-            if (obj == null)
-            {
-                return false;
-            }
-
-            var equals = GenUtils.CompareJsonFieldsAndProperties(this, obj, out object invalid);
-            return equals;
-        }
-
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
     }
 }

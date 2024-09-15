@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 
 namespace TiaXmlReader.Utility
 {
@@ -51,14 +46,14 @@ namespace TiaXmlReader.Utility
 
         private class CalcInfo
         {
-            public double Average {  get; set; }
+            public double Average { get; set; }
             public double Deviation { get; set; }
             public double Min { get; set; }
             public double Max { get; set; }
 
             public CalcInfo Calculate(List<TimeInfo> timeInfoList)
             {
-                if(timeInfoList.Count == 0)
+                if (timeInfoList.Count == 0)
                 {
                     return this;
                 }

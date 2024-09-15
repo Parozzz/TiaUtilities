@@ -1,8 +1,7 @@
-﻿using SimaticML.Enums.Utility;
-using SimaticML.Enums;
-using System.Xml;
+﻿using SimaticML.Enums;
+using SimaticML.Enums.Utility;
 using System.Globalization;
-using Irony.Parsing;
+using System.Xml;
 
 namespace SimaticML.XMLClasses
 {
@@ -61,7 +60,7 @@ namespace SimaticML.XMLClasses
         public override string ToString()
         {
             var str = $"Name: {this.ConfigurationName}, Required: {Required}, XmlValue: \"{this.XmlValue}\"";
-            if(this is ILocalObject localObject)
+            if (this is ILocalObject localObject)
             {
                 str = $"UId={localObject.GetUId()}, {str}";
             }

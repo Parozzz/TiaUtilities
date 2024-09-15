@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SimaticML;
-using SimaticML.XMLClasses;
-
-namespace SimaticML.XMLClasses
+﻿namespace SimaticML.XMLClasses
 {
     public class UnknownXmlGlobalObject : XmlNodeConfiguration, IGlobalObject
     {

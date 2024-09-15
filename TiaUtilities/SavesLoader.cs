@@ -1,14 +1,11 @@
-﻿using ClosedXML.Excel.CalcEngine;
-using DocumentFormat.OpenXml.Wordprocessing;
-using Microsoft.WindowsAPICodePack.Dialogs;
+﻿using Microsoft.WindowsAPICodePack.Dialogs;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
-using System.Linq;
+using TiaUtilities.Generation.Alarms.Module;
+using TiaUtilities.Generation.IO.Module;
 using TiaXmlReader;
 using TiaXmlReader.Utility;
-using TiaUtilities.Generation.IO.Module;
-using TiaUtilities.Generation.Alarms.Module;
 
 namespace TiaUtilities
 {
@@ -114,7 +111,7 @@ namespace TiaUtilities
                 }
 
                 FixExtesion(ref filePath, extension);
-                if(!CreateFileWithDirectory(filePath)) //This is just to throw an exception in case the path is wrong!
+                if (!CreateFileWithDirectory(filePath)) //This is just to throw an exception in case the path is wrong!
                 {
                     return false;
                 }

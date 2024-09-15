@@ -1,12 +1,11 @@
-﻿using TiaUtilities.Generation.GridHandler.JSScript;
+﻿using TiaUtilities.Generation.GenModules.Alarm.Tab;
+using TiaUtilities.Generation.GridHandler.Data;
+using TiaUtilities.Generation.GridHandler.JSScript;
+using TiaUtilities.Generation.Placeholders;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Javascript;
-using TiaUtilities.Generation.GenModules.Alarm.Tab;
-using TiaUtilities.Generation.Placeholders;
-using TiaUtilities.Generation.GridHandler.Data;
-using TiaUtilities.Generation.GenModules;
 
 namespace TiaUtilities.Generation.Alarms.Module.Tab
 {
@@ -170,13 +169,13 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             TabControl.Translate();
         }
 
-        public bool IsDirty() => this.dirty || TabConfig.IsDirty() || deviceGridHandler.IsDirty() || alarmGridHandler.IsDirty();
+        public bool IsDirty() => this.dirty || this.TabConfig.IsDirty() || this.deviceGridHandler.IsDirty() || this.alarmGridHandler.IsDirty();
         public void Wash()
         {
             this.dirty = false;
-            TabConfig.Wash();
-            deviceGridHandler.Wash();
-            alarmGridHandler.Wash();
+            this.TabConfig.Wash();
+            this.deviceGridHandler.Wash();
+            this.alarmGridHandler.Wash();
         }
 
         public AlarmGenTabSave CreateSave()

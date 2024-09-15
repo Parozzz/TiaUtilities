@@ -1,5 +1,4 @@
 ﻿using TiaUtilities.Generation.Configuration;
-using TiaUtilities.Generation.Configuration.Lines;
 
 namespace TiaXmlReader.Generation.Configuration
 {
@@ -122,7 +121,7 @@ namespace TiaXmlReader.Generation.Configuration
                                 linePanel.RowStyles.Add(new RowStyle(SizeType.Percent, 50f));
                             }
 
-                            if(label != null)
+                            if (label != null)
                             {
                                 label.TextAlign = ContentAlignment.MiddleRight; //Set the text to be closer to the control!
                                 label.Padding = new(0, 0, 4, 0);

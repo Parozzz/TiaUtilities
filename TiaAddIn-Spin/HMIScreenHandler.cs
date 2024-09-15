@@ -1,10 +1,10 @@
-﻿using Siemens.Engineering.AddIn.Menu;
-using System;
+﻿using Siemens.Engineering;
+using Siemens.Engineering.AddIn.Menu;
 using Siemens.Engineering.Hmi.Screen;
-using System.Windows.Forms;
 using SpinAddin.Utility;
-using Siemens.Engineering;
+using System;
 using System.IO;
+using System.Windows.Forms;
 
 namespace SpinAddIn
 {
@@ -58,7 +58,7 @@ namespace SpinAddIn
         {
             foreach (Siemens.Engineering.Hmi.Screen.Screen hmiScreen in selectionProvider.GetSelection())
             {
-                var hmiScreenFolder = (ScreenFolder) hmiScreen.Parent;
+                var hmiScreenFolder = (ScreenFolder)hmiScreen.Parent;
 
                 var fileDialog = new OpenFileDialog
                 {
@@ -83,7 +83,7 @@ namespace SpinAddIn
         {
             foreach (Siemens.Engineering.Hmi.Screen.Screen hmiScreen in selectionProvider.GetSelection())
             {
-                var hmiScreenFolder = (ScreenFolder) hmiScreen.Parent;
+                var hmiScreenFolder = (ScreenFolder)hmiScreen.Parent;
 
                 var folderDialog = new FolderBrowserDialog();
                 if (folderDialog.ShowDialog(Util.CreateForm()) == DialogResult.OK)
@@ -99,7 +99,7 @@ namespace SpinAddIn
         {
             foreach (Siemens.Engineering.Hmi.Screen.Screen hmiScreen in selectionProvider.GetSelection())
             {
-                var hmiScreenFolder = (ScreenFolder) hmiScreen.Parent;
+                var hmiScreenFolder = (ScreenFolder)hmiScreen.Parent;
 
                 var folderDialog = new FolderBrowserDialog();
                 if (folderDialog.ShowDialog(Util.CreateForm()) == DialogResult.OK)

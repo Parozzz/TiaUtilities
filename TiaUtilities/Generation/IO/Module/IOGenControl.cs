@@ -1,19 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using TiaXmlReader.Generation.IO;
+﻿using TiaUtilities.Generation.Configuration.Utility;
+using TiaUtilities.Languages;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.Configuration;
+using TiaXmlReader.Generation.IO;
 using TiaXmlReader.Generation.Placeholders;
-using TiaXmlReader.Languages;
-using TiaUtilities.Generation.Configuration.Utility;
-using TiaUtilities.Languages;
 
 namespace TiaUtilities.Generation.IO.Module
 {

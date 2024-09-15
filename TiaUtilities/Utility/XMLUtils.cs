@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Xml;
-using TiaXmlReader.Utility;
+﻿using System.Xml;
 
 namespace TiaXmlReader.Utility
 {

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using System.Collections.ObjectModel;
 using TiaUtilities.CustomControls;
 using TiaXmlReader.Generation.Configuration;
 
@@ -19,8 +13,8 @@ namespace TiaUtilities.Generation.Configuration.Lines
         private Action<TabPage?>? tabSelectedChangedAction;
         private Action<TabPage, string>? tabChangedNameAction;
 
-        public ReadOnlyCollection<TabPage> TabPages 
-        { 
+        public ReadOnlyCollection<TabPage> TabPages
+        {
             get
             {
                 List<TabPage> list = [];
@@ -63,7 +57,7 @@ namespace TiaUtilities.Generation.Configuration.Lines
             this.tabControl.VisibleChanged += (sender, args) =>
             {
                 var tabPage = this.tabControl.SelectedTab;
-                if(tabPage != null)
+                if (tabPage != null)
                 {
                     this.tabSelectedChangedAction?.Invoke(tabPage);
                 }

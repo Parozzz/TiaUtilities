@@ -26,7 +26,7 @@
             foreach (var field in typeof(SimaticDataType).GetFields().Where(f => f.IsStatic && f.FieldType == typeof(SimaticDataType)))
             {
                 var fieldValue = field.GetValue(null);
-                if(fieldValue is SimaticDataType dataType)
+                if (fieldValue is SimaticDataType dataType)
                 {
                     SimaticDataType.AddDataType(dataType);
                 }
@@ -37,7 +37,7 @@
         {
             if (!TYPE_DICT.TryGetValue(simaticString, out SimaticDataType? value))
             {
-                if(throwException)
+                if (throwException)
                 {
                     throw new ArgumentException("SimaticDataType " + simaticString + " has not been implemented yet.");
                 }

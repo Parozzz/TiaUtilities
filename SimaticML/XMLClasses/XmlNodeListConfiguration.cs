@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Xml;
-using SimaticML;
-using SimaticML.XMLClasses;
 
 namespace SimaticML.XMLClasses
 {

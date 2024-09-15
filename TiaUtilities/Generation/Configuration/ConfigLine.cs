@@ -1,11 +1,4 @@
-﻿using DocumentFormat.OpenXml.Drawing.Charts;
-using System;
-using System.Drawing;
-using System.Windows.Forms;
-using TiaUtilities.Generation.Configuration.Lines;
-using TiaXmlReader.Languages;
-
-namespace TiaXmlReader.Generation.Configuration
+﻿namespace TiaXmlReader.Generation.Configuration
 {
     public abstract class ConfigLine<LINE> : IConfigLine where LINE : ConfigLine<LINE>
     {

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SimaticML.API
+﻿namespace SimaticML.API
 {
     public abstract class SimaticConnection(SimaticConnection? previousConnection = null)
     {
@@ -36,7 +30,7 @@ namespace SimaticML.API
             }
 
             ArgumentNullException.ThrowIfNull(connection, nameof(connection));
-            
+
             this.NextConnection = connection;
             return connection;
         }
@@ -49,7 +43,7 @@ namespace SimaticML.API
             {
                 orConnection.PartList.Add(nextPart);
             }
-            else if(next is SimaticSelfConnection nextSelfConnection)
+            else if (next is SimaticSelfConnection nextSelfConnection)
             {
                 orConnection.PartList.Add(nextSelfConnection.Part);
             }
@@ -120,7 +114,7 @@ namespace SimaticML.API
             {
                 this.PartList.Add(nextSelfConnection.Part);
             }
-            else if(next is SimaticORConnection nextORConnection)
+            else if (next is SimaticORConnection nextORConnection)
             { //Making an or with another or collection will just incorporate it.
                 this.PartList.AddRange(nextORConnection.PartList);
             }

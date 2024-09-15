@@ -1,17 +1,15 @@
 ﻿using Siemens.Engineering;
 using Siemens.Engineering.AddIn.Menu;
+using Siemens.Engineering.Hmi.Screen;
+using Siemens.Engineering.SW.Blocks;
+using Siemens.Engineering.SW.Tags;
+using Siemens.Engineering.SW.Types;
+using Siemens.Engineering.SW.WatchAndForceTables;
+using SpinAddin.Utility;
+using SpinAddIn;
 using System;
 using System.IO;
 using System.Reflection;
-using SpinAddIn;
-using Siemens.Engineering.SW.Blocks;
-using Siemens.Engineering.SW.Tags;
-using System.Collections.Generic;
-using Siemens.Engineering.SW.Types;
-using Siemens.Engineering.SW.WatchAndForceTables;
-using Siemens.Engineering.SW.TechnologicalObjects;
-using SpinAddin.Utility;
-using Siemens.Engineering.Hmi.Screen;
 
 namespace AddIn_V18
 {
@@ -21,7 +19,7 @@ namespace AddIn_V18
 
         private readonly TiaPortal _tiaPortal;
         private readonly string _traceFilePath;
-        
+
         private readonly SpinAddinMenuRegistrationService plcBlockHandler;
         private readonly SpinAddinMenuRegistrationService plcTagTableHandler;
         private readonly SpinAddinMenuRegistrationService plcUDTHandler;
@@ -65,7 +63,7 @@ namespace AddIn_V18
                 plcTagTable => plcTagTable.Export,
                 group => group.Name,
                 plcTagTable => plcTagTable.Name,
-                plcTagTable => (PlcTagTableGroup) plcTagTable.Parent,
+                plcTagTable => (PlcTagTableGroup)plcTagTable.Parent,
                 group => group.TagTables,
                 group => group.Groups,
                 importData =>

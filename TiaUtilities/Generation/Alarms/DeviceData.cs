@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using TiaUtilities.Generation.Alarms;
 using TiaUtilities.Languages;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.Generation.Placeholders;
@@ -26,8 +25,8 @@ namespace TiaXmlReader.Generation.Alarms
             COLUMN_LIST = columnList.AsReadOnly();
         }
 
-        [JsonProperty][Locale(nameof(Locale.DEVICE_DATA_NAME), append: " > " + GenPlaceholders.Alarms.DEVICE_NAME)] public string? Name { get; set; }
-        [JsonProperty][Locale(nameof(Locale.DEVICE_DATA_DESCRIPTION), append: " > " + GenPlaceholders.Alarms.DEVICE_DESCRIPTION)] public string? Description { get; set; }
+        [JsonProperty][Locale(nameof(Locale.DEVICE_DATA_NAME), append: $" > {GenPlaceholders.Alarms.DEVICE_NAME}")] public string? Name { get; set; }
+        [JsonProperty][Locale(nameof(Locale.DEVICE_DATA_DESCRIPTION), append: $" > {GenPlaceholders.Alarms.DEVICE_DESCRIPTION}")] public string? Description { get; set; }
         public object? this[int column]
         {
             get

@@ -1,7 +1,6 @@
 ﻿using SimaticML.Enums;
-using SimaticML.Enums.Utility;
-using System.Xml;
 using SimaticML.XMLClasses;
+using System.Xml;
 
 namespace SimaticML.Blocks.FlagNet.nCall
 {

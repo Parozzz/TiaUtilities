@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Siemens.Engineering;
+using Siemens.Engineering.SW.Blocks;
+using System;
 using System.Diagnostics;
 using System.IO;
-using Siemens.Engineering;
-using Siemens.Engineering.SW.Blocks;
 using System.Windows.Forms;
 
 namespace FCFBConverter.Utility
@@ -19,7 +19,7 @@ namespace FCFBConverter.Utility
                 }
                 block.Export(new FileInfo(filePath), ExportOptions.None);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Trace.TraceError("Exception during export:" + Environment.NewLine + ex);
                 return false;
@@ -47,7 +47,7 @@ namespace FCFBConverter.Utility
         {
             for (var i = 0; i < blocks.Count; i++)
             {
-                if (blocks[i] is InstanceDB && ((InstanceDB) blocks[i]).InstanceOfName == blockName)
+                if (blocks[i] is InstanceDB && ((InstanceDB)blocks[i]).InstanceOfName == blockName)
                 {
                     try
                     {

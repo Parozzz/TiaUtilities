@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Siemens.Engineering;
+using Siemens.Engineering.AddIn.Menu;
+using System;
 using System.IO;
 using System.Reflection;
 using System.Xml.Serialization;
-using Siemens.Engineering;
-using Siemens.Engineering.AddIn.Menu;
 
 namespace FCFBConverter.Utility
 {
@@ -32,7 +32,7 @@ namespace FCFBConverter.Utility
             RemoveReturnValue = false;
             OpenBlocksInEditor = false;
         }
-        
+
         public static Settings Load()
         {
             if (File.Exists(SettingsFilePath) == false)
@@ -52,7 +52,7 @@ namespace FCFBConverter.Utility
             {
                 return new Settings();
             }
-            
+
         }
 
         private void Save()
@@ -70,7 +70,7 @@ namespace FCFBConverter.Utility
                 // Ignore file operation. I know that changed settings will be lost
             }
         }
-        
+
         internal void StaticToInOut(MenuSelectionProvider<IEngineeringObject> menuSelectionProvider)
         {
             StaticVariables = MoveStaticVariables.InOut;
@@ -142,7 +142,7 @@ namespace FCFBConverter.Utility
             style.State = RemoveReturnValue ? RadioButtonState.Selected : RadioButtonState.Unselected;
             return MenuStatus.Enabled;
         }
-        
+
         internal void OpenInEditor(MenuSelectionProvider<IEngineeringObject> menuSelectionProvider)
         {
             OpenBlocksInEditor = !OpenBlocksInEditor;

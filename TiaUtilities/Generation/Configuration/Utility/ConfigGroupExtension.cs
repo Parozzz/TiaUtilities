@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TiaUtilities.Generation.Configuration.Lines;
+﻿using TiaUtilities.Generation.Configuration.Lines;
 using TiaXmlReader.Generation.Configuration;
 
 namespace TiaUtilities.Generation.Configuration.Utility

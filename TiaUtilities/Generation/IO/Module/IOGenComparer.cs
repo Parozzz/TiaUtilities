@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
+﻿using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Generation.IO;
-using TiaXmlReader.Generation.GridHandler;
 
 namespace TiaUtilities.Generation.IO.Module
 {

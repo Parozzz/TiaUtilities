@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TiaXmlReader.UndoRedo
+﻿namespace TiaXmlReader.UndoRedo
 {
     public class UndoRedoHandler
     {
@@ -32,7 +26,7 @@ namespace TiaXmlReader.UndoRedo
 
         public void Undo()
         {
-            if(undoActionList.Count == 0)
+            if (undoActionList.Count == 0)
             {
                 return;
             }
@@ -46,7 +40,7 @@ namespace TiaXmlReader.UndoRedo
 
         public void AddUndo(Action action)
         {
-            if(locked)
+            if (locked)
             {
                 return;
             }

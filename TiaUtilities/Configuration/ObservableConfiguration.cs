@@ -26,7 +26,7 @@ namespace TiaUtilities.Configuration
                     var differentObjects = Utils.AreDifferentObject(this._value, value);
                     this._value = value;
 
-                    if(differentObjects)
+                    if (differentObjects)
                     {
                         configuration.ConfigurationObjectChanged(this.PropertyName);
                     }
@@ -57,7 +57,7 @@ namespace TiaUtilities.Configuration
             this.objectChangedDict = [];
         }
 
-        
+
 
         public bool IsDirty() => this.dirty;
         public void Wash() => this.dirty = false;
@@ -113,7 +113,7 @@ namespace TiaUtilities.Configuration
 
         private void InitObject(string key, object startValue)
         {
-            if(startValue == null || objectDict.ContainsKey(key))
+            if (startValue == null || objectDict.ContainsKey(key))
             {
                 return;
             }
@@ -140,7 +140,7 @@ namespace TiaUtilities.Configuration
 
         public T GetAs<T>([CallerMemberName] string key = "")
         {
-            if(!objectDict.TryGetValue(key, out var obj))
+            if (!objectDict.TryGetValue(key, out var obj))
             {
                 throw new ArgumentException($"{key} does not exists inside {this.GetType().FullName}");
             }

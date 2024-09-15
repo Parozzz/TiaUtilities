@@ -1,17 +1,5 @@
-﻿using SimaticML.Blocks.FlagNet.nPart;
-using SimaticML.Blocks.FlagNet;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SimaticML.Blocks;
-using DocumentFormat.OpenXml.Vml.Office;
-using System.Globalization;
-using SimaticML.LanguageText;
-using DocumentFormat.OpenXml.Wordprocessing;
-using DocumentFormat.OpenXml.Drawing;
-using Irony.Parsing;
+﻿using SimaticML.Blocks;
+using SimaticML.Blocks.FlagNet.nPart;
 
 namespace SimaticML.API
 {

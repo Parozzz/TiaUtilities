@@ -2,7 +2,7 @@
 
 namespace TiaUtilities.Generation.IO.Module.ExcelImporter
 {
-    public class IOGenerationExcelImportData : IGridData
+    public class IOGenExcelImportData : IGridData
     {
         private readonly static int COLUMN_COUNT = 0;
         //THESE IS THE ORDER IN WHICH THEY APPEAR!
@@ -11,9 +11,9 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
         public static readonly GridDataColumn COMMENT;
         public static readonly IReadOnlyList<GridDataColumn> COLUMN_LIST;
 
-        static IOGenerationExcelImportData()
+        static IOGenExcelImportData()
         {
-            var type = typeof(IOGenerationExcelImportData);
+            var type = typeof(IOGenExcelImportData);
             ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(Address));
             IO_NAME = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(IOName));
             COMMENT = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(Comment));

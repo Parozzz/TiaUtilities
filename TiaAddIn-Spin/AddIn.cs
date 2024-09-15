@@ -1,14 +1,6 @@
-﻿using Siemens.Engineering;
-using Siemens.Engineering.AddIn.Menu;
-using Siemens.Engineering.SW.Blocks;
-using Siemens.Engineering.SW.Tags;
-using System;
+﻿using System;
 using System.IO;
 using System.Reflection;
-using Siemens.Engineering.SW;
-using Siemens.Engineering.Hmi.Screen;
-using SpinAddin.Utility;
-using System.Windows.Forms;
 
 namespace SpinAddIn
 {

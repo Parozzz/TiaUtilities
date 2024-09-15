@@ -1,12 +1,12 @@
 ﻿using Newtonsoft.Json;
+using SimaticML;
+using SimaticML.Enums;
+using TiaUtilities.Generation.GridHandler.Data;
+using TiaUtilities.Generation.Placeholders;
+using TiaUtilities.Languages;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.Generation.Placeholders;
 using TiaXmlReader.Languages;
-using SimaticML;
-using SimaticML.Enums;
-using TiaUtilities.Generation.Placeholders;
-using TiaUtilities.Generation.GridHandler.Data;
-using TiaUtilities.Languages;
 
 namespace TiaXmlReader.Generation.IO
 {
@@ -88,7 +88,7 @@ namespace TiaXmlReader.Generation.IO
             }
 
             var variableAddressTag = SimaticTagAddress.FromAddress(this.MerkerAddress);
-            if(variableAddressTag == null || variableAddressTag.MemoryArea != SimaticMemoryArea.MERKER)
+            if (variableAddressTag == null || variableAddressTag.MemoryArea != SimaticMemoryArea.MERKER)
             {
                 var addressTag = SimaticTagAddress.FromAddress(this.Address);
                 if (addressTag != null)

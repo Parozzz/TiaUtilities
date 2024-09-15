@@ -1,13 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using TiaUtilities.Generation.GridHandler.Data;
 using static TiaXmlReader.Generation.GridHandler.GridCellPaintHandler;
-using TiaXmlReader.Generation.GridHandler;
-using TiaXmlReader.Generation.GridHandler.Data;
-using TiaUtilities.Generation.GridHandler.Data;
 
 namespace TiaXmlReader.Generation.GridHandler
 {
@@ -29,7 +21,7 @@ namespace TiaXmlReader.Generation.GridHandler
 
         public void AddPainterRange(ICollection<IGridCellPainter> painterCollection)
         {
-            foreach(var painter in painterCollection)
+            foreach (var painter in painterCollection)
             {
                 this.AddPainter(painter);
             }
@@ -46,18 +38,18 @@ namespace TiaXmlReader.Generation.GridHandler
                 foreach (var painter in painterList)
                 {
                     var request = painter.PaintCellRequest(args);
-                    if(!request.HasNone())
+                    if (!request.HasNone())
                     {
                         resultDict.Add(painter, request);
                     }
                 }
 
-                foreach(var entry in resultDict)
+                foreach (var entry in resultDict)
                 {
                     var painter = entry.Key;
                     var request = entry.Value;
 
-                    if(request.HasBackground())
+                    if (request.HasBackground())
                     {
                         backgroundDone |= request.HasBackground();
                         contentDone |= request.HasContent();
@@ -80,11 +72,11 @@ namespace TiaXmlReader.Generation.GridHandler
                     }
                 }
 
-                if(backgroundDone || contentDone)
+                if (backgroundDone || contentDone)
                 {
                     args.Handled = true;
 
-                    if(!contentDone)
+                    if (!contentDone)
                     {
                         args.PaintContent(args.ClipBounds);
                     }

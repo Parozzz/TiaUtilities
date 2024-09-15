@@ -1,14 +1,14 @@
-﻿using TiaUtilities.Generation.GridHandler.JSScript;
+﻿using SimaticML;
+using SimaticML.Enums;
+using TiaUtilities.Generation.GenModules.IO.Tab;
+using TiaUtilities.Generation.GridHandler.Data;
+using TiaUtilities.Generation.GridHandler.JSScript;
+using TiaUtilities.Generation.Placeholders;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Generation.GridHandler.CustomColumns;
 using TiaXmlReader.Generation.IO;
 using TiaXmlReader.Javascript;
-using TiaUtilities.Generation.GenModules.IO.Tab;
-using SimaticML.Enums;
-using SimaticML;
-using TiaUtilities.Generation.Placeholders;
-using TiaUtilities.Generation.GridHandler.Data;
 
 namespace TiaUtilities.Generation.IO.Module.Tab
 {
@@ -17,7 +17,7 @@ namespace TiaUtilities.Generation.IO.Module.Tab
         private const int MERKER_ADDRESS_COLUMN_SIZE = 80;
 
         private readonly IOGenModule module;
-        
+
         private readonly IOMainConfiguration mainConfig;
         private readonly SuggestionTextBoxColumn variableAddressColumn;
 

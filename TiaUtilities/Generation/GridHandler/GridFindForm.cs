@@ -3,8 +3,6 @@ using System.Data;
 using TiaUtilities.Languages;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Generation.GridHandler.Data;
-using TiaXmlReader.GenerationForms;
-using TiaXmlReader.Languages;
 using TiaXmlReader.Utility;
 
 namespace TiaUtilities.Generation.GridHandler

@@ -1,10 +1,8 @@
-﻿using System.ComponentModel;
-using System.Globalization;
-using System.Text.RegularExpressions;
-using System.Xml;
-using SimaticML.API;
+﻿using SimaticML.API;
 using SimaticML.Enums;
 using SimaticML.XMLClasses;
+using System.Globalization;
+using System.Xml;
 
 namespace SimaticML.LanguageText
 {
@@ -70,12 +68,12 @@ namespace SimaticML.LanguageText
                 var items = this.objectList.GetItems();
 
                 MultilingualTextItem? textItem = items.Where(i => i.Culture == culture).FirstOrDefault();
-                if(textItem != null)
+                if (textItem != null)
                 {
                     items.Remove(textItem);
                 }
 
-                if(value != null)
+                if (value != null)
                 {
                     items.Add(new MultilingualTextItem(culture, value));
                 }

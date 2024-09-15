@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.Wordprocessing;
-using TiaUtilities.Generation.Placeholders;
+﻿using TiaUtilities.Generation.Placeholders;
 using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.Generation.IO;

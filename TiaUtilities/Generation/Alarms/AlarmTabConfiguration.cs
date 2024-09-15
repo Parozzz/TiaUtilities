@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using TiaUtilities.Configuration;
-using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation.Placeholders;
 using TiaXmlReader.GenerationForms;
@@ -41,19 +40,19 @@ namespace TiaUtilities.Generation.Alarms
         {
             this.PartitionType = AlarmPartitionType.DEVICE;
             this.GroupingType = AlarmGroupingType.GROUP;
-            
+
             this.StartingAlarmNum = 1000;
             this.AlarmNumFormat = "000.###";
             this.AntiSlipNumber = 0;
             this.SkipNumberAfterGroup = 0;
-            
+
             this.GenerateEmptyAlarmAntiSlip = false;
             this.EmptyAlarmAtEnd = 0;
             this.EmptyAlarmContactAddress = "FALSE";
             this.EmptyAlarmTimerAddress = "\\";
             this.EmptyAlarmTimerType = "TON";
             this.EmptyAlarmTimerValue = "T#0s";
-            
+
             this.DefaultCoil1Address = $"Alm.Act.Alm{GenPlaceholders.Alarms.ALARM_NUM}";
             this.DefaultCoil1Type = AlarmCoilType.COIL;
             this.DefaultCoil2Address = $"Alm.Mem.Alm{GenPlaceholders.Alarms.ALARM_NUM}";
@@ -61,27 +60,11 @@ namespace TiaUtilities.Generation.Alarms
             this.DefaultTimerAddress = "/";
             this.DefaultTimerType = "TON";
             this.DefaultTimerValue = "T#0s";
-            
+
             this.AlarmAddressPrefix = $"{GenPlaceholders.Alarms.DEVICE_NAME}.";
             this.Coil1AddressPrefix = "";
             this.Coil2AddressPrefix = "";
             this.TimerAddressPrefix = "";
-        }
-
-        public override bool Equals(object? obj)
-        {
-            if (obj == null)
-            {
-                return false;
-            }
-
-            var equals = GenUtils.CompareJsonFieldsAndProperties(this, obj, out _);
-            return equals;
-        }
-
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
         }
     }
 }

@@ -1,16 +1,9 @@
 ﻿using SimaticML.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.IO;
-using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.Generation.IO;
 using TiaXmlReader.Generation.Placeholders;
 using TiaXmlReader.Generation.Placeholders.Data;
-using TiaXmlReader.GenerationForms;
 
 namespace TiaUtilities.Generation.Placeholders
 {

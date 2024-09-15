@@ -1,16 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TiaXmlReader.Utility;
-using TiaXmlReader.Utility.Extensions;
-using System.Windows.Forms;
+﻿using System.Reflection;
 using TiaUtilities.Languages;
-using System.Reflection;
+using TiaXmlReader.Utility.Extensions;
 
 namespace TiaXmlReader.Languages
 {
@@ -23,7 +13,7 @@ namespace TiaXmlReader.Languages
         public string? GetTranslation()
         {
             var translation = Locale.ResourceManager.GetString(translationStringName, Thread.CurrentThread.CurrentUICulture);
-            if(translation == null)
+            if (translation == null)
             {
                 return null;
             }

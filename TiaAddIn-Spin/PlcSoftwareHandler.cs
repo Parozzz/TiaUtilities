@@ -1,19 +1,103 @@
-﻿using Siemens.Engineering;
-using Siemens.Engineering.AddIn.Menu;
-using Siemens.Engineering.SW;
+﻿using Siemens.Engineering.AddIn.Menu;
 using Siemens.Engineering.HW;
+using Siemens.Engineering.HW.Features;
+using Siemens.Engineering.SW;
 using Siemens.Engineering.SW.Blocks;
-using Siemens.Engineering.SW.Units;
+
+/* Modifica senza merge dal progetto 'AddIn_V16'
+Prima:
 using SpinAddin.Utility;
 using System;
 using System.IO;
 using System.Windows.Forms;
 using Siemens.Engineering.SW.Tags;
-using Siemens.Engineering.SW.Types;
-using Siemens.Engineering.HW.Features;
-using System.Collections.Generic;
-using Siemens.Engineering.SW.WatchAndForceTables;
+Dopo:
+using SpinAddin.Engineering.SW.Tags;
 using Siemens.Engineering.SW.TechnologicalObjects;
+using Siemens.Engineering.SW.Types;
+using Siemens.Engineering.SW.Units;
+*/
+
+/* Modifica senza merge dal progetto 'AddIn_V17'
+Prima:
+using SpinAddin.Utility;
+using System;
+using System.IO;
+using System.Windows.Forms;
+using Siemens.Engineering.SW.Tags;
+Dopo:
+using SpinAddin.Engineering.SW.Tags;
+using Siemens.Engineering.SW.TechnologicalObjects;
+using Siemens.Engineering.SW.Types;
+using Siemens.Engineering.SW.Units;
+*/
+
+/* Modifica senza merge dal progetto 'AddIn_V18'
+Prima:
+using SpinAddin.Utility;
+using System;
+using System.IO;
+using System.Windows.Forms;
+using Siemens.Engineering.SW.Tags;
+Dopo:
+using SpinAddin.Engineering.SW.Tags;
+using Siemens.Engineering.SW.TechnologicalObjects;
+using Siemens.Engineering.SW.Types;
+using Siemens.Engineering.SW.Units;
+*/
+
+/* Modifica senza merge dal progetto 'AddIn_V19'
+Prima:
+using SpinAddin.Utility;
+using System;
+using System.IO;
+using System.Windows.Forms;
+using Siemens.Engineering.SW.Tags;
+Dopo:
+using SpinAddin.Engineering.SW.Tags;
+using Siemens.Engineering.SW.TechnologicalObjects;
+using Siemens.Engineering.SW.Types;
+using Siemens.Engineering.SW.Units;
+*/
+using Siemens.Engineering.SW.Tags;
+using Siemens.Engineering.SW.Types;
+using Siemens.Engineering.SW.WatchAndForceTables;
+
+/* Modifica senza merge dal progetto 'AddIn_V16'
+Prima:
+using Siemens.Engineering.HW.Features;
+Dopo:
+using Siemens.Engineering.HW.Utility;
+using System;
+*/
+
+/* Modifica senza merge dal progetto 'AddIn_V17'
+Prima:
+using Siemens.Engineering.HW.Features;
+Dopo:
+using Siemens.Engineering.HW.Utility;
+using System;
+*/
+
+/* Modifica senza merge dal progetto 'AddIn_V18'
+Prima:
+using Siemens.Engineering.HW.Features;
+Dopo:
+using Siemens.Engineering.HW.Utility;
+using System;
+*/
+
+/* Modifica senza merge dal progetto 'AddIn_V19'
+Prima:
+using Siemens.Engineering.HW.Features;
+Dopo:
+using Siemens.Engineering.HW.Utility;
+using System;
+*/
+using SpinAddin.Utility;
+using System.Collections.Generic;
+using System.IO;
+using System.Windows.Forms;
 
 namespace SpinAddIn
 {
@@ -58,7 +142,7 @@ namespace SpinAddIn
                     break;
                 }
 
-                list.Add((PlcSoftware) software);
+                list.Add((PlcSoftware)software);
             }
             return list;
         }

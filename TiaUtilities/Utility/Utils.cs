@@ -1,11 +1,4 @@
-﻿using DocumentFormat.OpenXml.Drawing.Charts;
-using InfoBox;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Windows.Forms;
-using TiaXmlReader.Utility;
+﻿using InfoBox;
 
 namespace TiaXmlReader.Utility
 {
@@ -23,7 +16,7 @@ namespace TiaXmlReader.Utility
 
         public static List<T> SingletonList<T>(T data)
         {
-            return new List<T>( [data] );
+            return new List<T>([data]);
         }
 
         public static void ShowExceptionMessage(Exception ex, bool silent = false)
@@ -32,7 +25,7 @@ namespace TiaXmlReader.Utility
             string caption = "An exception occoured while executing!";
             Console.WriteLine("Exception:\r\n{0}", message);
             LogHandler.INSTANCE.AddException(message);
-            if(!silent)
+            if (!silent)
             {
                 InformationBox.Show(message, caption, icon: InformationBoxIcon.Warning, order: InformationBoxOrder.TopMost, sound: InformationBoxSound.None);
             }
@@ -54,7 +47,7 @@ namespace TiaXmlReader.Utility
             }
 
             var properties = type.GetProperties();
-            foreach(var property in properties.Where(property => property.CanRead))
+            foreach (var property in properties.Where(property => property.CanRead))
             {
                 var propertyName = "PROPERTY_" + property.Name;
                 snapshotDict.Add(propertyName, property.GetValue(obj));
@@ -66,7 +59,7 @@ namespace TiaXmlReader.Utility
         /// <summary>
         ///  Returns true if all fields / properties are equals 
         /// </summary>
-        public static bool ComparePublicFieldSnapshot(object obj, Dictionary<string, object?> snapshotDict) 
+        public static bool ComparePublicFieldSnapshot(object obj, Dictionary<string, object?> snapshotDict)
         {
             ArgumentNullException.ThrowIfNull(obj, nameof(obj));
             ArgumentNullException.ThrowIfNull(snapshotDict, nameof(snapshotDict));
@@ -124,7 +117,7 @@ namespace TiaXmlReader.Utility
                 return true;
             }
 
-            if(valueOne is string strOne && valueTwo is string strTwo)
+            if (valueOne is string strOne && valueTwo is string strTwo)
             {
                 var oneEmpty = string.IsNullOrEmpty(strOne);
                 var twoEmpty = string.IsNullOrEmpty(strTwo);

@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using Siemens.Engineering;
+﻿using Siemens.Engineering;
 using Siemens.Engineering.Compiler;
 using Siemens.Engineering.Library.Types;
 using Siemens.Engineering.SW;
 using Siemens.Engineering.SW.Blocks;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
 
 namespace FCFBConverter.Utility
 {
@@ -16,7 +16,7 @@ namespace FCFBConverter.Utility
         private PlcBlock _block;
         private ExitState _state;
         public string BlockName { get; }
-        
+
         public bool IsChangeable
         {
             get { return _state == ExitState.IsChangeable; }
@@ -87,7 +87,7 @@ namespace FCFBConverter.Utility
             var dir = Directory.CreateDirectory(dirPath);
             var filePath = Path.Combine(dir.FullName, RemoveInvalidFileNameChars(BlockName) + ".xml");
 
-            var blockGroup = (PlcBlockGroup) _block.Parent;
+            var blockGroup = (PlcBlockGroup)_block.Parent;
 
             //Export selected block as SimaticML file
             if (Util.ExportBlock(_block, filePath) != true)
@@ -119,7 +119,7 @@ namespace FCFBConverter.Utility
             {
                 importedBlocks = blockGroup.Blocks.Import(new FileInfo(filePath), ImportOptions.Override, SWImportOptions.IgnoreMissingReferencedObjects | SWImportOptions.IgnoreStructuralChanges | SWImportOptions.IgnoreUnitAttributes);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Trace.TraceError("Exception during import:" + Environment.NewLine + ex);
                 _state = ExitState.CouldNotImport;

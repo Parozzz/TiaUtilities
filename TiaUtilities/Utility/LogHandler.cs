@@ -27,7 +27,7 @@ namespace TiaXmlReader.Utility
 
         public void Init()
         {
-            if(init)
+            if (init)
             {
                 return;
             }
@@ -68,7 +68,7 @@ namespace TiaXmlReader.Utility
             AddMessage(message, "exceptions");
         }
 
-        public void AddMessage(string message, string fileName) 
+        public void AddMessage(string message, string fileName)
         {
             var timeString = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss fff") + "[ms]";
 
@@ -92,7 +92,8 @@ namespace TiaXmlReader.Utility
                 }
 
                 File.AppendAllText(filePath, log.Message);
-            } catch { }
+            }
+            catch { }
         }
     }
 }

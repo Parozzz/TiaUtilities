@@ -39,9 +39,9 @@ namespace SimaticML
             uint length = 0; //0 means bit or special like timers, counters or UDT.
 
             char lengthChar = Char.ToUpper(address[1]);
-            if(Char.IsDigit(lengthChar)) 
+            if (Char.IsDigit(lengthChar))
             {
-                if(!address.Contains('.')) //If second char is number, must contain a dot! Like I0.0
+                if (!address.Contains('.')) //If second char is number, must contain a dot! Like I0.0
                 {
                     return null;
                 }
@@ -147,7 +147,7 @@ namespace SimaticML
             uint bitToRemove = toRemove % bitLength;
             uint byteToRemove = toRemove / bitLength;
 
-            if(nextBitOffset < bitToRemove)
+            if (nextBitOffset < bitToRemove)
             {
                 byteToRemove++;
                 bitToRemove = bitToRemove - nextBitOffset - 1;

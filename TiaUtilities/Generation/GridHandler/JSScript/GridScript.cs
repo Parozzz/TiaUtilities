@@ -8,11 +8,9 @@ using TiaUtilities.Languages;
 using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Generation.GridHandler.Data;
-using TiaXmlReader.GenerationForms;
 using TiaXmlReader.Javascript;
 using TiaXmlReader.Utility;
 using TiaXmlReader.Utility.Extensions;
-using static TiaUtilities.Generation.GridHandler.JSScript.GridScriptContainer;
 
 namespace TiaUtilities.Generation.GridHandler.JSScript
 {
@@ -102,7 +100,7 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                 });
 
 
-            if(scriptContainer.Count == 0)
+            if (scriptContainer.Count == 0)
             {
                 scriptContainer.AddScript();
             }
@@ -243,7 +241,7 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                     if (rowIndex >= 0 && rowIndex <= gridHandler.RowCount)
                     {
                         var data = gridHandler.DataSource[rowIndex];
-                        if(!data.IsEmpty())
+                        if (!data.IsEmpty())
                         {
                             engine.SetValue(ENGINE_ROW_VARIABLE, rowIndex);
 
@@ -264,33 +262,33 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                             gridHandler.SelectRow(nextRow);
                         }
                     }
-/*
-                    var dataEnumerable = gridHandler.DataSource.GetNotEmptyDataDict().Where(e => e.Value > singleExecutionLastRow);
+                    /*
+                                        var dataEnumerable = gridHandler.DataSource.GetNotEmptyDataDict().Where(e => e.Value > singleExecutionLastRow);
 
-                    var anyFound = dataEnumerable.Any();
-                    if (anyFound)
-                    {
-                        var entry = dataEnumerable.First();
+                                        var anyFound = dataEnumerable.Any();
+                                        if (anyFound)
+                                        {
+                                            var entry = dataEnumerable.First();
 
-                        var rowIndex = entry.Value;
-                        var data = entry.Key;
+                                            var rowIndex = entry.Value;
+                                            var data = entry.Key;
 
-                        engine.SetValue(ENGINE_ROW_VARIABLE, rowIndex);
+                                            engine.SetValue(ENGINE_ROW_VARIABLE, rowIndex);
 
-                        var newIOData = ExecuteTimedJS(scriptTimer, engine, preparedScript, data);
-                        if (newIOData != null)
-                        {
-                            gridHandler.ChangeRow(rowIndex, newIOData);
-                        }
+                                            var newIOData = ExecuteTimedJS(scriptTimer, engine, preparedScript, data);
+                                            if (newIOData != null)
+                                            {
+                                                gridHandler.ChangeRow(rowIndex, newIOData);
+                                            }
 
-                        singleExecutionLastRow = rowIndex;
-                        gridHandler.SelectRow(rowIndex);
-                    }
+                                            singleExecutionLastRow = rowIndex;
+                                            gridHandler.SelectRow(rowIndex);
+                                        }
 
-                    if (!anyFound || anyFound && dataEnumerable.Count() == 1)
-                    {
-                        singleExecutionLastRow = -1;
-                    }*/
+                                        if (!anyFound || anyFound && dataEnumerable.Count() == 1)
+                                        {
+                                            singleExecutionLastRow = -1;
+                                        }*/
                 }
 
                 UpdateJsonContext(engine);

@@ -1,8 +1,4 @@
 ﻿using FastColoredTextBoxNS;
-using System;
-using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
 using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Javascript;
 

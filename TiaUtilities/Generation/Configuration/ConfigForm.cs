@@ -5,9 +5,6 @@ namespace TiaXmlReader.Generation.Configuration
 {
     public partial class ConfigForm : Form
     {
-
-
-
         private readonly string title;
 
         public Font LabelFont { get; set; } = ConfigStyle.LABEL_FONT;

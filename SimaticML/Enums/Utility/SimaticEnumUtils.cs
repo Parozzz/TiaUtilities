@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SimaticML.Enums.Utility
+﻿namespace SimaticML.Enums.Utility
 {
     public static class SimaticEnumUtils
     {
@@ -16,7 +10,7 @@ namespace SimaticML.Enums.Utility
                 var anyFound = loopEnumValue.GetSimaticMLAlias()
                     .Where(s => string.Equals(s, simaticMLString, StringComparison.OrdinalIgnoreCase))
                     .Any();
-                if(anyFound)
+                if (anyFound)
                 {
                     return loopEnumValue;
                 }

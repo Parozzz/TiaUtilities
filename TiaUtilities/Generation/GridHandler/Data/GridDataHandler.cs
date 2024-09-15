@@ -17,23 +17,23 @@ namespace TiaXmlReader.Generation.GridHandler.Data
         {
             var type = typeof(T);
             var fieldInfo = type.GetField("COLUMN_LIST", BindingFlags.Static | BindingFlags.Public);
-            if(fieldInfo == null)
+            if (fieldInfo == null)
             {
                 throw new MissingFieldException($"IGridData must have a public static List<GridDataColumn> COLUMN_LIST field for {type.Name}");
             }
 
-            if(fieldInfo.FieldType != typeof(IReadOnlyList<GridDataColumn>))
+            if (fieldInfo.FieldType != typeof(IReadOnlyList<GridDataColumn>))
             {
                 throw new MissingFieldException($"IGridData must have a public static List<GridDataColumn> COLUMN_LIST field for {type.Name}");
             }
 
-            return (IReadOnlyList<GridDataColumn>) fieldInfo.GetValue(null);
+            return (IReadOnlyList<GridDataColumn>)fieldInfo.GetValue(null);
         }
 
         public T CreateInstance()
         {
             var type = typeof(T);
-            return (T) type.Assembly.CreateInstance(type.FullName);
+            return (T)type.Assembly.CreateInstance(type.FullName);
         }
 
         public void CopyValues(T copyFrom, T moveTo)

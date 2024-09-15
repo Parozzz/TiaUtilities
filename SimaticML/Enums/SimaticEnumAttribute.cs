@@ -14,13 +14,13 @@ namespace SimaticML.Enums
         public static string GetSimaticMLString(this Enum enumValue)
         {
             var memberInfo = enumValue.GetType().GetMember(enumValue.ToString()).FirstOrDefault();
-            if(memberInfo == null)
+            if (memberInfo == null)
             {
                 throw new Exception("SimaticML string not set for enum type= " + enumValue.GetType() + ", value= " + enumValue);
             }
 
             var simaticEnumAttribute = memberInfo.GetCustomAttribute<SimaticEnumAttribute>();
-            if(simaticEnumAttribute == null)
+            if (simaticEnumAttribute == null)
             {
                 throw new Exception("SimaticML string not set for enum type= " + enumValue.GetType() + ", value= " + enumValue);
             }

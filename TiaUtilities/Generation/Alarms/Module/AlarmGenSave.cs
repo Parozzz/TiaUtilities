@@ -1,8 +1,7 @@
 ﻿using Newtonsoft.Json;
-using TiaXmlReader.Generation.Alarms;
-using TiaXmlReader.Generation;
-using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.Alarms.Module.Tab;
+using TiaUtilities.Generation.GridHandler.JSScript;
+using TiaXmlReader.Generation.Alarms;
 
 namespace TiaUtilities.Generation.Alarms.Module
 {
@@ -12,16 +11,5 @@ namespace TiaUtilities.Generation.Alarms.Module
 
         [JsonProperty] public AlarmMainConfiguration AlarmMainConfig { get; set; } = new();
         [JsonProperty] public List<AlarmGenTabSave> TabSaves { get; set; } = [];
-
-        public override bool Equals(object? obj)
-        {
-            return obj is AlarmGenSave compare &&
-                TabSaves.SequenceEqual(compare.TabSaves);
-        }
-
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
     }
 }

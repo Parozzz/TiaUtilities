@@ -1,14 +1,8 @@
-﻿using System;
-using System.Drawing;
-using System.Windows.Forms;
-using static TiaXmlReader.Generation.GridHandler.GridCellPaintHandler;
-using TiaXmlReader.Utility;
+﻿using TiaUtilities.Generation.GridHandler.Data;
 using TiaXmlReader.Generation.GridHandler.Data;
-using TiaXmlReader.GenerationForms;
 using TiaXmlReader.Generation.Placeholders;
-using TiaXmlReader.Generation.GridHandler.Events;
-using TiaUtilities.Generation.GridHandler.Events;
-using TiaUtilities.Generation.GridHandler.Data;
+using TiaXmlReader.Utility;
+using static TiaXmlReader.Generation.GridHandler.GridCellPaintHandler;
 
 namespace TiaXmlReader.Generation.GridHandler
 {
@@ -40,7 +34,7 @@ namespace TiaXmlReader.Generation.GridHandler
                 paintRequest.data = gridData;
                 return paintRequest.Content();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Utils.ShowExceptionMessage(ex);
             }

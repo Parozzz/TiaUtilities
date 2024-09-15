@@ -1,8 +1,4 @@
 ﻿using FastColoredTextBoxNS;
-using System;
-using System.Drawing;
-using System.Text.RegularExpressions;
-using System.Windows.Forms;
 using TiaXmlReader.Generation.Configuration;
 
 namespace TiaUtilities.Generation.Configuration.Lines

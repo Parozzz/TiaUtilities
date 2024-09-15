@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Siemens.Engineering;
+using System;
 using System.Diagnostics;
 using System.Xml;
-using Siemens.Engineering;
 
 namespace FCFBConverter.Utility
 {
@@ -81,7 +81,7 @@ namespace FCFBConverter.Utility
                 document.Save(filePath);
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Trace.TraceError("Exception during XML editing:" + Environment.NewLine + ex);
                 return false;
@@ -147,13 +147,13 @@ namespace FCFBConverter.Utility
                         var sectionConstant = swBlocksFb.SelectSingleNode(".//ns:Section[@Name='Constant']", nsmgr);
                         if (sectionConstant?.ParentNode != null && swBlocksFb.OwnerDocument != null && sectionReturn.DocumentElement != null)
                         {
-                            sectionConstant.ParentNode.InsertAfter(swBlocksFb.OwnerDocument.ImportNode(sectionReturn.DocumentElement, true),sectionConstant);
+                            sectionConstant.ParentNode.InsertAfter(swBlocksFb.OwnerDocument.ImportNode(sectionReturn.DocumentElement, true), sectionConstant);
                         }
 
                         break;
                     }
                 }
-                
+
                 // remove all <StartValue> tags (except from Constant section) because FCs do not support start values
                 var startValues = swBlocksFb.SelectNodes(".//ns:Section[@Name!='Constant']//ns:StartValue", nsmgr);
                 foreach (XmlNode node in startValues)
@@ -200,7 +200,7 @@ namespace FCFBConverter.Utility
                 document.Save(filePath);
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Trace.TraceError("Exception during XML editing:" + Environment.NewLine + ex);
                 return false;

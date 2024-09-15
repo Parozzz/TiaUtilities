@@ -1,6 +1,5 @@
 ﻿using TiaUtilities.Generation.GridHandler.Events;
 using TiaXmlReader.Generation.GridHandler.Data;
-using TiaXmlReader.GenerationForms;
 
 namespace TiaXmlReader.Generation.GridHandler.Events
 {
@@ -8,7 +7,7 @@ namespace TiaXmlReader.Generation.GridHandler.Events
     {
         public event GridCellChangeEventHandler CellChange = delegate { };
 
-        public event GridScriptShowVariableEventHandler ScriptShowVariable = delegate {};
+        public event GridScriptShowVariableEventHandler ScriptShowVariable = delegate { };
         public event GridScriptAddVariableEventHandler ScriptAddVariables = delegate { };
 
         public event GridPreSortEventHandler PreSort = delegate { };

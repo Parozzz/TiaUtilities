@@ -89,8 +89,8 @@ namespace TiaXmlReader.Generation.Alarms
 
         public bool IsEmpty()
         {
-            return string.IsNullOrEmpty(this.AlarmVariable) && 
-                string.IsNullOrEmpty(this.Coil1Address) && string.IsNullOrEmpty(this.Coil1Type) && 
+            return string.IsNullOrEmpty(this.AlarmVariable) &&
+                string.IsNullOrEmpty(this.Coil1Address) && string.IsNullOrEmpty(this.Coil1Type) &&
                 string.IsNullOrEmpty(this.Coil2Address) && string.IsNullOrEmpty(this.Coil2Type) &&
                 string.IsNullOrEmpty(this.TimerAddress) && string.IsNullOrEmpty(this.TimerType) && string.IsNullOrEmpty(this.TimerValue) &&
                 string.IsNullOrEmpty(this.Description);

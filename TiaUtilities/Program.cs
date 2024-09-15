@@ -1,13 +1,11 @@
-﻿using TiaXmlReader.Utility;
-using TiaXmlReader.Generation.GridHandler.CustomColumns;
+﻿using ClosedXML.Excel;
+using FastColoredTextBoxNS;
 using InfoBox;
 using Jint;
-using ClosedXML.Excel;
 using Microsoft.WindowsAPICodePack.Dialogs;
-using FastColoredTextBoxNS;
+using TiaXmlReader.Generation.GridHandler.CustomColumns;
 using TiaXmlReader.Languages;
-using System.Diagnostics;
-using System.Runtime.ExceptionServices;
+using TiaXmlReader.Utility;
 
 namespace TiaXmlReader
 {
@@ -46,7 +44,9 @@ namespace TiaXmlReader
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
                 Application.Run(new MainImportExportForm());
-            } catch(Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Utils.ShowExceptionMessage(ex);
             }
 

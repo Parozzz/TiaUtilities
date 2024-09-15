@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using TiaUtilities.Languages;
 using TiaXmlReader.Generation.GridHandler.Data;
-using TiaXmlReader.Generation.IO;
 using TiaXmlReader.Languages;
 
 namespace TiaUtilities.Generation.IO.Module
@@ -37,10 +36,12 @@ namespace TiaUtilities.Generation.IO.Module
                 return COLUMN_LIST[column].PropertyInfo.GetValue(this);
             }
         }
+
         public IReadOnlyList<GridDataColumn> GetColumns()
         {
             return COLUMN_LIST;
         }
+
         public GridDataColumn GetColumn(int column)
         {
             return COLUMN_LIST[column];

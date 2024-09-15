@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TiaXmlReader.Utility
+﻿namespace TiaXmlReader.Utility
 {
     public static class Constants
     {
@@ -22,8 +15,8 @@ namespace TiaXmlReader.Utility
         public const string STRUCTURED_TEXT_NAMESPACE_V19 = "http://www.siemens.com/automation/Openness/SW/NetworkSource/StructuredText/v4";
 
         public static string? GET_SECTIONS_NAMESPACE()
-        {            
-            if(VERSION >= 17)
+        {
+            if (VERSION >= 17)
             {
                 return SECTIONS_NAMESPACE_V17;
             }
@@ -33,7 +26,7 @@ namespace TiaXmlReader.Utility
 
         public static string? GET_FLAG_NET_NAMESPACE()
         {
-            if(VERSION >= 19)
+            if (VERSION >= 19)
             {
                 return FLG_NET_NAMESPACE_V19;
             }

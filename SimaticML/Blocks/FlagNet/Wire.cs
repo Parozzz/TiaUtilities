@@ -1,14 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Xml;
-using DocumentFormat.OpenXml.Math;
-using DocumentFormat.OpenXml.Vml.Office;
-using SimaticML;
-using SimaticML.API;
-using SimaticML.Blocks.FlagNet.nAccess;
+﻿using SimaticML.Blocks.FlagNet.nAccess;
 using SimaticML.Blocks.FlagNet.nPart;
-using SimaticML.Enums;
 using SimaticML.XMLClasses;
+using System.Xml;
 
 namespace SimaticML.Blocks.FlagNet
 {
@@ -104,7 +97,7 @@ namespace SimaticML.Blocks.FlagNet
         public Wire CreateIdentCon(SimaticVariable variable, Part part, string partConnectionName)
         {
             var access = variable.CreateAccess(this.compileUnit);
-            if(access == null)
+            if (access == null)
             {
                 return this;
             }
@@ -251,7 +244,7 @@ namespace SimaticML.Blocks.FlagNet
 
         public void SetUId(uint uid)
         {
-            this.uid.AsUInt =  uid;
+            this.uid.AsUInt = uid;
         }
 
         public uint GetUId()

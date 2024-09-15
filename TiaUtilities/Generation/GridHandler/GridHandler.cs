@@ -464,7 +464,7 @@ namespace TiaXmlReader.Generation.GridHandler
 
         public bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            if(!this.DataGridView.Focused)
+            if (!this.DataGridView.Focused)
             {
                 return false;
             }

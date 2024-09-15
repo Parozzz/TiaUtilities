@@ -1,8 +1,4 @@
 ﻿using System.Xml;
-using SimaticML;
-using SimaticML.Enums;
-using SimaticML.Enums.Utility;
-using SimaticML.XMLClasses;
 
 namespace SimaticML.XMLClasses
 {
@@ -241,7 +237,7 @@ namespace SimaticML.XMLClasses
 
         public T? FindParent<T>() where T : XmlNodeConfiguration
         {
-            if(this.ParentConfiguration == null)
+            if (this.ParentConfiguration == null)
             {
                 return null;
             }

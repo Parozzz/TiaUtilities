@@ -1,13 +1,4 @@
-﻿using DocumentFormat.OpenXml.Office2010.Excel;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using TiaXmlReader.Generation.Configuration;
-using TiaXmlReader.Utility;
+﻿using TiaXmlReader.Generation.Configuration;
 
 namespace TiaUtilities.Generation.Configuration.Lines
 {

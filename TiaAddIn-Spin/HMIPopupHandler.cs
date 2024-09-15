@@ -1,15 +1,152 @@
-﻿using Siemens.Engineering.AddIn.Menu;
+﻿
+/* Modifica senza merge dal progetto 'AddIn_V16'
+Prima:
+using Siemens.Engineering.AddIn.Menu;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+Dopo:
+using Siemens.Engineering;
+using Siemens.Engineering.AddIn.Menu;
 using Siemens.Engineering.Hmi.Screen;
+using Siemens.Collections.SW;
+using SpinAddin.Utility;
+using System;
+using System.Collections.Generic;
+*/
+
+/* Modifica senza merge dal progetto 'AddIn_V17'
+Prima:
+using Siemens.Engineering.AddIn.Menu;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+Dopo:
+using Siemens.Engineering;
+using Siemens.Engineering.AddIn.Menu;
+using Siemens.Engineering.Hmi.Screen;
+using Siemens.Collections.SW;
+using SpinAddin.Utility;
+using System;
+using System.Collections.Generic;
+*/
+
+/* Modifica senza merge dal progetto 'AddIn_V18'
+Prima:
+using Siemens.Engineering.AddIn.Menu;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+Dopo:
+using Siemens.Engineering;
+using Siemens.Engineering.AddIn.Menu;
+using Siemens.Engineering.Hmi.Screen;
+using Siemens.Collections.SW;
+using SpinAddin.Utility;
+using System;
+using System.Collections.Generic;
+*/
+
+/* Modifica senza merge dal progetto 'AddIn_V19'
+Prima:
+using Siemens.Engineering.AddIn.Menu;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+Dopo:
+using Siemens.Engineering;
+using Siemens.Engineering.AddIn.Menu;
+using Siemens.Engineering.Hmi.Screen;
+using Siemens.Collections.SW;
+using SpinAddin.Utility;
+using System;
+using System.Collections.Generic;
+*/
+using Siemens.Engineering;
+using Siemens.Engineering.AddIn.Menu;
+/* Modifica senza merge dal progetto 'AddIn_V16'
+Prima:
 using System.Windows.Forms;
 using SpinAddin.Utility;
 using Siemens.Engineering;
+Dopo:
+using System.Linq;
+using System.Text;
+*/
+
+/* Modifica senza merge dal progetto 'AddIn_V17'
+Prima:
+using System.Windows.Forms;
+using SpinAddin.Utility;
+using Siemens.Engineering;
+Dopo:
+using System.Linq;
+using System.Text;
+*/
+
+/* Modifica senza merge dal progetto 'AddIn_V18'
+Prima:
+using System.Windows.Forms;
+using SpinAddin.Utility;
+using Siemens.Engineering;
+Dopo:
+using System.Linq;
+using System.Text;
+*/
+
+/* Modifica senza merge dal progetto 'AddIn_V19'
+Prima:
+using System.Windows.Forms;
+using SpinAddin.Utility;
+using Siemens.Engineering;
+Dopo:
+using System.Linq;
+using System.Text;
+*/
+using SpinAddin.Utility;
+using System;
+
+/* Modifica senza merge dal progetto 'AddIn_V16'
+Prima:
+using System.Threading.Tasks;
+Dopo:
 using System.IO;
-using Siemens.Engineering.SW;
+using System.Threading.Tasks;
+*/
+
+/* Modifica senza merge dal progetto 'AddIn_V17'
+Prima:
+using System.Threading.Tasks;
+Dopo:
+using System.IO;
+using System.Threading.Tasks;
+*/
+
+/* Modifica senza merge dal progetto 'AddIn_V18'
+Prima:
+using System.Threading.Tasks;
+Dopo:
+using System.IO;
+using System.Threading.Tasks;
+*/
+
+/* Modifica senza merge dal progetto 'AddIn_V19'
+Prima:
+using System.Threading.Tasks;
+Dopo:
+using System.IO;
+using System.Threading.Tasks;
+*/
+using System.IO;
+using System.Windows.Forms;
 
 namespace SpinAddIn
 {
@@ -63,7 +200,7 @@ namespace SpinAddIn
         {
             foreach (ScreenPopup hmiPopup in selectionProvider.GetSelection())
             {
-                var hmiPopupFolder = (ScreenPopupFolder) hmiPopup.Parent;
+                var hmiPopupFolder = (ScreenPopupFolder)hmiPopup.Parent;
 
                 var fileDialog = new OpenFileDialog
                 {
@@ -88,7 +225,7 @@ namespace SpinAddIn
         {
             foreach (ScreenPopup hmiPopup in selectionProvider.GetSelection())
             {
-                var hmiPopupFolder = (ScreenPopupFolder) hmiPopup.Parent;
+                var hmiPopupFolder = (ScreenPopupFolder)hmiPopup.Parent;
 
                 var folderDialog = new FolderBrowserDialog();
                 if (folderDialog.ShowDialog(Util.CreateForm()) == DialogResult.OK)
@@ -104,7 +241,7 @@ namespace SpinAddIn
         {
             foreach (ScreenPopup hmiPopup in selectionProvider.GetSelection())
             {
-                var hmiPopupFolder = (ScreenPopupFolder) hmiPopup.Parent;
+                var hmiPopupFolder = (ScreenPopupFolder)hmiPopup.Parent;
 
                 var folderDialog = new FolderBrowserDialog();
                 if (folderDialog.ShowDialog(Util.CreateForm()) == DialogResult.OK)
