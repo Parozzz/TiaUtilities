@@ -32,6 +32,7 @@
             tiaVersionLabel = new Label();
             TopMenuStrip = new MenuStrip();
             fileToolStripMenuItem = new ToolStripMenuItem();
+            loadToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator2 = new ToolStripSeparator();
             autoSaveMenuItem = new ToolStripMenuItem();
             autoSaveTimeTextBox = new ToolStripTextBox();
@@ -94,23 +95,30 @@
             // 
             // fileToolStripMenuItem
             // 
-            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { toolStripSeparator2, autoSaveMenuItem, autoSaveTimeTextBox, toolStripSeparator1 });
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { loadToolStripMenuItem, toolStripSeparator2, autoSaveMenuItem, autoSaveTimeTextBox, toolStripSeparator1 });
             fileToolStripMenuItem.Font = new Font("Segoe UI", 12F);
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new Size(46, 25);
             fileToolStripMenuItem.Text = "File";
             // 
+            // loadToolStripMenuItem
+            // 
+            loadToolStripMenuItem.Name = "loadToolStripMenuItem";
+            loadToolStripMenuItem.Size = new Size(180, 26);
+            loadToolStripMenuItem.Text = "Load";
+            loadToolStripMenuItem.Click += LoadToolStripMenuItem_Click;
+            // 
             // toolStripSeparator2
             // 
             toolStripSeparator2.Name = "toolStripSeparator2";
-            toolStripSeparator2.Size = new Size(157, 6);
+            toolStripSeparator2.Size = new Size(177, 6);
             // 
             // autoSaveMenuItem
             // 
             autoSaveMenuItem.Enabled = false;
             autoSaveMenuItem.Font = new Font("Segoe UI", 12F);
             autoSaveMenuItem.Name = "autoSaveMenuItem";
-            autoSaveMenuItem.Size = new Size(160, 26);
+            autoSaveMenuItem.Size = new Size(180, 26);
             autoSaveMenuItem.Text = "Auto Save";
             // 
             // autoSaveTimeTextBox
@@ -123,7 +131,7 @@
             // toolStripSeparator1
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(157, 6);
+            toolStripSeparator1.Size = new Size(177, 6);
             // 
             // dbDuplicationMenuItem
             // 
@@ -296,6 +304,7 @@
         private ToolStripSeparator toolStripSeparator1;
         private ToolStripMenuItem sampleXMLMenuItem;
         private ToolStripMenuItem testProjectMenuItem;
+        private ToolStripMenuItem loadToolStripMenuItem;
     }
 }
 

@@ -151,7 +151,7 @@ namespace TiaUtilities.Generation.GenModules
         private void ModuleSave(bool force = false, bool saveAs = false)
         {
             if (projectLoading)
-            { //This is to avoid that autosave will save and empty file while selected file with dialog
+            { //This is to avoid that autosave will save an empty file while selecting file with dialog
                 return;
             }
 
@@ -174,11 +174,11 @@ namespace TiaUtilities.Generation.GenModules
             this.SetLocalizedFormText(lastFilePath ?? "");
         }
 
-        private void ModuleLoad()
+        public void ModuleLoad(object? saveObject = null)
         {
             projectLoading = true;
 
-            var saveObject = SavesLoader.LoadWithDialog(ref lastFilePath, Constants.SAVE_FILE_EXTENSION);
+            saveObject ??= SavesLoader.LoadWithDialog(ref lastFilePath, Constants.SAVE_FILE_EXTENSION);
             if (saveObject != null)
             {
                 this.module.LoadSave(saveObject);
@@ -193,6 +193,11 @@ namespace TiaUtilities.Generation.GenModules
         private void SetLocalizedFormText(string filePath)
         {
             this.Text = this.module.GetFormLocalizatedName().Replace("{file_path}", filePath);
+        }
+
+        public void SetLastFilePath(string? filePath)
+        {
+            this.lastFilePath = filePath;
         }
     }
 }

@@ -332,7 +332,7 @@ for row validation</value>
     <value>Time</value>
   </data>
   <data name="ALARM_GEN_FORM" xml:space="preserve">
-    <value>Alarms generator</value>
+    <value>Alarms generator. Project file: {file_path}</value>
   </data>
   <data name="DEVICE_DATA_DESCRIPTION" xml:space="preserve">
     <value>Description</value>

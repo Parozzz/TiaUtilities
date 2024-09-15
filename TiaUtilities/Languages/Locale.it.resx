@@ -298,7 +298,7 @@
     <value>Tempo</value>
   </data>
   <data name="ALARM_GEN_FORM" xml:space="preserve">
-    <value>Generazione Allarmi</value>
+    <value>Generazione Allarmi. Percorso progetto: {file_path}</value>
   </data>
   <data name="DEVICE_DATA_DESCRIPTION" xml:space="preserve">
     <value>Descrizione</value>

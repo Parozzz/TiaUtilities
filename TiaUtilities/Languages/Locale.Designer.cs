@@ -556,7 +556,7 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Alarms generator.
+        ///   Cerca una stringa localizzata simile a Alarms generator. Project file: {file_path}.
         /// </summary>
         internal static string ALARM_GEN_FORM {
             get {

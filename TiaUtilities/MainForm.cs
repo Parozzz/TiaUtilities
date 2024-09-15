@@ -134,6 +134,7 @@ namespace TiaXmlReader
             this.Text = Locale.MAIN_FORM;
 
             this.fileToolStripMenuItem.Text = Locale.GENERICS_FILE;
+            this.loadToolStripMenuItem.Text = Locale.GENERICS_LOAD;
             this.autoSaveMenuItem.Text = Locale.MAIN_FORM_TOP_FILE_AUTO_SAVE;
 
             this.dbDuplicationMenuItem.Text = Locale.MAIN_FORM_TOP_DB_DUPLICATION;
@@ -143,38 +144,78 @@ namespace TiaXmlReader
             this.tiaVersionLabel.Text = Locale.MAIN_FORM_TIA_VERSION;
             this.languageLabel.Text = Locale.MAIN_FORM_LANGUAGE;
         }
-
-        private void DbDuplicationMenuItem_Click(object sender, EventArgs e)
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            var dbDuplicationForm = new DBDuplicationForm(Settings)
+            try
             {
-                ShowInTaskbar = false
-            };
-            dbDuplicationForm.ShowDialog();
+                switch (keyData)
+                {
+                    case Keys.L | Keys.Control:
+                        this.loadToolStripMenuItem.PerformClick();
+                        return true; //Return required otherwise will write the letter.
+                }
+            }
+            catch (Exception ex)
+            {
+                Utils.ShowExceptionMessage(ex);
+            }
+
+            // Call the base class
+            return base.ProcessCmdKey(ref msg, keyData);
         }
 
-        private void GenerateIOMenuItem_Click(object sender, EventArgs e)
+        private void LoadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var filePath = "";
+
+            var saveObject = SavesLoader.LoadWithDialog(ref filePath, Constants.SAVE_FILE_EXTENSION);
+
+            GenModuleForm genForm;
+            if (saveObject is IOGenSave)
+            {
+                genForm = OpenIOGenModuleForm();
+            }
+            else if(saveObject is AlarmGenSave)
+            {
+                genForm = OpenAlarmGenModuleForm();
+            }
+            else
+            {
+                return;
+            }
+
+            genForm.SetLastFilePath(filePath);
+            genForm.ModuleLoad(saveObject);
+        }
+
+        private void DbDuplicationMenuItem_Click(object sender, EventArgs e) => new DBDuplicationForm(Settings) { ShowInTaskbar = false }.ShowDialog();
+
+        private void GenerateIOMenuItem_Click(object sender, EventArgs e) => OpenIOGenModuleForm();
+
+        private void GenerateAlarmsToolStripMenuItem_Click(object sender, EventArgs e) => OpenAlarmGenModuleForm();
+
+        private GenModuleForm OpenIOGenModuleForm()
         {
             IOGenModule ioGenProject = new(jsErrorHandlingThread);
-
             GenModuleForm projectForm = new(ioGenProject, autoSaveHandler)
             {
                 Width = 1400,
                 Height = 850
             };
             projectForm.Show(this);
+            return projectForm;
         }
 
-        private void GenerateAlarmsToolStripMenuItem_Click(object sender, EventArgs e)
+        private GenModuleForm OpenAlarmGenModuleForm()
         {
             AlarmGenModule alarmGenProject = new(jsErrorHandlingThread);
-
             GenModuleForm projectForm = new(alarmGenProject, autoSaveHandler)
             {
                 Width = 1400,
                 Height = 850
             };
             projectForm.Show(this);
+            return projectForm;
         }
 
         private void ImportXMLToolStripMenuItem_Click(object sender, EventArgs e)
@@ -335,7 +376,6 @@ namespace TiaXmlReader
             //Save the file.
             //xmlDocument.Save(Directory.GetCurrentDirectory() + "/fc.xml");
         }
-
     }
 }
 
