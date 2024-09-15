@@ -1,9 +1,7 @@
 ﻿using InfoBox;
 using Microsoft.WindowsAPICodePack.Dialogs;
-using TiaUtilities.Configuration;
 using TiaUtilities.Languages;
 using TiaXmlReader.Generation.GridHandler;
-using TiaXmlReader.Languages;
 using TiaXmlReader.Utility;
 
 namespace TiaUtilities.Generation.GenModules
@@ -110,7 +108,7 @@ namespace TiaUtilities.Generation.GenModules
 
         private void Translate()
         {
-            this.Text = this.module.GetFormLocalizatedName();
+            this.SetLocalizedFormText("");
 
             this.fileMenuItem.Text = Locale.GENERICS_FILE;
             this.saveMenuItem.Text = Locale.GENERICS_SAVE;
@@ -174,7 +172,7 @@ namespace TiaUtilities.Generation.GenModules
 
             this.module.Wash();
 
-            this.Text = this.module.GetFormLocalizatedName().Replace("{file_path}", lastFilePath);
+            this.SetLocalizedFormText(lastFilePath ?? "");
         }
 
         private void ModuleLoad()
@@ -187,10 +185,15 @@ namespace TiaUtilities.Generation.GenModules
                 this.module.LoadSave(saveObject);
                 this.module.Wash();
 
-                this.Text = this.module.GetFormLocalizatedName().Replace("{file_path}", lastFilePath);
+                this.SetLocalizedFormText(lastFilePath ?? "");
             }
 
             projectLoading = false;
+        }
+
+        private void SetLocalizedFormText(string filePath)
+        {
+            this.Text = this.module.GetFormLocalizatedName().Replace("{file_path}", filePath);
         }
     }
 }
