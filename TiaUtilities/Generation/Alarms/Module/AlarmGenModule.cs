@@ -48,9 +48,12 @@ namespace TiaUtilities.Generation.Alarms.Module
 
             form.Shown += (sender, args) =>
             {
-                TabPage tabPage = new();
-                TabCreation(tabPage);
-                this.control.tabControl.TabPages.Add(tabPage);
+                if(this.control.tabControl.TabPages.Count == 0)
+                { //Check required because Load could be called before form is shown!
+                    TabPage tabPage = new();
+                    TabCreation(tabPage);
+                    this.control.tabControl.TabPages.Add(tabPage);
+                }
             };
         }
 
