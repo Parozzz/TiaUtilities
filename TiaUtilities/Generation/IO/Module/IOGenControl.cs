@@ -1,5 +1,6 @@
 ﻿using TiaUtilities.Generation.Configuration.Utility;
 using TiaUtilities.Languages;
+using TiaXmlReader;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Generation.IO;
@@ -48,7 +49,8 @@ namespace TiaUtilities.Generation.IO.Module
                 var button = this.dbConfigButton;
                 button.Click += (sender, args) =>
                 {
-                    var configForm = new ConfigForm(button.Text, mainConfig) { ControlWidth = 250 };
+                    var configForm = new ConfigForm(button.Text) { ControlWidth = 250 };
+                    configForm.SetConfiguration(mainConfig, MainForm.Settings.PresetIOMainConfiguration);
 
                     var mainGroup = configForm.Init();
                     mainGroup.AddTextBox().Label($"{Locale.GENERICS_NAME} > {GenPlaceholders.IO.CONFIG_DB_NAME}").BindText(() => mainConfig.DBName);
@@ -65,7 +67,8 @@ namespace TiaUtilities.Generation.IO.Module
                 var button = this.ioTableConfigButton;
                 button.Click += (sender, args) =>
                 {
-                    var configForm = new ConfigForm(button.Text, mainConfig) { ControlWidth = 285 };
+                    var configForm = new ConfigForm(button.Text) { ControlWidth = 285 };
+                    configForm.SetConfiguration(mainConfig, MainForm.Settings.PresetIOMainConfiguration);
 
                     var mainGroup = configForm.Init();
                     mainGroup.AddTextBox().Label(Locale.GENERICS_NAME).BindText(() => mainConfig.IOTableName);
@@ -81,6 +84,7 @@ namespace TiaUtilities.Generation.IO.Module
                 button.Click += (sender, args) =>
                 {
                     var configForm = new ConfigForm(button.Text) { ControlWidth = 250 };
+                    configForm.SetConfiguration(mainConfig, MainForm.Settings.PresetIOMainConfiguration);
 
                     var mainGroup = configForm.Init();
                     mainGroup.AddTextBox().Label(Locale.GENERICS_NAME).BindText(() => mainConfig.VariableTableName);

@@ -25,7 +25,8 @@ namespace TiaXmlReader.Generation.GridHandler
 
         public void ShowConfigForm(IWin32Window owner)
         {
-            var configForm = new ConfigForm(Locale.GRID_PREFERENCES, this) { ControlWidth = 300 };
+            var configForm = new ConfigForm(Locale.GRID_PREFERENCES) { ControlWidth = 300 };
+            configForm.SetConfiguration(this);
 
             var mainGroup = configForm.Init();
             mainGroup.AddColorPicker().Label(Locale.GRID_PREFERENCES_SELECTED_CELL_BORDER).BindColor(() => this.SingleSelectedCellBorderColor);

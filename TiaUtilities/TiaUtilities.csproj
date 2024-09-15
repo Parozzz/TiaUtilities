@@ -66,8 +66,13 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Locale.resx</DependentUpon>
     </Compile>
-    <Compile Update="MainImportExportForm.cs">
+    <Compile Update="MainForm.cs">
       <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
   </ItemGroup>
 
@@ -80,6 +85,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Locale.Designer.cs</LastGenOutput>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 

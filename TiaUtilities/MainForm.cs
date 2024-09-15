@@ -19,21 +19,22 @@ using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Javascript;
 using TiaXmlReader.Languages;
 using TiaXmlReader.Utility;
+using Timer = System.Windows.Forms.Timer;
 
 namespace TiaXmlReader
 {
-    public partial class MainImportExportForm : Form
+    public partial class MainForm : Form
     {
-        private readonly ProgramSettings programSettings;
+        public static ProgramSettings Settings { get; private set; } = new();
+
         private readonly TimedSaveHandler autoSaveHandler;
         private readonly JavascriptErrorReportThread jsErrorHandlingThread;
-
-        public MainImportExportForm()
+        public MainForm()
         {
             InitializeComponent();
 
-            this.programSettings = SavesLoader.LoadWithoutDialog(ProgramSettings.GetFilePath(), "json") is ProgramSettings loadedSave ? loadedSave : new();
-            this.programSettings.Save(); //To create file if not exist!
+            Settings = SavesLoader.LoadWithoutDialog(ProgramSettings.GetFilePath(), "json") is ProgramSettings loadedSave ? loadedSave : new();
+            Settings.Save(); //To create file if not exist!
 
             this.autoSaveHandler = new TimedSaveHandler();
             this.jsErrorHandlingThread = new JavascriptErrorReportThread();
@@ -59,12 +60,12 @@ namespace TiaXmlReader
 
                     if (!ignoreSettingsAtStartup)
                     {
-                        this.programSettings.TIAVersion = version;
-                        this.programSettings.Save();
+                        Settings.TIAVersion = version;
+                        Settings.Save();
                     }
                 }
             };
-            this.tiaVersionComboBox.Text = "" + programSettings.TIAVersion; //After the event so is applied!
+            this.tiaVersionComboBox.Text = "" + Settings.TIAVersion; //After the event so is applied!
 
             this.languageComboBox.Items.AddRange(["it-IT", "en-US"]);
             this.languageComboBox.TextChanged += (sender, args) =>
@@ -80,8 +81,8 @@ namespace TiaXmlReader
                     }
 
                     //Without save, after restart it would restore the old (Meaning it would be useless)
-                    this.programSettings.IetfLanguage = culture.IetfLanguageTag;
-                    this.programSettings.Save();
+                    Settings.IetfLanguage = culture.IetfLanguageTag;
+                    Settings.Save();
 
                     //This should stay always in english. In case someone set an unkown language, this will be neautral.
                     var result = InformationBox.Show("Do you want to restart application?", "Restart to change language", buttons: InformationBoxButtons.YesNo);
@@ -97,23 +98,31 @@ namespace TiaXmlReader
                     Utils.ShowExceptionMessage(ex);
                 }
             };
-            this.languageComboBox.Text = programSettings.IetfLanguage; //Call this after so the text changed event changes the system lang.
+            this.languageComboBox.Text = Settings.IetfLanguage; //Call this after so the text changed event changes the system lang.
 
             this.autoSaveTimeTextBox.TextChanged += (sender, args) =>
             {
                 if (int.TryParse(autoSaveTimeTextBox.Text, out int time))
                 {
                     this.autoSaveHandler.Start(time * 1000);
-                    if(!ignoreSettingsAtStartup)
+                    if (!ignoreSettingsAtStartup)
                     {
-                        this.programSettings.AutoSaveTime = time;
-                        this.programSettings.Save(); //To create file if not exist!
+                        Settings.AutoSaveTime = time;
+                        Settings.Save(); //To create file if not exist!
                     }
                 }
             };
-            this.autoSaveTimeTextBox.Text = "" + programSettings.AutoSaveTime; //Call this after so it start auto save
+            this.autoSaveTimeTextBox.Text = "" + Settings.AutoSaveTime; //Call this after so it start auto save
 
-            this.programSettings.PropertyChanged += (sender, args) => this.programSettings.Save();
+            Timer settingsDirtyTimer = new() { Interval = 1000 };
+            settingsDirtyTimer.Tick += (sender, args) =>
+            {
+                if (MainForm.Settings.IsDirty())
+                {
+                    MainForm.Settings.Save();
+                }
+            };
+            settingsDirtyTimer.Start();
 
             Translate();
 
@@ -137,7 +146,7 @@ namespace TiaXmlReader
 
         private void DbDuplicationMenuItem_Click(object sender, EventArgs e)
         {
-            var dbDuplicationForm = new DBDuplicationForm(programSettings)
+            var dbDuplicationForm = new DBDuplicationForm(Settings)
             {
                 ShowInTaskbar = false
             };
@@ -146,9 +155,9 @@ namespace TiaXmlReader
 
         private void GenerateIOMenuItem_Click(object sender, EventArgs e)
         {
-            IOGenModule ioGenProject = new(jsErrorHandlingThread, programSettings.GridSettings);
+            IOGenModule ioGenProject = new(jsErrorHandlingThread);
 
-            GenModuleForm projectForm = new(ioGenProject, autoSaveHandler, programSettings.GridSettings)
+            GenModuleForm projectForm = new(ioGenProject, autoSaveHandler)
             {
                 Width = 1400,
                 Height = 850
@@ -158,9 +167,9 @@ namespace TiaXmlReader
 
         private void GenerateAlarmsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            AlarmGenModule alarmGenProject = new(jsErrorHandlingThread, programSettings.GridSettings);
+            AlarmGenModule alarmGenProject = new(jsErrorHandlingThread);
 
-            GenModuleForm projectForm = new(alarmGenProject, autoSaveHandler, programSettings.GridSettings)
+            GenModuleForm projectForm = new(alarmGenProject, autoSaveHandler)
             {
                 Width = 1400,
                 Height = 850

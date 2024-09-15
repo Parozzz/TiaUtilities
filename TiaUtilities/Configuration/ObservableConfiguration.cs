@@ -28,19 +28,19 @@ namespace TiaUtilities.Configuration
 
             public void UpdateValue(object value)
             {
-                if (value == null || value.GetType() != Type)
-                {
-                    return;
-                }
-
                 if (_value is ObservableConfiguration oldObservableConfiguration)
                 {
                     configuration.subConfigurationList.Remove(oldObservableConfiguration);
                 }
 
+                if (value == null || value.GetType() != Type)
+                {
+                    return;
+                }
+
                 if (value is ObservableConfiguration newObservableConfiguration)
                 {
-                    configuration.subConfigurationList.Remove(newObservableConfiguration);
+                    configuration.subConfigurationList.Add(newObservableConfiguration);
                 }
 
                 var differentObjects = Utils.AreDifferentObject(this._value, value);

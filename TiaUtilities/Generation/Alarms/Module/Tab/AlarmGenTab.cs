@@ -2,6 +2,7 @@
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.Placeholders;
+using TiaXmlReader;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation.GridHandler;
@@ -36,6 +37,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             TabPage = tabPage;
 
             this.TabConfig = new();
+            GenUtils.CopyJsonFieldsAndProperties(MainForm.Settings.PresetAlarmTabConfiguration, this.TabConfig);
             this.DeviceDataPreview = new();
             this.AlarmDataPreview = new();
 

@@ -1,6 +1,7 @@
 ﻿using InfoBox;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using TiaUtilities.Languages;
+using TiaXmlReader;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Utility;
 
@@ -10,16 +11,14 @@ namespace TiaUtilities.Generation.GenModules
     {
         private readonly IGenModule module;
         private readonly TimedSaveHandler autoSaveHandler;
-        private readonly GridSettings gridSettings;
 
         private bool projectLoading = false;
         private string? lastFilePath;
 
-        public GenModuleForm(IGenModule generationProject, TimedSaveHandler autoSaveHandler, GridSettings gridSettings)
+        public GenModuleForm(IGenModule generationProject, TimedSaveHandler autoSaveHandler)
         {
             this.module = generationProject;
             this.autoSaveHandler = autoSaveHandler;
-            this.gridSettings = gridSettings;
 
             InitializeComponent();
 
@@ -84,7 +83,7 @@ namespace TiaUtilities.Generation.GenModules
                     Utils.ShowExceptionMessage(ex);
                 }
             };
-            this.preferencesMenuItem.Click += (sender, args) => this.gridSettings.ShowConfigForm(this);
+            this.preferencesMenuItem.Click += (sender, args) => MainForm.Settings.GridSettings.ShowConfigForm(this);
             #endregion
 
             #region AUTO_SAVE

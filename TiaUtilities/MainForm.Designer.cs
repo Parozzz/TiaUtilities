@@ -1,6 +1,6 @@
 ﻿namespace TiaXmlReader
 {
-    partial class MainImportExportForm
+    partial class MainForm
     {
         /// <summary>
         /// Variabile di progettazione necessaria.
@@ -253,7 +253,7 @@
             SettingsLayoutPanel.Size = new Size(243, 73);
             SettingsLayoutPanel.TabIndex = 14;
             // 
-            // MainImportExportForm
+            // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -261,7 +261,7 @@
             Controls.Add(MainLayoutPanel);
             MainMenuStrip = TopMenuStrip;
             Margin = new Padding(4, 3, 4, 3);
-            Name = "MainImportExportForm";
+            Name = "MainForm";
             Text = "AppoggioMan";
             TopMenuStrip.ResumeLayout(false);
             TopMenuStrip.PerformLayout();

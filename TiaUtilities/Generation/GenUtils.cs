@@ -196,6 +196,30 @@ namespace TiaXmlReader.Generation
             }
         }
 
+        public static void CopySamePublicFieldsAndProperties(object copyFrom, object saveTo)
+        {
+            if(copyFrom.GetType() != saveTo.GetType())
+            {
+                return;
+            }
+
+            var type = copyFrom.GetType();
+
+            var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public);
+            foreach (var field in fields)
+            {
+                var obj = field.GetValue(copyFrom);
+                field.SetValue(saveTo, obj);
+            }
+
+            var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public).Where(p => p.CanRead && p.CanWrite);
+            foreach (var property in properties)
+            {
+                var obj = property.GetValue(copyFrom);
+                property.SetValue(saveTo, obj);
+            }
+        }
+
         /***
          * RETURN TRUE IF ALL EQUALS
          * */

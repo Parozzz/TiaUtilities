@@ -7,6 +7,7 @@ using TiaUtilities.Generation.Configuration.Utility;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.IO.Module;
 using TiaUtilities.Generation.IO.Module.ExcelImporter;
+using TiaXmlReader;
 using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Javascript;
@@ -18,13 +19,13 @@ namespace TiaUtilities.Generation.GenModules.IO.ExcelImporter
     {
         public const string ROW_SPECIAL_CHAR = "$";
 
-        private readonly IOGenExcelImportConfiguration importConfig;
+        private readonly IOExcelImportConfiguration importConfig;
         private readonly GridHandler<IOGenExcelImportData> gridHandler;
 
         public IEnumerable<IOGenExcelImportData> ImportDataEnumerable { get => gridHandler.DataSource.GetNotEmptyDataDict().Keys; }
 
         public IOGenerationExcelImportForm(JavascriptErrorReportThread jsErrorHandlingThread, GridSettings gridSettings, GridScriptContainer scriptContainer,
-                    IOGenExcelImportConfiguration configuration)
+                    IOExcelImportConfiguration configuration)
         {
             InitializeComponent();
 
@@ -78,7 +79,8 @@ namespace TiaUtilities.Generation.GenModules.IO.ExcelImporter
 
             this.ConfigButton.Click += (sender, args) =>
             {
-                var configForm = new ConfigForm("Configurazione", this.importConfig) { ControlWidth = 500 };
+                var configForm = new ConfigForm("Configurazione") { ControlWidth = 500 };
+                configForm.SetConfiguration(this.importConfig, MainForm.Settings.PresetIOExcelImportConfiguration);
 
                 var mainGroup = configForm.Init();
                 mainGroup.AddTextBox().Label("Indirizzo").BindText(() => importConfig.AddressCellConfig);

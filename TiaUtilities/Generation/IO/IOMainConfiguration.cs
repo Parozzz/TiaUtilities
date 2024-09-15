@@ -45,7 +45,7 @@ namespace TiaXmlReader.Generation.IO
 
         public IOMainConfiguration()
         {
-            MemoryType = IOMemoryTypeEnum.DB;
+            this.MemoryType = IOMemoryTypeEnum.DB;
             this.GroupingType = IOGroupingTypeEnum.PER_BYTE;
 
             this.DBName = "TestIO_DB";

@@ -7,7 +7,8 @@ namespace TiaXmlReader.Generation.Configuration
     {
         private readonly string title;
 
-        public object? Configuration { get; init; }
+        public object? Configuration { get; private set; }
+        public object? PresetConfiguration { get; private set; }
 
         public Font LabelFont { get; set; } = ConfigStyle.LABEL_FONT;
         public Font ControlFont { get; set; } = ConfigStyle.CONTROL_FONT;
@@ -17,12 +18,17 @@ namespace TiaXmlReader.Generation.Configuration
         public bool CloseOnEnter { get; set; } = true;
         public bool ShowControlBox { get; set; } = false;
 
-        public ConfigForm(string title, object? configuration = null)
+        public ConfigForm(string title)
         {
             InitializeComponent();
 
             this.title = title;
+        }
+
+        public void SetConfiguration<T>(T configuration, T? presetConfiguration = default)
+        {
             this.Configuration = configuration;
+            this.PresetConfiguration = presetConfiguration;
         }
 
         public void StartShowingAtCursor()
@@ -51,6 +57,11 @@ namespace TiaXmlReader.Generation.Configuration
             this.MinimizeBox = false;
 
             this.titleLabel.Text = title;
+
+            if(this.PresetConfiguration == null)
+            {
+                this.topPanel.Controls.Remove(this.savePresetButton);
+            }
 
             var mainGroup = new ConfigGroup(this);
 
@@ -103,6 +114,14 @@ namespace TiaXmlReader.Generation.Configuration
 
             // Call the base class
             return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        private void SavePresetButton_Click(object sender, EventArgs e)
+        {
+            if (this.Configuration != null && this.PresetConfiguration != null)
+            {
+                GenUtils.CopySamePublicFieldsAndProperties(this.Configuration, this.PresetConfiguration);
+            }
         }
     }
 

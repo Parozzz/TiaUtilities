@@ -1,6 +1,7 @@
 ﻿using TiaUtilities.Generation.Configuration.Utility;
 using TiaUtilities.Generation.IO;
 using TiaUtilities.Languages;
+using TiaXmlReader;
 using TiaXmlReader.Generation.Configuration;
 
 namespace TiaUtilities.Generation.GenModules.IO.Tab
@@ -38,7 +39,8 @@ namespace TiaUtilities.Generation.GenModules.IO.Tab
                 var button = this.fcConfigButton;
                 button.Click += (sender, args) =>
                 {
-                    var configForm = new ConfigForm(button.Text, tabConfig) { ControlWidth = 150 };
+                    var configForm = new ConfigForm(button.Text) { ControlWidth = 150 };
+                    configForm.SetConfiguration(tabConfig, MainForm.Settings.PresetIOTabConfiguration);
 
                     var mainGroup = configForm.Init();
                     mainGroup.AddTextBox().Label(Locale.GENERICS_NAME).BindText(() => tabConfig.FCBlockName);
@@ -51,7 +53,8 @@ namespace TiaUtilities.Generation.GenModules.IO.Tab
                 var button = this.segmentNameConfigButton;
                 button.Click += (sender, args) =>
                 {
-                    var configForm = new ConfigForm(button.Text, tabConfig) { ControlWidth = 400 };
+                    var configForm = new ConfigForm(button.Text) { ControlWidth = 400 };
+                    configForm.SetConfiguration(tabConfig, MainForm.Settings.PresetIOTabConfiguration);
 
                     var mainGroup = configForm.Init();
                     mainGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_SEGMENT_BIT_DIVISION).BindText(() => tabConfig.SegmentNameBitGrouping);

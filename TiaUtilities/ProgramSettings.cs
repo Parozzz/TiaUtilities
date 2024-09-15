@@ -1,8 +1,13 @@
 ﻿using Newtonsoft.Json;
 using TiaUtilities;
 using TiaUtilities.Configuration;
+using TiaUtilities.Generation.Alarms;
+using TiaUtilities.Generation.IO;
+using TiaUtilities.Generation.IO.Module.ExcelImporter;
 using TiaXmlReader.Generation;
+using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation.GridHandler;
+using TiaXmlReader.Generation.IO;
 using TiaXmlReader.Languages;
 using TiaXmlReader.Utility;
 
@@ -26,6 +31,13 @@ namespace TiaXmlReader
 
         [JsonProperty] public GridSettings GridSettings { get => this.GetAs<GridSettings>(); set => this.Set(value); }
 
+        [JsonProperty] public IOMainConfiguration PresetIOMainConfiguration { get => this.GetAs<IOMainConfiguration>(); set => this.Set(value); }
+        [JsonProperty] public IOTabConfiguration PresetIOTabConfiguration { get => this.GetAs<IOTabConfiguration>(); set => this.Set(value); }
+        [JsonProperty] public IOExcelImportConfiguration PresetIOExcelImportConfiguration { get => this.GetAs<IOExcelImportConfiguration>(); set => this.Set(value); }
+
+        [JsonProperty] public AlarmMainConfiguration PresetAlarmMainConfiguration { get => this.GetAs<AlarmMainConfiguration>(); set => this.Set(value); }
+        [JsonProperty] public AlarmTabConfiguration PresetAlarmTabConfiguration { get => this.GetAs<AlarmTabConfiguration>(); set => this.Set(value); }
+
         public ProgramSettings()
         {
             this.LastDBDuplicationFileName = "";
@@ -43,6 +55,13 @@ namespace TiaXmlReader
             this.IetfLanguage = LocaleVariables.LANG;
 
             this.GridSettings = new();
+
+            this.PresetIOMainConfiguration = new();
+            this.PresetIOTabConfiguration = new();
+            this.PresetIOExcelImportConfiguration = new();
+
+            this.PresetAlarmMainConfiguration = new();
+            this.PresetAlarmTabConfiguration = new();
         }
 
         public static string GetFilePath()

@@ -3,6 +3,7 @@ using TiaUtilities.Generation.GenModules;
 using TiaUtilities.Generation.GenModules.Alarm;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Languages;
+using TiaXmlReader;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation.GridHandler;
@@ -13,8 +14,6 @@ namespace TiaUtilities.Generation.Alarms.Module
     public class AlarmGenModule : IGenModule
     {
         private readonly JavascriptErrorReportThread jsErrorHandlingThread;
-        private readonly GridSettings gridSettings;
-
         private readonly GridScriptContainer scriptContainer;
 
         private readonly AlarmGenControl control;
@@ -22,15 +21,14 @@ namespace TiaUtilities.Generation.Alarms.Module
 
         private readonly List<AlarmGenTab> genTabList;
 
-        public AlarmGenModule(JavascriptErrorReportThread jsErrorHandlingThread, GridSettings gridSettings)
+        public AlarmGenModule(JavascriptErrorReportThread jsErrorHandlingThread)
         {
             this.jsErrorHandlingThread = jsErrorHandlingThread;
-            this.gridSettings = gridSettings;
-
             this.scriptContainer = new();
 
             this.control = new();
             this.mainConfig = new();
+            GenUtils.CopyJsonFieldsAndProperties(MainForm.Settings.PresetAlarmMainConfiguration, this.mainConfig);
 
             this.genTabList = [];
         }
@@ -60,7 +58,7 @@ namespace TiaUtilities.Generation.Alarms.Module
         {
             tabPage.Text = save?.Name ?? "AlarmGen";
 
-            AlarmGenTab alarmGenTab = new(this.jsErrorHandlingThread, this.gridSettings, this.scriptContainer, this, this.mainConfig, tabPage);
+            AlarmGenTab alarmGenTab = new(this.jsErrorHandlingThread, MainForm.Settings.GridSettings, this.scriptContainer, this, this.mainConfig, tabPage);
             genTabList.Add(alarmGenTab);
 
             alarmGenTab.Init();

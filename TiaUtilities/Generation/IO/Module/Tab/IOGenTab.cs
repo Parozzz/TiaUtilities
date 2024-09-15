@@ -4,6 +4,7 @@ using TiaUtilities.Generation.GenModules.IO.Tab;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.Placeholders;
+using TiaXmlReader;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Generation.GridHandler.CustomColumns;
@@ -38,9 +39,11 @@ namespace TiaUtilities.Generation.IO.Module.Tab
             this.module = module;
             this.TabPage = tabPage;
             this.mainConfig = mainConfig;
-
             this.variableAddressColumn = new();
+
             this.TabConfig = new();
+            GenUtils.CopyJsonFieldsAndProperties(MainForm.Settings.PresetIOTabConfiguration, this.TabConfig);
+
             this.Previewer = new();
 
             IOGenPlaceholderHandler placeholdersHandler = new(this.Previewer, this.mainConfig, TabConfig);

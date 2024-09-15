@@ -1,5 +1,6 @@
 ﻿using TiaUtilities.Generation.Configuration.Utility;
 using TiaUtilities.Languages;
+using TiaXmlReader;
 using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation.Configuration;
 
@@ -30,7 +31,8 @@ namespace TiaUtilities.Generation.GenModules.Alarm
                 var button = this.fcConfigButton;
                 button.Click += (sender, args) =>
                 {
-                    var configForm = new ConfigForm(button.Text, mainConfig);
+                    var configForm = new ConfigForm(button.Text);
+                    configForm.SetConfiguration(mainConfig, MainForm.Settings.PresetAlarmMainConfiguration);
 
                     var mainGroup = configForm.Init().ControlWidth(185);
                     mainGroup.AddTextBox().Label(Locale.GENERICS_NAME)
@@ -47,7 +49,8 @@ namespace TiaUtilities.Generation.GenModules.Alarm
                 var button = this.segmentNameConfigButton;
                 button.Click += (sender, args) =>
                 {
-                    var configForm = new ConfigForm(button.Text, mainConfig) { ControlWidth = 500 };
+                    var configForm = new ConfigForm(button.Text) { ControlWidth = 500 };
+                    configForm.SetConfiguration(mainConfig, MainForm.Settings.PresetAlarmMainConfiguration);
 
                     var mainGroup = configForm.Init();
                     mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_SEGMENT_NAME_ONE_EACH)
@@ -70,7 +73,8 @@ namespace TiaUtilities.Generation.GenModules.Alarm
                 var button = this.textListConfigButton;
                 button.Click += (sender, args) =>
                 {
-                    var configForm = new ConfigForm(button.Text, mainConfig);
+                    var configForm = new ConfigForm(button.Text);
+                    configForm.SetConfiguration(mainConfig, MainForm.Settings.PresetAlarmMainConfiguration);
 
                     var mainGroup = configForm.Init();
                     mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_TEXT_LIST_FULL)

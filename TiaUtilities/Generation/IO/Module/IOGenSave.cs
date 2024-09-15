@@ -10,7 +10,7 @@ namespace TiaUtilities.Generation.IO.Module
     public class IOGenSave
     {
         [JsonProperty] public IOMainConfiguration MainConfig { get; set; } = new();
-        [JsonProperty] public IOGenExcelImportConfiguration ExcelImportConfiguration { get; set; } = new();
+        [JsonProperty] public IOExcelImportConfiguration ExcelImportConfiguration { get; set; } = new();
 
         [JsonProperty] public GridScriptContainer.ContainerSave ScriptContainer { get; set; } = new();
 

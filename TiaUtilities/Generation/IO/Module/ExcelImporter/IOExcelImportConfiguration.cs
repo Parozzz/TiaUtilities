@@ -4,7 +4,7 @@ using TiaXmlReader.GenerationForms;
 
 namespace TiaUtilities.Generation.IO.Module.ExcelImporter
 {
-    public class IOGenExcelImportConfiguration : ObservableConfiguration, IGenerationConfiguration
+    public class IOExcelImportConfiguration : ObservableConfiguration, IGenerationConfiguration
     {
         [JsonProperty] public string AddressCellConfig { get => this.GetAs<string>(); set => this.Set(value); }
         [JsonProperty] public string IONameCellConfig { get => this.GetAs<string>(); set => this.Set(value); }
@@ -12,7 +12,7 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
         [JsonProperty] public uint StartingRow { get => this.GetAs<uint>(); set => this.Set(value); }
         [JsonProperty] public string IgnoreRowExpressionConfig { get => this.GetAs<string>(); set => this.Set(value); }
 
-        public IOGenExcelImportConfiguration()
+        public IOExcelImportConfiguration()
         {
             this.AddressCellConfig = "$A";
             this.IONameCellConfig = "$A";
