@@ -48,7 +48,7 @@ namespace TiaUtilities.Generation.Alarms.Module
 
             form.Shown += (sender, args) =>
             {
-                if(this.control.tabControl.TabPages.Count == 0)
+                if(this.control.tabControl.TabCount == 0)
                 { //Check required because Load could be called before form is shown!
                     TabPage tabPage = new();
                     TabCreation(tabPage);

@@ -208,8 +208,7 @@ namespace TiaUtilities.Generation.IO.Module
             form.Shown += (sender, args) =>
             {
                 suggestionGridHandler.DataGridView.AutoResizeColumnHeadersHeight();
-
-                if (this.control.gridsTabControl.TabPages.Count == 0)
+                if (this.control.gridsTabControl.TabCount == 0)
                 { //Check required because Load could be called before form is shown!
                     TabPage tabPage = new();
                     TabCreation(tabPage);

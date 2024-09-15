@@ -22,6 +22,14 @@ namespace TiaUtilities.CustomControls
 
         private bool tabClosed;
 
+        public new int TabCount
+        {
+            get
+            {//This is to avoid keeping count of the InteractableNewTabPage
+                return base.TabCount > 0 ? base.TabCount - 1 : 0;
+            }
+        }
+
         public InteractableTabControl() : base()
         {
             this.DrawMode = TabDrawMode.OwnerDrawFixed;
@@ -46,7 +54,7 @@ namespace TiaUtilities.CustomControls
 
             this.ControlAdded += (sender, args) =>
             {
-                if (this.TabPages.IndexOf(this.newTabPage) != this.TabCount - 1)
+                if (this.TabPages.IndexOf(this.newTabPage) != base.TabCount - 1)
                 {
                     this.TabPages.Remove(this.newTabPage);
                     this.TabPages.Add(this.newTabPage);
@@ -152,7 +160,7 @@ namespace TiaUtilities.CustomControls
 
         private int GetLocationTabRectIndex(Point p)
         {
-            for (int i = 0; i < TabCount; i++)
+            for (int i = 0; i < base.TabCount; i++)
             {
                 var tabRect = this.GetTabRect(i);
                 if (tabRect.Contains(p))

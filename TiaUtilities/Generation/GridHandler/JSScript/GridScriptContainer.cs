@@ -7,13 +7,13 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
     {
         public class ContainerSave
         {
-            [JsonProperty] public Dictionary<string, string> Scripts { get; set; } = [];
+            [JsonProperty] public List<ScriptInfo> Scripts { get; set; } = [];
         }
 
         public class ScriptInfo() : ICleanable
         {
             private string _name = "JS_SCRIPT";
-            public string Name
+            [JsonProperty] public string Name
             {
                 get => _name;
                 set
@@ -24,7 +24,7 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
             }
 
             private string _text = string.Empty;
-            public string Text
+            [JsonProperty] public string Text
             {
                 get => _text;
                 set
@@ -50,7 +50,7 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
             ContainerSave save = new();
             foreach (var scriptInfo in this.scriptInfoList)
             {
-                save.Scripts.Add(scriptInfo.Name, scriptInfo.Text);
+                save.Scripts.Add(scriptInfo);
             }
             return save;
         }
@@ -58,16 +58,7 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
         public void LoadSave(ContainerSave save)
         {
             this.scriptInfoList.Clear();
-
-            foreach (var entry in save.Scripts)
-            {
-                var name = entry.Key;
-                var value = entry.Value;
-
-                var scriptInfo = this.AddScript();
-                scriptInfo.Name = name;
-                scriptInfo.Text = value;
-            }
+            scriptInfoList.AddRange(save.Scripts);
         }
 
         public ScriptInfo AddScript()
