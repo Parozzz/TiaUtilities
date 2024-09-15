@@ -43,8 +43,8 @@ namespace TiaUtilities.Generation.GenModules
 
                 if (result == InformationBoxResult.Yes)
                 {
+                    this.ModuleSave(force: true);
                     this.module.Wash();
-                    this.ModuleSave();
                 }
                 else if (result == InformationBoxResult.Cancel)
                 {
