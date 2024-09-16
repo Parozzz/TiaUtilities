@@ -503,7 +503,10 @@ for row validation</value>
     <value>Import Excel</value>
   </data>
   <data name="IO_GEN_FORM_IMPEXP_IMPORT_SUGGESTION" xml:space="preserve">
-    <value>Import Suggestions From DB/Tags</value>
+    <value>Import Suggestions From DB or Tag table</value>
+  </data>
+  <data name="IO_GEN_FORM_IMPEXP_IMPORT_IO" xml:space="preserve">
+    <value>Import IO from Tag table</value>
   </data>
   <data name="IO_SUGGESTION_DATA_VALUE" xml:space="preserve">
     <value>Prompt</value>

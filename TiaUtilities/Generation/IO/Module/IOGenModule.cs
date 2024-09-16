@@ -15,6 +15,8 @@ using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Generation.IO;
 using TiaXmlReader.Javascript;
+using TiaXmlReader.Languages;
+using TiaXmlReader.Utility.Extensions;
 
 namespace TiaUtilities.Generation.IO.Module
 {
@@ -105,7 +107,6 @@ namespace TiaUtilities.Generation.IO.Module
                     EnsurePathExists = true,
                     EnsureValidNames = true,
                     Multiselect = true,
-                    InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
                     DefaultExtension = ".xml",
                     Filters = { new CommonFileDialogFilter("XML Files", "*.xml") }
                 };
@@ -116,8 +117,6 @@ namespace TiaUtilities.Generation.IO.Module
 
                     foreach (var filePath in fileDialog.FileNames)
                     {
-                        var extension = Path.GetExtension(filePath);
-
                         var xmlNodeConfiguration = SimaticMLAPI.ParseFile(filePath);
                         if (xmlNodeConfiguration is BlockGlobalDB globalDB)
                         {
@@ -135,12 +134,77 @@ namespace TiaUtilities.Generation.IO.Module
                         {
                             InformationBox.Show("The selected block is NOT a GlobalDB or file is invalid.", "Invalid imported xml", icon: InformationBoxIcon.Exclamation);
                         }
-
-                        UpdateSuggestionColors();
                     }
+
+                    this.UpdateSuggestionColors();
                 }
             };
             form.importExportMenuItem.DropDownItems.Add(importSuggestionsMenuItem);
+
+            ToolStripMenuItem importAddressMenuItem = new(Locale.IO_GEN_FORM_IMPEXP_IMPORT_IO);
+            importAddressMenuItem.Click += (sender, args) =>
+            {
+                if (this.control.gridsTabControl.SelectedTab?.Tag is not IOGenTab ioTab)
+                {
+                    return;
+                }
+
+                var fileDialog = new CommonOpenFileDialog
+                {
+                    IsFolderPicker = false,
+                    EnsurePathExists = true,
+                    EnsureValidNames = true,
+                    Multiselect = true,
+                    DefaultExtension = ".xml",
+                    Filters = { new CommonFileDialogFilter("XML Files", "*.xml") }
+                };
+
+                if (fileDialog.ShowDialog() != CommonFileDialogResult.Ok)
+                {
+                    return;
+                }
+
+                foreach (var filePath in fileDialog.FileNames)
+                {
+                    var xmlNodeConfiguration = SimaticMLAPI.ParseFile(filePath);
+                    if (xmlNodeConfiguration is XMLTagTable tagTable)
+                    {
+                        var tags = tagTable.GetTags().Values;
+
+                        var emptyIndexList = ioTab.GridHandler.DataSource.GetFirstEmptyRowIndexes(tags.Count);
+
+                        List<GridCellChange> cellChangeList = [];
+
+                        int i = 0;
+                        foreach (var tag in tagTable.GetTags().Values)
+                        {
+                            if (i >= emptyIndexList.Count)
+                            {
+                                break;
+                            }
+
+                            var index = emptyIndexList[i++];
+
+                            var address = tag.GetLogicalAddress().Replace("%", "");
+                            var ioName = tag.TagName;
+                            var comment = tag.Comment[LocaleVariables.CULTURE] ?? tag.Comment.GetDictionary().Values.FirstOrElse(() => "");
+
+                            cellChangeList.AddRange(
+                                ioTab.GridHandler.DataHandler.CreateCellChanges(index, new() { Address = address, IOName = ioName, Comment = comment })
+                            );
+                        }
+
+                        ioTab.GridHandler.ChangeCells(cellChangeList);
+                    }
+                    else
+                    {
+                        InformationBox.Show("The selected block is NOT a Tag Table or file is invalid.", "Invalid imported xml", icon: InformationBoxIcon.Exclamation);
+                    }
+                }
+
+                this.UpdateSuggestionColors();
+            };
+            form.importExportMenuItem.DropDownItems.Add(importAddressMenuItem);
             #endregion
 
             #region DRAG

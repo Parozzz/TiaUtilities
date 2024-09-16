@@ -529,4 +529,7 @@ validità riga</value>
   <data name="GENERICS_CANCEL" xml:space="preserve">
     <value>Cancella</value>
   </data>
+  <data name="IO_GEN_FORM_IMPEXP_IMPORT_IO" xml:space="preserve">
+    <value>Importa IO da Tabella</value>
+  </data>
 </root>

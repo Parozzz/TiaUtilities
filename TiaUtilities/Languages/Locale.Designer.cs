@@ -1205,7 +1205,16 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Import Suggestions From DB/Tags.
+        ///   Cerca una stringa localizzata simile a Import IO from Tag table.
+        /// </summary>
+        internal static string IO_GEN_FORM_IMPEXP_IMPORT_IO {
+            get {
+                return ResourceManager.GetString("IO_GEN_FORM_IMPEXP_IMPORT_IO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Import Suggestions From DB or Tag table.
         /// </summary>
         internal static string IO_GEN_FORM_IMPEXP_IMPORT_SUGGESTION {
             get {
