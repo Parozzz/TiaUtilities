@@ -42,8 +42,8 @@ namespace TiaUtilities.Generation.GridHandler
 
             findForm.ReplaceButton.Click += (sender, args) =>
             {
-                var replaceText = findForm.ReplaceTextBox.Text;
-                if ((gridHandler.FindData == null && !TryFindText(gridHandler, findForm)) || string.IsNullOrEmpty(replaceText))
+                var replaceText = findForm.ReplaceTextBox.Text ?? "";
+                if (gridHandler.FindData == null && !TryFindText(gridHandler, findForm))
                 {
                     return;
                 }
@@ -58,11 +58,7 @@ namespace TiaUtilities.Generation.GridHandler
 
             findForm.ReplaceAllButton.Click += (sender, args) =>
             {
-                var replaceText = findForm.ReplaceTextBox.Text;
-                if (string.IsNullOrEmpty(replaceText))
-                {
-                    return;
-                }
+                var replaceText = findForm.ReplaceTextBox.Text ?? "";
 
                 gridHandler.FindData = null; //I want to search everything. So reset and start from the top.
 
