@@ -156,6 +156,26 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             };
             #endregion
 
+            #region JS_SCRIPT_EVENTS
+            this.alarmGridHandler.Events.ScriptShowVariable += (sender, args) =>
+            {
+                args.VariableList.Add("tabName [string]");
+            };
+            this.alarmGridHandler.Events.ScriptAddVariables += (sender, args) =>
+            {
+                args.VariableDict.Add("tabName", this.TabPage.Text);
+            };
+
+            this.deviceGridHandler.Events.ScriptShowVariable += (sender, args) =>
+            {
+                args.VariableList.Add("tabName [string]");
+            };
+            this.deviceGridHandler.Events.ScriptAddVariables += (sender, args) =>
+            {
+                args.VariableDict.Add("tabName", this.TabPage.Text);
+            };
+            #endregion
+
             #region DIRTY
             this.TabPage.TextChanged += (sender, args) => this.dirty = true;
             #endregion

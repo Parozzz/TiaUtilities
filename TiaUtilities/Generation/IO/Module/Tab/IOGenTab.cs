@@ -169,8 +169,16 @@ namespace TiaUtilities.Generation.IO.Module.Tab
             #endregion
 
             #region JS_SCRIPT_EVENTS
-            GridHandler.Events.ScriptShowVariable += (sender, args) => args.VariableList.Add("suggestions [array]");
-            GridHandler.Events.ScriptAddVariables += (sender, args) => args.VariableDict.Add("suggestions", module.Suggestions.Select(s => s.Value).ToArray());
+            GridHandler.Events.ScriptShowVariable += (sender, args) =>
+            {
+                args.VariableList.Add("suggestions [array]");
+                args.VariableList.Add("tabName [string]");
+            };
+            GridHandler.Events.ScriptAddVariables += (sender, args) =>
+            {
+                args.VariableDict.Add("suggestions", module.Suggestions.Select(s => s.Value).ToArray());
+                args.VariableDict.Add("tabName", this.TabPage.Text);
+            };
             #endregion
 
             #region DIRTY
