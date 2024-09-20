@@ -18,6 +18,7 @@ namespace TiaUtilities.Generation.IO.Module.Tab
         private const int MERKER_ADDRESS_COLUMN_SIZE = 80;
 
         private readonly IOGenModule module;
+        private readonly GridScript gridScript;
 
         private readonly IOMainConfiguration mainConfig;
         private readonly SuggestionTextBoxColumn variableAddressColumn;
@@ -33,11 +34,12 @@ namespace TiaUtilities.Generation.IO.Module.Tab
 
         private bool dirty = false;
 
-        public IOGenTab(JavascriptErrorReportThread jsErrorHandlingThread, GridSettings gridSettings, GridScriptContainer scriptContainer,
-                IOGenModule module, TabPage tabPage, IOMainConfiguration mainConfig)
+        public IOGenTab(GridSettings gridSettings, GridScript gridScript, IOGenModule module, TabPage tabPage, IOMainConfiguration mainConfig)
         {
             this.module = module;
+            this.gridScript = gridScript;
             this.TabPage = tabPage;
+
             this.mainConfig = mainConfig;
             this.variableAddressColumn = new();
 
@@ -47,7 +49,7 @@ namespace TiaUtilities.Generation.IO.Module.Tab
             this.Previewer = new();
 
             IOGenPlaceholderHandler placeholdersHandler = new(this.Previewer, this.mainConfig, TabConfig);
-            this.GridHandler = new(jsErrorHandlingThread, gridSettings, scriptContainer, this.Previewer, placeholdersHandler, new IOGenComparer()) { RowCount = 2999 };
+            this.GridHandler = new(gridSettings, gridScript, this.Previewer, placeholdersHandler, new IOGenComparer()) { RowCount = 2999 };
 
             this.TabControl = new(this.GridHandler.DataGridView);
         }
@@ -168,22 +170,19 @@ namespace TiaUtilities.Generation.IO.Module.Tab
             };
             #endregion
 
-            #region JS_SCRIPT_EVENTS
-            GridHandler.Events.ScriptShowVariable += (sender, args) =>
-            {
-                args.VariableList.Add("suggestions [array]");
-                args.VariableList.Add("tabName [string]");
-            };
-            GridHandler.Events.ScriptAddVariables += (sender, args) =>
-            {
-                args.VariableDict.Add("suggestions", module.Suggestions.Select(s => s.Value).ToArray());
-                args.VariableDict.Add("tabName", this.TabPage.Text);
-            };
+            #region GRID_SCRIPT_CUSTOM_VARIABLES
+            this.GridHandler.ScriptVariableList.Add(GridScriptVariable.ReadOnlyValue("tabName", () => this.TabPage.Text));
+            this.GridHandler.ScriptVariableList.Add(GridScriptVariable.ReadOnlyValue("suggestions", () => this.module.Suggestions.Select(s => s.Value).ToArray()));
             #endregion
 
             #region DIRTY
             this.TabPage.TextChanged += (sender, args) => dirty = true;
             #endregion
+        }
+
+        public void Selected()
+        {
+            this.gridScript.BindHandler(this.GridHandler);
         }
 
         public bool IsDirty() => this.dirty || TabConfig.IsDirty() || GridHandler.IsDirty();

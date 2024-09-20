@@ -1,9 +1,11 @@
-﻿namespace TiaXmlReader.Generation.Configuration
+﻿using TiaUtilities.Configuration;
+
+namespace TiaXmlReader.Generation.Configuration
 {
     public abstract class ConfigLine<LINE> : IConfigLine where LINE : ConfigLine<LINE>
     {
         private bool labelOnTop = false;
-        private string? labelText = null;
+        private ObservableObject<string?> labelText = new(null);
         private Font? labelFont = null;
 
         private int height = 0; // 0 = means use standard value in ConfigForm
@@ -19,7 +21,7 @@
 
         public LINE Label(string labelText)
         {
-            this.labelText = labelText;
+            this.labelText.Value = labelText;
             return (LINE)this;
         }
 
@@ -52,7 +54,7 @@
             return (LINE)this;
         }
 
-        public string? GetLabelText()
+        public ObservableObject<string?> GetLabelText()
         {
             return labelText;
         }

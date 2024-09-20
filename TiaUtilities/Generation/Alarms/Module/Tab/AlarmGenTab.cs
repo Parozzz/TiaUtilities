@@ -16,6 +16,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
         private static readonly string[] ALARM_COIL_TYPE_ITEMS = [AlarmCoilType.NONE.ToString(), AlarmCoilType.SET.ToString(), AlarmCoilType.RESET.ToString(), AlarmCoilType.COIL.ToString()];
 
         private readonly AlarmGenModule module;
+        private readonly GridScript gridScript;
 
         public TabPage TabPage { get; init; }
         public AlarmTabConfiguration TabConfig { get; init; }
@@ -31,10 +32,11 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
 
         private bool dirty = false;
 
-        public AlarmGenTab(JavascriptErrorReportThread jsErrorHandlingThread, GridSettings gridSettings, GridScriptContainer scriptContainer, AlarmGenModule module, AlarmMainConfiguration mainConfig, TabPage tabPage)
+        public AlarmGenTab(GridSettings gridSettings, GridScript gridScript, AlarmGenModule module, AlarmMainConfiguration mainConfig, TabPage tabPage)
         {
             this.module = module;
-            TabPage = tabPage;
+            this.gridScript = gridScript;
+            this.TabPage = tabPage;
 
             this.TabConfig = new();
             GenUtils.CopyJsonFieldsAndProperties(MainForm.Settings.PresetAlarmTabConfiguration, this.TabConfig);
@@ -42,8 +44,8 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             this.AlarmDataPreview = new();
 
             AlarmGenPlaceholdersHandler placeholdersHandler = new(mainConfig, this.TabConfig);
-            deviceGridHandler = new(jsErrorHandlingThread, gridSettings, scriptContainer, this.DeviceDataPreview, placeholdersHandler) { RowCount = 499 };
-            alarmGridHandler = new(jsErrorHandlingThread, gridSettings, scriptContainer, this.AlarmDataPreview, placeholdersHandler) { RowCount = 199 };
+            deviceGridHandler = new(gridSettings, gridScript, this.DeviceDataPreview, placeholdersHandler) { RowCount = 499 };
+            alarmGridHandler = new(gridSettings, gridScript, this.AlarmDataPreview, placeholdersHandler) { RowCount = 199 };
 
             TabControl = new(deviceGridHandler.DataGridView, alarmGridHandler.DataGridView);
         }
@@ -156,24 +158,9 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             };
             #endregion
 
-            #region JS_SCRIPT_EVENTS
-            this.alarmGridHandler.Events.ScriptShowVariable += (sender, args) =>
-            {
-                args.VariableList.Add("tabName [string]");
-            };
-            this.alarmGridHandler.Events.ScriptAddVariables += (sender, args) =>
-            {
-                args.VariableDict.Add("tabName", this.TabPage.Text);
-            };
-
-            this.deviceGridHandler.Events.ScriptShowVariable += (sender, args) =>
-            {
-                args.VariableList.Add("tabName [string]");
-            };
-            this.deviceGridHandler.Events.ScriptAddVariables += (sender, args) =>
-            {
-                args.VariableDict.Add("tabName", this.TabPage.Text);
-            };
+            #region GRID_SCRIPT_CUSTOM_VARIABLES
+            this.alarmGridHandler.ScriptVariableList.Add(GridScriptVariable.ReadOnlyValue("tabName", () => this.TabPage.Text));
+            this.deviceGridHandler.ScriptVariableList.Add(GridScriptVariable.ReadOnlyValue("tabName", () => this.TabPage.Text));
             #endregion
 
             #region DIRTY
@@ -184,6 +171,11 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             deviceGridHandler.DataGridView.AutoResizeColumnHeadersHeight();
 
             Translate();
+        }
+
+        public void Selected()
+        {
+            this.gridScript.BindHandler(this.alarmGridHandler);
         }
 
         private void Translate()

@@ -7,9 +7,6 @@ namespace TiaXmlReader.Generation.GridHandler.Events
     {
         public event GridCellChangeEventHandler CellChange = delegate { };
 
-        public event GridScriptShowVariableEventHandler ScriptShowVariable = delegate { };
-        public event GridScriptAddVariableEventHandler ScriptAddVariables = delegate { };
-
         public event GridPreSortEventHandler PreSort = delegate { };
         public event GridPostSortEventHandler PostSort = delegate { };
 
@@ -19,16 +16,6 @@ namespace TiaXmlReader.Generation.GridHandler.Events
         public void CellChangeEvent(object? sender, GridCellChangeEventArgs args)
         {
             CellChange(sender, args);
-        }
-
-        public void ScriptShowVariableEvent(object? sender, GridScriptShowVariableEventArgs args)
-        {
-            ScriptShowVariable(sender, args);
-        }
-
-        public void ScriptAddVariablesEvent(object? sender, GridScriptAddVariableEventArgs args)
-        {
-            ScriptAddVariables(sender, args);
         }
 
         public void PreSortEvent(object? sender, GridPreSortEventArgs args)

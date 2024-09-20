@@ -25,13 +25,12 @@ namespace TiaUtilities.Generation.GenModules.IO.ExcelImporter
 
         public IEnumerable<IOGenExcelImportData> ImportDataEnumerable { get => gridHandler.DataSource.GetNotEmptyDataDict().Keys; }
 
-        public IOGenerationExcelImportForm(JavascriptErrorReportThread jsErrorHandlingThread, GridSettings gridSettings, GridScriptContainer scriptContainer,
-                    IOExcelImportConfiguration configuration)
+        public IOGenerationExcelImportForm(GridSettings gridSettings, GridScript gridScript, IOExcelImportConfiguration configuration)
         {
             InitializeComponent();
 
             this.importConfig = configuration;
-            this.gridHandler = new(jsErrorHandlingThread, gridSettings, scriptContainer, new(), new()) { RowCount = 1999 };
+            this.gridHandler = new(gridSettings, gridScript, new(), new()) { RowCount = 1999 };
 
             Init();
         }

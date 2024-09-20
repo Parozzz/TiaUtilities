@@ -26,8 +26,7 @@ namespace TiaUtilities.Generation.IO.Module
 
         public ICollection<IOSuggestionData> Suggestions { get => suggestionGridHandler.DataSource.GetNotEmptyDataDict().Keys; }
 
-        private readonly JavascriptErrorReportThread jsErrorHandlingThread;
-        private readonly GridScriptContainer scriptContainer;
+        private readonly GridScript gridScript;
 
         private readonly IOMainConfiguration mainConfig;
         private readonly IOExcelImportConfiguration excelImportConfig;
@@ -41,8 +40,7 @@ namespace TiaUtilities.Generation.IO.Module
 
         public IOGenModule(JavascriptErrorReportThread jsErrorHandlingThread)
         {
-            this.jsErrorHandlingThread = jsErrorHandlingThread;
-            this.scriptContainer = new();
+            this.gridScript = new(jsErrorHandlingThread);
 
             this.mainConfig = new();
             GenUtils.CopyJsonFieldsAndProperties(MainForm.Settings.PresetIOMainConfiguration, this.mainConfig);
@@ -51,7 +49,7 @@ namespace TiaUtilities.Generation.IO.Module
             GenUtils.CopyJsonFieldsAndProperties(MainForm.Settings.PresetIOExcelImportConfiguration, this.excelImportConfig);
 
             this.suggestionPreviewer = new();
-            this.suggestionGridHandler = new(jsErrorHandlingThread, MainForm.Settings.GridSettings, scriptContainer, suggestionPreviewer, new()) { RowCount = 1999 };
+            this.suggestionGridHandler = new(MainForm.Settings.GridSettings, gridScript, suggestionPreviewer, new()) { RowCount = 1999 };
 
             this.control = new(suggestionGridHandler.DataGridView);
 
@@ -64,7 +62,7 @@ namespace TiaUtilities.Generation.IO.Module
             ToolStripMenuItem importExcelMenuItem = new(Locale.IO_GEN_FORM_IMPEXP_IMPORT_EXCEL);
             importExcelMenuItem.Click += (sender, args) =>
             {
-                IOGenerationExcelImportForm excelImportForm = new(this.jsErrorHandlingThread, MainForm.Settings.GridSettings, this.scriptContainer, this.excelImportConfig);
+                IOGenerationExcelImportForm excelImportForm = new(MainForm.Settings.GridSettings, this.gridScript, this.excelImportConfig);
 
                 var dialogResult = excelImportForm.ShowDialog();
                 if (dialogResult == DialogResult.OK)
@@ -216,11 +214,13 @@ namespace TiaUtilities.Generation.IO.Module
             suggestionGridHandler.AddTextBoxColumn(IOSuggestionData.VALUE, 0);
             #endregion
 
-            suggestionGridHandler.Init();
+            this.gridScript.Init();
+
+            this.suggestionGridHandler.Init();
             this.control.BindConfig(mainConfig);
 
             #region SUGGESTION_GRIDS_EVENTS
-            suggestionGridHandler.DataGridView.CellToolTipTextNeeded += (sender, args) =>
+            this.suggestionGridHandler.DataGridView.CellToolTipTextNeeded += (sender, args) =>
             {
                 if (args.RowIndex < 0 || args.RowIndex > suggestionGridHandler.RowCount)
                 {
@@ -259,7 +259,6 @@ namespace TiaUtilities.Generation.IO.Module
             #endregion
 
             this.control.gridsTabControl.TabPreAdded += (sender, args) => TabCreation(args.TabPage);
-
             this.control.gridsTabControl.TabPreRemoved += (sender, args) =>
             {
                 if (args.TabPage.Tag is IOGenTab ioGenTab)
@@ -267,7 +266,13 @@ namespace TiaUtilities.Generation.IO.Module
                     genTabList.Remove(ioGenTab);
                 }
             };
-
+            this.control.gridsTabControl.Selected += (sender, args) =>
+            {
+                if (args.TabPage?.Tag is IOGenTab tab)
+                {
+                    tab.Selected();
+                }
+            };
 
             form.Shown += (sender, args) =>
             {
@@ -285,7 +290,7 @@ namespace TiaUtilities.Generation.IO.Module
         {
             tabPage.Text = save?.Name ?? "IOGen";
 
-            IOGenTab ioGenTab = new(this.jsErrorHandlingThread, MainForm.Settings.GridSettings, this.scriptContainer, this, tabPage, this.mainConfig);
+            IOGenTab ioGenTab = new(MainForm.Settings.GridSettings, this.gridScript, this, tabPage, this.mainConfig);
             genTabList.Add(ioGenTab);
 
             ioGenTab.Init();
@@ -304,7 +309,7 @@ namespace TiaUtilities.Generation.IO.Module
             this.control.gridsTabControl.TabPages.Clear();
         }
 
-        public bool IsDirty() => mainConfig.IsDirty() || suggestionGridHandler.IsDirty() || genTabList.Any(x => x.IsDirty()) || this.scriptContainer.IsDirty();
+        public bool IsDirty() => mainConfig.IsDirty() || suggestionGridHandler.IsDirty() || genTabList.Any(x => x.IsDirty()) || this.gridScript.IsDirty();
         public void Wash()
         {
             this.mainConfig.Wash();
@@ -313,7 +318,7 @@ namespace TiaUtilities.Generation.IO.Module
             {
                 tab.Wash();
             }
-            this.scriptContainer.Wash();
+            this.gridScript.Wash();
         }
 
         public Control? GetControl()
@@ -339,8 +344,8 @@ namespace TiaUtilities.Generation.IO.Module
         {
             IOGenSave save = new()
             {
-                SuggestionGrid = suggestionGridHandler.CreateSave(),
-                ScriptContainer = scriptContainer.CreateSave()
+                SuggestionGrid = this.suggestionGridHandler.CreateSave(),
+                ScriptSave = this.gridScript.CreateSave()
             };
 
             GenUtils.CopyJsonFieldsAndProperties(mainConfig, save.MainConfig);
@@ -364,7 +369,7 @@ namespace TiaUtilities.Generation.IO.Module
 
             this.Clear();
 
-            scriptContainer.LoadSave(loadedSave.ScriptContainer);
+            this.gridScript.LoadSave(loadedSave.ScriptSave);
             suggestionGridHandler.LoadSave(loadedSave.SuggestionGrid);
 
             GenUtils.CopyJsonFieldsAndProperties(loadedSave.MainConfig, mainConfig);

@@ -826,15 +826,6 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Execute Debug.
-        /// </summary>
-        internal static string GRID_SCRIPT_EXECUTE_DEBUG {
-            get {
-                return ResourceManager.GetString("GRID_SCRIPT_EXECUTE_DEBUG", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Cerca una stringa localizzata simile a Execute on selected line.
         /// </summary>
         internal static string GRID_SCRIPT_EXECUTE_ONE_LINE {

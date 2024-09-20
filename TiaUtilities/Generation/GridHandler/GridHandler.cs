@@ -26,6 +26,7 @@ namespace TiaXmlReader.Generation.GridHandler
         }
 
         private readonly GridSettings settings;
+        private readonly GridScript gridScript;
 
         public GridEvents<T> Events { get; init; }
 
@@ -38,14 +39,16 @@ namespace TiaXmlReader.Generation.GridHandler
         public DataGridView DataGridView { get; init; }
         public GridDataHandler<T> DataHandler { get; init; }
         public GridDataSource<T> DataSource { get; init; }
-        public GridScript<T> Script { get; init; }
 
         public FindData<T>? FindData { get; set; }
 
         private readonly List<ColumnInfo> columnInfoList;
         private readonly List<IGridCellPainter> cellPainterList;
-        private bool init;
+        private readonly List<GridCellChange> cachedCellChangeList;
 
+        public List<GridScriptVariable> ScriptVariableList { get; init; }
+
+        private bool init;
         private bool dirty;
 
         public uint RowCount { get; set; } = 9;
@@ -54,12 +57,13 @@ namespace TiaXmlReader.Generation.GridHandler
         public bool EnableRowSelectionFromRowHeaderClick { get; set; } = true;
         public bool ShowJSContextMenuTopLeft { get; set; } = true;
 
-        public GridHandler(JavascriptErrorReportThread jsErrorThread, GridSettings settings, GridScriptContainer scriptContainer,
-                    GridDataPreviewer<T> previewer, GenPlaceholderHandler placeholderHandler, IGridRowComparer<T>? comparer = null)
+        public GridHandler(GridSettings settings, GridScript gridScript, GridDataPreviewer<T> previewer, GenPlaceholderHandler placeholderHandler, IGridRowComparer<T>? comparer = null)
         {
             this.DataGridView = new MyGrid();
 
             this.settings = settings;
+            this.gridScript = gridScript;
+
             this.Events = new();
 
             this.undoRedoHandler = new();
@@ -72,11 +76,11 @@ namespace TiaXmlReader.Generation.GridHandler
             this.previewer = previewer;
             this.placeholderHandler = placeholderHandler;
 
-            this.Script = new(this, jsErrorThread, scriptContainer);
-
-
             this.columnInfoList = [];
             this.cellPainterList = [];
+            this.cachedCellChangeList = [];
+
+            this.ScriptVariableList = [];
         }
 
         public void AddCellPainter(IGridCellPainter cellPainter)
@@ -179,7 +183,8 @@ namespace TiaXmlReader.Generation.GridHandler
                         GridFindForm.StartFind(this);
                         break;
                     case Keys.J | Keys.Control:
-                        this.Script.ShowConfigForm(this.DataGridView);
+                        this.gridScript.BindHandler(this);
+                        this.gridScript.ShowConfigForm(this.DataGridView);
                         break;
                     case Keys.Delete:
                         this.DeleteSelectedCells();
@@ -296,13 +301,24 @@ namespace TiaXmlReader.Generation.GridHandler
             };
             #endregion
 
-            #region SHOW_JS_CONTEXT_MENU
+            #region SCRIPT
+            foreach (var column in this.DataHandler.DataColumns)
+            {
+                var scriptVariable = GridScriptVariable.CreateFromGrid(column, this);
+                this.ScriptVariableList.Add(scriptVariable);
+            }
+
+            this.DataGridView.MouseClick += (sender, args) => this.gridScript.BindHandler(this);
             this.DataGridView.CellMouseClick += (sender, args) =>
             {
                 if (args.RowIndex == -1 && args.ColumnIndex == -1 && args.Button == MouseButtons.Right)
                 {
                     var menuItem = new ToolStripMenuItem { Text = Locale.GRID_SCRIPT_OPEN_JAVASCRIPT_CONTEXT };
-                    menuItem.Click += (s, a) => this.Script.ShowConfigForm(this.DataGridView);
+                    menuItem.Click += (s, a) =>
+                    {
+                        this.gridScript.BindHandler(this);
+                        this.gridScript.ShowConfigForm(this.DataGridView);
+                    };
 
                     var contextMenu = new ContextMenuStrip();
                     contextMenu.Items.Add(menuItem);
@@ -519,9 +535,25 @@ namespace TiaXmlReader.Generation.GridHandler
             this.ChangeCells(this.DataHandler.CreateCellChanges(dataDict));
         }
 
-        public void ChangeCell(GridCellChange cell, bool applyChanges = true)
+        public void AddCachedCellChange(GridCellChange cellChange)
         {
-            ChangeCells(Utils.SingletonList(cell), applyChanges);
+            this.cachedCellChangeList.Add(cellChange);
+        }
+
+        public void ExecuteCachedCellChange(bool applyChanges = true)
+        {
+            this.ChangeCells(this.cachedCellChangeList, applyChanges: applyChanges);
+            this.ClearCachedCellChange();
+        }
+
+        public void ClearCachedCellChange()
+        {
+            this.cachedCellChangeList.Clear();
+        }
+
+        public void ChangeCell(GridCellChange cellChange, bool applyChanges = true)
+        {
+            ChangeCells(Utils.SingletonList(cellChange), applyChanges);
         }
 
         public void ChangeCells(List<GridCellChange>? cellChangeList, bool applyChanges = true)
@@ -530,6 +562,9 @@ namespace TiaXmlReader.Generation.GridHandler
             {
                 return;
             }
+
+            //This is to avoid having a list that is reused passed here and would cause problems with undo / redo
+            var localCellChangeList = new List<GridCellChange>(cellChangeList);
 
             if (applyChanges)
             {
@@ -541,7 +576,7 @@ namespace TiaXmlReader.Generation.GridHandler
                 if (applyChanges)
                 {
                     this.undoRedoHandler.Lock();
-                    foreach (var cellChange in cellChangeList) //Accessing DataSource instead of changing value of cell is WAAAAY faster (From 3s to 22ms)
+                    foreach (var cellChange in localCellChangeList) //Accessing DataSource instead of changing value of cell is WAAAAY faster (From 3s to 22ms)
                     {
                         var data = this.DataSource[cellChange.RowIndex];
                         if (data == null)
@@ -569,8 +604,8 @@ namespace TiaXmlReader.Generation.GridHandler
                     this.undoRedoHandler.Unlock();
                 }
 
-                this.Events.CellChangeEvent(this.DataGridView, new() { CellChangeList = cellChangeList });
-                undoRedoHandler.AddUndo(() => UndoChangeCells(cellChangeList));
+                this.Events.CellChangeEvent(this.DataGridView, new() { CellChangeList = localCellChangeList });
+                undoRedoHandler.AddUndo(() => UndoChangeCells(localCellChangeList));
             }
             catch (Exception ex)
             {
@@ -687,11 +722,13 @@ namespace TiaXmlReader.Generation.GridHandler
 
         private void SelectCell(DataGridViewCell? cell)
         {
-            DataGridView.RefreshEdit(); //This is required to refresh checkbox otherwise, if the undo is in a selected cell, it will not update visually (DATA IS CHANGED!)
-            DataGridView.Refresh();
+            this.DataGridView.RefreshEdit(); //This is required to refresh checkbox otherwise, if the undo is in a selected cell, it will not update visually (DATA IS CHANGED!)
+            this.DataGridView.Refresh();
 
-            DataGridView.CurrentCell = cell; //Setting se current cell already center the grid to it.
-            DataGridView.Refresh();
+            this.DataGridView.ClearSelection();
+
+            this.DataGridView.CurrentCell = cell; //Setting se current cell already center the grid to it.
+            this.DataGridView.Refresh();
         }
 
     }

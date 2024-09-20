@@ -1,4 +1,6 @@
-﻿namespace TiaXmlReader.Generation.GridHandler
+﻿using TiaXmlReader.Generation.GridHandler.Data;
+
+namespace TiaXmlReader.Generation.GridHandler
 {
     public class GridCellChange(int columnIndex, int rowIndex)
     {
@@ -8,6 +10,8 @@
         public int ColumnIndex { get; private set; } = columnIndex;
 
         public GridCellChange(DataGridViewCell cell) : this(cell.ColumnIndex, cell.RowIndex) { }
+
+        public GridCellChange(GridDataColumn column, int rowIndex) : this(column.ColumnIndex, rowIndex) { }
 
         public bool IsOldValueEmptyString()
         {

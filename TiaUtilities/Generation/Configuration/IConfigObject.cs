@@ -1,4 +1,6 @@
-﻿namespace TiaXmlReader.Generation.Configuration
+﻿using TiaUtilities.Configuration;
+
+namespace TiaXmlReader.Generation.Configuration
 {
     public interface IConfigObject
     {
@@ -8,7 +10,7 @@
     public interface IConfigLine : IConfigObject
     {
         bool IsLabelOnTop();
-        string? GetLabelText();
+        ObservableObject<string?> GetLabelText();
         Font? GetLabelFont();
 
         int GetHeight();

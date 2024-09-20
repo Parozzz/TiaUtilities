@@ -46,14 +46,35 @@ namespace TiaXmlReader.Generation.GridHandler.Data
         public PropertyInfo PropertyInfo { get; init; } = propertyInfo;
         public string ProgrammingFriendlyName { get; init; } = programmingFriendlyName;
 
-        public V? GetValueFrom<V>(object obj)
+        public V? GetValueFrom<V>(IGridData? gridData)
         {
-            return obj != null && PropertyInfo.DeclaringType == obj.GetType() && PropertyInfo.GetValue(obj) is V value ? value : default;
+            if(gridData == null || PropertyInfo.DeclaringType != gridData.GetType())
+            {
+                return default;
+            }
+
+            var propertyValue = PropertyInfo.GetValue(gridData);
+            if (propertyValue is not V value)
+            {
+                return default;
+            }
+
+            return value;
         }
 
-        public void SetValueTo(object obj, object? value)
+        public object? GetValueFrom(IGridData gridData)
         {
-            if (obj == null || PropertyInfo.DeclaringType != obj.GetType())
+            if (gridData == null || PropertyInfo.DeclaringType != gridData.GetType())
+            {
+                return default;
+            }
+
+            return PropertyInfo.GetValue(gridData);
+        }
+
+        public void SetValueTo(IGridData gridData, object? value)
+        {
+            if (gridData == null || PropertyInfo.DeclaringType != gridData.GetType())
             {
                 return;
             }
@@ -62,12 +83,12 @@ namespace TiaXmlReader.Generation.GridHandler.Data
             {
                 if (!PropertyInfo.PropertyType.IsPrimitive)
                 {
-                    PropertyInfo.SetValue(obj, value);
+                    PropertyInfo.SetValue(gridData, value);
                 }
             }
             else if (value.GetType() == PropertyInfo.PropertyType)
             {
-                PropertyInfo.SetValue(obj, value);
+                PropertyInfo.SetValue(gridData, value);
             }
         }
 

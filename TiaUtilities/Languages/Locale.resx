@@ -367,9 +367,6 @@ for row validation</value>
   <data name="GRID_SCRIPT_VARIABLES" xml:space="preserve">
     <value>Variables: </value>
   </data>
-  <data name="GRID_SCRIPT_EXECUTE_DEBUG" xml:space="preserve">
-    <value>Execute Debug</value>
-  </data>
   <data name="GRID_SCRIPT_EXECUTE_ONE_LINE" xml:space="preserve">
     <value>Execute on selected line</value>
   </data>

@@ -333,9 +333,6 @@
   <data name="GRID_SCRIPT_VARIABLES" xml:space="preserve">
     <value>Variabili: </value>
   </data>
-  <data name="GRID_SCRIPT_EXECUTE_DEBUG" xml:space="preserve">
-    <value>Esegui in debug</value>
-  </data>
   <data name="GRID_SCRIPT_EXECUTE_ONE_LINE" xml:space="preserve">
     <value>Esegui su riga selezionata</value>
   </data>

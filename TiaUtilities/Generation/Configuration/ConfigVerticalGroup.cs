@@ -43,7 +43,7 @@ namespace TiaUtilities.Generation.Configuration
         {
             if (configObjectList.Count == 1)
             {
-                var control = this.ParseConfigObject(this.configObjectList[0]);
+                var control = this.CreateConfigObjectPanel(this.configObjectList[0]);
                 if (control != null)
                 {
                     return CreateSingleControlPanel(control);
@@ -51,9 +51,9 @@ namespace TiaUtilities.Generation.Configuration
             }
             else if (configObjectList.Count >= 2)
             {
-                var controlLeft = this.ParseConfigObject(this.configObjectList[0], insidedSplitContainer: true);
-                var controlRight = this.ParseConfigObject(this.configObjectList[1], insidedSplitContainer: true);
-                if (controlLeft != null && controlRight != null)
+                var panelLeft = this.CreateConfigObjectPanel(this.configObjectList[0], insidedSplitContainer: true);
+                var panelRight = this.CreateConfigObjectPanel(this.configObjectList[1], insidedSplitContainer: true);
+                if (panelLeft != null && panelRight != null)
                 {
                     var splitContainer = new SplitContainer()
                     {
@@ -70,25 +70,25 @@ namespace TiaUtilities.Generation.Configuration
                     }
                     splitContainer.Paint += (sender, args) => ControlPaint.DrawBorder(args.Graphics, Rectangle.Inflate(args.ClipRectangle, -2, -2), Color.DarkGray, ButtonBorderStyle.Solid);
 
-                    splitContainer.Panel1.Controls.Add(controlLeft);
-                    splitContainer.Panel2.Controls.Add(controlRight);
+                    splitContainer.Panel1.Controls.Add(panelLeft);
+                    splitContainer.Panel2.Controls.Add(panelRight);
 
                     return splitContainer;
                 }
-                else if (controlLeft != null)
+                else if (panelLeft != null)
                 {
-                    return CreateSingleControlPanel(controlLeft);
+                    return CreateSingleControlPanel(panelLeft);
                 }
-                else if (controlRight != null)
+                else if (panelRight != null)
                 {
-                    return CreateSingleControlPanel(controlRight);
+                    return CreateSingleControlPanel(panelRight);
                 }
             }
 
             return null;
         }
 
-        private TableLayoutPanel CreateSingleControlPanel(Control control)
+        private static TableLayoutPanel CreateSingleControlPanel(Control control)
         {
             var mainPanel = new TableLayoutPanel()
             {
@@ -107,7 +107,7 @@ namespace TiaUtilities.Generation.Configuration
             return mainPanel;
         }
 
-        private Control? ParseConfigObject(IConfigObject configObject, bool insidedSplitContainer = false)
+        private TableLayoutPanel? CreateConfigObjectPanel(IConfigObject configObject, bool insidedSplitContainer = false)
         {
             if (configObject is IConfigLine line)
             {
@@ -122,7 +122,7 @@ namespace TiaUtilities.Generation.Configuration
                     RowStyles = { new RowStyle(SizeType.Percent, 50f) },
                 };
 
-                var labelText = line.GetLabelText();
+                var labelText = line.GetLabelText().Value;
                 if (labelText != null)
                 {
                     linePanel.ColumnCount++;
@@ -131,14 +131,16 @@ namespace TiaUtilities.Generation.Configuration
                     var label = new Label
                     {
                         TextAlign = ContentAlignment.MiddleCenter,
-                        Text = line.GetLabelText(),
+                        Text = labelText,
                         AutoSize = true,
                         Dock = DockStyle.Fill,
                         Padding = new Padding(0),
                         Margin = new Padding(2),
                         Font = line.GetLabelFont() ?? this.configForm.LabelFont,
                     };
+                    line.GetLabelText().Changed += (sender, args) => label.Text = args.NewValue;
                     linePanel.Controls.Add(label);
+
                     //Needs height otherwise will not show! AutoSize won't work alone.
                     var textSize = TextRenderer.MeasureText(label.Text, this.configForm.LabelFont);
                     linePanel.RowStyles[0].SizeType = SizeType.Absolute;

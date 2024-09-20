@@ -2,7 +2,7 @@
 
 namespace TiaXmlReader.Utility
 {
-    public class ScriptTimer
+    public class ScriptTimeLogger
     {
         private class TimeInfo
         {
@@ -12,7 +12,7 @@ namespace TiaXmlReader.Utility
         private readonly List<TimeInfo> scriptTimeInfoList;
         private readonly Stopwatch stopwatch;
         private int executions = 0;
-        public ScriptTimer()
+        public ScriptTimeLogger()
         {
             this.scriptTimeInfoList = new List<TimeInfo>();
             this.stopwatch = new Stopwatch();

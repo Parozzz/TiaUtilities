@@ -1,9 +1,9 @@
 ﻿using Acornima.Ast;
 using Jint;
+using System.Collections.ObjectModel;
 using TiaUtilities.Generation.Configuration;
 using TiaUtilities.Generation.Configuration.Lines;
 using TiaUtilities.Generation.Configuration.Utility;
-using TiaUtilities.Generation.GridHandler.Events;
 using TiaUtilities.Languages;
 using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Generation.GridHandler;
@@ -14,60 +14,70 @@ using TiaXmlReader.Utility.Extensions;
 
 namespace TiaUtilities.Generation.GridHandler.JSScript
 {
-    public class GridScript<T>(GridHandler<T> gridHandler, JavascriptErrorReportThread jsErrorThread, GridScriptContainer scriptContainer) where T : IGridData
+    public class GridScript : ICleanable
     {
-        private record TabPageScriptRecord(GridScriptContainer.ScriptInfo ScriptInfo, JavascriptEditor JavascriptEditor);
+        private record TabPageScriptRecord(ScriptInfo ScriptInfo, JavascriptEditor JavascriptEditor);
 
         private const string ENGINE_LOG_FUNCTION = "log";
         private const string ENGINE_ROW_VARIABLE = "row";
 
-        private ConfigTextBoxLine? logTextBoxLine;
-        private ConfigJSONLine? jsonLine;
+        private readonly JavascriptErrorReportThread jsErrorThread;
+
+        private readonly List<ScriptInfo> scriptInfoList;
+        private readonly ObservableCollection<GridScriptVariable> gridVariableList;
+        private readonly ObservableCollection<GridScriptVariable> customVariableList;
+
+        private readonly ConfigForm configForm;
+        private readonly ConfigLabelLine labelTopLine;
+        private readonly ConfigTextBoxLine logTextBoxLine;
+        private readonly ConfigJSONLine jsonLine;
+        private readonly ConfigInteractableTabLine tabLine;
 
         private TabPageScriptRecord? record;
+        private GridScriptHandlerBind? bind;
 
-        private int singleExecutionLastRow = -1;
-
-        public void ShowConfigForm(IWin32Window window)
+        public GridScript(JavascriptErrorReportThread jsErrorThread)
         {
-            var configForm = new ConfigForm(Locale.GRID_SCRIPT_JS_EXPRESSION)
+            this.jsErrorThread = jsErrorThread;
+
+            this.scriptInfoList = [];
+            this.gridVariableList = [];
+            this.customVariableList = [];
+
+            this.configForm = new ConfigForm(Locale.GRID_SCRIPT_JS_EXPRESSION)
             {
-                ControlWidth = 750,
+                ControlWidth = 900,
                 CloseOnOutsideClick = false,
                 ShowControlBox = true,
                 CloseOnEnter = false,
             };
 
-            GridScriptShowVariableEventArgs showVariableEventArgs = new();
+            var variableNamesText = this.CreateVariableNamesText();
 
-            var variableList = showVariableEventArgs.VariableList;
-            variableList.AddRange(gridHandler.DataHandler.DataColumns.Select(c => c.ProgrammingFriendlyName + " [" + c.PropertyInfo.PropertyType.Name + "]"));
-            variableList.Add(ENGINE_ROW_VARIABLE + " [int]");
-
-            gridHandler.Events.ScriptShowVariableEvent(gridHandler.DataGridView, showVariableEventArgs);
-
-            var mainGroup = configForm.Init();
-            mainGroup.AddLabel()
-                .Label($"{Locale.GRID_SCRIPT_VARIABLES} {showVariableEventArgs.VariableList.Aggregate((a, b) => a + ", " + b)}")
+            var mainGroup = this.configForm.Init();
+            this.labelTopLine = mainGroup.AddLabel()
+                .Label($"{Locale.GRID_SCRIPT_VARIABLES} {variableNamesText}")
                 .LabelFont(ConfigStyle.LABEL_FONT.Copy(9f, FontStyle.Regular));
 
             var debugGroup = mainGroup.AddVerticalGroup().Height(150).SplitterDistance(95);
-            logTextBoxLine = debugGroup.AddTextBox()
-                .Label("Log > " + ENGINE_LOG_FUNCTION + "(string)").LabelFont(ConfigStyle.LABEL_FONT.Copy(9f, FontStyle.Regular)).LabelOnTop()
+            this.logTextBoxLine = debugGroup.AddTextBox()
+                .Label($"Log > {ENGINE_LOG_FUNCTION} [string]")
+                .LabelFont(ConfigStyle.LABEL_FONT.Copy(9f, FontStyle.Regular))
+                .LabelOnTop()
                 .Readonly().Multiline();
 
-            jsonLine = debugGroup.AddJSON().Readonly()
+            this.jsonLine = debugGroup.AddJSON().Readonly()
                 .Label(Locale.GRID_SCRIPT_JSON_CONTEXT)
                 .LabelFont(ConfigStyle.LABEL_FONT.Copy(9f, FontStyle.Regular))
                 .LabelOnTop();
 
-            var tabLine = mainGroup.AddInteractableTab()
-                .Height(500)
+            this.tabLine = mainGroup.AddInteractableTab()
+                .Height(650)
                 .LabelOnTop()
                 .RequireConfirmationBeforeClosing()
                 .TabAdded(tabPage =>
                 {
-                    var scriptInfo = scriptContainer.AddScript();
+                    var scriptInfo = this.AddScript();
                     AddJavascriptControl(tabPage, scriptInfo);
                 }).TabRemoved(tabPage =>
                 {
@@ -76,7 +86,7 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                         return;
                     }
 
-                    scriptContainer.RemoveScript(record.ScriptInfo);
+                    this.RemoveScript(record.ScriptInfo);
                 }).TabChanged(tabPage =>
                 {
                     this.record?.JavascriptEditor.UnregisterErrorReport(jsErrorThread);
@@ -99,35 +109,110 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                     record.ScriptInfo.Name = newName;
                 });
 
-
-            if (scriptContainer.Count == 0)
-            {
-                scriptContainer.AddScript();
-            }
-
-            foreach (var scriptInfo in scriptContainer.Scripts)
-            {
-                var tabPage = tabLine.AddTabPage();
-                AddJavascriptControl(tabPage, scriptInfo);
-            }
-
             mainGroup.AddButtonPanel()
                  .AddButton(Locale.GRID_SCRIPT_AUTO_FORMAT, () => record?.JavascriptEditor.GetTextBox().DoAutoIndent())
                  .AddButton(Locale.GRID_SCRIPT_EXECUTE_ALL, () => ParseJS())
-                 .AddButton(Locale.GRID_SCRIPT_EXECUTE_ONE_LINE, () => ParseJS(singleExecution: true))
-                 .AddButton(Locale.GRID_SCRIPT_EXECUTE_DEBUG, () => ParseJS(debugRun: true));
+                 .AddButton(Locale.GRID_SCRIPT_EXECUTE_ONE_LINE, () => ParseJS(singleExecution: true));
+        }
 
-            configForm.FormClosed += (sender, args) =>
+        public void Init()
+        {
+            this.configForm.FormClosed += (sender, args) =>
             {
                 record?.JavascriptEditor.UnregisterErrorReport(jsErrorThread);
                 record = null;
             };
 
+            customVariableList.CollectionChanged += (sender, args) => this.labelTopLine?.Label(this.CreateVariableNamesText());
+            gridVariableList.CollectionChanged += (sender, args) => this.labelTopLine?.Label(this.CreateVariableNamesText());
+        }
+
+        public ScriptInfo AddScript()
+        {
+            ScriptInfo scriptInfo = new();
+            this.scriptInfoList.Add(scriptInfo);
+            return scriptInfo;
+        }
+
+        public void RemoveScript(ScriptInfo scriptInfo)
+        {
+            this.scriptInfoList.Remove(scriptInfo);
+        }
+
+        public bool IsDirty() => this.scriptInfoList.Any(x => x.IsDirty());
+        public void Wash() => this.scriptInfoList.ForEach(x => x.Wash());
+
+        public GridScriptSave CreateSave()
+        {
+            GridScriptSave save = new();
+            foreach (var scriptInfo in this.scriptInfoList)
+            {
+                save.Scripts.Add(scriptInfo);
+            }
+            return save;
+        }
+
+        public void LoadSave(GridScriptSave save)
+        {
+            this.scriptInfoList.Clear();
+            scriptInfoList.AddRange(save.Scripts);
+        }
+
+        public void ClearAllCustomVariables() => customVariableList.Clear();
+
+        public void AddCustomVariable(GridScriptVariable variable) => customVariableList.Add(variable);
+
+        public void BindHandler<H>(GridHandler<H> gridHandler) where H : IGridData
+        {
+            if (this.bind != null && this.bind.IsSameGridHandler(gridHandler))
+            {
+                return;
+            }
+
+            this.ClearBind();
+
+            this.bind = GridScriptHandlerBind.CreateBind(gridHandler);
+            gridHandler.ScriptVariableList.ForEach(this.gridVariableList.Add);
+        }
+
+        public void ClearBind()
+        {
+            this.bind = null;
+            this.gridVariableList.Clear();
+        }
+
+        private string CreateVariableNamesText()
+        {
+            List<string> variableTextList = [];
+            variableTextList.AddRange(customVariableList.Select(v => $"{v.Name} [{v.ValueType}]"));
+            variableTextList.AddRange(gridVariableList.Select(v => $"{v.Name} [{v.ValueType}]"));
+            variableTextList.Add($"{ENGINE_ROW_VARIABLE} [int]");
+            return variableTextList.Aggregate((a, b) => $"{a}, {b}");
+        }
+
+        public void ShowConfigForm(IWin32Window window)
+        {
+            if (configForm == null)
+            {
+                return;
+            }
+
+            if (this.scriptInfoList.Count == 0)
+            {
+                this.AddScript();
+            }
+
+            foreach (var scriptInfo in this.scriptInfoList)
+            {
+                var tabPage = tabLine.AddTabPage();
+                AddJavascriptControl(tabPage, scriptInfo);
+            }
+
             configForm.StartShowingAtCursor();
             configForm.Show(window);
         }
 
-        private static void AddJavascriptControl(TabPage tabPage, GridScriptContainer.ScriptInfo scriptInfo)
+        private static void AddJavascriptControl(TabPage tabPage, ScriptInfo scriptInfo)
         {
             var jsTabMainGroup = new ConfigGroup(null);
 
@@ -153,37 +238,26 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
 
         private void Log(string logString)
         {
-            if (logTextBoxLine != null)
+            Control? control = logTextBoxLine?.GetControl();
+            if (control == null)
             {
-                var control = logTextBoxLine.GetControl();
-                if (control != null)
-                {
-                    var timeString = DateTime.Now.ToString("HH:mm:ss fff") + "ms";
-
-                    var text = control.Text;
-                    text += timeString + ") " + logString + "\r\n";
-                    control.Text = text;
-                }
+                return;
             }
+
+            var timeString = DateTime.Now.ToString("HH:mm:ss fff") + "ms";
+            control.Text = $"{control.Text}{timeString}) {logString} \r\n";
         }
 
-        private bool ParseJS(bool singleExecution = false, bool ignoreLog = false, bool debugRun = false)
+        private bool ParseJS(bool singleExecution = false, bool ignoreLog = false)
         {
-            if (!singleExecution)
-            {
-                singleExecutionLastRow = -1;
-            }
-
-            if (record == null)
+            if (this.record == null || this.bind == null)
             {
                 return false;
             }
 
             try
             {
-                var tableScript = record.JavascriptEditor.GetTextBox().Text;
-
-                var scriptTimer = new ScriptTimer();
+                var tableScript = this.record.JavascriptEditor.GetTextBox().Text;
 
                 var preparedScript = Engine.PrepareScript(tableScript, strict: true);
 
@@ -199,101 +273,48 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                 Action<string> logAction = ignoreLog ? str => { } : new Action<string>(Log);
                 engine.SetValue(ENGINE_LOG_FUNCTION, logAction);
 
-                var addVariablesArgs = new GridScriptAddVariableEventArgs();
-                gridHandler.Events.ScriptAddVariablesEvent(gridHandler.DataGridView, addVariablesArgs);
-                foreach (var entry in addVariablesArgs.VariableDict)
-                {
-                    engine.SetValue(entry.Key, entry.Value);
-                }
+                this.bind.ClearCachedCellChange();
 
-                if (debugRun)
-                {
-                    var newData = gridHandler.DataHandler.CreateInstance();
-                    engine.SetValue(ENGINE_ROW_VARIABLE, 0);
-                    ExecuteTimedJS(scriptTimer, engine, preparedScript, newData);
-                }
-                else if (!singleExecution)
-                {
-                    singleExecutionLastRow = -1;
+                ScriptTimeLogger timeLogger = new();
 
-                    var changedDataDict = new Dictionary<int, T>();
-
-                    var dataDict = gridHandler.DataSource.GetNotEmptyDataDict();
-                    foreach (var entry in dataDict)
+                List<int> rowIndexes = [];
+                if (singleExecution)
+                {
+                    int rowIndex = this.bind.DataGridView.CurrentCell?.RowIndex ?? 0;
+                    if (rowIndex >= 0 && rowIndex <= this.bind.DataGridView.RowCount)
                     {
-                        var rowIndex = entry.Value;
-                        var data = entry.Key;
-
-                        engine.SetValue(ENGINE_ROW_VARIABLE, rowIndex);
-
-                        var newIOData = ExecuteTimedJS(scriptTimer, engine, preparedScript, data);
-                        if (newIOData != null)
+                        if (!this.bind.IsGridDataEmpty(rowIndex))
                         {
-                            changedDataDict.Add(rowIndex, newIOData);
+                            rowIndexes.Add(rowIndex);
+                        }
+
+                        var nextRow = this.bind.GetFirstFullIndexStartingAt(rowIndex + 1);
+                        //If there is no next row, start from top (and now we are here).
+                        nextRow = nextRow < 0 ? this.bind.GetFirstFullIndexStartingAt(0) : nextRow;
+                        if (nextRow >= 0)
+                        {
+                            this.bind.SelectRow(nextRow);
                         }
                     }
-
-                    gridHandler.ChangeMultipleRows(changedDataDict);
                 }
                 else
                 {
-                    int rowIndex = gridHandler.DataGridView.CurrentCell?.RowIndex ?? 0;
-                    if (rowIndex >= 0 && rowIndex <= gridHandler.RowCount)
-                    {
-                        var data = gridHandler.DataSource[rowIndex];
-                        if (!data.IsEmpty())
-                        {
-                            engine.SetValue(ENGINE_ROW_VARIABLE, rowIndex);
-
-                            var newIOData = ExecuteTimedJS(scriptTimer, engine, preparedScript, data);
-                            if (newIOData != null)
-                            {
-                                gridHandler.ChangeRow(rowIndex, newIOData);
-                            }
-
-                            singleExecutionLastRow = rowIndex;
-                        }
-
-                        var nextRow = gridHandler.DataSource.GetFirstNotEmptyIndexStartingFrom(rowIndex + 1);
-                        //If there is no next row, start from top (and now we are here).
-                        nextRow = nextRow < 0 ? gridHandler.DataSource.GetFirstNotEmptyIndexStartingFrom(0) : nextRow;
-                        if (nextRow >= 0)
-                        {
-                            gridHandler.SelectRow(nextRow);
-                        }
-                    }
-                    /*
-                                        var dataEnumerable = gridHandler.DataSource.GetNotEmptyDataDict().Where(e => e.Value > singleExecutionLastRow);
-
-                                        var anyFound = dataEnumerable.Any();
-                                        if (anyFound)
-                                        {
-                                            var entry = dataEnumerable.First();
-
-                                            var rowIndex = entry.Value;
-                                            var data = entry.Key;
-
-                                            engine.SetValue(ENGINE_ROW_VARIABLE, rowIndex);
-
-                                            var newIOData = ExecuteTimedJS(scriptTimer, engine, preparedScript, data);
-                                            if (newIOData != null)
-                                            {
-                                                gridHandler.ChangeRow(rowIndex, newIOData);
-                                            }
-
-                                            singleExecutionLastRow = rowIndex;
-                                            gridHandler.SelectRow(rowIndex);
-                                        }
-
-                                        if (!anyFound || anyFound && dataEnumerable.Count() == 1)
-                                        {
-                                            singleExecutionLastRow = -1;
-                                        }*/
+                    rowIndexes.AddRange(this.bind.GetNotEmptyRowIndexes());
                 }
+
+                foreach (var rowIndex in rowIndexes)
+                {
+                    SetEngineVariables(engine, rowIndex, this.gridVariableList);
+                    SetEngineVariables(engine, rowIndex, this.customVariableList);
+                    engine.SetValue(ENGINE_ROW_VARIABLE, rowIndex);
+                    ExecuteTimeLoggedJS(timeLogger, engine, preparedScript, rowIndex);
+                }
+
+                this.bind.ApplyCachedCellChange();
 
                 UpdateJsonContext(engine);
 
-                scriptTimer.Log(tableScript, typeof(T).Name);
+                timeLogger.Log(tableScript, this.bind.DataTypeName);
 
                 return true;
             }
@@ -305,27 +326,33 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
             return false;
         }
 
-        private T? ExecuteTimedJS(ScriptTimer scriptTimer, Engine engine, Prepared<Script> script, T data)
+        private static void SetEngineVariables(Engine engine, int rowIndex, ICollection<GridScriptVariable> scriptVariables)
         {
-            scriptTimer.Restart();
-            var ret = ExecuteJS(engine, script, data);
-            scriptTimer.StopAndSave();
-            return ret;
-        }
-
-        private T? ExecuteJS(Engine engine, Prepared<Script> script, T data)
-        {
-            var dataValuesDict = new Dictionary<string, GridJSVariable>();
-            foreach (var dataColumn in gridHandler.DataHandler.DataColumns)
+            foreach (var scriptVariable in scriptVariables)
             {
-                var value = dataColumn.GetValueFrom<object>(data);
-                if (value == null && dataColumn.PropertyInfo.PropertyType == typeof(string))
+                var getFunc = scriptVariable.Get;
+                if (getFunc == null)
                 {
-                    value = "";
+                    continue;
                 }
 
-                dataValuesDict.Add(dataColumn.ProgrammingFriendlyName, new GridJSVariable(dataColumn) { OldValue = value });
+                engine.SetValue(scriptVariable.Name, getFunc(rowIndex));
             }
+        }
+
+        private void ExecuteTimeLoggedJS(ScriptTimeLogger timeLogger, Engine engine, Prepared<Script> script, int row)
+        {
+            timeLogger.Restart();
+            ExecuteJS(engine, script, row);
+            timeLogger.StopAndSave();
+        }
+
+        private void ExecuteJS(Engine engine, Prepared<Script> script, int row)
+        {
+            var dataValuesDict = new Dictionary<string, GridJSVariable>();
+
+            FillDataValueDictionary(dataValuesDict, row, this.gridVariableList);
+            FillDataValueDictionary(dataValuesDict, row, this.customVariableList);
 
             foreach (var entry in dataValuesDict)
             {
@@ -336,7 +363,7 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
             var eval = engine.Evaluate(script);
             if (eval.IsBoolean() && !eval.AsBoolean())
             {
-                return default;
+                return;
             }
 
             var changed = false;
@@ -353,15 +380,35 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
 
             if (!changed)
             {
-                return default;
+                return;
             }
 
-            var newData = gridHandler.DataHandler.CreateInstance();
             foreach (var ioJSVariable in dataValuesDict.Values)
             {
-                ioJSVariable.Column.SetValueTo(newData, ioJSVariable.NewValue);
+                var scriptVariable = ioJSVariable.ScriptVariable;
+                if (scriptVariable.CreateCachedCellChange != null)
+                { //THIS HAS THE PRIORITY!
+                    scriptVariable.CreateCachedCellChange.Invoke(row, ioJSVariable.NewValue);
+                }
+                else if (scriptVariable.Set != null)
+                {
+                    scriptVariable.Set.Invoke(row, ioJSVariable.NewValue);
+                }
             }
-            return newData;
+        }
+
+        private static void FillDataValueDictionary(Dictionary<string, GridJSVariable> dict, int rowIndex, ICollection<GridScriptVariable> gridScriptVariables)
+        {
+            foreach (var scriptVariable in gridScriptVariables)
+            {
+                var value = scriptVariable.Get?.Invoke(rowIndex);
+                if (value == null)
+                {
+                    continue;
+                }
+
+                dict.Add(scriptVariable.Name, new(scriptVariable) { OldValue = value });
+            }
         }
 
         private void UpdateJsonContext(Engine engine)
@@ -378,11 +425,11 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
             }
         }
 
-        private class GridJSVariable(GridDataColumn column)
+        private class GridJSVariable(GridScriptVariable scriptVariable)
         {
             public object? OldValue { get; set; }
             public object? NewValue { get; set; }
-            public GridDataColumn Column { get; init; } = column;
+            public GridScriptVariable ScriptVariable { get; init; } = scriptVariable;
         }
     }
 }

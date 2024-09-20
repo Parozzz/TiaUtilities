@@ -49,18 +49,4 @@ namespace TiaUtilities.Generation.GridHandler.Events
         public SortOrder SortOrder { get; init; } = sortOrder;
     }
     #endregion
-
-    #region JS_SCRIPT
-    public delegate void GridScriptAddVariableEventHandler(object? sender, GridScriptAddVariableEventArgs args);
-    public class GridScriptAddVariableEventArgs : EventArgs
-    {
-        public Dictionary<string, object> VariableDict { get; set; } = [];
-    }
-
-    public delegate void GridScriptShowVariableEventHandler(object? sender, GridScriptShowVariableEventArgs args);
-    public class GridScriptShowVariableEventArgs : EventArgs
-    {
-        public List<string> VariableList { get; set; } = [];
-    }
-    #endregion
 }

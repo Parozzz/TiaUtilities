@@ -7,7 +7,7 @@ namespace TiaUtilities.Generation.Alarms.Module
 {
     public class AlarmGenSave
     {
-        [JsonProperty] public GridScriptContainer.ContainerSave ScriptContainer { get; set; } = new();
+        [JsonProperty] public GridScriptSave ScriptSave { get; set; } = new();
 
         [JsonProperty] public AlarmMainConfiguration AlarmMainConfig { get; set; } = new();
         [JsonProperty] public List<AlarmGenTabSave> TabSaves { get; set; } = [];
