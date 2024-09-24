@@ -27,6 +27,7 @@ namespace TiaXmlReader.Generation.GridHandler
 
         private readonly GridSettings settings;
         private readonly GridScript gridScript;
+        private readonly GridFindForm findForm;
 
         public GridEvents<T> Events { get; init; }
 
@@ -39,8 +40,6 @@ namespace TiaXmlReader.Generation.GridHandler
         public DataGridView DataGridView { get; init; }
         public GridDataHandler<T> DataHandler { get; init; }
         public GridDataSource<T> DataSource { get; init; }
-
-        public FindData<T>? FindData { get; set; }
 
         private readonly List<ColumnInfo> columnInfoList;
         private readonly List<IGridCellPainter> cellPainterList;
@@ -57,12 +56,14 @@ namespace TiaXmlReader.Generation.GridHandler
         public bool EnableRowSelectionFromRowHeaderClick { get; set; } = true;
         public bool ShowJSContextMenuTopLeft { get; set; } = true;
 
-        public GridHandler(GridSettings settings, GridScript gridScript, GridDataPreviewer<T> previewer, GenPlaceholderHandler placeholderHandler, IGridRowComparer<T>? comparer = null)
+        public GridHandler(GridSettings settings, GridScript gridScript, GridFindForm findForm, GridDataPreviewer<T> previewer, 
+            GenPlaceholderHandler placeholderHandler, IGridRowComparer<T>? comparer = null)
         {
             this.DataGridView = new MyGrid();
 
             this.settings = settings;
             this.gridScript = gridScript;
+            this.findForm = findForm;
 
             this.Events = new();
 
@@ -180,7 +181,7 @@ namespace TiaXmlReader.Generation.GridHandler
                         this.Refresh(); //This is required since for some special column type (Like checkbox) is needed.
                         break;
                     case Keys.F | Keys.Control:
-                        GridFindForm.StartFind(this);
+                        findForm.ShowBinded(this);
                         break;
                     case Keys.J | Keys.Control:
                         this.gridScript.BindHandler(this);
@@ -190,7 +191,7 @@ namespace TiaXmlReader.Generation.GridHandler
                         this.DeleteSelectedCells();
                         break;
                     case Keys.Escape:
-                        this.ResetSelectedCell();
+                        this.SelectCell(cell: null);
                         break;
                     case Keys.F5:
                         this.DataGridView.Refresh();
@@ -687,12 +688,6 @@ namespace TiaXmlReader.Generation.GridHandler
             }
             this.ChangeMultipleRows(dataDict);
         }
-
-        public void ResetSelectedCell()
-        {
-            this.SelectCell(cell: null);
-        }
-
         public void SelectRow(int rowIndex)
         {
             this.DataGridView.ClearSelection();
@@ -715,7 +710,7 @@ namespace TiaXmlReader.Generation.GridHandler
             this.SelectCell(cellChange.RowIndex, cellChange.ColumnIndex);
         }
 
-        public void SelectCell(int rowIndex, int columnIndex)
+        private void SelectCell(int rowIndex, int columnIndex)
         {
             this.SelectCell(this.DataGridView.Rows[rowIndex].Cells[columnIndex]);
         }

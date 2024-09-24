@@ -4,6 +4,7 @@ using Jint;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Text.RegularExpressions;
 using TiaUtilities.Generation.Configuration.Utility;
+using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.IO.Module;
 using TiaUtilities.Generation.IO.Module.ExcelImporter;
@@ -25,12 +26,12 @@ namespace TiaUtilities.Generation.GenModules.IO.ExcelImporter
 
         public IEnumerable<IOGenExcelImportData> ImportDataEnumerable { get => gridHandler.DataSource.GetNotEmptyDataDict().Keys; }
 
-        public IOGenerationExcelImportForm(GridSettings gridSettings, GridScript gridScript, IOExcelImportConfiguration configuration)
+        public IOGenerationExcelImportForm(GridSettings gridSettings, GridScript gridScript, GridFindForm findForm, IOExcelImportConfiguration configuration)
         {
             InitializeComponent();
 
             this.importConfig = configuration;
-            this.gridHandler = new(gridSettings, gridScript, new(), new()) { RowCount = 1999 };
+            this.gridHandler = new(gridSettings, gridScript, findForm, new(), new()) { RowCount = 1999 };
 
             Init();
         }

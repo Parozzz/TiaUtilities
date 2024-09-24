@@ -125,12 +125,12 @@ namespace TiaXmlReader.Generation.GridHandler
         {
             dataList.Sort((x, y) =>
             {
-                if (!dict.ContainsKey(x) || !dict.ContainsKey(y))
+                if (!dict.TryGetValue(x, out int xValue) || !dict.TryGetValue(y, out int yValue))
                 {
                     return 0;
                 }
 
-                return dict[x].CompareTo(dict[y]);
+                return xValue.CompareTo(yValue);
             });
             dataGridView.Refresh();
         }
@@ -154,24 +154,33 @@ namespace TiaXmlReader.Generation.GridHandler
             return -1;
         }
 
-        public Dictionary<T, int> GetNotEmptyDataDict()
+        public Dictionary<T, int> GetNotEmptyDataDict(int startRow = 0)
         {
-            var notEmptyDict = new Dictionary<T, int>();
+            Dictionary<T, int> dict = [];
+            if(startRow >= dataList.Count)
+            {
+                return dict;
+            }
 
-            for (var x = 0; x < dataList.Count; x++)
+            for (var x = startRow; x < dataList.Count; x++)
             {
                 var data = dataList[x];
                 if (!data.IsEmpty())
                 {
-                    notEmptyDict.Add(data, x);
+                    dict.Add(data, x);
                 }
             }
-            return notEmptyDict;
+            return dict;
         }
 
-        public IEnumerable<T> GetNotEmptyData()
+        public IEnumerable<T> GetNotEmptyData(int startRow = 0)
         {
-            return GetNotEmptyDataDict().Keys;
+            return GetNotEmptyDataDict(startRow).Keys;
+        }
+
+        public ICollection<int> GetNotEmptyIndexes(int startRow = 0)
+        {
+            return GetNotEmptyDataDict(startRow).Values;
         }
 
         public Dictionary<T, int> GetNotEmptyClonedDataDict()
@@ -190,12 +199,11 @@ namespace TiaXmlReader.Generation.GridHandler
             }
             return notEmptyDict;
         }
+
         public IEnumerable<T> GetNotEmptyClonedData()
         {
             return GetNotEmptyClonedDataDict().Keys;
         }
-
-
     }
 
 }

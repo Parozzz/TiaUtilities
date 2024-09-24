@@ -1,6 +1,7 @@
 ﻿using TiaUtilities.Generation.Alarms.Module.Tab;
 using TiaUtilities.Generation.GenModules;
 using TiaUtilities.Generation.GenModules.Alarm;
+using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Languages;
 using TiaXmlReader;
@@ -14,6 +15,7 @@ namespace TiaUtilities.Generation.Alarms.Module
     public class AlarmGenModule : IGenModule
     {
         private readonly GridScript gridScript;
+        private readonly GridFindForm findForm;
 
         private readonly AlarmGenControl control;
         private readonly AlarmMainConfiguration mainConfig;
@@ -23,6 +25,7 @@ namespace TiaUtilities.Generation.Alarms.Module
         public AlarmGenModule(JavascriptErrorReportThread jsErrorHandlingThread)
         {
             this.gridScript = new(jsErrorHandlingThread);
+            this.findForm = new();
 
             this.control = new();
             this.mainConfig = new();
@@ -68,7 +71,7 @@ namespace TiaUtilities.Generation.Alarms.Module
         {
             tabPage.Text = save?.Name ?? "AlarmGen";
 
-            AlarmGenTab alarmGenTab = new(MainForm.Settings.GridSettings, this.gridScript, this, this.mainConfig, tabPage);
+            AlarmGenTab alarmGenTab = new(MainForm.Settings.GridSettings, this.gridScript, this.findForm, this, this.mainConfig, tabPage);
             genTabList.Add(alarmGenTab);
 
             alarmGenTab.Init();

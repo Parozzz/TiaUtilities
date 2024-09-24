@@ -51,12 +51,6 @@
     <Compile Update="Generation\Configuration\ConfigForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Generation\IO\Module\Controls\IOGenBottomControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Update="Generation\IO\Module\Controls\IOGenConfigTopControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
     <Compile Update="Generation\IO\Module\ExcelImporter\IOGenExcelImportForm.cs">
       <SubType>Form</SubType>
     </Compile>

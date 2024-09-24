@@ -1,6 +1,7 @@
 ﻿using SimaticML;
 using SimaticML.Enums;
 using TiaUtilities.Generation.GenModules.IO.Tab;
+using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.Placeholders;
@@ -34,7 +35,7 @@ namespace TiaUtilities.Generation.IO.Module.Tab
 
         private bool dirty = false;
 
-        public IOGenTab(GridSettings gridSettings, GridScript gridScript, IOGenModule module, TabPage tabPage, IOMainConfiguration mainConfig)
+        public IOGenTab(GridSettings gridSettings, GridScript gridScript, GridFindForm findForm, IOGenModule module, TabPage tabPage, IOMainConfiguration mainConfig)
         {
             this.module = module;
             this.gridScript = gridScript;
@@ -49,7 +50,7 @@ namespace TiaUtilities.Generation.IO.Module.Tab
             this.Previewer = new();
 
             IOGenPlaceholderHandler placeholdersHandler = new(this.Previewer, this.mainConfig, TabConfig);
-            this.GridHandler = new(gridSettings, gridScript, this.Previewer, placeholdersHandler, new IOGenComparer()) { RowCount = 2999 };
+            this.GridHandler = new(gridSettings, gridScript, findForm, this.Previewer, placeholdersHandler, new IOGenComparer()) { RowCount = 2999 };
 
             this.TabControl = new(this.GridHandler.DataGridView);
         }

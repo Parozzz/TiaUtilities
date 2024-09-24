@@ -1,4 +1,5 @@
 ﻿using TiaUtilities.Generation.GenModules.Alarm.Tab;
+using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.Placeholders;
@@ -32,7 +33,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
 
         private bool dirty = false;
 
-        public AlarmGenTab(GridSettings gridSettings, GridScript gridScript, AlarmGenModule module, AlarmMainConfiguration mainConfig, TabPage tabPage)
+        public AlarmGenTab(GridSettings gridSettings, GridScript gridScript, GridFindForm findForm, AlarmGenModule module, AlarmMainConfiguration mainConfig, TabPage tabPage)
         {
             this.module = module;
             this.gridScript = gridScript;
@@ -44,8 +45,8 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             this.AlarmDataPreview = new();
 
             AlarmGenPlaceholdersHandler placeholdersHandler = new(mainConfig, this.TabConfig);
-            deviceGridHandler = new(gridSettings, gridScript, this.DeviceDataPreview, placeholdersHandler) { RowCount = 499 };
-            alarmGridHandler = new(gridSettings, gridScript, this.AlarmDataPreview, placeholdersHandler) { RowCount = 199 };
+            deviceGridHandler = new(gridSettings, gridScript, findForm, this.DeviceDataPreview, placeholdersHandler) { RowCount = 499 };
+            alarmGridHandler = new(gridSettings, gridScript, findForm, this.AlarmDataPreview, placeholdersHandler) { RowCount = 199 };
 
             TabControl = new(deviceGridHandler.DataGridView, alarmGridHandler.DataGridView);
         }

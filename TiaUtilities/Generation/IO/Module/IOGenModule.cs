@@ -5,6 +5,7 @@ using SimaticML.Blocks;
 using SimaticML.TagTable;
 using TiaUtilities.Generation.GenModules;
 using TiaUtilities.Generation.GenModules.IO.ExcelImporter;
+using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.IO.Module.ExcelImporter;
@@ -27,6 +28,7 @@ namespace TiaUtilities.Generation.IO.Module
         public ICollection<IOSuggestionData> Suggestions { get => suggestionGridHandler.DataSource.GetNotEmptyDataDict().Keys; }
 
         private readonly GridScript gridScript;
+        private readonly GridFindForm findForm;
 
         private readonly IOMainConfiguration mainConfig;
         private readonly IOExcelImportConfiguration excelImportConfig;
@@ -41,6 +43,7 @@ namespace TiaUtilities.Generation.IO.Module
         public IOGenModule(JavascriptErrorReportThread jsErrorHandlingThread)
         {
             this.gridScript = new(jsErrorHandlingThread);
+            this.findForm = new();
 
             this.mainConfig = new();
             GenUtils.CopyJsonFieldsAndProperties(MainForm.Settings.PresetIOMainConfiguration, this.mainConfig);
@@ -49,7 +52,7 @@ namespace TiaUtilities.Generation.IO.Module
             GenUtils.CopyJsonFieldsAndProperties(MainForm.Settings.PresetIOExcelImportConfiguration, this.excelImportConfig);
 
             this.suggestionPreviewer = new();
-            this.suggestionGridHandler = new(MainForm.Settings.GridSettings, gridScript, suggestionPreviewer, new()) { RowCount = 1999 };
+            this.suggestionGridHandler = new(MainForm.Settings.GridSettings, gridScript, findForm, suggestionPreviewer, new()) { RowCount = 1999 };
 
             this.control = new(suggestionGridHandler.DataGridView);
 
@@ -62,7 +65,7 @@ namespace TiaUtilities.Generation.IO.Module
             ToolStripMenuItem importExcelMenuItem = new(Locale.IO_GEN_FORM_IMPEXP_IMPORT_EXCEL);
             importExcelMenuItem.Click += (sender, args) =>
             {
-                IOGenerationExcelImportForm excelImportForm = new(MainForm.Settings.GridSettings, this.gridScript, this.excelImportConfig);
+                IOGenerationExcelImportForm excelImportForm = new(MainForm.Settings.GridSettings, this.gridScript, this.findForm, this.excelImportConfig);
 
                 var dialogResult = excelImportForm.ShowDialog();
                 if (dialogResult == DialogResult.OK)
@@ -290,7 +293,7 @@ namespace TiaUtilities.Generation.IO.Module
         {
             tabPage.Text = save?.Name ?? "IOGen";
 
-            IOGenTab ioGenTab = new(MainForm.Settings.GridSettings, this.gridScript, this, tabPage, this.mainConfig);
+            IOGenTab ioGenTab = new(MainForm.Settings.GridSettings, this.gridScript, this.findForm, this, tabPage, this.mainConfig);
             genTabList.Add(ioGenTab);
 
             ioGenTab.Init();
