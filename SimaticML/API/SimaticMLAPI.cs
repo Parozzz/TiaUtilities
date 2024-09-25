@@ -44,7 +44,7 @@ namespace SimaticML.API
                 return SECTIONS_NAMESPACE_V16;
             }
 
-            return null;
+            throw new Exception("Invalid TIA Version for Sections Namespace");
         }
 
         public static string GET_FLAG_NET_NAMESPACE()
@@ -62,7 +62,7 @@ namespace SimaticML.API
                 return FLG_NET_NAMESPACE_V16;
             }
 
-            return null;
+            throw new Exception("Invalid TIA Version for FlagNet Namespace");
         }
 
         public static string GET_STRUCTRED_TEXT_NAMESPACE()
@@ -76,7 +76,7 @@ namespace SimaticML.API
                 return STRUCTURED_TEXT_NAMESPACE_V16;
             }
 
-            return null;
+            throw new Exception("Invalid TIA Version for StructuredText Namespace");
         }
 
         public static XmlNodeConfiguration? ParseFile(string filePath)

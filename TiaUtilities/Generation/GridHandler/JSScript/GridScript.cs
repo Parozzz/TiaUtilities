@@ -14,7 +14,7 @@ using TiaXmlReader.Utility.Extensions;
 
 namespace TiaUtilities.Generation.GridHandler.JSScript
 {
-    public class GridScript : ICleanable
+    public class GridScript : ICleanable, ISaveable<GridScriptSave>
     {
         private record TabPageScriptRecord(ScriptInfo ScriptInfo, JavascriptEditor JavascriptEditor);
 

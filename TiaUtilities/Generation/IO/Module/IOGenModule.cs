@@ -363,7 +363,7 @@ namespace TiaUtilities.Generation.IO.Module
             return save;
         }
 
-        public void LoadSave(object? saveObject)
+        public void LoadSave(object saveObject)
         {
             if (saveObject is not IOGenSave loadedSave)
             {

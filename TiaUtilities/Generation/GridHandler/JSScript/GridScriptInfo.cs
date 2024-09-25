@@ -10,8 +10,7 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
     public class ScriptInfo() : ICleanable
     {
         private string _name = "JS_SCRIPT";
-        [JsonProperty]
-        public string Name
+        [JsonProperty] public string Name
         {
             get => _name;
             set
@@ -22,8 +21,7 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
         }
 
         private string _text = string.Empty;
-        [JsonProperty]
-        public string Text
+        [JsonProperty] public string Text
         {
             get => _text;
             set

@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel;
+using TiaUtilities;
 using TiaXmlReader.Generation.GridHandler.Data;
 
 namespace TiaXmlReader.Generation.GridHandler
 {
-    public class GridDataSource<T> where T : IGridData
+    public class GridDataSource<T> : ISaveable<Dictionary<int, T>> where T : IGridData
     {
         private readonly DataGridView dataGridView;
         private readonly GridDataHandler<T> dataHandler;

@@ -1,14 +1,9 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using DocumentFormat.OpenXml.Wordprocessing;
-using FastColoredTextBoxNS;
-using InfoBox;
+﻿using InfoBox;
 using System.Data;
 using TiaUtilities.Generation.GridHandler.Find_Replace;
 using TiaUtilities.Languages;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Generation.GridHandler.Data;
-using TiaXmlReader.Utility;
-using static TiaUtilities.Generation.GridHandler.GridFindForm;
 
 namespace TiaUtilities.Generation.GridHandler
 {

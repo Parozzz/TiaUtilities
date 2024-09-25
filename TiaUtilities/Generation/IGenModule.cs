@@ -2,16 +2,12 @@
 
 namespace TiaUtilities.Generation
 {
-    public interface IGenModule : ICleanable
+    public interface IGenModule : ICleanable, ISaveable<object>
     {
 
         public void Init(GenModuleForm form);
 
         public void Clear();
-
-        public object CreateSave();
-
-        public void LoadSave(object? saveObject);
 
         public void ExportXML(string folderPath);
 

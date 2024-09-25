@@ -15,7 +15,7 @@ using static TiaUtilities.Generation.GridHandler.GridFindForm;
 
 namespace TiaXmlReader.Generation.GridHandler
 {
-    public class GridHandler<T> : ICleanable where T : IGridData
+    public class GridHandler<T> : ICleanable, ISaveable<GridSave<T>> where T : IGridData
     {
         private class ColumnInfo(DataGridViewColumn column, GridDataColumn dataColumn, int width)
         {

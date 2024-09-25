@@ -14,7 +14,7 @@ using TiaXmlReader.Javascript;
 
 namespace TiaUtilities.Generation.IO.Module.Tab
 {
-    public class IOGenTab : ICleanable
+    public class IOGenTab : ICleanable, ISaveable<IOGenTabSave>
     {
         private const int MERKER_ADDRESS_COLUMN_SIZE = 80;
 

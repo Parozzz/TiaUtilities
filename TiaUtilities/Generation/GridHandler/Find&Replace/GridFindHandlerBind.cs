@@ -42,7 +42,6 @@ namespace TiaUtilities.Generation.GridHandler.Find_Replace
         public required Action ClearCachedCellChange { get; init; }
         public required Action ApplyCachedCellChange { get; init; }
 
-
         private GridFindHandlerBind()
         {
 

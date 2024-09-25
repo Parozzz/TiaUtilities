@@ -118,7 +118,7 @@ namespace TiaUtilities.Generation.Alarms.Module
             return projectSave;
         }
 
-        public void LoadSave(object? saveObject)
+        public void LoadSave(object saveObject)
         {
             if (saveObject is not AlarmGenSave loadedSave)
             {

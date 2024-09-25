@@ -11,7 +11,7 @@ using TiaXmlReader.Javascript;
 
 namespace TiaUtilities.Generation.Alarms.Module.Tab
 {
-    public class AlarmGenTab : ICleanable
+    public class AlarmGenTab : ICleanable, ISaveable<AlarmGenTabSave>
     {
         private static readonly string[] TIMERS_TYPES_ITEMS = ["TON", "TOF"];
         private static readonly string[] ALARM_COIL_TYPE_ITEMS = [AlarmCoilType.NONE.ToString(), AlarmCoilType.SET.ToString(), AlarmCoilType.RESET.ToString(), AlarmCoilType.COIL.ToString()];
