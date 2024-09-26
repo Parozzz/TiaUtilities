@@ -1,5 +1,7 @@
 ﻿using TiaUtilities;
 using TiaUtilities.Generation.GridHandler;
+using TiaUtilities.Generation.GridHandler.Binds;
+using TiaUtilities.Generation.GridHandler.CellPainters;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Languages;
@@ -26,8 +28,7 @@ namespace TiaXmlReader.Generation.GridHandler
         }
 
         private readonly GridSettings settings;
-        private readonly GridScript gridScript;
-        private readonly GridFindForm findForm;
+        private readonly GridBindContainer gridBindFactory;
 
         public GridEvents<T> Events { get; init; }
 
@@ -56,14 +57,13 @@ namespace TiaXmlReader.Generation.GridHandler
         public bool EnableRowSelectionFromRowHeaderClick { get; set; } = true;
         public bool ShowJSContextMenuTopLeft { get; set; } = true;
 
-        public GridHandler(GridSettings settings, GridScript gridScript, GridFindForm findForm, GridDataPreviewer<T> previewer, 
+        public GridHandler(GridSettings settings, GridBindContainer gridBindFactory, GridDataPreviewer<T> previewer, 
             GenPlaceholderHandler placeholderHandler, IGridRowComparer<T>? comparer = null)
         {
             this.DataGridView = new MyGrid();
 
             this.settings = settings;
-            this.gridScript = gridScript;
-            this.findForm = findForm;
+            this.gridBindFactory = gridBindFactory;
 
             this.Events = new();
 
@@ -130,7 +130,7 @@ namespace TiaXmlReader.Generation.GridHandler
             var paintHandler = new GridCellPaintHandler(this.DataGridView);
             paintHandler.AddPainter(this.sortHandler); //ORDER IS IMPORTANT!
             paintHandler.AddPainter(this.excelDragHandler);
-            paintHandler.AddPainter(new GridCellPreviewCellPainter<T>(this.placeholderHandler, this.previewer, this.DataSource, this.settings));
+            paintHandler.AddPainter(new GridCellPreviewPainter<T>(this.placeholderHandler, this.previewer, this.DataSource, this.settings));
             paintHandler.AddPainterRange(cellPainterList);
             paintHandler.Init();
             #endregion
@@ -181,11 +181,10 @@ namespace TiaXmlReader.Generation.GridHandler
                         this.Refresh(); //This is required since for some special column type (Like checkbox) is needed.
                         break;
                     case Keys.F | Keys.Control:
-                        findForm.ShowBinded(this);
+                        this.gridBindFactory.ShowFindForm(this);
                         break;
                     case Keys.J | Keys.Control:
-                        this.gridScript.BindHandler(this);
-                        this.gridScript.ShowConfigForm(this.DataGridView);
+                        this.gridBindFactory.ShowGridScript(this);
                         break;
                     case Keys.Delete:
                         this.DeleteSelectedCells();
@@ -309,21 +308,16 @@ namespace TiaXmlReader.Generation.GridHandler
                 this.ScriptVariableList.Add(scriptVariable);
             }
 
-            this.DataGridView.MouseClick += (sender, args) => this.gridScript.BindHandler(this);
+            this.DataGridView.MouseClick += (sender, args) => this.gridBindFactory.ChangeBind(this);
             this.DataGridView.CellMouseClick += (sender, args) =>
             {
                 if (args.RowIndex == -1 && args.ColumnIndex == -1 && args.Button == MouseButtons.Right)
                 {
                     var menuItem = new ToolStripMenuItem { Text = Locale.GRID_SCRIPT_OPEN_JAVASCRIPT_CONTEXT };
-                    menuItem.Click += (s, a) =>
-                    {
-                        this.gridScript.BindHandler(this);
-                        this.gridScript.ShowConfigForm(this.DataGridView);
-                    };
+                    menuItem.Click += (sender, args) => { this.gridBindFactory.ShowGridScript(); };
 
                     var contextMenu = new ContextMenuStrip();
                     contextMenu.Items.Add(menuItem);
-
                     contextMenu.Show(this.DataGridView, this.DataGridView.PointToClient(Cursor.Position));
                 }
             };

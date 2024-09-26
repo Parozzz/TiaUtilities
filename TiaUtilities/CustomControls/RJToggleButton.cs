@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Drawing.Drawing2D;
 
-namespace CustomControls.RJControls
+namespace TiaUtilities.CustomControls
 {
     public class RJToggleButton : CheckBox
     {

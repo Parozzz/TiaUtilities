@@ -1,10 +1,9 @@
 ﻿using Newtonsoft.Json;
 using TiaUtilities.Configuration;
-using TiaXmlReader.GenerationForms;
 
 namespace TiaUtilities.Generation.IO.Module.ExcelImporter
 {
-    public class IOExcelImportConfiguration : ObservableConfiguration, IGenerationConfiguration
+    public class IOExcelImportConfiguration : ObservableConfiguration
     {
         [JsonProperty] public string AddressCellConfig { get => this.GetAs<string>(); set => this.Set(value); }
         [JsonProperty] public string IONameCellConfig { get => this.GetAs<string>(); set => this.Set(value); }

@@ -1,12 +1,13 @@
 ﻿using TiaUtilities.Generation.GridHandler.Data;
+using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.Generation.Placeholders;
 using TiaXmlReader.Utility;
-using static TiaXmlReader.Generation.GridHandler.GridCellPaintHandler;
+using static TiaUtilities.Generation.GridHandler.CellPainters.GridCellPaintHandler;
 
-namespace TiaXmlReader.Generation.GridHandler
+namespace TiaUtilities.Generation.GridHandler.CellPainters
 {
-    public class GridCellPreviewCellPainter<T>(GenPlaceholderHandler placeholderHandler, GridDataPreviewer<T> previewer, GridDataSource<T> dataSource, GridSettings settings) : IGridCellPainter where T : IGridData
+    public class GridCellPreviewPainter<T>(GenPlaceholderHandler placeholderHandler, GridDataPreviewer<T> previewer, GridDataSource<T> dataSource, GridSettings settings) : IGridCellPainter where T : IGridData
     {
         public PaintRequest PaintCellRequest(DataGridViewCellPaintingEventArgs args)
         {

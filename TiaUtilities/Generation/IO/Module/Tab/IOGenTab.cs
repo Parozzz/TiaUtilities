@@ -2,6 +2,7 @@
 using SimaticML.Enums;
 using TiaUtilities.Generation.GenModules.IO.Tab;
 using TiaUtilities.Generation.GridHandler;
+using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.Placeholders;
@@ -19,7 +20,7 @@ namespace TiaUtilities.Generation.IO.Module.Tab
         private const int MERKER_ADDRESS_COLUMN_SIZE = 80;
 
         private readonly IOGenModule module;
-        private readonly GridScript gridScript;
+        private readonly GridBindContainer gridBindFactory;
 
         private readonly IOMainConfiguration mainConfig;
         private readonly SuggestionTextBoxColumn variableAddressColumn;
@@ -35,10 +36,10 @@ namespace TiaUtilities.Generation.IO.Module.Tab
 
         private bool dirty = false;
 
-        public IOGenTab(GridSettings gridSettings, GridScript gridScript, GridFindForm findForm, IOGenModule module, TabPage tabPage, IOMainConfiguration mainConfig)
+        public IOGenTab(GridSettings gridSettings, GridBindContainer gridBindFactory, IOGenModule module, TabPage tabPage, IOMainConfiguration mainConfig)
         {
             this.module = module;
-            this.gridScript = gridScript;
+            this.gridBindFactory = gridBindFactory;
             this.TabPage = tabPage;
 
             this.mainConfig = mainConfig;
@@ -50,7 +51,7 @@ namespace TiaUtilities.Generation.IO.Module.Tab
             this.Previewer = new();
 
             IOGenPlaceholderHandler placeholdersHandler = new(this.Previewer, this.mainConfig, TabConfig);
-            this.GridHandler = new(gridSettings, gridScript, findForm, this.Previewer, placeholdersHandler, new IOGenComparer()) { RowCount = 2999 };
+            this.GridHandler = new(gridSettings, gridBindFactory, this.Previewer, placeholdersHandler, new IOGenComparer()) { RowCount = 2999 };
 
             this.TabControl = new(this.GridHandler.DataGridView);
         }
@@ -183,20 +184,20 @@ namespace TiaUtilities.Generation.IO.Module.Tab
 
         public void Selected()
         {
-            this.gridScript.BindHandler(this.GridHandler);
+            this.gridBindFactory.ChangeBind(this.GridHandler);
         }
 
-        public bool IsDirty() => this.dirty || TabConfig.IsDirty() || GridHandler.IsDirty();
+        public bool IsDirty() => this.dirty || this.TabConfig.IsDirty() || this.GridHandler.IsDirty();
         public void Wash()
         {
             this.dirty = false;
-            TabConfig.Wash();
-            GridHandler.Wash();
+            this.TabConfig.Wash();
+            this.GridHandler.Wash();
         }
 
         private void UpdateMerkerColumn(IOMemoryTypeEnum memoryType)
         {
-            GridHandler.ChangeColumnVisibility(IOData.MERKER_ADDRESS, visible: memoryType == IOMemoryTypeEnum.MERKER, init: true);
+            this.GridHandler.ChangeColumnVisibility(IOData.MERKER_ADDRESS, visible: memoryType == IOMemoryTypeEnum.MERKER, init: true);
         }
 
         public IOGenTabSave CreateSave()

@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.Drawing.Design;
 using System.Drawing.Drawing2D;
 
-namespace CustomControls.RJControls
+namespace TiaUtilities.CustomControls
 {
     [DefaultEvent("OnSelectedIndexChanged")]
     class RJComboBox : UserControl

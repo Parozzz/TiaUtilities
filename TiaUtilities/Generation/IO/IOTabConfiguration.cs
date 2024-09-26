@@ -1,11 +1,10 @@
 ﻿using Newtonsoft.Json;
 using TiaUtilities.Configuration;
 using TiaXmlReader.Generation.Placeholders;
-using TiaXmlReader.GenerationForms;
 
 namespace TiaUtilities.Generation.IO
 {
-    public class IOTabConfiguration : ObservableConfiguration, IGenerationConfiguration
+    public class IOTabConfiguration : ObservableConfiguration
     {
         [JsonProperty] public string FCBlockName { get => this.GetAs<string>(); set => this.Set(value); }
         [JsonProperty] public uint FCBlockNumber { get => this.GetAs<uint>(); set => this.Set(value); }

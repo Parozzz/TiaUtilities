@@ -1,7 +1,7 @@
 ﻿using TiaUtilities.Generation.GridHandler.Data;
-using static TiaXmlReader.Generation.GridHandler.GridCellPaintHandler;
+using static TiaUtilities.Generation.GridHandler.CellPainters.GridCellPaintHandler;
 
-namespace TiaXmlReader.Generation.GridHandler
+namespace TiaUtilities.Generation.GridHandler.CellPainters
 {
     public class GridCellPaintHandler
     {
@@ -11,7 +11,7 @@ namespace TiaXmlReader.Generation.GridHandler
         public GridCellPaintHandler(DataGridView dataGridView)
         {
             this.dataGridView = dataGridView;
-            this.painterList = new List<IGridCellPainter>();
+            painterList = new List<IGridCellPainter>();
         }
 
         public void AddPainter(IGridCellPainter painter)
@@ -23,13 +23,13 @@ namespace TiaXmlReader.Generation.GridHandler
         {
             foreach (var painter in painterCollection)
             {
-                this.AddPainter(painter);
+                AddPainter(painter);
             }
         }
 
         public void Init()
         {
-            this.dataGridView.CellPainting += (sender, args) =>
+            dataGridView.CellPainting += (sender, args) =>
             {
 
                 bool backgroundDone = false, contentDone = false;

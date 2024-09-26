@@ -1,6 +1,6 @@
 ﻿using TiaXmlReader.Utility;
 
-namespace TiaUtilities.Utility
+namespace TiaUtilities.CustomControls
 {
     public partial class FloatingTextBox : Form
     {

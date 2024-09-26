@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using TiaUtilities.Configuration;
 using TiaUtilities.Languages;
-using TiaXmlReader.GenerationForms;
 using TiaXmlReader.Languages;
 
 namespace TiaXmlReader.Generation.Alarms
@@ -26,7 +25,7 @@ namespace TiaXmlReader.Generation.Alarms
         [Locale(nameof(Locale.ALARM_CONFIG_COIL_TYPE_RESET))] RESET
     }
 
-    public class AlarmMainConfiguration : ObservableConfiguration, IGenerationConfiguration
+    public class AlarmMainConfiguration : ObservableConfiguration
     {
         [JsonProperty] public string FCBlockName { get => this.GetAs<string>(); set => this.Set(value); }
         [JsonProperty] public uint FCBlockNumber { get => this.GetAs<uint>(); set => this.Set(value); }

@@ -2,11 +2,10 @@
 using TiaUtilities.Configuration;
 using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation.Placeholders;
-using TiaXmlReader.GenerationForms;
 
 namespace TiaUtilities.Generation.Alarms
 {
-    public class AlarmTabConfiguration : ObservableConfiguration, IGenerationConfiguration
+    public class AlarmTabConfiguration : ObservableConfiguration
     {
         [JsonProperty] public AlarmPartitionType PartitionType { get => this.GetAs<AlarmPartitionType>(); set => this.Set(value); }
         [JsonProperty] public AlarmGroupingType GroupingType { get => this.GetAs<AlarmGroupingType>(); set => this.Set(value); }

@@ -1,13 +1,13 @@
 ﻿using InfoBox;
 using System.Data;
-using TiaUtilities.Generation.GridHandler.Find_Replace;
+using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Languages;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Generation.GridHandler.Data;
 
 namespace TiaUtilities.Generation.GridHandler
 {
-    public partial class GridFindForm : Form
+    public partial class GridFindForm : Form, IBindable
     {
         public class FindData(GridDataColumn column, int row, string text)
         {
@@ -16,7 +16,7 @@ namespace TiaUtilities.Generation.GridHandler
             public string Text { get; init; } = text;
         }
 
-        private GridFindHandlerBind? bind;
+        private GridHandlerBind? handlerBInd;
 
         public GridFindForm()
         {
@@ -27,18 +27,17 @@ namespace TiaUtilities.Generation.GridHandler
 
         private void Init()
         {
-            this.FormClosed += (sender, args) => this.bind = null;
             this.FindButton.Click += (sender, args) => this.TryFindText(startFromNextCell: true);
             this.ReplaceButton.Click += (sender, args) =>
             {
-                if (this.bind == null || this.TryFindText(startFromNextCell: false) is not FindData findData)
+                if (this.handlerBInd == null || this.TryFindText(startFromNextCell: false) is not FindData findData)
                 {
                     return;
                 }
 
-                this.bind.ClearCachedCellChange();
+                this.handlerBInd.ClearCachedCellChange();
                 var addOK = this.AddSearchReplaceCellChange(findData);
-                this.bind.ApplyCachedCellChange();
+                this.handlerBInd.ApplyCachedCellChange();
 
                 if(addOK)
                 {
@@ -47,13 +46,13 @@ namespace TiaUtilities.Generation.GridHandler
             };
             this.ReplaceAllButton.Click += (sender, args) =>
             {
-                if(this.bind == null)
+                if(this.handlerBInd == null)
                 {
                     return;
                 }
 
-                this.bind.DataGridView.SuspendLayout();
-                this.bind.ClearCachedCellChange();
+                this.handlerBInd.DataGridView.SuspendLayout();
+                this.handlerBInd.ClearCachedCellChange();
 
                 int count = 0;
 
@@ -70,8 +69,8 @@ namespace TiaUtilities.Generation.GridHandler
                     count++;
                 }
 
-                this.bind.ApplyCachedCellChange();
-                this.bind.DataGridView.ResumeLayout(performLayout: true);
+                this.handlerBInd.ApplyCachedCellChange();
+                this.handlerBInd.DataGridView.ResumeLayout(performLayout: true);
 
                 var title = Locale.GRID_FIND_FORM_NAME;
                 var searchCompletedText = Locale.GRID_FIND_REPLACE_ALL_COMPLETED.Replace("{count}", count.ToString());
@@ -93,21 +92,14 @@ namespace TiaUtilities.Generation.GridHandler
             this.MatchCaseCheckBox.Text = Locale.GRID_FIND_MATCH_CASE_CHECKBOX;
         }
 
-        public void ShowBinded<T>(GridHandler<T> gridHandler) where T : IGridData
+        public void BindToHandler(GridHandlerBind? handlerBind)
         {
-            var form = gridHandler.DataGridView.FindForm();
-            if(form == null)
-            {
-                return;
-            }
-
-            this.bind = GridFindHandlerBind.Bind(gridHandler);
-            this.Show(form);
+            this.handlerBInd = handlerBind;
         }
 
         private bool AddSearchReplaceCellChange(FindData? findData)
         {
-            if (findData == null || this.bind == null)
+            if (findData == null || this.handlerBInd == null)
             {
                 return false;
             }
@@ -122,14 +114,14 @@ namespace TiaUtilities.Generation.GridHandler
             var newText = findData.Text.Replace(searchText, replaceText, StringComparison.OrdinalIgnoreCase);
 
             GridCellChange cellChange = new(findData.Column, findData.Row) { NewValue = newText };
-            this.bind.AddCachedCellChange(cellChange);
+            this.handlerBInd.AddCachedCellChange(cellChange);
 
             return true;
         }
 
         private FindData? TryFindText(bool showInfoOnFail = true, bool startFromNextCell = true)
         {
-            if(this.bind == null)
+            if(this.handlerBInd == null)
             {
                 return null;
             }
@@ -141,7 +133,7 @@ namespace TiaUtilities.Generation.GridHandler
                 return null;
             }
 
-            var currentCell = bind.DataGridView.CurrentCell;
+            var currentCell = this.handlerBInd.DataGridView.CurrentCell;
 
             var startRow = currentCell?.RowIndex ?? 0;
             var startColumn = (currentCell?.ColumnIndex ?? 0); 
@@ -149,7 +141,7 @@ namespace TiaUtilities.Generation.GridHandler
             if(startFromNextCell)
             {
                 startColumn++;
-                if (startColumn >= this.bind.DataGridView.ColumnCount)
+                if (startColumn >= this.handlerBInd.DataGridView.ColumnCount)
                 {
                     startRow++;
                     startColumn = 0;
@@ -158,12 +150,12 @@ namespace TiaUtilities.Generation.GridHandler
 
             FindData? findData = null;
 
-            var notEmptyRowIndexes = this.bind.GetNotEmptyRowIndexesStartingAt(startRow);
+            var notEmptyRowIndexes = this.handlerBInd.GetNotEmptyRowIndexesStartingAt(startRow);
             for (int x = 0; x < notEmptyRowIndexes.Count; x++)
             {
                 var rowIndex = notEmptyRowIndexes.ElementAt(x);
 
-                var stringColumns = this.bind.DataColumns.Where(c => c.PropertyInfo.PropertyType == typeof(string));
+                var stringColumns = this.handlerBInd.DataColumns.Where(c => c.PropertyInfo.PropertyType == typeof(string));
                 if(x == 0)
                 { //Only for the starting row! From the second i want to check all columns.
                     stringColumns = stringColumns.Where(c => c.ColumnIndex >= startColumn);
@@ -171,7 +163,7 @@ namespace TiaUtilities.Generation.GridHandler
 
                 foreach (var column in stringColumns)
                 {
-                    var strValue = this.bind.GetColumnStringData(column, rowIndex);
+                    var strValue = this.handlerBInd.GetColumnStringData(column, rowIndex);
                     if (strValue == null)
                     {
                         continue;
@@ -187,7 +179,7 @@ namespace TiaUtilities.Generation.GridHandler
                 if (findData != null)
                 {
                     //I directly edit the CurrentCell to avoid calling unwanted refresh!
-                    this.bind.DataGridView.CurrentCell = this.bind.DataGridView.Rows[findData.Row].Cells[findData.Column.ColumnIndex];
+                    this.handlerBInd.DataGridView.CurrentCell = this.handlerBInd.DataGridView.Rows[findData.Row].Cells[findData.Column.ColumnIndex];
                     break;
                 }
             }

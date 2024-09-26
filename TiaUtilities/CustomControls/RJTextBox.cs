@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Drawing.Drawing2D;
 
-namespace CustomControls.RJControls
+namespace TiaUtilities.CustomControls
 {
     [DefaultEvent("TextChanged")]
     public partial class RJTextBox : UserControl

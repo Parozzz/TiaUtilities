@@ -1,4 +1,4 @@
-﻿namespace CustomControls.RJControls
+﻿namespace TiaUtilities.CustomControls
 {
     partial class RJTextBox
     {

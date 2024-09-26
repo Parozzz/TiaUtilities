@@ -4,45 +4,100 @@ using System.Collections.ObjectModel;
 using TiaUtilities.Generation.Configuration;
 using TiaUtilities.Generation.Configuration.Lines;
 using TiaUtilities.Generation.Configuration.Utility;
+using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Languages;
 using TiaXmlReader.Generation.Configuration;
-using TiaXmlReader.Generation.GridHandler;
-using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.Javascript;
 using TiaXmlReader.Utility;
 using TiaXmlReader.Utility.Extensions;
 
 namespace TiaUtilities.Generation.GridHandler.JSScript
 {
-    public class GridScript : ICleanable, ISaveable<GridScriptSave>
+    public class GridScript(JavascriptErrorReportThread jsErrorThread) : ICleanable, ISaveable<GridScriptSave>, IBindable
     {
         private record TabPageScriptRecord(ScriptInfo ScriptInfo, JavascriptEditor JavascriptEditor);
 
         private const string ENGINE_LOG_FUNCTION = "log";
         private const string ENGINE_ROW_VARIABLE = "row";
+        private GridHandlerBind? handlerBind;
 
-        private readonly JavascriptErrorReportThread jsErrorThread;
+        private readonly List<ScriptInfo> scriptInfoList = [];
+        private readonly ObservableCollection<GridScriptVariable> gridVariableList = [];
+        private readonly ObservableCollection<GridScriptVariable> customVariableList = [];
 
-        private readonly List<ScriptInfo> scriptInfoList;
-        private readonly ObservableCollection<GridScriptVariable> gridVariableList;
-        private readonly ObservableCollection<GridScriptVariable> customVariableList;
-
-        private readonly ConfigForm configForm;
-        private readonly ConfigLabelLine labelTopLine;
-        private readonly ConfigTextBoxLine logTextBoxLine;
-        private readonly ConfigJSONLine jsonLine;
-        private readonly ConfigInteractableTabLine tabLine;
+        private ConfigForm? configForm;
+        private ConfigLabelLine? labelTopLine;
+        private ConfigTextBoxLine? logTextBoxLine;
+        private ConfigJSONLine? jsonLine;
+        private ConfigInteractableTabLine? tabLine;
 
         private TabPageScriptRecord? record;
-        private GridScriptHandlerBind? bind;
 
-        public GridScript(JavascriptErrorReportThread jsErrorThread)
+        public void Init()
         {
-            this.jsErrorThread = jsErrorThread;
+            customVariableList.CollectionChanged += (sender, args) => this.labelTopLine?.Label(this.CreateVariableNamesText());
+            gridVariableList.CollectionChanged += (sender, args) => this.labelTopLine?.Label(this.CreateVariableNamesText());
+        }
 
-            this.scriptInfoList = [];
-            this.gridVariableList = [];
-            this.customVariableList = [];
+        public ScriptInfo AddScript()
+        {
+            ScriptInfo scriptInfo = new();
+            this.scriptInfoList.Add(scriptInfo);
+            return scriptInfo;
+        }
+
+        public void RemoveScript(ScriptInfo scriptInfo)
+        {
+            this.scriptInfoList.Remove(scriptInfo);
+        }
+
+        public bool IsDirty() => this.scriptInfoList.Any(x => x.IsDirty());
+        public void Wash() => this.scriptInfoList.ForEach(x => x.Wash());
+
+        public GridScriptSave CreateSave()
+        {
+            GridScriptSave save = new();
+            foreach (var scriptInfo in this.scriptInfoList)
+            {
+                save.Scripts.Add(scriptInfo);
+            }
+            return save;
+        }
+
+        public void LoadSave(GridScriptSave save)
+        {
+            this.scriptInfoList.Clear();
+            scriptInfoList.AddRange(save.Scripts);
+        }
+
+        public void ClearAllCustomVariables() => customVariableList.Clear();
+
+        public void AddCustomVariable(GridScriptVariable variable) => customVariableList.Add(variable);
+
+        public void BindToHandler(GridHandlerBind? handlerBind)
+        {
+            this.handlerBind = handlerBind;
+
+            this.gridVariableList.Clear();
+            this.handlerBind?.GetScriptVariables().ForEach(this.gridVariableList.Add);
+        }
+
+        private string CreateVariableNamesText()
+        {
+            List<string> variableTextList = [];
+            variableTextList.AddRange(customVariableList.Select(v => $"{v.Name} [{v.ValueType}]"));
+            variableTextList.AddRange(gridVariableList.Select(v => $"{v.Name} [{v.ValueType}]"));
+            variableTextList.Add($"{ENGINE_ROW_VARIABLE} [int]");
+            return variableTextList.Aggregate((a, b) => $"{a}, {b}");
+        }
+
+        public void ShowConfigForm(IWin32Window? window)
+        {
+            if (this.configForm != null)
+            {
+                this.configForm.Activate();
+                return;
+            }
 
             this.configForm = new ConfigForm(Locale.GRID_SCRIPT_JS_EXPRESSION)
             {
@@ -113,89 +168,18 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                  .AddButton(Locale.GRID_SCRIPT_AUTO_FORMAT, () => record?.JavascriptEditor.GetTextBox().DoAutoIndent())
                  .AddButton(Locale.GRID_SCRIPT_EXECUTE_ALL, () => ParseJS())
                  .AddButton(Locale.GRID_SCRIPT_EXECUTE_ONE_LINE, () => ParseJS(singleExecution: true));
-        }
 
-        public void Init()
-        {
             this.configForm.FormClosed += (sender, args) =>
             {
                 record?.JavascriptEditor.UnregisterErrorReport(jsErrorThread);
                 record = null;
+
+                this.configForm = null;
+                this.labelTopLine = null;
+                this.logTextBoxLine = null;
+                this.jsonLine = null;
+                this.tabLine = null;
             };
-
-            customVariableList.CollectionChanged += (sender, args) => this.labelTopLine?.Label(this.CreateVariableNamesText());
-            gridVariableList.CollectionChanged += (sender, args) => this.labelTopLine?.Label(this.CreateVariableNamesText());
-        }
-
-        public ScriptInfo AddScript()
-        {
-            ScriptInfo scriptInfo = new();
-            this.scriptInfoList.Add(scriptInfo);
-            return scriptInfo;
-        }
-
-        public void RemoveScript(ScriptInfo scriptInfo)
-        {
-            this.scriptInfoList.Remove(scriptInfo);
-        }
-
-        public bool IsDirty() => this.scriptInfoList.Any(x => x.IsDirty());
-        public void Wash() => this.scriptInfoList.ForEach(x => x.Wash());
-
-        public GridScriptSave CreateSave()
-        {
-            GridScriptSave save = new();
-            foreach (var scriptInfo in this.scriptInfoList)
-            {
-                save.Scripts.Add(scriptInfo);
-            }
-            return save;
-        }
-
-        public void LoadSave(GridScriptSave save)
-        {
-            this.scriptInfoList.Clear();
-            scriptInfoList.AddRange(save.Scripts);
-        }
-
-        public void ClearAllCustomVariables() => customVariableList.Clear();
-
-        public void AddCustomVariable(GridScriptVariable variable) => customVariableList.Add(variable);
-
-        public void BindHandler<H>(GridHandler<H> gridHandler) where H : IGridData
-        {
-            if (this.bind != null && this.bind.IsSameGridHandler(gridHandler))
-            {
-                return;
-            }
-
-            this.ClearBind();
-
-            this.bind = GridScriptHandlerBind.CreateBind(gridHandler);
-            gridHandler.ScriptVariableList.ForEach(this.gridVariableList.Add);
-        }
-
-        public void ClearBind()
-        {
-            this.bind = null;
-            this.gridVariableList.Clear();
-        }
-
-        private string CreateVariableNamesText()
-        {
-            List<string> variableTextList = [];
-            variableTextList.AddRange(customVariableList.Select(v => $"{v.Name} [{v.ValueType}]"));
-            variableTextList.AddRange(gridVariableList.Select(v => $"{v.Name} [{v.ValueType}]"));
-            variableTextList.Add($"{ENGINE_ROW_VARIABLE} [int]");
-            return variableTextList.Aggregate((a, b) => $"{a}, {b}");
-        }
-
-        public void ShowConfigForm(IWin32Window window)
-        {
-            if (configForm == null)
-            {
-                return;
-            }
 
             if (this.scriptInfoList.Count == 0)
             {
@@ -250,7 +234,7 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
 
         private bool ParseJS(bool singleExecution = false, bool ignoreLog = false)
         {
-            if (this.record == null || this.bind == null)
+            if (this.record == null || this.handlerBind == null)
             {
                 return false;
             }
@@ -273,33 +257,33 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                 Action<string> logAction = ignoreLog ? str => { } : new Action<string>(Log);
                 engine.SetValue(ENGINE_LOG_FUNCTION, logAction);
 
-                this.bind.ClearCachedCellChange();
+                this.handlerBind.ClearCachedCellChange();
 
                 ScriptTimeLogger timeLogger = new();
 
                 List<int> rowIndexes = [];
                 if (singleExecution)
                 {
-                    int rowIndex = this.bind.DataGridView.CurrentCell?.RowIndex ?? 0;
-                    if (rowIndex >= 0 && rowIndex <= this.bind.DataGridView.RowCount)
+                    int rowIndex = this.handlerBind.DataGridView.CurrentCell?.RowIndex ?? 0;
+                    if (rowIndex >= 0 && rowIndex <= this.handlerBind.DataGridView.RowCount)
                     {
-                        if (!this.bind.IsGridDataEmpty(rowIndex))
+                        if (!this.handlerBind.IsGridDataEmpty(rowIndex))
                         {
                             rowIndexes.Add(rowIndex);
                         }
 
-                        var nextRow = this.bind.GetFirstFullIndexStartingAt(rowIndex + 1);
+                        var nextRow = this.handlerBind.GetFirstFullIndexStartingAt(rowIndex + 1);
                         //If there is no next row, start from top (and now we are here).
-                        nextRow = nextRow < 0 ? this.bind.GetFirstFullIndexStartingAt(0) : nextRow;
+                        nextRow = nextRow < 0 ? this.handlerBind.GetFirstFullIndexStartingAt(0) : nextRow;
                         if (nextRow >= 0)
                         {
-                            this.bind.SelectRow(nextRow);
+                            this.handlerBind.SelectRow(nextRow);
                         }
                     }
                 }
                 else
                 {
-                    rowIndexes.AddRange(this.bind.GetNotEmptyRowIndexes());
+                    rowIndexes.AddRange(this.handlerBind.GetNotEmptyRowIndexesStartingAt(0));
                 }
 
                 foreach (var rowIndex in rowIndexes)
@@ -310,11 +294,11 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                     ExecuteTimeLoggedJS(timeLogger, engine, preparedScript, rowIndex);
                 }
 
-                this.bind.ApplyCachedCellChange();
+                this.handlerBind.ApplyCachedCellChange();
 
                 UpdateJsonContext(engine);
 
-                timeLogger.Log(tableScript, this.bind.DataTypeName);
+                timeLogger.Log(tableScript, this.handlerBind.DataTypeName);
 
                 return true;
             }
@@ -413,7 +397,8 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
 
         private void UpdateJsonContext(Engine engine)
         {
-            if (jsonLine == null)
+            var control = jsonLine?.GetControl();
+            if (control == null)
             {
                 return;
             }
@@ -421,7 +406,7 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
             var contextJsonJSValue = engine.Evaluate(@"JSON.stringify(this, null, 2);");
             if (contextJsonJSValue.IsString())
             {
-                jsonLine.GetControl().Text = contextJsonJSValue.AsString();
+                control.Text = contextJsonJSValue.AsString();
             }
         }
 

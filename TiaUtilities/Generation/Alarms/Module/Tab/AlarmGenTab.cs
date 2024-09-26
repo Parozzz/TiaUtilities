@@ -1,5 +1,5 @@
 ﻿using TiaUtilities.Generation.GenModules.Alarm.Tab;
-using TiaUtilities.Generation.GridHandler;
+using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.Placeholders;
@@ -7,7 +7,6 @@ using TiaXmlReader;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation.GridHandler;
-using TiaXmlReader.Javascript;
 
 namespace TiaUtilities.Generation.Alarms.Module.Tab
 {
@@ -17,7 +16,8 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
         private static readonly string[] ALARM_COIL_TYPE_ITEMS = [AlarmCoilType.NONE.ToString(), AlarmCoilType.SET.ToString(), AlarmCoilType.RESET.ToString(), AlarmCoilType.COIL.ToString()];
 
         private readonly AlarmGenModule module;
-        private readonly GridScript gridScript;
+        private readonly GridBindContainer gridBindHandler;
+        private GridScript GridScript { get => gridBindHandler.GridScript; }
 
         public TabPage TabPage { get; init; }
         public AlarmTabConfiguration TabConfig { get; init; }
@@ -33,10 +33,10 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
 
         private bool dirty = false;
 
-        public AlarmGenTab(GridSettings gridSettings, GridScript gridScript, GridFindForm findForm, AlarmGenModule module, AlarmMainConfiguration mainConfig, TabPage tabPage)
+        public AlarmGenTab(GridSettings gridSettings, GridBindContainer bindContainer, AlarmGenModule module, AlarmMainConfiguration mainConfig, TabPage tabPage)
         {
             this.module = module;
-            this.gridScript = gridScript;
+            this.gridBindHandler = bindContainer;
             this.TabPage = tabPage;
 
             this.TabConfig = new();
@@ -45,8 +45,8 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             this.AlarmDataPreview = new();
 
             AlarmGenPlaceholdersHandler placeholdersHandler = new(mainConfig, this.TabConfig);
-            deviceGridHandler = new(gridSettings, gridScript, findForm, this.DeviceDataPreview, placeholdersHandler) { RowCount = 499 };
-            alarmGridHandler = new(gridSettings, gridScript, findForm, this.AlarmDataPreview, placeholdersHandler) { RowCount = 199 };
+            deviceGridHandler = new(gridSettings, this.gridBindHandler, this.DeviceDataPreview, placeholdersHandler) { RowCount = 499 };
+            alarmGridHandler = new(gridSettings, this.gridBindHandler, this.AlarmDataPreview, placeholdersHandler) { RowCount = 199 };
 
             TabControl = new(deviceGridHandler.DataGridView, alarmGridHandler.DataGridView);
         }
@@ -176,7 +176,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
 
         public void Selected()
         {
-            this.gridScript.BindHandler(this.alarmGridHandler);
+            this.gridBindHandler.ChangeBind(this.alarmGridHandler);
         }
 
         private void Translate()

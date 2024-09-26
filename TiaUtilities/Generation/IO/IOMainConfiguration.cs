@@ -2,7 +2,6 @@
 using TiaUtilities.Configuration;
 using TiaUtilities.Languages;
 using TiaXmlReader.Generation.Placeholders;
-using TiaXmlReader.GenerationForms;
 using TiaXmlReader.Languages;
 
 namespace TiaXmlReader.Generation.IO
@@ -19,7 +18,7 @@ namespace TiaXmlReader.Generation.IO
         [Locale(nameof(Locale.IO_CONFIG_MEMORY_TYPE_MERKER))] MERKER
     }
 
-    public class IOMainConfiguration : ObservableConfiguration, IGenerationConfiguration
+    public class IOMainConfiguration : ObservableConfiguration
     {
         [JsonProperty] public IOMemoryTypeEnum MemoryType { get => this.GetAs<IOMemoryTypeEnum>(); set => this.Set(value); }
         [JsonProperty] public IOGroupingTypeEnum GroupingType { get => this.GetAs<IOGroupingTypeEnum>(); set => this.Set(value); }

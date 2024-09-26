@@ -1,6 +1,4 @@
-﻿using CustomControls.RJControls;
-
-namespace TiaUtilities.Utility
+﻿namespace TiaUtilities.CustomControls
 {
     partial class FloatingTextBox
     {

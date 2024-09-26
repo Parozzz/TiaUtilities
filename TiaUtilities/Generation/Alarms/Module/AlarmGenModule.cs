@@ -2,6 +2,7 @@
 using TiaUtilities.Generation.GenModules;
 using TiaUtilities.Generation.GenModules.Alarm;
 using TiaUtilities.Generation.GridHandler;
+using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Languages;
 using TiaXmlReader;
@@ -14,8 +15,8 @@ namespace TiaUtilities.Generation.Alarms.Module
 {
     public class AlarmGenModule : IGenModule
     {
-        private readonly GridScript gridScript;
-        private readonly GridFindForm findForm;
+        private readonly GridBindContainer gridBindContainer;
+        private GridScript GridScript { get => gridBindContainer.GridScript; }
 
         private readonly AlarmGenControl control;
         private readonly AlarmMainConfiguration mainConfig;
@@ -24,8 +25,7 @@ namespace TiaUtilities.Generation.Alarms.Module
 
         public AlarmGenModule(JavascriptErrorReportThread jsErrorHandlingThread)
         {
-            this.gridScript = new(jsErrorHandlingThread);
-            this.findForm = new();
+            this.gridBindContainer = new(jsErrorHandlingThread);
 
             this.control = new();
             this.mainConfig = new();
@@ -36,7 +36,7 @@ namespace TiaUtilities.Generation.Alarms.Module
 
         public void Init(GenModuleForm form)
         {
-            this.gridScript.Init();
+            this.gridBindContainer.Init(form);
 
             this.control.BindConfig(this.mainConfig);
 
@@ -71,7 +71,7 @@ namespace TiaUtilities.Generation.Alarms.Module
         {
             tabPage.Text = save?.Name ?? "AlarmGen";
 
-            AlarmGenTab alarmGenTab = new(MainForm.Settings.GridSettings, this.gridScript, this.findForm, this, this.mainConfig, tabPage);
+            AlarmGenTab alarmGenTab = new(MainForm.Settings.GridSettings, this.gridBindContainer, this, this.mainConfig, tabPage);
             genTabList.Add(alarmGenTab);
 
             alarmGenTab.Init();
@@ -89,7 +89,7 @@ namespace TiaUtilities.Generation.Alarms.Module
             this.control.tabControl.TabPages.Clear();
         }
 
-        public bool IsDirty() => this.mainConfig.IsDirty() || this.genTabList.Any(x => x.IsDirty()) || this.gridScript.IsDirty();
+        public bool IsDirty() => this.mainConfig.IsDirty() || this.genTabList.Any(x => x.IsDirty()) || this.GridScript.IsDirty();
         public void Wash()
         {
             this.mainConfig.Wash();
@@ -97,14 +97,14 @@ namespace TiaUtilities.Generation.Alarms.Module
             {
                 tab.Wash();
             }
-            this.gridScript.Wash();
+            this.GridScript.Wash();
         }
 
         public object CreateSave()
         {
             var projectSave = new AlarmGenSave()
             {
-                ScriptSave = this.gridScript.CreateSave()
+                ScriptSave = this.GridScript.CreateSave()
             };
 
             GenUtils.CopyJsonFieldsAndProperties(mainConfig, projectSave.AlarmMainConfig);
@@ -127,7 +127,7 @@ namespace TiaUtilities.Generation.Alarms.Module
 
             this.Clear();
 
-            this.gridScript.LoadSave(loadedSave.ScriptSave);
+            this.GridScript.LoadSave(loadedSave.ScriptSave);
             GenUtils.CopyJsonFieldsAndProperties(loadedSave.AlarmMainConfig, mainConfig);
 
             foreach (var tabSave in loadedSave.TabSaves)
