@@ -168,9 +168,6 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             this.TabPage.TextChanged += (sender, args) => this.dirty = true;
             #endregion
 
-            alarmGridHandler.DataGridView.AutoResizeColumnHeadersHeight();
-            deviceGridHandler.DataGridView.AutoResizeColumnHeadersHeight();
-
             Translate();
         }
 

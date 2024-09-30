@@ -325,6 +325,8 @@ namespace TiaXmlReader.Generation.GridHandler
 
             this.settings.PropertyChanged += (sender, args) => this.DataGridView.Refresh();
 
+            this.DataGridView.VisibleChanged += (sender, argz) => this.DataGridView.AutoResizeColumnHeadersHeight();
+
             this.excelDragHandler.Init();
             this.sortHandler.Init();
 
