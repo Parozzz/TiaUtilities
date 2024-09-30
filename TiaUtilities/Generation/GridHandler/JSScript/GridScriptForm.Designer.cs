@@ -338,7 +338,6 @@
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableLayoutPanel1.Size = new Size(794, 260);
             tableLayoutPanel1.TabIndex = 4;
-            tableLayoutPanel1.Paint += tableLayoutPanel1_Paint;
             // 
             // scriptTabControl
             // 
