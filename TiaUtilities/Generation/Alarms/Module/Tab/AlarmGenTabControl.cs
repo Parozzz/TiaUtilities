@@ -41,6 +41,8 @@ namespace TiaUtilities.Generation.GenModules.Alarm.Tab
                 partitionTypeItems.Add(new { Text = partitionType.GetTranslation(), Value = partitionType });
             }
             this.partitionTypeComboBox.DataSource = partitionTypeItems;
+            //Seems every time a tab is shown, these have all the text selected. Not sure why. This fixes it.
+            this.partitionTypeComboBox.VisibleChanged += (sender, args) => this.partitionTypeComboBox.SelectionLength = 0;
             #endregion
 
             #region GroupingType ComboBox
@@ -53,6 +55,8 @@ namespace TiaUtilities.Generation.GenModules.Alarm.Tab
                 gropingTypeItems.Add(new { Text = groupingType.GetTranslation(), Value = groupingType });
             }
             this.groupingTypeComboBox.DataSource = gropingTypeItems;
+            //Seems every time a tab is shown, these have all the text selected. Not sure why. This fixes it.
+            this.groupingTypeComboBox.VisibleChanged += (sender, args) => this.groupingTypeComboBox.SelectionLength = 0;
             #endregion
         }
 
