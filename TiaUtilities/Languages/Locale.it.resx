@@ -529,4 +529,7 @@ validità riga</value>
   <data name="IO_GEN_FORM_IMPEXP_IMPORT_IO" xml:space="preserve">
     <value>Importa IO da Tabella</value>
   </data>
+  <data name="ALARM_CONFIG_COIL_TYPE_NCOIL" xml:space="preserve">
+    <value>N-Coil</value>
+  </data>
 </root>

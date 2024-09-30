@@ -529,4 +529,7 @@ for row validation</value>
   <data name="MAIN_FORM_TOP_IO_GENERATION" xml:space="preserve">
     <value>Alias Generator</value>
   </data>
+  <data name="ALARM_CONFIG_COIL_TYPE_NCOIL" xml:space="preserve">
+    <value>N-Coil</value>
+  </data>
 </root>

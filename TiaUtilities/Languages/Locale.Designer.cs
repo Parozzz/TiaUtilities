@@ -70,6 +70,15 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a N-Coil.
+        /// </summary>
+        internal static string ALARM_CONFIG_COIL_TYPE_NCOIL {
+            get {
+                return ResourceManager.GetString("ALARM_CONFIG_COIL_TYPE_NCOIL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Ignore.
         /// </summary>
         internal static string ALARM_CONFIG_COIL_TYPE_NONE {

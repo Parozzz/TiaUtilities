@@ -21,6 +21,7 @@ namespace TiaXmlReader.Generation.Alarms
     {
         [Locale(nameof(Locale.ALARM_CONFIG_COIL_TYPE_NONE))] NONE,
         [Locale(nameof(Locale.ALARM_CONFIG_COIL_TYPE_COIL))] COIL,
+        [Locale(nameof(Locale.ALARM_CONFIG_COIL_TYPE_NCOIL))] NCOIL,
         [Locale(nameof(Locale.ALARM_CONFIG_COIL_TYPE_SET))] SET,
         [Locale(nameof(Locale.ALARM_CONFIG_COIL_TYPE_RESET))] RESET
     }

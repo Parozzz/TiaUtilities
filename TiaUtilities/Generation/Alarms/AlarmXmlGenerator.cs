@@ -398,6 +398,7 @@ namespace TiaXmlReader.Generation.Alarms
             return coilType switch
             {
                 AlarmCoilType.COIL => new CoilPart() { Operand = simaticVariable },
+                AlarmCoilType.NCOIL => new CoilPart() { Operand = simaticVariable, Negated = true },
                 AlarmCoilType.SET => new SetCoilPart() { Operand = simaticVariable },
                 AlarmCoilType.RESET => new ResetCoilPart() { Operand = simaticVariable },
                 _ => null,

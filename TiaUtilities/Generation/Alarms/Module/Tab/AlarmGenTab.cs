@@ -13,7 +13,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
     public class AlarmGenTab : ICleanable, ISaveable<AlarmGenTabSave>
     {
         private static readonly string[] TIMERS_TYPES_ITEMS = ["TON", "TOF"];
-        private static readonly string[] ALARM_COIL_TYPE_ITEMS = [AlarmCoilType.NONE.ToString(), AlarmCoilType.SET.ToString(), AlarmCoilType.RESET.ToString(), AlarmCoilType.COIL.ToString()];
+        private static readonly string[] ALARM_COIL_TYPE_ITEMS = Enum.GetNames(typeof(AlarmCoilType));
 
         private readonly AlarmGenModule module;
         private readonly GridBindContainer gridBindHandler;
