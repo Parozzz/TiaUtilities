@@ -29,8 +29,8 @@ namespace TiaUtilities.Generation.GridHandler.Binds
 
             handlerBind = handler == null ? null : GridHandlerBind.CreateBind(handler);
 
-            findForm?.BindToHandler(handlerBind);
-            GridScript.BindToHandler(handlerBind);
+            findForm?.BindToGridHandler(handlerBind);
+            GridScript.BindToGridHandler(handlerBind);
         }
 
         public void ShowFindForm<T>(GridHandler<T> handler) where T : IGridData
@@ -44,7 +44,7 @@ namespace TiaUtilities.Generation.GridHandler.Binds
             if (this.findForm == null)
             {
                 this.findForm = new();
-                this.findForm.BindToHandler(handlerBind);
+                this.findForm.BindToGridHandler(handlerBind);
                 this.findForm.FormClosed += (sender, args) => this.findForm = null;
                 this.findForm.Show(form);
             }

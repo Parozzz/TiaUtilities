@@ -55,7 +55,9 @@ namespace TiaUtilities.Generation.GridHandler.Binds
 
         public required Action<GridDataColumn, int, string> SetColumnData { get; init; }
         public required Func<GridDataColumn, int, string?> GetColumnStringData { get; init; }
-        public required Func<IReadOnlyList<GridScriptVariable>> GetScriptVariables { get; init; }
+
+        public IReadOnlyList<GridScriptVariable> ScriptVariables { get => this.GetScriptVariables(); }
+        public required Func<IReadOnlyList<GridScriptVariable>> GetScriptVariables { private get; init; }
 
 
         public required Action<GridCellChange> AddCachedCellChange { get; init; }

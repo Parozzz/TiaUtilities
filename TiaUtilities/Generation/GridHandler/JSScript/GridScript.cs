@@ -13,7 +13,7 @@ using TiaXmlReader.Utility.Extensions;
 
 namespace TiaUtilities.Generation.GridHandler.JSScript
 {
-    public class GridScript(JavascriptErrorReportThread jsErrorThread) : ICleanable, ISaveable<GridScriptSave>, IBindable
+    public class GridScript(JavascriptErrorReportThread jsErrorThread) : ICleanable, ISaveable<GridScriptSave>, IGridBindable
     {
         private record TabPageScriptRecord(ScriptInfo ScriptInfo, JavascriptEditor JavascriptEditor);
 
@@ -74,7 +74,7 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
 
         public void AddCustomVariable(GridScriptVariable variable) => customVariableList.Add(variable);
 
-        public void BindToHandler(GridHandlerBind? handlerBind)
+        public void BindToGridHandler(GridHandlerBind? handlerBind)
         {
             this.handlerBind = handlerBind;
 
