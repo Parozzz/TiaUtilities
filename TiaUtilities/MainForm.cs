@@ -29,6 +29,7 @@ namespace TiaXmlReader
 
         private readonly TimedSaveHandler autoSaveHandler;
         private readonly JavascriptErrorReportThread jsErrorHandlingThread;
+
         public MainForm()
         {
             InitializeComponent();

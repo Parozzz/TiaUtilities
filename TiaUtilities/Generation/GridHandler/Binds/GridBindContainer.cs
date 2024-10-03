@@ -5,20 +5,23 @@ using TiaXmlReader.Javascript;
 
 namespace TiaUtilities.Generation.GridHandler.Binds
 {
-    public class GridBindContainer(JavascriptErrorReportThread errorReportThread)
+    public class GridBindContainer(JavascriptErrorReportThread errorReportThread) : ICleanable
     {
         private Form? form;
         private GridHandlerBind? handlerBind;
 
         private GridFindForm? findForm;
-        public GridScript GridScript { get; init; } = new(errorReportThread);
+        public GridScriptHandler GridScriptHandler { get; init; } = new(errorReportThread);
 
         public void Init(Form form)
         {
             this.form = form;
 
-            this.GridScript.Init();
+            this.GridScriptHandler.Init();
         }
+
+        public bool IsDirty() => this.GridScriptHandler.IsDirty();
+        public void Wash() => this.GridScriptHandler.Wash();
 
         public void ChangeBind<T>(GridHandler<T>? handler) where T : IGridData
         {
@@ -29,8 +32,8 @@ namespace TiaUtilities.Generation.GridHandler.Binds
 
             handlerBind = handler == null ? null : GridHandlerBind.CreateBind(handler);
 
-            findForm?.BindToHandler(handlerBind);
-            GridScript.BindToHandler(handlerBind);
+            findForm?.BindToGridHandler(handlerBind);
+            GridScriptHandler.BindToGridHandler(handlerBind);
         }
 
         public void ShowFindForm<T>(GridHandler<T> handler) where T : IGridData
@@ -44,7 +47,7 @@ namespace TiaUtilities.Generation.GridHandler.Binds
             if (this.findForm == null)
             {
                 this.findForm = new();
-                this.findForm.BindToHandler(handlerBind);
+                this.findForm.BindToGridHandler(handlerBind);
                 this.findForm.FormClosed += (sender, args) => this.findForm = null;
                 this.findForm.Show(form);
             }
@@ -62,7 +65,7 @@ namespace TiaUtilities.Generation.GridHandler.Binds
 
         public void ShowGridScript()
         {
-            this.GridScript.ShowConfigForm(form);
+            this.GridScriptHandler.ShowForm(form);
         }
     }
 }

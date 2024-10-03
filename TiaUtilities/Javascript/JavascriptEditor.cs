@@ -6,7 +6,7 @@ using Timer = System.Windows.Forms.Timer;
 
 namespace TiaXmlReader.Javascript
 {
-    public class JavascriptEditor
+    public class JavascriptEditor(FastColoredTextBox? fctb = null)
     {
         private static readonly Style SAME_WORDS_STYLE = new MarkerStyle(new SolidBrush(Color.FromArgb(65, Color.Green)));
         private static readonly Style LINE_ERROR_WAVY_STYLE = new CustomWavyLineStyle(Color.FromArgb(255, Color.DarkRed), Color.FromArgb(125, Color.MediumVioletRed));
@@ -14,17 +14,12 @@ namespace TiaXmlReader.Javascript
 
         private const int SHOW_ERROR_DELAY_AFTER_TEXT_CHANGED = 1250; //ms
 
-        private readonly FastColoredTextBox fctb;
+        private readonly FastColoredTextBox fctb = fctb ?? new();
 
         private JavascriptErrorReportThread.JSScriptReport? scriptReport;
         private DisplayedError? currentError;
 
         private bool haltError; //This is required to avoid having the wavy style contantly flash on screen. After changing text, give some time before accetting new text!
-
-        public JavascriptEditor()
-        {
-            this.fctb = new FastColoredTextBox();
-        }
 
         public FastColoredTextBox GetTextBox()
         {

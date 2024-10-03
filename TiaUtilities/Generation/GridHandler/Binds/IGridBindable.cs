@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace TiaUtilities.Generation.GridHandler.Binds
 {
-    public interface IBindable
+    public interface IGridBindable
     {
-        public void BindToHandler(GridHandlerBind? handlerBind);
+        public void BindToGridHandler(GridHandlerBind? handlerBind);
     }
 }

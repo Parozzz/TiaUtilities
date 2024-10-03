@@ -17,7 +17,6 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
 
         private readonly AlarmGenModule module;
         private readonly GridBindContainer gridBindHandler;
-        private GridScript GridScript { get => gridBindHandler.GridScript; }
 
         public TabPage TabPage { get; init; }
         public AlarmTabConfiguration TabConfig { get; init; }

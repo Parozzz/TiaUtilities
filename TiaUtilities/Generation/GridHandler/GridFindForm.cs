@@ -7,7 +7,7 @@ using TiaXmlReader.Generation.GridHandler.Data;
 
 namespace TiaUtilities.Generation.GridHandler
 {
-    public partial class GridFindForm : Form, IBindable
+    public partial class GridFindForm : Form, IGridBindable
     {
         public class FindData(GridDataColumn column, int row, string text)
         {
@@ -92,7 +92,7 @@ namespace TiaUtilities.Generation.GridHandler
             this.MatchCaseCheckBox.Text = Locale.GRID_FIND_MATCH_CASE_CHECKBOX;
         }
 
-        public void BindToHandler(GridHandlerBind? handlerBind)
+        public void BindToGridHandler(GridHandlerBind? handlerBind)
         {
             this.handlerBInd = handlerBind;
         }
