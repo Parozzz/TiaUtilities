@@ -10,7 +10,7 @@ using TiaXmlReader.Utility.Extensions;
 
 namespace TiaUtilities.Generation.GridHandler.JSScript
 {
-    public class GridScriptHandler(JavascriptErrorReportThread jsErrorThread) : ICleanable, IGridBindable
+    public class GridScriptHandler(JavascriptErrorReportThread jsErrorThread) : ICleanable, ISaveable<GridScriptSave>, IGridBindable
     {
         public const string ENGINE_LOG_FUNCTION = "log";
         public const string ENGINE_ROW_VARIABLE = "row";
@@ -32,9 +32,8 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
             this.log.Changed += (sender, args) => form?.UpdateLog(args.NewValue);
             this.jsonContext.Changed += (sender, args) => form?.UpdateJsonContext(args.NewValue);
 
-            void UpdateVariableView() => form?.UpdateVariableView(this.gridVariables.Concat(this.customVariables));
-            this.gridVariables.CollectionChanged += (sender, args) => UpdateVariableView();
-            this.gridVariables.CollectionChanged += (sender, args) => UpdateVariableView();
+            this.gridVariables.CollectionChanged += (sender, args) => this.UpdateFormVariableView();
+            this.gridVariables.CollectionChanged += (sender, args) => this.UpdateFormVariableView();
 
             if (this.Scripts.Count == 0)
             {
@@ -44,6 +43,22 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
 
         public bool IsDirty() => this.Scripts.Any(x => x.IsDirty());
         public void Wash() => this.Scripts.ForEach(x => x.Wash());
+
+        public GridScriptSave CreateSave()
+        {
+            GridScriptSave save = new();
+            foreach (var scriptInfo in this.Scripts)
+            {
+                save.Scripts.Add(scriptInfo);
+            }
+            return save;
+        }
+
+        public void LoadSave(GridScriptSave save)
+        {
+            this.Scripts.Clear();
+            this.Scripts.AddRange(save.Scripts);
+        }
 
         public void ClearAllCustomVariables() => this.customVariables.Clear();
         public void AddCustomVariable(GridScriptVariable variable) => this.customVariables.Add(variable);
@@ -66,13 +81,22 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                 this.log.Value = "";
                 this.jsonContext.Value = "";
 
-                form = new(this);
+                form = new(this)
+                {
+                    Width = 1150,
+                    Height = 950
+                };
                 form.Init();
+
                 form.FormClosed += (sender, args) => form = null;
+                this.UpdateFormVariableView();
+
                 form.Show(window);
             }
-
-            form.Activate();
+            else
+            {
+                form.Activate();
+            }
         }
 
         public bool ParseJS(GridScriptForm.TabPageScriptRecord? record, bool singleExecution = false, bool ignoreLog = false)
@@ -136,18 +160,19 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                 var variables = this.JoinAllVariables();
                 foreach (var rowIndex in rowIndexes)
                 {
+                    Dictionary<string, GridJSVariable> variablesDict = [];
+
                     engine.SetValue(ENGINE_ROW_VARIABLE, rowIndex);
                     foreach (var variable in variables)
                     {
                         var value = variable.Get?.Invoke(rowIndex);
-                        if (value != null)
-                        {
-                            engine.SetValue(variable.Name, value);
-                        }
+                        engine.SetValue(variable.Name, value);
+
+                        variablesDict.Add(variable.Name, new(variable) { OldValue = value });
                     }
 
                     timeLogger.Restart();
-                    ExecuteJS(engine, preparedScript, variables, rowIndex);
+                    ExecuteJS(engine, preparedScript, variablesDict, rowIndex);
                     timeLogger.StopAndSave();
                 }
 
@@ -172,26 +197,8 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
             return false;
         }
 
-        public void ExecuteJS(Engine engine, Prepared<Script> script, IEnumerable<GridScriptVariable> variables, int row)
+        private static void ExecuteJS(Engine engine, Prepared<Script> script, Dictionary<string, GridJSVariable> variablesDict, int row)
         {
-            Dictionary<string, GridJSVariable> dataValuesDict = [];
-            foreach (var variable in variables)
-            {
-                var value = variable.Get?.Invoke(row);
-                if (value == null)
-                {
-                    continue;
-                }
-
-                dataValuesDict.Add(variable.Name, new(variable) { OldValue = value });
-            }
-
-            foreach (var entry in dataValuesDict)
-            {
-                var ioJSVariable = entry.Value;
-                engine.SetValue(entry.Key, ioJSVariable.OldValue);
-            }
-
             var eval = engine.Evaluate(script);
             if (eval.IsBoolean() && !eval.AsBoolean())
             {
@@ -199,7 +206,7 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
             }
 
             var changed = false;
-            foreach (var entry in dataValuesDict)
+            foreach (var entry in variablesDict)
             {
                 var ioJSVariable = entry.Value;
 
@@ -215,7 +222,7 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                 return;
             }
 
-            foreach (var ioJSVariable in dataValuesDict.Values)
+            foreach (var ioJSVariable in variablesDict.Values)
             {
                 var scriptVariable = ioJSVariable.ScriptVariable;
                 if (scriptVariable.CreateCachedCellChange != null)
@@ -229,9 +236,19 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
             }
         }
 
+        public void ClearLog()
+        {
+            this.log.Value = "";
+        }
+
         private IEnumerable<GridScriptVariable> JoinAllVariables()
         {
             return this.customVariables.Concat(this.gridVariables);
+        }
+
+        private void UpdateFormVariableView()
+        {
+            form?.UpdateVariableView(this.JoinAllVariables());
         }
 
         private class GridJSVariable(GridScriptVariable scriptVariable)

@@ -183,6 +183,9 @@
   <data name="GENERICS_CANCEL" xml:space="preserve">
     <value>Cancel</value>
   </data>
+  <data name="GENERICS_CLEAR" xml:space="preserve">
+    <value>Clear</value>
+  </data>
   <data name="IO_GEN_EXCELIMPORT_IO_NAME" xml:space="preserve">
     <value>IO Name</value>
   </data>

@@ -17,18 +17,28 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
         public record TabPageScriptRecord(ScriptInfo Script, JavascriptEditor Editor);
 
         private readonly GridScriptHandler scriptHandler;
-        private TabPageScriptRecord? record;
-
+        private readonly FastColoredTextBox jsonContextTextBox;
+        
         public GridScriptForm(GridScriptHandler scriptHandler)
         {
             InitializeComponent();
 
             this.scriptHandler = scriptHandler;
+            this.jsonContextTextBox = new();
         }
 
         public void Init()
         {
             #region JSON_CONTEXT_TEXT_BOX_CONFIGURATION
+            this.jsonContextTextBox.ReadOnly = true;
+            this.jsonContextTextBox.BorderStyle = BorderStyle.FixedSingle;
+
+            this.jsonContextTextBox.AutoSize = true;
+            this.jsonContextTextBox.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            this.jsonContextTextBox.Dock = DockStyle.Fill;
+
+            this.jsonContextTextBox.BackColor = SystemColors.Control;
+
             this.jsonContextTextBox.Language = Language.JSON;
             // == INDENTATION ==
             this.jsonContextTextBox.AutoIndent = true;
@@ -41,7 +51,7 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
             // == CARET ==
             this.jsonContextTextBox.CaretVisible = true;
             this.jsonContextTextBox.CaretBlinking = true;
-            this.jsonContextTextBox.ShowCaretWhenInactive = true;
+            this.jsonContextTextBox.ShowCaretWhenInactive = false;
             this.jsonContextTextBox.WideCaret = false;
 
             this.jsonContextTextBox.CharHeight = 16; //Default 14
@@ -50,7 +60,41 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
             this.jsonContextTextBox.AcceptsTab = true;
             this.jsonContextTextBox.AcceptsReturn = true;
             this.jsonContextTextBox.ShowFoldingLines = true;
+            this.jsonContextPanel.Controls.Add(jsonContextTextBox);
             #endregion
+
+            #region LOG_TEXT_BOX
+            var menuItem = new ToolStripMenuItem(Locale.GENERICS_CLEAR);
+            menuItem.Click += (sender, args) => this.scriptHandler.ClearLog();
+
+            var contextMenu = new ContextMenuStrip();
+            contextMenu.Items.Add(menuItem);
+            this.logTextBox.ContextMenuStrip = contextMenu;
+
+            //Scroll to the end after text is changed!
+            this.logTextBox.TextChanged += (sender, args) =>
+            {
+                this.logTextBox.Select(this.logTextBox.TextLength + 1, 0);
+                this.logTextBox.ScrollToCaret();
+            };
+            #endregion
+
+
+            this.variablesTreeView.NodeMouseDoubleClick += (sender, args) =>
+            {
+                var currentRecord = this.GetCurrentTabPageRecord();
+                if(currentRecord == null)
+                {
+                    return;
+                }
+
+                if(args.Node.Tag is GridScriptVariable variable)
+                {
+                    var textBox = currentRecord.Editor.GetTextBox();
+                    textBox.InsertText(variable.Name);
+                    textBox.Focus();
+                }
+            };
 
             this.scriptTabControl.TabPreAdded += (sender, args) =>
             {
@@ -70,26 +114,21 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                 }
 
                 this.scriptHandler.Scripts.Remove(record.Script);
-                if(this.record == record)
-                {
-                    this.record = null;
-                }
             };
 
             this.scriptTabControl.Selected += (sender, args) =>
             {
                 var tabPage = args.TabPage;
 
-                this.record?.Editor.UnregisterErrorReport(this.scriptHandler.JSErrorThread);
-                this.record = null;
+                var currentRecord = this.GetCurrentTabPageRecord();
+                currentRecord?.Editor.UnregisterErrorReport(this.scriptHandler.JSErrorThread);
 
                 if (tabPage?.Tag is not TabPageScriptRecord record)
                 {
                     return;
                 }
 
-                this.record = record;
-                this.record.Editor.RegisterErrorReport(this.scriptHandler.JSErrorThread);
+                record.Editor.RegisterErrorReport(this.scriptHandler.JSErrorThread);
             };
 
             this.scriptTabControl.TabNameUserChanged += (sender, args) =>
@@ -103,9 +142,9 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                 record.Script.Name = args.NewName;
             };
 
-            this.autoFormatButton.Click += (sender, args) => this.record?.Editor.GetTextBox().DoAutoIndent();
-            this.executeAllButton.Click += (sender, args) => this.scriptHandler.ParseJS(this.record);
-            this.executeLineButton.Click += (sender, args) => this.scriptHandler.ParseJS(this.record, singleExecution: true);
+            this.autoFormatButton.Click += (sender, args) => this.GetCurrentTabPageRecord()?.Editor.GetTextBox().DoAutoIndent();
+            this.executeAllButton.Click += (sender, args) => this.scriptHandler.ParseJS(this.GetCurrentTabPageRecord());
+            this.executeLineButton.Click += (sender, args) => this.scriptHandler.ParseJS(this.GetCurrentTabPageRecord(), singleExecution: true);
 
             foreach (var script in this.scriptHandler.Scripts)
             {
@@ -116,8 +155,8 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
 
             this.FormClosed += (sender, args) =>
             {
-                record?.Editor.UnregisterErrorReport(this.scriptHandler.JSErrorThread);
-                record = null;
+                var currentRecord = this.GetCurrentTabPageRecord();
+                currentRecord?.Editor.UnregisterErrorReport(this.scriptHandler.JSErrorThread);
             };
 
             this.Translate();
@@ -141,7 +180,8 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
 
             foreach (var v in variables)
             {
-                this.variablesTreeView.Nodes.Add($"{v.Name}, {v.ValueType}");
+                var node = this.variablesTreeView.Nodes.Add($"{v.Name}, {v.ValueType}");
+                node.Tag = v;
             }
 
             this.variablesTreeView.ResumeLayout();
@@ -173,6 +213,11 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
         public void UpdateJsonContext(string contextString)
         {
             this.jsonContextTextBox.Text = contextString;
+        }
+
+        private TabPageScriptRecord? GetCurrentTabPageRecord()
+        {
+            return this.scriptTabControl.SelectedTab?.Tag is TabPageScriptRecord record ? record : null;
         }
     }
 }

@@ -29,7 +29,6 @@ namespace TiaUtilities.Generation.IO.Module
         public ICollection<IOSuggestionData> Suggestions { get => suggestionGridHandler.DataSource.GetNotEmptyDataDict().Keys; }
 
         private readonly GridBindContainer gridBindContainer;
-        private GridScript GridScript { get => this.gridBindContainer.GridScript; }
 
         private readonly IOMainConfiguration mainConfig;
         private readonly IOExcelImportConfiguration excelImportConfig;
@@ -312,7 +311,7 @@ namespace TiaUtilities.Generation.IO.Module
             this.control.gridsTabControl.TabPages.Clear();
         }
 
-        public bool IsDirty() => mainConfig.IsDirty() || suggestionGridHandler.IsDirty() || genTabList.Any(x => x.IsDirty()) || this.GridScript.IsDirty();
+        public bool IsDirty() => mainConfig.IsDirty() || suggestionGridHandler.IsDirty() || genTabList.Any(x => x.IsDirty()) || this.gridBindContainer.IsDirty();
         public void Wash()
         {
             this.mainConfig.Wash();
@@ -321,7 +320,7 @@ namespace TiaUtilities.Generation.IO.Module
             {
                 tab.Wash();
             }
-            this.GridScript.Wash();
+            this.gridBindContainer.Wash();
         }
 
         public Control? GetControl()
@@ -348,7 +347,7 @@ namespace TiaUtilities.Generation.IO.Module
             IOGenSave save = new()
             {
                 SuggestionGrid = this.suggestionGridHandler.CreateSave(),
-                ScriptSave = this.GridScript.CreateSave()
+                ScriptSave = this.gridBindContainer.GridScriptHandler.CreateSave()
             };
 
             GenUtils.CopyJsonFieldsAndProperties(mainConfig, save.MainConfig);
@@ -372,8 +371,8 @@ namespace TiaUtilities.Generation.IO.Module
 
             this.Clear();
 
-            this.GridScript.LoadSave(loadedSave.ScriptSave);
-            suggestionGridHandler.LoadSave(loadedSave.SuggestionGrid);
+            this.gridBindContainer.GridScriptHandler.LoadSave(loadedSave.ScriptSave);
+            this.suggestionGridHandler.LoadSave(loadedSave.SuggestionGrid);
 
             GenUtils.CopyJsonFieldsAndProperties(loadedSave.MainConfig, mainConfig);
             GenUtils.CopyJsonFieldsAndProperties(loadedSave.ExcelImportConfiguration, excelImportConfig);

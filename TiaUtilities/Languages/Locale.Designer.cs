@@ -619,6 +619,15 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Clear.
+        /// </summary>
+        internal static string GENERICS_CLEAR {
+            get {
+                return ResourceManager.GetString("GENERICS_CLEAR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Comment.
         /// </summary>
         internal static string GENERICS_COMMENT {
