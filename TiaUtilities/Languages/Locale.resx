@@ -308,7 +308,7 @@ for row validation</value>
     <value>Alarm Variable</value>
   </data>
   <data name="ALARM_DATA_CUSTOM_VAR_ADDR" xml:space="preserve">
-    <value>Custom Var.</value>
+    <value>Custom Variable</value>
   </data>
   <data name="ALARM_DATA_CUSTOM_VAR_VALUE" xml:space="preserve">
     <value>Value</value>
@@ -542,6 +542,12 @@ for row validation</value>
     <value>N-Coil</value>
   </data>
   <data name="ALARM_CONFIG_DEFAULTS_CUSTOM_VAR" xml:space="preserve">
-    <value>Custom numeric variable</value>
+    <value>Custom variable</value>
+  </data>
+  <data name="ALARM_CONFIG_ENABLE_CUSTOM_VAR" xml:space="preserve">
+    <value>Enable custom variable</value>
+  </data>
+  <data name="ALARM_CONFIG_ENABLE_TIMER" xml:space="preserve">
+    <value>Enable timer</value>
   </data>
 </root>

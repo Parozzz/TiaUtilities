@@ -117,7 +117,7 @@ namespace TiaXmlReader.Generation.IO
                             tag.Comment[LocaleVariables.CULTURE] = ioData.Comment;
                             tag.SetBoolean(SimaticMemoryArea.MERKER, merkerVariableTag.ByteOffset, merkerVariableTag.BitOffset);
 
-                            inOutAddress = merkerVariableAddress;
+                            inOutAddress = $"\"merkerVariableAddress\""; //Add double quote to avoid this address to be parsed as a DB call (eg. to avoid I0.0 to be parsed as "I0"."0" instead "I0.0")
                             break;
                         case IOMemoryTypeEnum.DB:
                             var member = AddMemberToDB(duplicatedAddressDict, ioData.Variable, ioData.Comment);

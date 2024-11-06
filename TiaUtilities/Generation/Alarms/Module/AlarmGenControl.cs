@@ -23,10 +23,25 @@ namespace TiaUtilities.Generation.GenModules.Alarm
             this.fcConfigButton.Text = Locale.ALARM_CONFIG_FC;
             this.segmentNameConfigButton.Text = Locale.ALARM_CONFIG_SEGMENT_NAME;
             this.textListConfigButton.Text = Locale.ALARM_CONFIG_TEXT_LIST;
+
+            this.enableCustomVarLabel.Text = Locale.ALARM_CONFIG_ENABLE_CUSTOM_VAR;
+            this.enableTimerLabel.Text = Locale.ALARM_CONFIG_ENABLE_TIMER;
         }
 
         public void BindConfig(AlarmMainConfiguration mainConfig)
         {
+            this.enableCustomVarToggleButton.Checked = mainConfig.EnableCustomVariable;
+            this.enableCustomVarToggleButton.CheckedChanged += (sender, args) =>
+            {
+                mainConfig.EnableCustomVariable = this.enableCustomVarToggleButton.Checked;
+            };
+
+            this.enableTimerToggleButton.Checked = mainConfig.EnableTimer;
+            this.enableTimerToggleButton.CheckedChanged += (sender, args) =>
+            {
+                mainConfig.EnableTimer = this.enableTimerToggleButton.Checked;
+            };
+
             {
                 var button = this.fcConfigButton;
                 button.Click += (sender, args) =>

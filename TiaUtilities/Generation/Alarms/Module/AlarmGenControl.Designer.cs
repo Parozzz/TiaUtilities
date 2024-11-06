@@ -36,9 +36,17 @@ namespace TiaUtilities.Generation.GenModules.Alarm
             fcConfigButton = new Button();
             segmentNameConfigButton = new Button();
             textListConfigButton = new Button();
+            enableCustomVarPanel = new TableLayoutPanel();
+            enableCustomVarToggleButton = new RJToggleButton();
+            enableCustomVarLabel = new Label();
             tabControl = new InteractableTabControl();
+            enableTimerPanel = new TableLayoutPanel();
+            enableTimerToggleButton = new RJToggleButton();
+            enableTimerLabel = new Label();
             mainTableLayout.SuspendLayout();
             configButtonPanel.SuspendLayout();
+            enableCustomVarPanel.SuspendLayout();
+            enableTimerPanel.SuspendLayout();
             SuspendLayout();
             // 
             // PlaceholdersLabel
@@ -77,11 +85,13 @@ namespace TiaUtilities.Generation.GenModules.Alarm
             configButtonPanel.Controls.Add(fcConfigButton);
             configButtonPanel.Controls.Add(segmentNameConfigButton);
             configButtonPanel.Controls.Add(textListConfigButton);
+            configButtonPanel.Controls.Add(enableCustomVarPanel);
+            configButtonPanel.Controls.Add(enableTimerPanel);
             configButtonPanel.Dock = DockStyle.Left;
             configButtonPanel.Location = new Point(0, 19);
             configButtonPanel.Margin = new Padding(0, 3, 0, 0);
             configButtonPanel.Name = "configButtonPanel";
-            configButtonPanel.Size = new Size(350, 30);
+            configButtonPanel.Size = new Size(888, 30);
             configButtonPanel.TabIndex = 15;
             // 
             // fcConfigButton
@@ -126,6 +136,55 @@ namespace TiaUtilities.Generation.GenModules.Alarm
             textListConfigButton.Text = "Lista testi";
             textListConfigButton.UseVisualStyleBackColor = true;
             // 
+            // enableCustomVarPanel
+            // 
+            enableCustomVarPanel.AutoSize = true;
+            enableCustomVarPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            enableCustomVarPanel.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
+            enableCustomVarPanel.ColumnCount = 2;
+            enableCustomVarPanel.ColumnStyles.Add(new ColumnStyle());
+            enableCustomVarPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            enableCustomVarPanel.Controls.Add(enableCustomVarToggleButton, 1, 0);
+            enableCustomVarPanel.Controls.Add(enableCustomVarLabel, 0, 0);
+            enableCustomVarPanel.Location = new Point(353, 0);
+            enableCustomVarPanel.Margin = new Padding(3, 0, 0, 0);
+            enableCustomVarPanel.Name = "enableCustomVarPanel";
+            enableCustomVarPanel.Padding = new Padding(3, 0, 3, 0);
+            enableCustomVarPanel.RowCount = 1;
+            enableCustomVarPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            enableCustomVarPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            enableCustomVarPanel.Size = new Size(266, 30);
+            enableCustomVarPanel.TabIndex = 19;
+            // 
+            // enableCustomVarToggleButton
+            // 
+            enableCustomVarToggleButton.AutoSize = true;
+            enableCustomVarToggleButton.BorderColor = Color.Gray;
+            enableCustomVarToggleButton.BorderWidth = 2;
+            enableCustomVarToggleButton.Location = new Point(214, 4);
+            enableCustomVarToggleButton.MinimumSize = new Size(45, 22);
+            enableCustomVarToggleButton.Name = "enableCustomVarToggleButton";
+            enableCustomVarToggleButton.OffBackColor = Color.Gray;
+            enableCustomVarToggleButton.OffToggleColor = Color.Gainsboro;
+            enableCustomVarToggleButton.OnBackColor = Color.MediumSlateBlue;
+            enableCustomVarToggleButton.OnToggleColor = Color.WhiteSmoke;
+            enableCustomVarToggleButton.Size = new Size(45, 22);
+            enableCustomVarToggleButton.TabIndex = 18;
+            enableCustomVarToggleButton.ToggleWidthPercentage = 15;
+            enableCustomVarToggleButton.UseVisualStyleBackColor = true;
+            // 
+            // enableCustomVarLabel
+            // 
+            enableCustomVarLabel.AutoSize = true;
+            enableCustomVarLabel.Dock = DockStyle.Fill;
+            enableCustomVarLabel.Font = new Font("Microsoft Sans Serif", 12.75F);
+            enableCustomVarLabel.Location = new Point(7, 1);
+            enableCustomVarLabel.Name = "enableCustomVarLabel";
+            enableCustomVarLabel.Size = new Size(200, 28);
+            enableCustomVarLabel.TabIndex = 19;
+            enableCustomVarLabel.Text = "ENABLE_CUSTOM_VAR";
+            enableCustomVarLabel.TextAlign = ContentAlignment.MiddleCenter;
+            // 
             // tabControl
             // 
             tabControl.Dock = DockStyle.Fill;
@@ -137,6 +196,54 @@ namespace TiaUtilities.Generation.GenModules.Alarm
             tabControl.SelectedIndex = 0;
             tabControl.Size = new Size(1394, 674);
             tabControl.TabIndex = 16;
+            // 
+            // enableTimerPanel
+            // 
+            enableTimerPanel.AutoSize = true;
+            enableTimerPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            enableTimerPanel.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
+            enableTimerPanel.ColumnCount = 2;
+            enableTimerPanel.ColumnStyles.Add(new ColumnStyle());
+            enableTimerPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            enableTimerPanel.Controls.Add(enableTimerToggleButton, 1, 0);
+            enableTimerPanel.Controls.Add(enableTimerLabel, 0, 0);
+            enableTimerPanel.Location = new Point(622, 0);
+            enableTimerPanel.Margin = new Padding(3, 0, 0, 0);
+            enableTimerPanel.Name = "enableTimerPanel";
+            enableTimerPanel.Padding = new Padding(3, 0, 3, 0);
+            enableTimerPanel.RowCount = 1;
+            enableTimerPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            enableTimerPanel.Size = new Size(266, 30);
+            enableTimerPanel.TabIndex = 20;
+            // 
+            // enableTimerToggleButton
+            // 
+            enableTimerToggleButton.AutoSize = true;
+            enableTimerToggleButton.BorderColor = Color.Gray;
+            enableTimerToggleButton.BorderWidth = 2;
+            enableTimerToggleButton.Location = new Point(214, 4);
+            enableTimerToggleButton.MinimumSize = new Size(45, 22);
+            enableTimerToggleButton.Name = "enableTimerToggleButton";
+            enableTimerToggleButton.OffBackColor = Color.Gray;
+            enableTimerToggleButton.OffToggleColor = Color.Gainsboro;
+            enableTimerToggleButton.OnBackColor = Color.MediumSlateBlue;
+            enableTimerToggleButton.OnToggleColor = Color.WhiteSmoke;
+            enableTimerToggleButton.Size = new Size(45, 22);
+            enableTimerToggleButton.TabIndex = 18;
+            enableTimerToggleButton.ToggleWidthPercentage = 15;
+            enableTimerToggleButton.UseVisualStyleBackColor = true;
+            // 
+            // enableTimerLabel
+            // 
+            enableTimerLabel.AutoSize = true;
+            enableTimerLabel.Dock = DockStyle.Fill;
+            enableTimerLabel.Font = new Font("Microsoft Sans Serif", 12.75F);
+            enableTimerLabel.Location = new Point(7, 1);
+            enableTimerLabel.Name = "enableTimerLabel";
+            enableTimerLabel.Size = new Size(200, 28);
+            enableTimerLabel.TabIndex = 19;
+            enableTimerLabel.Text = "ENABLE_CUSTOM_VAR";
+            enableTimerLabel.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // AlarmGenControl
             // 
@@ -150,6 +257,10 @@ namespace TiaUtilities.Generation.GenModules.Alarm
             mainTableLayout.PerformLayout();
             configButtonPanel.ResumeLayout(false);
             configButtonPanel.PerformLayout();
+            enableCustomVarPanel.ResumeLayout(false);
+            enableCustomVarPanel.PerformLayout();
+            enableTimerPanel.ResumeLayout(false);
+            enableTimerPanel.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -163,5 +274,11 @@ namespace TiaUtilities.Generation.GenModules.Alarm
         public Button segmentNameConfigButton;
         public Button textListConfigButton;
         public InteractableTabControl tabControl;
+        private TableLayoutPanel enableCustomVarPanel;
+        private RJToggleButton enableCustomVarToggleButton;
+        private Label enableCustomVarLabel;
+        private TableLayoutPanel enableTimerPanel;
+        private RJToggleButton enableTimerToggleButton;
+        private Label enableTimerLabel;
     }
 }

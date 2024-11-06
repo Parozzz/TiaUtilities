@@ -72,12 +72,14 @@ namespace TiaUtilities.Generation.IO.Module.Tab
 
             this.GridHandler.AddTextBoxColumn(IOData.IO_NAME, 110);
             this.GridHandler.AddCustomColumn(variableAddressColumn, IOData.VARIABLE, 200);
-            variableAddressColumn.SetGetItemsFunc(() =>
+            this.variableAddressColumn.SetGetItemsFunc(() =>
             {
-                var ioVariableEnumerable = GridHandler.DataSource.GetNotEmptyDataDict().Keys.Select(i => i.Variable);
+                var ioVariableEnumerable = this.GridHandler.DataSource.GetNotEmptyDataDict().Keys.Select(i => i.Variable.ToLowerInvariant());
                 var suggestionEnumerable = module.Suggestions;
 
-                var notAddedSuggestionEnumerable = suggestionEnumerable.Select(k => k.Value).Except(ioVariableEnumerable).ToArray();
+                var notAddedSuggestionEnumerable = suggestionEnumerable.Select(k => k.Value)
+                                                                       .Where(v => v != null && ioVariableEnumerable.Contains(v.ToLower()))
+                                                                       .ToArray();
                 return notAddedSuggestionEnumerable;
             });
 

@@ -298,7 +298,7 @@ namespace TiaXmlReader.Generation.Alarms
 
         }
 
-        private static void FillAlarmSegment(AlarmTabConfiguration tabConfig, SimaticLADSegment segment, GenPlaceholderHandler placeholders, AlarmData alarmData)
+        private void FillAlarmSegment(AlarmTabConfiguration tabConfig, SimaticLADSegment segment, GenPlaceholderHandler placeholders, AlarmData alarmData)
         {
             if (string.IsNullOrEmpty(alarmData.AlarmVariable))
             {
@@ -320,8 +320,9 @@ namespace TiaXmlReader.Generation.Alarms
 
             var parsedCustomVarAddress = placeholders.Parse(alarmData.CustomVariableAddress);
             var parsedCustomVarValue = placeholders.Parse(alarmData.CustomVariableValue);
-            if (!string.IsNullOrEmpty(parsedCustomVarAddress) && AlarmData.IsAddressValid(parsedCustomVarAddress)
-                && !string.IsNullOrEmpty(parsedCustomVarValue) && AlarmData.IsAddressValid(parsedCustomVarValue))
+            if (mainConfig.EnableCustomVariable && 
+                !string.IsNullOrEmpty(parsedCustomVarAddress) && AlarmData.IsAddressValid(parsedCustomVarAddress) && 
+                !string.IsNullOrEmpty(parsedCustomVarValue) && AlarmData.IsAddressValid(parsedCustomVarValue))
             {
 
                 SimaticVariable inVar;
@@ -346,10 +347,11 @@ namespace TiaXmlReader.Generation.Alarms
             }
 
             TimerPart? timer = null;
-            if (!string.IsNullOrEmpty(alarmData.TimerAddress)
-                && !string.IsNullOrEmpty(alarmData.TimerType)
-                && !string.IsNullOrEmpty(alarmData.TimerValue)
-                && AlarmData.IsAddressValid(alarmData.TimerAddress))
+            if (mainConfig.EnableTimer &&
+                !string.IsNullOrEmpty(alarmData.TimerAddress) && 
+                !string.IsNullOrEmpty(alarmData.TimerType) && 
+                !string.IsNullOrEmpty(alarmData.TimerValue) && 
+                AlarmData.IsAddressValid(alarmData.TimerAddress))
             {
                 var partType = alarmData.TimerType.ToLower() switch
                 {

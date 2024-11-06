@@ -15,8 +15,9 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
         private static readonly string[] TIMERS_TYPES_ITEMS = ["TON", "TOF"];
         private static readonly string[] ALARM_COIL_TYPE_ITEMS = Enum.GetNames(typeof(AlarmCoilType));
 
-        private readonly AlarmGenModule module;
         private readonly GridBindContainer gridBindHandler;
+        private readonly AlarmGenModule module;
+        private readonly AlarmMainConfiguration mainConfig;
 
         public TabPage TabPage { get; init; }
         public AlarmTabConfiguration TabConfig { get; init; }
@@ -36,6 +37,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
         {
             this.module = module;
             this.gridBindHandler = bindContainer;
+            this.mainConfig = mainConfig;
             this.TabPage = tabPage;
 
             this.TabConfig = new();
@@ -84,6 +86,49 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
 
             deviceGridHandler.Init();
             alarmGridHandler.Init();
+
+            #region HIDE_CUSTOM_VARIABLE/TIMER_COLUMNS
+            void UpdateShowCustomVariable(bool enable)
+            {
+                if (!enable)
+                {
+                    alarmGridHandler.HideColumn(AlarmData.CUSTOM_VARIABLE_ADDRESS);
+                    alarmGridHandler.HideColumn(AlarmData.CUSTOM_VARIABLE_VALUE);
+                }
+                else
+                {
+                    alarmGridHandler.ShowColumn(AlarmData.CUSTOM_VARIABLE_ADDRESS);
+                    alarmGridHandler.ShowColumn(AlarmData.CUSTOM_VARIABLE_VALUE);
+                }
+
+                alarmGridHandler.InitColumns();
+            }
+
+            UpdateShowCustomVariable(mainConfig.EnableCustomVariable);
+            mainConfig.Subscribe(() => mainConfig.EnableCustomVariable, UpdateShowCustomVariable);
+
+
+            void UpdateShowTimer(bool enable)
+            {
+                if (!enable)
+                {
+                    alarmGridHandler.HideColumn(AlarmData.TIMER_ADDRESS);
+                    alarmGridHandler.HideColumn(AlarmData.TIMER_TYPE);
+                    alarmGridHandler.HideColumn(AlarmData.TIMER_VALUE);
+                }
+                else
+                {
+                    alarmGridHandler.ShowColumn(AlarmData.TIMER_ADDRESS);
+                    alarmGridHandler.ShowColumn(AlarmData.TIMER_TYPE);
+                    alarmGridHandler.ShowColumn(AlarmData.TIMER_VALUE);
+                }
+
+                alarmGridHandler.InitColumns();
+            }
+
+            UpdateShowTimer(mainConfig.EnableTimer);
+            mainConfig.Subscribe(() => mainConfig.EnableTimer, UpdateShowTimer);
+            #endregion
 
             #region PREVIEW
             this.AlarmDataPreview.Function = (column, alarmData) =>

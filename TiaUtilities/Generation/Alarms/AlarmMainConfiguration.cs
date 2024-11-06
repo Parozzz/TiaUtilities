@@ -39,6 +39,9 @@ namespace TiaXmlReader.Generation.Alarms
         [JsonProperty] public string AlarmTextInList { get => this.GetAs<string>(); set => this.Set(value); }
         [JsonProperty] public string EmptyAlarmTextInList { get => this.GetAs<string>(); set => this.Set(value); }
 
+        [JsonProperty] public bool EnableCustomVariable { get => this.GetAs<bool>(); set => this.Set(value); }
+        [JsonProperty] public bool EnableTimer { get => this.GetAs<bool>(); set => this.Set(value); }
+
         public AlarmMainConfiguration()
         {
             FCBlockName = "fcAlarmGeneration";
@@ -51,6 +54,9 @@ namespace TiaXmlReader.Generation.Alarms
 
             AlarmTextInList = "{device_name} - {alarm_description}";
             EmptyAlarmTextInList = "{device_name} - SPARE";
+
+            EnableCustomVariable = true;
+            EnableTimer = true;
         }
     }
 }
