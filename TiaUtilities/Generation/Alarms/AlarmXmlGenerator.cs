@@ -283,6 +283,8 @@ namespace TiaXmlReader.Generation.Alarms
             return new AlarmData()
             {
                 AlarmVariable = tabConfig.AlarmAddressPrefix + alarmData.AlarmVariable,
+                CustomVariableAddress = string.IsNullOrEmpty(alarmData.CustomVariableAddress) ? tabConfig.DefaultCustomVarAddress : alarmData.CustomVariableAddress,
+                CustomVariableValue = string.IsNullOrEmpty(alarmData.CustomVariableValue) ? tabConfig.DefaultCustomVarValue : alarmData.CustomVariableValue,
                 Coil1Address = string.IsNullOrEmpty(alarmData.Coil1Address) ? tabConfig.DefaultCoil1Address : (tabConfig.Coil1AddressPrefix + alarmData.Coil1Address),
                 Coil1Type = coil1Type.ToString(),
                 Coil2Address = string.IsNullOrEmpty(alarmData.Coil2Address) ? tabConfig.DefaultCoil2Address : (tabConfig.Coil2AddressPrefix + alarmData.Coil2Address),
@@ -304,7 +306,7 @@ namespace TiaXmlReader.Generation.Alarms
             }
 
             var parsedContactAddress = placeholders.Parse(alarmData.AlarmVariable);
-            var contact = new ContactPart()
+            SimaticPart contact = new ContactPart()
             {
                 Operand = parsedContactAddress.ToLower() switch
                 {
@@ -315,6 +317,33 @@ namespace TiaXmlReader.Generation.Alarms
                     _ => new SimaticGlobalVariable(parsedContactAddress),
                 }
             };
+
+            var parsedCustomVarAddress = placeholders.Parse(alarmData.CustomVariableAddress);
+            var parsedCustomVarValue = placeholders.Parse(alarmData.CustomVariableValue);
+            if (!string.IsNullOrEmpty(parsedCustomVarAddress) && AlarmData.IsAddressValid(parsedCustomVarAddress)
+                && !string.IsNullOrEmpty(parsedCustomVarValue) && AlarmData.IsAddressValid(parsedCustomVarValue))
+            {
+
+                SimaticVariable inVar;
+                if (parsedCustomVarValue.Contains('.') && float.TryParse(parsedCustomVarValue, out _))
+                {
+                    inVar = new SimaticLiteralConstant(SimaticDataType.REAL, parsedCustomVarValue);
+                }
+                else if (long.TryParse(parsedCustomVarValue, out _))
+                {
+                    inVar = new SimaticLiteralConstant(SimaticDataType.DINT, parsedCustomVarValue);
+                }
+                else
+                {
+                    inVar = new SimaticTypedConstant(parsedCustomVarValue);
+                }
+
+                contact.Branch(new MovePart()
+                { 
+                    IN = inVar, 
+                    OUT = { new SimaticGlobalVariable(parsedCustomVarAddress) } 
+                });
+            }
 
             TimerPart? timer = null;
             if (!string.IsNullOrEmpty(alarmData.TimerAddress)

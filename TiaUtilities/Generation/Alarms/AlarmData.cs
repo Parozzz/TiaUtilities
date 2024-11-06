@@ -12,6 +12,8 @@ namespace TiaXmlReader.Generation.Alarms
         //THESE IS THE ORDER IN WHICH THEY APPEAR!
         public static readonly GridDataColumn ENABLE;
         public static readonly GridDataColumn ALARM_VARIABLE;
+        public static readonly GridDataColumn CUSTOM_VARIABLE_ADDRESS;
+        public static readonly GridDataColumn CUSTOM_VARIABLE_VALUE;
         public static readonly GridDataColumn COIL1_ADDRESS;
         public static readonly GridDataColumn COIL1_TYPE;
         public static readonly GridDataColumn COIL2_ADDRESS;
@@ -26,7 +28,9 @@ namespace TiaXmlReader.Generation.Alarms
         {
             var type = typeof(AlarmData);
             ENABLE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.Enable));
-            ALARM_VARIABLE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.AlarmVariable), "alarmVariable");
+            ALARM_VARIABLE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.AlarmVariable));
+            CUSTOM_VARIABLE_ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.CustomVariableAddress), "customVarAddress");
+            CUSTOM_VARIABLE_VALUE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.CustomVariableValue), "customVarValue");
             COIL1_ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.Coil1Address), "coil1Address");
             COIL1_TYPE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.Coil1Type), "coil1Type");
             COIL2_ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.Coil2Address), "coil2Address");
@@ -43,6 +47,8 @@ namespace TiaXmlReader.Generation.Alarms
 
         [JsonProperty][Locale(nameof(Locale.ALARM_DATA_ENABLE))] public bool Enable { get; set; }
         [JsonProperty][Locale(nameof(Locale.ALARM_DATA_ALM_VARIABLE))] public string? AlarmVariable { get; set; }
+        [JsonProperty][Locale(nameof(Locale.ALARM_DATA_CUSTOM_VAR_ADDR))] public string? CustomVariableAddress { get; set; }
+        [JsonProperty][Locale(nameof(Locale.ALARM_DATA_CUSTOM_VAR_VALUE))] public string? CustomVariableValue { get; set; }
         [JsonProperty][Locale(nameof(Locale.ALARM_DATA_COIL1_ADDRESS))] public string? Coil1Address { get; set; }
         [JsonProperty][Locale(nameof(Locale.ALARM_DATA_COIL1_TYPE))] public string? Coil1Type { get; set; }
         [JsonProperty][Locale(nameof(Locale.ALARM_DATA_COIL2_ADDRESS))] public string? Coil2Address { get; set; }
@@ -83,13 +89,14 @@ namespace TiaXmlReader.Generation.Alarms
         public void Clear()
         {
             this.Enable = false;
-            this.AlarmVariable = this.Coil1Address = this.Coil1Type = this.Coil2Address = this.Coil2Type =
-                    this.TimerAddress = this.TimerType = this.TimerValue = this.Description = null;
+            this.AlarmVariable = this.CustomVariableAddress = this.CustomVariableValue = this.Coil1Address = this.Coil1Type
+               = this.Coil2Address = this.Coil2Type = this.TimerAddress = this.TimerType = this.TimerValue = this.Description = null;
         }
 
         public bool IsEmpty()
         {
             return string.IsNullOrEmpty(this.AlarmVariable) &&
+                string.IsNullOrEmpty(this.CustomVariableAddress) && string.IsNullOrEmpty(this.CustomVariableValue) &&
                 string.IsNullOrEmpty(this.Coil1Address) && string.IsNullOrEmpty(this.Coil1Type) &&
                 string.IsNullOrEmpty(this.Coil2Address) && string.IsNullOrEmpty(this.Coil2Type) &&
                 string.IsNullOrEmpty(this.TimerAddress) && string.IsNullOrEmpty(this.TimerType) && string.IsNullOrEmpty(this.TimerValue) &&

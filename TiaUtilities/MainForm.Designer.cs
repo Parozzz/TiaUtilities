@@ -46,6 +46,7 @@
             jSToolStripMenuItem = new ToolStripMenuItem();
             sampleXMLMenuItem = new ToolStripMenuItem();
             testProjectMenuItem = new ToolStripMenuItem();
+            svgToolStripMenuItem = new ToolStripMenuItem();
             languageLabel = new Label();
             languageComboBox = new ComboBox();
             LogWorker = new System.ComponentModel.BackgroundWorker();
@@ -164,7 +165,7 @@
             // 
             // testToolStripMenuItem
             // 
-            testToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { importXMLToolStripMenuItem, jSToolStripMenuItem, sampleXMLMenuItem, testProjectMenuItem });
+            testToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { importXMLToolStripMenuItem, jSToolStripMenuItem, sampleXMLMenuItem, testProjectMenuItem, svgToolStripMenuItem });
             testToolStripMenuItem.Font = new Font("Segoe UI", 12F);
             testToolStripMenuItem.Name = "testToolStripMenuItem";
             testToolStripMenuItem.Size = new Size(48, 25);
@@ -173,29 +174,36 @@
             // importXMLToolStripMenuItem
             // 
             importXMLToolStripMenuItem.Name = "importXMLToolStripMenuItem";
-            importXMLToolStripMenuItem.Size = new Size(167, 26);
+            importXMLToolStripMenuItem.Size = new Size(180, 26);
             importXMLToolStripMenuItem.Text = "Import XML";
             importXMLToolStripMenuItem.Click += ImportXMLToolStripMenuItem_Click;
             // 
             // jSToolStripMenuItem
             // 
             jSToolStripMenuItem.Name = "jSToolStripMenuItem";
-            jSToolStripMenuItem.Size = new Size(167, 26);
+            jSToolStripMenuItem.Size = new Size(180, 26);
             jSToolStripMenuItem.Text = "JS";
             jSToolStripMenuItem.Click += JSToolStripMenuItem_Click;
             // 
             // sampleXMLMenuItem
             // 
             sampleXMLMenuItem.Name = "sampleXMLMenuItem";
-            sampleXMLMenuItem.Size = new Size(167, 26);
+            sampleXMLMenuItem.Size = new Size(180, 26);
             sampleXMLMenuItem.Text = "Sample XML";
             sampleXMLMenuItem.Click += SampleXMLMenuItem_Click;
             // 
             // testProjectMenuItem
             // 
             testProjectMenuItem.Name = "testProjectMenuItem";
-            testProjectMenuItem.Size = new Size(167, 26);
+            testProjectMenuItem.Size = new Size(180, 26);
             testProjectMenuItem.Text = "Project";
+            // 
+            // svgToolStripMenuItem
+            // 
+            svgToolStripMenuItem.Name = "svgToolStripMenuItem";
+            svgToolStripMenuItem.Size = new Size(180, 26);
+            svgToolStripMenuItem.Text = "Svg";
+            svgToolStripMenuItem.Click += SvgToolStripMenuItem_Click;
             // 
             // languageLabel
             // 
@@ -305,6 +313,7 @@
         private ToolStripMenuItem sampleXMLMenuItem;
         private ToolStripMenuItem testProjectMenuItem;
         private ToolStripMenuItem loadToolStripMenuItem;
+        private ToolStripMenuItem svgToolStripMenuItem;
     }
 }
 

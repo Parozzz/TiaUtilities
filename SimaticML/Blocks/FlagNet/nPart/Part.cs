@@ -14,6 +14,7 @@ namespace SimaticML.Blocks.FlagNet.nPart
         [SimaticEnum("Not")] NOT,
         [SimaticEnum("TON")] TON,
         [SimaticEnum("TOF")] TOF,
+        [SimaticEnum("Move")] MOVE,
         [SimaticEnum("O")] OR,
         UNKNOWN = 0 //Default value. Do not implement SimaticEnum so an exception is thrown!
     }

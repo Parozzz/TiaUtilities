@@ -151,6 +151,15 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Custom numeric variable.
+        /// </summary>
+        internal static string ALARM_CONFIG_DEFAULTS_CUSTOM_VAR {
+            get {
+                return ResourceManager.GetString("ALARM_CONFIG_DEFAULTS_CUSTOM_VAR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Timer.
         /// </summary>
         internal static string ALARM_CONFIG_DEFAULTS_TIMER {
@@ -516,6 +525,24 @@ namespace TiaUtilities.Languages {
         internal static string ALARM_DATA_COIL2_TYPE {
             get {
                 return ResourceManager.GetString("ALARM_DATA_COIL2_TYPE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Custom Var..
+        /// </summary>
+        internal static string ALARM_DATA_CUSTOM_VAR_ADDR {
+            get {
+                return ResourceManager.GetString("ALARM_DATA_CUSTOM_VAR_ADDR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Value.
+        /// </summary>
+        internal static string ALARM_DATA_CUSTOM_VAR_VALUE {
+            get {
+                return ResourceManager.GetString("ALARM_DATA_CUSTOM_VAR_VALUE", resourceCulture);
             }
         }
         

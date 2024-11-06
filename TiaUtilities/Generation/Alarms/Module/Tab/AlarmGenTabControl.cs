@@ -119,7 +119,12 @@ namespace TiaUtilities.Generation.GenModules.Alarm.Tab
                     configForm.SetConfiguration(tabConfig, MainForm.Settings.PresetAlarmTabConfiguration);
 
                     var mainGroup = configForm.Init();
-
+                    
+                    var customVarGroup = mainGroup.AddGroup().ControlWidth(225).NoAdapt();
+                    customVarGroup.AddLabel().Label(Locale.ALARM_CONFIG_DEFAULTS_CUSTOM_VAR);
+                    customVarGroup.AddTextBox().Label(Locale.GENERICS_ADDRESS).BindText(() => tabConfig.DefaultCustomVarAddress);
+                    customVarGroup.AddTextBox().Label(Locale.GENERICS_VALUE).BindText(() => tabConfig.DefaultCustomVarValue);
+                    
                     var coil1Group = mainGroup.AddGroup().ControlWidth(225).NoAdapt();
                     coil1Group.AddLabel().Label(Locale.ALARM_CONFIG_DEFAULTS_COIL1);
                     coil1Group.AddTextBox().Label(Locale.GENERICS_ADDRESS).BindText(() => tabConfig.DefaultCoil1Address);
@@ -139,8 +144,7 @@ namespace TiaUtilities.Generation.GenModules.Alarm.Tab
                     var timerGroup = mainGroup.AddGroup().ControlWidth(225).NoAdapt();
                     timerGroup.AddLabel().Label(Locale.ALARM_CONFIG_DEFAULTS_TIMER);
                     timerGroup.AddTextBox().Label(Locale.GENERICS_ADDRESS).BindText(() => tabConfig.DefaultTimerAddress);
-                    timerGroup.AddComboBox().Label(Locale.GENERICS_TYPE).BindText(() => tabConfig.DefaultTimerType)
-                         .Items(["TON", "TOF"]).DisableEdit();
+                    timerGroup.AddComboBox().Label(Locale.GENERICS_TYPE).BindText(() => tabConfig.DefaultTimerType).Items(["TON", "TOF"]).DisableEdit();
                     timerGroup.AddTextBox().Label(Locale.GENERICS_VALUE).BindText(() => tabConfig.DefaultTimerValue);
 
                     SetupConfigForm(button, configForm);

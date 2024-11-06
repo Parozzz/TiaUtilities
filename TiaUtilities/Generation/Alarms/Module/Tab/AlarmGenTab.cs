@@ -67,6 +67,8 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
 
             alarmGridHandler.AddCheckBoxColumn(AlarmData.ENABLE, 40);
             alarmGridHandler.AddTextBoxColumn(AlarmData.ALARM_VARIABLE, 200);
+            alarmGridHandler.AddTextBoxColumn(AlarmData.CUSTOM_VARIABLE_ADDRESS, 145);
+            alarmGridHandler.AddTextBoxColumn(AlarmData.CUSTOM_VARIABLE_VALUE, 50);
             alarmGridHandler.AddTextBoxColumn(AlarmData.COIL1_ADDRESS, 145);
             alarmGridHandler.AddComboBoxColumn(AlarmData.COIL1_TYPE, 55, ALARM_COIL_TYPE_ITEMS);
             alarmGridHandler.AddTextBoxColumn(AlarmData.COIL2_ADDRESS, 145);
@@ -94,6 +96,14 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
                 if (column == AlarmData.ALARM_VARIABLE)
                 {
                     return new() { Prefix = TabConfig.AlarmAddressPrefix, Value = alarmData.AlarmVariable };
+                }
+                else if(column == AlarmData.CUSTOM_VARIABLE_ADDRESS)
+                {
+                    return new() { DefaultValue = TabConfig.DefaultCustomVarAddress, Value = alarmData.CustomVariableAddress };
+                }
+                else if (column == AlarmData.CUSTOM_VARIABLE_VALUE)
+                {
+                    return new() { DefaultValue = TabConfig.DefaultCustomVarValue, Value = alarmData.CustomVariableValue };
                 }
                 else if (column == AlarmData.COIL1_ADDRESS)
                 {

@@ -1,8 +1,9 @@
 ﻿using TiaUtilities.Generation.Configuration;
+using TiaUtilities.Generation.Configuration.Lines;
 
 namespace TiaXmlReader.Generation.Configuration
 {
-    public class ConfigGroup(ConfigForm? configForm) : IConfigGroup
+    public class ConfigGroup(ConfigForm configForm) : IConfigGroup
     {
         private readonly List<IConfigObject> configObjectList = [];
 
@@ -10,13 +11,6 @@ namespace TiaXmlReader.Generation.Configuration
         private bool noAdapt = false;
 
         public bool IsSubGroup { get; set; } = false;
-
-        /*
-                 public Font LabelFont { get; set; } = ConfigStyle.LABEL_FONT;
-        public Font ControlFont { get; set; } = ConfigStyle.CONTROL_FONT;
-        public int ControlWidth { get; set; } = 300;
-        public int ControlHeight { get; set; } = 30;
-         */
 
         public ConfigForm GetConfigForm()
         {
@@ -125,17 +119,21 @@ namespace TiaXmlReader.Generation.Configuration
                     Text = labelText,
                     Padding = Padding.Empty,
                     Margin = Padding.Empty,
+                    AutoEllipsis = true,
                     Font = line.GetLabelFont() ?? configForm?.LabelFont ?? ConfigStyle.LABEL_FONT
                 };
                 panel.Controls.Add(label);
 
                 line.GetLabelText().Changed += (sender, args) => label.Text = args.NewValue;
 
-                var size = TextRenderer.MeasureText(labelText, label.Font);
-                size.Width += 4; //Padding
-                if (size.Width > biggestTitleLength)
-                {
-                    biggestTitleLength = size.Width;
+                if(line is not ConfigLabelLine)
+                {//For the biggest title, you need to consider only the lines that have A ACTIVE CONTROL! Lines that only contains the label are not counted!
+                    var size = TextRenderer.MeasureText(labelText, label.Font);
+                    size.Width += 4; //Padding
+                    if (size.Width > biggestTitleLength)
+                    {
+                        biggestTitleLength = size.Width;
+                    }
                 }
             }
 
@@ -167,6 +165,7 @@ namespace TiaXmlReader.Generation.Configuration
 
                 control.Width = this.controlWidth == 0 ? (configForm?.ControlWidth ?? 300) : this.controlWidth;
                 control.Height = line.GetHeight() == 0 ? (configForm?.ControlHeight ?? 30) : line.GetHeight();
+
                 control.Dock = line.IsControlNoAdapt() ? DockStyle.None : DockStyle.Fill;
                 control.Font = configForm?.ControlFont ?? ConfigStyle.CONTROL_FONT;
                 panel.Controls.Add(control);

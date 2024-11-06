@@ -22,6 +22,8 @@ namespace TiaUtilities.Generation.Alarms
         [JsonProperty] public string EmptyAlarmTimerType { get => this.GetAs<string>(); set => this.Set(value); }
         [JsonProperty] public string EmptyAlarmTimerValue { get => this.GetAs<string>(); set => this.Set(value); }
 
+        [JsonProperty] public string DefaultCustomVarAddress { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public string DefaultCustomVarValue { get => this.GetAs<string>(); set => this.Set(value); }
         [JsonProperty] public string DefaultCoil1Address { get => this.GetAs<string>(); set => this.Set(value); }
         [JsonProperty] public AlarmCoilType DefaultCoil1Type { get => this.GetAs<AlarmCoilType>(); set => this.Set(value); }
         [JsonProperty] public string DefaultCoil2Address { get => this.GetAs<string>(); set => this.Set(value); }
@@ -52,6 +54,8 @@ namespace TiaUtilities.Generation.Alarms
             this.EmptyAlarmTimerType = "TON";
             this.EmptyAlarmTimerValue = "T#0s";
 
+            this.DefaultCustomVarAddress = $"Alm.Level[{GenPlaceholders.Alarms.ALARM_NUM}]";
+            this.DefaultCustomVarValue = "0";
             this.DefaultCoil1Address = $"Alm.Act.Alm{GenPlaceholders.Alarms.ALARM_NUM}";
             this.DefaultCoil1Type = AlarmCoilType.COIL;
             this.DefaultCoil2Address = $"Alm.Mem.Alm{GenPlaceholders.Alarms.ALARM_NUM}";

@@ -2,28 +2,24 @@
 using SimaticML.Blocks.FlagNet;
 using SimaticML.Blocks.FlagNet.nPart;
 using SimaticML.Enums;
+using System.Collections.Generic;
 
 namespace SimaticML.API
 {
-    public abstract class SimaticPart
+    public abstract class SimaticPart(PartType partType)
     {
         //all LADDER blocks have input / output connections ("in" and "out" for contact, "en" and "eno" for blocks).
         //Some, like a call for an FC, have more named connections.
         public abstract string InputConName { get; }
         public abstract string OutputConName { get; }
 
-        public PartType PartType { get; init; }
-        public SimaticMultilingualText Comment { get; init; }
+        public PartType PartType { get; init; } = partType;
+        public SimaticMultilingualText Comment { get; init; } = new();
 
         //A part can only have 1 previous part but multiple next
         //(The OR is considered one single part when connection something AFTER. Before the OR, the part will have multiple connections)
         public SimaticPart? Next { get; set; }
-
-        public SimaticPart(PartType partType)
-        {
-            this.PartType = partType;
-            this.Comment = new();
-        }
+        public List<SimaticPart> Branches { get; init; } = [];
 
         public virtual bool IsCloser() => false;
 
@@ -49,6 +45,12 @@ namespace SimaticML.API
             return this;
         }
 
+        public virtual SimaticPart Branch(SimaticPart branch)
+        {
+            this.Branches.Add(branch);
+            return branch;
+        }
+
         public SimaticPart FindLast() => this.Next == null ? this : this.Next.FindLast();
 
         public virtual SimaticPart OR(SimaticPart nextPart)
@@ -56,7 +58,6 @@ namespace SimaticML.API
             var orPart = new OrPart();
             orPart.PartList.Add(this);
             orPart.PartList.Add(nextPart);
-
             orPart.PreviousPartAndConnections.AddRange(orPart.PartList);
 
             return orPart;
@@ -175,6 +176,44 @@ namespace SimaticML.API
     public class ResetCoilPart() : OperandPart(PartType.RESET_COIL)
     {
         public override bool IsCloser() => true;
+    }
+
+    public class MovePart() : SimaticPart(PartType.MOVE)
+    {
+        public override string InputConName => "en";
+        public override string OutputConName => "eno";
+
+        public SimaticVariable? IN { get; set; }
+        public List<SimaticVariable> OUT { get; init; } = [];
+
+        public override Part GetPart(CompileUnit compileUnit)
+        {
+            var part = base.GetPart(compileUnit);
+
+            part.TemplateValueName = "Card";
+            part.TemplateValueType = "Cardinality";
+            part.TemplateValue = OUT.Count.ToString();
+
+            if(IN != default)
+            {
+                compileUnit.CreateWire().CreateIdentCon(IN, part, "in");
+            }
+
+            if (OUT.Count > 0)
+            {
+                for (int x = 0; x < OUT.Count; x++)
+                {
+                    var outVariable = OUT[x];
+                    compileUnit.CreateWire().CreateIdentCon(outVariable, part, "out" + (x + 1));
+                }
+            }
+
+            return part;
+        }
+
+        public override bool IsCloser() => true;
+
+        public override string ToString() => $"{base.ToString()}, IN=[{IN}], OUT=[{string.Join(" ", OUT)}]";
     }
 
     public class TimerPart(PartType partType) : SimaticPart(partType)

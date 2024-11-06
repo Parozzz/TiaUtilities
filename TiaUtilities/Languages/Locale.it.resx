@@ -276,6 +276,9 @@
   <data name="ALARM_DATA_ALM_VARIABLE" xml:space="preserve">
     <value>Variabile allarme</value>
   </data>
+  <data name="ALARM_DATA_CUSTOM_VAR_ADDR" xml:space="preserve">
+    <value>Var. custom</value>
+  </data>
   <data name="ALARM_DATA_COIL1_ADDRESS" xml:space="preserve">
     <value>Indirizzo bobina1</value>
   </data>
@@ -534,5 +537,11 @@ validità riga</value>
   </data>
   <data name="ALARM_CONFIG_COIL_TYPE_NCOIL" xml:space="preserve">
     <value>N-Coil</value>
+  </data>
+  <data name="ALARM_DATA_CUSTOM_VAR_VALUE" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="ALARM_CONFIG_DEFAULTS_CUSTOM_VAR" xml:space="preserve">
+    <value>Variabile numerica custom</value>
   </data>
 </root>

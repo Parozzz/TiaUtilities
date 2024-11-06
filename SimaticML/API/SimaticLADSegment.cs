@@ -108,9 +108,16 @@ namespace SimaticML.API
             }
             else
             {
-                compileUnit.CreateWire()
+                var wire = compileUnit.CreateWire()
                     .CreateNameCon(previousPart.Part, previousPart.OutputConName)
                     .CreateNameCon(part.Part, part.InputConName);
+
+                foreach (var branchSimaticPart in previousPart.SimaticPart.Branches)
+                {
+                    var branchPart = this.ComputePart(compileUnit, branchSimaticPart) ?? throw new ArgumentNullException(nameof(branchSimaticPart));
+                    wire.CreateNameCon(branchPart.Part, branchPart.InputConName);
+                    ParsePart(compileUnit, branchPart);
+                }
 
                 ParsePart(compileUnit, part);
             }

@@ -176,7 +176,7 @@ namespace TiaXmlReader
             {
                 genForm = OpenIOGenModuleForm();
             }
-            else if(saveObject is AlarmGenSave)
+            else if (saveObject is AlarmGenSave)
             {
                 genForm = OpenAlarmGenModuleForm();
             }
@@ -376,6 +376,12 @@ namespace TiaXmlReader
 
             //Save the file.
             //xmlDocument.Save(Directory.GetCurrentDirectory() + "/fc.xml");
+        }
+
+        private void SvgToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SvgTestForm svgTestForm = new();
+            svgTestForm.Show(this);
         }
     }
 }

@@ -307,6 +307,12 @@ for row validation</value>
   <data name="ALARM_DATA_ALM_VARIABLE" xml:space="preserve">
     <value>Alarm Variable</value>
   </data>
+  <data name="ALARM_DATA_CUSTOM_VAR_ADDR" xml:space="preserve">
+    <value>Custom Var.</value>
+  </data>
+  <data name="ALARM_DATA_CUSTOM_VAR_VALUE" xml:space="preserve">
+    <value>Value</value>
+  </data>
   <data name="ALARM_DATA_COIL1_ADDRESS" xml:space="preserve">
     <value>Coil1 Address</value>
   </data>
@@ -534,5 +540,8 @@ for row validation</value>
   </data>
   <data name="ALARM_CONFIG_COIL_TYPE_NCOIL" xml:space="preserve">
     <value>N-Coil</value>
+  </data>
+  <data name="ALARM_CONFIG_DEFAULTS_CUSTOM_VAR" xml:space="preserve">
+    <value>Custom numeric variable</value>
   </data>
 </root>
