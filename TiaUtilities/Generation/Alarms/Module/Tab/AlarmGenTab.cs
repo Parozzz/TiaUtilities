@@ -72,9 +72,9 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             alarmGridHandler.AddTextBoxColumn(AlarmData.CUSTOM_VARIABLE_ADDRESS, 145);
             alarmGridHandler.AddTextBoxColumn(AlarmData.CUSTOM_VARIABLE_VALUE, 50);
             alarmGridHandler.AddTextBoxColumn(AlarmData.COIL1_ADDRESS, 145);
-            alarmGridHandler.AddComboBoxColumn(AlarmData.COIL1_TYPE, 55, ALARM_COIL_TYPE_ITEMS);
+            alarmGridHandler.AddComboBoxColumn(AlarmData.COIL1_TYPE, 65, ALARM_COIL_TYPE_ITEMS);
             alarmGridHandler.AddTextBoxColumn(AlarmData.COIL2_ADDRESS, 145);
-            alarmGridHandler.AddComboBoxColumn(AlarmData.COIL2_TYPE, 55, ALARM_COIL_TYPE_ITEMS);
+            alarmGridHandler.AddComboBoxColumn(AlarmData.COIL2_TYPE, 65, ALARM_COIL_TYPE_ITEMS);
             alarmGridHandler.AddTextBoxColumn(AlarmData.TIMER_ADDRESS, 95);
             alarmGridHandler.AddComboBoxColumn(AlarmData.TIMER_TYPE, 55, TIMERS_TYPES_ITEMS);
             alarmGridHandler.AddTextBoxColumn(AlarmData.TIMER_VALUE, 50);

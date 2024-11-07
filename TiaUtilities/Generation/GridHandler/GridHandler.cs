@@ -126,6 +126,110 @@ namespace TiaXmlReader.Generation.GridHandler
 
             InitColumns();
 
+            #region QOL - Quality of life
+
+            #region Full Row Selection
+            if (EnableRowSelectionFromRowHeaderClick)
+            {
+                this.DataGridView.MouseDown += (sender, args) =>
+                {
+                    var hitTest = this.DataGridView.HitTest(args.X, args.Y);
+                    switch (hitTest.Type)
+                    {
+                        case DataGridViewHitTestType.None: //I want that to clear the selection, you do a simple click in an empty area!
+                            this.DataGridView.ClearSelection();
+                            this.DataGridView.CurrentCell = null; //This avoid the situation where if you click the old cell again, it start editing immediately! 
+                            break;
+                        case DataGridViewHitTestType.RowHeader: //If i click a row head, i want the whole row to be selected!
+                            var currentRow = this.DataGridView.CurrentRow;
+                            if (Control.ModifierKeys == Keys.Shift && currentRow != null)
+                            {
+                                if (hitTest.RowIndex < 0)
+                                {
+                                    break;
+                                }
+
+                                var startRowIndex = currentRow.Index;
+                                var endRowIndex = hitTest.RowIndex;
+
+                                this.DataGridView.ClearSelection();
+
+                                var biggestIndex = Math.Max(startRowIndex, endRowIndex);
+                                var lowestIndex = Math.Min(startRowIndex, endRowIndex);
+                                for (int x = lowestIndex; x < biggestIndex + 1; x++)
+                                {
+                                    foreach (DataGridViewCell cell in this.DataGridView.Rows[x].Cells)
+                                    {
+                                        cell.Selected = true;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                SelectRow(hitTest.RowIndex);
+                            }
+
+                            break;
+                        case DataGridViewHitTestType.Cell:
+                            break;
+                    }
+                };
+            }
+            #endregion
+
+            #region Better Editing Control Show
+            this.DataGridView.CellClick += (sender, args) =>
+            {
+                if (Control.ModifierKeys == Keys.Shift || Control.ModifierKeys == Keys.Control || args.RowIndex < 0 || args.ColumnIndex < 0)
+                {
+                    return;
+                }
+
+                var cell = this.DataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex];
+                if (cell == null)
+                {
+                    return;
+                }
+
+                //This is to have a better user experience while dealing with combobox. When finishing the edit, it will revert back to a simple selected cell instead of selected text!
+                if (cell is DataGridViewComboBoxCell comboBoxCell)
+                {
+                    this.DataGridView.CurrentCell = cell;
+                    this.DataGridView.BeginEdit(false);
+                    if (this.DataGridView.EditingControl is DataGridViewComboBoxEditingControl comboBoxEditingControl)
+                    {
+                        comboBoxEditingControl.DroppedDown = true;
+                        comboBoxEditingControl.DropDownClosed += (sender, args) => this.DataGridView.EndEdit();
+                    }
+                }
+            };
+
+            this.DataGridView.CellMouseDoubleClick += (sender, args) =>
+            {
+                if (Control.ModifierKeys == Keys.Shift || Control.ModifierKeys == Keys.Control || args.RowIndex < 0 || args.ColumnIndex < 0)
+                {
+                    return;
+                }
+
+                var cell = this.DataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex];
+                if (cell == null)
+                {
+                    return;
+                }
+
+                if (cell is DataGridViewTextBoxCell textBoxCell)
+                {
+                    this.DataGridView.BeginEdit(true);
+                }
+                else if (cell is DataGridViewCheckBoxCell checkboxCell)
+                {
+                    checkboxCell.Value = (bool)(checkboxCell.Value ?? false) == false;
+                }
+            };
+            #endregion
+
+            #endregion
+
             #region Cell Paiting
             var paintHandler = new GridCellPaintHandler(this.DataGridView);
             paintHandler.AddPainter(this.sortHandler); //ORDER IS IMPORTANT!
@@ -204,56 +308,7 @@ namespace TiaXmlReader.Generation.GridHandler
             };
             #endregion
 
-            #region MouseClick - RowSelection
-            if (EnableRowSelectionFromRowHeaderClick)
-            {
-                this.DataGridView.MouseDown += (sender, args) =>
-                {
-                    var hitTest = this.DataGridView.HitTest(args.X, args.Y);
-                    switch (hitTest.Type)
-                    {
-                        case DataGridViewHitTestType.None: //I want that to clear the selection, you do a simple click in an empty area!
-                            this.DataGridView.ClearSelection();
-                            this.DataGridView.CurrentCell = null; //This avoid the situation where if you click the old cell again, it start editing immediately! 
-                            break;
-                        case DataGridViewHitTestType.RowHeader: //If i click a row head, i want the whole row to be selected!
-                            var currentRow = this.DataGridView.CurrentRow;
-                            if (Control.ModifierKeys == Keys.Shift && currentRow != null)
-                            {
-                                if (hitTest.RowIndex < 0)
-                                {
-                                    break;
-                                }
-
-                                var startRowIndex = currentRow.Index;
-                                var endRowIndex = hitTest.RowIndex;
-
-                                this.DataGridView.ClearSelection();
-
-                                var biggestIndex = Math.Max(startRowIndex, endRowIndex);
-                                var lowestIndex = Math.Min(startRowIndex, endRowIndex);
-                                for (int x = lowestIndex; x < biggestIndex + 1; x++)
-                                {
-                                    foreach (DataGridViewCell cell in this.DataGridView.Rows[x].Cells)
-                                    {
-                                        cell.Selected = true;
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                SelectRow(hitTest.RowIndex);
-                            }
-
-                            break;
-                        case DataGridViewHitTestType.Cell:
-                            break;
-                    }
-                };
-            }
-            #endregion
-
-            #region CellEdit Begin-End
+            #region CellEdit Begin-End - ChangeCell
             GridCellChange? editCellChange = null;
             DataGridView.CellBeginEdit += (sender, args) =>
             {
