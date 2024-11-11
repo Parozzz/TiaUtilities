@@ -6,15 +6,18 @@ namespace TiaUtilities
 {
     public partial class SvgTestForm : Form
     {
-        public record SvgPathRecord(SvgPath VvgPath, GraphicsPath GraphicsPath);
+        public record SvgPathRecord(SvgVisualElement Element, SvgElement OriginalElement, GraphicsPath GraphicsPath);
 
-        private readonly List<SvgPathRecord> pathRecordList;
+        private SvgDocument? svgDocument;
+        private readonly List<SvgPathRecord> visualElementList;
+
+        private SvgPathRecord? selectedPathRecord;
 
         public SvgTestForm()
         {
             InitializeComponent();
 
-            this.pathRecordList = [];
+            this.visualElementList = [];
         }
 
         private void PathTextBox_Click(object sender, EventArgs e)
@@ -37,68 +40,93 @@ namespace TiaUtilities
         {
             if (this.pathTextBox.Text is string filePath && File.Exists(filePath))
             {
-                var svgDoc = SvgDocument.Open<SvgDocument>(filePath);
+                visualElementList.Clear();
 
-                // Recursively change all nodes.
-                ProcessNodes(svgDoc.Descendants(), new SvgColourServer(Color.DarkGreen));
-
-                var graphics = this.svgPictureBox.CreateGraphics();
-                graphics.Clear(Color.White);
-
-                var rendered = SvgRenderer.FromGraphics(graphics);
-
-                pathRecordList.Clear();
-                this.RenderNodes(svgDoc.Descendants(), rendered);
-                //svgDoc.Draw(graphics);
-                //var bitmap = svgDoc.Draw();
+                this.svgDocument = SvgDocument.Open<SvgDocument>(filePath);
+                DrawSvg();
             }
         }
 
-        private void ProcessNodes(IEnumerable<SvgElement> nodes, SvgPaintServer colorServer)
-        {
-            int IDCounter = 1;
-            foreach (var node in nodes)
-            {
-
-                if (node.Fill != SvgPaintServer.None) node.Fill = colorServer;
-                if (node.Color != SvgPaintServer.None) node.Color = colorServer;
-                //if (node.StopColor != SvgPaintServer.None) node.StopColor = colorServer;
-                if (node.Stroke != SvgPaintServer.None) node.Stroke = colorServer;
-
-                //node.ID = $"path_{IDCounter++}";
-
-                ProcessNodes(node.Descendants(), colorServer);
-            }
-        }
-
-        private void RenderNodes(IEnumerable<SvgElement> nodes, ISvgRenderer renderer)
+        private void ProcessNodes(IEnumerable<SvgElement> nodes, SvgPaintServer colorServer, ISvgRenderer renderer)
         {
             foreach (var node in nodes)
             {
-                if (node is SvgPath svgPath)
+                if(node is SvgElement svgElement)
                 {
-                    svgPath.RenderElement(renderer);
+                    svgElement.RenderElement(renderer);
 
-                    var path = svgPath.Path(renderer);
-                    pathRecordList.Add(new(svgPath, path));
+                    if(svgElement is SvgVisualElement svgVisualElement)
+                    {
+                        var graphicsPath = svgVisualElement.Path(renderer);
+                        visualElementList.Add(new(svgVisualElement, svgVisualElement.DeepCopy(), graphicsPath));
+                    }
                 }
 
-                RenderNodes(node.Descendants(), renderer);
+                ProcessNodes(node.Descendants(), colorServer, renderer);
             }
         }
 
         private void svgPictureBox_MouseClick(object sender, MouseEventArgs e)
         {
+            if(this.svgDocument == null)
+            {
+                return;
+            }
+
+            bool requireRedraw = false;
+
             var x = e.X;
             var y = e.Y;
 
-            foreach(var record in pathRecordList)
+            SvgPathRecord? clickedPathRecord = null;
+
+            foreach(var record in visualElementList)
             {
                 if(record.GraphicsPath.IsVisible(x, y))
                 {
-                    Console.WriteLine("Visible!");
+                    clickedPathRecord = record;
+                    break;
                 }
             }
+
+            var oldPathRecord = this.selectedPathRecord;
+            this.selectedPathRecord = clickedPathRecord;
+
+            this.svgDocument.ApplyRecursive(svgElement =>
+            {
+                if (this.selectedPathRecord != null && svgElement == this.selectedPathRecord.Element)
+                {
+                    svgElement.Stroke = new SvgColourServer(Color.Yellow);
+                    svgElement.StrokeWidth = 3;
+
+                    requireRedraw = true;
+                }
+                else if(oldPathRecord != null && svgElement == oldPathRecord.Element)
+                {
+                    svgElement.Stroke = oldPathRecord.OriginalElement.Stroke;
+                    svgElement.StrokeWidth = oldPathRecord.OriginalElement.StrokeWidth;
+                }
+            });
+
+            if (requireRedraw)
+            {
+                DrawSvg();
+            }
+        }
+
+        private void DrawSvg()
+        {
+            if(this.svgDocument == null)
+            {
+                return;
+            }    
+
+            var graphics = this.svgPictureBox.CreateGraphics();
+            graphics.Clear(Color.White);
+
+            // Recursively change all nodes.
+            var rendered = SvgRenderer.FromGraphics(graphics);
+            ProcessNodes(this.svgDocument.Descendants(), new SvgColourServer(Color.DarkGreen), rendered);
         }
     }
 
