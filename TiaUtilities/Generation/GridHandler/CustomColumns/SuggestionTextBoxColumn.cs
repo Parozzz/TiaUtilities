@@ -23,6 +23,11 @@ namespace TiaXmlReader.Generation.GridHandler.CustomColumns
                 this.CanOverflow = false;
                 this.DoubleBuffered = true;
             }
+
+            protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+            {
+                return base.ProcessCmdKey(ref msg, keyData);
+            }
         }
 
 
@@ -33,7 +38,7 @@ namespace TiaXmlReader.Generation.GridHandler.CustomColumns
         private readonly EventHandler editingControlTextChangedEvent;
 
         private ToolStripDropDown? dropDown;
-        private Func<string[]>? GetItemsFunc;
+        private Func<IEnumerable<string?>>? GetItemsFunc;
 
         private DataGridViewTextBoxEditingControl? editingControl;
         private bool inEditMode;
@@ -47,7 +52,7 @@ namespace TiaXmlReader.Generation.GridHandler.CustomColumns
             this.editingControlTextChangedEvent = this.EditingControlTextChangedEvent;
         }
 
-        public void SetGetItemsFunc(Func<string[]> GetItemsFunc)
+        public void SetGetItemsFunc(Func<IEnumerable<string?>> GetItemsFunc)
         {
             this.GetItemsFunc = GetItemsFunc;
         }
@@ -81,8 +86,8 @@ namespace TiaXmlReader.Generation.GridHandler.CustomColumns
 
             var cell = (DataGridViewTextBoxCell)dataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex];
 
-            var items = GetItemsFunc();
-            if (items == null || items.Length == 0)
+            var items = GetItemsFunc().Where(v => v != null);
+            if (items == null || !items.Any())
             {
                 return;
             }

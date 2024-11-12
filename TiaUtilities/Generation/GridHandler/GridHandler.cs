@@ -532,34 +532,32 @@ namespace TiaXmlReader.Generation.GridHandler
 
         public bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            if (!this.DataGridView.Focused)
+            //For custom columns, focused must not be checked (eg. for columns with dropdown this would kill the interaction).
+            if (this.DataGridView.Focused)
             {
-                return false;
-            }
-
-            if (keyData == Keys.Enter)
-            {
-                var currentCell = this.DataGridView.CurrentCell;
-                if (currentCell is DataGridViewCheckBoxCell checkBoxCell && checkBoxCell.Value is bool boolValue)
+                if (keyData == Keys.Enter)
                 {
-                    this.ChangeCell(new GridCellChange(currentCell) { OldValue = boolValue, NewValue = !boolValue });
-                    this.Refresh(); //Needed for checkbox cell
+                    var currentCell = this.DataGridView.CurrentCell;
+                    if (currentCell is DataGridViewCheckBoxCell checkBoxCell && checkBoxCell.Value is bool boolValue)
+                    {
+                        this.ChangeCell(new GridCellChange(currentCell) { OldValue = boolValue, NewValue = !boolValue });
+                        this.Refresh(); //Needed for checkbox cell
 
-                    if (currentCell.RowIndex < this.DataGridView.RowCount)
-                    {//Move the cursor to the next cell below, same as default behaviour that i am overriding
-                        this.DataGridView.CurrentCell = this.DataGridView.Rows[currentCell.RowIndex + 1].Cells[currentCell.ColumnIndex];
+                        if (currentCell.RowIndex < this.DataGridView.RowCount)
+                        {//Move the cursor to the next cell below, same as default behaviour that i am overriding
+                            this.DataGridView.CurrentCell = this.DataGridView.Rows[currentCell.RowIndex + 1].Cells[currentCell.ColumnIndex];
+                        }
+
+                        return true; //Stop all other cmd to be executed
                     }
-
-                    return true; //Stop all other cmd to be executed
                 }
             }
-
 
             foreach (var column in this.DataGridView.Columns)
             {//This is required for some special actions! (Like arrows for Suggestions!)
                 if (column is IGridCustomColumn customColumn && customColumn.ProcessCmdKey(ref msg, keyData))
                 {
-                    return true;
+                    return true; 
                 }
             }
 

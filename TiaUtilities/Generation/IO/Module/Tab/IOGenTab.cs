@@ -1,5 +1,6 @@
 ﻿using SimaticML;
 using SimaticML.Enums;
+using System.Collections.Immutable;
 using TiaUtilities.Generation.GenModules.IO.Tab;
 using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.Binds;
@@ -21,9 +22,7 @@ namespace TiaUtilities.Generation.IO.Module.Tab
 
         private readonly IOGenModule module;
         private readonly GridBindContainer gridBindFactory;
-
         private readonly IOMainConfiguration mainConfig;
-        private readonly SuggestionTextBoxColumn variableAddressColumn;
 
         public TabPage TabPage { get; init; }
 
@@ -40,10 +39,9 @@ namespace TiaUtilities.Generation.IO.Module.Tab
         {
             this.module = module;
             this.gridBindFactory = gridBindFactory;
-            this.TabPage = tabPage;
-
             this.mainConfig = mainConfig;
-            this.variableAddressColumn = new();
+
+            this.TabPage = tabPage;
 
             this.TabConfig = new();
             GenUtils.CopyJsonFieldsAndProperties(MainForm.Settings.PresetIOTabConfiguration, this.TabConfig);
@@ -66,25 +64,14 @@ namespace TiaUtilities.Generation.IO.Module.Tab
             //Column initialization before gridHandler.Init()
             #region COLUMNS
             var addressColumn = GridHandler.AddTextBoxColumn(IOData.ADDRESS, 65);
-            addressColumn.MaxInputLength = 10;
-
             this.GridHandler.AddCheckBoxColumn(IOData.NEGATED, 50);
-
             this.GridHandler.AddTextBoxColumn(IOData.IO_NAME, 110);
-            this.GridHandler.AddCustomColumn(variableAddressColumn, IOData.VARIABLE, 200);
-            this.variableAddressColumn.SetGetItemsFunc(() =>
-            {
-                var ioVariableEnumerable = this.GridHandler.DataSource.GetNotEmptyDataDict().Keys.Select(i => i.Variable.ToLowerInvariant());
-                var suggestionEnumerable = module.Suggestions;
-
-                var notAddedSuggestionEnumerable = suggestionEnumerable.Select(k => k.Value)
-                                                                       .Where(v => v != null && ioVariableEnumerable.Contains(v.ToLower()))
-                                                                       .ToArray();
-                return notAddedSuggestionEnumerable;
-            });
-
+            var variableAddressColumn = this.GridHandler.AddCustomColumn(new SuggestionTextBoxColumn(), IOData.VARIABLE, 200);
             this.GridHandler.AddTextBoxColumn(IOData.MERKER_ADDRESS, MERKER_ADDRESS_COLUMN_SIZE);
             this.GridHandler.AddTextBoxColumn(IOData.COMMENT, 0);
+
+            addressColumn.MaxInputLength = 10;
+            variableAddressColumn.SetGetItemsFunc(() => module.GetSuggestions(filterAlreadyUsed: true));
 
             mainConfig.Subscribe(() => mainConfig.MemoryType, UpdateMerkerColumn);
             UpdateMerkerColumn(mainConfig.MemoryType);
@@ -176,7 +163,7 @@ namespace TiaUtilities.Generation.IO.Module.Tab
 
             #region GRID_SCRIPT_CUSTOM_VARIABLES
             this.GridHandler.ScriptVariableList.Add(GridScriptVariable.ReadOnlyValue("tabName", () => this.TabPage.Text));
-            this.GridHandler.ScriptVariableList.Add(GridScriptVariable.ReadOnlyValue("suggestions", () => this.module.Suggestions.Select(s => s.Value).ToArray()));
+            this.GridHandler.ScriptVariableList.Add(GridScriptVariable.ReadOnlyValue("suggestions", () => this.module.GetSuggestions(false).ToArray()));
             #endregion
 
             #region DIRTY

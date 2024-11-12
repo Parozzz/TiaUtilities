@@ -26,8 +26,6 @@ namespace TiaUtilities.Generation.IO.Module
     {
         private record GenTabRowRecord(IOGenTab GenTab, IOData IOData, int Row);
 
-        public ICollection<IOSuggestionData> Suggestions { get => suggestionGridHandler.DataSource.GetNotEmptyDataDict().Keys; }
-
         private readonly GridBindContainer gridBindContainer;
 
         private readonly IOMainConfiguration mainConfig;
@@ -401,6 +399,21 @@ namespace TiaUtilities.Generation.IO.Module
         public string GetFormLocalizatedName()
         {
             return Locale.IO_GEN_FORM_NAME;
+        }
+
+        public IEnumerable<string> GetSuggestions(bool filterAlreadyUsed = false)
+        {
+            IEnumerable<string> suggestions = suggestionGridHandler.DataSource.GetNotEmptyDataDict().Keys.Select(k => k.Value ?? "");
+            if(filterAlreadyUsed)
+            {
+                foreach (var ioTab in this.genTabList)
+                {
+                    var tabVariables = ioTab.GridHandler.DataSource.GetNotEmptyData().Select(i => i.Variable?.ToLowerInvariant())
+                                                                                     .Where(i => i != null);
+                    suggestions = suggestions.Where(v => !tabVariables.Contains(v.ToLowerInvariant()));
+                }
+            }
+            return suggestions;
         }
 
         public void UpdateSuggestionColors()
