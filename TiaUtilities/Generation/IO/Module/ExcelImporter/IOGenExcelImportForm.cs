@@ -145,37 +145,33 @@ namespace TiaUtilities.Generation.GenModules.IO.ExcelImporter
 
                 var worksheet = configWorkbook.Worksheets.Worksheet(1);
 
-                var excelCellLetterList = AddMatchExpression([
+                var excelColumnsLetterList = AddMatchExpression([
                                 importConfig.AddressCellConfig, importConfig.CommentCellConfig, importConfig.IONameCellConfig, importConfig.IgnoreRowExpressionConfig
                             ]);
 
                 var importDataList = new List<IOGenExcelImportData>();
 
-                uint rowIndex = importConfig.StartingRow;
-                while (true)
+                var usedRows = worksheet.RowsUsed();
+                foreach(var row in usedRows)
                 {
+                    var rowNumber = row.RowNumber();
+                    if(rowNumber < this.importConfig.StartingRow)
+                    {
+                        continue;
+                    }
+
                     var excelCellValueDict = new Dictionary<string, string>();
 
                     bool allEmpty = true;
-                    foreach (var cellLetter in excelCellLetterList)
+                    foreach (var columnLetter in excelColumnsLetterList)
                     {
-                        var cellValue = worksheet.Cell(cellLetter + rowIndex).Value.ToString();
-                        excelCellValueDict.Add(cellLetter, cellValue); //There should not be two equals cellLetter. If there are, somethign wrong in AddMatchExpression.
+                        var cellValue = row.Cell(columnLetter.Replace("$", "")).Value.ToString();
+                        excelCellValueDict.Add(columnLetter, cellValue); //There should not be two equals cellLetter. If there are, somethign wrong in AddMatchExpression.
 
                         allEmpty &= string.IsNullOrEmpty(cellValue);
                     }
-                    rowIndex++;
 
-                    if (allEmpty)
-                    {
-                        break;
-                    }
-
-                    if (!EvaluteRowExpression(engine, excelCellValueDict, out bool expressionResult))
-                    {
-                        break;
-                    }
-                    else if (!expressionResult)
+                    if (allEmpty || !EvaluteRowExpression(engine, excelCellValueDict, out bool expressionResult) || !expressionResult)
                     {
                         continue;
                     }
@@ -192,6 +188,7 @@ namespace TiaUtilities.Generation.GenModules.IO.ExcelImporter
 
                     importDataList.Add(new() { Address = address, IOName = ioName, Comment = comment });
                 }
+
                 //Splitted this way to increase performance. Changing cell one at the time for 20-30 values takes 400ms, this way 10ms
                 var freeIndexList = this.gridHandler.DataSource.GetFirstEmptyRowIndexes(importDataList.Count);
 

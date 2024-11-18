@@ -383,6 +383,12 @@ namespace TiaXmlReader
             SvgTestForm svgTestForm = new();
             svgTestForm.Show(this);
         }
+
+        private void dbVisualizationMenuItem_Click(object sender, EventArgs e)
+        {
+            TreeViewDBVisualization dbVisualizationForm = new();
+            dbVisualizationForm.Show(this);
+        }
     }
 }
 
