@@ -119,8 +119,15 @@ namespace SimaticML.nBlockAttributeList
         {
             if (parentConfiguration is Member parentMember)
             {
-                //Wrap the member name in double quotes to "join" all the values toghether. If the name contains special chars (Like a dot) it will create problems.
-                return this.GetParentSymbol(parentMember.ParentConfiguration) + "." + SimaticMLUtil.WrapAddressComponentIfRequired(parentMember.MemberName);
+                if(parentMember.ParentConfiguration == null)
+                {
+                    return SimaticMLUtil.WrapAddressComponentIfRequired(parentMember.MemberName);
+                }
+                else
+                {
+                    //Wrap the member name in double quotes to "join" all the values toghether. If the name contains special chars (Like a dot) it will create problems.
+                    return this.GetParentSymbol(parentMember.ParentConfiguration) + "." + SimaticMLUtil.WrapAddressComponentIfRequired(parentMember.MemberName);
+                }
             }
             else if (parentConfiguration != null)
             {

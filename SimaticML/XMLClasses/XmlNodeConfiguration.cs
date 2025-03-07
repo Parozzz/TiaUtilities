@@ -225,7 +225,7 @@ namespace SimaticML.XMLClasses
             return xmlElement;
         }
 
-        protected string FindFirstNamespaceURI(XmlNodeConfiguration configuration)
+        protected string FindFirstNamespaceURI(XmlNodeConfiguration? configuration)
         {
             if (configuration == null)
             {

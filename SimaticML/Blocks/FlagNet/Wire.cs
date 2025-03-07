@@ -222,7 +222,7 @@ namespace SimaticML.Blocks.FlagNet
             }
         }
 
-        public void SetLocalObject(ILocalObject localObject)
+        public void SetLocalObject(ILocalObject? localObject)
         {
             this.localObject = localObject;
         }
@@ -283,7 +283,7 @@ namespace SimaticML.Blocks.FlagNet
             }
         }
 
-        public void SetLocalObject(ILocalObject localObject)
+        public void SetLocalObject(ILocalObject? localObject)
         {
             this.localObject = localObject;
         }

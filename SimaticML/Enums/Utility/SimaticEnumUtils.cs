@@ -2,7 +2,7 @@
 {
     public static class SimaticEnumUtils
     {
-        public static T FindByString<T>(string simaticMLString) where T : Enum
+        public static T? FindByString<T>(string simaticMLString) where T : Enum
         {
             var type = typeof(T);
             foreach (T loopEnumValue in Enum.GetValues(type))

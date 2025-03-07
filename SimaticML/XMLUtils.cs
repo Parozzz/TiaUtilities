@@ -4,7 +4,7 @@ namespace SimaticML
 {
     public static class XMLUtils
     {
-        public static XmlNode GetFirstChild(XmlNode node, string childName)
+        public static XmlNode? GetFirstChild(XmlNode node, string childName)
         {
             foreach (XmlNode childNode in node.ChildNodes)
             {
@@ -17,7 +17,7 @@ namespace SimaticML
             return null;
         }
 
-        private static XmlNode GetFirstSubChildInner(XmlNode node, string[] childNameArray, int index)
+        private static XmlNode? GetFirstSubChildInner(XmlNode node, string[] childNameArray, int index)
         {
             if (node == null || childNameArray.Length == 0)
             {

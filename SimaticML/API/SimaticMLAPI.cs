@@ -149,7 +149,11 @@ namespace SimaticML.API
             var document = CreateDocument();
 
             var xml = mainNode.Generate(document);
-            (document.DocumentElement ?? throw new InvalidProgramException()).AppendChild(xml);
+            if (xml != null)
+            {
+                (document.DocumentElement ?? throw new InvalidProgramException()).AppendChild(xml);
+            }
+            
             return document;
         }
 

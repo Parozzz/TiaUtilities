@@ -3,9 +3,9 @@ using SimaticML.Enums.Utility;
 
 namespace SimaticML
 {
-    public class SimaticAddressComponent
+    public class SimaticAddressComponent(string name)
     {
-        public string Name { get; set; }
+        public string Name { get; init; } = name;
         public List<SimaticAddressArrayIndex> ArrayIndexes { get; init; } = [];
     }
 
@@ -175,9 +175,9 @@ namespace SimaticML
             return GetAddress();
         }
 
-        public int CompareTo(SimaticTagAddress other)
+        public int CompareTo(SimaticTagAddress? other)
         {
-            return this.GetSortingNumber().CompareTo(other.GetSortingNumber());
+            return other == null ? 1 : this.GetSortingNumber().CompareTo(other.GetSortingNumber());
         }
     }
 
@@ -310,10 +310,8 @@ namespace SimaticML
                             var openSquareIndex = str.IndexOf('[');
                             var closedSquareIndex = str.LastIndexOf(']'); //Get the last index. If there are two square bracket one after the other (Array[i[1]]) i want the last.
 
-                            var mainComponent = new SimaticAddressComponent()
-                            {
-                                Name = str.Substring(0, openSquareIndex).Replace("\"", "")
-                            };
+                            var name = str.Substring(0, openSquareIndex).Replace("\"", "");
+                            var mainComponent = new SimaticAddressComponent(name);
 
                             var arrayIndexesStr = str.Substring(openSquareIndex + 1, closedSquareIndex - openSquareIndex - 1); //-1 because i don't won't the final square
 
@@ -334,7 +332,9 @@ namespace SimaticML
                     }
                     else
                     {
-                        var mainComponent = new SimaticAddressComponent() { Name = str.Replace("\"", "") };
+                        var name = str.Replace("\"", "");
+
+                        var mainComponent = new SimaticAddressComponent(name);
                         componentList.Add(mainComponent);
 
                         loopComponent.Clear();

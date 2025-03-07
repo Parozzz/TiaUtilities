@@ -23,7 +23,7 @@ namespace SimaticML.XMLClasses
             this.Required = required;
         }
 
-        public T AsEnum<T>() where T : Enum
+        public T? AsEnum<T>() where T : Enum
         {
             return SimaticEnumUtils.FindByString<T>(this.XmlValue);
         }

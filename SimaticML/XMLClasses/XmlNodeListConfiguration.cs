@@ -31,15 +31,18 @@ namespace SimaticML.XMLClasses
         {
             base.Load(xmlNode, parseUnknown: false);
 
-            foreach (XmlNode childNode in base.xmlElement.ChildNodes)
+            if (base.xmlElement != null)
             {
-                var configuration = creationFunction.Invoke(childNode);
-                if (configuration != null)
+                foreach (XmlNode childNode in base.xmlElement.ChildNodes)
                 {
-                    items.Add(configuration);
-                    configuration.Load(childNode);
+                    var configuration = creationFunction.Invoke(childNode);
+                    if (configuration != null)
+                    {
+                        items.Add(configuration);
+                        configuration.Load(childNode);
 
-                    base.parseUnkownChilds.Remove(childNode);
+                        base.parseUnkownChilds.Remove(childNode);
+                    }
                 }
             }
 
@@ -60,9 +63,13 @@ namespace SimaticML.XMLClasses
             return base.IsEmpty() && items.Count == 0;
         }
 
-        public override XmlElement Generate(XmlDocument document)
+        public override XmlElement? Generate(XmlDocument document)
         {
             var xmlElement = base.Generate(document);
+            if(xmlElement == null)
+            {
+                return null;
+            }
 
             foreach (var item in items)
             {

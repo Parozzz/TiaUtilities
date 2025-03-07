@@ -5,18 +5,14 @@ namespace SimaticML.Attributes
 {
     public static class AttributeUtil
     {
-        public static XmlNodeConfiguration CreateAttribute(XmlNode node)
+        public static XmlNodeConfiguration? CreateAttribute(XmlNode node)
         {
-            switch (node.Name)
+            return node.Name switch
             {
-                case BooleanAttribute.NODE_NAME:
-                    return new BooleanAttribute();
-                case StringAttribute.NODE_NAME:
-                    return new StringAttribute();
-                default:
-                    return null;
-
-            }
+                BooleanAttribute.NODE_NAME => new BooleanAttribute(),
+                StringAttribute.NODE_NAME => new StringAttribute(),
+                _ => null,
+            };
         }
     }
 
