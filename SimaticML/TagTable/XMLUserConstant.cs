@@ -7,25 +7,26 @@ using System.Xml;
 
 namespace SimaticML.TagTable
 {
-    public class XMLTag : XmlNodeConfiguration, IGlobalObject, ISimaticVariableDataHolder
+    public class XMLUserConstant : XmlNodeConfiguration, IGlobalObject, ISimaticVariableDataHolder
     {
-        public const string NODE_NAME = "SW.Tags.PlcTag";
+        public const string NODE_NAME = "SW.Tags.PlcUserConstant";
 
         public MultilingualText Comment { get => comment; }
-        public string TagName { get => tagName.AsString; set => tagName.AsString = value; }
+        public string ConstantName { get => constantName.AsString; set => constantName.AsString = value; }
+        public string ConstantValue { get => constantValue.AsString; set => constantValue.AsString = value; }
         public SimaticDataType DataType { get => SimaticDataType.FromSimaticMLString(dataTypeName.AsString); set => dataTypeName.AsString = value.SimaticMLString; }
 
 
         private readonly GlobalObjectData globalObjectData;
 
         private readonly XmlNodeConfiguration dataTypeName;
-        private readonly XmlNodeConfiguration logicalAddress;
-        private readonly XmlNodeConfiguration tagName;
+        private readonly XmlNodeConfiguration constantName;
+        private readonly XmlNodeConfiguration constantValue;
 
         private readonly XmlNodeConfiguration objectList;
         private readonly MultilingualText comment;
 
-        public XMLTag() : base(XMLTag.NODE_NAME)
+        public XMLUserConstant() : base(XMLTag.NODE_NAME)
         {
             //==== INIT CONFIGURATION ====
             globalObjectData = this.AddAttribute(new GlobalObjectData());
@@ -34,8 +35,8 @@ namespace SimaticML.TagTable
 
             var attributeList = this.AddNode(SimaticMLAPI.ATTRIBUTE_LIST_KEY, required: true);
             dataTypeName = attributeList.AddNode("DataTypeName", required: true, defaultInnerText: "bool");
-            logicalAddress = attributeList.AddNode("LogicalAddress", required: true, defaultInnerText: "%M0.0");
-            tagName = attributeList.AddNode("Name", required: true, defaultInnerText: "DefaultTagName");
+            constantName = attributeList.AddNode("Name", required: true, defaultInnerText: "DEFAULT_CONSTANT");
+            constantValue = attributeList.AddNode("Value", required: true, defaultInnerText: "false");
 
             objectList = this.AddNode(SimaticMLAPI.OBJECT_LIST_KEY, required: false);
             comment = objectList.AddNode(new MultilingualText(MultilingualTextType.COMMENT));
@@ -51,35 +52,9 @@ namespace SimaticML.TagTable
         {
             return globalObjectData;
         }
-
-        public string GetLogicalAddress()
-        {
-            return logicalAddress.AsString;
-        }
-
-        public XMLTag SetLogicalAddress(SimaticMemoryArea memoryArea, uint memoryByte, uint memoryBit)
-        {
-            logicalAddress.AsString = "%" + memoryArea.GetSimaticMLString() + memoryByte + "." + memoryBit;
-            return this;
-        }
-
-        public XMLTag SetBoolean(SimaticMemoryArea memoryArea, uint memoryByte, uint memoryBit)
-        {
-            this.DataType = SimaticDataType.BOOLEAN;
-            logicalAddress.AsString = "%" + memoryArea.GetSimaticMLString() + memoryByte + "." + memoryBit;
-            return this;
-        }
-
-        public XMLTag SetComplex(SimaticMemoryArea memoryArea, SimaticDataType dataType, uint memoryByte)
-        {
-            this.DataType = dataType;
-            logicalAddress.AsString = "%" + memoryArea.GetSimaticMLString() + dataType.GetSimaticLengthIdentifier() + memoryByte;
-            return this;
-        }
-
         public string GetName()
         {
-            return this.TagName;
+            return this.ConstantName;
         }
 
         public void AddComment(CultureInfo cultureInfo, string commentText)

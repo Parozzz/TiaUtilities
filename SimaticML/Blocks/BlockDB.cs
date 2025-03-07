@@ -21,8 +21,10 @@ namespace SimaticML.Blocks
         public MultilingualText Comment { get => this.CompuleMultilingualText(MultilingualTextType.COMMENT); }
         public BlockAttributeList AttributeList { get => this.blockAttributeList; }
 
+        public Section STATIC { get => this.AttributeList.STATIC; }
+
         private readonly GlobalObjectData globalObjectData;
-        public readonly BlockAttributeList blockAttributeList;
+        private readonly BlockAttributeList blockAttributeList;
         private readonly XmlNodeListConfiguration<XmlNodeConfiguration> objectList;
 
         public BlockDB(string nodeName) : base(nodeName)

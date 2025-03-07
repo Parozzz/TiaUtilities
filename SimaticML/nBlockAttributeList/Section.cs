@@ -1,5 +1,6 @@
 ﻿using SimaticML.API;
 using SimaticML.Blocks;
+using SimaticML.Blocks.FlagNet;
 using SimaticML.Enums;
 using SimaticML.Enums.Utility;
 using SimaticML.XMLClasses;
@@ -20,7 +21,7 @@ namespace SimaticML.nBlockAttributeList
         [SimaticEnum("None")] NONE //Used inside member to define start value in case of an array of UDT, or inside an UDT directly.1
     }
 
-    public class Section : XmlNodeListConfiguration<Member>
+    public class Section : XmlNodeListConfiguration<Member>, ISimaticVariableCollection
     {
         public const string NODE_NAME = "Section";
 
@@ -58,6 +59,19 @@ namespace SimaticML.nBlockAttributeList
         {
             this.SetReturnRetValMember("Ret_Val", SimaticDataType.VOID);
             return this;
+        }
+
+        public SimaticVariable AddVariable(string name, SimaticDataType dataType)
+        {
+            var member = this.AddMember(name, dataType);
+            SimaticVariable variable = SectionType switch
+            {
+                SectionTypeEnum.INPUT or SectionTypeEnum.OUTPUT or SectionTypeEnum.INOUT or SectionTypeEnum.STATIC or SectionTypeEnum.TEMP or SectionTypeEnum.RETURN => new SimaticLocalVariable(this, member),
+                SectionTypeEnum.CONSTANT => new SimaticLocalConstant(this, member),
+                _ => throw new InvalidOperationException($"Cannot create a Variable because SectionType {SectionType} is not valid!"),
+            };
+            
+            return variable;
         }
 
         public Member AddMember(string name, SimaticDataType dataType)
@@ -129,6 +143,19 @@ namespace SimaticML.nBlockAttributeList
             }
 
             return lastMember;
+        }
+
+        public SimaticDataType? FetchDataTypeOf(string variableName)
+        {
+            foreach (var member in this.GetItems())
+            {
+                if(member.MemberName.Equals(variableName, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    return SimaticDataType.FromSimaticMLString(member.MemberDataType);
+                }
+            }
+
+            return null;
         }
     }
 }

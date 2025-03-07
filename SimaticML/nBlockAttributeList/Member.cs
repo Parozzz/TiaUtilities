@@ -10,7 +10,7 @@ using System.Xml;
 namespace SimaticML.nBlockAttributeList
 {
     //Members can have other members inside (In case of structs)
-    public class Member : XmlNodeListConfiguration<Member>
+    public class Member : XmlNodeListConfiguration<Member>, ISimaticVariableDataHolder
     {
         public const string NODE_NAME = "Member";
         public static Member? CreateMember(XmlNode node)
@@ -20,6 +20,7 @@ namespace SimaticML.nBlockAttributeList
 
         public string MemberName { get => this.memberName.AsString; set => this.memberName.AsString = (string.IsNullOrEmpty(value) ? SimaticMLAPI.DEFAULT_EMPTY_MEMBER_NAME : value); }
         public string MemberDataType { get => this.dataType.AsString; set => this.dataType.AsString = value; }
+        public SimaticDataType SimaticDataType { get => SimaticDataType.FromSimaticMLString(this.MemberDataType); }
         public string StartValue { get => this.startValue.AsString; set => this.startValue.AsString = value; }
         public string Version { get => this.version.AsString; set => this.version.AsString = value; }
 
@@ -159,5 +160,15 @@ namespace SimaticML.nBlockAttributeList
         }
 
         public override string ToString() => $@"Member: {memberName.AsString}, Type: {dataType.AsString}";
+
+        public string GetName()
+        {
+            return this.MemberName;
+        }
+
+        public void AddComment(CultureInfo cultureInfo, string commentText)
+        {
+            this.comment[cultureInfo] = commentText;
+        }
     }
 }

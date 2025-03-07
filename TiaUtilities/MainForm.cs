@@ -322,33 +322,36 @@ namespace TiaXmlReader
             var fc = new BlockFC();
 
             //Add basic block information, like name, number and programming language.
-            fc.AttributeList.BlockName = "FC_TEST";
-            fc.AttributeList.BlockNumber = 123;
-            fc.AttributeList.ProgrammingLanguage = SimaticProgrammingLanguage.LADDER;
+            var attributeList = fc.AttributeList;
+            attributeList.BlockName = "FC_TEST";
+            attributeList.BlockNumber = 123;
+            attributeList.ProgrammingLanguage = SimaticProgrammingLanguage.LADDER;
 
             //Add two temp variables to the specific section.
 
+            var contactVariables = new List<SimaticVariable>();
             for (int i = 0; i < 10; i++)
             {
-                fc.AttributeList.TEMP.AddMember($"tContact{i}", SimaticDataType.BOOLEAN);
+                var var = attributeList.TEMP.AddVariable($"tContact{i}", SimaticDataType.BOOLEAN);
+                contactVariables.Add(var);
             }
-            fc.AttributeList.TEMP.AddMember("tCoil1", SimaticDataType.BOOLEAN);
-            fc.AttributeList.TEMP.AddMember("tCoil2", SimaticDataType.BOOLEAN);
+            var coil1Var = attributeList.TEMP.AddVariable("tCoil1", SimaticDataType.BOOLEAN);
+            var coil2Var = attributeList.TEMP.AddVariable("tCoil2", SimaticDataType.BOOLEAN);
 
             var segment = new SimaticLADSegment();
             segment.Title[LocaleVariables.CULTURE] = "Segment Title!";
             segment.Comment[LocaleVariables.CULTURE] = "Segment Comment! Much information here ...";
 
-            ContactPart[] contacts = new ContactPart[10];
+            var contactParts = new ContactPart[10];
             for (int i = 0; i < 10; i++)
             {
-                contacts[i] = new ContactPart() { Operand = new SimaticLocalVariable($"tContact{i}") };
+                contactParts[i] = new ContactPart() { Operand = contactVariables[i] };
             }
-            var coil1 = new CoilPart() { Operand = new SimaticLocalVariable("tCoil1") };
-            var coil2 = new CoilPart() { Operand = new SimaticLocalVariable("tCoil2") };
+            var coil1 = new CoilPart() { Operand = coil1Var };
+            var coil2 = new CoilPart() { Operand = coil2Var };
 
             //Brackets are important! C# will prioritize & to |, so the logic might break if not using them!
-            var _ = segment.Powerrail & (contacts[0] & (((contacts[1] | contacts[2]) & (contacts[3] | contacts[4])) | (contacts[5] & contacts[6])) & (contacts[7] | contacts[8]) | contacts[9]) & coil1 & coil2;
+            var _ = segment.Powerrail & (contactParts[0] & (((contactParts[1] | contactParts[2]) & (contactParts[3] | contactParts[4])) | (contactParts[5] & contactParts[6])) & (contactParts[7] | contactParts[8]) | contactParts[9]) & coil1 & coil2;
             segment.Create(fc);
             /*
             var compileUnit = fc.AddCompileUnit();
