@@ -40,6 +40,7 @@
             groupingTypeTableLayout = new TableLayoutPanel();
             groupingTypeLabel = new Label();
             groupingTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
+            editTemplateConfigButton = new Button();
             ((System.ComponentModel.ISupportInitialize)gridSplitContainer).BeginInit();
             gridSplitContainer.SuspendLayout();
             mainTableLayout.SuspendLayout();
@@ -83,6 +84,7 @@
             configFlowLayout.Controls.Add(valuesPrefixesConfigButton);
             configFlowLayout.Controls.Add(partitionTypeTableLayout);
             configFlowLayout.Controls.Add(groupingTypeTableLayout);
+            configFlowLayout.Controls.Add(editTemplateConfigButton);
             configFlowLayout.Dock = DockStyle.Fill;
             configFlowLayout.Location = new Point(3, 3);
             configFlowLayout.Name = "configFlowLayout";
@@ -210,6 +212,19 @@
             groupingTypeComboBox.Size = new Size(180, 26);
             groupingTypeComboBox.TabIndex = 0;
             // 
+            // editTemplateConfigButton
+            // 
+            editTemplateConfigButton.AutoSize = true;
+            editTemplateConfigButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            editTemplateConfigButton.Font = new Font("Microsoft Sans Serif", 12.75F, FontStyle.Bold);
+            editTemplateConfigButton.Location = new Point(1085, 3);
+            editTemplateConfigButton.Name = "editTemplateConfigButton";
+            editTemplateConfigButton.Padding = new Padding(3);
+            editTemplateConfigButton.Size = new Size(141, 36);
+            editTemplateConfigButton.TabIndex = 3;
+            editTemplateConfigButton.Text = "Edit Template";
+            editTemplateConfigButton.UseVisualStyleBackColor = true;
+            // 
             // AlarmGenTabControl
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -244,5 +259,6 @@
         public Label groupingTypeLabel;
         public TiaXmlReader.CustomControls.FlatComboBox partitionTypeComboBox;
         public TiaXmlReader.CustomControls.FlatComboBox groupingTypeComboBox;
+        public Button editTemplateConfigButton;
     }
 }

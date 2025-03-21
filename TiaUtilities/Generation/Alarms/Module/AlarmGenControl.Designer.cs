@@ -39,10 +39,10 @@ namespace TiaUtilities.Generation.GenModules.Alarm
             enableCustomVarPanel = new TableLayoutPanel();
             enableCustomVarToggleButton = new RJToggleButton();
             enableCustomVarLabel = new Label();
-            tabControl = new InteractableTabControl();
             enableTimerPanel = new TableLayoutPanel();
             enableTimerToggleButton = new RJToggleButton();
             enableTimerLabel = new Label();
+            tabControl = new InteractableTabControl();
             mainTableLayout.SuspendLayout();
             configButtonPanel.SuspendLayout();
             enableCustomVarPanel.SuspendLayout();
@@ -91,7 +91,7 @@ namespace TiaUtilities.Generation.GenModules.Alarm
             configButtonPanel.Location = new Point(0, 19);
             configButtonPanel.Margin = new Padding(0, 3, 0, 0);
             configButtonPanel.Name = "configButtonPanel";
-            configButtonPanel.Size = new Size(888, 30);
+            configButtonPanel.Size = new Size(824, 30);
             configButtonPanel.TabIndex = 15;
             // 
             // fcConfigButton
@@ -185,18 +185,6 @@ namespace TiaUtilities.Generation.GenModules.Alarm
             enableCustomVarLabel.Text = "ENABLE_CUSTOM_VAR";
             enableCustomVarLabel.TextAlign = ContentAlignment.MiddleCenter;
             // 
-            // tabControl
-            // 
-            tabControl.Dock = DockStyle.Fill;
-            tabControl.DrawMode = TabDrawMode.OwnerDrawFixed;
-            tabControl.Location = new Point(3, 52);
-            tabControl.Name = "tabControl";
-            tabControl.Padding = new Point(12, 5);
-            tabControl.RequireConfirmationBeforeClosing = true;
-            tabControl.SelectedIndex = 0;
-            tabControl.Size = new Size(1394, 674);
-            tabControl.TabIndex = 16;
-            // 
             // enableTimerPanel
             // 
             enableTimerPanel.AutoSize = true;
@@ -213,7 +201,7 @@ namespace TiaUtilities.Generation.GenModules.Alarm
             enableTimerPanel.Padding = new Padding(3, 0, 3, 0);
             enableTimerPanel.RowCount = 1;
             enableTimerPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            enableTimerPanel.Size = new Size(266, 30);
+            enableTimerPanel.Size = new Size(202, 30);
             enableTimerPanel.TabIndex = 20;
             // 
             // enableTimerToggleButton
@@ -221,7 +209,7 @@ namespace TiaUtilities.Generation.GenModules.Alarm
             enableTimerToggleButton.AutoSize = true;
             enableTimerToggleButton.BorderColor = Color.Gray;
             enableTimerToggleButton.BorderWidth = 2;
-            enableTimerToggleButton.Location = new Point(214, 4);
+            enableTimerToggleButton.Location = new Point(150, 4);
             enableTimerToggleButton.MinimumSize = new Size(45, 22);
             enableTimerToggleButton.Name = "enableTimerToggleButton";
             enableTimerToggleButton.OffBackColor = Color.Gray;
@@ -240,10 +228,22 @@ namespace TiaUtilities.Generation.GenModules.Alarm
             enableTimerLabel.Font = new Font("Microsoft Sans Serif", 12.75F);
             enableTimerLabel.Location = new Point(7, 1);
             enableTimerLabel.Name = "enableTimerLabel";
-            enableTimerLabel.Size = new Size(200, 28);
+            enableTimerLabel.Size = new Size(136, 28);
             enableTimerLabel.TabIndex = 19;
-            enableTimerLabel.Text = "ENABLE_CUSTOM_VAR";
+            enableTimerLabel.Text = "ENABLE_TIMER";
             enableTimerLabel.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // tabControl
+            // 
+            tabControl.Dock = DockStyle.Fill;
+            tabControl.DrawMode = TabDrawMode.OwnerDrawFixed;
+            tabControl.Location = new Point(3, 52);
+            tabControl.Name = "tabControl";
+            tabControl.Padding = new Point(12, 5);
+            tabControl.RequireConfirmationBeforeClosing = true;
+            tabControl.SelectedIndex = 0;
+            tabControl.Size = new Size(1394, 674);
+            tabControl.TabIndex = 16;
             // 
             // AlarmGenControl
             // 

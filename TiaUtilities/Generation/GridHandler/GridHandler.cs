@@ -356,6 +356,13 @@ namespace TiaXmlReader.Generation.GridHandler
             };
             #endregion
 
+            #region ROWS_EVENTS
+            this.DataGridView.RowEnter += (sender, args) =>
+            {
+                this.Events.RowSelectedChangedEvent(this, new() { RowIndex = args.RowIndex, ColumnIndex = args.ColumnIndex });
+            };
+            #endregion
+
             #region SCRIPT
             foreach (var column in this.DataHandler.DataColumns)
             {

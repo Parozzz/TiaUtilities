@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Languages;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.Generation.Placeholders;
@@ -27,6 +28,7 @@ namespace TiaXmlReader.Generation.Alarms
 
         [JsonProperty][Locale(nameof(Locale.DEVICE_DATA_NAME), append: $" > {GenPlaceholders.Alarms.DEVICE_NAME}")] public string? Name { get; set; }
         [JsonProperty][Locale(nameof(Locale.DEVICE_DATA_DESCRIPTION), append: $" > {GenPlaceholders.Alarms.DEVICE_DESCRIPTION}")] public string? Description { get; set; }
+        [JsonProperty] public GridSave<AlarmData>? AlarmGridSave {  get; set; }
         public object? this[int column]
         {
             get
@@ -53,11 +55,12 @@ namespace TiaXmlReader.Generation.Alarms
         public void Clear()
         {
             this.Name = this.Description = null;
+            this.AlarmGridSave = null;
         }
 
         public bool IsEmpty()
         {
-            return string.IsNullOrEmpty(this.Name) && string.IsNullOrEmpty(this.Description);
+            return string.IsNullOrEmpty(this.Name) && string.IsNullOrEmpty(this.Description) && this.AlarmGridSave == null;
         }
 
         public override bool Equals(object? obj)

@@ -2,6 +2,17 @@
 
 namespace TiaUtilities.Generation.GridHandler.Events
 {
+    #region SELECTED_ROW_CHANGED
+    public delegate void GridSelectedRowChangedEventHandler(object? sender, GridSelectedRowChangedArgs args);
+
+    public class GridSelectedRowChangedArgs : EventArgs
+    {
+        public int RowIndex { get; set; }
+        public int ColumnIndex { get; set; }
+    }
+
+    #endregion
+
     #region CELL_CHANGE
     public delegate void GridCellChangeEventHandler(object? sender, GridCellChangeEventArgs args);
 

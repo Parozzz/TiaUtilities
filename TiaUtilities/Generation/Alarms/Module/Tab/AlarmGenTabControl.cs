@@ -1,5 +1,8 @@
 ﻿using TiaUtilities.Generation.Alarms;
+using TiaUtilities.Generation.Alarms.Module;
+using TiaUtilities.Generation.Alarms.Module.Template;
 using TiaUtilities.Generation.Configuration.Utility;
+using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Languages;
 using TiaXmlReader;
 using TiaXmlReader.Generation.Alarms;
@@ -60,7 +63,7 @@ namespace TiaUtilities.Generation.GenModules.Alarm.Tab
             #endregion
         }
 
-        public void BindConfig(AlarmTabConfiguration tabConfig)
+        public void BindConfig(GridBindContainer bindContainer, AlarmMainConfiguration mainConfig, AlarmTabConfiguration tabConfig)
         {
             {
                 var comboBox = this.partitionTypeComboBox;
@@ -165,6 +168,16 @@ namespace TiaUtilities.Generation.GenModules.Alarm.Tab
                     mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_PREFIX_TIMER).BindText(() => tabConfig.TimerAddressPrefix);
 
                     SetupConfigForm(button, configForm);
+                };
+            }
+
+            {
+                var button = this.editTemplateConfigButton;
+                button.Click += (sender, args) =>
+                {
+                    var deviceTemplateForm = new AlarmGenDeviceTemplateForm(mainConfig, tabConfig, bindContainer);
+                    deviceTemplateForm.Init([]);
+                    deviceTemplateForm.Show(this);
                 };
             }
         }
