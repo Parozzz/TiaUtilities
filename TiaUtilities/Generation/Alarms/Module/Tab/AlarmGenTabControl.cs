@@ -13,13 +13,13 @@ namespace TiaUtilities.Generation.GenModules.Alarm.Tab
 {
     public partial class AlarmGenTabControl : UserControl
     {
-        private readonly DataGridView dataGridViewLeft;
-        private readonly DataGridView dataGridViewRight;
+        private readonly AlarmGenTemplateHandler templateHandler;
+        private readonly DataGridView dataGridView;
 
-        public AlarmGenTabControl(DataGridView dataGridViewLeft, DataGridView dataGridViewRight)
+        public AlarmGenTabControl(AlarmGenTemplateHandler templateHandler, DataGridView dataGridView)
         {
-            this.dataGridViewLeft = dataGridViewLeft;
-            this.dataGridViewRight = dataGridViewRight;
+            this.templateHandler = templateHandler;
+            this.dataGridView = dataGridView;
 
             InitializeComponent();
 
@@ -31,22 +31,7 @@ namespace TiaUtilities.Generation.GenModules.Alarm.Tab
             this.AutoSize = true; //AutoSize set here otherwise while doing the UI, everything will be shrinked to minimun (So useless)
             this.Dock = DockStyle.Fill;
 
-            this.gridSplitContainer.Panel1.Controls.Add(this.dataGridViewLeft);
-            this.gridSplitContainer.Panel2.Controls.Add(this.dataGridViewRight);
-
-            #region PartitionType ComboBox
-            this.partitionTypeComboBox.DisplayMember = "Text";
-            this.partitionTypeComboBox.ValueMember = "Value";
-
-            var partitionTypeItems = new List<object>();
-            foreach (AlarmPartitionType partitionType in Enum.GetValues(typeof(AlarmPartitionType)))
-            {
-                partitionTypeItems.Add(new { Text = partitionType.GetTranslation(), Value = partitionType });
-            }
-            this.partitionTypeComboBox.DataSource = partitionTypeItems;
-            //Seems every time a tab is shown, these have all the text selected. Not sure why. This fixes it.
-            this.partitionTypeComboBox.VisibleChanged += (sender, args) => this.partitionTypeComboBox.SelectionLength = 0;
-            #endregion
+            this.mainTableLayout.Controls.Add(this.dataGridView);
 
             #region GroupingType ComboBox
             this.groupingTypeComboBox.DisplayMember = "Text";
@@ -65,12 +50,6 @@ namespace TiaUtilities.Generation.GenModules.Alarm.Tab
 
         public void BindConfig(GridBindContainer bindContainer, AlarmMainConfiguration mainConfig, AlarmTabConfiguration tabConfig)
         {
-            {
-                var comboBox = this.partitionTypeComboBox;
-                comboBox.SelectedValue = tabConfig.PartitionType;
-                comboBox.SelectionChangeCommitted += (sender, args) => tabConfig.PartitionType = (AlarmPartitionType)(comboBox.SelectedValue ?? default(AlarmPartitionType));
-            }
-
             {
                 var comboBox = this.groupingTypeComboBox;
                 comboBox.SelectedValue = tabConfig.GroupingType;
@@ -175,9 +154,9 @@ namespace TiaUtilities.Generation.GenModules.Alarm.Tab
                 var button = this.editTemplateConfigButton;
                 button.Click += (sender, args) =>
                 {
-                    var deviceTemplateForm = new AlarmGenDeviceTemplateForm(mainConfig, tabConfig, bindContainer);
-                    deviceTemplateForm.Init([]);
-                    deviceTemplateForm.Show(this);
+                    var deviceTemplateForm = new AlarmGenTemplateForm(mainConfig, tabConfig, bindContainer, templateHandler);
+                    deviceTemplateForm.Init();
+                    deviceTemplateForm.ShowDialog(this);
                 };
             }
         }
@@ -187,6 +166,7 @@ namespace TiaUtilities.Generation.GenModules.Alarm.Tab
             this.generationConfigButton.Text = Locale.ALARM_CONFIG_GENERATION;
             this.defaultValuesConfigButton.Text = Locale.ALARM_CONFIG_DEFAULTS;
             this.valuesPrefixesConfigButton.Text = Locale.ALARM_CONFIG_PREFIX;
+            this.editTemplateConfigButton.Text = Locale.ALARM_CONFIG_EDIT_TEMPLATE;
         }
 
         private static void SetupConfigForm(Control button, ConfigForm configForm)

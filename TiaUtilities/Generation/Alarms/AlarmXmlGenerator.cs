@@ -4,6 +4,7 @@ using SimaticML.Blocks.FlagNet;
 using SimaticML.Blocks.FlagNet.nPart;
 using SimaticML.Enums;
 using TiaUtilities.Generation.Alarms;
+using TiaUtilities.Generation.Alarms.Module.Template;
 using TiaUtilities.Generation.Placeholders;
 using TiaXmlReader.Generation.Placeholders;
 using TiaXmlReader.Languages;
@@ -22,7 +23,7 @@ namespace TiaXmlReader.Generation.Alarms
         {
         }
 
-        public void GenerateAlarms(string name, AlarmTabConfiguration tabConfig, List<AlarmData> alarmDataList, List<DeviceData> deviceDataList)
+        public void GenerateAlarms(string name, AlarmTabConfiguration tabConfig, AlarmGenTemplateHandler templateHandler, List<DeviceData> deviceDataList)
         {
             AlarmGenPlaceholdersHandler placeholdersHandler = new(this.mainConfig, tabConfig);
 
@@ -37,95 +38,110 @@ namespace TiaXmlReader.Generation.Alarms
             var segment = new SimaticLADSegment();
 
             var nextAlarmNum = tabConfig.StartingAlarmNum;
+            //Switching to a Template system broke the ability to use the Partition system of the alarms (AlarmPartitionType.DEVICE / ALARM_TYPE)
+            foreach (var deviceData in deviceDataList)
+            {
+                if (tabConfig.GroupingType == AlarmGroupingType.GROUP)
+                {
+                    segment = new SimaticLADSegment();
+                }
+
+                var template = templateHandler.FindTemplate(deviceData.Template);
+                if (template == null)
+                {
+                    continue;
+                }
+
+                var alarmDataList = template.AlarmGridSave?.RowData.Values;
+                if (alarmDataList == null || alarmDataList.Count == 0)
+                {
+                    continue;
+                }
+
+                placeholdersHandler.Clear();
+                placeholdersHandler.TabName = name;
+
+                var startAlarmNum = nextAlarmNum;
+                foreach (var alarmData in alarmDataList)
+                {
+                    if (!alarmData.Enable)
+                    {
+                        continue;
+                    }
+
+                    var parsedAlarmData = ReplaceAlarmDataWithDefaultAndPrefix(tabConfig, alarmData);
+
+                    placeholdersHandler.DeviceData = deviceData;
+                    placeholdersHandler.AlarmData = parsedAlarmData;
+                    placeholdersHandler.SetAlarmNum(nextAlarmNum++, tabConfig.AlarmNumFormat);
+                    fullAlarmList += placeholdersHandler.Parse(this.mainConfig.AlarmTextInList) + '\n';
+
+                    if (tabConfig.GroupingType == AlarmGroupingType.ONE)
+                    {
+                        segment = new SimaticLADSegment();
+                        segment.Title[LocaleVariables.CULTURE] = placeholdersHandler.Parse(mainConfig.OneEachSegmentName);
+                    }
+
+                    FillAlarmSegment(tabConfig, segment, placeholdersHandler, parsedAlarmData);
+
+                    if (tabConfig.GroupingType == AlarmGroupingType.ONE)
+                    {
+                        segment.Create(fc);
+                    }
+                }
+
+                var lastAlarmNum = nextAlarmNum - 1;
+                var alarmCount = (lastAlarmNum - startAlarmNum) + 1;
+
+                if (tabConfig.AntiSlipNumber > 0)
+                {
+                    uint slippingAlarmCount = 0;
+                    if (alarmCount < tabConfig.AntiSlipNumber)
+                    {
+                        slippingAlarmCount = tabConfig.AntiSlipNumber - alarmCount;
+                    }
+                    else
+                    {
+                        slippingAlarmCount = tabConfig.AntiSlipNumber % alarmCount;
+                    }
+
+                    if (slippingAlarmCount > 0)
+                    {
+                        nextAlarmNum += slippingAlarmCount;
+
+                        for (var x = 0; x < slippingAlarmCount; x++)
+                        {
+                            placeholdersHandler.SetAlarmNum((uint)(lastAlarmNum + x + 1), tabConfig.AlarmNumFormat);
+                            fullAlarmList += placeholdersHandler.Parse(this.mainConfig.EmptyAlarmTextInList) + '\n';
+                        }
+
+                        if (tabConfig.GenerateEmptyAlarmAntiSlip)
+                        {
+                            GenerateEmptyAlarms(placeholdersHandler, tabConfig, lastAlarmNum + 1, slippingAlarmCount, segment); //CompileUnit only used for group division
+                            lastAlarmNum += slippingAlarmCount;
+                        }
+                    }
+                }
+
+                if (tabConfig.GroupingType == AlarmGroupingType.GROUP)
+                {
+                    placeholdersHandler.SetStartEndAlarmNum(startAlarmNum, lastAlarmNum, tabConfig.AlarmNumFormat);
+
+                    segment.Title[LocaleVariables.CULTURE] = placeholdersHandler.Parse(mainConfig.GroupSegmentName);
+                    segment.Create(fc);
+                }
+
+                nextAlarmNum += tabConfig.SkipNumberAfterGroup;
+                for (var x = 0; x < tabConfig.SkipNumberAfterGroup; x++)
+                {
+                    fullAlarmList += '\n';
+                }
+            }
+            /*
             switch (tabConfig.PartitionType)
             {
                 case AlarmPartitionType.DEVICE:
-                    foreach (var deviceData in deviceDataList)
-                    {
-                        if (tabConfig.GroupingType == AlarmGroupingType.GROUP)
-                        {
-                            segment = new SimaticLADSegment();
-                        }
 
-                        placeholdersHandler.Clear();
-                        placeholdersHandler.TabName = name;
-
-                        var startAlarmNum = nextAlarmNum;
-                        foreach (var alarmData in alarmDataList)
-                        {
-                            if (!alarmData.Enable)
-                            {
-                                continue;
-                            }
-
-                            var parsedAlarmData = ReplaceAlarmDataWithDefaultAndPrefix(tabConfig, alarmData);
-
-                            placeholdersHandler.DeviceData = deviceData;
-                            placeholdersHandler.AlarmData = parsedAlarmData;
-                            placeholdersHandler.SetAlarmNum(nextAlarmNum++, tabConfig.AlarmNumFormat);
-                            fullAlarmList += placeholdersHandler.Parse(this.mainConfig.AlarmTextInList) + '\n';
-
-                            if (tabConfig.GroupingType == AlarmGroupingType.ONE)
-                            {
-                                segment = new SimaticLADSegment();
-                                segment.Title[LocaleVariables.CULTURE] = placeholdersHandler.Parse(mainConfig.OneEachSegmentName);
-                            }
-
-                            FillAlarmSegment(tabConfig, segment, placeholdersHandler, parsedAlarmData);
-
-                            if (tabConfig.GroupingType == AlarmGroupingType.ONE)
-                            {
-                                segment.Create(fc);
-                            }
-                        }
-
-                        var lastAlarmNum = nextAlarmNum - 1;
-                        var alarmCount = (lastAlarmNum - startAlarmNum) + 1;
-
-                        if (tabConfig.AntiSlipNumber > 0)
-                        {
-                            uint slippingAlarmCount = 0;
-                            if (alarmCount < tabConfig.AntiSlipNumber)
-                            {
-                                slippingAlarmCount = tabConfig.AntiSlipNumber - alarmCount;
-                            }
-                            else
-                            {
-                                slippingAlarmCount = tabConfig.AntiSlipNumber % alarmCount;
-                            }
-
-                            if (slippingAlarmCount > 0)
-                            {
-                                nextAlarmNum += slippingAlarmCount;
-
-                                for (var x = 0; x < slippingAlarmCount; x++)
-                                {
-                                    placeholdersHandler.SetAlarmNum((uint)(lastAlarmNum + x + 1), tabConfig.AlarmNumFormat);
-                                    fullAlarmList += placeholdersHandler.Parse(this.mainConfig.EmptyAlarmTextInList) + '\n';
-                                }
-
-                                if (tabConfig.GenerateEmptyAlarmAntiSlip)
-                                {
-                                    GenerateEmptyAlarms(placeholdersHandler, tabConfig, lastAlarmNum + 1, slippingAlarmCount, segment); //CompileUnit only used for group division
-                                    lastAlarmNum += slippingAlarmCount;
-                                }
-                            }
-                        }
-
-                        if (tabConfig.GroupingType == AlarmGroupingType.GROUP)
-                        {
-                            placeholdersHandler.SetStartEndAlarmNum(startAlarmNum, lastAlarmNum, tabConfig.AlarmNumFormat);
-
-                            segment.Title[LocaleVariables.CULTURE] = placeholdersHandler.Parse(mainConfig.GroupSegmentName);
-                            segment.Create(fc);
-                        }
-
-                        nextAlarmNum += tabConfig.SkipNumberAfterGroup;
-                        for (var x = 0; x < tabConfig.SkipNumberAfterGroup; x++)
-                        {
-                            fullAlarmList += '\n';
-                        }
-                    }
                     break;
                 case AlarmPartitionType.ALARM_TYPE:
                     foreach (var alarmData in alarmDataList)
@@ -215,7 +231,7 @@ namespace TiaXmlReader.Generation.Alarms
                     }
                     break;
             }
-
+            */
             GenerateEmptyAlarms(placeholdersHandler, tabConfig, nextAlarmNum, tabConfig.EmptyAlarmAtEnd);
 
             fcDict.Add(name, fc);
@@ -320,8 +336,8 @@ namespace TiaXmlReader.Generation.Alarms
 
             var parsedCustomVarAddress = placeholders.Parse(alarmData.CustomVariableAddress);
             var parsedCustomVarValue = placeholders.Parse(alarmData.CustomVariableValue);
-            if (mainConfig.EnableCustomVariable && 
-                !string.IsNullOrEmpty(parsedCustomVarAddress) && AlarmData.IsAddressValid(parsedCustomVarAddress) && 
+            if (mainConfig.EnableCustomVariable &&
+                !string.IsNullOrEmpty(parsedCustomVarAddress) && AlarmData.IsAddressValid(parsedCustomVarAddress) &&
                 !string.IsNullOrEmpty(parsedCustomVarValue) && AlarmData.IsAddressValid(parsedCustomVarValue))
             {
 
@@ -340,17 +356,17 @@ namespace TiaXmlReader.Generation.Alarms
                 }
 
                 contact.Branch(new MovePart()
-                { 
-                    IN = inVar, 
-                    OUT = { new SimaticGlobalVariable(parsedCustomVarAddress) } 
+                {
+                    IN = inVar,
+                    OUT = { new SimaticGlobalVariable(parsedCustomVarAddress) }
                 });
             }
 
             TimerPart? timer = null;
             if (mainConfig.EnableTimer &&
-                !string.IsNullOrEmpty(alarmData.TimerAddress) && 
-                !string.IsNullOrEmpty(alarmData.TimerType) && 
-                !string.IsNullOrEmpty(alarmData.TimerValue) && 
+                !string.IsNullOrEmpty(alarmData.TimerAddress) &&
+                !string.IsNullOrEmpty(alarmData.TimerType) &&
+                !string.IsNullOrEmpty(alarmData.TimerValue) &&
                 AlarmData.IsAddressValid(alarmData.TimerAddress))
             {
                 var partType = alarmData.TimerType.ToLower() switch

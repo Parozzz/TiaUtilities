@@ -7,7 +7,6 @@ namespace TiaUtilities.Generation.Alarms
 {
     public class AlarmTabConfiguration : ObservableConfiguration
     {
-        [JsonProperty] public AlarmPartitionType PartitionType { get => this.GetAs<AlarmPartitionType>(); set => this.Set(value); }
         [JsonProperty] public AlarmGroupingType GroupingType { get => this.GetAs<AlarmGroupingType>(); set => this.Set(value); }
 
         [JsonProperty] public uint StartingAlarmNum { get => this.GetAs<uint>(); set => this.Set(value); }
@@ -39,7 +38,6 @@ namespace TiaUtilities.Generation.Alarms
 
         public AlarmTabConfiguration()
         {
-            this.PartitionType = AlarmPartitionType.DEVICE;
             this.GroupingType = AlarmGroupingType.GROUP;
 
             this.StartingAlarmNum = 1000;

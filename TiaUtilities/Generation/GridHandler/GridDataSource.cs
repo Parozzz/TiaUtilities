@@ -35,8 +35,11 @@ namespace TiaXmlReader.Generation.GridHandler
 
         public void LoadSave(Dictionary<int, T> saveDict)
         {
-            this.Clear();
-
+            //Here DO NOT CLEAR the data. Seems like the system binds to the loaded data and changes are directly applied.
+            //Only clearing it, it will not unbind from previous loaded data and will corrupt it.
+            //this.Clear();
+            this.InitializeData((uint) this.Count);
+            
             foreach (var entry in saveDict)
             {
                 var rowIndex = entry.Key;

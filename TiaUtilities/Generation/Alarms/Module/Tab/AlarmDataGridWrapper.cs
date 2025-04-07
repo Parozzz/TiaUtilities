@@ -24,7 +24,6 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
 
         public List<AlarmData> AlarmDataList { get => new(this.gridHandler.DataSource.GetNotEmptyClonedDataDict().Keys); } //Return CLONED data, otherwise operations on the xml generation will affect the table!
 
-
         public AlarmDataGridWrapper(GenPlaceholderHandler placeholderHandler, GridBindContainer bindContainer) 
         {
             this.previewer = new();

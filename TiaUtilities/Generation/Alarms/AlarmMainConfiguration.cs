@@ -11,12 +11,6 @@ namespace TiaXmlReader.Generation.Alarms
         [Locale(nameof(Locale.ALARM_CONFIG_GROUPING_TYPE_ONE))] ONE
     }
 
-    public enum AlarmPartitionType
-    {
-        [Locale(nameof(Locale.ALARM_CONFIG_PARTITION_TYPE_ALARM_TYPE))] ALARM_TYPE,
-        [Locale(nameof(Locale.ALARM_CONFIG_PARTITION_TYPE_DEVICE))] DEVICE
-    }
-
     public enum AlarmCoilType
     {
         [Locale(nameof(Locale.ALARM_CONFIG_COIL_TYPE_NONE))] NONE,

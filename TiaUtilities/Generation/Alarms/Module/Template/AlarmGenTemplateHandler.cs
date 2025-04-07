@@ -1,0 +1,146 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using TiaUtilities.CustomControls;
+
+namespace TiaUtilities.Generation.Alarms.Module.Template
+{
+    public class AlarmGenTemplateHandler : ICleanable
+    {
+        private readonly List<AlarmGenTemplate> templateList;
+        public BindingList<AlarmGenTemplate> BindingList { get; init; }
+        public AlarmGenTemplate? SelectedTemplate { get; private set; }
+
+        private bool dirty = false;
+
+        public AlarmGenTemplateHandler()
+        {
+            this.templateList = [];
+            this.BindingList = new(templateList);
+        }
+
+        public void Init(ICollection<AlarmGenTemplate> templateCollection)
+        {
+            this.templateList.Clear();
+            foreach (var template in templateCollection)
+            {
+                this.templateList.Add(template);
+            }
+
+            if (templateCollection.Count == 0)
+            {
+                this.AddNewTemplate();
+            }
+            this.SelectedTemplate = this.templateList[0];
+        }
+
+        public IEnumerable<string> GetAllNames()
+        {
+            return this.templateList.Select(template => template.Name);
+        }
+
+        public AlarmGenTemplate? FindTemplate(string? name)
+        {
+            if(name == null)
+            {
+                return null;
+            }
+
+            foreach (var template in this.templateList)
+            {
+                if(template.Name == name)
+                {
+                    return template;
+                }
+            }
+
+            return null;
+        }
+
+        public void SetSelectedTemplate(AlarmGenTemplate template)
+        {
+            this.SelectedTemplate = template;
+        }
+
+        public void AddNewTemplate()
+        {
+            AlarmGenTemplate newTemplate = new($"New template [{templateList.Count}]");
+            this.templateList.Add(newTemplate);
+
+            this.BindingList.ResetBindings();
+
+            this.dirty = true;
+        }
+
+        public void RemoveSelectedTemplate()
+        {
+            if (this.SelectedTemplate == null)
+            {
+                return;
+            }
+
+            this.templateList.Remove(this.SelectedTemplate);
+            this.BindingList.ResetBindings();
+
+            this.dirty = true;
+        }
+
+        public void RenameSelectedTemplate(IWin32Window? window)
+        {
+            if (SelectedTemplate == null)
+            {
+                return;
+            }
+
+            var floatingTextBox = new FloatingTextBox(SelectedTemplate.Name);
+            if (floatingTextBox.ShowDialogAtCursor(window) == DialogResult.OK)
+            {
+                SelectedTemplate.Name = floatingTextBox.InputText;
+                this.BindingList.ResetBindings();
+
+                this.dirty = true;
+            }
+        }
+
+        public List<AlarmGenTemplateSave> CreateSave()
+        {
+            List<AlarmGenTemplateSave> list = [];
+
+            foreach (var template in this.templateList)
+            {
+                if (template.AlarmGridSave == null)
+                {
+                    continue;
+                }
+
+                list.Add(new()
+                {
+                    Name = template.Name,
+                    AlarmGrid = template.AlarmGridSave
+                });
+            }
+
+            return list;
+        }
+
+        public void LoadSave(List<AlarmGenTemplateSave> saveList)
+        {
+            List<AlarmGenTemplate> templateList = [];
+            foreach (var save in saveList)
+            {
+                AlarmGenTemplate template = new(save.Name) { AlarmGridSave = save.AlarmGrid };
+                templateList.Add(template);
+            }
+
+            this.Init(templateList);
+        }
+
+        public bool IsDirty() => this.dirty;
+
+        public void Wash() => this.dirty = false;
+    }
+
+}

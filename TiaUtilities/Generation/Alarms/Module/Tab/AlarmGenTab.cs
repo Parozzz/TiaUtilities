@@ -1,4 +1,5 @@
-﻿using TiaUtilities.Generation.GenModules.Alarm.Tab;
+﻿using TiaUtilities.Generation.Alarms.Module.Template;
+using TiaUtilities.Generation.GenModules.Alarm.Tab;
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.GridHandler.JSScript;
@@ -7,6 +8,8 @@ using TiaXmlReader;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation.GridHandler;
+using TiaXmlReader.Generation.GridHandler.CustomColumns;
+using TiaXmlReader.Generation.IO;
 
 namespace TiaUtilities.Generation.Alarms.Module.Tab
 {
@@ -15,26 +18,25 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
         private readonly GridBindContainer gridBindContainer;
         private readonly AlarmGenModule module;
         private readonly AlarmMainConfiguration mainConfig;
+        private readonly AlarmGenTemplateHandler templateHandler;
 
         public TabPage TabPage { get; init; }
         public AlarmTabConfiguration TabConfig { get; init; }
 
         private readonly GridDataPreviewer<DeviceData> deviceDataPreview;
         private readonly GridHandler<DeviceData> deviceGridHandler;
-        private readonly AlarmDataGridWrapper alarmDataGridWrapper;
 
         public AlarmGenTabControl TabControl { get; init; }
-
         public List<DeviceData> DeviceDataList { get => new(deviceGridHandler.DataSource.GetNotEmptyClonedDataDict().Keys); } //Return CLONED data, otherwise operations on the xml generation will affect the table!
-        public List<AlarmData> AlarmDataList { get => this.alarmDataGridWrapper.AlarmDataList; } //Return CLONED data, otherwise operations on the xml generation will affect the table!
 
         private bool dirty = false;
 
-        public AlarmGenTab(GridBindContainer bindContainer, AlarmGenModule module, AlarmMainConfiguration mainConfig, TabPage tabPage)
+        public AlarmGenTab(GridBindContainer bindContainer, AlarmGenModule module, AlarmMainConfiguration mainConfig, AlarmGenTemplateHandler templateHandler, TabPage tabPage)
         {
             this.module = module;
             this.gridBindContainer = bindContainer;
             this.mainConfig = mainConfig;
+            this.templateHandler = templateHandler;
             this.TabPage = tabPage;
 
             this.TabConfig = new();
@@ -44,9 +46,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             this.deviceDataPreview = new();
             this.deviceGridHandler = new(MainForm.Settings.GridSettings, this.gridBindContainer, this.deviceDataPreview, placeholdersHandler) { RowCount = 499 };
             
-            this.alarmDataGridWrapper = new(placeholdersHandler, this.gridBindContainer);
-
-            TabControl = new(deviceGridHandler.DataGridView, this.alarmDataGridWrapper.GetDataGridView());
+            this.TabControl = new(this.templateHandler, deviceGridHandler.DataGridView);
         }
 
         public void Init()
@@ -60,17 +60,17 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
 
             //Columns before GridHandler.Init()
             this.deviceGridHandler.AddTextBoxColumn(DeviceData.NAME, 125);
+
+            SuggestionTextBoxColumn templateSuggestionColumn = new();
+            templateSuggestionColumn.SetGetItemsFunc(templateHandler.GetAllNames);
+            this.deviceGridHandler.AddCustomColumn(templateSuggestionColumn, DeviceData.TEMPLATE, 200);
+
             this.deviceGridHandler.AddTextBoxColumn(DeviceData.DESCRIPTION, 0);
 
             this.deviceGridHandler.Init();
             this.deviceDataPreview.Function = (column, deviceData) => null;
 
             this.deviceGridHandler.ScriptVariableList.Add(GridScriptVariable.ReadOnlyValue("tabName", () => this.TabPage.Text));
-            #endregion
-
-            #region ALARM_GRID_WRAPPER_SETUP
-            this.alarmDataGridWrapper.Init(this.mainConfig, this.TabConfig);
-            this.alarmDataGridWrapper.AddScriptVariable(GridScriptVariable.ReadOnlyValue("tabName", () => this.TabPage.Text));
             #endregion
 
             this.TabPage.TextChanged += (sender, args) => this.dirty = true;
@@ -88,13 +88,12 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             TabControl.Translate();
         }
 
-        public bool IsDirty() => this.dirty || this.TabConfig.IsDirty() || this.deviceGridHandler.IsDirty() || this.alarmDataGridWrapper.IsDirty();
+        public bool IsDirty() => this.dirty || this.TabConfig.IsDirty() || this.deviceGridHandler.IsDirty();
         public void Wash()
         {
             this.dirty = false;
             this.TabConfig.Wash();
             this.deviceGridHandler.Wash();
-            this.alarmDataGridWrapper.Wash();
         }
 
         public AlarmGenTabSave CreateSave()
@@ -103,8 +102,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             {
                 TabConfig = TabConfig,
                 Name = TabPage.Text,
-                DeviceGrid = deviceGridHandler.CreateSave(),
-                AlarmGrid = this.alarmDataGridWrapper.CreateSave()
+                DeviceGrid = deviceGridHandler.CreateSave()
             };
 
             GenUtils.CopyJsonFieldsAndProperties(TabConfig, save.TabConfig);
@@ -116,13 +114,12 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             TabPage.Text = save.Name;
             GenUtils.CopyJsonFieldsAndProperties(save.TabConfig, TabConfig);
 
-            this.alarmDataGridWrapper.LoadSave(save.AlarmGrid);
             deviceGridHandler.LoadSave(save.DeviceGrid);
         }
 
         public bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            return deviceGridHandler.ProcessCmdKey(ref msg, keyData) || this.alarmDataGridWrapper.ProcessCmdKey(ref msg, keyData);
+            return deviceGridHandler.ProcessCmdKey(ref msg, keyData);
         }
     }
 }

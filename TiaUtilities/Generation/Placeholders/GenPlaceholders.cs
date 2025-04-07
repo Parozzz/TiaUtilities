@@ -25,6 +25,7 @@
             public const string DEVICE_NAME = "{device_name}";
             public const string DEVICE_ADDRESS = "{device_address}";
             public const string DEVICE_DESCRIPTION = "{device_description}";
+            public const string DEVICE_TEMPLATE = "{device_template}";
 
             public const string ALARM_DESCRIPTION = "{alarm_description}";
             public const string ALARM_NUM = "{alarm_num}";

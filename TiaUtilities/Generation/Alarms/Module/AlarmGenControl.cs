@@ -1,4 +1,6 @@
-﻿using TiaUtilities.Generation.Configuration.Utility;
+﻿using TiaUtilities.Generation.Alarms.Module;
+using TiaUtilities.Generation.Alarms.Module.Template;
+using TiaUtilities.Generation.Configuration.Utility;
 using TiaUtilities.Languages;
 using TiaXmlReader;
 using TiaXmlReader.Generation.Alarms;

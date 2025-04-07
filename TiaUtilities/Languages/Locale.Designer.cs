@@ -169,6 +169,15 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Edit Template.
+        /// </summary>
+        internal static string ALARM_CONFIG_EDIT_TEMPLATE {
+            get {
+                return ResourceManager.GetString("ALARM_CONFIG_EDIT_TEMPLATE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Enable custom variable.
         /// </summary>
         internal static string ALARM_CONFIG_ENABLE_CUSTOM_VAR {
@@ -619,6 +628,24 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Template Configurator.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_FORM {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_FORM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Select Template.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_SELECT_TEMPLATE {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_SELECT_TEMPLATE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Description.
         /// </summary>
         internal static string DEVICE_DATA_DESCRIPTION {
@@ -633,6 +660,15 @@ namespace TiaUtilities.Languages {
         internal static string DEVICE_DATA_NAME {
             get {
                 return ResourceManager.GetString("DEVICE_DATA_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Template.
+        /// </summary>
+        internal static string DEVICE_DATA_TEMPLATE {
+            get {
+                return ResourceManager.GetString("DEVICE_DATA_TEMPLATE", resourceCulture);
             }
         }
         
