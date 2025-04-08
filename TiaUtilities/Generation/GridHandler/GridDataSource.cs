@@ -72,7 +72,7 @@ namespace TiaXmlReader.Generation.GridHandler
             {
                 dataList.Add(dataHandler.CreateInstance());
             }
-
+            //To Fix. Bind the BindingSource only one with consecutives Initialization (Or separate the functions).
             this.dataGridView.DataSource = new BindingSource() { DataSource = bindingList };
         }
 
