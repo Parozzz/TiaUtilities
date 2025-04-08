@@ -103,6 +103,25 @@ namespace TiaXmlReader.Generation.Alarms
                 string.IsNullOrEmpty(this.Description);
         }
 
+        public AlarmData Clone()
+        {
+            return new()
+            {
+                Enable = this.Enable,
+                AlarmVariable = this.AlarmVariable,
+                CustomVariableAddress = this.CustomVariableAddress,
+                CustomVariableValue = this.CustomVariableValue,
+                Coil1Address = this.Coil1Address,
+                Coil1Type = this.Coil1Type,
+                Coil2Address = this.Coil2Address,
+                Coil2Type = this.Coil2Type,
+                TimerAddress = this.TimerAddress,
+                TimerType = this.TimerType,
+                TimerValue = this.TimerValue,
+                Description = this.Description
+            };
+        }
+
         public override bool Equals(object? obj)
         {
             if (obj == null)

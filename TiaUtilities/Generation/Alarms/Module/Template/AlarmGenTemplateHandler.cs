@@ -5,14 +5,37 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TiaUtilities.CustomControls;
+using TiaUtilities.Languages;
 
 namespace TiaUtilities.Generation.Alarms.Module.Template
 {
+    public delegate void AlarmGenTemplateSelectedChanged(object? sender, AlarmGenTemplateSelectedChangedArgs args);
+    public class AlarmGenTemplateSelectedChangedArgs : EventArgs
+    {
+        public AlarmGenTemplate? OldTemplate { get; set; }
+        public AlarmGenTemplate? NewTemplate { get; set; }
+    }
+
+
     public class AlarmGenTemplateHandler : ICleanable
     {
         private readonly List<AlarmGenTemplate> templateList;
         public BindingList<AlarmGenTemplate> BindingList { get; init; }
-        public AlarmGenTemplate? SelectedTemplate { get; private set; }
+
+        private AlarmGenTemplate? _selectedTemplate;
+        public AlarmGenTemplate? SelectedTemplate
+        {
+            get => _selectedTemplate;
+            set
+            {
+                AlarmGenTemplateSelectedChangedArgs args = new() { OldTemplate = this._selectedTemplate, NewTemplate = value };
+                this.SelectedTemplateChanged(this, args);
+
+                this._selectedTemplate = value;
+            }
+        }
+
+        public event AlarmGenTemplateSelectedChanged SelectedTemplateChanged = delegate { };
 
         private bool dirty = false;
 
@@ -44,14 +67,14 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
 
         public AlarmGenTemplate? FindTemplate(string? name)
         {
-            if(name == null)
+            if (name == null)
             {
                 return null;
             }
 
             foreach (var template in this.templateList)
             {
-                if(template.Name == name)
+                if (template.Name == name)
                 {
                     return template;
                 }
@@ -60,17 +83,13 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
             return null;
         }
 
-        public void SetSelectedTemplate(AlarmGenTemplate template)
-        {
-            this.SelectedTemplate = template;
-        }
-
         public void AddNewTemplate()
         {
             AlarmGenTemplate newTemplate = new($"New template [{templateList.Count}]");
             this.templateList.Add(newTemplate);
-
             this.BindingList.ResetBindings();
+
+            this.SelectedTemplate = newTemplate;
 
             this.dirty = true;
         }
@@ -82,10 +101,25 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
                 return;
             }
 
-            this.templateList.Remove(this.SelectedTemplate);
-            this.BindingList.ResetBindings();
+            var result = MessageBox.Show(Locale.CONFIRM_DELETE_DIALOG_TEXT.Replace("{delete_item}", this.SelectedTemplate.Name),
+                Locale.CONFIRM_DELETE_DIALOG_CAPTION,
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
 
-            this.dirty = true;
+            if (result == DialogResult.Yes)
+            {
+                var index = this.templateList.IndexOf(this.SelectedTemplate);
+
+                this.templateList.Remove(this.SelectedTemplate);
+                this.BindingList.ResetBindings();
+
+                if (this.templateList.Count > 0)
+                {//Select the template above the one just deleted.
+                    this.SelectedTemplate = this.templateList[index - 1];
+                }
+
+                this.dirty = true;
+            }
         }
 
         public void RenameSelectedTemplate(IWin32Window? window)
@@ -95,7 +129,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
                 return;
             }
 
-            var floatingTextBox = new FloatingTextBox(SelectedTemplate.Name);
+            var floatingTextBox = new FloatingTextBox(SelectedTemplate.Name) { Width = 400 };
             if (floatingTextBox.ShowDialogAtCursor(window) == DialogResult.OK)
             {
                 SelectedTemplate.Name = floatingTextBox.InputText;
@@ -103,6 +137,23 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
 
                 this.dirty = true;
             }
+        }
+
+        public void CloneSelectedTemplate()
+        {
+            if (this.SelectedTemplate == null)
+            {
+                return;
+            }
+
+            AlarmGenTemplate newClone = this.SelectedTemplate.Clone();
+            newClone.Name += $" [{this.templateList.Count}]";
+            this.templateList.Add(newClone);
+            this.BindingList.ResetBindings();
+
+            this.SelectedTemplate = newClone;
+
+            this.dirty = true;
         }
 
         public List<AlarmGenTemplateSave> CreateSave()

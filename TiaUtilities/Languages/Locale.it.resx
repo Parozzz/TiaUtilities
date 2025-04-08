@@ -562,4 +562,10 @@ validità riga</value>
   <data name="ALARM_CONFIG_EDIT_TEMPLATE" xml:space="preserve">
     <value>Modifica Template</value>
   </data>
+  <data name="CONFIRM_DELETE_DIALOG_CAPTION" xml:space="preserve">
+    <value>Conferma di cancellazione</value>
+  </data>
+  <data name="CONFIRM_DELETE_DIALOG_TEXT" xml:space="preserve">
+    <value>Sei sicuro di voler cancellare {delete_item}?</value>
+  </data>
 </root>

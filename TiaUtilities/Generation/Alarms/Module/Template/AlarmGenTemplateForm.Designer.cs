@@ -37,6 +37,7 @@
             addButton = new Button();
             removeButton = new Button();
             renameButton = new Button();
+            cloneButton = new Button();
             mainPanel.SuspendLayout();
             topPanel.SuspendLayout();
             selectPanel.SuspendLayout();
@@ -66,6 +67,7 @@
             topPanel.Controls.Add(addButton);
             topPanel.Controls.Add(removeButton);
             topPanel.Controls.Add(renameButton);
+            topPanel.Controls.Add(cloneButton);
             topPanel.Dock = DockStyle.Fill;
             topPanel.Location = new Point(3, 3);
             topPanel.Name = "topPanel";
@@ -158,6 +160,22 @@
             renameButton.TabIndex = 3;
             renameButton.UseVisualStyleBackColor = true;
             // 
+            // cloneButton
+            // 
+            cloneButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            cloneButton.BackgroundImage = (Image)resources.GetObject("cloneButton.BackgroundImage");
+            cloneButton.BackgroundImageLayout = ImageLayout.Stretch;
+            cloneButton.Dock = DockStyle.Left;
+            cloneButton.FlatAppearance.BorderColor = SystemColors.Control;
+            cloneButton.FlatStyle = FlatStyle.Flat;
+            cloneButton.Font = new Font("Segoe UI", 11F);
+            cloneButton.Location = new Point(417, 0);
+            cloneButton.Margin = new Padding(8, 0, 0, 0);
+            cloneButton.Name = "cloneButton";
+            cloneButton.Size = new Size(40, 37);
+            cloneButton.TabIndex = 4;
+            cloneButton.UseVisualStyleBackColor = true;
+            // 
             // AlarmGenTemplateForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -165,7 +183,6 @@
             ClientSize = new Size(1184, 661);
             Controls.Add(mainPanel);
             DoubleBuffered = true;
-            ImeMode = ImeMode.NoControl;
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "AlarmGenTemplateForm";
@@ -193,5 +210,6 @@
         private Button addButton;
         private Button removeButton;
         private Button renameButton;
+        private Button cloneButton;
     }
 }

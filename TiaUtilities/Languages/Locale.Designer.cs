@@ -646,6 +646,24 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Delete confirmation.
+        /// </summary>
+        internal static string CONFIRM_DELETE_DIALOG_CAPTION {
+            get {
+                return ResourceManager.GetString("CONFIRM_DELETE_DIALOG_CAPTION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Are you sure you want to delete {delete_item}?.
+        /// </summary>
+        internal static string CONFIRM_DELETE_DIALOG_TEXT {
+            get {
+                return ResourceManager.GetString("CONFIRM_DELETE_DIALOG_TEXT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Description.
         /// </summary>
         internal static string DEVICE_DATA_DESCRIPTION {

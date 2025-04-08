@@ -38,9 +38,12 @@ namespace TiaUtilities.Generation.Alarms.Module
 
             this.mainPanel.Controls.Add(this.alarmDataGridWrapper.GetDataGridView());
 
+            this.templateHandler.SelectedTemplateChanged += (sender, args) => this.HandleTemplateChanged(args.OldTemplate, args.NewTemplate);
+
             this.addButton.Click += (sender, args) => this.templateHandler.AddNewTemplate();
             this.removeButton.Click += (sender, args) => this.templateHandler.RemoveSelectedTemplate();
             this.renameButton.Click += (sender, args) => this.templateHandler.RenameSelectedTemplate(this);
+            this.cloneButton.Click += (sender, args) => this.templateHandler.CloneSelectedTemplate();
 
             this.selectComboBox.DataSource = new BindingSource() { DataSource = this.templateHandler.BindingList };
             this.selectComboBox.DisplayMember = "Name";
@@ -50,17 +53,17 @@ namespace TiaUtilities.Generation.Alarms.Module
                 var selectedItem = this.selectComboBox.SelectedItem;
                 if (selectedItem is AlarmGenTemplate template)
                 {
-                    SelectTemplate(template);
+                    this.templateHandler.SelectedTemplate = template;
                 }
             };
 
-            this.SelectTemplate(this.templateHandler.SelectedTemplate);
+            this.HandleTemplateChanged(null, this.templateHandler.SelectedTemplate);
 
             System.Windows.Forms.Timer timer = new() { Interval = 300 };
             timer.Tick += (sender, args) =>
             {
                 var selectedTemplate = this.templateHandler.SelectedTemplate;
-                if (selectedTemplate == null || Selecting)
+                if (selectedTemplate == null)
                 {
                     return;
                 }
@@ -77,28 +80,27 @@ namespace TiaUtilities.Generation.Alarms.Module
             this.Translate();
         }
 
-        private void Translate()
+        private void HandleTemplateChanged(AlarmGenTemplate? oldTemplate, AlarmGenTemplate? newTemplate)
         {
-            this.Text = Locale.ALARM_TEMPLATE_FORM;
-            this.selectLabel.Text = Locale.ALARM_TEMPLATE_SELECT_TEMPLATE;
-        }
+            if (oldTemplate != null)
+            {
+                oldTemplate.AlarmGridSave = this.alarmDataGridWrapper.CreateSave();
+            }
 
-        private bool Selecting = false;
-        private void SelectTemplate(AlarmGenTemplate? template)
-        {
-            if (template == null)
+            if (newTemplate == null)
             {
                 return;
             }
 
-            Selecting = true;
-
-            this.templateHandler.SetSelectedTemplate(template);
-
-            this.alarmDataGridWrapper.LoadSave(template.AlarmGridSave);
+            this.alarmDataGridWrapper.LoadSave(newTemplate.AlarmGridSave);
             this.alarmDataGridWrapper.Wash();
+            selectComboBox.SelectedItem = newTemplate;
+        }
 
-            Selecting = false;
+        private void Translate()
+        {
+            this.Text = Locale.ALARM_TEMPLATE_FORM;
+            this.selectLabel.Text = Locale.ALARM_TEMPLATE_SELECT_TEMPLATE;
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)

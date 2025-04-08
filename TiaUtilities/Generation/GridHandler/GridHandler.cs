@@ -417,6 +417,7 @@ namespace TiaXmlReader.Generation.GridHandler
         {
             this.DataGridView.SuspendLayout();
 
+            this.undoRedoHandler.Clear();
             this.DataSource.LoadSave(gridSave.RowData);
 
             this.DataGridView.Refresh();
