@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TiaUtilities.CustomControls;
 using TiaUtilities.Languages;
+using TiaXmlReader.Utility;
 
 namespace TiaUtilities.Generation.Alarms.Module.Template
 {
@@ -13,9 +14,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
     public class AlarmGenTemplateSelectedChangedArgs : EventArgs
     {
         public AlarmGenTemplate? OldTemplate { get; set; }
-        public AlarmGenTemplate? NewTemplate { get; set; }
     }
-
 
     public class AlarmGenTemplateHandler : ICleanable
     {
@@ -28,10 +27,13 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
             get => _selectedTemplate;
             set
             {
-                AlarmGenTemplateSelectedChangedArgs args = new() { OldTemplate = this._selectedTemplate, NewTemplate = value };
-                this.SelectedTemplateChanged(this, args);
+                var oldTemplate = _selectedTemplate;
+                _selectedTemplate = value;
 
-                this._selectedTemplate = value;
+                if(Utils.AreDifferentObject(oldTemplate, _selectedTemplate))
+                {
+                    this.SelectedTemplateChanged(this, new() { OldTemplate = oldTemplate });
+                }
             }
         }
 

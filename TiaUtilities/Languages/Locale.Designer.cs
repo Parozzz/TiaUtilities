@@ -646,6 +646,24 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Save actual configuration as default.
+        /// </summary>
+        internal static string CONFIG_LINE_SAVE_DEFAULT_TOOLTIP {
+            get {
+                return ResourceManager.GetString("CONFIG_LINE_SAVE_DEFAULT_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Transfer values to all others configurations.
+        /// </summary>
+        internal static string CONFIG_LINE_TRANSFER_TO_OTHERS {
+            get {
+                return ResourceManager.GetString("CONFIG_LINE_TRANSFER_TO_OTHERS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Delete confirmation.
         /// </summary>
         internal static string CONFIRM_DELETE_DIALOG_CAPTION {

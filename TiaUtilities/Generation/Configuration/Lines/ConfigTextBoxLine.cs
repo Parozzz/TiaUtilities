@@ -13,6 +13,8 @@ namespace TiaUtilities.Generation.Configuration.Lines
         private bool numericOnly;
         private Action<string?>? textChangedAction;
         private Action<uint>? uintChangedAction;
+        private Action? transferToOtherTextAction;
+        private Action? transferToOtherUIntAction;
 
         public ConfigTextBoxLine(IConfigGroup group)
         {
@@ -87,22 +89,48 @@ namespace TiaUtilities.Generation.Configuration.Lines
 
         public ConfigTextBoxLine BindText(Expression<Func<string>> propertyExpression, bool nullable = false)
         {
-            var propertyInfo = ConfigLineUtils.ValidateBindExpression(this.configGroup, propertyExpression.Body, out object configuration);
+            var propertyInfo = ConfigLineUtils.ValidateBindExpression(this.configGroup, propertyExpression.Body, out object configuration, out IEnumerable<object> otherConfigurations);
 
             this.ControlText(propertyExpression.Compile().Invoke());
-            textChangedAction = str => propertyInfo.SetValue(configuration, nullable ? str : (str ?? ""));
+            this.textChangedAction = str => propertyInfo.SetValue(configuration, nullable ? str : (str ?? ""));
+            this.transferToOtherTextAction = () =>
+            {
+                var str = this.textBox.Text;
+                foreach (var otherConfig in otherConfigurations)
+                {
+                    propertyInfo.SetValue(otherConfig, str);
+                }
+            };
             return this;
         }
 
         public ConfigTextBoxLine BindUInt(Expression<Func<uint>> propertyExpression)
         {
-            var propertyInfo = ConfigLineUtils.ValidateBindExpression(this.configGroup,propertyExpression.Body, out object configuration);
+            var propertyInfo = ConfigLineUtils.ValidateBindExpression(this.configGroup,propertyExpression.Body, out object configuration, out IEnumerable<object> otherConfigurations);
 
             this.ControlText(propertyExpression.Compile().Invoke());
-            uintChangedAction = uintValue => propertyInfo.SetValue(configuration, uintValue);
+            this.uintChangedAction = uintValue => propertyInfo.SetValue(configuration, uintValue);
+            this.transferToOtherUIntAction = () =>
+            {
+                var str = this.textBox.Text;
+                if (uintChangedAction != null && uint.TryParse(str, out uint result))
+                {
+                    foreach (var otherConfig in otherConfigurations)
+                    {
+                        propertyInfo.SetValue(otherConfig, result);
+                    }
+                }
+            };
             return this;
         }
-        
+
+        public override void TrasferToAllConfigurations()
+        {
+            transferToOtherTextAction?.Invoke();
+            transferToOtherUIntAction?.Invoke();
+        }
+
+
         public override Control GetControl()
         {
             return this.textBox;

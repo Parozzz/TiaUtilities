@@ -568,4 +568,10 @@ for row validation</value>
   <data name="CONFIRM_DELETE_DIALOG_TEXT" xml:space="preserve">
     <value>Are you sure you want to delete {delete_item}?</value>
   </data>
+  <data name="CONFIG_LINE_TRANSFER_TO_OTHERS" xml:space="preserve">
+    <value>Transfer values to all others configurations</value>
+  </data>
+  <data name="CONFIG_LINE_SAVE_DEFAULT_TOOLTIP" xml:space="preserve">
+    <value>Save actual configuration as default</value>
+  </data>
 </root>

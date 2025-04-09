@@ -38,7 +38,7 @@ namespace TiaUtilities.Generation.Alarms.Module
 
             this.mainPanel.Controls.Add(this.alarmDataGridWrapper.GetDataGridView());
 
-            this.templateHandler.SelectedTemplateChanged += (sender, args) => this.HandleTemplateChanged(args.OldTemplate, args.NewTemplate);
+            this.templateHandler.SelectedTemplateChanged += (sender, args) => this.HandleTemplateChanged(args.OldTemplate);
 
             this.addButton.Click += (sender, args) => this.templateHandler.AddNewTemplate();
             this.removeButton.Click += (sender, args) => this.templateHandler.RemoveSelectedTemplate();
@@ -57,44 +57,29 @@ namespace TiaUtilities.Generation.Alarms.Module
                 }
             };
 
-            this.HandleTemplateChanged(null, this.templateHandler.SelectedTemplate);
-
-            System.Windows.Forms.Timer timer = new() { Interval = 300 };
-            timer.Tick += (sender, args) =>
-            {
-                var selectedTemplate = this.templateHandler.SelectedTemplate;
-                if (selectedTemplate == null)
-                {
-                    return;
-                }
-
-                if (this.alarmDataGridWrapper.IsDirty())
-                {
-                    selectedTemplate.AlarmGridSave = this.alarmDataGridWrapper.CreateSave();
-                    this.alarmDataGridWrapper.Wash();
-                }
-            };
-            timer.Start();
-            this.FormClosed += (sender, args) => timer.Stop();
+            //Load Current after init and save current when form is closed.
+            this.HandleTemplateChanged(null);
+            this.FormClosing += (sender, args) => HandleTemplateChanged(null);
 
             this.Translate();
         }
 
-        private void HandleTemplateChanged(AlarmGenTemplate? oldTemplate, AlarmGenTemplate? newTemplate)
+        private void HandleTemplateChanged(AlarmGenTemplate? oldTemplate)
         {
             if (oldTemplate != null)
             {
                 oldTemplate.AlarmGridSave = this.alarmDataGridWrapper.CreateSave();
             }
 
-            if (newTemplate == null)
+            if (this.templateHandler.SelectedTemplate == null)
             {
                 return;
             }
 
-            this.alarmDataGridWrapper.LoadSave(newTemplate.AlarmGridSave);
+            this.alarmDataGridWrapper.LoadSave(this.templateHandler.SelectedTemplate.AlarmGridSave);
             this.alarmDataGridWrapper.Wash();
-            selectComboBox.SelectedItem = newTemplate;
+
+            this.selectComboBox.SelectedItem = this.templateHandler.SelectedTemplate;
         }
 
         private void Translate()

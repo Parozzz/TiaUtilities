@@ -11,6 +11,7 @@ namespace TiaUtilities.Generation.Configuration.Lines
         private readonly FastColoredTextBox control;
 
         private Action<string>? textChangedAction;
+        private Action? transferToOtherTextAction;
 
         public ConfigJSONLine(IConfigGroup configGroup)
         {
@@ -72,11 +73,24 @@ namespace TiaUtilities.Generation.Configuration.Lines
 
         public ConfigJSONLine BindText(Expression<Func<string>> propertyExpression, bool nullable = false)
         {
-            var propertyInfo = ConfigLineUtils.ValidateBindExpression(this.configGroup, propertyExpression.Body, out object configuration);
+            var propertyInfo = ConfigLineUtils.ValidateBindExpression(this.configGroup, propertyExpression.Body, out object configuration, out IEnumerable<object> otherConfigurations);
 
             this.ControlText(propertyExpression.Compile().Invoke());
-            textChangedAction = str => propertyInfo.SetValue(configuration, nullable ? str : (str ?? ""));
+            this.textChangedAction = str => propertyInfo.SetValue(configuration, nullable ? str : (str ?? ""));
+            this.transferToOtherTextAction = () =>
+            {
+                var str = this.control.Text;
+                foreach (var otherConfig in otherConfigurations)
+                {
+                    propertyInfo.SetValue(otherConfig, str);
+                }
+            };
             return this;
+        }
+
+        public override void TrasferToAllConfigurations()
+        {
+            transferToOtherTextAction?.Invoke();
         }
 
         public override Control GetControl()

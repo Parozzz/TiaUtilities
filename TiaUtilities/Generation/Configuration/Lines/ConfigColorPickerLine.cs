@@ -14,6 +14,8 @@ namespace TiaUtilities.Generation.Configuration.Lines
         private readonly Button colorPickerButton;
 
         private Action<Color>? colorAction;
+        private Action? transferToOtherColorAction;
+
         private Color lastColor = Color.White;
 
         public ConfigColorPickerLine(IConfigGroup configGroup)
@@ -89,10 +91,18 @@ namespace TiaUtilities.Generation.Configuration.Lines
         
         public ConfigColorPickerLine BindColor(Expression<Func<Color>> propertyExpression)
         {
-            var propertyInfo = ConfigLineUtils.ValidateBindExpression(this.configGroup, propertyExpression.Body, out object configuration);
+            var propertyInfo = ConfigLineUtils.ValidateBindExpression(this.configGroup, propertyExpression.Body, out object configuration, out IEnumerable<object> otherConfigurations);
 
             this.ApplyColor(propertyExpression.Compile().Invoke());
             colorAction = colorValue => propertyInfo.SetValue(configuration, colorValue);
+            transferToOtherColorAction = () =>
+            {
+                var colorValue = this.lastColor;
+                foreach (var otherConfig in otherConfigurations)
+                {
+                    propertyInfo.SetValue(otherConfig, colorValue);
+                }
+            };
             return this;
         }
 

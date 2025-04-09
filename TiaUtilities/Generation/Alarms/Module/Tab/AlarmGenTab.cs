@@ -51,8 +51,8 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
 
         public void Init()
         {
-            TabControl.Init(); //This before configHandler.
-            TabControl.BindConfig(this.gridBindContainer, this.mainConfig, this.TabConfig);
+            this.TabControl.Init(); //This before configHandler.
+            this.TabControl.BindConfig(this.gridBindContainer, this.mainConfig, this.TabConfig, this.module.TabConfigurations);
 
             #region DEVICE_GRID_SETUP
             this.deviceGridHandler.Events.ExcelDragPreview += (sender, args) => GridUtils.DragPreview(args, deviceGridHandler);

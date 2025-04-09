@@ -568,4 +568,10 @@ validità riga</value>
   <data name="CONFIRM_DELETE_DIALOG_TEXT" xml:space="preserve">
     <value>Sei sicuro di voler cancellare {delete_item}?</value>
   </data>
+  <data name="CONFIG_LINE_TRANSFER_TO_OTHERS" xml:space="preserve">
+    <value>Trasferisci valore a tutte le configurazioni</value>
+  </data>
+  <data name="CONFIG_LINE_SAVE_DEFAULT_TOOLTIP" xml:space="preserve">
+    <value>Salva configurazione attuale come default</value>
+  </data>
 </root>

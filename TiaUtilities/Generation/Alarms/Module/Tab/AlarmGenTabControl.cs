@@ -48,7 +48,7 @@ namespace TiaUtilities.Generation.GenModules.Alarm.Tab
             #endregion
         }
 
-        public void BindConfig(GridBindContainer bindContainer, AlarmMainConfiguration mainConfig, AlarmTabConfiguration tabConfig)
+        public void BindConfig(GridBindContainer bindContainer, AlarmMainConfiguration mainConfig, AlarmTabConfiguration tabConfig, IEnumerable<AlarmTabConfiguration> tabConfigs)
         {
             {
                 var comboBox = this.groupingTypeComboBox;
@@ -61,7 +61,7 @@ namespace TiaUtilities.Generation.GenModules.Alarm.Tab
                 button.Click += (sender, args) =>
                 {
                     var configForm = new ConfigForm(button.Text) { ControlWidth = 300 };
-                    configForm.SetConfiguration(tabConfig, MainForm.Settings.PresetAlarmTabConfiguration);
+                    configForm.SetConfiguration(tabConfig, MainForm.Settings.PresetAlarmTabConfiguration, tabConfigs);
 
                     var mainGroup = configForm.Init().ControlWidth(150);
                     mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_GENERATION_START_NUM).BindUInt(() => tabConfig.StartingAlarmNum);
@@ -98,7 +98,7 @@ namespace TiaUtilities.Generation.GenModules.Alarm.Tab
                 button.Click += (sender, args) =>
                 {
                     var configForm = new ConfigForm(button.Text);
-                    configForm.SetConfiguration(tabConfig, MainForm.Settings.PresetAlarmTabConfiguration);
+                    configForm.SetConfiguration(tabConfig, MainForm.Settings.PresetAlarmTabConfiguration, tabConfigs);
 
                     var mainGroup = configForm.Init();
                     
@@ -138,7 +138,7 @@ namespace TiaUtilities.Generation.GenModules.Alarm.Tab
                 button.Click += (sender, args) =>
                 {
                     var configForm = new ConfigForm(button.Text);
-                    configForm.SetConfiguration(tabConfig, MainForm.Settings.PresetAlarmTabConfiguration);
+                    configForm.SetConfiguration(tabConfig, MainForm.Settings.PresetAlarmTabConfiguration, tabConfigs);
 
                     var mainGroup = configForm.Init();
                     mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_PREFIX_ALARM).BindText(() => tabConfig.AlarmAddressPrefix);

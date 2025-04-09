@@ -416,10 +416,12 @@ namespace TiaXmlReader.Generation.GridHandler
         public void LoadSave(GridSave<T> gridSave)
         {
             this.DataGridView.SuspendLayout();
-
+            this.DataGridView.Enabled = false;
+            
             this.undoRedoHandler.Clear();
             this.DataSource.LoadSave(gridSave.RowData);
-
+            
+            this.DataGridView.Enabled = true;
             this.DataGridView.Refresh();
             this.DataGridView.ResumeLayout();
         }

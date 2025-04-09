@@ -1,5 +1,7 @@
-﻿using TiaUtilities.Generation.Configuration;
+﻿using TiaUtilities.CustomControls;
+using TiaUtilities.Generation.Configuration;
 using TiaUtilities.Generation.Configuration.Lines;
+using TiaUtilities.Languages;
 
 namespace TiaXmlReader.Generation.Configuration
 {
@@ -122,11 +124,12 @@ namespace TiaXmlReader.Generation.Configuration
                     AutoEllipsis = true,
                     Font = line.GetLabelFont() ?? configForm?.LabelFont ?? ConfigStyle.LABEL_FONT
                 };
+
                 panel.Controls.Add(label);
 
                 line.GetLabelText().Changed += (sender, args) => label.Text = args.NewValue;
 
-                if(line is not ConfigLabelLine)
+                if (line is not ConfigLabelLine)
                 {//For the biggest title, you need to consider only the lines that have A ACTIVE CONTROL! Lines that only contains the label are not counted!
                     var size = TextRenderer.MeasureText(labelText, label.Font);
                     size.Width += 4; //Padding
@@ -163,12 +166,20 @@ namespace TiaXmlReader.Generation.Configuration
                     panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50f));
                 }
 
-                control.Width = this.controlWidth == 0 ? (configForm?.ControlWidth ?? 300) : this.controlWidth;
-                control.Height = line.GetHeight() == 0 ? (configForm?.ControlHeight ?? 30) : line.GetHeight();
+                var width = this.controlWidth == 0 ? (configForm?.ControlWidth ?? 300) : this.controlWidth;
+                var height = line.GetHeight() == 0 ? (configForm?.ControlHeight ?? 30) : line.GetHeight();
 
+                control.Width = width;
+                control.Height = height;
                 control.Dock = line.IsControlNoAdapt() ? DockStyle.None : DockStyle.Fill;
                 control.Font = configForm?.ControlFont ?? ConfigStyle.CONTROL_FONT;
+
+                ToolStripMenuItem item = new(Locale.CONFIG_LINE_TRANSFER_TO_OTHERS) { Image = Image.FromFile("Resources/Images/noun-transfer-7710063.png") };
+                item.Click += (sender, args) => line.TrasferToAllConfigurations();
+                control.ContextMenuStrip = new() { Items = { item } };
+
                 panel.Controls.Add(control);
+
             }
         }
     }

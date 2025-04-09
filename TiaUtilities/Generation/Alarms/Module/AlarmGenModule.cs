@@ -22,6 +22,7 @@ namespace TiaUtilities.Generation.Alarms.Module
         private readonly AlarmGenTemplateHandler templateHandler;
 
         private readonly List<AlarmGenTab> genTabList;
+        public IEnumerable<AlarmTabConfiguration> TabConfigurations { get => this.genTabList.Select(tab => tab.TabConfig); }
 
         public AlarmGenModule(JavascriptErrorReportThread jsErrorHandlingThread)
         {

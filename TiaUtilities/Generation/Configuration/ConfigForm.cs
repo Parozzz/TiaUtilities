@@ -1,4 +1,5 @@
 ﻿using TiaUtilities.Generation.Configuration;
+using TiaUtilities.Languages;
 using TiaXmlReader.Utility;
 
 namespace TiaXmlReader.Generation.Configuration
@@ -9,6 +10,7 @@ namespace TiaXmlReader.Generation.Configuration
 
         public object? Configuration { get; private set; }
         public object? PresetConfiguration { get; private set; }
+        public IEnumerable<object> OtherConfigurations { get; private set; } = [];
 
         public Font LabelFont { get; set; } = ConfigStyle.LABEL_FONT;
         public Font ControlFont { get; set; } = ConfigStyle.CONTROL_FONT;
@@ -25,10 +27,11 @@ namespace TiaXmlReader.Generation.Configuration
             this.title = title;
         }
 
-        public void SetConfiguration<T>(T configuration, T? presetConfiguration = default)
+        public void SetConfiguration<T>(T configuration, T? presetConfiguration = default, IEnumerable<T>? otherConfigurations = null)
         {
             this.Configuration = configuration;
             this.PresetConfiguration = presetConfiguration;
+            this.OtherConfigurations = otherConfigurations == null ? [] : otherConfigurations.Cast<object>();
         }
 
         public void StartShowingAtCursor()
@@ -57,6 +60,9 @@ namespace TiaXmlReader.Generation.Configuration
             this.MinimizeBox = false;
 
             this.titleLabel.Text = title;
+
+            ToolTip savePresetTooltip = new() { InitialDelay = 500, AutoPopDelay = 4000, ReshowDelay = 500 };
+            savePresetTooltip.SetToolTip(this.savePresetButton, Locale.CONFIG_LINE_SAVE_DEFAULT_TOOLTIP);
 
             if(this.PresetConfiguration == null)
             {

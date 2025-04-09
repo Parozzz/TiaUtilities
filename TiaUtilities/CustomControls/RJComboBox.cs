@@ -153,6 +153,11 @@ namespace TiaUtilities.CustomControls
             }
         }
 
+        public override ContextMenuStrip? ContextMenuStrip
+        {
+            get => this.textBox.ContextMenuStrip;
+            set => this.textBox.ContextMenuStrip = value;
+        }
         #region COMBO_BOX_PROPERTIES
         [Category("RJ Code - Data")]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]

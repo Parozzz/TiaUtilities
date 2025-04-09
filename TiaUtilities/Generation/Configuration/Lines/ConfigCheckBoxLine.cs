@@ -11,6 +11,7 @@ namespace TiaUtilities.Generation.Configuration.Lines
         private readonly RJToggleButton control;
 
         private Action<bool>? checkedChangedAction;
+        private Action? transferToOtherBoolAction;
 
         public ConfigCheckBoxLine(IConfigGroup configGroup)
         {
@@ -48,11 +49,23 @@ namespace TiaUtilities.Generation.Configuration.Lines
         */
         public ConfigCheckBoxLine BindChecked(Expression<Func<bool>> propertyExpression)
         {
-            var propertyInfo = ConfigLineUtils.ValidateBindExpression(this.configGroup, propertyExpression.Body, out object configuration);
+            var propertyInfo = ConfigLineUtils.ValidateBindExpression(this.configGroup, propertyExpression.Body, out object configuration, out IEnumerable<object> otherConfigurations);
 
-            this.ControlText(propertyExpression.Compile().Invoke());
-            checkedChangedAction = boolValue => propertyInfo.SetValue(configuration, boolValue);
+            this.control.Checked = propertyExpression.Compile().Invoke();
+            this.checkedChangedAction = boolValue => propertyInfo.SetValue(configuration, boolValue);
+            this.transferToOtherBoolAction = () =>
+            {
+                var boolValue = this.control.Checked;
+                foreach (var otherConfig in otherConfigurations)
+                {
+                    propertyInfo.SetValue(otherConfig, boolValue);
+                }
+            };
             return this;
+        }
+        public override void TrasferToAllConfigurations()
+        {
+            transferToOtherBoolAction?.Invoke();
         }
 
         public override Control GetControl()

@@ -15,6 +15,8 @@ namespace TiaXmlReader.Generation.Configuration
 
         int GetHeight();
         bool IsControlNoAdapt();
+
+        void TrasferToAllConfigurations();
     }
 
     public interface IConfigGroup : IConfigObject

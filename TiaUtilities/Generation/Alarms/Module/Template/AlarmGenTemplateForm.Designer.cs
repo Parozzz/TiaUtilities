@@ -116,7 +116,7 @@
             // 
             addButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             addButton.BackgroundImage = (Image)resources.GetObject("addButton.BackgroundImage");
-            addButton.BackgroundImageLayout = ImageLayout.Stretch;
+            addButton.BackgroundImageLayout = ImageLayout.Zoom;
             addButton.Dock = DockStyle.Left;
             addButton.FlatAppearance.BorderColor = SystemColors.Control;
             addButton.FlatStyle = FlatStyle.Flat;
@@ -132,7 +132,7 @@
             // 
             removeButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             removeButton.BackgroundImage = (Image)resources.GetObject("removeButton.BackgroundImage");
-            removeButton.BackgroundImageLayout = ImageLayout.Stretch;
+            removeButton.BackgroundImageLayout = ImageLayout.Zoom;
             removeButton.Dock = DockStyle.Left;
             removeButton.FlatAppearance.BorderColor = SystemColors.Control;
             removeButton.FlatStyle = FlatStyle.Flat;
@@ -148,7 +148,7 @@
             // 
             renameButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             renameButton.BackgroundImage = (Image)resources.GetObject("renameButton.BackgroundImage");
-            renameButton.BackgroundImageLayout = ImageLayout.Stretch;
+            renameButton.BackgroundImageLayout = ImageLayout.Zoom;
             renameButton.Dock = DockStyle.Left;
             renameButton.FlatAppearance.BorderColor = SystemColors.Control;
             renameButton.FlatStyle = FlatStyle.Flat;
@@ -164,7 +164,7 @@
             // 
             cloneButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             cloneButton.BackgroundImage = (Image)resources.GetObject("cloneButton.BackgroundImage");
-            cloneButton.BackgroundImageLayout = ImageLayout.Stretch;
+            cloneButton.BackgroundImageLayout = ImageLayout.Zoom;
             cloneButton.Dock = DockStyle.Left;
             cloneButton.FlatAppearance.BorderColor = SystemColors.Control;
             cloneButton.FlatStyle = FlatStyle.Flat;

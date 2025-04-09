@@ -15,6 +15,9 @@ namespace TiaUtilities.Generation.Configuration.Lines
         private Action<string>? textChangedAction;
         private Action<uint>? uintChangedAction;
         private Action<object?>? selectedValueChangedAction;
+        private Action? transferToOtherTextAction;
+        private Action? transferToOtherUIntAction;
+        private Action? transferToOtherObjectAction;
 
         public ConfigComboBoxLine(IConfigGroup configGroup)
         {
@@ -125,25 +128,44 @@ namespace TiaUtilities.Generation.Configuration.Lines
         
         public ConfigComboBoxLine BindText(Expression<Func<string>> propertyExpression, bool nullable = false)
         {
-            var propertyInfo = ConfigLineUtils.ValidateBindExpression(this.configGroup, propertyExpression.Body, out object configuration);
+            var propertyInfo = ConfigLineUtils.ValidateBindExpression(this.configGroup, propertyExpression.Body, out object configuration, out IEnumerable<object> otherConfigurations);
 
             this.ControlText(propertyExpression.Compile().Invoke());
             this.textChangedAction = str => propertyInfo.SetValue(configuration, nullable ? str : (str ?? ""));
+            this.transferToOtherTextAction = () =>
+            {
+                var str = this.comboBox.Text;
+                foreach (var otherConfig in otherConfigurations)
+                {
+                    propertyInfo.SetValue(otherConfig, str);
+                }
+            };
             return this;
         }
 
         public ConfigComboBoxLine BindUInt(Expression<Func<uint>> propertyExpression)
         {
-            var propertyInfo = ConfigLineUtils.ValidateBindExpression(this.configGroup, propertyExpression.Body, out object configuration);
+            var propertyInfo = ConfigLineUtils.ValidateBindExpression(this.configGroup, propertyExpression.Body, out object configuration, out IEnumerable<object> otherConfigurations);
 
             this.ControlText(propertyExpression.Compile().Invoke());
             this.uintChangedAction = uintValue => propertyInfo.SetValue(configuration, uintValue);
+            this.transferToOtherUIntAction = () =>
+            {
+                var str = this.comboBox.Text;
+                if (uintChangedAction != null && uint.TryParse(str, out uint result))
+                {
+                    foreach (var otherConfig in otherConfigurations)
+                    {
+                        propertyInfo.SetValue(otherConfig, result);
+                    }
+                }
+            };
             return this;
         }
 
         public ConfigComboBoxLine BindValue<T>(Expression<Func<T>> propertyExpression)
         {
-            var propertyInfo = ConfigLineUtils.ValidateBindExpression(this.configGroup, propertyExpression.Body, out object configuration);
+            var propertyInfo = ConfigLineUtils.ValidateBindExpression(this.configGroup, propertyExpression.Body, out object configuration, out IEnumerable<object> otherConfigurations);
 
             this.comboBox.SelectedValue = propertyExpression.Compile().Invoke();
             this.selectedValueChangedAction = obj =>
@@ -153,7 +175,24 @@ namespace TiaUtilities.Generation.Configuration.Lines
                     propertyInfo.SetValue(configuration, tValue);
                 }
             };
+            this.transferToOtherTextAction = () =>
+            {
+                var objectValue = this.comboBox.SelectedValue;
+                if(objectValue is T tValue)
+                {
+                    foreach (var otherConfig in otherConfigurations)
+                    {
+                        propertyInfo.SetValue(otherConfig, tValue);
+                    }
+                }
+            };
             return this;
+        }
+        public override void TrasferToAllConfigurations()
+        {
+            transferToOtherTextAction?.Invoke();
+            transferToOtherUIntAction?.Invoke();
+            transferToOtherTextAction?.Invoke();
         }
 
         public ConfigComboBoxLine NumericOnly()

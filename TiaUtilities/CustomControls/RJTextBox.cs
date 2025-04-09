@@ -201,6 +201,11 @@ namespace TiaUtilities.CustomControls
             get => this.textBox.ScrollBars;
             set => this.textBox.ScrollBars = value;
         }
+        public override ContextMenuStrip? ContextMenuStrip
+        {
+            get => this.textBox.ContextMenuStrip;
+            set => this.textBox.ContextMenuStrip = value;
+        }
 
         private bool isFocused = false;
 

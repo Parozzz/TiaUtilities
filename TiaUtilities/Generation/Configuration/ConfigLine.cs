@@ -80,5 +80,7 @@ namespace TiaXmlReader.Generation.Configuration
         }
 
         public abstract Control? GetControl();
+
+        public virtual void TrasferToAllConfigurations() { } //To be implemeted inside all childrens 
     }
 }
