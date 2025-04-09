@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Languages;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.Generation.Placeholders;
@@ -11,6 +12,7 @@ namespace TiaXmlReader.Generation.Alarms
         private readonly static int COLUMN_COUNT = 0;
         //THESE IS THE ORDER IN WHICH THEY APPEAR!
         public static readonly GridDataColumn NAME;
+        public static readonly GridDataColumn TEMPLATE;
         public static readonly GridDataColumn DESCRIPTION;
         public static readonly IReadOnlyList<GridDataColumn> COLUMN_LIST;
 
@@ -18,6 +20,7 @@ namespace TiaXmlReader.Generation.Alarms
         {
             var type = typeof(DeviceData);
             NAME = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(DeviceData.Name));
+            TEMPLATE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(DeviceData.Template));
             DESCRIPTION = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(DeviceData.Description));
 
             var columnList = GridDataColumn.GetStaticColumnList(type);
@@ -27,6 +30,9 @@ namespace TiaXmlReader.Generation.Alarms
 
         [JsonProperty][Locale(nameof(Locale.DEVICE_DATA_NAME), append: $" > {GenPlaceholders.Alarms.DEVICE_NAME}")] public string? Name { get; set; }
         [JsonProperty][Locale(nameof(Locale.DEVICE_DATA_DESCRIPTION), append: $" > {GenPlaceholders.Alarms.DEVICE_DESCRIPTION}")] public string? Description { get; set; }
+        [JsonProperty][Locale(nameof(Locale.DEVICE_DATA_TEMPLATE), append: $" > {GenPlaceholders.Alarms.DEVICE_TEMPLATE}")] public string? Template { get; set; }
+
+        [JsonProperty] public GridSave<AlarmData>? AlarmGridSave {  get; set; }
         public object? this[int column]
         {
             get
@@ -53,11 +59,12 @@ namespace TiaXmlReader.Generation.Alarms
         public void Clear()
         {
             this.Name = this.Description = null;
+            this.AlarmGridSave = null;
         }
 
         public bool IsEmpty()
         {
-            return string.IsNullOrEmpty(this.Name) && string.IsNullOrEmpty(this.Description);
+            return string.IsNullOrEmpty(this.Name) && string.IsNullOrEmpty(this.Description) && this.AlarmGridSave == null;
         }
 
         public override bool Equals(object? obj)

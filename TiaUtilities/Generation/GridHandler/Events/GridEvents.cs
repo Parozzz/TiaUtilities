@@ -5,6 +5,7 @@ namespace TiaXmlReader.Generation.GridHandler.Events
 {
     public class GridEvents<T> where T : IGridData
     {
+        public event GridSelectedRowChangedEventHandler RowSelectedChanged = delegate { };
         public event GridCellChangeEventHandler CellChange = delegate { };
 
         public event GridPreSortEventHandler PreSort = delegate { };
@@ -12,6 +13,11 @@ namespace TiaXmlReader.Generation.GridHandler.Events
 
         public event GridExcelDragPreviewEventHandler ExcelDragPreview = delegate { };
         public event GridExcelDragDoneEventHandler ExcelDragDone = delegate { };
+
+        public void RowSelectedChangedEvent(object? sender, GridSelectedRowChangedArgs args)
+        {
+            RowSelectedChanged(sender, args);
+        }
 
         public void CellChangeEvent(object? sender, GridCellChangeEventArgs args)
         {

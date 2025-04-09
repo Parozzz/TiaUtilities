@@ -71,6 +71,12 @@
 
             redoActionList.Add(action);
         }
+
+        public void Clear()
+        {
+            this.undoActionList.Clear();
+            this.redoActionList.Clear();
+        }
     }
 
     public class UndoRedoAction

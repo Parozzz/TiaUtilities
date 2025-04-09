@@ -550,4 +550,22 @@ for row validation</value>
   <data name="ALARM_CONFIG_ENABLE_TIMER" xml:space="preserve">
     <value>Enable timer</value>
   </data>
+  <data name="DEVICE_DATA_TEMPLATE" xml:space="preserve">
+    <value>Template</value>
+  </data>
+  <data name="ALARM_TEMPLATE_FORM" xml:space="preserve">
+    <value>Template Configurator</value>
+  </data>
+  <data name="ALARM_TEMPLATE_SELECT_TEMPLATE" xml:space="preserve">
+    <value>Select Template</value>
+  </data>
+  <data name="ALARM_CONFIG_EDIT_TEMPLATE" xml:space="preserve">
+    <value>Edit Template</value>
+  </data>
+  <data name="CONFIRM_DELETE_DIALOG_CAPTION" xml:space="preserve">
+    <value>Delete confirmation</value>
+  </data>
+  <data name="CONFIRM_DELETE_DIALOG_TEXT" xml:space="preserve">
+    <value>Are you sure you want to delete {delete_item}?</value>
+  </data>
 </root>

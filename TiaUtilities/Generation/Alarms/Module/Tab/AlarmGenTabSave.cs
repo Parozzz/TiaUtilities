@@ -8,7 +8,6 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
     {
         [JsonProperty] public string Name { get; set; } = "AlarmGenTab";
         [JsonProperty] public AlarmTabConfiguration TabConfig { get; set; } = new();
-        [JsonProperty] public GridSave<AlarmData> AlarmGrid { get; set; } = new();
         [JsonProperty] public GridSave<DeviceData> DeviceGrid { get; set; } = new();
     }
 }

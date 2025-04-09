@@ -11,6 +11,7 @@ namespace TiaXmlReader.Generation.GridHandler
 
         private readonly List<T> dataList;
         private readonly BindingList<T> bindingList;
+        private readonly BindingSource bindingSource;
 
         public int Count { get => dataList.Count; }
 
@@ -19,8 +20,9 @@ namespace TiaXmlReader.Generation.GridHandler
             this.dataGridView = dataGridView;
             this.dataHandler = dataHandler;
 
-            dataList = [];
-            bindingList = new(dataList);
+            this.dataList = [];
+            this.bindingList = new(dataList);
+            this.bindingSource = new() { DataSource = bindingList };
         }
 
         public Dictionary<int, T> CreateSave()
@@ -35,8 +37,11 @@ namespace TiaXmlReader.Generation.GridHandler
 
         public void LoadSave(Dictionary<int, T> saveDict)
         {
-            this.Clear();
-
+            //Here DO NOT CLEAR the data. Seems like the system binds to the loaded data and changes are directly applied.
+            //Only clearing it, it will not unbind from previous loaded data and will corrupt it.
+            //this.Clear();
+            this.InitializeData((uint) this.Count);
+            
             foreach (var entry in saveDict)
             {
                 var rowIndex = entry.Key;
@@ -69,8 +74,12 @@ namespace TiaXmlReader.Generation.GridHandler
             {
                 dataList.Add(dataHandler.CreateInstance());
             }
-
-            this.dataGridView.DataSource = new BindingSource() { DataSource = bindingList };
+            
+            if(this.dataGridView.DataSource != this.bindingSource)
+            {
+                this.dataGridView.DataSource = this.bindingSource;
+            }
+            this.bindingSource.ResetBindings(metadataChanged: true);
         }
 
         public List<int> GetFirstEmptyRowIndexes(int num)

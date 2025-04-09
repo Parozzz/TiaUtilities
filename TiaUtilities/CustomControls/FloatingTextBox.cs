@@ -13,6 +13,11 @@ namespace TiaUtilities.CustomControls
             this.Shown += (sender, args) => formReadyToClose = true;
         }
 
+        public FloatingTextBox(string inputText) : this()
+        {
+            this.InputText = inputText;
+        }
+
         private bool formReadyToClose = false;
         protected override void WndProc(ref Message m)
         {
@@ -52,5 +57,12 @@ namespace TiaUtilities.CustomControls
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
+        public DialogResult ShowDialogAtCursor(IWin32Window? owner)
+        {
+            this.StartPosition = FormStartPosition.Manual;
+            this.Location = Cursor.Position;
+
+            return this.ShowDialog(owner);
+        }
     }
 }

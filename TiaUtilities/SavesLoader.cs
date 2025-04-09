@@ -54,7 +54,7 @@ namespace TiaUtilities
             JsonSerializer serializer = new();
             serializer.Converters.Add(new JavaScriptDateTimeConverter());
             serializer.NullValueHandling = NullValueHandling.Ignore;
-            serializer.DefaultValueHandling = DefaultValueHandling.Ignore;
+            serializer.DefaultValueHandling = DefaultValueHandling.Include;
             serializer.Formatting = Formatting.Indented;
             return serializer;
         }

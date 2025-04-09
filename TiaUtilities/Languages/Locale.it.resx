@@ -171,6 +171,34 @@
   <data name="GENERICS_SAVE_AS" xml:space="preserve">
     <value>Salva Come</value>
   </data>
+  <data name="GENERICS_COMMENT" xml:space="preserve">
+    <value>Commento</value>
+  </data>
+  <data name="GENERICS_CONFIGURATION" xml:space="preserve">
+    <value>Configurazione</value>
+  </data>
+  <data name="GENERICS_ACCEPT" xml:space="preserve">
+    <value>Accetta</value>
+  </data>
+  <data name="GENERICS_CANCEL" xml:space="preserve">
+    <value>Cancella</value>
+  </data>
+  <data name="GENERICS_CLEAR" xml:space="preserve">
+    <value>Pulisci</value>
+  </data>
+  <data name="IO_GEN_EXCELIMPORT_IO_NAME" xml:space="preserve">
+    <value>Nome IO</value>
+  </data>
+  <data name="IO_GEN_EXCELIMPORT_STARTING_ROW" xml:space="preserve">
+    <value>Riga di partenza</value>
+  </data>
+  <data name="IO_GEN_EXCELIMPORT_EXPRESSION" xml:space="preserve">
+    <value>Espressione JS
+validità riga</value>
+  </data>
+  <data name="IO_GEN_EXCELIMPORT_IMPORT" xml:space="preserve">
+    <value>Importa Excel</value>
+  </data>
   <data name="ALARM_CONFIG_FC" xml:space="preserve">
     <value>FC</value>
   </data>
@@ -191,6 +219,9 @@
   </data>
   <data name="ALARM_CONFIG_GENERATION_EMPTY_ALARM_ADDRESS" xml:space="preserve">
     <value>Indirizzo Allarme</value>
+  </data>
+  <data name="ALARM_CONFIG_GENERATION_EMPTY_ANTI_SLIP" xml:space="preserve">
+    <value>Genera durante anti-slip</value>
   </data>
   <data name="ALARM_CONFIG_GENERATION_EMPTY_NUM" xml:space="preserve">
     <value>Quantità alla fine</value>
@@ -279,8 +310,17 @@
   <data name="ALARM_DATA_CUSTOM_VAR_ADDR" xml:space="preserve">
     <value>Variabile Custom</value>
   </data>
+  <data name="ALARM_DATA_CUSTOM_VAR_VALUE" xml:space="preserve">
+    <value>Value</value>
+  </data>
   <data name="ALARM_DATA_COIL1_ADDRESS" xml:space="preserve">
     <value>Indirizzo bobina1</value>
+  </data>
+  <data name="ALARM_DATA_COIL1_TYPE" xml:space="preserve">
+    <value>Tipo</value>
+  </data>
+  <data name="ALARM_DATA_COIL2_TYPE" xml:space="preserve">
+    <value>Tipo</value>
   </data>
   <data name="ALARM_DATA_COIL2_ADDRESS" xml:space="preserve">
     <value>Indirizzo bobina2</value>
@@ -345,6 +385,9 @@
   <data name="GRID_SCRIPT_AUTO_FORMAT" xml:space="preserve">
     <value>Auto Formattazione</value>
   </data>
+  <data name="GRID_SCRIPT_OPEN_JAVASCRIPT_CONTEXT" xml:space="preserve">
+    <value>Apri esecutore Javascript</value>
+  </data>
   <data name="GRID_FIND_SEARCH_COMPLETED" xml:space="preserve">
     <value>Operazione completata</value>
   </data>
@@ -386,6 +429,9 @@
   </data>
   <data name="IO_DATA_ADDRESS" xml:space="preserve">
     <value>Indirizzo</value>
+  </data>
+  <data name="IO_DATA_NEGATED" xml:space="preserve">
+    <value>Negato</value>
   </data>
   <data name="IO_DATA_COMMENT" xml:space="preserve">
     <value>Commento</value>
@@ -465,6 +511,9 @@
   <data name="IO_GEN_FORM_IMPEXP_IMPORT_SUGGESTION" xml:space="preserve">
     <value>Importa Suggerimenti da DB/Tabella</value>
   </data>
+  <data name="IO_GEN_FORM_IMPEXP_IMPORT_IO" xml:space="preserve">
+    <value>Importa IO da Tabella</value>
+  </data>
   <data name="IO_SUGGESTION_DATA_VALUE" xml:space="preserve">
     <value>Suggerimento</value>
   </data>
@@ -489,57 +538,8 @@
   <data name="MAIN_FORM_TOP_IO_GENERATION" xml:space="preserve">
     <value>Generatore Appoggi</value>
   </data>
-  <data name="ALARM_CONFIG_GENERATION_EMPTY_ANTI_SLIP" xml:space="preserve">
-    <value>Genera durante anti-slip</value>
-  </data>
-  <data name="IO_DATA_NEGATED" xml:space="preserve">
-    <value>Negato</value>
-  </data>
-  <data name="ALARM_DATA_COIL1_TYPE" xml:space="preserve">
-    <value>Tipo</value>
-  </data>
-  <data name="ALARM_DATA_COIL2_TYPE" xml:space="preserve">
-    <value>Tipo</value>
-  </data>
-  <data name="GRID_SCRIPT_OPEN_JAVASCRIPT_CONTEXT" xml:space="preserve">
-    <value>Apri esecutore Javascript</value>
-  </data>
-  <data name="GENERICS_COMMENT" xml:space="preserve">
-    <value>Commento</value>
-  </data>
-  <data name="GENERICS_CONFIGURATION" xml:space="preserve">
-    <value>Configurazione</value>
-  </data>
-  <data name="IO_GEN_EXCELIMPORT_IO_NAME" xml:space="preserve">
-    <value>Nome IO</value>
-  </data>
-  <data name="IO_GEN_EXCELIMPORT_STARTING_ROW" xml:space="preserve">
-    <value>Riga di partenza</value>
-  </data>
-  <data name="IO_GEN_EXCELIMPORT_EXPRESSION" xml:space="preserve">
-    <value>Espressione JS
-validità riga</value>
-  </data>
-  <data name="IO_GEN_EXCELIMPORT_IMPORT" xml:space="preserve">
-    <value>Importa Excel</value>
-  </data>
-  <data name="GENERICS_ACCEPT" xml:space="preserve">
-    <value>Accetta</value>
-  </data>
-  <data name="GENERICS_CANCEL" xml:space="preserve">
-    <value>Cancella</value>
-  </data>
-  <data name="GENERICS_CLEAR" xml:space="preserve">
-    <value>Pulisci</value>
-  </data>
-  <data name="IO_GEN_FORM_IMPEXP_IMPORT_IO" xml:space="preserve">
-    <value>Importa IO da Tabella</value>
-  </data>
   <data name="ALARM_CONFIG_COIL_TYPE_NCOIL" xml:space="preserve">
     <value>N-Coil</value>
-  </data>
-  <data name="ALARM_DATA_CUSTOM_VAR_VALUE" xml:space="preserve">
-    <value>Value</value>
   </data>
   <data name="ALARM_CONFIG_DEFAULTS_CUSTOM_VAR" xml:space="preserve">
     <value>Variabile custom</value>
@@ -549,5 +549,23 @@ validità riga</value>
   </data>
   <data name="ALARM_CONFIG_ENABLE_TIMER" xml:space="preserve">
     <value>Abilita timer</value>
+  </data>
+  <data name="DEVICE_DATA_TEMPLATE" xml:space="preserve">
+    <value>Template</value>
+  </data>
+  <data name="ALARM_TEMPLATE_FORM" xml:space="preserve">
+    <value>Configuratore Template</value>
+  </data>
+  <data name="ALARM_TEMPLATE_SELECT_TEMPLATE" xml:space="preserve">
+    <value>Selezione Template</value>
+  </data>
+  <data name="ALARM_CONFIG_EDIT_TEMPLATE" xml:space="preserve">
+    <value>Modifica Template</value>
+  </data>
+  <data name="CONFIRM_DELETE_DIALOG_CAPTION" xml:space="preserve">
+    <value>Conferma di cancellazione</value>
+  </data>
+  <data name="CONFIRM_DELETE_DIALOG_TEXT" xml:space="preserve">
+    <value>Sei sicuro di voler cancellare {delete_item}?</value>
   </data>
 </root>
