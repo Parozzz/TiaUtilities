@@ -11,6 +11,7 @@ namespace TiaXmlReader.Generation.GridHandler
 
         private readonly List<T> dataList;
         private readonly BindingList<T> bindingList;
+        private readonly BindingSource bindingSource;
 
         public int Count { get => dataList.Count; }
 
@@ -19,8 +20,9 @@ namespace TiaXmlReader.Generation.GridHandler
             this.dataGridView = dataGridView;
             this.dataHandler = dataHandler;
 
-            dataList = [];
-            bindingList = new(dataList);
+            this.dataList = [];
+            this.bindingList = new(dataList);
+            this.bindingSource = new() { DataSource = bindingList };
         }
 
         public Dictionary<int, T> CreateSave()
@@ -73,7 +75,13 @@ namespace TiaXmlReader.Generation.GridHandler
                 dataList.Add(dataHandler.CreateInstance());
             }
             //To Fix. Bind the BindingSource only one with consecutives Initialization (Or separate the functions).
-            this.dataGridView.DataSource = new BindingSource() { DataSource = bindingList };
+
+            if(this.dataGridView.DataSource != this.bindingSource)
+            {
+                this.dataGridView.DataSource = this.bindingSource;
+            }
+            this.bindingSource.ResetBindings(metadataChanged: true);
+            //this.dataGridView.DataSource = new BindingSource() { DataSource = bindingList };
         }
 
         public List<int> GetFirstEmptyRowIndexes(int num)
