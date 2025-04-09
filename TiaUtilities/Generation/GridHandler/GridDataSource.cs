@@ -74,14 +74,12 @@ namespace TiaXmlReader.Generation.GridHandler
             {
                 dataList.Add(dataHandler.CreateInstance());
             }
-            //To Fix. Bind the BindingSource only one with consecutives Initialization (Or separate the functions).
-
+            
             if(this.dataGridView.DataSource != this.bindingSource)
             {
                 this.dataGridView.DataSource = this.bindingSource;
             }
             this.bindingSource.ResetBindings(metadataChanged: true);
-            //this.dataGridView.DataSource = new BindingSource() { DataSource = bindingList };
         }
 
         public List<int> GetFirstEmptyRowIndexes(int num)
