@@ -51,6 +51,8 @@ using Siemens.Engineering.SW.Tags;
 using System;
 */
 using Siemens.Engineering;
+using Siemens.Engineering.SW.Blocks;
+
 
 /* Modifica senza merge dal progetto 'AddIn_V16'
 Prima:
@@ -88,6 +90,7 @@ using System;
 using System.Diagnostics;
 */
 using System;
+using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
@@ -103,6 +106,62 @@ namespace SpinAddin.Utility
             form.Activate();
             form.TopMost = false;
             return form;
+        }
+
+        public static DialogResult ShowMessageBox(string text, string caption, MessageBoxButtons buttons = MessageBoxButtons.OK)
+        {
+            return MessageBox.Show(Util.CreateForm(), text, caption, buttons);
+        }
+
+        public static DialogResult ShowInputDialog(ref string input)
+        {
+            var size = new Size(250, 70);
+            Form inputBox = new Form
+            {
+                Opacity = 1,
+                ShowIcon = true,
+                TopMost = true,
+                StartPosition = FormStartPosition.CenterScreen,
+                WindowState = FormWindowState.Normal,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                ClientSize = size,
+                Text = "Input"
+            };
+
+            var textBox = new TextBox
+            {
+                Size = new Size(size.Width - 10, 23),
+                Location = new Point(5, 5),
+                Text = input
+            };
+            inputBox.Controls.Add(textBox);
+
+            var okButton = new Button
+            {
+                DialogResult = DialogResult.OK,
+                Name = "okButton",
+                Size = new Size(75, 23),
+                Text = "&OK",
+                Location = new Point(size.Width - 80 - 80, 39)
+            };
+            inputBox.Controls.Add(okButton);
+
+            var cancelButton = new Button
+            {
+                DialogResult = DialogResult.Cancel,
+                Name = "cancelButton",
+                Size = new Size(75, 23),
+                Text = "&Cancel",
+                Location = new Point(size.Width - 80, 39)
+            };
+            inputBox.Controls.Add(cancelButton);
+
+            inputBox.AcceptButton = okButton;
+            inputBox.CancelButton = cancelButton;
+
+            DialogResult result = inputBox.ShowDialog();
+            input = textBox.Text;
+            return result;
         }
 
         public static void RemoveIDBs(FC fc)

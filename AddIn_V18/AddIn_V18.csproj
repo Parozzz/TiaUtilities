@@ -84,12 +84,6 @@
     <Compile Include="..\TiaAddIn-Spin\GenericImportExportHandler.cs">
       <Link>GenericImportExportHandler.cs</Link>
     </Compile>
-    <Compile Include="..\TiaAddIn-Spin\HMIPopupHandler.cs">
-      <Link>HMIPopupHandler.cs</Link>
-    </Compile>
-    <Compile Include="..\TiaAddIn-Spin\HMIScreenHandler.cs">
-      <Link>HMIScreenHandler.cs</Link>
-    </Compile>
     <Compile Include="..\TiaAddIn-Spin\PlcSoftwareHandler.cs">
       <Link>PlcSoftwareHandler.cs</Link>
     </Compile>

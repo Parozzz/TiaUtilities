@@ -168,6 +168,7 @@ namespace AddIn_V16
             //hmiPopupHandler = new HMIPopupHandler();
         }
 
+        //DO NOT REMOVE. OVERRIDE INTERNAL METHOD.
         protected override void BuildContextMenuItems(ContextMenuAddInRoot menuRoot)
         {
             plcBlockHandler.Register(menuRoot);
@@ -179,7 +180,5 @@ namespace AddIn_V16
             plcWatchtableHandler.Register(menuRoot);
             plcSoftwareHandler.Register(menuRoot);
         }
-
-
     }
 }

@@ -1,10 +1,13 @@
 ﻿using Siemens.Engineering;
 using Siemens.Engineering.AddIn.Menu;
 using Siemens.Engineering.SW;
+using Siemens.Engineering.SW.Blocks;
 using SpinAddin.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
 using static SpinAddin.Utility.ExportUtil;
 
@@ -58,16 +61,19 @@ namespace SpinAddIn
 
         public void Register(ContextMenuAddInRoot menuRoot)
         {
-            menuRoot.Items.AddActionItem<GROUP>("Importa " + descriptiveName + " dalla cartella", ImportOnlyTopFolder);
-            menuRoot.Items.AddActionItem<GROUP>("Importa " + descriptiveName + " dalla cartella (Comprese sottocartelle)", ImportAllSubFolders);
-            menuRoot.Items.AddActionItem<GROUP>("Esporta " + descriptiveName + " nella cartella", ExportOnlySelectedFolder);
-            menuRoot.Items.AddActionItem<GROUP>("Esporta " + descriptiveName + " nella cartella (Comprese Sottocartelle)", ExportAllFolders);
+            menuRoot.Items.AddActionItem<GROUP>($"Importa {descriptiveName} da file", ImportDescrete);
+            menuRoot.Items.AddActionItem<GROUP>($"Importa {descriptiveName} dalla cartella", ImportOnlyTopFolder);
+            menuRoot.Items.AddActionItem<GROUP>($"Importa {descriptiveName} dalla cartella (Comprese sottocartelle)", ImportAllSubFolders);
+            menuRoot.Items.AddActionItem<GROUP>($"Esporta {descriptiveName} nella cartella", ExportOnlySelectedFolder);
+            menuRoot.Items.AddActionItem<GROUP>($"Esporta {descriptiveName} nella cartella (Comprese Sottocartelle)", ExportAllFolders);
 
-            menuRoot.Items.AddActionItem<OBJ>("Esporta " + descriptiveName + " singolarmente", ExportDescrete);
-            menuRoot.Items.AddActionItem<OBJ>("Esporta " + descriptiveName + " selez. su cartella", ExportAllToFolder);
-            menuRoot.Items.AddActionItem<OBJ>("Importa " + descriptiveName + "", ImportDescrete);
-            menuRoot.Items.AddActionItem<OBJ>("Importa Cartella", ImportOnlyTopFolder);
-            menuRoot.Items.AddActionItem<OBJ>("Importa Cartella (comprese sottocartelle)", ImportAllSubFolders);
+            menuRoot.Items.AddActionItem<OBJ>($"Copia tutti i nomi dei {descriptiveName} selezionati", CopyAllSelectedNamesToClipboard);
+            menuRoot.Items.AddActionItem<OBJ>($"Sostituisci tutti i nomi dei {descriptiveName} selezionati", ChangeAllSelectedNames);
+            menuRoot.Items.AddActionItem<OBJ>($"Esporta {descriptiveName} singolarmente", ExportDescrete);
+            menuRoot.Items.AddActionItem<OBJ>($"Esporta {descriptiveName} selez. su cartella", ExportAllToFolder);
+            menuRoot.Items.AddActionItem<OBJ>($"Importa {descriptiveName}", ImportDescrete);
+            menuRoot.Items.AddActionItem<OBJ>($"Importa Cartella", ImportOnlyTopFolder);
+            menuRoot.Items.AddActionItem<OBJ>($"Importa Cartella (comprese sottocartelle)", ImportAllSubFolders);
         }
 
         private void ExportOnlySelectedFolder(MenuSelectionProvider selectionProvider)
@@ -165,39 +171,119 @@ namespace SpinAddIn
             }
         }
 
-
-        private void ImportDescrete(MenuSelectionProvider selectionProvider)
+        private void CopyAllSelectedNamesToClipboard(MenuSelectionProvider selectionProvider)
         {
-            foreach (OBJ obj in selectionProvider.GetSelection())
+            try
             {
-                var fileDialog = new OpenFileDialog
+                var names = new List<string>();
+                foreach (OBJ obj in selectionProvider.GetSelection())
                 {
-                    Filter = "xml files (*.xml)|*.xml",
-                    CheckFileExists = true,
-                    CheckPathExists = true,
-                    Multiselect = true
-                };
+                    PropertyInfo propertyInfo = null;
 
-                if (fileDialog.ShowDialog(Util.CreateForm()) == DialogResult.OK)
-                {
-                    var group = parentFunction(obj);
-                    foreach (var fileName in fileDialog.FileNames)
+                    var properties = obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                    foreach (var property in properties)
                     {
-                        if (!ImportBlock(group, fileName))
+                        if (property.Name == "Name" || property.Name == "name")
                         {
-                            return;
+                            propertyInfo = property;
+                            break;
                         }
+                    }
+
+                    if (propertyInfo == null)
+                    {
+                        continue;
+                    }
+
+                    var name = (string)propertyInfo.GetValue(obj);
+                    if (!string.IsNullOrEmpty(name))
+                    {
+                        names.Add(name);
                     }
                 }
 
-                break;
+                var namesText = String.Join("\n", names) + "\n";
+                Clipboard.SetText(namesText, TextDataFormat.Text);
             }
+            catch (Exception)
+            {
+            }
+        }
+
+        private void ChangeAllSelectedNames(MenuSelectionProvider selectionProvider)
+        {
+            string placeholder = "{actual_name}";
+            try
+            {
+                string str = placeholder;
+                var result = Util.ShowInputDialog(ref str);
+                if (result == DialogResult.OK)
+                {
+                    foreach (OBJ obj in selectionProvider.GetSelection())
+                    {
+                        var properties = obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                        foreach (var property in properties)
+                        {
+                            if (property.Name == "Name" || property.Name == "name")
+                            {
+                                var name = (string)property.GetValue(obj);
+                                var newName = str.Replace("{actual_name}", name);
+                                property.SetValue(obj, newName);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Util.ShowExceptionMessage(ex);
+            }
+        }
+
+        private void ImportDescrete(MenuSelectionProvider selectionProvider)
+        {
+            var selection = selectionProvider.GetSelection();
+
+            var selectedGroup = selection.Where(group => group is GROUP).Cast<GROUP>().SingleOrDefault();
+            if (selectedGroup == null)
+            {
+                selectedGroup = selectionProvider.GetSelection()
+                    .Where(obj => obj is OBJ)
+                    .Cast<OBJ>()
+                    .Select(parentFunction)
+                    .First();
+            }
+
+            if (selectedGroup == null)
+            {
+                return;
+            }
+
+            var fileDialog = new OpenFileDialog
+            {
+                Filter = "xml files (*.xml)|*.xml",
+                CheckFileExists = true,
+                CheckPathExists = true,
+                Multiselect = true
+            };
+
+            if (fileDialog.ShowDialog(Util.CreateForm()) == DialogResult.OK)
+            {
+                foreach (var fileName in fileDialog.FileNames)
+                {
+                    if (!ImportBlock(selectedGroup, fileName))
+                    {
+                        return;
+                    }
+                }
+            }
+
         }
 
         private void ImportOnlyTopFolder(MenuSelectionProvider selectionProvider)
         {
             ImportFolderGeneric(selectionProvider, false);
-
         }
 
         private void ImportAllSubFolders(MenuSelectionProvider selectionProvider)

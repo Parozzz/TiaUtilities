@@ -56,20 +56,20 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="Siemens.Engineering.AddIn, Version=16.0.0.0, Culture=neutral, PublicKeyToken=65b871d8372d6a8f, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\..\Program Files\Siemens\Automation\Portal V16\PublicAPI\V16.AddIn\Siemens.Engineering.AddIn.dll</HintPath>
+      <HintPath>..\SiemensAPI\V16\Siemens.Engineering.AddIn.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="Siemens.Engineering.AddIn.Permissions, Version=17.0.0.0, Culture=neutral, PublicKeyToken=65b871d8372d6a8f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\Program Files\Siemens\Automation\Portal V16\PublicAPI\V16.AddIn\Siemens.Engineering.AddIn.Permissions.dll</HintPath>
+      <HintPath>..\SiemensAPI\V16\Siemens.Engineering.AddIn.Permissions.dll</HintPath>
     </Reference>
     <Reference Include="Siemens.Engineering.AddIn.Utilities, Version=17.0.0.0, Culture=neutral, PublicKeyToken=65b871d8372d6a8f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\Program Files\Siemens\Automation\Portal V16\PublicAPI\V16.AddIn\Siemens.Engineering.AddIn.Utilities.dll</HintPath>
+      <HintPath>..\SiemensAPI\V16\Siemens.Engineering.AddIn.Utilities.dll</HintPath>
     </Reference>
     <Reference Include="Siemens.Engineering.Hmi, Version=17.0.0.0, Culture=neutral, PublicKeyToken=65b871d8372d6a8f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\Program Files\Siemens\Automation\Portal V16\PublicAPI\V16.AddIn\Siemens.Engineering.Hmi.dll</HintPath>
+      <HintPath>..\SiemensAPI\V16\Siemens.Engineering.Hmi.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -83,25 +83,11 @@
   <ItemGroup>
     <Compile Include="AddIn.cs" />
     <Compile Include="AddInProvider.cs" />
-    <Compile Include="HMIPopupHandler.cs" />
-    <Compile Include="HMIScreenHandler.cs" />
     <Compile Include="GenericImportExportHandler.cs" />
-    <Compile Include="PlcWatchTablesHandler.cs" />
     <Compile Include="PlcSoftwareHandler.cs" />
-    <Compile Include="PLCUDTHandler.cs" />
-    <Compile Include="PlcBlockHandler.cs" />
-    <Compile Include="PlcTagTableHandler.cs" />
     <Compile Include="SpinAddinMenuRegistrationService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Config_V16.xml">
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="Config_V17.xml">
-      <SubType>Designer</SubType>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

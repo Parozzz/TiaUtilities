@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Siemens.Engineering;
+using Siemens.Engineering.AddIn;
+using Siemens.Engineering.AddIn.Menu;
+using System.Collections.Generic;
 
 namespace SpinAddIn
 {
