@@ -79,7 +79,7 @@ namespace SimaticML.nBlockAttributeList
         private readonly XmlNodeConfiguration udaBlockProperties;
         private readonly XmlNodeConfiguration udaEnableTagReadback;
 
-        public BlockAttributeList() : base(SimaticMLAPI.ATTRIBUTE_LIST_KEY, required: true)
+        public BlockAttributeList(bool isUDT = false) : base(SimaticMLAPI.ATTRIBUTE_LIST_KEY, required: true)
         {
             //==== INIT CONFIGURATION ====
             dbAccessibleFromOPCUA = this.AddNode("DBAccessibleFromOPCUA");
@@ -89,32 +89,43 @@ namespace SimaticML.nBlockAttributeList
             headerName = this.AddNode("HeaderName");
             headerVersion = this.AddNode("HeaderVersion");
 
-            autoNumber = this.AddNode("AutoNumber");
-            instanceOfName = this.AddNode("InstanceOfName");
-            instanceOfType = this.AddNode("InstanceOfType");
+            if(!isUDT)
+            {
+                autoNumber = this.AddNode("AutoNumber");
+                instanceOfName = this.AddNode("InstanceOfName");
+                instanceOfType = this.AddNode("InstanceOfType");
+            }
 
             blockInterface = this.AddNode("Interface", required: true);
             blockSections = blockInterface.AddNodeList("Sections", this.CreateSection, required: true, namespaceURI: SimaticMLAPI.GET_SECTIONS_NAMESPACE());
 
-            secondaryType = this.AddNode("SecondaryType");
-            assignedProDiagFB = this.AddNode("AssignedProDiagFB");
-            supervisions = this.AddNode("Supervisions");
-            isOnlyStoredInLoadMemory = this.AddNode("IsOnlyStoredInLoadMemory");
-            isWriteProtectedInAS = this.AddNode("IsWriteProtectedInAS");
-            isRetainMemResEnabled = this.AddNode("IsRetainMemResEnabled");
-            isIECCheckEnabled = this.AddNode("IsIECCheckEnabled");
-            memoryLayout = this.AddNode("MemoryLayout");
-            memoryReserve = this.AddNode("MemoryReserve");
-            retainMemoryReserve = this.AddNode("RetainMemoryReserve");
-            parameterPassing = this.AddNode("ParameterPassing");
+            if(!isUDT)
+            {
+                secondaryType = this.AddNode("SecondaryType");
+                assignedProDiagFB = this.AddNode("AssignedProDiagFB");
+                supervisions = this.AddNode("Supervisions");
+                isOnlyStoredInLoadMemory = this.AddNode("IsOnlyStoredInLoadMemory");
+                isWriteProtectedInAS = this.AddNode("IsWriteProtectedInAS");
+                isRetainMemResEnabled = this.AddNode("IsRetainMemResEnabled");
+                isIECCheckEnabled = this.AddNode("IsIECCheckEnabled");
+                memoryLayout = this.AddNode("MemoryLayout");
+                memoryReserve = this.AddNode("MemoryReserve");
+                retainMemoryReserve = this.AddNode("RetainMemoryReserve");
+                parameterPassing = this.AddNode("ParameterPassing");
+            }
+
             blockName = this.AddNode("Name", required: true, defaultInnerText: "fcTest");
             if (SimaticMLAPI.TIA_VERSION >= 18)
             {
                 this.AddNode("Namespace", required: true);
             }
-            blockNumber = this.AddNode("Number", required: true, defaultInnerText: "1");
-            programmingLanguage = this.AddNode("ProgrammingLanguage", required: true, defaultInnerText: "LAD");
-            setENOAutomatically = this.AddNode("SetENOAutomatically");
+
+            if(!isUDT)
+            {
+                blockNumber = this.AddNode("Number", required: true, defaultInnerText: "1");
+                programmingLanguage = this.AddNode("ProgrammingLanguage", required: true, defaultInnerText: "LAD");
+                setENOAutomatically = this.AddNode("SetENOAutomatically");
+            }
             libraryConformanceStatus = this.AddNode("LibraryConformanceStatus");
             udaBlockProperties = this.AddNode("UDABlockProperties");
             udaEnableTagReadback = this.AddNode("UDAEnableTagReadback");

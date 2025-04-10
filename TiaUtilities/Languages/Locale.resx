@@ -238,14 +238,14 @@ for row validation</value>
   <data name="ALARM_CONFIG_GENERATION_EMPTY_TIMER_VALUE" xml:space="preserve">
     <value>Time</value>
   </data>
-  <data name="ALARM_CONFIG_GENERATION_FORMAT" xml:space="preserve">
+  <data name="ALARM_CONFIG_FORMATTING_FORMAT" xml:space="preserve">
     <value>Format</value>
   </data>
   <data name="ALARM_CONFIG_GENERATION_SKIP" xml:space="preserve">
     <value>Skip after each group</value>
   </data>
   <data name="ALARM_CONFIG_GENERATION_START_NUM" xml:space="preserve">
-    <value>Starting Num.</value>
+    <value>Starting alarm num.</value>
   </data>
   <data name="ALARM_CONFIG_GROUPING_TYPE" xml:space="preserve">
     <value>Grouping type</value>
@@ -573,5 +573,23 @@ for row validation</value>
   </data>
   <data name="CONFIG_LINE_SAVE_DEFAULT_TOOLTIP" xml:space="preserve">
     <value>Save actual configuration as default</value>
+  </data>
+  <data name="ALARM_CONFIG_GENERATION_TOTAL_NUM" xml:space="preserve">
+    <value>Total num. of alarms</value>
+  </data>
+  <data name="ALARM_CONFIG_FORMATTING_NAME_TEMPLATE" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="ALARM_CONFIG_FORMATTING_COMMENT_TEMPLATE" xml:space="preserve">
+    <value>Comment</value>
+  </data>
+  <data name="ALARM_CONFIG_FORMATTING_COMMENT_TEMPLATE_SPARE" xml:space="preserve">
+    <value>Spare comment</value>
+  </data>
+  <data name="ALARM_CONFIG_FORMATTING_UDT_NAME" xml:space="preserve">
+    <value>UDT Name</value>
+  </data>
+  <data name="ALARM_CONFIG_FORMATTING" xml:space="preserve">
+    <value>Formatting / UDT</value>
   </data>
 </root>

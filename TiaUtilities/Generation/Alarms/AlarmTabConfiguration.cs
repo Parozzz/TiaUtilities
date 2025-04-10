@@ -9,8 +9,8 @@ namespace TiaUtilities.Generation.Alarms
     {
         [JsonProperty] public AlarmGroupingType GroupingType { get => this.GetAs<AlarmGroupingType>(); set => this.Set(value); }
 
+        [JsonProperty] public uint TotalAlarmNum { get => this.GetAs<uint>(); set => this.Set(value); }
         [JsonProperty] public uint StartingAlarmNum { get => this.GetAs<uint>(); set => this.Set(value); }
-        [JsonProperty] public string AlarmNumFormat { get => this.GetAs<string>(); set => this.Set(value); }
         [JsonProperty] public uint AntiSlipNumber { get => this.GetAs<uint>(); set => this.Set(value); }
         [JsonProperty] public uint SkipNumberAfterGroup { get => this.GetAs<uint>(); set => this.Set(value); }
 
@@ -40,8 +40,8 @@ namespace TiaUtilities.Generation.Alarms
         {
             this.GroupingType = AlarmGroupingType.GROUP;
 
-            this.StartingAlarmNum = 1000;
-            this.AlarmNumFormat = "000.###";
+            this.TotalAlarmNum = 256;
+            this.StartingAlarmNum = 50;
             this.AntiSlipNumber = 0;
             this.SkipNumberAfterGroup = 0;
 

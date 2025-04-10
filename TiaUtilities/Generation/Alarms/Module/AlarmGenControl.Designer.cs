@@ -35,7 +35,6 @@ namespace TiaUtilities.Generation.GenModules.Alarm
             configButtonPanel = new FlowLayoutPanel();
             fcConfigButton = new Button();
             segmentNameConfigButton = new Button();
-            textListConfigButton = new Button();
             enableCustomVarPanel = new TableLayoutPanel();
             enableCustomVarToggleButton = new RJToggleButton();
             enableCustomVarLabel = new Label();
@@ -43,6 +42,7 @@ namespace TiaUtilities.Generation.GenModules.Alarm
             enableTimerToggleButton = new RJToggleButton();
             enableTimerLabel = new Label();
             tabControl = new InteractableTabControl();
+            formattingButton = new Button();
             mainTableLayout.SuspendLayout();
             configButtonPanel.SuspendLayout();
             enableCustomVarPanel.SuspendLayout();
@@ -84,14 +84,14 @@ namespace TiaUtilities.Generation.GenModules.Alarm
             configButtonPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             configButtonPanel.Controls.Add(fcConfigButton);
             configButtonPanel.Controls.Add(segmentNameConfigButton);
-            configButtonPanel.Controls.Add(textListConfigButton);
+            configButtonPanel.Controls.Add(formattingButton);
             configButtonPanel.Controls.Add(enableCustomVarPanel);
             configButtonPanel.Controls.Add(enableTimerPanel);
             configButtonPanel.Dock = DockStyle.Left;
             configButtonPanel.Location = new Point(0, 19);
             configButtonPanel.Margin = new Padding(0, 3, 0, 0);
             configButtonPanel.Name = "configButtonPanel";
-            configButtonPanel.Size = new Size(824, 30);
+            configButtonPanel.Size = new Size(915, 30);
             configButtonPanel.TabIndex = 15;
             // 
             // fcConfigButton
@@ -122,20 +122,6 @@ namespace TiaUtilities.Generation.GenModules.Alarm
             segmentNameConfigButton.Text = "Nomi Segmenti";
             segmentNameConfigButton.UseVisualStyleBackColor = true;
             // 
-            // textListConfigButton
-            // 
-            textListConfigButton.AutoSize = true;
-            textListConfigButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            textListConfigButton.Font = new Font("Microsoft Sans Serif", 12.75F, FontStyle.Bold);
-            textListConfigButton.Location = new Point(230, 0);
-            textListConfigButton.Margin = new Padding(3, 0, 0, 0);
-            textListConfigButton.Name = "textListConfigButton";
-            textListConfigButton.Padding = new Padding(8, 0, 8, 0);
-            textListConfigButton.Size = new Size(120, 30);
-            textListConfigButton.TabIndex = 16;
-            textListConfigButton.Text = "Lista testi";
-            textListConfigButton.UseVisualStyleBackColor = true;
-            // 
             // enableCustomVarPanel
             // 
             enableCustomVarPanel.AutoSize = true;
@@ -146,7 +132,7 @@ namespace TiaUtilities.Generation.GenModules.Alarm
             enableCustomVarPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             enableCustomVarPanel.Controls.Add(enableCustomVarToggleButton, 1, 0);
             enableCustomVarPanel.Controls.Add(enableCustomVarLabel, 0, 0);
-            enableCustomVarPanel.Location = new Point(353, 0);
+            enableCustomVarPanel.Location = new Point(444, 0);
             enableCustomVarPanel.Margin = new Padding(3, 0, 0, 0);
             enableCustomVarPanel.Name = "enableCustomVarPanel";
             enableCustomVarPanel.Padding = new Padding(3, 0, 3, 0);
@@ -195,7 +181,7 @@ namespace TiaUtilities.Generation.GenModules.Alarm
             enableTimerPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             enableTimerPanel.Controls.Add(enableTimerToggleButton, 1, 0);
             enableTimerPanel.Controls.Add(enableTimerLabel, 0, 0);
-            enableTimerPanel.Location = new Point(622, 0);
+            enableTimerPanel.Location = new Point(713, 0);
             enableTimerPanel.Margin = new Padding(3, 0, 0, 0);
             enableTimerPanel.Name = "enableTimerPanel";
             enableTimerPanel.Padding = new Padding(3, 0, 3, 0);
@@ -245,6 +231,20 @@ namespace TiaUtilities.Generation.GenModules.Alarm
             tabControl.Size = new Size(1394, 674);
             tabControl.TabIndex = 16;
             // 
+            // formattingButton
+            // 
+            formattingButton.AutoSize = true;
+            formattingButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            formattingButton.Font = new Font("Microsoft Sans Serif", 12.75F, FontStyle.Bold);
+            formattingButton.Location = new Point(230, 0);
+            formattingButton.Margin = new Padding(3, 0, 0, 0);
+            formattingButton.Name = "formattingButton";
+            formattingButton.Padding = new Padding(8, 0, 8, 0);
+            formattingButton.Size = new Size(211, 30);
+            formattingButton.TabIndex = 21;
+            formattingButton.Text = "Formattazione / UDT";
+            formattingButton.UseVisualStyleBackColor = true;
+            // 
             // AlarmGenControl
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -272,7 +272,6 @@ namespace TiaUtilities.Generation.GenModules.Alarm
         private FlowLayoutPanel configButtonPanel;
         public Button fcConfigButton;
         public Button segmentNameConfigButton;
-        public Button textListConfigButton;
         public InteractableTabControl tabControl;
         private TableLayoutPanel enableCustomVarPanel;
         private RJToggleButton enableCustomVarToggleButton;
@@ -280,5 +279,6 @@ namespace TiaUtilities.Generation.GenModules.Alarm
         private TableLayoutPanel enableTimerPanel;
         private RJToggleButton enableTimerToggleButton;
         private Label enableTimerLabel;
+        public Button formattingButton;
     }
 }

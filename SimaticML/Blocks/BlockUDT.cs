@@ -31,7 +31,7 @@ namespace SimaticML.Blocks
             //==== INIT CONFIGURATION ====
             globalObjectData = this.AddAttribute(new GlobalObjectData());
 
-            this.blockAttributeList = this.AddNode(new BlockAttributeList());
+            this.blockAttributeList = this.AddNode(new BlockAttributeList(isUDT: true));
 
             this.objectList = this.AddNodeList(SimaticMLAPI.OBJECT_LIST_KEY, CreateObjectListConfiguration, required: true);
             //==== INIT CONFIGURATION ====

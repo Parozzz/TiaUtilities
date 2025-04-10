@@ -205,6 +205,60 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Formatting / UDT.
+        /// </summary>
+        internal static string ALARM_CONFIG_FORMATTING {
+            get {
+                return ResourceManager.GetString("ALARM_CONFIG_FORMATTING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Comment.
+        /// </summary>
+        internal static string ALARM_CONFIG_FORMATTING_COMMENT_TEMPLATE {
+            get {
+                return ResourceManager.GetString("ALARM_CONFIG_FORMATTING_COMMENT_TEMPLATE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Spare comment.
+        /// </summary>
+        internal static string ALARM_CONFIG_FORMATTING_COMMENT_TEMPLATE_SPARE {
+            get {
+                return ResourceManager.GetString("ALARM_CONFIG_FORMATTING_COMMENT_TEMPLATE_SPARE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Format.
+        /// </summary>
+        internal static string ALARM_CONFIG_FORMATTING_FORMAT {
+            get {
+                return ResourceManager.GetString("ALARM_CONFIG_FORMATTING_FORMAT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Name.
+        /// </summary>
+        internal static string ALARM_CONFIG_FORMATTING_NAME_TEMPLATE {
+            get {
+                return ResourceManager.GetString("ALARM_CONFIG_FORMATTING_NAME_TEMPLATE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a UDT Name.
+        /// </summary>
+        internal static string ALARM_CONFIG_FORMATTING_UDT_NAME {
+            get {
+                return ResourceManager.GetString("ALARM_CONFIG_FORMATTING_UDT_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Generation.
         /// </summary>
         internal static string ALARM_CONFIG_GENERATION {
@@ -313,15 +367,6 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Format.
-        /// </summary>
-        internal static string ALARM_CONFIG_GENERATION_FORMAT {
-            get {
-                return ResourceManager.GetString("ALARM_CONFIG_GENERATION_FORMAT", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Cerca una stringa localizzata simile a Skip after each group.
         /// </summary>
         internal static string ALARM_CONFIG_GENERATION_SKIP {
@@ -331,11 +376,20 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Starting Num..
+        ///   Cerca una stringa localizzata simile a Starting alarm num..
         /// </summary>
         internal static string ALARM_CONFIG_GENERATION_START_NUM {
             get {
                 return ResourceManager.GetString("ALARM_CONFIG_GENERATION_START_NUM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Total num. of alarms.
+        /// </summary>
+        internal static string ALARM_CONFIG_GENERATION_TOTAL_NUM {
+            get {
+                return ResourceManager.GetString("ALARM_CONFIG_GENERATION_TOTAL_NUM", resourceCulture);
             }
         }
         

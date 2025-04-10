@@ -1,4 +1,6 @@
-﻿using SimaticML.API;
+﻿using DocumentFormat.OpenXml.Math;
+using DocumentFormat.OpenXml.Vml.Office;
+using SimaticML.API;
 using SimaticML.Blocks;
 using SimaticML.Blocks.FlagNet;
 using SimaticML.Blocks.FlagNet.nPart;
@@ -12,12 +14,19 @@ using TiaXmlReader.Languages;
 namespace TiaXmlReader.Generation.Alarms
 {
 
+    public class AlarmXmlItem(BlockFC blockFC, BlockUDT blockUDT, string alarmList, Dictionary<uint, string?> alarmDescriptionDict)
+    {
+        public BlockFC BlockFC { get; init; } = blockFC;
+        public BlockUDT BlockUDT { get; init; } = blockUDT;
+        public string AlarmList { get; init; } = alarmList;
+        public Dictionary<uint, string?> AlarmDescriptionDict { get; init; } = alarmDescriptionDict;
+    }
+
     public class AlarmXmlGenerator(AlarmMainConfiguration mainConfig)
     {
         private readonly AlarmMainConfiguration mainConfig = mainConfig;
 
-        private readonly Dictionary<string, BlockFC> fcDict = [];
-        private readonly Dictionary<string, string> alarmListDict = [];
+        private readonly Dictionary<string, AlarmXmlItem> itemDict = [];
 
         public void Init()
         {
@@ -34,6 +43,7 @@ namespace TiaXmlReader.Generation.Alarms
             fc.AttributeList.BlockNumber = mainConfig.FCBlockNumber;
             fc.AttributeList.AutoNumber = (mainConfig.FCBlockNumber > 0);
 
+            Dictionary<uint, string?> alarmDescriptionDict = [];
             var fullAlarmList = "";
 
             var segment = new SimaticLADSegment();
@@ -70,12 +80,20 @@ namespace TiaXmlReader.Generation.Alarms
                         continue;
                     }
 
+                    var alarmNum = nextAlarmNum;
+                    nextAlarmNum++;
+
                     var parsedAlarmData = ReplaceAlarmDataWithDefaultAndPrefix(tabConfig, template.TemplateConfig, alarmData);
 
                     placeholdersHandler.DeviceData = deviceData;
                     placeholdersHandler.AlarmData = parsedAlarmData;
-                    placeholdersHandler.SetAlarmNum(nextAlarmNum++, tabConfig.AlarmNumFormat);
-                    fullAlarmList += placeholdersHandler.Parse(this.mainConfig.AlarmTextInList) + '\n';
+                    placeholdersHandler.SetAlarmNum(alarmNum, mainConfig.AlarmNumFormat);
+
+                    var comment = placeholdersHandler.Parse(mainConfig.AlarmCommentTemplate);
+                    comment = placeholdersHandler.Parse(comment);
+
+                    alarmDescriptionDict.Add(alarmNum, comment);
+                    fullAlarmList += $"{comment}'\n'";
 
                     if (tabConfig.GroupingType == AlarmGroupingType.ONE)
                     {
@@ -112,8 +130,8 @@ namespace TiaXmlReader.Generation.Alarms
 
                         for (var x = 0; x < slippingAlarmCount; x++)
                         {
-                            placeholdersHandler.SetAlarmNum((uint)(lastAlarmNum + x + 1), tabConfig.AlarmNumFormat);
-                            fullAlarmList += placeholdersHandler.Parse(this.mainConfig.EmptyAlarmTextInList) + '\n';
+                            placeholdersHandler.SetAlarmNum((uint)(lastAlarmNum + x + 1), mainConfig.AlarmNumFormat);
+                            fullAlarmList += placeholdersHandler.Parse(mainConfig.AlarmCommentTemplateSpare) + '\n';
                         }
 
                         if (tabConfig.GenerateEmptyAlarmAntiSlip)
@@ -126,7 +144,7 @@ namespace TiaXmlReader.Generation.Alarms
 
                 if (tabConfig.GroupingType == AlarmGroupingType.GROUP)
                 {
-                    placeholdersHandler.SetStartEndAlarmNum(startAlarmNum, lastAlarmNum, tabConfig.AlarmNumFormat);
+                    placeholdersHandler.SetStartEndAlarmNum(startAlarmNum, lastAlarmNum, mainConfig.AlarmNumFormat);
 
                     segment.Title[LocaleVariables.CULTURE] = placeholdersHandler.Parse(mainConfig.GroupSegmentName);
                     segment.Create(fc);
@@ -141,8 +159,31 @@ namespace TiaXmlReader.Generation.Alarms
 
             GenerateEmptyAlarms(placeholdersHandler, tabConfig, nextAlarmNum, tabConfig.EmptyAlarmAtEnd);
 
-            fcDict.Add(name, fc);
-            alarmListDict.Add(name, fullAlarmList);
+            BlockUDT blockUDT = new();
+            blockUDT.Init();
+            blockUDT.AttributeList.BlockName = placeholdersHandler.Parse(mainConfig.UDTBlockName) ?? $"INVALID_{name}";
+
+            placeholdersHandler.Clear();
+            placeholdersHandler.TabName = name;
+            for (uint alarmNum = 1; alarmNum <= tabConfig.TotalAlarmNum; alarmNum++)
+            {
+                placeholdersHandler.SetAlarmNum(alarmNum, mainConfig.AlarmNumFormat);
+
+                var getDone = alarmDescriptionDict.TryGetValue(alarmNum, out string? almDescription);
+                if (!getDone)
+                {
+                    almDescription = placeholdersHandler.Parse(mainConfig.AlarmCommentTemplateSpare);
+                }
+
+                var alarmName = placeholdersHandler.Parse(mainConfig.AlarmNameTemplate) ?? $"INVALID_{alarmNum}";
+
+                var member = blockUDT.AttributeList.NONE.AddMember(alarmName, SimaticDataType.BOOLEAN);
+                member.Comment[LocaleVariables.CULTURE] = almDescription;
+            }
+
+
+            AlarmXmlItem item = new(fc, blockUDT, fullAlarmList, alarmDescriptionDict);
+            this.itemDict.Add(name, item);
         }
 
         private void GenerateEmptyAlarms(AlarmGenPlaceholdersHandler placeholdersHandler, AlarmTabConfiguration tabConfig, uint startAlarmNum, uint alarmCount, SimaticLADSegment? externalGroupSegment = null)
@@ -167,7 +208,7 @@ namespace TiaXmlReader.Generation.Alarms
             if (segment == null && tabConfig.GroupingType == AlarmGroupingType.GROUP)
             {
                 placeholdersHandler.AlarmData = emptyAlarmData;
-                placeholdersHandler.SetStartEndAlarmNum(alarmNum, alarmNum + (alarmCount - 1), tabConfig.AlarmNumFormat);
+                placeholdersHandler.SetStartEndAlarmNum(alarmNum, alarmNum + (alarmCount - 1), mainConfig.AlarmNumFormat);
 
                 segment = new SimaticLADSegment();
                 segment.Title[LocaleVariables.CULTURE] = placeholdersHandler.Parse(mainConfig.GroupEmptyAlarmSegmentName);
@@ -176,7 +217,7 @@ namespace TiaXmlReader.Generation.Alarms
             for (int j = 0; j < alarmCount; j++)
             {
                 placeholdersHandler.AlarmData = emptyAlarmData;
-                placeholdersHandler.SetAlarmNum(alarmNum++, tabConfig.AlarmNumFormat);
+                placeholdersHandler.SetAlarmNum(alarmNum++, mainConfig.AlarmNumFormat);
 
                 if (tabConfig.GroupingType == AlarmGroupingType.ONE)
                 {
@@ -366,21 +407,21 @@ namespace TiaXmlReader.Generation.Alarms
                 return;
             }
 
-            foreach (var entry in fcDict)
+            foreach (var (name, item) in itemDict)
             {
-                var name = entry.Key;
-                var fc = entry.Value;
+                var blockFC = item.BlockFC;
+                var blockUDT = item.BlockUDT;
+                var alarmList = item.AlarmList;
 
-                var xmlDocument = SimaticMLAPI.CreateDocument(fc);
-                xmlDocument.Save(exportPath + $"/[FC]{name}_{fc.AttributeList.BlockName}.xml");
-            }
+                var fcXmlDocument = SimaticMLAPI.CreateDocument(blockFC);
+                fcXmlDocument.Save(exportPath + $"/[FC]{name}_{blockFC.AttributeList.BlockName}.xml");
 
-            foreach (var entry in alarmListDict)
-            {
-                var alarmTextPath = exportPath + $"/Texts_{entry.Key.Replace("\\", "_").Replace("/", "_")}.txt";
+                var udtXmlDocument = SimaticMLAPI.CreateDocument(blockUDT);
+                udtXmlDocument.Save(exportPath + $"/[UDT]{name}_{blockUDT.AttributeList.BlockName}.xml");
 
+                var alarmTextPath = exportPath + $"/Texts_{name.Replace("\\", "_").Replace("/", "_")}.txt";
                 using var stream = File.CreateText(alarmTextPath);
-                stream.Write(entry.Value);
+                stream.Write(alarmList);
             }
         }
 
