@@ -38,6 +38,7 @@
             removeButton = new Button();
             renameButton = new Button();
             cloneButton = new Button();
+            configurationButton = new Button();
             mainPanel.SuspendLayout();
             topPanel.SuspendLayout();
             selectPanel.SuspendLayout();
@@ -68,6 +69,7 @@
             topPanel.Controls.Add(removeButton);
             topPanel.Controls.Add(renameButton);
             topPanel.Controls.Add(cloneButton);
+            topPanel.Controls.Add(configurationButton);
             topPanel.Dock = DockStyle.Fill;
             topPanel.Location = new Point(3, 3);
             topPanel.Name = "topPanel";
@@ -176,6 +178,22 @@
             cloneButton.TabIndex = 4;
             cloneButton.UseVisualStyleBackColor = true;
             // 
+            // configurationButton
+            // 
+            configurationButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            configurationButton.BackgroundImage = (Image)resources.GetObject("configurationButton.BackgroundImage");
+            configurationButton.BackgroundImageLayout = ImageLayout.Zoom;
+            configurationButton.Dock = DockStyle.Left;
+            configurationButton.FlatAppearance.BorderColor = SystemColors.Control;
+            configurationButton.FlatStyle = FlatStyle.Flat;
+            configurationButton.Font = new Font("Segoe UI", 11F);
+            configurationButton.Location = new Point(465, 0);
+            configurationButton.Margin = new Padding(8, 0, 0, 0);
+            configurationButton.Name = "configurationButton";
+            configurationButton.Size = new Size(40, 37);
+            configurationButton.TabIndex = 5;
+            configurationButton.UseVisualStyleBackColor = true;
+            // 
             // AlarmGenTemplateForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -211,5 +229,6 @@
         private Button removeButton;
         private Button renameButton;
         private Button cloneButton;
+        private Button configurationButton;
     }
 }

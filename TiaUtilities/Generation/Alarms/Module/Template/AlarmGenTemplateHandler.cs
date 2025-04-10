@@ -172,7 +172,8 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
                 list.Add(new()
                 {
                     Name = template.Name,
-                    AlarmGrid = template.AlarmGridSave
+                    AlarmGrid = template.AlarmGridSave,
+                    TemplateConfig = template.TemplateConfig,
                 });
             }
 
@@ -184,7 +185,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
             List<AlarmGenTemplate> templateList = [];
             foreach (var save in saveList)
             {
-                AlarmGenTemplate template = new(save.Name) { AlarmGridSave = save.AlarmGrid };
+                AlarmGenTemplate template = new(save.Name) { AlarmGridSave = save.AlarmGrid, TemplateConfig = save.TemplateConfig };
                 templateList.Add(template);
             }
 

@@ -37,6 +37,7 @@ namespace TiaXmlReader
 
         [JsonProperty] public AlarmMainConfiguration PresetAlarmMainConfiguration { get => this.GetAs<AlarmMainConfiguration>(); set => this.Set(value); }
         [JsonProperty] public AlarmTabConfiguration PresetAlarmTabConfiguration { get => this.GetAs<AlarmTabConfiguration>(); set => this.Set(value); }
+        [JsonProperty] public AlarmTemplateConfiguration PresetTemplateConfiguration { get => this.GetAs<AlarmTemplateConfiguration>(); set => this.Set(value); }
 
         public ProgramSettings()
         {
@@ -62,6 +63,7 @@ namespace TiaXmlReader
 
             this.PresetAlarmMainConfiguration = new();
             this.PresetAlarmTabConfiguration = new();
+            this.PresetTemplateConfiguration = new();
         }
 
         public static string GetFilePath()

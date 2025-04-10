@@ -12,7 +12,9 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
     public class AlarmGenTemplate(string name)
     {
         public string Name { get; set; } = name;
+        public AlarmTemplateConfiguration TemplateConfig { get; init; } = new();
         public GridSave<AlarmData> AlarmGridSave { get; set; } = new();
+
 
         public AlarmGenTemplate Clone()
         {

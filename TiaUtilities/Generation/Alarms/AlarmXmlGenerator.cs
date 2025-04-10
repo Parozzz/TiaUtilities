@@ -70,7 +70,7 @@ namespace TiaXmlReader.Generation.Alarms
                         continue;
                     }
 
-                    var parsedAlarmData = ReplaceAlarmDataWithDefaultAndPrefix(tabConfig, alarmData);
+                    var parsedAlarmData = ReplaceAlarmDataWithDefaultAndPrefix(tabConfig, template.TemplateConfig, alarmData);
 
                     placeholdersHandler.DeviceData = deviceData;
                     placeholdersHandler.AlarmData = parsedAlarmData;
@@ -189,7 +189,7 @@ namespace TiaXmlReader.Generation.Alarms
             }
         }
 
-        private static AlarmData ReplaceAlarmDataWithDefaultAndPrefix(AlarmTabConfiguration tabConfig, AlarmData alarmData)
+        private static AlarmData ReplaceAlarmDataWithDefaultAndPrefix(AlarmTabConfiguration tabConfig, AlarmTemplateConfiguration templateConfig, AlarmData alarmData)
         {
             AlarmCoilType coil1Type = tabConfig.DefaultCoil1Type;
             if (Enum.TryParse(alarmData.Coil1Type, out AlarmCoilType res1))
@@ -205,7 +205,7 @@ namespace TiaXmlReader.Generation.Alarms
 
             return new AlarmData()
             {
-                AlarmVariable = tabConfig.AlarmAddressPrefix + alarmData.AlarmVariable,
+                AlarmVariable = (templateConfig.StandaloneAlarms ? "" : tabConfig.AlarmAddressPrefix) + alarmData.AlarmVariable,
                 CustomVariableAddress = string.IsNullOrEmpty(alarmData.CustomVariableAddress) ? tabConfig.DefaultCustomVarAddress : alarmData.CustomVariableAddress,
                 CustomVariableValue = string.IsNullOrEmpty(alarmData.CustomVariableValue) ? tabConfig.DefaultCustomVarValue : alarmData.CustomVariableValue,
                 Coil1Address = string.IsNullOrEmpty(alarmData.Coil1Address) ? tabConfig.DefaultCoil1Address : (tabConfig.Coil1AddressPrefix + alarmData.Coil1Address),
