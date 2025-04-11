@@ -592,4 +592,22 @@ validità riga</value>
   <data name="ALARM_CONFIG_FORMATTING" xml:space="preserve">
     <value>Formattazione / UDT</value>
   </data>
+  <data name="ALARM_CONFIG_GENERATION_HMI_START_ID" xml:space="preserve">
+    <value>ID start hmi</value>
+  </data>
+  <data name="ALARM_CONFIG_FORMATTING_HMI_TRIGGER_TAG_TEMPLATE" xml:space="preserve">
+    <value>Template trigger tag</value>
+  </data>
+  <data name="ALARM_CONFIG_FORMATTING_HMI_USE_WORD_ARRAY" xml:space="preserve">
+    <value>Array di word come trigger</value>
+  </data>
+  <data name="ALARM_CONFIG_FORMATTING_HMI" xml:space="preserve">
+    <value>HMI</value>
+  </data>
+  <data name="ALARM_CONFIG_FORMATTING_HMI_NAME" xml:space="preserve">
+    <value>Nome</value>
+  </data>
+  <data name="ALARM_DATA_ALM_NEGATED" xml:space="preserve">
+    <value>Negato</value>
+  </data>
 </root>

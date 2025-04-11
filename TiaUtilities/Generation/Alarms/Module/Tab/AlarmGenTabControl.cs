@@ -67,6 +67,7 @@ namespace TiaUtilities.Generation.GenModules.Alarm.Tab
                     mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_GENERATION_TOTAL_NUM).BindUInt(() => tabConfig.TotalAlarmNum);
                     mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_GENERATION_START_NUM).BindUInt(() => tabConfig.StartingAlarmNum);
                     mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_GENERATION_SKIP).BindUInt(() => tabConfig.SkipNumberAfterGroup);
+                    mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_GENERATION_HMI_START_ID).BindUInt(() => tabConfig.HmiStartID);
 
                     mainGroup.AddSeparator().Height(15);
 

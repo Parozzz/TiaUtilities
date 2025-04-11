@@ -241,6 +241,42 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a HMI.
+        /// </summary>
+        internal static string ALARM_CONFIG_FORMATTING_HMI {
+            get {
+                return ResourceManager.GetString("ALARM_CONFIG_FORMATTING_HMI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Name.
+        /// </summary>
+        internal static string ALARM_CONFIG_FORMATTING_HMI_NAME {
+            get {
+                return ResourceManager.GetString("ALARM_CONFIG_FORMATTING_HMI_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Trigger tag template.
+        /// </summary>
+        internal static string ALARM_CONFIG_FORMATTING_HMI_TRIGGER_TAG_TEMPLATE {
+            get {
+                return ResourceManager.GetString("ALARM_CONFIG_FORMATTING_HMI_TRIGGER_TAG_TEMPLATE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Word array as trigger.
+        /// </summary>
+        internal static string ALARM_CONFIG_FORMATTING_HMI_USE_WORD_ARRAY {
+            get {
+                return ResourceManager.GetString("ALARM_CONFIG_FORMATTING_HMI_USE_WORD_ARRAY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Name.
         /// </summary>
         internal static string ALARM_CONFIG_FORMATTING_NAME_TEMPLATE {
@@ -363,6 +399,15 @@ namespace TiaUtilities.Languages {
         internal static string ALARM_CONFIG_GENERATION_EMPTY_TIMER_VALUE {
             get {
                 return ResourceManager.GetString("ALARM_CONFIG_GENERATION_EMPTY_TIMER_VALUE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Hmi start ID.
+        /// </summary>
+        internal static string ALARM_CONFIG_GENERATION_HMI_START_ID {
+            get {
+                return ResourceManager.GetString("ALARM_CONFIG_GENERATION_HMI_START_ID", resourceCulture);
             }
         }
         
@@ -561,6 +606,15 @@ namespace TiaUtilities.Languages {
         internal static string ALARM_CONFIG_TEXT_LIST_FULL {
             get {
                 return ResourceManager.GetString("ALARM_CONFIG_TEXT_LIST_FULL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Negated.
+        /// </summary>
+        internal static string ALARM_DATA_ALM_NEGATED {
+            get {
+                return ResourceManager.GetString("ALARM_DATA_ALM_NEGATED", resourceCulture);
             }
         }
         

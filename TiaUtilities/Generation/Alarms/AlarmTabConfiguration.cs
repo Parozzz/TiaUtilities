@@ -14,6 +14,8 @@ namespace TiaUtilities.Generation.Alarms
         [JsonProperty] public uint AntiSlipNumber { get => this.GetAs<uint>(); set => this.Set(value); }
         [JsonProperty] public uint SkipNumberAfterGroup { get => this.GetAs<uint>(); set => this.Set(value); }
 
+        [JsonProperty] public uint HmiStartID { get => this.GetAs<uint>(); set => this.Set(value); }
+
         [JsonProperty] public bool GenerateEmptyAlarmAntiSlip { get => this.GetAs<bool>(); set => this.Set(value); }
         [JsonProperty] public uint EmptyAlarmAtEnd { get => this.GetAs<uint>(); set => this.Set(value); }
         [JsonProperty] public string EmptyAlarmContactAddress { get => this.GetAs<string>(); set => this.Set(value); }
@@ -44,6 +46,8 @@ namespace TiaUtilities.Generation.Alarms
             this.StartingAlarmNum = 50;
             this.AntiSlipNumber = 0;
             this.SkipNumberAfterGroup = 0;
+
+            this.HmiStartID = 1;
 
             this.GenerateEmptyAlarmAntiSlip = false;
             this.EmptyAlarmAtEnd = 0;

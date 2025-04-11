@@ -31,6 +31,9 @@ namespace TiaXmlReader.Generation.Alarms
         [JsonProperty] public string AlarmNameTemplate { get => this.GetAs<string>(); set => this.Set(value); }
         [JsonProperty] public string AlarmCommentTemplate { get => this.GetAs<string>(); set => this.Set(value); }
         [JsonProperty] public string AlarmCommentTemplateSpare { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public string HmiNameTemplate { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public string HmiTriggerTagTemplate { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty] public bool HmiTriggerTagUseWordArray { get => this.GetAs<bool>(); set => this.Set(value); }
 
         [JsonProperty] public string OneEachSegmentName { get => this.GetAs<string>(); set => this.Set(value); }
         [JsonProperty] public string OneEachEmptyAlarmSegmentName { get => this.GetAs<string>(); set => this.Set(value); }
@@ -50,6 +53,9 @@ namespace TiaXmlReader.Generation.Alarms
             this.AlarmNameTemplate = $"Alm{GenPlaceholders.Alarms.ALARM_NUM}";
             this.AlarmCommentTemplate = $"Alm{GenPlaceholders.Alarms.ALARM_NUM} - {GenPlaceholders.Alarms.DEVICE_NAME}: {GenPlaceholders.Alarms.ALARM_DESCRIPTION}";
             this.AlarmCommentTemplateSpare = $"Alm{GenPlaceholders.Alarms.ALARM_NUM} - SPARE";
+            this.HmiNameTemplate = $"{GenPlaceholders.Generation.TAB_NAME}_Alm{GenPlaceholders.Alarms.ALARM_NUM}";
+            this.HmiTriggerTagTemplate = $"AlmAux_Mem{GenPlaceholders.Generation.TAB_NAME}";
+            this.HmiTriggerTagUseWordArray = true;
 
             this.OneEachSegmentName = $"Alm{GenPlaceholders.Alarms.ALARM_NUM} - {GenPlaceholders.Alarms.DEVICE_DESCRIPTION} {GenPlaceholders.Alarms.ALARM_DESCRIPTION}";
             this.OneEachEmptyAlarmSegmentName = $"Alm{GenPlaceholders.Alarms.ALARM_NUM} - SPARE";

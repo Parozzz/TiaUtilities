@@ -63,17 +63,10 @@ namespace TiaUtilities.Generation.GenModules.Alarm
                     configForm.SetConfiguration(mainConfig, MainForm.Settings.PresetAlarmMainConfiguration);
 
                     var mainGroup = configForm.Init();
-                    mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_SEGMENT_NAME_ONE_EACH)
-                         .BindText(() => mainConfig.OneEachSegmentName);
-
-                    mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_SEGMENT_NAME_ONE_EACH_EMPTY)
-                         .BindText(() => mainConfig.OneEachEmptyAlarmSegmentName);
-
-                    mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_SEGMENT_NAME_GROUP_EACH)
-                         .BindText(() => mainConfig.GroupSegmentName);
-
-                    mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_SEGMENT_NAME_GROUP_EACH_EMPTY)
-                         .BindText(() => mainConfig.GroupEmptyAlarmSegmentName);
+                    mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_SEGMENT_NAME_ONE_EACH).BindText(() => mainConfig.OneEachSegmentName);
+                    mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_SEGMENT_NAME_ONE_EACH_EMPTY).BindText(() => mainConfig.OneEachEmptyAlarmSegmentName);
+                    mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_SEGMENT_NAME_GROUP_EACH).BindText(() => mainConfig.GroupSegmentName);
+                    mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_SEGMENT_NAME_GROUP_EACH_EMPTY).BindText(() => mainConfig.GroupEmptyAlarmSegmentName);
 
                     SetupConfigForm(button, configForm);
                 };
@@ -83,7 +76,7 @@ namespace TiaUtilities.Generation.GenModules.Alarm
                 var button = this.formattingButton;
                 button.Click += (sender, args) =>
                 {
-                    var configForm = new ConfigForm(button.Text) { ControlWidth = 500 };
+                    var configForm = new ConfigForm(button.Text) { ControlWidth = 400 };
                     configForm.SetConfiguration(mainConfig, MainForm.Settings.PresetAlarmMainConfiguration);
 
                     var mainGroup = configForm.Init().ControlWidth(250);
@@ -92,6 +85,12 @@ namespace TiaUtilities.Generation.GenModules.Alarm
                     mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_FORMATTING_NAME_TEMPLATE).BindText(() => mainConfig.AlarmNameTemplate);
                     mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_FORMATTING_COMMENT_TEMPLATE).BindText(() => mainConfig.AlarmCommentTemplate);
                     mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_FORMATTING_COMMENT_TEMPLATE_SPARE).BindText(() => mainConfig.AlarmCommentTemplateSpare);
+
+                    var hmiGroup = mainGroup.AddGroup();
+                    hmiGroup.AddLabel().Label(Locale.ALARM_CONFIG_FORMATTING_HMI);
+                    hmiGroup.AddTextBox().Label(Locale.ALARM_CONFIG_FORMATTING_HMI_NAME).BindText(() => mainConfig.HmiNameTemplate);
+                    hmiGroup.AddTextBox().Label(Locale.ALARM_CONFIG_FORMATTING_HMI_TRIGGER_TAG_TEMPLATE).BindText(() => mainConfig.HmiTriggerTagTemplate);
+                    hmiGroup.AddCheckBox().Label(Locale.ALARM_CONFIG_FORMATTING_HMI_USE_WORD_ARRAY).BindChecked(() => mainConfig.HmiTriggerTagUseWordArray).ControlNoAdapt();
 
                     SetupConfigForm(button, configForm);
                 };

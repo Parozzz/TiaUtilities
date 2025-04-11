@@ -35,6 +35,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
             #region COLUMNS
             gridHandler.AddCheckBoxColumn(AlarmData.ENABLE, 40);
             gridHandler.AddTextBoxColumn(AlarmData.ALARM_VARIABLE, 200);
+            gridHandler.AddCheckBoxColumn(AlarmData.ALARM_NEGATED, 40);
             gridHandler.AddTextBoxColumn(AlarmData.CUSTOM_VARIABLE_ADDRESS, 145);
             gridHandler.AddTextBoxColumn(AlarmData.CUSTOM_VARIABLE_VALUE, 50);
             gridHandler.AddTextBoxColumn(AlarmData.COIL1_ADDRESS, 145);

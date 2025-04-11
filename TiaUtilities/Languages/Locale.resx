@@ -592,4 +592,22 @@ for row validation</value>
   <data name="ALARM_CONFIG_FORMATTING" xml:space="preserve">
     <value>Formatting / UDT</value>
   </data>
+  <data name="ALARM_CONFIG_GENERATION_HMI_START_ID" xml:space="preserve">
+    <value>Hmi start ID</value>
+  </data>
+  <data name="ALARM_CONFIG_FORMATTING_HMI_TRIGGER_TAG_TEMPLATE" xml:space="preserve">
+    <value>Trigger tag template</value>
+  </data>
+  <data name="ALARM_CONFIG_FORMATTING_HMI_USE_WORD_ARRAY" xml:space="preserve">
+    <value>Word array as trigger</value>
+  </data>
+  <data name="ALARM_CONFIG_FORMATTING_HMI" xml:space="preserve">
+    <value>HMI</value>
+  </data>
+  <data name="ALARM_CONFIG_FORMATTING_HMI_NAME" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="ALARM_DATA_ALM_NEGATED" xml:space="preserve">
+    <value>Negated</value>
+  </data>
 </root>

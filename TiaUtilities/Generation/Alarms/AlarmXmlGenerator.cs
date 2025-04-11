@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.Math;
-using DocumentFormat.OpenXml.Vml.Office;
+﻿using ClosedXML.Excel;
 using SimaticML.API;
 using SimaticML.Blocks;
 using SimaticML.Blocks.FlagNet;
@@ -22,11 +21,21 @@ namespace TiaXmlReader.Generation.Alarms
         public Dictionary<uint, string?> AlarmDescriptionDict { get; init; } = alarmDescriptionDict;
     }
 
+    public class AlarmXmlHmiItem(uint id, string name, string alarmText, string triggerTag, uint triggerBit)
+    {
+        public uint ID { get; init; } = id;
+        public string Name { get; init; } = name;
+        public string AlarmText { get; init; } = alarmText;
+        public string TriggerTag { get; init; } = triggerTag;
+        public uint TriggerBit { get; init; } = triggerBit;
+    }
+
     public class AlarmXmlGenerator(AlarmMainConfiguration mainConfig)
     {
         private readonly AlarmMainConfiguration mainConfig = mainConfig;
 
         private readonly Dictionary<string, AlarmXmlItem> itemDict = [];
+        private readonly List<AlarmXmlHmiItem> hmiItems = [];
 
         public void Init()
         {
@@ -161,7 +170,9 @@ namespace TiaXmlReader.Generation.Alarms
 
             BlockUDT blockUDT = new();
             blockUDT.Init();
-            blockUDT.AttributeList.BlockName = placeholdersHandler.Parse(mainConfig.UDTBlockName) ?? $"INVALID_{name}";
+            blockUDT.AttributeList.BlockName = placeholdersHandler.ParseNotNull(mainConfig.UDTBlockName);
+
+            var hmiID = tabConfig.HmiStartID;
 
             placeholdersHandler.Clear();
             placeholdersHandler.TabName = name;
@@ -169,18 +180,33 @@ namespace TiaXmlReader.Generation.Alarms
             {
                 placeholdersHandler.SetAlarmNum(alarmNum, mainConfig.AlarmNumFormat);
 
-                var getDone = alarmDescriptionDict.TryGetValue(alarmNum, out string? almDescription);
-                if (!getDone)
-                {
-                    almDescription = placeholdersHandler.Parse(mainConfig.AlarmCommentTemplateSpare);
-                }
+                alarmDescriptionDict.TryGetValue(alarmNum, out string? almDescription);
+                almDescription ??= placeholdersHandler.ParseNotNull(mainConfig.AlarmCommentTemplateSpare);
 
-                var alarmName = placeholdersHandler.Parse(mainConfig.AlarmNameTemplate) ?? $"INVALID_{alarmNum}";
+                var alarmName = placeholdersHandler.ParseNotNull(mainConfig.AlarmNameTemplate);
+                var hmiAlarmName = placeholdersHandler.ParseNotNull(mainConfig.HmiNameTemplate);
+                var hmiTriggerTag = placeholdersHandler.ParseNotNull(mainConfig.HmiTriggerTagTemplate);
 
                 var member = blockUDT.AttributeList.NONE.AddMember(alarmName, SimaticDataType.BOOLEAN);
                 member.Comment[LocaleVariables.CULTURE] = almDescription;
-            }
 
+                AlarmXmlHmiItem hmiItem;
+
+                if (mainConfig.HmiTriggerTagUseWordArray)
+                {
+                    var triggerByte = (alarmNum - 1) / 16;
+                    var triggerBit = (alarmNum - 1) % 16;
+                    hmiItem = new(hmiID, hmiAlarmName, almDescription, hmiTriggerTag + $"[{triggerByte}]", triggerBit);
+                }
+                else
+                {
+                    hmiItem = new(hmiID, hmiAlarmName, almDescription, hmiTriggerTag, 0);
+                }
+
+                hmiItems.Add(hmiItem);
+
+                hmiID++;
+            }
 
             AlarmXmlItem item = new(fc, blockUDT, fullAlarmList, alarmDescriptionDict);
             this.itemDict.Add(name, item);
@@ -191,6 +217,7 @@ namespace TiaXmlReader.Generation.Alarms
             var emptyAlarmData = new AlarmData()
             {
                 AlarmVariable = tabConfig.EmptyAlarmContactAddress,
+                AlarmNegated = false,
                 Coil1Address = tabConfig.DefaultCoil1Address,
                 Coil1Type = tabConfig.DefaultCoil1Type.ToString(),
                 Coil2Address = tabConfig.DefaultCoil2Address,
@@ -247,6 +274,7 @@ namespace TiaXmlReader.Generation.Alarms
             return new AlarmData()
             {
                 AlarmVariable = (templateConfig.StandaloneAlarms ? "" : tabConfig.AlarmAddressPrefix) + alarmData.AlarmVariable,
+                AlarmNegated = alarmData.AlarmNegated,
                 CustomVariableAddress = string.IsNullOrEmpty(alarmData.CustomVariableAddress) ? tabConfig.DefaultCustomVarAddress : alarmData.CustomVariableAddress,
                 CustomVariableValue = string.IsNullOrEmpty(alarmData.CustomVariableValue) ? tabConfig.DefaultCustomVarValue : alarmData.CustomVariableValue,
                 Coil1Address = string.IsNullOrEmpty(alarmData.Coil1Address) ? tabConfig.DefaultCoil1Address : (tabConfig.Coil1AddressPrefix + alarmData.Coil1Address),
@@ -279,7 +307,8 @@ namespace TiaXmlReader.Generation.Alarms
                     "true" => new SimaticLiteralConstant(SimaticDataType.BOOLEAN, "TRUE"),
                     "1" => new SimaticLiteralConstant(SimaticDataType.BOOLEAN, "1"),
                     _ => new SimaticGlobalVariable(parsedContactAddress),
-                }
+                },
+                Negated = alarmData.AlarmNegated,
             };
 
             var parsedCustomVarAddress = placeholders.Parse(alarmData.CustomVariableAddress);
@@ -410,20 +439,44 @@ namespace TiaXmlReader.Generation.Alarms
             foreach (var (name, item) in itemDict)
             {
                 var blockFC = item.BlockFC;
-                var blockUDT = item.BlockUDT;
-                var alarmList = item.AlarmList;
-
                 var fcXmlDocument = SimaticMLAPI.CreateDocument(blockFC);
                 fcXmlDocument.Save(exportPath + $"/[FC]{name}_{blockFC.AttributeList.BlockName}.xml");
 
+                var blockUDT = item.BlockUDT;
                 var udtXmlDocument = SimaticMLAPI.CreateDocument(blockUDT);
                 udtXmlDocument.Save(exportPath + $"/[UDT]{name}_{blockUDT.AttributeList.BlockName}.xml");
 
-                var alarmTextPath = exportPath + $"/Texts_{name.Replace("\\", "_").Replace("/", "_")}.txt";
-                using var stream = File.CreateText(alarmTextPath);
-                stream.Write(alarmList);
+                {
+                    var path = exportPath + $"/Texts_{name.Replace("\\", "_").Replace("/", "_")}.txt";
+                    using var stream = File.CreateText(path);
+                    stream.Write(item.AlarmList);
+                }
+            }
+
+            {
+                XLWorkbook wb = new();
+                var ws = wb.Worksheets.Add("DiscreteAlarms");
+
+                ws.Cell(1, 1).Value = "ID";
+                ws.Cell(1, 2).Value = "Name";
+                ws.Cell(1, 3).Value = $"Alarm text [{LocaleVariables.CULTURE.IetfLanguageTag}], Alarm text 1";
+                ws.Cell(1, 4).Value = "Trigger tag";
+                ws.Cell(1, 5).Value = "Trigger bit";
+
+                int x = 2;
+                foreach (var hmiItem in hmiItems)
+                {
+                    ws.Cell(x, 1).Value = hmiItem.ID;
+                    ws.Cell(x, 2).Value = hmiItem.Name;
+                    ws.Cell(x, 3).Value = hmiItem.AlarmText;
+                    ws.Cell(x, 4).Value = hmiItem.TriggerTag;
+                    ws.Cell(x, 5).Value = hmiItem.TriggerBit;
+                    x++;
+                }
+
+                var path = exportPath + $"/HmiAlarms.xlsx";
+                wb.SaveAs(path);
             }
         }
-
     }
 }
