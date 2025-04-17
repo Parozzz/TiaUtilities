@@ -67,7 +67,13 @@ namespace TiaUtilities.Generation.GenModules.Alarm.Tab
                     mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_GENERATION_TOTAL_NUM).BindUInt(() => tabConfig.TotalAlarmNum);
                     mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_GENERATION_START_NUM).BindUInt(() => tabConfig.StartingAlarmNum);
                     mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_GENERATION_SKIP).BindUInt(() => tabConfig.SkipNumberAfterGroup);
-                    mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_GENERATION_HMI_START_ID).BindUInt(() => tabConfig.HmiStartID);
+
+                    mainGroup.AddSeparator().Height(15);
+
+                    var hmiGroup = mainGroup.AddGroup().ControlWidth(150);
+                    hmiGroup.AddLabel().Label(Locale.GENERICS_HMI);
+                    hmiGroup.AddTextBox().Label(Locale.ALARM_CONFIG_GENERATION_HMI_START_ID).BindUInt(() => tabConfig.HmiStartID);
+                    hmiGroup.AddTextBox().Label(Locale.ALARM_CONFIG_GENERATION_HMI_DEFAULT_ALARM_CLASS).BindText(() => tabConfig.DefaultHmiAlarmClass);
 
                     mainGroup.AddSeparator().Height(15);
 
@@ -146,6 +152,24 @@ namespace TiaUtilities.Generation.GenModules.Alarm.Tab
                     mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_PREFIX_COIL1).BindText(() => tabConfig.Coil1AddressPrefix);
                     mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_PREFIX_COIL2).BindText(() => tabConfig.Coil2AddressPrefix);
                     mainGroup.AddTextBox().Label(Locale.ALARM_CONFIG_PREFIX_TIMER).BindText(() => tabConfig.TimerAddressPrefix);
+
+                    SetupConfigForm(button, configForm);
+                };
+            }
+
+            {
+                var button = this.customPlaceholdersButton;
+                button.Click += (sender, args) =>
+                {
+                    var configForm = new ConfigForm(button.Text)
+                    {
+                        CloseOnEnter = false, //Avoid closing when entering new line in the text box
+                    };
+                    configForm.SetConfiguration(tabConfig, MainForm.Settings.PresetAlarmTabConfiguration, tabConfigs);
+
+                    var mainGroup = configForm.Init().ControlWidth(600);
+                    mainGroup.AddLabel().Label("Custom Placeholders JSON object");
+                    mainGroup.AddJSON().Height(500).BindText(() => tabConfig.CustomPlaceholdersJSON);
 
                     SetupConfigForm(button, configForm);
                 };

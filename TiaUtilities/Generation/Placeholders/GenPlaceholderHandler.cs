@@ -1,4 +1,5 @@
-﻿using TiaUtilities.Generation.Placeholders;
+﻿using Newtonsoft.Json;
+using TiaUtilities.Generation.Placeholders;
 using TiaXmlReader.Generation.Alarms;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.Generation.IO;
@@ -43,6 +44,49 @@ namespace TiaXmlReader.Generation.Placeholders
             }
         }
 
+        public void LoadJSONObject(string json)
+        {
+            try
+            {
+                var placeholderDict = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+                if (placeholderDict == null)
+                {
+                    return;
+                }
+
+                foreach (var item in placeholderDict)
+                {
+                    var placeholder = item.Key;
+                    if (!placeholder.StartsWith('{'))
+                    {
+                        placeholder = '{' + placeholder;
+                    }
+                    if (!placeholder.EndsWith('}'))
+                    {
+                        placeholder = placeholder + '}';
+                    }
+
+                    var value = item.Value;
+                    if (value == null)
+                    {
+                        continue;
+                    }
+
+                    var stringValue = value.ToString();
+                    if (stringValue == null)
+                    {
+                        continue;
+                    }
+
+                    this.AddOrReplace(placeholder, new StringGenPlaceholderData() { Value = stringValue });
+                }
+            }
+            catch (Exception)
+            {
+
+            }
+        }
+
         protected void AddOrReplace(string placeholder, IGenPlaceholderData placeholderData)
         {
             placeholdersDict.Compute(placeholder, placeholderData);
@@ -61,27 +105,20 @@ namespace TiaXmlReader.Generation.Placeholders
                 return str;
             }
 
-            var loopStr = str;
-            foreach (KeyValuePair<string, IGenPlaceholderData> entry in placeholdersDict)
+            var localStr = str;
+
+            while (true)
             {
-                var placeholder = entry.Key;
-                var placeholderData = entry.Value;
-
-                if (string.IsNullOrEmpty(placeholder))
+                //Parse until no more placeholders are found!
+                var result = this.ParseWithResult(ref localStr);
+                if (!result)
                 {
-                    continue;
+                    break;
                 }
-
-                if (loopStr == null)
-                {
-                    return null;
-                }
-
-                loopStr = loopStr.Replace(placeholder, placeholderData.GetSubstitution());
             }
 
             //{mnemonic} {bit_address} {byte_address} {cad_address} {cad_comment1} {cad_comment2} {cad_comment3} {cad_comment4} {cad_page} {cad_panel} {cad_type}
-            return loopStr;
+            return localStr;
         }
 
         public bool ParseWithResult(ref string str)
@@ -101,9 +138,9 @@ namespace TiaXmlReader.Generation.Placeholders
                 if (str.Contains(placeholder))
                 {
                     anyFound = true;
+                    str = str.Replace(placeholder, placeholderData.GetSubstitution());
                 }
 
-                str = str.Replace(placeholder, placeholderData.GetSubstitution());
             }
 
             return anyFound;

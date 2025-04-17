@@ -241,15 +241,6 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a HMI.
-        /// </summary>
-        internal static string ALARM_CONFIG_FORMATTING_HMI {
-            get {
-                return ResourceManager.GetString("ALARM_CONFIG_FORMATTING_HMI", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Cerca una stringa localizzata simile a Name.
         /// </summary>
         internal static string ALARM_CONFIG_FORMATTING_HMI_NAME {
@@ -403,7 +394,16 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Hmi start ID.
+        ///   Cerca una stringa localizzata simile a Default Alarm Class.
+        /// </summary>
+        internal static string ALARM_CONFIG_GENERATION_HMI_DEFAULT_ALARM_CLASS {
+            get {
+                return ResourceManager.GetString("ALARM_CONFIG_GENERATION_HMI_DEFAULT_ALARM_CLASS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Start ID.
         /// </summary>
         internal static string ALARM_CONFIG_GENERATION_HMI_START_ID {
             get {
@@ -700,6 +700,15 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Hmi Class.
+        /// </summary>
+        internal static string ALARM_DATA_HMI_CLASS {
+            get {
+                return ResourceManager.GetString("ALARM_DATA_HMI_CLASS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Timer Address.
         /// </summary>
         internal static string ALARM_DATA_TIMER_ADDRESS {
@@ -876,6 +885,15 @@ namespace TiaUtilities.Languages {
         internal static string GENERICS_FILE {
             get {
                 return ResourceManager.GetString("GENERICS_FILE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a HMI.
+        /// </summary>
+        internal static string GENERICS_HMI {
+            get {
+                return ResourceManager.GetString("GENERICS_HMI", resourceCulture);
             }
         }
         

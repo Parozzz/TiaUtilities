@@ -22,6 +22,7 @@ namespace TiaXmlReader.Generation.Alarms
         public static readonly GridDataColumn TIMER_ADDRESS;
         public static readonly GridDataColumn TIMER_TYPE;
         public static readonly GridDataColumn TIMER_VALUE;
+        public static readonly GridDataColumn HMI_ALARM_CLASS;
         public static readonly GridDataColumn DESCRIPTION;
         public static readonly IReadOnlyList<GridDataColumn> COLUMN_LIST;
 
@@ -30,7 +31,7 @@ namespace TiaXmlReader.Generation.Alarms
             var type = typeof(AlarmData);
             ENABLE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.Enable));
             ALARM_VARIABLE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.AlarmVariable));
-            ALARM_NEGATED = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.AlarmNegated));
+            ALARM_NEGATED = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.AlarmNegated), "negated");
             CUSTOM_VARIABLE_ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.CustomVariableAddress), "customVarAddress");
             CUSTOM_VARIABLE_VALUE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.CustomVariableValue), "customVarValue");
             COIL1_ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.Coil1Address), "coil1Address");
@@ -40,6 +41,7 @@ namespace TiaXmlReader.Generation.Alarms
             TIMER_ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.TimerAddress), "timerAddress");
             TIMER_TYPE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.TimerType), "timerType");
             TIMER_VALUE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.TimerValue), "timerValue");
+            HMI_ALARM_CLASS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.HmiAlarmClass), "hmiClass");
             DESCRIPTION = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(AlarmData.Description));
 
             var columnList = GridDataColumn.GetStaticColumnList(type);
@@ -59,6 +61,7 @@ namespace TiaXmlReader.Generation.Alarms
         [JsonProperty][Locale(nameof(Locale.ALARM_DATA_TIMER_ADDRESS))] public string? TimerAddress { get; set; }
         [JsonProperty][Locale(nameof(Locale.ALARM_DATA_TIMER_TYPE))] public string? TimerType { get; set; }
         [JsonProperty][Locale(nameof(Locale.ALARM_DATA_TIMER_VALUE))] public string? TimerValue { get; set; }
+        [JsonProperty][Locale(nameof(Locale.ALARM_DATA_HMI_CLASS))] public string? HmiAlarmClass { get; set; }
         [JsonProperty][Locale(nameof(Locale.ALARM_DATA_DESCRIPTION), append: " > " + GenPlaceholders.Alarms.ALARM_DESCRIPTION)] public string? Description { get; set; }
 
         public object? this[int column]

@@ -37,6 +37,7 @@
             groupingTypeTableLayout = new TableLayoutPanel();
             groupingTypeLabel = new Label();
             groupingTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
+            customPlaceholdersButton = new Button();
             mainTableLayout.SuspendLayout();
             configFlowLayout.SuspendLayout();
             groupingTypeTableLayout.SuspendLayout();
@@ -64,6 +65,7 @@
             configFlowLayout.Controls.Add(generationConfigButton);
             configFlowLayout.Controls.Add(defaultValuesConfigButton);
             configFlowLayout.Controls.Add(valuesPrefixesConfigButton);
+            configFlowLayout.Controls.Add(customPlaceholdersButton);
             configFlowLayout.Controls.Add(editTemplateConfigButton);
             configFlowLayout.Controls.Add(groupingTypeTableLayout);
             configFlowLayout.Dock = DockStyle.Fill;
@@ -116,7 +118,7 @@
             editTemplateConfigButton.AutoSize = true;
             editTemplateConfigButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             editTemplateConfigButton.Font = new Font("Microsoft Sans Serif", 12.75F, FontStyle.Bold);
-            editTemplateConfigButton.Location = new Point(523, 3);
+            editTemplateConfigButton.Location = new Point(663, 3);
             editTemplateConfigButton.Name = "editTemplateConfigButton";
             editTemplateConfigButton.Padding = new Padding(3);
             editTemplateConfigButton.Size = new Size(141, 36);
@@ -134,7 +136,7 @@
             groupingTypeTableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             groupingTypeTableLayout.Controls.Add(groupingTypeLabel, 0, 0);
             groupingTypeTableLayout.Controls.Add(groupingTypeComboBox, 1, 0);
-            groupingTypeTableLayout.Location = new Point(670, 3);
+            groupingTypeTableLayout.Location = new Point(810, 3);
             groupingTypeTableLayout.Name = "groupingTypeTableLayout";
             groupingTypeTableLayout.RowCount = 1;
             groupingTypeTableLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
@@ -165,6 +167,19 @@
             groupingTypeComboBox.Size = new Size(180, 26);
             groupingTypeComboBox.TabIndex = 0;
             // 
+            // customPlaceholdersButton
+            // 
+            customPlaceholdersButton.AutoSize = true;
+            customPlaceholdersButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            customPlaceholdersButton.Font = new Font("Microsoft Sans Serif", 12.75F, FontStyle.Bold);
+            customPlaceholdersButton.Location = new Point(523, 3);
+            customPlaceholdersButton.Name = "customPlaceholdersButton";
+            customPlaceholdersButton.Padding = new Padding(3);
+            customPlaceholdersButton.Size = new Size(134, 36);
+            customPlaceholdersButton.TabIndex = 4;
+            customPlaceholdersButton.Text = "Placeholders";
+            customPlaceholdersButton.UseVisualStyleBackColor = true;
+            // 
             // AlarmGenTabControl
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -192,5 +207,6 @@
         public Label groupingTypeLabel;
         public TiaXmlReader.CustomControls.FlatComboBox groupingTypeComboBox;
         public Button editTemplateConfigButton;
+        public Button customPlaceholdersButton;
     }
 }

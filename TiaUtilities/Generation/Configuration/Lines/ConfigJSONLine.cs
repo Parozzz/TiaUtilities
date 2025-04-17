@@ -19,6 +19,7 @@ namespace TiaUtilities.Generation.Configuration.Lines
             this.control = new FastColoredTextBox
             {
                 Language = Language.JSON,
+                ReadOnly = false,
                 // == INDENTATION ==
                 AutoIndent = true,
                 AutoIndentExistingLines = true,

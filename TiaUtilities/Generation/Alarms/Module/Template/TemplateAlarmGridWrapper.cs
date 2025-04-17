@@ -45,6 +45,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
             gridHandler.AddTextBoxColumn(AlarmData.TIMER_ADDRESS, 95);
             gridHandler.AddComboBoxColumn(AlarmData.TIMER_TYPE, 55, TIMERS_TYPES_ITEMS);
             gridHandler.AddTextBoxColumn(AlarmData.TIMER_VALUE, 50);
+            gridHandler.AddTextBoxColumn(AlarmData.HMI_ALARM_CLASS, 150);
             gridHandler.AddTextBoxColumn(AlarmData.DESCRIPTION, 0);
             #endregion
 
@@ -111,6 +112,10 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
                     {
                         return new() { DefaultValue = tabConfig.DefaultTimerValue, Value = alarmData.TimerValue };
                     }
+                }
+                else if (column == AlarmData.HMI_ALARM_CLASS)
+                {
+                    return new() { DefaultValue = tabConfig.DefaultHmiAlarmClass, Value = alarmData.HmiAlarmClass };
                 }
 
                 return null;

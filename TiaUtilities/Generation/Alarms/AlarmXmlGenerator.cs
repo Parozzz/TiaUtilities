@@ -13,29 +13,31 @@ using TiaXmlReader.Languages;
 namespace TiaXmlReader.Generation.Alarms
 {
 
-    public class AlarmXmlItem(BlockFC blockFC, BlockUDT blockUDT, string alarmList, Dictionary<uint, string?> alarmDescriptionDict)
+    public class AlarmGroupXmlItem(BlockFC blockFC, BlockUDT blockUDT, string alarmList, List<AlarmDataXmlItem> alarmDataItems)
     {
         public BlockFC BlockFC { get; init; } = blockFC;
         public BlockUDT BlockUDT { get; init; } = blockUDT;
         public string AlarmList { get; init; } = alarmList;
-        public Dictionary<uint, string?> AlarmDescriptionDict { get; init; } = alarmDescriptionDict;
+        public List<AlarmDataXmlItem> AlarmDataItems { get; init; } = alarmDataItems;
     }
 
-    public class AlarmXmlHmiItem(uint id, string name, string alarmText, string triggerTag, uint triggerBit)
+    public class AlarmDataXmlItem(string alarmVariableName, uint hmiID, string hmiAlarmName, string hmiAlarmText, string hmiAlarmClass, string hmiTriggerTag, uint hmiTriggerBit)
     {
-        public uint ID { get; init; } = id;
-        public string Name { get; init; } = name;
-        public string AlarmText { get; init; } = alarmText;
-        public string TriggerTag { get; init; } = triggerTag;
-        public uint TriggerBit { get; init; } = triggerBit;
+        public string AlarmVariableName { get; init; } = alarmVariableName;
+
+        public uint HmiID { get; init; } = hmiID;
+        public string HmiAlarmName { get; init; } = hmiAlarmName;
+        public string HmiAlarmText { get; init; } = hmiAlarmText;
+        public string AlarmClass { get; init; } = hmiAlarmClass;
+        public string TriggerTag { get; init; } = hmiTriggerTag;
+        public uint TriggerBit { get; init; } = hmiTriggerBit;
     }
 
     public class AlarmXmlGenerator(AlarmMainConfiguration mainConfig)
     {
         private readonly AlarmMainConfiguration mainConfig = mainConfig;
 
-        private readonly Dictionary<string, AlarmXmlItem> itemDict = [];
-        private readonly List<AlarmXmlHmiItem> hmiItems = [];
+        private readonly Dictionary<string, AlarmGroupXmlItem> alarmGroupDict = [];
 
         public void Init()
         {
@@ -52,11 +54,12 @@ namespace TiaXmlReader.Generation.Alarms
             fc.AttributeList.BlockNumber = mainConfig.FCBlockNumber;
             fc.AttributeList.AutoNumber = (mainConfig.FCBlockNumber > 0);
 
-            Dictionary<uint, string?> alarmDescriptionDict = [];
+            List<AlarmDataXmlItem> hmiAlarmItems = [];
             var fullAlarmList = "";
 
             var segment = new SimaticLADSegment();
 
+            var hmiID = tabConfig.HmiStartID;
             var nextAlarmNum = tabConfig.StartingAlarmNum;
             //Switching to a Template system broke the ability to use the Partition system of the alarms (AlarmPartitionType.DEVICE / ALARM_TYPE)
             foreach (var deviceData in deviceDataList)
@@ -79,6 +82,7 @@ namespace TiaXmlReader.Generation.Alarms
                 }
 
                 placeholdersHandler.Clear();
+                placeholdersHandler.LoadJSONObject(tabConfig.CustomPlaceholdersJSON);
                 placeholdersHandler.TabName = name;
 
                 var startAlarmNum = nextAlarmNum;
@@ -98,16 +102,20 @@ namespace TiaXmlReader.Generation.Alarms
                     placeholdersHandler.AlarmData = parsedAlarmData;
                     placeholdersHandler.SetAlarmNum(alarmNum, mainConfig.AlarmNumFormat);
 
-                    var comment = placeholdersHandler.Parse(mainConfig.AlarmCommentTemplate);
-                    comment = placeholdersHandler.Parse(comment);
+                    var comment = placeholdersHandler.ParseNotNull(mainConfig.AlarmCommentTemplate);
 
-                    alarmDescriptionDict.Add(alarmNum, comment);
+                    var alarmName = placeholdersHandler.ParseNotNull(mainConfig.AlarmNameTemplate);
+                    var hmiAlarmName = placeholdersHandler.ParseNotNull(mainConfig.HmiNameTemplate);
+                    var hmiTriggerTag = placeholdersHandler.ParseNotNull(mainConfig.HmiTriggerTagTemplate);
+                    var alarmClass = placeholdersHandler.ParseNotNull(tabConfig.DefaultHmiAlarmClass);
+
+                    hmiAlarmItems.Add(this.CreateHmiAlarmItem(ref hmiID, placeholdersHandler, alarmData, alarmNum, tabConfig));
                     fullAlarmList += $"{comment}'\n'";
 
                     if (tabConfig.GroupingType == AlarmGroupingType.ONE)
                     {
                         segment = new SimaticLADSegment();
-                        segment.Title[LocaleVariables.CULTURE] = placeholdersHandler.Parse(mainConfig.OneEachSegmentName);
+                        segment.Title[LocaleVariables.CULTURE] = placeholdersHandler.ParseNotNull(mainConfig.OneEachSegmentName);
                     }
 
                     FillAlarmSegment(tabConfig, segment, placeholdersHandler, parsedAlarmData);
@@ -139,8 +147,11 @@ namespace TiaXmlReader.Generation.Alarms
 
                         for (var x = 0; x < slippingAlarmCount; x++)
                         {
-                            placeholdersHandler.SetAlarmNum((uint)(lastAlarmNum + x + 1), mainConfig.AlarmNumFormat);
-                            fullAlarmList += placeholdersHandler.Parse(mainConfig.AlarmCommentTemplateSpare) + '\n';
+                            var loopAlarmNum = (uint)(lastAlarmNum + x + 1);
+                            placeholdersHandler.SetAlarmNum(loopAlarmNum, mainConfig.AlarmNumFormat);
+
+                            hmiAlarmItems.Add(this.CreateHmiAlarmItem(ref hmiID, placeholdersHandler, alarmData: null, loopAlarmNum, tabConfig));
+                            fullAlarmList += placeholdersHandler.ParseNotNull(mainConfig.AlarmCommentTemplateSpare) + '\n';
                         }
 
                         if (tabConfig.GenerateEmptyAlarmAntiSlip)
@@ -159,11 +170,15 @@ namespace TiaXmlReader.Generation.Alarms
                     segment.Create(fc);
                 }
 
-                nextAlarmNum += tabConfig.SkipNumberAfterGroup;
-                for (var x = 0; x < tabConfig.SkipNumberAfterGroup; x++)
+                for (uint x = 0; x < tabConfig.SkipNumberAfterGroup; x++)
                 {
+                    var loopAlarmNum = nextAlarmNum + x;
+
+                    hmiAlarmItems.Add(this.CreateHmiAlarmItem(ref hmiID, placeholdersHandler, alarmData: null, loopAlarmNum, tabConfig));
                     fullAlarmList += '\n';
                 }
+
+                nextAlarmNum += tabConfig.SkipNumberAfterGroup;
             }
 
             GenerateEmptyAlarms(placeholdersHandler, tabConfig, nextAlarmNum, tabConfig.EmptyAlarmAtEnd);
@@ -172,44 +187,51 @@ namespace TiaXmlReader.Generation.Alarms
             blockUDT.Init();
             blockUDT.AttributeList.BlockName = placeholdersHandler.ParseNotNull(mainConfig.UDTBlockName);
 
-            var hmiID = tabConfig.HmiStartID;
-
-            placeholdersHandler.Clear();
-            placeholdersHandler.TabName = name;
-            for (uint alarmNum = 1; alarmNum <= tabConfig.TotalAlarmNum; alarmNum++)
+            foreach (var hmiAlarmItem in hmiAlarmItems)
             {
-                placeholdersHandler.SetAlarmNum(alarmNum, mainConfig.AlarmNumFormat);
-
-                alarmDescriptionDict.TryGetValue(alarmNum, out string? almDescription);
-                almDescription ??= placeholdersHandler.ParseNotNull(mainConfig.AlarmCommentTemplateSpare);
-
-                var alarmName = placeholdersHandler.ParseNotNull(mainConfig.AlarmNameTemplate);
-                var hmiAlarmName = placeholdersHandler.ParseNotNull(mainConfig.HmiNameTemplate);
-                var hmiTriggerTag = placeholdersHandler.ParseNotNull(mainConfig.HmiTriggerTagTemplate);
-
-                var member = blockUDT.AttributeList.NONE.AddMember(alarmName, SimaticDataType.BOOLEAN);
-                member.Comment[LocaleVariables.CULTURE] = almDescription;
-
-                AlarmXmlHmiItem hmiItem;
-
-                if (mainConfig.HmiTriggerTagUseWordArray)
-                {
-                    var triggerByte = (alarmNum - 1) / 16;
-                    var triggerBit = (alarmNum - 1) % 16;
-                    hmiItem = new(hmiID, hmiAlarmName, almDescription, hmiTriggerTag + $"[{triggerByte}]", triggerBit);
-                }
-                else
-                {
-                    hmiItem = new(hmiID, hmiAlarmName, almDescription, hmiTriggerTag, 0);
-                }
-
-                hmiItems.Add(hmiItem);
-
-                hmiID++;
+                var member = blockUDT.AttributeList.NONE.AddMember(hmiAlarmItem.AlarmVariableName, SimaticDataType.BOOLEAN);
+                member.Comment[LocaleVariables.CULTURE] = hmiAlarmItem.HmiAlarmText;
             }
 
-            AlarmXmlItem item = new(fc, blockUDT, fullAlarmList, alarmDescriptionDict);
-            this.itemDict.Add(name, item);
+            AlarmGroupXmlItem item = new(fc, blockUDT, fullAlarmList, hmiAlarmItems);
+            this.alarmGroupDict.Add(name, item);
+        }
+
+        private AlarmDataXmlItem CreateHmiAlarmItem(ref uint ID, AlarmGenPlaceholdersHandler placeholdersHandler, AlarmData? alarmData, uint alarmNum, AlarmTabConfiguration tabConfig)
+        {
+            var alarmVariableName = placeholdersHandler.ParseNotNull(mainConfig.AlarmNameTemplate);
+
+            var hmiAlarmName = placeholdersHandler.ParseNotNull(mainConfig.HmiNameTemplate);
+            var hmiAlarmText = placeholdersHandler.ParseNotNull(mainConfig.AlarmCommentTemplate);
+            var hmiTriggerTag = placeholdersHandler.ParseNotNull(mainConfig.HmiTriggerTagTemplate);
+            var hmiAlarmClass = placeholdersHandler.ParseNotNull(string.IsNullOrEmpty(alarmData?.HmiAlarmClass) ? tabConfig.DefaultHmiAlarmClass : alarmData?.HmiAlarmClass);
+
+            AlarmDataXmlItem hmiItem;
+            if (this.mainConfig.HmiTriggerTagUseWordArray)
+            {
+                var triggerByte = (alarmNum - 1) / 16;
+                var triggerBit = (alarmNum - 1) % 16;
+                hmiItem = new(alarmVariableName: alarmVariableName,
+                    hmiID: ID,
+                    hmiAlarmName: hmiAlarmName,
+                    hmiAlarmText: hmiAlarmText,
+                    hmiAlarmClass: hmiAlarmClass,
+                    hmiTriggerTag: hmiTriggerTag + $"[{triggerByte}]",
+                    hmiTriggerBit: triggerBit);
+            }
+            else
+            {
+                hmiItem = new(alarmVariableName: alarmVariableName,
+                    hmiID: ID,
+                    hmiAlarmName: hmiAlarmName,
+                    hmiAlarmText: hmiAlarmText,
+                    hmiAlarmClass: hmiAlarmClass,
+                    hmiTriggerTag: hmiTriggerTag,
+                    hmiTriggerBit: 0);
+            }
+
+            ID++;
+            return hmiItem;
         }
 
         private void GenerateEmptyAlarms(AlarmGenPlaceholdersHandler placeholdersHandler, AlarmTabConfiguration tabConfig, uint startAlarmNum, uint alarmCount, SimaticLADSegment? externalGroupSegment = null)
@@ -436,47 +458,45 @@ namespace TiaXmlReader.Generation.Alarms
                 return;
             }
 
-            foreach (var (name, item) in itemDict)
+            XLWorkbook wb = new();
+            var ws = wb.Worksheets.Add("DiscreteAlarms");
+            ws.Cell(1, 1).Value = "ID";
+            ws.Cell(1, 2).Value = "Name";
+            ws.Cell(1, 3).Value = "Class";
+            ws.Cell(1, 4).Value = $"Alarm text [{LocaleVariables.CULTURE.IetfLanguageTag}], Alarm text 1";
+            ws.Cell(1, 5).Value = "Trigger tag";
+            ws.Cell(1, 6).Value = "Trigger bit";
+
+            int excelRowIndex = 2; //Starts from 1 and the first is the headers.
+
+            foreach (var (alarmGroupName, alarmGroupItem) in alarmGroupDict)
             {
-                var blockFC = item.BlockFC;
+                var blockFC = alarmGroupItem.BlockFC;
                 var fcXmlDocument = SimaticMLAPI.CreateDocument(blockFC);
-                fcXmlDocument.Save(exportPath + $"/[FC]{name}_{blockFC.AttributeList.BlockName}.xml");
+                fcXmlDocument.Save(exportPath + $"/[FC]{alarmGroupName}_{blockFC.AttributeList.BlockName}.xml");
 
-                var blockUDT = item.BlockUDT;
+                var blockUDT = alarmGroupItem.BlockUDT;
                 var udtXmlDocument = SimaticMLAPI.CreateDocument(blockUDT);
-                udtXmlDocument.Save(exportPath + $"/[UDT]{name}_{blockUDT.AttributeList.BlockName}.xml");
+                udtXmlDocument.Save(exportPath + $"/[UDT]{alarmGroupName}_{blockUDT.AttributeList.BlockName}.xml");
 
+                using var stream = File.CreateText(exportPath + $"/Texts_{alarmGroupName.Replace("\\", "_").Replace("/", "_")}.txt");
+                stream.Write(alarmGroupItem.AlarmList);
+
+                foreach (var alarmDataItem in alarmGroupItem.AlarmDataItems)
                 {
-                    var path = exportPath + $"/Texts_{name.Replace("\\", "_").Replace("/", "_")}.txt";
-                    using var stream = File.CreateText(path);
-                    stream.Write(item.AlarmList);
-                }
-            }
-
-            {
-                XLWorkbook wb = new();
-                var ws = wb.Worksheets.Add("DiscreteAlarms");
-
-                ws.Cell(1, 1).Value = "ID";
-                ws.Cell(1, 2).Value = "Name";
-                ws.Cell(1, 3).Value = $"Alarm text [{LocaleVariables.CULTURE.IetfLanguageTag}], Alarm text 1";
-                ws.Cell(1, 4).Value = "Trigger tag";
-                ws.Cell(1, 5).Value = "Trigger bit";
-
-                int x = 2;
-                foreach (var hmiItem in hmiItems)
-                {
-                    ws.Cell(x, 1).Value = hmiItem.ID;
-                    ws.Cell(x, 2).Value = hmiItem.Name;
-                    ws.Cell(x, 3).Value = hmiItem.AlarmText;
-                    ws.Cell(x, 4).Value = hmiItem.TriggerTag;
-                    ws.Cell(x, 5).Value = hmiItem.TriggerBit;
-                    x++;
+                    ws.Cell(excelRowIndex, 1).Value = alarmDataItem.HmiID;
+                    ws.Cell(excelRowIndex, 2).Value = alarmDataItem.HmiAlarmName;
+                    ws.Cell(excelRowIndex, 3).Value = alarmDataItem.AlarmClass;
+                    ws.Cell(excelRowIndex, 4).Value = alarmDataItem.HmiAlarmText;
+                    ws.Cell(excelRowIndex, 5).Value = alarmDataItem.TriggerTag;
+                    ws.Cell(excelRowIndex, 6).Value = alarmDataItem.TriggerBit;
+                    excelRowIndex++;
                 }
 
-                var path = exportPath + $"/HmiAlarms.xlsx";
-                wb.SaveAs(path);
             }
+
+            var hmiAlarmsPath = exportPath + $"/HmiAlarms.xlsx";
+            wb.SaveAs(hmiAlarmsPath);
         }
     }
 }

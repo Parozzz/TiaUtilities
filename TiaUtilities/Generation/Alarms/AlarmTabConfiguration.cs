@@ -15,6 +15,7 @@ namespace TiaUtilities.Generation.Alarms
         [JsonProperty] public uint SkipNumberAfterGroup { get => this.GetAs<uint>(); set => this.Set(value); }
 
         [JsonProperty] public uint HmiStartID { get => this.GetAs<uint>(); set => this.Set(value); }
+        [JsonProperty] public string DefaultHmiAlarmClass { get => this.GetAs<string>(); set => this.Set(value); }
 
         [JsonProperty] public bool GenerateEmptyAlarmAntiSlip { get => this.GetAs<bool>(); set => this.Set(value); }
         [JsonProperty] public uint EmptyAlarmAtEnd { get => this.GetAs<uint>(); set => this.Set(value); }
@@ -38,6 +39,8 @@ namespace TiaUtilities.Generation.Alarms
         [JsonProperty] public string Coil2AddressPrefix { get => this.GetAs<string>(); set => this.Set(value); }
         [JsonProperty] public string TimerAddressPrefix { get => this.GetAs<string>(); set => this.Set(value); }
 
+        [JsonProperty] public string CustomPlaceholdersJSON { get => this.GetAs<string>(); set => this.Set(value); }
+
         public AlarmTabConfiguration()
         {
             this.GroupingType = AlarmGroupingType.GROUP;
@@ -48,6 +51,7 @@ namespace TiaUtilities.Generation.Alarms
             this.SkipNumberAfterGroup = 0;
 
             this.HmiStartID = 1;
+            this.DefaultHmiAlarmClass = "No Acknowledgement";
 
             this.GenerateEmptyAlarmAntiSlip = false;
             this.EmptyAlarmAtEnd = 0;
@@ -70,6 +74,8 @@ namespace TiaUtilities.Generation.Alarms
             this.Coil1AddressPrefix = "";
             this.Coil2AddressPrefix = "";
             this.TimerAddressPrefix = "";
+
+            this.CustomPlaceholdersJSON = "{}";
         }
     }
 }
