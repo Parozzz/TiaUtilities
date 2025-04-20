@@ -16,42 +16,85 @@ At the moment, this is what exists:
 ## SimaticML API
 Still WIP, but adds the ability to create segments programmatically. Still needs quite a grasp on how siemens generate .xml files since names are taken from there.
 
+You can find some examples in ![SimaticMLExamples](https://github.com/Parozzz/TiaUtilities/blob/main/SimaticML/SimaticMLExamples.cs)
+
 Below an example on how to create an FC block.
 ```C#
-var fc = new BlockFC();
+            //Use BlockFC for creating a Function and BlockFB for creating a Function Block.
+            var fc = new BlockFC();
+            fc.Init();
 
-//Add basic block information, like name, number and programming language.
-fc.AttributeList.BlockName = "FC_TEST";
-fc.AttributeList.BlockNumber = 123;
-fc.AttributeList.ProgrammingLanguage = SimaticProgrammingLanguage.LADDER;
+            //Add basic block information, like name, number and programming language.
+            var attributeList = fc.AttributeList;
+            attributeList.BlockName = "FC_TEST";
+            attributeList.BlockNumber = 123;
+            attributeList.ProgrammingLanguage = SimaticProgrammingLanguage.LADDER;
 
-//Add two temp variables to the specific section.
-fc.AttributeList.TEMP.AddMember("tVar1", SimaticDataType.BOOLEAN);
-fc.AttributeList.TEMP.AddMember("tVar2", SimaticDataType.BOOLEAN);
+            var createSafeFC = false;
+            if(createSafeFC)
+            {
+                attributeList.ProgrammingLanguage = SimaticProgrammingLanguage.SAFE_LADDER;
+            }
 
-var compileUnit = fc.AddCompileUnit();
+            //While creating a variable, you need to select the Section first (They are stored inside the attribute list).
+            //INPUT - Use for BlockFC / BlockFB
+            //OUTPUT - Use for BlockFC / BlockFB
+            //INOUT - Use for BlockFC / BlockFB
+            //STATIC - Use for BlockFB / BlockDB / BlockInstanceDB
+            //TEMP - Use for BlockFC / BlockFB
+            //CONSTANT - Use for BlockFC / BlockFB
+            //RETURN - Use for BlockFC / BlockFB
+            //NONE - Use for BlockUDT
 
-//Create the parts that will form the compileUnit (Segment). Also add the operand of the part to the local variable created before.
-//A Part is everything that does something inside a segment (Contact, Coil, Block) that is not an FC/FB.
-var contact = new ContactPart(compileUnit) { Operand = new SimaticLocalVariable("tVar1") };
-var coil = new CoilPart(compileUnit) { Operand = new SimaticLocalVariable("tVar2") };
+            //Create some TEMP (Temporary) variables, to laser use for the contacts of the logic, beforehand.
+            var contactVariables = new List<SimaticVariable>();
+            for (int i = 0; i < 10; i++)
+            {
+                var var = attributeList.TEMP.AddVariable($"tContact{i}", SimaticDataType.BOOLEAN);
+                contactVariables.Add(var);
+            }
+            //Create some TEMP variables for the coils.
+            var coil1Var = attributeList.TEMP.AddVariable("tCoil1", SimaticDataType.BOOLEAN);
+            var coil2Var = attributeList.TEMP.AddVariable("tCoil2", SimaticDataType.BOOLEAN);
 
-//Create the connections between the parts
-// |
-// | --- || --- () 
-// |
-var _ = compileUnit.Powerrail & contact & coil; //Create a AND connection between all the parts.
+            //Create the parts that will form the compileUnit (Segment). While creating them, associate them with the previous create variables.
+            //A Part is everything that does something inside a segment (Contact, Coil, Block) that is not a call for an FC/FB.
+            var contactParts = new ContactPart[10];
+            for (int i = 0; i < 10; i++)
+            {
+                contactParts[i] = new ContactPart() { Operand = contactVariables[i] };
+            }
+            var coil1 = new CoilPart() { Operand = coil1Var };
+            var coil2 = new CoilPart() { Operand = coil2Var };
 
-//Update all internal ID and UID of the block.
-fc.UpdateID_UId(new IDGenerator());
+            //Create the segment. For now, only ladder segments are *still partially* implemented.
+            var segment = new SimaticLADSegment();
+            segment.Title[CultureInfo.CurrentCulture] = "Segment Title!";
+            segment.Comment[CultureInfo.CurrentCulture] = "Segment Comment! Much information here ...";
 
-//Create skeleton for the XML Document and add the FC to it.
-var xmlDocument = SimaticMLAPI.CreateDocument(fc);
+            //Create the connections between the parts
+            //Brackets are important! C# will prioritize & to |, so the logic might break if not using them!
+            var _ = segment.Powerrail & (contactParts[0] & (((contactParts[1] | contactParts[2]) & (contactParts[3] | contactParts[4])) | (contactParts[5] & contactParts[6])) & (contactParts[7] | contactParts[8]) | contactParts[9]) & coil1 & coil2;
 
-//Save the file.
-xmlDocument.Save(Directory.GetCurrentDirectory() + "/fc.xml");
+            //This will add the segment to the Block.
+            segment.Create(fc);
+
+            //Create skeleton for the XML Document and add the FC to it.
+            var xmlDocument = SimaticMLAPI.CreateDocument(fc);
+
+            var result = NativeFileDialogCore.Dialog.FileSave(".xml");
+            if (result.IsOk)
+            {
+                var path = result.Path;
+                if (string.IsNullOrEmpty(path))
+                {
+                    return;
+                }
+                //Save the file.
+                xmlDocument.Save(path);
+            }
 ```
-![image](https://github.com/Parozzz/TiaUtilities/assets/29524775/4c149485-f08a-46ed-a8b5-f24a3c973e0f)
+![image](https://github.com/user-attachments/assets/e6007aa7-04d4-4cd7-b3ed-b7f147c30743)
 
 ### Mentions
 - FastColoredTextBox (For JS Editor) - https://github.com/PavelTorgashov/FastColoredTextBox
