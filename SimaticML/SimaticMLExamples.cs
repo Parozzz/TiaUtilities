@@ -41,10 +41,6 @@ namespace SimaticML
             var coil1Var = attributeList.TEMP.AddVariable("tCoil1", SimaticDataType.BOOLEAN);
             var coil2Var = attributeList.TEMP.AddVariable("tCoil2", SimaticDataType.BOOLEAN);
 
-            var segment = new SimaticLADSegment();
-            segment.Title[CultureInfo.CurrentCulture] = "Segment Title!";
-            segment.Comment[CultureInfo.CurrentCulture] = "Segment Comment! Much information here ...";
-
             //Create the parts that will form the compileUnit (Segment). While creating them, associate them with the previous create variables.
             //A Part is everything that does something inside a segment (Contact, Coil, Block) that is not a call for an FC/FB.
             var contactParts = new ContactPart[10];
@@ -54,6 +50,11 @@ namespace SimaticML
             }
             var coil1 = new CoilPart() { Operand = coil1Var };
             var coil2 = new CoilPart() { Operand = coil2Var };
+
+            //Create the segment. For now, only ladder segments are *still partially* implemented.
+            var segment = new SimaticLADSegment();
+            segment.Title[CultureInfo.CurrentCulture] = "Segment Title!";
+            segment.Comment[CultureInfo.CurrentCulture] = "Segment Comment! Much information here ...";
 
             //Create the connections between the parts
             //Brackets are important! C# will prioritize & to |, so the logic might break if not using them!
