@@ -191,7 +191,6 @@
             sampleXMLMenuItem.Name = "sampleXMLMenuItem";
             sampleXMLMenuItem.Size = new Size(188, 26);
             sampleXMLMenuItem.Text = "Sample XML";
-            sampleXMLMenuItem.Click += SampleXMLMenuItem_Click;
             // 
             // testProjectMenuItem
             // 

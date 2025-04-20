@@ -20,6 +20,12 @@ namespace SimaticML
             attributeList.BlockNumber = 123;
             attributeList.ProgrammingLanguage = SimaticProgrammingLanguage.LADDER;
 
+            var createSafeFC = false;
+            if(createSafeFC)
+            {
+                attributeList.ProgrammingLanguage = SimaticProgrammingLanguage.SAFE_LADDER;
+            }
+
             //While creating a variable, you need to select the Section first (They are stored inside the attribute list).
             //INPUT - Use for BlockFC / BlockFB
             //OUTPUT - Use for BlockFC / BlockFB
@@ -94,17 +100,26 @@ namespace SimaticML
 
             //If you want to create a SAFE DB, set the programming language to SAFE_DB (As below)
             //Remember that while creating a safety block, you will have limited data types and cannot use them all :)
-            var createSafeDB = false;
-            if(createSafeDB)
-            {
-                attributeList.ProgrammingLanguage = SimaticProgrammingLanguage.SAFE_DB;
-            }
 
             //Create some STATIC variables. BlockGlobalDB only allows to add to STATIC.
             //You could use the create variables inside a segment and will directly reference this created DB.
-            var lword = attributeList.STATIC.AddVariable("LWORD_1", SimaticDataType.LWORD);
-            var int1 = attributeList.STATIC.AddVariable("INT_1", SimaticDataType.INT);
-            var real1 = attributeList.STATIC.AddVariable("REAL_1", SimaticDataType.REAL);
+            var createSafeDB = true;
+            if(createSafeDB)
+            {
+                attributeList.ProgrammingLanguage = SimaticProgrammingLanguage.SAFE_DB;
+
+                var bool1 = attributeList.STATIC.AddVariable("BOOL_1", SimaticDataType.BOOLEAN);
+                var int1 = attributeList.STATIC.AddVariable("INT_1", SimaticDataType.INT);
+                var word1 = attributeList.STATIC.AddVariable("WORD_1", SimaticDataType.WORD);
+            }
+            else
+            {
+                var lword = attributeList.STATIC.AddVariable("LWORD_1", SimaticDataType.LWORD);
+                var int1 = attributeList.STATIC.AddVariable("INT_1", SimaticDataType.INT);
+                var real1 = attributeList.STATIC.AddVariable("REAL_1", SimaticDataType.REAL);
+            }
+
+
 
             //Create skeleton for the XML Document and add the FC to it.
             var xmlDocument = SimaticMLAPI.CreateDocument(db);

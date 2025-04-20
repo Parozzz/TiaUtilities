@@ -7,6 +7,7 @@ namespace SimaticML.XMLClasses
         public string NamespaceURI { get; init; }
         public bool Parsed { get; private set; }
         protected override string XmlValue { get => this.innerText; set => this.innerText = value; }
+        public Func<bool>? CanBeGeneratedFunc { get; init; }
 
         protected XmlElement? xmlElement;
 
@@ -20,6 +21,7 @@ namespace SimaticML.XMLClasses
         protected readonly List<XmlAttribute> parseUnkownAttributes;
 
         private string innerText;
+
 
         public XmlNodeConfiguration(string name, bool required = false, string namespaceURI = "", string defaultInnerText = "") : base(name, required)
         {
@@ -62,6 +64,14 @@ namespace SimaticML.XMLClasses
         public XmlNodeConfiguration AddNode(string name, bool required = false, string namespaceURI = "", string defaultInnerText = "")
         {
             return AddNode(new XmlNodeConfiguration(name, required, namespaceURI, defaultInnerText));
+        }
+
+        public XmlNodeConfiguration AddNodeWithFunc(string name, Func<bool> canBeGeneratedFunc, bool required = false, string namespaceURI = "", string defaultInnerText = "")
+        {
+            return AddNode(new XmlNodeConfiguration(name, required, namespaceURI, defaultInnerText)
+            {
+                CanBeGeneratedFunc = canBeGeneratedFunc
+            });
         }
 
         public XmlNodeListConfiguration<T> AddNodeList<T>(string name, Func<XmlNode, T?> creationFunction, bool required = false, string namespaceURI = "", string defaultInnerText = "") where T : XmlNodeConfiguration
@@ -215,10 +225,14 @@ namespace SimaticML.XMLClasses
             childConfigList.AddRange(unkownChilds); //UNKNOWN CHILDS
             foreach (var childConfig in childConfigList)
             {
-                var childXmlElement = childConfig.Generate(document);
-                if (childXmlElement != null)
+                var func = childConfig.CanBeGeneratedFunc;
+                if (func == null || func())
                 {
-                    xmlElement.AppendChild(childXmlElement);
+                    var childXmlElement = childConfig.Generate(document);
+                    if (childXmlElement != null)
+                    {
+                        xmlElement.AppendChild(childXmlElement);
+                    }
                 }
             }
 

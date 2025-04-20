@@ -45,6 +45,12 @@ namespace TiaXmlReader
 
         private void Init()
         {
+            this.sampleXMLMenuItem.Click += (sender, args) =>
+            {
+                SimaticMLExamples.CreateFCExample();
+                SimaticMLExamples.CreateGlobalDBExample();
+            };
+
             var ignoreSettingsAtStartup = true;
 
             LogHandler.INSTANCE.Init();

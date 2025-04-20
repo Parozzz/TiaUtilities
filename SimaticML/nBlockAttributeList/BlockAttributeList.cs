@@ -88,31 +88,23 @@ namespace SimaticML.nBlockAttributeList
             headerFamily = this.AddNode("HeaderFamily");
             headerName = this.AddNode("HeaderName");
             headerVersion = this.AddNode("HeaderVersion");
-
-            if(!isUDT)
-            {
-                autoNumber = this.AddNode("AutoNumber");
-                instanceOfName = this.AddNode("InstanceOfName");
-                instanceOfType = this.AddNode("InstanceOfType");
-            }
-
+            autoNumber = this.AddNodeWithFunc("AutoNumber", () => !isUDT);
+            instanceOfName = this.AddNodeWithFunc("InstanceOfName", () => !isUDT);
+            instanceOfType = this.AddNodeWithFunc("InstanceOfType", () => !isUDT);
             blockInterface = this.AddNode("Interface", required: true);
             blockSections = blockInterface.AddNodeList("Sections", this.CreateSection, required: true, namespaceURI: SimaticMLAPI.GET_SECTIONS_NAMESPACE());
 
-            if(!isUDT)
-            {
-                secondaryType = this.AddNode("SecondaryType");
-                assignedProDiagFB = this.AddNode("AssignedProDiagFB");
-                supervisions = this.AddNode("Supervisions");
-                isOnlyStoredInLoadMemory = this.AddNode("IsOnlyStoredInLoadMemory");
-                isWriteProtectedInAS = this.AddNode("IsWriteProtectedInAS");
-                isRetainMemResEnabled = this.AddNode("IsRetainMemResEnabled");
-                isIECCheckEnabled = this.AddNode("IsIECCheckEnabled");
-                memoryLayout = this.AddNode("MemoryLayout");
-                memoryReserve = this.AddNode("MemoryReserve");
-                retainMemoryReserve = this.AddNode("RetainMemoryReserve");
-                parameterPassing = this.AddNode("ParameterPassing");
-            }
+            secondaryType = this.AddNodeWithFunc("SecondaryType", () => !isUDT);
+            assignedProDiagFB = this.AddNodeWithFunc("AssignedProDiagFB", () => !isUDT);
+            supervisions = this.AddNodeWithFunc("Supervisions", () => !isUDT);
+            isOnlyStoredInLoadMemory = this.AddNodeWithFunc("IsOnlyStoredInLoadMemory", () => !isUDT);
+            isWriteProtectedInAS = this.AddNodeWithFunc("IsWriteProtectedInAS", () => !isUDT);
+            isRetainMemResEnabled = this.AddNodeWithFunc("IsRetainMemResEnabled", () => !isUDT);
+            isIECCheckEnabled = this.AddNodeWithFunc("IsIECCheckEnabled", () => !isUDT);
+            memoryLayout = this.AddNodeWithFunc("MemoryLayout", () => !isUDT);
+            memoryReserve = this.AddNodeWithFunc("MemoryReserve", () => !isUDT && !IsSafe());
+            retainMemoryReserve = this.AddNodeWithFunc("RetainMemoryReserve", () => !isUDT && !IsSafe());
+            parameterPassing = this.AddNodeWithFunc("ParameterPassing", () => !isUDT);
 
             blockName = this.AddNode("Name", required: true, defaultInnerText: "fcTest");
             if (SimaticMLAPI.TIA_VERSION >= 18)
@@ -120,12 +112,9 @@ namespace SimaticML.nBlockAttributeList
                 this.AddNode("Namespace", required: true);
             }
 
-            if(!isUDT)
-            {
-                blockNumber = this.AddNode("Number", required: true, defaultInnerText: "1");
-                programmingLanguage = this.AddNode("ProgrammingLanguage", required: true, defaultInnerText: "LAD");
-                setENOAutomatically = this.AddNode("SetENOAutomatically");
-            }
+            blockNumber = this.AddNodeWithFunc("Number", () => !isUDT, required: true, defaultInnerText: "1");
+            programmingLanguage = this.AddNodeWithFunc("ProgrammingLanguage", () => !isUDT, required: true, defaultInnerText: "LAD");
+            setENOAutomatically = this.AddNodeWithFunc("SetENOAutomatically", () => !isUDT && !IsSafe());
             libraryConformanceStatus = this.AddNode("LibraryConformanceStatus");
             udaBlockProperties = this.AddNode("UDABlockProperties");
             udaEnableTagReadback = this.AddNode("UDAEnableTagReadback");
@@ -155,6 +144,13 @@ namespace SimaticML.nBlockAttributeList
         public ICollection<Section> GetBlockSections()
         {
             return blockSections.GetItems();
+        }
+
+        private bool IsSafe()
+        {
+            return this.ProgrammingLanguage == SimaticProgrammingLanguage.SAFE_LADDER
+            || this.ProgrammingLanguage == SimaticProgrammingLanguage.SAFE_FBD
+            || this.ProgrammingLanguage == SimaticProgrammingLanguage.SAFE_DB;
         }
     }
 }
