@@ -79,10 +79,17 @@ namespace SimaticML.Blocks
             objectList.GetItems().Add(comment);
             return comment;
         }
-
-        public CompileUnit AddCompileUnit()
+        public SimaticProgrammingLanguage GetProgrammingLanguage()
         {
-            var compileUnit = new CompileUnit();
+            return this.blockAttributeList.ProgrammingLanguage;
+        }
+
+        public CompileUnit AddCompileUnit(SimaticProgrammingLanguage programmingLanguage)
+        {
+            var compileUnit = new CompileUnit()
+            {
+                ProgrammingLanguage = programmingLanguage
+            };
             objectList.GetItems().Add(compileUnit);
             return compileUnit;
         }

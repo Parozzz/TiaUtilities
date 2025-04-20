@@ -1,7 +1,10 @@
-﻿namespace SimaticML.Blocks
+﻿using SimaticML.Enums;
+
+namespace SimaticML.Blocks
 {
     public interface IProgramBlock
     {
-        public CompileUnit AddCompileUnit();
+        public SimaticProgrammingLanguage GetProgrammingLanguage();
+        public CompileUnit AddCompileUnit(SimaticProgrammingLanguage programmingLanguage);
     }
 }

@@ -1,9 +1,10 @@
 ﻿using SimaticML.Blocks;
 using SimaticML.Blocks.FlagNet.nPart;
+using SimaticML.Enums;
 
 namespace SimaticML.API
 {
-    public class SimaticLADSegment
+    public class SimaticLADSegment()
     {
         enum PartConnectionType
         {
@@ -24,26 +25,18 @@ namespace SimaticML.API
             public static SimaticPart operator &(PowerrailWire powerrail, SimaticPart partData) => powerrail.Add(partData);
         }
 
-        public PowerrailWire Powerrail { get; init; }
-        public SimaticMultilingualText Title { get; init; }
-        public SimaticMultilingualText Comment { get; init; }
+        public PowerrailWire Powerrail { get; init; } = new();
+        public SimaticMultilingualText Title { get; init; } = new();
+        public SimaticMultilingualText Comment { get; init; } = new();
 
-        private readonly List<SegmentPart> segmentParts;
-        public SimaticLADSegment()
-        {
-            this.Powerrail = new();
-            this.Title = new();
-            this.Comment = new();
-
-            this.segmentParts = [];
-        }
+        private readonly List<SegmentPart> segmentParts = [];
 
         public void Create(IProgramBlock programBlock)
         {
-            var compileUnit = programBlock.AddCompileUnit();
-            compileUnit.Init();
+            var isSafe = programBlock.GetProgrammingLanguage() == SimaticProgrammingLanguage.SAFE_LADDER;
 
-            compileUnit.ProgrammingLanguage = Enums.SimaticProgrammingLanguage.LADDER;
+            var compileUnit = programBlock.AddCompileUnit(isSafe ? SimaticProgrammingLanguage.SAFE_LADDER : SimaticProgrammingLanguage.LADDER);
+            compileUnit.Init();
 
             foreach (var entry in Title.GetDictionary())
             {
