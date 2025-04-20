@@ -91,6 +91,7 @@ using System.Diagnostics;
 */
 using System;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Windows.Forms;
 
@@ -98,6 +99,12 @@ namespace SpinAddin.Utility
 {
     public static class Util
     {
+        public static bool IsItalian()
+        {
+            return CultureInfo.InstalledUICulture.EnglishName.ToLowerInvariant().Contains("italy");
+        }
+
+
         public static Form CreateForm()
         {
             Form form = new Form { Opacity = 1, ShowIcon = true, TopMost = true, StartPosition = FormStartPosition.CenterScreen, WindowState = FormWindowState.Normal };

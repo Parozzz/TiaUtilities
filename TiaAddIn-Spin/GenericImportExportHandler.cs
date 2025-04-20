@@ -5,6 +5,7 @@ using Siemens.Engineering.SW.Blocks;
 using SpinAddin.Utility;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -32,7 +33,7 @@ namespace SpinAddIn
 
     public class GenericImportExportHandler<OBJ, GROUP> : SpinAddinMenuRegistrationService where OBJ : IEngineeringObject where GROUP : IEngineeringObject
     {
-        private readonly string descriptiveName;
+        private readonly string multipleDescriptiveName;
         private readonly Func<OBJ, ExportDelegate> exportDelegateFunction;
         private readonly Func<GROUP, string> groupNameFunction;
         private readonly Func<OBJ, string> objNameFunction;
@@ -40,7 +41,7 @@ namespace SpinAddIn
         private readonly Func<GROUP, IEnumerable<OBJ>> containedObjsFunction;
         private readonly Func<GROUP, IEnumerable<GROUP>> containedSubGroupsFunction;
         private readonly Predicate<ImportData<GROUP>> importPredicate;
-        public GenericImportExportHandler(string descriptiveName,
+        public GenericImportExportHandler(string multipleDescriptiveName,
             Func<OBJ, ExportDelegate> exportDelegateFunction,
             Func<GROUP, string> groupNameFunction,
             Func<OBJ, string> objNameFunction,
@@ -49,7 +50,7 @@ namespace SpinAddIn
             Func<GROUP, IEnumerable<GROUP>> containedSubGroupsFunction,
             Predicate<ImportData<GROUP>> importPredicate)
         {
-            this.descriptiveName = descriptiveName;
+            this.multipleDescriptiveName = multipleDescriptiveName;
             this.exportDelegateFunction = exportDelegateFunction;
             this.groupNameFunction = groupNameFunction;
             this.objNameFunction = objNameFunction;
@@ -61,19 +62,37 @@ namespace SpinAddIn
 
         public void Register(ContextMenuAddInRoot menuRoot)
         {
-            menuRoot.Items.AddActionItem<GROUP>($"Importa {descriptiveName} da file", ImportDescrete);
-            menuRoot.Items.AddActionItem<GROUP>($"Importa {descriptiveName} dalla cartella", ImportOnlyTopFolder);
-            menuRoot.Items.AddActionItem<GROUP>($"Importa {descriptiveName} dalla cartella (Comprese sottocartelle)", ImportAllSubFolders);
-            menuRoot.Items.AddActionItem<GROUP>($"Esporta {descriptiveName} nella cartella", ExportOnlySelectedFolder);
-            menuRoot.Items.AddActionItem<GROUP>($"Esporta {descriptiveName} nella cartella (Comprese Sottocartelle)", ExportAllFolders);
+            if (Util.IsItalian())
+            {
+                menuRoot.Items.AddActionItem<GROUP>($"Importa {multipleDescriptiveName} da file selezionati", ImportDescrete);
+                menuRoot.Items.AddActionItem<GROUP>($"Importa {multipleDescriptiveName} dalle cartelle selezionata", ImportOnlyTopFolder);
+                menuRoot.Items.AddActionItem<GROUP>($"Importa {multipleDescriptiveName} dalla cartella selezionata (Incluse sottocartelle)", ImportAllSubFolders);
+                menuRoot.Items.AddActionItem<GROUP>($"Esporta {multipleDescriptiveName} nella cartella selezionata", ExportOnlySelectedFolder);
+                menuRoot.Items.AddActionItem<GROUP>($"Esporta {multipleDescriptiveName} nella cartella selezionata (Comprese sotto-cartelle)", ExportAllFolders);
 
-            menuRoot.Items.AddActionItem<OBJ>($"Copia tutti i nomi dei {descriptiveName} selezionati", CopyAllSelectedNamesToClipboard);
-            menuRoot.Items.AddActionItem<OBJ>($"Sostituisci tutti i nomi dei {descriptiveName} selezionati", ChangeAllSelectedNames);
-            menuRoot.Items.AddActionItem<OBJ>($"Esporta {descriptiveName} singolarmente", ExportDescrete);
-            menuRoot.Items.AddActionItem<OBJ>($"Esporta {descriptiveName} selez. su cartella", ExportAllToFolder);
-            menuRoot.Items.AddActionItem<OBJ>($"Importa {descriptiveName}", ImportDescrete);
-            menuRoot.Items.AddActionItem<OBJ>($"Importa Cartella", ImportOnlyTopFolder);
-            menuRoot.Items.AddActionItem<OBJ>($"Importa Cartella (comprese sottocartelle)", ImportAllSubFolders);
+                menuRoot.Items.AddActionItem<OBJ>($"Copia tutti i nomi dei {multipleDescriptiveName} selezionati", CopyAllSelectedNamesToClipboard);
+                menuRoot.Items.AddActionItem<OBJ>($"Sostituisci tutti i nomi dei {multipleDescriptiveName} selezionati", ChangeAllSelectedNames);
+                menuRoot.Items.AddActionItem<OBJ>($"Esporta {multipleDescriptiveName} selez. su cartella", ExportAllToFolder);
+                menuRoot.Items.AddActionItem<OBJ>($"Importa {multipleDescriptiveName}", ImportDescrete);
+                menuRoot.Items.AddActionItem<OBJ>($"Importa {multipleDescriptiveName} da cartella", ImportOnlyTopFolder);
+                menuRoot.Items.AddActionItem<OBJ>($"Importa {multipleDescriptiveName} da cartella (comprese sotto-cartelle)", ImportAllSubFolders);
+            }
+            else
+            {
+                menuRoot.Items.AddActionItem<GROUP>($"Import {multipleDescriptiveName} from selected file(s)", ImportDescrete);
+                menuRoot.Items.AddActionItem<GROUP>($"Import {multipleDescriptiveName} from selected folder(s)", ImportOnlyTopFolder);
+                menuRoot.Items.AddActionItem<GROUP>($"Import {multipleDescriptiveName} from selected folder (Including sub-folders)", ImportAllSubFolders);
+                menuRoot.Items.AddActionItem<GROUP>($"Export all {multipleDescriptiveName} inside selected folder", ExportOnlySelectedFolder);
+                menuRoot.Items.AddActionItem<GROUP>($"Export {multipleDescriptiveName} inside selected folder (Including sub-folders)", ExportAllFolders);
+
+                menuRoot.Items.AddActionItem<OBJ>($"Copy the names of all selected {multipleDescriptiveName}", CopyAllSelectedNamesToClipboard);
+                menuRoot.Items.AddActionItem<OBJ>($"Replace all the names of selected {multipleDescriptiveName}", ChangeAllSelectedNames);
+                menuRoot.Items.AddActionItem<OBJ>($"Import {multipleDescriptiveName}", ImportDescrete);
+                menuRoot.Items.AddActionItem<OBJ>($"Import all {multipleDescriptiveName} from folder", ImportOnlyTopFolder);
+                menuRoot.Items.AddActionItem<OBJ>($"Import all {multipleDescriptiveName} from folder (Including sub-folder)", ImportAllSubFolders);
+                menuRoot.Items.AddActionItem<OBJ>($"Export all selected {multipleDescriptiveName} in folder", ExportAllToFolder);
+            }
+
         }
 
         private void ExportOnlySelectedFolder(MenuSelectionProvider selectionProvider)
@@ -126,32 +145,6 @@ namespace SpinAddIn
                 }
             }
 
-        }
-
-        private void ExportDescrete(MenuSelectionProvider selectionProvider)
-        {
-            foreach (OBJ obj in selectionProvider.GetSelection())
-            {
-                var fileDialog = new OpenFileDialog()
-                {
-                    Filter = "xml files (*.xml)|*.xml",
-                    CheckFileExists = false,
-                    CheckPathExists = false,
-                    Multiselect = false,
-                    Title = "Export " + descriptiveName + " " + objNameFunction(obj),
-                    ShowHelp = true,
-                    FileName = objNameFunction(obj)
-                };
-
-                if (fileDialog.ShowDialog(Util.CreateForm()) == DialogResult.OK)
-                {
-                    var exportSuccessful = ExportSingle(obj, fileDialog.FileName);
-                    if (!exportSuccessful)
-                    {
-                        return;
-                    }
-                }
-            }
         }
 
         private void ExportAllToFolder(MenuSelectionProvider selectionProvider)

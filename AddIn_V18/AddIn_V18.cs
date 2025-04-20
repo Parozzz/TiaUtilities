@@ -1,6 +1,7 @@
 ﻿using Siemens.Engineering;
 using Siemens.Engineering.AddIn.Menu;
 using Siemens.Engineering.Hmi.Screen;
+using Siemens.Engineering.Hmi.Tag;
 using Siemens.Engineering.SW.Blocks;
 using Siemens.Engineering.SW.Tags;
 using Siemens.Engineering.SW.Types;
@@ -8,6 +9,7 @@ using Siemens.Engineering.SW.WatchAndForceTables;
 using SpinAddin.Utility;
 using SpinAddIn;
 using System;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 
@@ -37,29 +39,38 @@ namespace AddIn_V18
             var logDirectoryPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "TIA Add-Ins", assemblyName.Name, assemblyName.Version.ToString(), "Logs");
             var logDirectory = Directory.CreateDirectory(logDirectoryPath);
             _traceFilePath = Path.Combine(logDirectory.FullName, string.Concat(DateTime.Now.ToString("yyyyMMdd_HHmmss"), ".txt"));
+            
+            var isItalian = Util.IsItalian();
 
-            var plcBlockHandler = new GenericImportExportHandler<PlcBlock, PlcBlockGroup>("Blocchi",
-                plcBlock => plcBlock.Export,
-                group => group.Name,
-                plcBlock => plcBlock.Name,
-                plcBlock => (PlcBlockGroup)plcBlock.Parent,
-                group => group.Blocks,
-                group => group.Groups,
-                importData =>
+            var blockName = isItalian ? "blocchi" : "blocks";
+            var plcTagName = isItalian ? "tags" : "tags";
+            var udtName = isItalian ? "udt" : "udt";
+            var watchTableName = isItalian ? "VAT" : "watch tables";
+            var hmiScreenName = isItalian ? "schermate" : "screens";
+            var hmiVariablesName = isItalian ? "variabili" : "variables";
+
+            var plcBlockHandler = new GenericImportExportHandler<PlcBlock, PlcBlockGroup>(blockName,
+            plcBlock => plcBlock.Export,
+            group => group.Name,
+            plcBlock => plcBlock.Name,
+            plcBlock => (PlcBlockGroup)plcBlock.Parent,
+            group => group.Blocks,
+            group => group.Groups,
+            importData =>
+            {
+                try
                 {
-                    try
-                    {
-                        importData.group.Blocks.Import(importData.fileInfo, importData.importOptions, importData.swImportOptions);
-                        return true;
-                    }
-                    catch (Exception ex)
-                    {
-                        return Util.ShowExceptionMessage(ex); //Return false if the message box is cancelled
-                    }
-                });
+                    importData.group.Blocks.Import(importData.fileInfo, importData.importOptions, importData.swImportOptions);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    return Util.ShowExceptionMessage(ex); //Return false if the message box is cancelled
+                }
+            });
             this.plcBlockHandler = plcBlockHandler;
 
-            var plcTagTableHandler = new GenericImportExportHandler<PlcTagTable, PlcTagTableGroup>("Tags",
+            var plcTagTableHandler = new GenericImportExportHandler<PlcTagTable, PlcTagTableGroup>(plcTagName,
                 plcTagTable => plcTagTable.Export,
                 group => group.Name,
                 plcTagTable => plcTagTable.Name,
@@ -80,7 +91,7 @@ namespace AddIn_V18
                 });
             this.plcTagTableHandler = plcTagTableHandler;
 
-            var plcUDTHandler = new GenericImportExportHandler<PlcType, PlcTypeGroup>("UDT",
+            var plcUDTHandler = new GenericImportExportHandler<PlcType, PlcTypeGroup>(udtName,
                 plcType => plcType.Export,
                 group => group.Name,
                 plcType => plcType.Name,
@@ -101,7 +112,7 @@ namespace AddIn_V18
                 });
             this.plcUDTHandler = plcUDTHandler;
 
-            var plcWatchtableHandler = new GenericImportExportHandler<PlcWatchTable, PlcWatchAndForceTableGroup>("VAT",
+            var plcWatchtableHandler = new GenericImportExportHandler<PlcWatchTable, PlcWatchAndForceTableGroup>(watchTableName,
                 plcWatchTable => plcWatchTable.Export,
                 group => group.Name,
                 plcWatchTable => plcWatchTable.Name,
@@ -122,7 +133,9 @@ namespace AddIn_V18
                 });
             this.plcWatchtableHandler = plcWatchtableHandler;
 
-            var hmiScreenHandler = new GenericImportExportHandler<Screen, ScreenFolder>(descriptiveName: "HMI Screen",
+            plcSoftwareHandler = new PlcSoftwareHandler(plcBlockHandler, plcTagTableHandler, plcUDTHandler, plcWatchtableHandler);
+
+            var hmiScreenHandler = new GenericImportExportHandler<Screen, ScreenFolder>(hmiScreenName,
                 exportDelegateFunction: plcWatchTable => plcWatchTable.Export,
                 groupNameFunction: group => group.Name,
                 objNameFunction: plcWatchTable => plcWatchTable.Name,
@@ -143,7 +156,7 @@ namespace AddIn_V18
                 });
             this.hmiScreenHandler = hmiScreenHandler;
 
-            var hmiVariableHandler = new GenericImportExportHandler<Siemens.Engineering.Hmi.Tag.TagTable, Siemens.Engineering.Hmi.Tag.TagFolder>(descriptiveName: "HMI Variable",
+            var hmiVariableHandler = new GenericImportExportHandler<TagTable, TagFolder>(hmiVariablesName,
                 exportDelegateFunction: plcWatchTable => plcWatchTable.Export,
                 groupNameFunction: group => group.Name,
                 objNameFunction: plcWatchTable => plcWatchTable.Name,
