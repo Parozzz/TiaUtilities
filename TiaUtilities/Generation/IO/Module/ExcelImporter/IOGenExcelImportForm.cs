@@ -22,6 +22,7 @@ namespace TiaUtilities.Generation.GenModules.IO.ExcelImporter
     {
         public const string ROW_SPECIAL_CHAR = "$";
 
+        private readonly JavascriptErrorReportThread jsErrorThread;
         private readonly IOExcelImportConfiguration importConfig;
         private readonly GridHandler<IOGenExcelImportData> gridHandler;
 
@@ -31,6 +32,7 @@ namespace TiaUtilities.Generation.GenModules.IO.ExcelImporter
         {
             InitializeComponent();
 
+            this.jsErrorThread = gridBindContainer.GridScriptHandler.JSErrorThread;
             this.importConfig = configuration;
             this.gridHandler = new(gridSettings, gridBindContainer, new(), new()) { RowCount = 1999 };
 
@@ -81,7 +83,7 @@ namespace TiaUtilities.Generation.GenModules.IO.ExcelImporter
 
             this.configButton.Click += (sender, args) =>
             {
-                var configForm = new ConfigForm(Locale.GENERICS_CONFIGURATION) { ControlWidth = 500 };
+                var configForm = new ConfigForm(Locale.GENERICS_CONFIGURATION) { ControlWidth = 500, CloseOnEnter = false };
                 configForm.SetConfiguration(this.importConfig, MainForm.Settings.PresetIOExcelImportConfiguration);
 
                 var mainGroup = configForm.Init();
@@ -89,7 +91,10 @@ namespace TiaUtilities.Generation.GenModules.IO.ExcelImporter
                 mainGroup.AddTextBox().Label(Locale.IO_GEN_EXCELIMPORT_IO_NAME).BindText(() => importConfig.IONameCellConfig);
                 mainGroup.AddTextBox().Label(Locale.GENERICS_COMMENT).BindText(() => importConfig.CommentCellConfig);
                 mainGroup.AddTextBox().Label(Locale.IO_GEN_EXCELIMPORT_STARTING_ROW).BindUInt(() => importConfig.StartingRow);
-                mainGroup.AddJavascript().Label(Locale.IO_GEN_EXCELIMPORT_EXPRESSION).BindText(() => importConfig.IgnoreRowExpressionConfig).Height(200);
+                mainGroup.AddJavascript().Label(Locale.IO_GEN_EXCELIMPORT_EXPRESSION)
+                                            .BindText(() => importConfig.IgnoreRowExpressionConfig)
+                                            .Height(200)
+                                            .RegisterErrorThreadWithForm(jsErrorThread, configForm);
 
                 configForm.StartShowingAtControl(this.configButton);
                 configForm.Init();
@@ -152,10 +157,10 @@ namespace TiaUtilities.Generation.GenModules.IO.ExcelImporter
                 var importDataList = new List<IOGenExcelImportData>();
 
                 var usedRows = worksheet.RowsUsed();
-                foreach(var row in usedRows)
+                foreach (var row in usedRows)
                 {
                     var rowNumber = row.RowNumber();
-                    if(rowNumber < this.importConfig.StartingRow)
+                    if (rowNumber < this.importConfig.StartingRow)
                     {
                         continue;
                     }

@@ -68,6 +68,13 @@ namespace TiaUtilities.Generation.Configuration.Lines
             transferToOtherTextAction?.Invoke();
         }
 
+        public ConfigJavascriptLine RegisterErrorThreadWithForm(JavascriptErrorReportThread jsErrorThread, Form form)
+        {
+            this.jsFCTB.RegisterErrorReport(jsErrorThread);
+            form.FormClosing += (sender, args) => this.jsFCTB.UnregisterErrorReport(jsErrorThread);
+            return this;
+        }
+
         public JavascriptEditor GetJavascriptFCTB()
         {
             return jsFCTB;

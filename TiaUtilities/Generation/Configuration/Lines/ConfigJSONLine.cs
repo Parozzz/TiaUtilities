@@ -1,5 +1,8 @@
 ﻿using FastColoredTextBoxNS;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Schema;
 using System.Linq.Expressions;
+using System.Text.Json;
 using TiaUtilities.Generation.Configuration.Utility;
 using TiaXmlReader.Generation.Configuration;
 
@@ -92,6 +95,25 @@ namespace TiaUtilities.Generation.Configuration.Lines
         public override void TrasferToAllConfigurations()
         {
             transferToOtherTextAction?.Invoke();
+        }
+
+        public ConfigJSONLine RegisterLinter(Form form)
+        {
+            System.Windows.Forms.Timer timer = new() { Interval = 500 };
+            timer.Tick += (sender, args) =>
+            {
+                try
+                {
+                    var jsonDocument = JsonDocument.Parse(this.control.Text);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"{ex.GetType().Name}, {ex.Message}");
+                }
+            };
+            timer.Start();
+            form.FormClosing += (sender, args) => timer.Stop();
+            return this;
         }
 
         public override Control GetControl()

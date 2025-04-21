@@ -169,7 +169,7 @@ namespace TiaUtilities.Generation.GenModules.Alarm.Tab
 
                     var mainGroup = configForm.Init().ControlWidth(600);
                     mainGroup.AddLabel().Label("Custom Placeholders JSON object");
-                    mainGroup.AddJSON().Height(500).BindText(() => tabConfig.CustomPlaceholdersJSON);
+                    mainGroup.AddJSON().Height(500).BindText(() => tabConfig.CustomPlaceholdersJSON).RegisterLinter(configForm);
 
                     SetupConfigForm(button, configForm);
                 };
