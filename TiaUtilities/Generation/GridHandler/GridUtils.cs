@@ -125,6 +125,8 @@ namespace TiaXmlReader.Generation.GridHandler
                     clipboardText += stringValue;
                 }
 
+                clipboardText += "\r\n"; //Add since some software requires it.
+
                 //The clipboard cannot have an empty string as text
                 if (string.IsNullOrEmpty(clipboardText))
                 {
