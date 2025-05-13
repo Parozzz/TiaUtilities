@@ -1,10 +1,8 @@
 ﻿using Newtonsoft.Json;
 using TiaUtilities.Configuration;
 using TiaUtilities.Languages;
-using TiaXmlReader.Generation.Placeholders;
-using TiaXmlReader.Languages;
 
-namespace TiaXmlReader.Generation.Alarms
+namespace TiaUtilities.Generation.Alarms
 {
     public enum AlarmGroupingType
     {
@@ -48,19 +46,19 @@ namespace TiaXmlReader.Generation.Alarms
             this.FCBlockName = "fcAlarmGeneration";
             this.FCBlockNumber = 100;
 
-            this.UDTBlockName = $"UdtAlm_{GenPlaceholders.Generation.TAB_NAME}";
+            this.UDTBlockName = $"UdtAlm_{TiaUtilities.Generation.Placeholders.Generation.TAB_NAME}";
             this.AlarmNumFormat = "000.###";
-            this.AlarmNameTemplate = $"Alm{GenPlaceholders.Alarms.ALARM_NUM}";
-            this.AlarmCommentTemplate = $"Alm{GenPlaceholders.Alarms.ALARM_NUM} - {GenPlaceholders.Alarms.DEVICE_NAME}: {GenPlaceholders.Alarms.ALARM_DESCRIPTION}";
-            this.AlarmCommentTemplateSpare = $"Alm{GenPlaceholders.Alarms.ALARM_NUM} - SPARE";
-            this.HmiNameTemplate = $"{GenPlaceholders.Generation.TAB_NAME}_Alm{GenPlaceholders.Alarms.ALARM_NUM}";
-            this.HmiTriggerTagTemplate = $"AlmAux_Mem{GenPlaceholders.Generation.TAB_NAME}";
+            this.AlarmNameTemplate = $"Alm{TiaUtilities.Generation.Placeholders.Alarms.ALARM_NUM}";
+            this.AlarmCommentTemplate = $"Alm{TiaUtilities.Generation.Placeholders.Alarms.ALARM_NUM} - {TiaUtilities.Generation.Placeholders.Alarms.DEVICE_NAME}: {TiaUtilities.Generation.Placeholders.Alarms.ALARM_DESCRIPTION}";
+            this.AlarmCommentTemplateSpare = $"Alm{TiaUtilities.Generation.Placeholders.Alarms.ALARM_NUM} - SPARE";
+            this.HmiNameTemplate = $"{TiaUtilities.Generation.Placeholders.Generation.TAB_NAME}_Alm{TiaUtilities.Generation.Placeholders.Alarms.ALARM_NUM}";
+            this.HmiTriggerTagTemplate = $"AlmAux_Mem{TiaUtilities.Generation.Placeholders.Generation.TAB_NAME}";
             this.HmiTriggerTagUseWordArray = true;
 
-            this.OneEachSegmentName = $"Alm{GenPlaceholders.Alarms.ALARM_NUM} - {GenPlaceholders.Alarms.DEVICE_DESCRIPTION} {GenPlaceholders.Alarms.ALARM_DESCRIPTION}";
-            this.OneEachEmptyAlarmSegmentName = $"Alm{GenPlaceholders.Alarms.ALARM_NUM} - SPARE";
-            this.GroupSegmentName = $"Alm{GenPlaceholders.Alarms.ALARM_NUM_START} ~ {GenPlaceholders.Alarms.ALARM_NUM_END} - {GenPlaceholders.Alarms.DEVICE_DESCRIPTION}";
-            this.GroupEmptyAlarmSegmentName = $"Alm{GenPlaceholders.Alarms.ALARM_NUM_START} ~ {GenPlaceholders.Alarms.ALARM_NUM_END} - SPARE";
+            this.OneEachSegmentName = $"Alm{TiaUtilities.Generation.Placeholders.Alarms.ALARM_NUM} - {TiaUtilities.Generation.Placeholders.Alarms.DEVICE_DESCRIPTION} {TiaUtilities.Generation.Placeholders.Alarms.ALARM_DESCRIPTION}";
+            this.OneEachEmptyAlarmSegmentName = $"Alm{TiaUtilities.Generation.Placeholders.Alarms.ALARM_NUM} - SPARE";
+            this.GroupSegmentName = $"Alm{TiaUtilities.Generation.Placeholders.Alarms.ALARM_NUM_START} ~ {TiaUtilities.Generation.Placeholders.Alarms.ALARM_NUM_END} - {TiaUtilities.Generation.Placeholders.Alarms.DEVICE_DESCRIPTION}";
+            this.GroupEmptyAlarmSegmentName = $"Alm{TiaUtilities.Generation.Placeholders.Alarms.ALARM_NUM_START} ~ {TiaUtilities.Generation.Placeholders.Alarms.ALARM_NUM_END} - SPARE";
 
             this.EnableCustomVariable = true;
             this.EnableTimer = true;

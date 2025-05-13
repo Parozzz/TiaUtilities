@@ -3,11 +3,9 @@ using FastColoredTextBoxNS;
 using InfoBox;
 using Jint;
 using Microsoft.WindowsAPICodePack.Dialogs;
-using TiaXmlReader.Generation.GridHandler.CustomColumns;
-using TiaXmlReader.Languages;
-using TiaXmlReader.Utility;
+using TiaUtilities.Utility;
 
-namespace TiaXmlReader
+namespace TiaUtilities
 {
     internal static class Program
     {
@@ -33,7 +31,7 @@ namespace TiaXmlReader
             {
                 AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
                 {
-                    if(args.ExceptionObject is Exception exception)
+                    if (args.ExceptionObject is Exception exception)
                     {
                         if (exception.Source == "Jint" || exception.Source == "Acornima")
                         {

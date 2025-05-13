@@ -1,8 +1,7 @@
 ﻿using FastColoredTextBoxNS;
-using TiaUtilities.Javascript.ErrorReporters;
-using TiaUtilities.Javascript.ErrorReporting;
+using TiaUtilities.Editors.ErrorReporting;
 
-namespace TiaUtilities.Javascript
+namespace TiaUtilities.Editors
 {
     public class JavascriptEditor
     {
@@ -69,7 +68,7 @@ namespace TiaUtilities.Javascript
             fctb.ToolTipNeeded += (sender, args) =>
             {
                 //This is checked since the VisualErrorHandler also handle stuff with tooltips to avoid problems.
-                if(!string.IsNullOrEmpty(args.ToolTipText) ||  !string.IsNullOrEmpty(args.ToolTipText))
+                if (!string.IsNullOrEmpty(args.ToolTipText) || !string.IsNullOrEmpty(args.ToolTipText))
                 {
                     return;
                 }

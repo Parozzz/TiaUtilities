@@ -1,4 +1,4 @@
-﻿namespace TiaUtilities.Generation.GenModules.IO.ExcelImporter
+﻿namespace TiaUtilities.Generation.IO.Module.ExcelImporter
 {
     partial class IOGenerationExcelImportForm
     {

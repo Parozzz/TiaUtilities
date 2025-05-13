@@ -1,9 +1,8 @@
 ﻿using InfoBox;
 using System.Data;
 using TiaUtilities.Generation.GridHandler.Binds;
+using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Languages;
-using TiaXmlReader.Generation.GridHandler;
-using TiaXmlReader.Generation.GridHandler.Data;
 
 namespace TiaUtilities.Generation.GridHandler
 {
@@ -39,14 +38,14 @@ namespace TiaUtilities.Generation.GridHandler
                 var addOK = this.AddSearchReplaceCellChange(findData);
                 this.handlerBInd.ApplyCachedCellChange();
 
-                if(addOK)
+                if (addOK)
                 {
                     this.TryFindText(startFromNextCell: true);
                 }
             };
             this.ReplaceAllButton.Click += (sender, args) =>
             {
-                if(this.handlerBInd == null)
+                if (this.handlerBInd == null)
                 {
                     return;
                 }
@@ -105,7 +104,7 @@ namespace TiaUtilities.Generation.GridHandler
             }
 
             var searchText = this.FindTextBox.Text;
-            if(string.IsNullOrEmpty(searchText))
+            if (string.IsNullOrEmpty(searchText))
             {
                 return false;
             }
@@ -121,7 +120,7 @@ namespace TiaUtilities.Generation.GridHandler
 
         private FindData? TryFindText(bool showInfoOnFail = true, bool startFromNextCell = true)
         {
-            if(this.handlerBInd == null)
+            if (this.handlerBInd == null)
             {
                 return null;
             }
@@ -136,9 +135,9 @@ namespace TiaUtilities.Generation.GridHandler
             var currentCell = this.handlerBInd.DataGridView.CurrentCell;
 
             var startRow = currentCell?.RowIndex ?? 0;
-            var startColumn = (currentCell?.ColumnIndex ?? 0); 
+            var startColumn = (currentCell?.ColumnIndex ?? 0);
 
-            if(startFromNextCell)
+            if (startFromNextCell)
             {
                 startColumn++;
                 if (startColumn >= this.handlerBInd.DataGridView.ColumnCount)
@@ -156,7 +155,7 @@ namespace TiaUtilities.Generation.GridHandler
                 var rowIndex = notEmptyRowIndexes.ElementAt(x);
 
                 var stringColumns = this.handlerBInd.DataColumns.Where(c => c.PropertyInfo.PropertyType == typeof(string));
-                if(x == 0)
+                if (x == 0)
                 { //Only for the starting row! From the second i want to check all columns.
                     stringColumns = stringColumns.Where(c => c.ColumnIndex >= startColumn);
                 }

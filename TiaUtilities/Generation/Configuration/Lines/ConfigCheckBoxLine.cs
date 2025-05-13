@@ -1,7 +1,6 @@
 ﻿using System.Linq.Expressions;
 using TiaUtilities.CustomControls;
 using TiaUtilities.Generation.Configuration.Utility;
-using TiaXmlReader.Generation.Configuration;
 
 namespace TiaUtilities.Generation.Configuration.Lines
 {

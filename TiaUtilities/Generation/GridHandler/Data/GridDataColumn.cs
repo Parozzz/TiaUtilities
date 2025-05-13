@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
-using TiaXmlReader.Languages;
-using TiaXmlReader.Utility;
+using TiaUtilities.Languages;
+using TiaUtilities.Utility;
 
-namespace TiaXmlReader.Generation.GridHandler.Data
+namespace TiaUtilities.Generation.GridHandler.Data
 {
     public class GridDataColumn(string name, string dataPropertyName, int columnIndex, PropertyInfo propertyInfo, string programmingFriendlyName)
     {
@@ -48,7 +48,7 @@ namespace TiaXmlReader.Generation.GridHandler.Data
 
         public V? GetValueFrom<V>(IGridData? gridData)
         {
-            if(gridData == null || PropertyInfo.DeclaringType != gridData.GetType())
+            if (gridData == null || PropertyInfo.DeclaringType != gridData.GetType())
             {
                 return default;
             }

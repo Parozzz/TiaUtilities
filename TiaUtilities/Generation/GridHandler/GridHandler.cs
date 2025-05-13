@@ -1,19 +1,16 @@
-﻿using TiaUtilities;
-using TiaUtilities.Generation.GridHandler;
-using TiaUtilities.Generation.GridHandler.Binds;
+﻿using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.CellPainters;
+using TiaUtilities.Generation.GridHandler.CustomColumns;
 using TiaUtilities.Generation.GridHandler.Data;
+using TiaUtilities.Generation.GridHandler.Events;
 using TiaUtilities.Generation.GridHandler.JSScript;
+using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Languages;
-using TiaXmlReader.Generation.GridHandler.CustomColumns;
-using TiaXmlReader.Generation.GridHandler.Data;
-using TiaXmlReader.Generation.GridHandler.Events;
-using TiaXmlReader.Generation.Placeholders;
-using TiaXmlReader.UndoRedo;
-using TiaXmlReader.Utility;
-using TiaXmlReader.Utility.Extensions;
+using TiaUtilities.UndoRedo;
+using TiaUtilities.Utility;
+using TiaUtilities.Utility.Extensions;
 
-namespace TiaXmlReader.Generation.GridHandler
+namespace TiaUtilities.Generation.GridHandler
 {
     public class GridHandler<T> : ICleanable, ISaveable<GridSave<T>> where T : IGridData
     {
@@ -55,7 +52,7 @@ namespace TiaXmlReader.Generation.GridHandler
         public bool EnableRowSelectionFromRowHeaderClick { get; set; } = true;
         public bool ShowJSContextMenuTopLeft { get; set; } = true;
 
-        public GridHandler(GridSettings settings, GridBindContainer gridBindFactory, GridDataPreviewer<T> previewer, 
+        public GridHandler(GridSettings settings, GridBindContainer gridBindFactory, GridDataPreviewer<T> previewer,
             GenPlaceholderHandler placeholderHandler, IGridRowComparer<T>? comparer = null)
         {
             this.DataGridView = new MyGrid();
@@ -415,10 +412,10 @@ namespace TiaXmlReader.Generation.GridHandler
         {
             this.DataGridView.SuspendLayout();
             this.DataGridView.Enabled = false;
-            
+
             this.undoRedoHandler.Clear();
             this.DataSource.LoadSave(gridSave.RowData);
-            
+
             this.DataGridView.Enabled = true;
             this.DataGridView.Refresh();
             this.DataGridView.ResumeLayout();
@@ -565,7 +562,7 @@ namespace TiaXmlReader.Generation.GridHandler
             {//This is required for some special actions! (Like arrows for Suggestions!)
                 if (column is IGridCustomColumn customColumn && customColumn.ProcessCmdKey(ref msg, keyData))
                 {
-                    return true; 
+                    return true;
                 }
             }
 

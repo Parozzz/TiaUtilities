@@ -1,9 +1,7 @@
-﻿using TiaUtilities.CustomControls;
-using TiaUtilities.Generation.Configuration;
-using TiaUtilities.Generation.Configuration.Lines;
+﻿using TiaUtilities.Generation.Configuration.Lines;
 using TiaUtilities.Languages;
 
-namespace TiaXmlReader.Generation.Configuration
+namespace TiaUtilities.Generation.Configuration
 {
     public class ConfigGroup(ConfigForm configForm) : IConfigGroup
     {

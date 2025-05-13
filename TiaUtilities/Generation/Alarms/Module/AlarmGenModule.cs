@@ -1,14 +1,9 @@
-﻿using TiaUtilities.Generation.Alarms.Module.Tab;
+﻿using TiaUtilities.Editors.ErrorReporting;
+using TiaUtilities.Generation.Alarms.Module.Tab;
 using TiaUtilities.Generation.Alarms.Module.Template;
-using TiaUtilities.Generation.GenModules;
-using TiaUtilities.Generation.GenModules.Alarm;
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.JSScript;
-using TiaUtilities.Javascript.ErrorReporting;
 using TiaUtilities.Languages;
-using TiaXmlReader;
-using TiaXmlReader.Generation;
-using TiaXmlReader.Generation.Alarms;
 
 namespace TiaUtilities.Generation.Alarms.Module
 {
@@ -61,7 +56,7 @@ namespace TiaUtilities.Generation.Alarms.Module
 
             form.Shown += (sender, args) =>
             {
-                if(this.control.tabControl.TabCount == 0)
+                if (this.control.tabControl.TabCount == 0)
                 { //Check required because Load could be called before form is shown!
                     TabPage tabPage = new();
                     TabCreation(tabPage);

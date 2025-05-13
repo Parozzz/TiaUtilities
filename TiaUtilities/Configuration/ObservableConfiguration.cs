@@ -2,7 +2,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using TiaXmlReader.Utility;
+using TiaUtilities.Utility;
 
 namespace TiaUtilities.Configuration
 {

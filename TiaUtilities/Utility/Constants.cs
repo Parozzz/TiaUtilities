@@ -1,4 +1,4 @@
-﻿namespace TiaXmlReader.Utility
+﻿namespace TiaUtilities.Utility
 {
     public static class Constants
     {

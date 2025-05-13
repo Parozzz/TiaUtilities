@@ -1,7 +1,5 @@
 ﻿using Newtonsoft.Json;
 using TiaUtilities.Configuration;
-using TiaXmlReader.Generation.Alarms;
-using TiaXmlReader.Generation.Placeholders;
 
 namespace TiaUtilities.Generation.Alarms
 {
@@ -60,17 +58,17 @@ namespace TiaUtilities.Generation.Alarms
             this.EmptyAlarmTimerType = "TON";
             this.EmptyAlarmTimerValue = "T#0s";
 
-            this.DefaultCustomVarAddress = $"Alm.Level[{GenPlaceholders.Alarms.ALARM_NUM}]";
+            this.DefaultCustomVarAddress = $"Alm.Level[{TiaUtilities.Generation.Placeholders.Alarms.ALARM_NUM}]";
             this.DefaultCustomVarValue = "0";
-            this.DefaultCoil1Address = $"Alm.Act.Alm{GenPlaceholders.Alarms.ALARM_NUM}";
+            this.DefaultCoil1Address = $"Alm.Act.Alm{TiaUtilities.Generation.Placeholders.Alarms.ALARM_NUM}";
             this.DefaultCoil1Type = AlarmCoilType.COIL;
-            this.DefaultCoil2Address = $"Alm.Mem.Alm{GenPlaceholders.Alarms.ALARM_NUM}";
+            this.DefaultCoil2Address = $"Alm.Mem.Alm{TiaUtilities.Generation.Placeholders.Alarms.ALARM_NUM}";
             this.DefaultCoil2Type = AlarmCoilType.SET;
             this.DefaultTimerAddress = "/";
             this.DefaultTimerType = "TON";
             this.DefaultTimerValue = "T#0s";
 
-            this.AlarmAddressPrefix = $"{GenPlaceholders.Alarms.DEVICE_NAME}.";
+            this.AlarmAddressPrefix = $"{TiaUtilities.Generation.Placeholders.Alarms.DEVICE_NAME}.";
             this.Coil1AddressPrefix = "";
             this.Coil2AddressPrefix = "";
             this.TimerAddressPrefix = "";

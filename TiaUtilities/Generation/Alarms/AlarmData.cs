@@ -1,10 +1,8 @@
 ﻿using Newtonsoft.Json;
+using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Languages;
-using TiaXmlReader.Generation.GridHandler.Data;
-using TiaXmlReader.Generation.Placeholders;
-using TiaXmlReader.Languages;
 
-namespace TiaXmlReader.Generation.Alarms
+namespace TiaUtilities.Generation.Alarms
 {
     public class AlarmData : IGridData
     {
@@ -62,7 +60,7 @@ namespace TiaXmlReader.Generation.Alarms
         [JsonProperty][Locale(nameof(Locale.ALARM_DATA_TIMER_TYPE))] public string? TimerType { get; set; }
         [JsonProperty][Locale(nameof(Locale.ALARM_DATA_TIMER_VALUE))] public string? TimerValue { get; set; }
         [JsonProperty][Locale(nameof(Locale.ALARM_DATA_HMI_CLASS))] public string? HmiAlarmClass { get; set; }
-        [JsonProperty][Locale(nameof(Locale.ALARM_DATA_DESCRIPTION), append: " > " + GenPlaceholders.Alarms.ALARM_DESCRIPTION)] public string? Description { get; set; }
+        [JsonProperty][Locale(nameof(Locale.ALARM_DATA_DESCRIPTION), append: " > " + TiaUtilities.Generation.Placeholders.Alarms.ALARM_DESCRIPTION)] public string? Description { get; set; }
 
         public object? this[int column]
         {

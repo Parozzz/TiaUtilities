@@ -1,6 +1,4 @@
-﻿using TiaXmlReader.Generation.Configuration;
-
-namespace TiaUtilities.Generation.Configuration.Lines
+﻿namespace TiaUtilities.Generation.Configuration.Lines
 {
     public class ConfigLabelLine : ConfigLine<ConfigLabelLine>
     {

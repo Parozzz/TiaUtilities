@@ -1,11 +1,9 @@
 ﻿using Newtonsoft.Json;
 using TiaUtilities.Generation.GridHandler;
+using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Languages;
-using TiaXmlReader.Generation.GridHandler.Data;
-using TiaXmlReader.Generation.Placeholders;
-using TiaXmlReader.Languages;
 
-namespace TiaXmlReader.Generation.Alarms
+namespace TiaUtilities.Generation.Alarms
 {
     public class DeviceData : IGridData
     {
@@ -28,11 +26,11 @@ namespace TiaXmlReader.Generation.Alarms
             COLUMN_LIST = columnList.AsReadOnly();
         }
 
-        [JsonProperty][Locale(nameof(Locale.DEVICE_DATA_NAME), append: $" > {GenPlaceholders.Alarms.DEVICE_NAME}")] public string? Name { get; set; }
-        [JsonProperty][Locale(nameof(Locale.DEVICE_DATA_DESCRIPTION), append: $" > {GenPlaceholders.Alarms.DEVICE_DESCRIPTION}")] public string? Description { get; set; }
-        [JsonProperty][Locale(nameof(Locale.DEVICE_DATA_TEMPLATE), append: $" > {GenPlaceholders.Alarms.DEVICE_TEMPLATE}")] public string? Template { get; set; }
+        [JsonProperty][Locale(nameof(Locale.DEVICE_DATA_NAME), append: $" > {TiaUtilities.Generation.Placeholders.Alarms.DEVICE_NAME}")] public string? Name { get; set; }
+        [JsonProperty][Locale(nameof(Locale.DEVICE_DATA_DESCRIPTION), append: $" > {TiaUtilities.Generation.Placeholders.Alarms.DEVICE_DESCRIPTION}")] public string? Description { get; set; }
+        [JsonProperty][Locale(nameof(Locale.DEVICE_DATA_TEMPLATE), append: $" > {TiaUtilities.Generation.Placeholders.Alarms.DEVICE_TEMPLATE}")] public string? Template { get; set; }
 
-        [JsonProperty] public GridSave<AlarmData>? AlarmGridSave {  get; set; }
+        [JsonProperty] public GridSave<AlarmData>? AlarmGridSave { get; set; }
         public object? this[int column]
         {
             get

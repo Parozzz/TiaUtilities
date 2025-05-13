@@ -3,22 +3,14 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using SimaticML.API;
 using SimaticML.Blocks;
 using SimaticML.TagTable;
-using TiaUtilities.Generation.GenModules;
-using TiaUtilities.Generation.GenModules.IO.ExcelImporter;
+using TiaUtilities.Editors.ErrorReporting;
 using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.Data;
-using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.IO.Module.ExcelImporter;
 using TiaUtilities.Generation.IO.Module.Tab;
-using TiaUtilities.Javascript.ErrorReporting;
 using TiaUtilities.Languages;
-using TiaXmlReader;
-using TiaXmlReader.Generation;
-using TiaXmlReader.Generation.GridHandler;
-using TiaXmlReader.Generation.IO;
-using TiaXmlReader.Languages;
-using TiaXmlReader.Utility.Extensions;
+using TiaUtilities.Utility.Extensions;
 
 namespace TiaUtilities.Generation.IO.Module
 {
@@ -404,7 +396,7 @@ namespace TiaUtilities.Generation.IO.Module
         public IEnumerable<string> GetSuggestions(bool filterAlreadyUsed = false)
         {
             IEnumerable<string> suggestions = suggestionGridHandler.DataSource.GetNotEmptyDataDict().Keys.Select(k => k.Value ?? "");
-            if(filterAlreadyUsed)
+            if (filterAlreadyUsed)
             {
                 foreach (var ioTab in this.genTabList)
                 {

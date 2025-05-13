@@ -9,7 +9,6 @@ using Siemens.Engineering.SW.WatchAndForceTables;
 using SpinAddin.Utility;
 using SpinAddIn;
 using System;
-using System.Globalization;
 using System.IO;
 using System.Reflection;
 
@@ -39,7 +38,7 @@ namespace AddIn_V18
             var logDirectoryPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "TIA Add-Ins", assemblyName.Name, assemblyName.Version.ToString(), "Logs");
             var logDirectory = Directory.CreateDirectory(logDirectoryPath);
             _traceFilePath = Path.Combine(logDirectory.FullName, string.Concat(DateTime.Now.ToString("yyyyMMdd_HHmmss"), ".txt"));
-            
+
             var isItalian = Util.IsItalian();
 
             var blockName = isItalian ? "blocchi" : "blocks";

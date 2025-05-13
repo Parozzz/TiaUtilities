@@ -4,13 +4,10 @@ using SimaticML.Blocks;
 using SimaticML.Blocks.FlagNet;
 using SimaticML.Blocks.FlagNet.nPart;
 using SimaticML.Enums;
-using TiaUtilities.Generation.Alarms;
 using TiaUtilities.Generation.Alarms.Module.Template;
 using TiaUtilities.Generation.Placeholders;
-using TiaXmlReader.Generation.Placeholders;
-using TiaXmlReader.Languages;
 
-namespace TiaXmlReader.Generation.Alarms
+namespace TiaUtilities.Generation.Alarms
 {
 
     public class AlarmGroupXmlItem(BlockFC blockFC, BlockUDT blockUDT, string alarmList, List<AlarmDataXmlItem> alarmDataItems)

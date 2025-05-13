@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using Timer = System.Windows.Forms.Timer;
 
-namespace TiaXmlReader.Utility
+namespace TiaUtilities.Utility
 {
     public class LogHandler
     {

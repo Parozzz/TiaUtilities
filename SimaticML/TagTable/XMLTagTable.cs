@@ -103,12 +103,12 @@ namespace SimaticML.TagTable
         {
             foreach (var node in this.objectList.GetItems())
             {
-                if(node is XMLTag tag 
+                if (node is XMLTag tag
                     && tag.TagName.Equals(variableName, StringComparison.OrdinalIgnoreCase))
                 {
                     return tag.DataType;
                 }
-                else if(node is XMLUserConstant userConstant 
+                else if (node is XMLUserConstant userConstant
                     && userConstant.ConfigurationName.Equals(variableName, StringComparison.OrdinalIgnoreCase))
                 {
                     return userConstant.DataType;

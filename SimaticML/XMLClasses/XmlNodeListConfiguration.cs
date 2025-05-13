@@ -66,7 +66,7 @@ namespace SimaticML.XMLClasses
         public override XmlElement? Generate(XmlDocument document)
         {
             var xmlElement = base.Generate(document);
-            if(xmlElement == null)
+            if (xmlElement == null)
             {
                 return null;
             }

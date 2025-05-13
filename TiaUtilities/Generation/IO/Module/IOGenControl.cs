@@ -1,10 +1,6 @@
-﻿using TiaUtilities.Generation.Configuration.Utility;
+﻿using TiaUtilities.Generation.Configuration;
+using TiaUtilities.Generation.Configuration.Utility;
 using TiaUtilities.Languages;
-using TiaXmlReader;
-using TiaXmlReader.Generation;
-using TiaXmlReader.Generation.Configuration;
-using TiaXmlReader.Generation.IO;
-using TiaXmlReader.Generation.Placeholders;
 
 namespace TiaUtilities.Generation.IO.Module
 {
@@ -53,8 +49,8 @@ namespace TiaUtilities.Generation.IO.Module
                     configForm.SetConfiguration(mainConfig, MainForm.Settings.PresetIOMainConfiguration);
 
                     var mainGroup = configForm.Init();
-                    mainGroup.AddTextBox().Label($"{Locale.GENERICS_NAME} > {GenPlaceholders.IO.CONFIG_DB_NAME}").BindText(() => mainConfig.DBName);
-                    mainGroup.AddTextBox().Label($"{Locale.GENERICS_NUMBER} > {GenPlaceholders.IO.CONFIG_DB_NUMBER}").BindUInt(() => mainConfig.DBNumber);
+                    mainGroup.AddTextBox().Label($"{Locale.GENERICS_NAME} > {TiaUtilities.Generation.Placeholders.IO.CONFIG_DB_NAME}").BindText(() => mainConfig.DBName);
+                    mainGroup.AddTextBox().Label($"{Locale.GENERICS_NUMBER} > {TiaUtilities.Generation.Placeholders.IO.CONFIG_DB_NUMBER}").BindUInt(() => mainConfig.DBNumber);
                     mainGroup.AddCheckBox().Label(Locale.IO_GEN_CONFIG_ALIAS_DB_GENERATED_DEFINED_VARIABLES).BindChecked(() => mainConfig.GenerateDefinedVariableAnyway).ControlNoAdapt();
                     mainGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_ALIAS_DB_IN_DEFAULT).BindText(() => mainConfig.DefaultDBInputVariable);
                     mainGroup.AddTextBox().Label(Locale.IO_GEN_CONFIG_ALIAS_DB_OUT_DEFAULT).BindText(() => mainConfig.DefaultDBOutputVariable);

@@ -1,8 +1,7 @@
-﻿using TiaUtilities.Generation.Configuration;
-using TiaUtilities.Languages;
-using TiaXmlReader.Utility;
+﻿using TiaUtilities.Languages;
+using TiaUtilities.Utility;
 
-namespace TiaXmlReader.Generation.Configuration
+namespace TiaUtilities.Generation.Configuration
 {
     public partial class ConfigForm : Form
     {
@@ -64,7 +63,7 @@ namespace TiaXmlReader.Generation.Configuration
             ToolTip savePresetTooltip = new() { InitialDelay = 500, AutoPopDelay = 4000, ReshowDelay = 500 };
             savePresetTooltip.SetToolTip(this.savePresetButton, Locale.CONFIG_LINE_SAVE_DEFAULT_TOOLTIP);
 
-            if(this.PresetConfiguration == null)
+            if (this.PresetConfiguration == null)
             {
                 this.topPanel.Controls.Remove(this.savePresetButton);
             }

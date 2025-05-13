@@ -1,9 +1,8 @@
 ﻿using FastColoredTextBoxNS;
 using System.Linq.Expressions;
+using TiaUtilities.Editors;
+using TiaUtilities.Editors.ErrorReporting;
 using TiaUtilities.Generation.Configuration.Utility;
-using TiaUtilities.Javascript;
-using TiaUtilities.Javascript.ErrorReporting;
-using TiaXmlReader.Generation.Configuration;
 
 namespace TiaUtilities.Generation.Configuration.Lines
 {
@@ -12,7 +11,7 @@ namespace TiaUtilities.Generation.Configuration.Lines
         private readonly IConfigGroup configGroup;
 
         private readonly JavascriptEditor editor;
-        private FastColoredTextBox Control {  get => editor.GetTextBox(); }
+        private FastColoredTextBox Control { get => editor.GetTextBox(); }
 
         private Action<string>? textChangedAction;
         private Action? transferToOtherTextAction;
@@ -39,13 +38,13 @@ namespace TiaUtilities.Generation.Configuration.Lines
             Control.ClearUndo(); //Avoid beeing able to undo after the text has been added.
             return this;
         }
-        
+
         public ConfigJavascriptLine TextChanged(Action<string> action)
         {
             textChangedAction = action;
             return this;
         }
-        
+
         public ConfigJavascriptLine BindText(Expression<Func<string>> propertyExpression, bool nullable = false)
         {
             var propertyInfo = ConfigLineUtils.ValidateBindExpression(this.configGroup, propertyExpression.Body, out object configuration, out IEnumerable<object> otherConfigurations);

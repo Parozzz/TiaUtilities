@@ -1,7 +1,6 @@
 ﻿
 using InfoBox;
 using System.Runtime.InteropServices;
-using TiaUtilities.Utility;
 
 namespace TiaUtilities.CustomControls
 {

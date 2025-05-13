@@ -1,9 +1,8 @@
 ﻿using System.Linq.Expressions;
 using TiaUtilities.CustomControls;
 using TiaUtilities.Generation.Configuration.Utility;
-using TiaXmlReader.Generation.Configuration;
-using TiaXmlReader.Utility;
-using TiaXmlReader.Utility.Extensions;
+using TiaUtilities.Utility;
+using TiaUtilities.Utility.Extensions;
 
 namespace TiaUtilities.Generation.Configuration.Lines
 {
@@ -82,13 +81,13 @@ namespace TiaUtilities.Generation.Configuration.Lines
             colorAction?.Invoke(color);
             return this;
         }
-        
+
         public ConfigColorPickerLine ColorChanged(Action<Color> action)
         {
             colorAction = action;
             return this;
         }
-        
+
         public ConfigColorPickerLine BindColor(Expression<Func<Color>> propertyExpression)
         {
             var propertyInfo = ConfigLineUtils.ValidateBindExpression(this.configGroup, propertyExpression.Body, out object configuration, out IEnumerable<object> otherConfigurations);

@@ -70,7 +70,7 @@ namespace SimaticML.nBlockAttributeList
                 SectionTypeEnum.CONSTANT => new SimaticLocalConstant(this, member),
                 _ => throw new InvalidOperationException($"Cannot create a Variable because SectionType {SectionType} is not valid!"),
             };
-            
+
             return variable;
         }
 
@@ -149,7 +149,7 @@ namespace SimaticML.nBlockAttributeList
         {
             foreach (var member in this.GetItems())
             {
-                if(member.MemberName.Equals(variableName, StringComparison.CurrentCultureIgnoreCase))
+                if (member.MemberName.Equals(variableName, StringComparison.CurrentCultureIgnoreCase))
                 {
                     return SimaticDataType.FromSimaticMLString(member.MemberDataType);
                 }

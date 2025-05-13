@@ -1,8 +1,7 @@
 ﻿using System.ComponentModel;
-using TiaUtilities;
-using TiaXmlReader.Generation.GridHandler.Data;
+using TiaUtilities.Generation.GridHandler.Data;
 
-namespace TiaXmlReader.Generation.GridHandler
+namespace TiaUtilities.Generation.GridHandler
 {
     public class GridDataSource<T> : ISaveable<Dictionary<int, T>> where T : IGridData
     {
@@ -36,8 +35,8 @@ namespace TiaXmlReader.Generation.GridHandler
             //Here DO NOT CLEAR the data. Seems like the system binds to the loaded data and changes are directly applied.
             //Only clearing it, it will not unbind from previous loaded data and will corrupt it.
             //this.Clear();
-            this.InitializeData((uint) this.Count);
-            
+            this.InitializeData((uint)this.Count);
+
             foreach (var entry in saveDict)
             {
                 var rowIndex = entry.Key;
@@ -159,7 +158,7 @@ namespace TiaXmlReader.Generation.GridHandler
         public Dictionary<T, int> GetNotEmptyDataDict(int startRow = 0)
         {
             Dictionary<T, int> dict = [];
-            if(startRow >= dataList.Count)
+            if (startRow >= dataList.Count)
             {
                 return dict;
             }

@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using TiaUtilities.Configuration;
-using TiaXmlReader.Generation.Placeholders;
 
 namespace TiaUtilities.Generation.IO
 {
@@ -14,7 +13,7 @@ namespace TiaUtilities.Generation.IO
 
         public IOTabConfiguration()
         {
-            FCBlockName = $"fc{GenPlaceholders.Generation.TAB_NAME}";
+            FCBlockName = $"fc{TiaUtilities.Generation.Placeholders.Generation.TAB_NAME}";
             FCBlockNumber = 195;
 
             SegmentNameBitGrouping = "{memory_type}{byte}_{bit} - {comment}";

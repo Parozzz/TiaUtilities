@@ -51,11 +51,11 @@ namespace TiaUtilities
         {
             foreach (var node in nodes)
             {
-                if(node is SvgElement svgElement)
+                if (node is SvgElement svgElement)
                 {
                     svgElement.RenderElement(renderer);
 
-                    if(svgElement is SvgVisualElement svgVisualElement)
+                    if (svgElement is SvgVisualElement svgVisualElement)
                     {
                         var graphicsPath = svgVisualElement.Path(renderer);
                         visualElementList.Add(new(svgVisualElement, svgVisualElement.DeepCopy(), graphicsPath));
@@ -68,7 +68,7 @@ namespace TiaUtilities
 
         private void svgPictureBox_MouseClick(object sender, MouseEventArgs e)
         {
-            if(this.svgDocument == null)
+            if (this.svgDocument == null)
             {
                 return;
             }
@@ -80,9 +80,9 @@ namespace TiaUtilities
 
             SvgPathRecord? clickedPathRecord = null;
 
-            foreach(var record in visualElementList)
+            foreach (var record in visualElementList)
             {
-                if(record.GraphicsPath.IsVisible(x, y))
+                if (record.GraphicsPath.IsVisible(x, y))
                 {
                     clickedPathRecord = record;
                     break;
@@ -101,7 +101,7 @@ namespace TiaUtilities
 
                     requireRedraw = true;
                 }
-                else if(oldPathRecord != null && svgElement == oldPathRecord.Element)
+                else if (oldPathRecord != null && svgElement == oldPathRecord.Element)
                 {
                     svgElement.Stroke = oldPathRecord.OriginalElement.Stroke;
                     svgElement.StrokeWidth = oldPathRecord.OriginalElement.StrokeWidth;
@@ -116,10 +116,10 @@ namespace TiaUtilities
 
         private void DrawSvg()
         {
-            if(this.svgDocument == null)
+            if (this.svgDocument == null)
             {
                 return;
-            }    
+            }
 
             var graphics = this.svgPictureBox.CreateGraphics();
             graphics.Clear(Color.White);

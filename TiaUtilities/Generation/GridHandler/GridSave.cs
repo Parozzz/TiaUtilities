@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using TiaXmlReader.Generation.GridHandler.Data;
 
 namespace TiaUtilities.Generation.GridHandler
 {

@@ -1,16 +1,11 @@
-﻿using TiaUtilities.Generation.Alarms;
-using TiaUtilities.Generation.Alarms.Module;
+﻿using TiaUtilities.Editors.ErrorReporting;
 using TiaUtilities.Generation.Alarms.Module.Template;
+using TiaUtilities.Generation.Configuration;
 using TiaUtilities.Generation.Configuration.Utility;
 using TiaUtilities.Generation.GridHandler.Binds;
-using TiaUtilities.Javascript.ErrorReporting;
 using TiaUtilities.Languages;
-using TiaXmlReader;
-using TiaXmlReader.Generation.Alarms;
-using TiaXmlReader.Generation.Configuration;
-using TiaXmlReader.Languages;
 
-namespace TiaUtilities.Generation.GenModules.Alarm.Tab
+namespace TiaUtilities.Generation.Alarms.Module.Tab
 {
     public partial class AlarmGenTabControl : UserControl
     {
@@ -82,7 +77,7 @@ namespace TiaUtilities.Generation.GenModules.Alarm.Tab
 
                     var antiSlipGroup = mainGroup.AddGroup().ControlWidth(175).NoAdapt();
                     antiSlipGroup.AddLabel().Label(Locale.ALARM_CONFIG_GENERATION_ANTI_SLIP);
-                    antiSlipGroup.AddTextBox().Label(Locale.ALARM_CONFIG_GENERATION_ANTI_SLIP_AMOUNT) .BindUInt(() => tabConfig.AntiSlipNumber);
+                    antiSlipGroup.AddTextBox().Label(Locale.ALARM_CONFIG_GENERATION_ANTI_SLIP_AMOUNT).BindUInt(() => tabConfig.AntiSlipNumber);
                     antiSlipGroup.AddCheckBox().Label(Locale.ALARM_CONFIG_GENERATION_ANTI_SLIP_GEN_EMPTY).BindChecked(() => tabConfig.GenerateEmptyAlarmAntiSlip).ControlNoAdapt();
 
                     mainGroup.AddSeparator().Height(15);
@@ -111,12 +106,12 @@ namespace TiaUtilities.Generation.GenModules.Alarm.Tab
                     configForm.SetConfiguration(tabConfig, MainForm.Settings.PresetAlarmTabConfiguration, tabConfigs);
 
                     var mainGroup = configForm.Init();
-                    
+
                     var customVarGroup = mainGroup.AddGroup().ControlWidth(225).NoAdapt();
                     customVarGroup.AddLabel().Label(Locale.ALARM_CONFIG_DEFAULTS_CUSTOM_VAR);
                     customVarGroup.AddTextBox().Label(Locale.GENERICS_ADDRESS).BindText(() => tabConfig.DefaultCustomVarAddress);
                     customVarGroup.AddTextBox().Label(Locale.GENERICS_VALUE).BindText(() => tabConfig.DefaultCustomVarValue);
-                    
+
                     var coil1Group = mainGroup.AddGroup().ControlWidth(225).NoAdapt();
                     coil1Group.AddLabel().Label(Locale.ALARM_CONFIG_DEFAULTS_COIL1);
                     coil1Group.AddTextBox().Label(Locale.GENERICS_ADDRESS).BindText(() => tabConfig.DefaultCoil1Address);

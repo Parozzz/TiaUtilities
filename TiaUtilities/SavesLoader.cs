@@ -4,8 +4,7 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using TiaUtilities.Generation.Alarms.Module;
 using TiaUtilities.Generation.IO.Module;
-using TiaXmlReader;
-using TiaXmlReader.Utility;
+using TiaUtilities.Utility;
 
 namespace TiaUtilities
 {
