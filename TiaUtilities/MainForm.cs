@@ -5,18 +5,19 @@ using SimaticML;
 using SimaticML.API;
 using System.Globalization;
 using System.Xml;
-using TiaUtilities.DbVisualization;
-using TiaUtilities.Editors.ErrorReporting;
-using TiaUtilities.Generation;
+using TiaUtilities;
 using TiaUtilities.Generation.Alarms.Module;
-using TiaUtilities.Generation.Configuration;
 using TiaUtilities.Generation.Configuration.Utility;
+using TiaUtilities.Generation.GenModules;
 using TiaUtilities.Generation.IO.Module;
+using TiaUtilities.Javascript.ErrorReporting;
 using TiaUtilities.Languages;
-using TiaUtilities.Utility;
+using TiaXmlReader.Generation.Configuration;
+using TiaXmlReader.Languages;
+using TiaXmlReader.Utility;
 using Timer = System.Windows.Forms.Timer;
 
-namespace TiaUtilities
+namespace TiaXmlReader
 {
     public partial class MainForm : Form
     {

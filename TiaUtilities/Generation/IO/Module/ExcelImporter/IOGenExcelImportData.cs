@@ -1,4 +1,4 @@
-﻿using TiaUtilities.Generation.GridHandler.Data;
+﻿using TiaXmlReader.Generation.GridHandler.Data;
 
 namespace TiaUtilities.Generation.IO.Module.ExcelImporter
 {

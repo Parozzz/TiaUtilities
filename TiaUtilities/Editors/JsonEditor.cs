@@ -1,7 +1,8 @@
 ﻿using FastColoredTextBoxNS;
-using TiaUtilities.Editors.ErrorReporting;
+using TiaUtilities.Javascript.ErrorReporters;
+using TiaUtilities.Javascript.ErrorReporting;
 
-namespace TiaUtilities.Editors
+namespace TiaUtilities.Javascript
 {
     public class JsonEditor
     {

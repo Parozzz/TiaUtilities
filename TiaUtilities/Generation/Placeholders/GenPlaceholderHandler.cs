@@ -1,10 +1,12 @@
 ﻿using Newtonsoft.Json;
-using TiaUtilities.Generation.Alarms;
-using TiaUtilities.Generation.IO;
-using TiaUtilities.Generation.Placeholders.Data;
-using TiaUtilities.Utility.Extensions;
+using TiaUtilities.Generation.Placeholders;
+using TiaXmlReader.Generation.Alarms;
+using TiaXmlReader.Generation.GridHandler.Data;
+using TiaXmlReader.Generation.IO;
+using TiaXmlReader.Generation.Placeholders.Data;
+using TiaXmlReader.Utility.Extensions;
 
-namespace TiaUtilities.Generation.Placeholders
+namespace TiaXmlReader.Generation.Placeholders
 {
     public class GenPlaceholderHandler
     {
@@ -15,7 +17,7 @@ namespace TiaUtilities.Generation.Placeholders
             placeholdersDict.Clear();
         }
 
-        public string TabName { set => AddOrReplace(TiaUtilities.Generation.Placeholders.Generation.TAB_NAME, new StringGenPlaceholderData() { Value = value }); }
+        public string TabName { set => AddOrReplace(GenPlaceholders.Generation.TAB_NAME, new StringGenPlaceholderData() { Value = value }); }
 
         public IGridData GridData
         {

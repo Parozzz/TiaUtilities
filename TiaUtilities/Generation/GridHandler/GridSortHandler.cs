@@ -1,9 +1,10 @@
 ﻿using TiaUtilities.Generation.GridHandler.CellPainters;
 using TiaUtilities.Generation.GridHandler.Events;
-using TiaUtilities.UndoRedo;
+using TiaXmlReader.Generation.GridHandler.Data;
+using TiaXmlReader.UndoRedo;
 using static TiaUtilities.Generation.GridHandler.CellPainters.GridCellPaintHandler;
 
-namespace TiaUtilities.Generation.GridHandler
+namespace TiaXmlReader.Generation.GridHandler
 {
     public class GridSortHandler<T>(GridHandler<T> gridHandler, UndoRedoHandler undoRedoHandler, IGridRowComparer<T>? comparer) : IGridCellPainter where T : IGridData
     {

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using TiaUtilities.Generation.GridHandler;
+using TiaXmlReader.Generation.Alarms;
 
 namespace TiaUtilities.Generation.Alarms.Module.Tab
 {

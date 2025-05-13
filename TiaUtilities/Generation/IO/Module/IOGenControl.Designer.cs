@@ -34,10 +34,10 @@
             configButtonPanel = new FlowLayoutPanel();
             memoryTypeTableLayout = new TableLayoutPanel();
             memoryTypeLabel = new Label();
-            memoryTypeComboBox = new TiaUtilities.CustomControls.FlatComboBox();
+            memoryTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
             groupingTypeTableLayout = new TableLayoutPanel();
             groupingTypeLabel = new Label();
-            groupingTypeComboBox = new TiaUtilities.CustomControls.FlatComboBox();
+            groupingTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
             ioTableConfigButton = new Button();
             dbConfigButton = new Button();
             variableTableConfigButton = new Button();
@@ -303,10 +303,10 @@
         private FlowLayoutPanel configButtonPanel;
         public TableLayoutPanel memoryTypeTableLayout;
         public Label memoryTypeLabel;
-        public TiaUtilities.CustomControls.FlatComboBox memoryTypeComboBox;
+        public TiaXmlReader.CustomControls.FlatComboBox memoryTypeComboBox;
         public TableLayoutPanel groupingTypeTableLayout;
         public Label groupingTypeLabel;
-        public TiaUtilities.CustomControls.FlatComboBox groupingTypeComboBox;
+        public TiaXmlReader.CustomControls.FlatComboBox groupingTypeComboBox;
         public Button ioTableConfigButton;
         public Button dbConfigButton;
         public Button variableTableConfigButton;

@@ -1,6 +1,14 @@
-﻿using FastColoredTextBoxNS;
-using TiaUtilities.Editors;
+﻿using Acornima.Ast;
+using FastColoredTextBoxNS;
+using Jint;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using TiaUtilities.Configuration;
+using TiaUtilities.Generation.GridHandler.Binds;
+using TiaUtilities.Javascript;
 using TiaUtilities.Languages;
+using TiaXmlReader.Generation.Configuration;
+using TiaXmlReader.Utility;
 
 namespace TiaUtilities.Generation.GridHandler.JSScript
 {
@@ -10,7 +18,7 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
 
         private readonly GridScriptHandler scriptHandler;
         private readonly FastColoredTextBox jsonContextTextBox;
-
+        
         public GridScriptForm(GridScriptHandler scriptHandler)
         {
             InitializeComponent();
@@ -75,12 +83,12 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
             this.variablesTreeView.NodeMouseDoubleClick += (sender, args) =>
             {
                 var currentRecord = this.GetCurrentTabPageRecord();
-                if (currentRecord == null)
+                if(currentRecord == null)
                 {
                     return;
                 }
 
-                if (args.Node.Tag is GridScriptVariable variable)
+                if(args.Node.Tag is GridScriptVariable variable)
                 {
                     var textBox = currentRecord.Editor.GetTextBox();
                     textBox.InsertText(variable.Name);

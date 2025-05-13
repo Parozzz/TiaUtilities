@@ -1,4 +1,6 @@
-﻿namespace TiaUtilities.Generation.GridHandler.Events
+﻿using TiaXmlReader.Generation.GridHandler;
+
+namespace TiaUtilities.Generation.GridHandler.Events
 {
     #region SELECTED_ROW_CHANGED
     public delegate void GridSelectedRowChangedEventHandler(object? sender, GridSelectedRowChangedArgs args);

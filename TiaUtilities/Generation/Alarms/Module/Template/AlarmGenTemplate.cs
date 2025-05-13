@@ -1,4 +1,11 @@
-﻿using TiaUtilities.Generation.GridHandler;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using TiaUtilities.Generation.GridHandler;
+using TiaXmlReader.Generation.Alarms;
 
 namespace TiaUtilities.Generation.Alarms.Module.Template
 {

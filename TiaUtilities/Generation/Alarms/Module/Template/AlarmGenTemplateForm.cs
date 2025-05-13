@@ -1,10 +1,15 @@
-﻿using TiaUtilities.Generation.Configuration;
+﻿using System.ComponentModel;
+using TiaUtilities.CustomControls;
+using TiaUtilities.Generation.Alarms.Module.Template;
 using TiaUtilities.Generation.Configuration.Utility;
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Languages;
+using TiaXmlReader;
+using TiaXmlReader.Generation.Alarms;
+using TiaXmlReader.Generation.Configuration;
 
-namespace TiaUtilities.Generation.Alarms.Module.Template
+namespace TiaUtilities.Generation.Alarms.Module
 {
     public partial class AlarmGenTemplateForm : Form
     {

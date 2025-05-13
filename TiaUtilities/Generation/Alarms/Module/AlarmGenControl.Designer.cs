@@ -1,6 +1,6 @@
 ﻿using TiaUtilities.CustomControls;
 
-namespace TiaUtilities.Generation.Alarms.Module
+namespace TiaUtilities.Generation.GenModules.Alarm
 {
     partial class AlarmGenControl
     {

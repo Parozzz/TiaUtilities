@@ -1,4 +1,4 @@
-﻿namespace TiaUtilities
+﻿namespace TiaXmlReader
 {
     partial class MainForm
     {

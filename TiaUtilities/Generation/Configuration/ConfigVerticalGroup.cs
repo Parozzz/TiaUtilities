@@ -1,4 +1,6 @@
-﻿namespace TiaUtilities.Generation.Configuration
+﻿using TiaXmlReader.Generation.Configuration;
+
+namespace TiaUtilities.Generation.Configuration
 {
     public class ConfigVerticalGroup : IConfigGroup
     {

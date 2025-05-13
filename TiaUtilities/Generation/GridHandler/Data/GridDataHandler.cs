@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace TiaUtilities.Generation.GridHandler.Data
+namespace TiaXmlReader.Generation.GridHandler.Data
 {
     public class GridDataHandler<T> where T : IGridData
     {

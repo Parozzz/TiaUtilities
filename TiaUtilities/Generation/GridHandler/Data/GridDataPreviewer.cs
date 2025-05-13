@@ -1,4 +1,6 @@
-﻿namespace TiaUtilities.Generation.GridHandler.Data
+﻿using TiaXmlReader.Generation.GridHandler.Data;
+
+namespace TiaUtilities.Generation.GridHandler.Data
 {
     public class Preview
     {

@@ -119,7 +119,7 @@ namespace SimaticML.nBlockAttributeList
         {
             if (parentConfiguration is Member parentMember)
             {
-                if (parentMember.ParentConfiguration == null)
+                if(parentMember.ParentConfiguration == null)
                 {
                     return SimaticMLUtil.WrapAddressComponentIfRequired(parentMember.MemberName);
                 }

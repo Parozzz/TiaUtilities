@@ -1,10 +1,10 @@
 ﻿using Newtonsoft.Json;
 using TiaUtilities.Configuration;
-using TiaUtilities.Generation.Configuration;
 using TiaUtilities.Generation.Configuration.Utility;
 using TiaUtilities.Languages;
+using TiaXmlReader.Generation.Configuration;
 
-namespace TiaUtilities.Generation.GridHandler
+namespace TiaXmlReader.Generation.GridHandler
 {
     public class GridSettings : ObservableConfiguration
     {

@@ -2,6 +2,7 @@
 using SimaticML.Blocks.FlagNet;
 using SimaticML.Blocks.FlagNet.nPart;
 using SimaticML.Enums;
+using System.Collections.Generic;
 
 namespace SimaticML.API
 {
@@ -193,7 +194,7 @@ namespace SimaticML.API
             part.TemplateValueType = "Cardinality";
             part.TemplateValue = OUT.Count.ToString();
 
-            if (IN != default)
+            if(IN != default)
             {
                 compileUnit.CreateWire().CreateIdentCon(IN, part, "in");
             }

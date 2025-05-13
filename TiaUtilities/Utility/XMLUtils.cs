@@ -1,6 +1,6 @@
 ﻿using System.Xml;
 
-namespace TiaUtilities.Utility
+namespace TiaXmlReader.Utility
 {
     public static class XMLUtils
     {

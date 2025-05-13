@@ -1,12 +1,17 @@
 ﻿using Newtonsoft.Json;
+using TiaUtilities;
 using TiaUtilities.Configuration;
 using TiaUtilities.Generation.Alarms;
-using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.IO;
 using TiaUtilities.Generation.IO.Module.ExcelImporter;
-using TiaUtilities.Utility;
+using TiaXmlReader.Generation;
+using TiaXmlReader.Generation.Alarms;
+using TiaXmlReader.Generation.GridHandler;
+using TiaXmlReader.Generation.IO;
+using TiaXmlReader.Languages;
+using TiaXmlReader.Utility;
 
-namespace TiaUtilities
+namespace TiaXmlReader
 {
     public class ProgramSettings : ObservableConfiguration
     {

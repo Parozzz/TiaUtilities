@@ -1,4 +1,4 @@
-﻿namespace TiaUtilities.Generation
+﻿namespace TiaUtilities.Generation.GenModules
 {
     partial class GenModuleForm
     {

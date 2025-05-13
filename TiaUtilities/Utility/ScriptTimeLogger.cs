@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace TiaUtilities.Utility
+namespace TiaXmlReader.Utility
 {
     public class ScriptTimeLogger
     {

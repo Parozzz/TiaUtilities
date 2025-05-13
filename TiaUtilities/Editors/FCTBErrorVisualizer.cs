@@ -1,11 +1,16 @@
 ﻿using FastColoredTextBoxNS;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
-using TiaUtilities.Editors.ErrorReporting;
-using TiaUtilities.Editors.FCTBStyle;
-using TiaUtilities.Utility;
+using System.Threading.Tasks;
+using TiaUtilities.Javascript.ErrorReporting;
+using TiaUtilities.Javascript.FCTB;
+using TiaXmlReader.Utility;
 using Timer = System.Windows.Forms.Timer;
 
-namespace TiaUtilities.Editors
+namespace TiaUtilities.Javascript
 {
     class VisualError
     {
@@ -26,7 +31,7 @@ namespace TiaUtilities.Editors
         private VisualError? currentError;
         private bool haltError; //This is required to avoid having the wavy style contantly flash on screen. After changing text, give some time before accetting new text!
 
-        public FCTBErrorVisualizer(FastColoredTextBox textBox, ErrorReporter errorReporter)
+        public FCTBErrorVisualizer(FastColoredTextBox textBox, ErrorReporter errorReporter) 
         {
             this.textBox = textBox;
             this.errorReporter = errorReporter;
@@ -101,8 +106,8 @@ namespace TiaUtilities.Editors
             {
                 var newError = new VisualError()
                 {
-                    Line = (int)reportedError.Line,
-                    Column = (int)reportedError.Column,
+                    Line = (int) reportedError.Line,
+                    Column = (int) reportedError.Column,
                     Description = reportedError.Description,
                 };
 

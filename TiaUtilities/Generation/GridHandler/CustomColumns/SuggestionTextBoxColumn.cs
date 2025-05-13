@@ -1,6 +1,6 @@
 ﻿using TiaUtilities.Utility;
 
-namespace TiaUtilities.Generation.GridHandler.CustomColumns
+namespace TiaXmlReader.Generation.GridHandler.CustomColumns
 {
     public class SuggestionTextBoxColumn : DataGridViewTextBoxColumn, IGridCustomColumn
     {

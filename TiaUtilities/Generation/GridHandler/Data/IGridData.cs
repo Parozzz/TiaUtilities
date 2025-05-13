@@ -1,4 +1,4 @@
-﻿namespace TiaUtilities.Generation.GridHandler.Data
+﻿namespace TiaXmlReader.Generation.GridHandler.Data
 {
     public interface IGridData
     { //CLASS THAT IMPLEMENT THIS MUST HAVE AN EMPTY CONSTRUCTOR!

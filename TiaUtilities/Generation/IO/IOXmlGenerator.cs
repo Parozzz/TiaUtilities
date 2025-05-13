@@ -6,9 +6,11 @@ using SimaticML.Enums;
 using SimaticML.nBlockAttributeList;
 using SimaticML.TagTable;
 using TiaUtilities.Generation.GridHandler.Data;
+using TiaUtilities.Generation.IO;
 using TiaUtilities.Generation.Placeholders;
+using TiaXmlReader.Languages;
 
-namespace TiaUtilities.Generation.IO
+namespace TiaXmlReader.Generation.IO
 {
     internal class IOXmlGenerator(IOMainConfiguration mainConfig)
     {

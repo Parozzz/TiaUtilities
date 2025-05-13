@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using TiaUtilities.CustomControls;
 using TiaUtilities.Generation.Configuration.Utility;
+using TiaXmlReader.Generation.Configuration;
 
 namespace TiaUtilities.Generation.Configuration.Lines
 {
@@ -66,7 +67,7 @@ namespace TiaUtilities.Generation.Configuration.Lines
             this.textBox.ScrollBars = ScrollBars.Both;
             return this;
         }
-
+        
         public ConfigTextBoxLine TextChanged(Action<string?> action)
         {
             textChangedAction = action;
@@ -78,7 +79,7 @@ namespace TiaUtilities.Generation.Configuration.Lines
             textChangedAction = str => action.Invoke(str ?? "");
             return this;
         }
-
+        
         public ConfigTextBoxLine UIntChanged(Action<uint> action)
         {
             numericOnly = true;
@@ -105,7 +106,7 @@ namespace TiaUtilities.Generation.Configuration.Lines
 
         public ConfigTextBoxLine BindUInt(Expression<Func<uint>> propertyExpression)
         {
-            var propertyInfo = ConfigLineUtils.ValidateBindExpression(this.configGroup, propertyExpression.Body, out object configuration, out IEnumerable<object> otherConfigurations);
+            var propertyInfo = ConfigLineUtils.ValidateBindExpression(this.configGroup,propertyExpression.Body, out object configuration, out IEnumerable<object> otherConfigurations);
 
             this.ControlText(propertyExpression.Compile().Invoke());
             this.uintChangedAction = uintValue => propertyInfo.SetValue(configuration, uintValue);

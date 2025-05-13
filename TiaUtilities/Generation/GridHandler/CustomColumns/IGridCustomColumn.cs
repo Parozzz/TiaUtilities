@@ -1,4 +1,4 @@
-﻿namespace TiaUtilities.Generation.GridHandler.CustomColumns
+﻿namespace TiaXmlReader.Generation.GridHandler.CustomColumns
 {
     public interface IGridCustomColumn
     {

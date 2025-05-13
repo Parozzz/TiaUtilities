@@ -1,4 +1,4 @@
-﻿namespace TiaUtilities.Utility.Extensions
+﻿namespace TiaXmlReader.Utility.Extensions
 {
     public static class ColorConverterExtension
     {

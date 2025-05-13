@@ -1,5 +1,7 @@
-﻿using System.Linq.Expressions;
+﻿using System.Configuration;
+using System.Linq.Expressions;
 using System.Reflection;
+using TiaXmlReader.Generation.Configuration;
 
 namespace TiaUtilities.Generation.Configuration.Utility
 {
@@ -23,8 +25,8 @@ namespace TiaUtilities.Generation.Configuration.Utility
             {
                 throw new ArgumentException($"Configuration type is different from expression. Expected {propertyInfo.DeclaringType}, Actual {configuration.GetType()}");
             }
-
-            foreach (var otherConfig in otherConfigurations)
+            
+            foreach(var otherConfig in otherConfigurations)
             {
                 if (otherConfig.GetType() != propertyInfo.DeclaringType)
                 {

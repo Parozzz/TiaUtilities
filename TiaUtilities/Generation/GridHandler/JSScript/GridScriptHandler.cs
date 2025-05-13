@@ -2,10 +2,11 @@
 using Jint;
 using System.Collections.ObjectModel;
 using TiaUtilities.Configuration;
-using TiaUtilities.Editors.ErrorReporting;
 using TiaUtilities.Generation.GridHandler.Binds;
-using TiaUtilities.Utility;
+using TiaUtilities.Javascript.ErrorReporting;
 using TiaUtilities.Utility.Extensions;
+using TiaXmlReader.Utility;
+using TiaXmlReader.Utility.Extensions;
 
 namespace TiaUtilities.Generation.GridHandler.JSScript
 {
@@ -67,7 +68,7 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
             this.GridHandlerBind = handlerBind;
 
             this.gridVariables.Clear();
-            if (handlerBind != null)
+            if(handlerBind != null)
             {
                 this.gridVariables.AddRange(handlerBind.ScriptVariables);
             }
@@ -75,7 +76,7 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
 
         public void ShowForm(IWin32Window? window = null)
         {
-            if (form == null)
+            if(form == null)
             {
                 this.log.Value = "";
                 this.jsonContext.Value = "";

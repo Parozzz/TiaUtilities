@@ -1,6 +1,7 @@
 ﻿using Acornima;
+using TiaUtilities.Javascript.ErrorReporting;
 
-namespace TiaUtilities.Editors.ErrorReporting
+namespace TiaUtilities.Javascript.ErrorReporters
 {
     public class JavascriptErrorReporter(Func<string> scriptFunc) : ErrorReporter
     {

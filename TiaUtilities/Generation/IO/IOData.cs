@@ -4,8 +4,11 @@ using SimaticML.Enums;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Languages;
+using TiaXmlReader.Generation.GridHandler.Data;
+using TiaXmlReader.Generation.Placeholders;
+using TiaXmlReader.Languages;
 
-namespace TiaUtilities.Generation.IO
+namespace TiaXmlReader.Generation.IO
 {
     public class IOData : IGridData
     {
@@ -36,10 +39,10 @@ namespace TiaUtilities.Generation.IO
 
         [JsonProperty][Locale(nameof(Locale.IO_DATA_ADDRESS))] public string? Address { get; set; }
         [JsonProperty][Locale(nameof(Locale.IO_DATA_NEGATED))] public bool Negated { get; set; }
-        [JsonProperty][Locale(nameof(Locale.IO_DATA_IO_NAME), append: " > " + TiaUtilities.Generation.Placeholders.IO.IONAME)] public string? IOName { get; set; }
-        [JsonProperty][Locale(nameof(Locale.IO_DATA_VARIABLE), append: " > " + TiaUtilities.Generation.Placeholders.IO.VARIABLE)] public string? Variable { get; set; }
+        [JsonProperty][Locale(nameof(Locale.IO_DATA_IO_NAME), append: " > " + GenPlaceholders.IO.IONAME)] public string? IOName { get; set; }
+        [JsonProperty][Locale(nameof(Locale.IO_DATA_VARIABLE), append: " > " + GenPlaceholders.IO.VARIABLE)] public string? Variable { get; set; }
         [JsonProperty][Locale(nameof(Locale.IO_DATA_MERKER_ADDRESS))] public string? MerkerAddress { get; set; }
-        [JsonProperty][Locale(nameof(Locale.IO_DATA_COMMENT), append: " > " + TiaUtilities.Generation.Placeholders.IO.COMMENT)] public string? Comment { get; set; }
+        [JsonProperty][Locale(nameof(Locale.IO_DATA_COMMENT), append: " > " + GenPlaceholders.IO.COMMENT)] public string? Comment { get; set; }
 
         public object? this[int column]
         {

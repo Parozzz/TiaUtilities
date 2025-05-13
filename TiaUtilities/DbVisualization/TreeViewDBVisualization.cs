@@ -3,7 +3,7 @@ using SimaticML.API;
 using SimaticML.Blocks;
 using TiaUtilities.CustomControls;
 
-namespace TiaUtilities.DbVisualization
+namespace TiaUtilities
 {
     public partial class TreeViewDBVisualization : Form
     {
@@ -12,7 +12,7 @@ namespace TiaUtilities.DbVisualization
         {
             InitializeComponent();
 
-
+            
             this.treeView = new()
             {
                 CheckBoxes = true,

@@ -1,7 +1,12 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using TiaUtilities.CustomControls;
 using TiaUtilities.Languages;
-using TiaUtilities.Utility;
+using TiaXmlReader.Utility;
 
 namespace TiaUtilities.Generation.Alarms.Module.Template
 {
@@ -25,7 +30,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
                 var oldTemplate = _selectedTemplate;
                 _selectedTemplate = value;
 
-                if (Utils.AreDifferentObject(oldTemplate, _selectedTemplate))
+                if(Utils.AreDifferentObject(oldTemplate, _selectedTemplate))
                 {
                     this.SelectedTemplateChanged(this, new() { OldTemplate = oldTemplate });
                 }

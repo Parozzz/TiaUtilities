@@ -1,7 +1,8 @@
 ﻿using System.Linq.Expressions;
 using TiaUtilities.CustomControls;
 using TiaUtilities.Generation.Configuration.Utility;
-using TiaUtilities.Languages;
+using TiaXmlReader.Generation.Configuration;
+using TiaXmlReader.Languages;
 
 namespace TiaUtilities.Generation.Configuration.Lines
 {
@@ -100,7 +101,7 @@ namespace TiaUtilities.Generation.Configuration.Lines
             this.selectedValueChangedAction = action;
             return this;
         }
-
+        
         public ConfigComboBoxLine SelectedValueChanged<T>(Action<T> action)
         {
             this.selectedValueChangedAction = obj =>
@@ -112,7 +113,7 @@ namespace TiaUtilities.Generation.Configuration.Lines
             };
             return this;
         }
-
+        
         public ConfigComboBoxLine TextChanged(Action<string> action)
         {
             textChangedAction = action;
@@ -124,7 +125,7 @@ namespace TiaUtilities.Generation.Configuration.Lines
             uintChangedAction = action;
             return this;
         }
-
+        
         public ConfigComboBoxLine BindText(Expression<Func<string>> propertyExpression, bool nullable = false)
         {
             var propertyInfo = ConfigLineUtils.ValidateBindExpression(this.configGroup, propertyExpression.Body, out object configuration, out IEnumerable<object> otherConfigurations);
@@ -177,7 +178,7 @@ namespace TiaUtilities.Generation.Configuration.Lines
             this.transferToOtherTextAction = () =>
             {
                 var objectValue = this.comboBox.SelectedValue;
-                if (objectValue is T tValue)
+                if(objectValue is T tValue)
                 {
                     foreach (var otherConfig in otherConfigurations)
                     {

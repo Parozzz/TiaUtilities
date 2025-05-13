@@ -1,6 +1,6 @@
-﻿using TiaUtilities.Generation.GridHandler.Data;
+﻿using TiaXmlReader.Generation.GridHandler.Data;
 
-namespace TiaUtilities.Generation.GridHandler
+namespace TiaXmlReader.Generation.GridHandler
 {
     public class GridCellChange(int columnIndex, int rowIndex)
     {

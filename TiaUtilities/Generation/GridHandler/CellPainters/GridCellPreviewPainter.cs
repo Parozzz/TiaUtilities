@@ -1,6 +1,8 @@
 ﻿using TiaUtilities.Generation.GridHandler.Data;
-using TiaUtilities.Generation.Placeholders;
-using TiaUtilities.Utility;
+using TiaXmlReader.Generation.GridHandler;
+using TiaXmlReader.Generation.GridHandler.Data;
+using TiaXmlReader.Generation.Placeholders;
+using TiaXmlReader.Utility;
 using static TiaUtilities.Generation.GridHandler.CellPainters.GridCellPaintHandler;
 
 namespace TiaUtilities.Generation.GridHandler.CellPainters

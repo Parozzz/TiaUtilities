@@ -1,6 +1,6 @@
 ﻿using SimaticML.API;
-using SimaticML.Blocks;
 using SimaticML.Blocks.FlagNet;
+using SimaticML.Blocks;
 using SimaticML.Enums;
 using System.Globalization;
 
@@ -21,7 +21,7 @@ namespace SimaticML
             attributeList.ProgrammingLanguage = SimaticProgrammingLanguage.LADDER;
 
             var createSafeFC = false;
-            if (createSafeFC)
+            if(createSafeFC)
             {
                 attributeList.ProgrammingLanguage = SimaticProgrammingLanguage.SAFE_LADDER;
             }
@@ -104,7 +104,7 @@ namespace SimaticML
             //Create some STATIC variables. BlockGlobalDB only allows to add to STATIC.
             //You could use the create variables inside a segment and will directly reference this created DB.
             var createSafeDB = true;
-            if (createSafeDB)
+            if(createSafeDB)
             {
                 attributeList.ProgrammingLanguage = SimaticProgrammingLanguage.SAFE_DB;
 

@@ -1,8 +1,10 @@
 ﻿using Newtonsoft.Json;
 using TiaUtilities.Configuration;
 using TiaUtilities.Languages;
+using TiaXmlReader.Generation.Placeholders;
+using TiaXmlReader.Languages;
 
-namespace TiaUtilities.Generation.IO
+namespace TiaXmlReader.Generation.IO
 {
     public enum IOGroupingTypeEnum
     {
@@ -49,7 +51,7 @@ namespace TiaUtilities.Generation.IO
             this.DBNumber = 196;
             this.GenerateDefinedVariableAnyway = false;
 
-            this.IOTableName = $"IN_OUT_{TiaUtilities.Generation.Placeholders.Generation.TAB_NAME}Table";
+            this.IOTableName = $"IN_OUT_{GenPlaceholders.Generation.TAB_NAME}Table";
             this.IOTableSplitEvery = 250;
             this.DefaultIoName = "{memory_type}{byte}_{bit}";
 

@@ -9,6 +9,7 @@ using Siemens.Engineering.SW.WatchAndForceTables;
 using SpinAddin.Utility;
 using SpinAddIn;
 using System;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 

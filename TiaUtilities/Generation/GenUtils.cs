@@ -1,10 +1,11 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System.Reflection;
-using TiaUtilities.Languages;
-using TiaUtilities.Utility;
+using TiaXmlReader.Languages;
+using TiaXmlReader.Utility;
 
-namespace TiaUtilities.Generation
+namespace TiaXmlReader.Generation
 {
     public static class GenUtils
     {
@@ -54,7 +55,7 @@ namespace TiaUtilities.Generation
 
         public static void CopySamePublicFieldsAndProperties(object copyFrom, object saveTo)
         {
-            if (copyFrom.GetType() != saveTo.GetType())
+            if(copyFrom.GetType() != saveTo.GetType())
             {
                 return;
             }

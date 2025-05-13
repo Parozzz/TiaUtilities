@@ -1,6 +1,6 @@
 ﻿using TiaUtilities.Configuration;
 
-namespace TiaUtilities.Generation.Configuration
+namespace TiaXmlReader.Generation.Configuration
 {
     public abstract class ConfigLine<LINE> : IConfigLine where LINE : ConfigLine<LINE>
     {

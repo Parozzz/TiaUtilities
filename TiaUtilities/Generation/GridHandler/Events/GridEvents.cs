@@ -1,4 +1,7 @@
-﻿namespace TiaUtilities.Generation.GridHandler.Events
+﻿using TiaUtilities.Generation.GridHandler.Events;
+using TiaXmlReader.Generation.GridHandler.Data;
+
+namespace TiaXmlReader.Generation.GridHandler.Events
 {
     public class GridEvents<T> where T : IGridData
     {

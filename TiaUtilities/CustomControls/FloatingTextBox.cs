@@ -1,4 +1,4 @@
-﻿using TiaUtilities.Utility;
+﻿using TiaXmlReader.Utility;
 
 namespace TiaUtilities.CustomControls
 {

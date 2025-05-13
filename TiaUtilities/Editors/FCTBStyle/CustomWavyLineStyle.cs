@@ -1,6 +1,6 @@
 ﻿using FastColoredTextBoxNS;
 
-namespace TiaUtilities.Editors.FCTBStyle
+namespace TiaUtilities.Javascript.FCTB
 {
     internal class CustomWavyLineStyle : Style
     {

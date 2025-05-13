@@ -1,7 +1,9 @@
 ﻿using SimaticML.Enums;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.IO;
-using TiaUtilities.Generation.Placeholders.Data;
+using TiaXmlReader.Generation.IO;
+using TiaXmlReader.Generation.Placeholders;
+using TiaXmlReader.Generation.Placeholders.Data;
 
 namespace TiaUtilities.Generation.Placeholders
 {
@@ -11,9 +13,9 @@ namespace TiaUtilities.Generation.Placeholders
         {
             set
             {
-                AddOrReplace(TiaUtilities.Generation.Placeholders.IO.MEMORY_TYPE, new StringGenPlaceholderData() { Value = value.GetAddressMemoryArea().GetSimaticMLString() });
-                AddOrReplace(TiaUtilities.Generation.Placeholders.IO.BIT, new StringGenPlaceholderData() { Value = "" + value.GetAddressBit() });
-                AddOrReplace(TiaUtilities.Generation.Placeholders.IO.BYTE, new StringGenPlaceholderData() { Value = "" + value.GetAddressByte() });
+                AddOrReplace(GenPlaceholders.IO.MEMORY_TYPE, new StringGenPlaceholderData() { Value = value.GetAddressMemoryArea().GetSimaticMLString() });
+                AddOrReplace(GenPlaceholders.IO.BIT, new StringGenPlaceholderData() { Value = "" + value.GetAddressBit() });
+                AddOrReplace(GenPlaceholders.IO.BYTE, new StringGenPlaceholderData() { Value = "" + value.GetAddressByte() });
 
                 string variable;
                 if (string.IsNullOrEmpty(value.Variable))
@@ -25,7 +27,7 @@ namespace TiaUtilities.Generation.Placeholders
                 {
                     variable = value.Variable;
                 }
-                AddOrReplace(TiaUtilities.Generation.Placeholders.IO.VARIABLE, new StringGenPlaceholderData() { Value = variable });
+                AddOrReplace(GenPlaceholders.IO.VARIABLE, new StringGenPlaceholderData() { Value = variable });
 
 
                 string ioName;
@@ -38,11 +40,11 @@ namespace TiaUtilities.Generation.Placeholders
                 {
                     ioName = value.IOName;
                 }
-                AddOrReplace(TiaUtilities.Generation.Placeholders.IO.IONAME, new StringGenPlaceholderData() { Value = this.ParseNotNull(ioName) }); // This one the last (Comment is not useful here!). The io name can contains other placeholders!
-                AddOrReplace(TiaUtilities.Generation.Placeholders.IO.COMMENT, new StringGenPlaceholderData() { Value = value.Comment });
+                AddOrReplace(GenPlaceholders.IO.IONAME, new StringGenPlaceholderData() { Value = this.ParseNotNull(ioName) }); // This one the last (Comment is not useful here!). The io name can contains other placeholders!
+                AddOrReplace(GenPlaceholders.IO.COMMENT, new StringGenPlaceholderData() { Value = value.Comment });
 
-                AddOrReplace(TiaUtilities.Generation.Placeholders.IO.CONFIG_DB_NAME, new StringGenPlaceholderData() { Value = mainConfig.DBName });
-                AddOrReplace(TiaUtilities.Generation.Placeholders.IO.CONFIG_DB_NUMBER, new StringGenPlaceholderData() { Value = "" + mainConfig.DBNumber });
+                AddOrReplace(GenPlaceholders.IO.CONFIG_DB_NAME, new StringGenPlaceholderData() { Value = mainConfig.DBName });
+                AddOrReplace(GenPlaceholders.IO.CONFIG_DB_NUMBER, new StringGenPlaceholderData() { Value = "" + mainConfig.DBNumber });
             }
         }
     }

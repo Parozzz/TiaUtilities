@@ -1,4 +1,4 @@
-﻿namespace TiaUtilities.Generation.Placeholders
+﻿namespace TiaXmlReader.Generation.Placeholders
 {
     public static class GenPlaceholders
     {

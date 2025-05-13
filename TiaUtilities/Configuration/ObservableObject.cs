@@ -1,4 +1,10 @@
-﻿using TiaUtilities.Utility;
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using TiaXmlReader.Utility;
 
 namespace TiaUtilities.Configuration
 {
@@ -8,7 +14,7 @@ namespace TiaUtilities.Configuration
 
         public T Value { get => _value; set => UpdateValue(value); }
         private T _value = startValue;
-
+        
         public void UpdateValue(T value)
         {
             if (Utils.AreDifferentObject(this._value, value))

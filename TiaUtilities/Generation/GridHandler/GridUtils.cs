@@ -1,8 +1,9 @@
 ﻿using System.Text.RegularExpressions;
 using TiaUtilities.Generation.GridHandler.Events;
-using TiaUtilities.Utility;
+using TiaXmlReader.Generation.GridHandler.Data;
+using TiaXmlReader.Utility;
 
-namespace TiaUtilities.Generation.GridHandler
+namespace TiaXmlReader.Generation.GridHandler
 {
     public static class GridUtils
     {

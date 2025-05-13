@@ -1,6 +1,6 @@
 ﻿using TiaUtilities.Configuration;
 
-namespace TiaUtilities.Generation.Configuration
+namespace TiaXmlReader.Generation.Configuration
 {
     public interface IConfigObject
     {

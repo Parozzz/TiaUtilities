@@ -1,4 +1,6 @@
-﻿namespace TiaUtilities.Generation.Configuration.Lines
+﻿using TiaXmlReader.Generation.Configuration;
+
+namespace TiaUtilities.Generation.Configuration.Lines
 {
     public class ConfigButtonPanelLine : ConfigLine<ConfigButtonPanelLine>
     {
