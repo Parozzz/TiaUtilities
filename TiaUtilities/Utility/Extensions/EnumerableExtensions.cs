@@ -1,4 +1,4 @@
-﻿namespace TiaXmlReader.Utility.Extensions
+﻿namespace TiaUtilities.Utility.Extensions
 {
     /// <summary>
     /// Helper methods for the lists.

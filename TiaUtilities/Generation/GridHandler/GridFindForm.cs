@@ -2,8 +2,7 @@
 using System.Data;
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Languages;
-using TiaXmlReader.Generation.GridHandler;
-using TiaXmlReader.Generation.GridHandler.Data;
+using TiaUtilities.Generation.GridHandler.Data;
 
 namespace TiaUtilities.Generation.GridHandler
 {

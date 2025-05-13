@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TiaUtilities.Generation.GridHandler;
-using TiaXmlReader.Generation.Alarms;
+using TiaUtilities.Generation.Alarms;
 
 namespace TiaUtilities.Generation.Alarms.Module.Template
 {

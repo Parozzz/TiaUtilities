@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel;
-using TiaXmlReader.Utility;
 using Timer = System.Windows.Forms.Timer;
+using TiaUtilities.Editors.ErrorReporting;
+using TiaUtilities.Utility;
 
-namespace TiaUtilities.Javascript.ErrorReporting
+namespace TiaUtilities.Editors.ErrorReporting
 {
     public class ErrorReportThread
     {

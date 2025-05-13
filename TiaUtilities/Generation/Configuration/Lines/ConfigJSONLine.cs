@@ -2,9 +2,9 @@
 using System.Linq.Expressions;
 using System.Text.Json;
 using TiaUtilities.Generation.Configuration.Utility;
-using TiaUtilities.Javascript;
-using TiaUtilities.Javascript.ErrorReporting;
-using TiaXmlReader.Generation.Configuration;
+using TiaUtilities.Editors;
+using TiaUtilities.Editors.ErrorReporting;
+using TiaUtilities.Generation.Configuration;
 
 namespace TiaUtilities.Generation.Configuration.Lines
 {

@@ -1,6 +1,7 @@
 ﻿using InfoBox;
+using TiaUtilities.Utility;
 
-namespace TiaXmlReader.Utility
+namespace TiaUtilities.Utility
 {
     public static class Utils
     {

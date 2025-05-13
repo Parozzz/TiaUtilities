@@ -1,7 +1,6 @@
 ﻿using TiaUtilities.Generation.Alarms;
-using TiaXmlReader.Generation.Alarms;
-using TiaXmlReader.Generation.Placeholders;
-using TiaXmlReader.Generation.Placeholders.Data;
+using TiaUtilities.Generation.Placeholders;
+using TiaUtilities.Generation.Placeholders.Data;
 
 namespace TiaUtilities.Generation.Placeholders
 {

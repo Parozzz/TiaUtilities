@@ -1,4 +1,6 @@
-﻿namespace TiaXmlReader.Generation.Placeholders.Data
+﻿using TiaUtilities.Generation.Placeholders.Data;
+
+namespace TiaUtilities.Generation.Placeholders.Data
 {
     public class StringGenPlaceholderData : IGenPlaceholderData
     {

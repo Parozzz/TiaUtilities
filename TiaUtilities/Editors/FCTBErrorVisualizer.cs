@@ -5,12 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using TiaUtilities.Javascript.ErrorReporting;
-using TiaUtilities.Javascript.FCTB;
-using TiaXmlReader.Utility;
 using Timer = System.Windows.Forms.Timer;
+using TiaUtilities.Editors;
+using TiaUtilities.Editors.ErrorReporting;
+using TiaUtilities.Editors.FCTBStyle;
+using TiaUtilities.Utility;
 
-namespace TiaUtilities.Javascript
+namespace TiaUtilities.Editors
 {
     class VisualError
     {

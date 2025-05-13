@@ -8,9 +8,10 @@ using SimaticML.TagTable;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.IO;
 using TiaUtilities.Generation.Placeholders;
-using TiaXmlReader.Languages;
+using TiaUtilities.Generation;
+using TiaUtilities.Languages;
 
-namespace TiaXmlReader.Generation.IO
+namespace TiaUtilities.Generation.IO
 {
     internal class IOXmlGenerator(IOMainConfiguration mainConfig)
     {

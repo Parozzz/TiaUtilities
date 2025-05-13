@@ -1,9 +1,9 @@
 ﻿using SimaticML;
 using SimaticML.Enums;
 using TiaUtilities.Generation.GridHandler.Events;
-using TiaXmlReader.Generation.GridHandler;
-using TiaXmlReader.Generation.GridHandler.Data;
-using TiaXmlReader.Generation.IO;
+using TiaUtilities.Generation.GridHandler;
+using TiaUtilities.Generation.GridHandler.Data;
+using TiaUtilities.Generation.IO;
 
 namespace TiaUtilities.Generation.IO.Module
 {

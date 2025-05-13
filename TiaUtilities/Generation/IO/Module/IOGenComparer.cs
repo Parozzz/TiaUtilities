@@ -1,5 +1,5 @@
-﻿using TiaXmlReader.Generation.GridHandler;
-using TiaXmlReader.Generation.IO;
+﻿using TiaUtilities.Generation.GridHandler;
+using TiaUtilities.Generation.IO;
 
 namespace TiaUtilities.Generation.IO.Module
 {

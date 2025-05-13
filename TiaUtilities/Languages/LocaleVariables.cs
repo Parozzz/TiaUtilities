@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace TiaXmlReader.Languages
+namespace TiaUtilities.Languages
 {
     public static class LocaleVariables
     {

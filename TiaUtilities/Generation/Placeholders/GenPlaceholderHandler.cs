@@ -1,12 +1,12 @@
 ﻿using Newtonsoft.Json;
 using TiaUtilities.Generation.Placeholders;
-using TiaXmlReader.Generation.Alarms;
-using TiaXmlReader.Generation.GridHandler.Data;
-using TiaXmlReader.Generation.IO;
-using TiaXmlReader.Generation.Placeholders.Data;
-using TiaXmlReader.Utility.Extensions;
+using TiaUtilities.Generation.Alarms;
+using TiaUtilities.Generation.GridHandler.Data;
+using TiaUtilities.Generation.IO;
+using TiaUtilities.Generation.Placeholders.Data;
+using TiaUtilities.Utility.Extensions;
 
-namespace TiaXmlReader.Generation.Placeholders
+namespace TiaUtilities.Generation.Placeholders
 {
     public class GenPlaceholderHandler
     {

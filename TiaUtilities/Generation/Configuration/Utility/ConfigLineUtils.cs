@@ -1,7 +1,7 @@
 ﻿using System.Configuration;
 using System.Linq.Expressions;
 using System.Reflection;
-using TiaXmlReader.Generation.Configuration;
+using TiaUtilities.Generation.Configuration;
 
 namespace TiaUtilities.Generation.Configuration.Utility
 {

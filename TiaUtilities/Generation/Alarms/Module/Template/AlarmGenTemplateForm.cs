@@ -5,11 +5,12 @@ using TiaUtilities.Generation.Configuration.Utility;
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Languages;
-using TiaXmlReader;
-using TiaXmlReader.Generation.Alarms;
-using TiaXmlReader.Generation.Configuration;
+using TiaUtilities;
+using TiaUtilities.Generation.Alarms;
+using TiaUtilities.Generation.Alarms.Module;
+using TiaUtilities.Generation.Configuration;
 
-namespace TiaUtilities.Generation.Alarms.Module
+namespace TiaUtilities.Generation.Alarms.Module.Template
 {
     public partial class AlarmGenTemplateForm : Form
     {

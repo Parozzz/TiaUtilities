@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TiaUtilities.CustomControls;
 using TiaUtilities.Languages;
-using TiaXmlReader.Utility;
+using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.Alarms.Module.Template
 {

@@ -1,4 +1,6 @@
-﻿namespace TiaXmlReader.UndoRedo
+﻿using TiaUtilities.UndoRedo;
+
+namespace TiaUtilities.UndoRedo
 {
     public class UndoRedoHandler
     {

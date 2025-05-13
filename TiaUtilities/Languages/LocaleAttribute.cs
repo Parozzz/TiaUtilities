@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 using TiaUtilities.Languages;
-using TiaXmlReader.Utility.Extensions;
+using TiaUtilities.Utility.Extensions;
 
-namespace TiaXmlReader.Languages
+namespace TiaUtilities.Languages
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Enum)]
     public class LocaleAttribute(string translationStringName, string append = "") : Attribute

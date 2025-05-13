@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TiaXmlReader.Generation.GridHandler.Data;
-using TiaXmlReader.Generation.GridHandler;
 using System.Linq.Expressions;
+using TiaUtilities.Generation.GridHandler;
+using TiaUtilities.Generation.GridHandler.Data;
 
 namespace TiaUtilities.Generation.GridHandler.JSScript
 {

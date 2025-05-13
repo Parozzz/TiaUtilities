@@ -8,16 +8,16 @@ using System.Xml;
 using TiaUtilities;
 using TiaUtilities.Generation.Alarms.Module;
 using TiaUtilities.Generation.Configuration.Utility;
-using TiaUtilities.Generation.GenModules;
 using TiaUtilities.Generation.IO.Module;
-using TiaUtilities.Javascript.ErrorReporting;
 using TiaUtilities.Languages;
-using TiaXmlReader.Generation.Configuration;
-using TiaXmlReader.Languages;
-using TiaXmlReader.Utility;
 using Timer = System.Windows.Forms.Timer;
+using TiaUtilities.DbVisualization;
+using TiaUtilities.Editors.ErrorReporting;
+using TiaUtilities.Generation;
+using TiaUtilities.Generation.Configuration;
+using TiaUtilities.Utility;
 
-namespace TiaXmlReader
+namespace TiaUtilities
 {
     public partial class MainForm : Form
     {

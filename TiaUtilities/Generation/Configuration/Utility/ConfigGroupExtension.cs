@@ -1,5 +1,5 @@
 ﻿using TiaUtilities.Generation.Configuration.Lines;
-using TiaXmlReader.Generation.Configuration;
+using TiaUtilities.Generation.Configuration;
 
 namespace TiaUtilities.Generation.Configuration.Utility
 {

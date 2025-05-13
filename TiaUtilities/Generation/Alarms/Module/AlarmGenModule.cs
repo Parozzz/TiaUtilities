@@ -1,14 +1,13 @@
 ﻿using TiaUtilities.Generation.Alarms.Module.Tab;
 using TiaUtilities.Generation.Alarms.Module.Template;
-using TiaUtilities.Generation.GenModules;
-using TiaUtilities.Generation.GenModules.Alarm;
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.JSScript;
-using TiaUtilities.Javascript.ErrorReporting;
 using TiaUtilities.Languages;
-using TiaXmlReader;
-using TiaXmlReader.Generation;
-using TiaXmlReader.Generation.Alarms;
+using TiaUtilities;
+using TiaUtilities.Editors.ErrorReporting;
+using TiaUtilities.Generation;
+using TiaUtilities.Generation.Alarms;
+using TiaUtilities.Generation.Alarms.Module;
 
 namespace TiaUtilities.Generation.Alarms.Module
 {

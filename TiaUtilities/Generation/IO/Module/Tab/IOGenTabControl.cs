@@ -1,10 +1,10 @@
 ﻿using TiaUtilities.Generation.Configuration.Utility;
 using TiaUtilities.Generation.IO;
 using TiaUtilities.Languages;
-using TiaXmlReader;
-using TiaXmlReader.Generation.Configuration;
+using TiaUtilities;
+using TiaUtilities.Generation.Configuration;
 
-namespace TiaUtilities.Generation.GenModules.IO.Tab
+namespace TiaUtilities.Generation.IO.Module.Tab
 {
     public partial class IOGenTabControl : UserControl
     {

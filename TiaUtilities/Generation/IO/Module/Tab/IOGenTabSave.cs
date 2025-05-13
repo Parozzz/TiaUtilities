@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 using TiaUtilities.Generation.GridHandler;
-using TiaXmlReader.Generation.IO;
+using TiaUtilities.Generation.IO;
 
 namespace TiaUtilities.Generation.IO.Module.Tab
 {

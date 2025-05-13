@@ -9,14 +9,14 @@ using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.IO.Module;
 using TiaUtilities.Generation.IO.Module.ExcelImporter;
-using TiaUtilities.Javascript.ErrorReporting;
 using TiaUtilities.Languages;
-using TiaXmlReader;
-using TiaXmlReader.Generation.Configuration;
-using TiaXmlReader.Generation.GridHandler;
-using TiaXmlReader.Utility;
+using TiaUtilities;
+using TiaUtilities.Editors.ErrorReporting;
+using TiaUtilities.Generation.Configuration;
+using TiaUtilities.Generation.Placeholders;
+using TiaUtilities.Utility;
 
-namespace TiaUtilities.Generation.GenModules.IO.ExcelImporter
+namespace TiaUtilities.Generation.IO.Module.ExcelImporter
 {
     public partial class IOGenerationExcelImportForm : Form
     {

@@ -1,8 +1,9 @@
 ﻿using System.Collections.Concurrent;
 using System.ComponentModel;
 using Timer = System.Windows.Forms.Timer;
+using TiaUtilities.Utility;
 
-namespace TiaXmlReader.Utility
+namespace TiaUtilities.Utility
 {
     public class LogHandler
     {

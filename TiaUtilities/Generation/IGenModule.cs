@@ -1,4 +1,4 @@
-﻿using TiaUtilities.Generation.GenModules;
+﻿using TiaUtilities.Generation;
 
 namespace TiaUtilities.Generation
 {

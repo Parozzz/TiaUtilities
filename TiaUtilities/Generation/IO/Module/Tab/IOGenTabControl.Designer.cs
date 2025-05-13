@@ -1,4 +1,4 @@
-﻿namespace TiaUtilities.Generation.GenModules.IO.Tab
+﻿namespace TiaUtilities.Generation.IO.Module.Tab
 {
     partial class IOGenTabControl
     {

@@ -1,4 +1,4 @@
-﻿namespace TiaUtilities.Javascript
+﻿namespace TiaUtilities.Editors
 {
     public static class JavascriptAutocompleteMenu
     {

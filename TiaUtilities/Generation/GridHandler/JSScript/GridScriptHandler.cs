@@ -3,10 +3,9 @@ using Jint;
 using System.Collections.ObjectModel;
 using TiaUtilities.Configuration;
 using TiaUtilities.Generation.GridHandler.Binds;
-using TiaUtilities.Javascript.ErrorReporting;
 using TiaUtilities.Utility.Extensions;
-using TiaXmlReader.Utility;
-using TiaXmlReader.Utility.Extensions;
+using TiaUtilities.Editors.ErrorReporting;
+using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.GridHandler.JSScript
 {

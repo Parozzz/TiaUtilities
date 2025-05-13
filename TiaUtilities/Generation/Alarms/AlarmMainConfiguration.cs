@@ -1,10 +1,9 @@
 ﻿using Newtonsoft.Json;
 using TiaUtilities.Configuration;
 using TiaUtilities.Languages;
-using TiaXmlReader.Generation.Placeholders;
-using TiaXmlReader.Languages;
+using TiaUtilities.Generation.Placeholders;
 
-namespace TiaXmlReader.Generation.Alarms
+namespace TiaUtilities.Generation.Alarms
 {
     public enum AlarmGroupingType
     {

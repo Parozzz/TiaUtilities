@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TiaUtilities.Generation.GridHandler.JSScript;
-using TiaXmlReader.Generation.GridHandler;
-using TiaXmlReader.Generation.GridHandler.Data;
-using TiaXmlReader.Utility;
+using TiaUtilities.Generation.GridHandler;
+using TiaUtilities.Generation.GridHandler.Data;
+using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.GridHandler.Binds
 {

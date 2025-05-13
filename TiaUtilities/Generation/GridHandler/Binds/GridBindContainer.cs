@@ -1,7 +1,7 @@
 ﻿using TiaUtilities.Generation.GridHandler.JSScript;
-using TiaUtilities.Javascript.ErrorReporting;
-using TiaXmlReader.Generation.GridHandler;
-using TiaXmlReader.Generation.GridHandler.Data;
+using TiaUtilities.Editors.ErrorReporting;
+using TiaUtilities.Generation.GridHandler;
+using TiaUtilities.Generation.GridHandler.Data;
 
 namespace TiaUtilities.Generation.GridHandler.Binds
 {

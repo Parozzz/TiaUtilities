@@ -2,11 +2,11 @@
 using TiaUtilities.Generation.Alarms.Module.Template;
 using TiaUtilities.Generation.Configuration.Utility;
 using TiaUtilities.Languages;
-using TiaXmlReader;
-using TiaXmlReader.Generation.Alarms;
-using TiaXmlReader.Generation.Configuration;
+using TiaUtilities;
+using TiaUtilities.Generation.Alarms;
+using TiaUtilities.Generation.Configuration;
 
-namespace TiaUtilities.Generation.GenModules.Alarm
+namespace TiaUtilities.Generation.Alarms.Module
 {
     public partial class AlarmGenControl : UserControl
     {

@@ -5,10 +5,8 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using TiaUtilities.Configuration;
 using TiaUtilities.Generation.GridHandler.Binds;
-using TiaUtilities.Javascript;
 using TiaUtilities.Languages;
-using TiaXmlReader.Generation.Configuration;
-using TiaXmlReader.Utility;
+using TiaUtilities.Editors;
 
 namespace TiaUtilities.Generation.GridHandler.JSScript
 {

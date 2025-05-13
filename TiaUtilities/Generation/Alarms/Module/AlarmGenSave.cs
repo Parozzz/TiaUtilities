@@ -2,7 +2,7 @@
 using TiaUtilities.Generation.Alarms.Module.Tab;
 using TiaUtilities.Generation.Alarms.Module.Template;
 using TiaUtilities.Generation.GridHandler.JSScript;
-using TiaXmlReader.Generation.Alarms;
+using TiaUtilities.Generation.Alarms;
 
 namespace TiaUtilities.Generation.Alarms.Module
 {

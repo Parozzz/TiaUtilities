@@ -1,8 +1,8 @@
 ﻿using Acornima;
 using System.Text.Json;
-using TiaUtilities.Javascript.ErrorReporting;
+using TiaUtilities.Editors.ErrorReporting;
 
-namespace TiaUtilities.Javascript.ErrorReporters
+namespace TiaUtilities.Editors.ErrorReporting
 {
     public class JsonErrorReporter(Func<string> scriptFunc) : ErrorReporter
     {

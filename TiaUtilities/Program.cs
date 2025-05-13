@@ -3,11 +3,11 @@ using FastColoredTextBoxNS;
 using InfoBox;
 using Jint;
 using Microsoft.WindowsAPICodePack.Dialogs;
-using TiaXmlReader.Generation.GridHandler.CustomColumns;
-using TiaXmlReader.Languages;
-using TiaXmlReader.Utility;
+using TiaUtilities.Generation.GridHandler.CustomColumns;
+using TiaUtilities.Languages;
+using TiaUtilities.Utility;
 
-namespace TiaXmlReader
+namespace TiaUtilities
 {
     internal static class Program
     {

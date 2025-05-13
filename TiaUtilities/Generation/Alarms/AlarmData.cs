@@ -1,10 +1,11 @@
 ﻿using Newtonsoft.Json;
 using TiaUtilities.Languages;
-using TiaXmlReader.Generation.GridHandler.Data;
-using TiaXmlReader.Generation.Placeholders;
-using TiaXmlReader.Languages;
+using TiaUtilities.Generation;
+using TiaUtilities.Generation.Alarms;
+using TiaUtilities.Generation.GridHandler.Data;
+using TiaUtilities.Generation.Placeholders;
 
-namespace TiaXmlReader.Generation.Alarms
+namespace TiaUtilities.Generation.Alarms
 {
     public class AlarmData : IGridData
     {

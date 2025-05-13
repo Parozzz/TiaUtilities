@@ -1,11 +1,10 @@
 ﻿using InfoBox;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using TiaUtilities.Languages;
-using TiaXmlReader;
-using TiaXmlReader.Generation.GridHandler;
-using TiaXmlReader.Utility;
+using TiaUtilities;
+using TiaUtilities.Utility;
 
-namespace TiaUtilities.Generation.GenModules
+namespace TiaUtilities.Generation
 {
     public partial class GenModuleForm : Form
     {

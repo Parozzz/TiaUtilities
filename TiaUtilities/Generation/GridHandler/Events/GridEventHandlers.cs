@@ -1,4 +1,4 @@
-﻿using TiaXmlReader.Generation.GridHandler;
+﻿using TiaUtilities.Generation.GridHandler;
 
 namespace TiaUtilities.Generation.GridHandler.Events
 {

@@ -2,10 +2,10 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System.Reflection;
-using TiaXmlReader.Languages;
-using TiaXmlReader.Utility;
+using TiaUtilities.Languages;
+using TiaUtilities.Utility;
 
-namespace TiaXmlReader.Generation
+namespace TiaUtilities.Generation
 {
     public static class GenUtils
     {
