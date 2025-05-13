@@ -1,6 +1,4 @@
 ﻿using System.Reflection;
-using TiaUtilities.Generation.GridHandler;
-using TiaUtilities.Generation.GridHandler.Data;
 
 namespace TiaUtilities.Generation.GridHandler.Data
 {

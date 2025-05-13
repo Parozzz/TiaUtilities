@@ -1,7 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.ComponentModel;
 using Timer = System.Windows.Forms.Timer;
-using TiaUtilities.Utility;
 
 namespace TiaUtilities.Utility
 {

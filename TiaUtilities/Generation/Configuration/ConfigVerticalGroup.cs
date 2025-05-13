@@ -1,6 +1,4 @@
-﻿using TiaUtilities.Generation.Configuration;
-
-namespace TiaUtilities.Generation.Configuration
+﻿namespace TiaUtilities.Generation.Configuration
 {
     public class ConfigVerticalGroup : IConfigGroup
     {

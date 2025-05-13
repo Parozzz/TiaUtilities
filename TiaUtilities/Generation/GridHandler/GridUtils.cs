@@ -1,6 +1,5 @@
 ﻿using System.Text.RegularExpressions;
 using TiaUtilities.Generation.GridHandler.Events;
-using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Utility;
 

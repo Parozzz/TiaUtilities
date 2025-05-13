@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using TiaUtilities;
 using TiaUtilities.Generation.GridHandler.Data;
 
 namespace TiaUtilities.Generation.GridHandler

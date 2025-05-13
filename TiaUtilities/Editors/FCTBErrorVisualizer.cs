@@ -1,12 +1,6 @@
 ﻿using FastColoredTextBoxNS;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Timer = System.Windows.Forms.Timer;
-using TiaUtilities.Editors;
 using TiaUtilities.Editors.ErrorReporting;
 using TiaUtilities.Editors.FCTBStyle;
 using TiaUtilities.Utility;

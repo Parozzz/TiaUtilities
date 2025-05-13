@@ -1,7 +1,6 @@
 ﻿using InfoBox;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using TiaUtilities.Languages;
-using TiaUtilities;
 using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation

@@ -1,6 +1,4 @@
-﻿using TiaUtilities.UndoRedo;
-
-namespace TiaUtilities.UndoRedo
+﻿namespace TiaUtilities.UndoRedo
 {
     public class UndoRedoHandler
     {

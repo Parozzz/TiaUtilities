@@ -1,5 +1,4 @@
 ﻿using TiaUtilities.Generation.Configuration.Lines;
-using TiaUtilities.Generation.Configuration;
 
 namespace TiaUtilities.Generation.Configuration.Utility
 {

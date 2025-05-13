@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using TiaUtilities.CustomControls;
-using TiaUtilities.Generation.Configuration;
 
 namespace TiaUtilities.Generation.Configuration.Lines
 {

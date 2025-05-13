@@ -1,10 +1,4 @@
-﻿using Acornima.Ast;
-using FastColoredTextBoxNS;
-using Jint;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using TiaUtilities.Configuration;
-using TiaUtilities.Generation.GridHandler.Binds;
+﻿using FastColoredTextBoxNS;
 using TiaUtilities.Languages;
 using TiaUtilities.Editors;
 

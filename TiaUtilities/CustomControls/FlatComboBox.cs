@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using System.Runtime.InteropServices;
-using TiaUtilities.CustomControls;
 
 namespace TiaUtilities.CustomControls
 {

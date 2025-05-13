@@ -1,13 +1,7 @@
-﻿using System.ComponentModel;
-using TiaUtilities.CustomControls;
-using TiaUtilities.Generation.Alarms.Module.Template;
-using TiaUtilities.Generation.Configuration.Utility;
+﻿using TiaUtilities.Generation.Configuration.Utility;
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Languages;
-using TiaUtilities;
-using TiaUtilities.Generation.Alarms;
-using TiaUtilities.Generation.Alarms.Module;
 using TiaUtilities.Generation.Configuration;
 
 namespace TiaUtilities.Generation.Alarms.Module.Template

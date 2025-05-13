@@ -1,6 +1,4 @@
-﻿using Acornima;
-using System.Text.Json;
-using TiaUtilities.Editors.ErrorReporting;
+﻿using System.Text.Json;
 
 namespace TiaUtilities.Editors.ErrorReporting
 {

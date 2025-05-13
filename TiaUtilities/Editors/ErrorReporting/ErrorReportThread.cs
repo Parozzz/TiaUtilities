@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using Timer = System.Windows.Forms.Timer;
-using TiaUtilities.Editors.ErrorReporting;
 using TiaUtilities.Utility;
 
 namespace TiaUtilities.Editors.ErrorReporting

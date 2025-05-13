@@ -1,6 +1,4 @@
-﻿using TiaUtilities.Generation.Placeholders.Data;
-
-namespace TiaUtilities.Generation.Placeholders.Data
+﻿namespace TiaUtilities.Generation.Placeholders.Data
 {
     public class UIntGenPlaceholderData : IGenPlaceholderData
     {

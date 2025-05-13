@@ -1,6 +1,4 @@
-﻿using TiaUtilities.Generation.Configuration;
-
-namespace TiaUtilities.Generation.Configuration.Lines
+﻿namespace TiaUtilities.Generation.Configuration.Lines
 {
     public class ConfigSeparatorLine : ConfigLine<ConfigSeparatorLine>
     {

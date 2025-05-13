@@ -1,5 +1,4 @@
-﻿using TiaUtilities.Generation.GridHandler.Events;
-using TiaUtilities.Generation.GridHandler.Data;
+﻿using TiaUtilities.Generation.GridHandler.Data;
 
 namespace TiaUtilities.Generation.GridHandler.Events
 {

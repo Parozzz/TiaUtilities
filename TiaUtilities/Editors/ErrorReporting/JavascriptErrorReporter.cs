@@ -1,5 +1,4 @@
 ﻿using Acornima;
-using TiaUtilities.Editors.ErrorReporting;
 
 namespace TiaUtilities.Editors.ErrorReporting
 {

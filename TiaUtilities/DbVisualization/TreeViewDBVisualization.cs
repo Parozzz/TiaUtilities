@@ -2,7 +2,6 @@
 using SimaticML.API;
 using SimaticML.Blocks;
 using TiaUtilities.CustomControls;
-using TiaUtilities;
 
 namespace TiaUtilities.DbVisualization
 {

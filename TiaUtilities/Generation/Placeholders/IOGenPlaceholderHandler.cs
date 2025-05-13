@@ -1,7 +1,6 @@
 ﻿using SimaticML.Enums;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.IO;
-using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Generation.Placeholders.Data;
 
 namespace TiaUtilities.Generation.Placeholders

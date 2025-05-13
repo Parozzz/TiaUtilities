@@ -1,5 +1,4 @@
 ﻿using FastColoredTextBoxNS;
-using TiaUtilities.Editors;
 using TiaUtilities.Editors.ErrorReporting;
 
 namespace TiaUtilities.Editors

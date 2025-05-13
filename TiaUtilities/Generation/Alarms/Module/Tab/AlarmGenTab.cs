@@ -3,10 +3,6 @@ using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.Placeholders;
-using TiaUtilities;
-using TiaUtilities.Generation;
-using TiaUtilities.Generation.Alarms;
-using TiaUtilities.Generation.Alarms.Module.Tab;
 using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.CustomColumns;
 

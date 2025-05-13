@@ -6,9 +6,7 @@ using SimaticML.Enums;
 using SimaticML.nBlockAttributeList;
 using SimaticML.TagTable;
 using TiaUtilities.Generation.GridHandler.Data;
-using TiaUtilities.Generation.IO;
 using TiaUtilities.Generation.Placeholders;
-using TiaUtilities.Generation;
 using TiaUtilities.Languages;
 
 namespace TiaUtilities.Generation.IO

@@ -4,7 +4,6 @@ using SimaticML.Blocks;
 using SimaticML.Blocks.FlagNet;
 using SimaticML.Blocks.FlagNet.nPart;
 using SimaticML.Enums;
-using TiaUtilities.Generation.Alarms;
 using TiaUtilities.Generation.Alarms.Module.Template;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Languages;

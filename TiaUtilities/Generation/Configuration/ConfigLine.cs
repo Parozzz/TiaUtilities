@@ -1,5 +1,4 @@
 ﻿using TiaUtilities.Configuration;
-using TiaUtilities.Generation.Configuration;
 
 namespace TiaUtilities.Generation.Configuration
 {

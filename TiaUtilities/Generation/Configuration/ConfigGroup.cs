@@ -1,6 +1,4 @@
-﻿using TiaUtilities.CustomControls;
-using TiaUtilities.Generation.Configuration;
-using TiaUtilities.Generation.Configuration.Lines;
+﻿using TiaUtilities.Generation.Configuration.Lines;
 using TiaUtilities.Languages;
 
 namespace TiaUtilities.Generation.Configuration

@@ -3,7 +3,6 @@ using System.Linq.Expressions;
 using TiaUtilities.Generation.Configuration.Utility;
 using TiaUtilities.Editors;
 using TiaUtilities.Editors.ErrorReporting;
-using TiaUtilities.Generation.Configuration;
 
 namespace TiaUtilities.Generation.Configuration.Lines
 {

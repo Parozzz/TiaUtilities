@@ -1,6 +1,5 @@
 ﻿using TiaUtilities.Generation.GridHandler.Data;
 using static TiaUtilities.Generation.GridHandler.CellPainters.GridCellPaintHandler;
-using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Utility;
 
