@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 using TiaUtilities.CustomControls;
 using TiaUtilities.Languages;
-using TiaXmlReader.Utility;
+using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.Alarms.Module.Template
 {

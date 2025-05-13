@@ -3,7 +3,6 @@ using SimaticML.Enums;
 using SimaticML.LanguageText;
 using SimaticML.XMLClasses;
 using System.Globalization;
-using System.Xml;
 
 namespace SimaticML.TagTable
 {

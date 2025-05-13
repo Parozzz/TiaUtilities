@@ -1,14 +1,6 @@
-﻿using Acornima.Ast;
-using FastColoredTextBoxNS;
-using Jint;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using TiaUtilities.Configuration;
-using TiaUtilities.Generation.GridHandler.Binds;
+﻿using FastColoredTextBoxNS;
 using TiaUtilities.Languages;
-using TiaXmlReader.Generation.Configuration;
-using TiaXmlReader.Javascript;
-using TiaXmlReader.Utility;
+using TiaUtilities.Editors;
 
 namespace TiaUtilities.Generation.GridHandler.JSScript
 {
@@ -121,14 +113,14 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                 var tabPage = args.TabPage;
 
                 var currentRecord = this.GetCurrentTabPageRecord();
-                currentRecord?.Editor.UnregisterErrorReport(this.scriptHandler.JSErrorThread);
+                currentRecord?.Editor.UnregisterErrorReporter(this.scriptHandler.ErrorThread);
 
                 if (tabPage?.Tag is not TabPageScriptRecord record)
                 {
                     return;
                 }
 
-                record.Editor.RegisterErrorReport(this.scriptHandler.JSErrorThread);
+                record.Editor.RegisterErrorReporter(this.scriptHandler.ErrorThread);
             };
 
             this.scriptTabControl.TabNameUserChanged += (sender, args) =>
@@ -156,7 +148,7 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
             this.FormClosed += (sender, args) =>
             {
                 var currentRecord = this.GetCurrentTabPageRecord();
-                currentRecord?.Editor.UnregisterErrorReport(this.scriptHandler.JSErrorThread);
+                currentRecord?.Editor.UnregisterErrorReporter(this.scriptHandler.ErrorThread);
             };
 
             this.Translate();

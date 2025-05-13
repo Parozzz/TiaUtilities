@@ -2,9 +2,9 @@
 using TiaUtilities.Configuration;
 using TiaUtilities.Generation.Configuration.Utility;
 using TiaUtilities.Languages;
-using TiaXmlReader.Generation.Configuration;
+using TiaUtilities.Generation.Configuration;
 
-namespace TiaXmlReader.Generation.GridHandler
+namespace TiaUtilities.Generation.GridHandler
 {
     public class GridSettings : ObservableConfiguration
     {

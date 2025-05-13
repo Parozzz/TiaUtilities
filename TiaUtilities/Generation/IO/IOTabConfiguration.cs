@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 using TiaUtilities.Configuration;
-using TiaXmlReader.Generation.Placeholders;
+using TiaUtilities.Generation.Placeholders;
 
 namespace TiaUtilities.Generation.IO
 {

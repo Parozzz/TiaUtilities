@@ -2,7 +2,7 @@
 using SimaticML.Blocks;
 using SimaticML.nBlockAttributeList;
 
-namespace TiaXmlReader
+namespace TiaUtilities
 {
     public partial class DBDuplicationForm : Form
     {

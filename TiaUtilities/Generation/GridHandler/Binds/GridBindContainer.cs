@@ -1,17 +1,16 @@
 ﻿using TiaUtilities.Generation.GridHandler.JSScript;
-using TiaXmlReader.Generation.GridHandler;
-using TiaXmlReader.Generation.GridHandler.Data;
-using TiaXmlReader.Javascript;
+using TiaUtilities.Editors.ErrorReporting;
+using TiaUtilities.Generation.GridHandler.Data;
 
 namespace TiaUtilities.Generation.GridHandler.Binds
 {
-    public class GridBindContainer(JavascriptErrorReportThread errorReportThread) : ICleanable
+    public class GridBindContainer(ErrorReportThread errorThread) : ICleanable
     {
         private Form? form;
         private GridHandlerBind? handlerBind;
 
         private GridFindForm? findForm;
-        public GridScriptHandler GridScriptHandler { get; init; } = new(errorReportThread);
+        public GridScriptHandler GridScriptHandler { get; init; } = new(errorThread);
 
         public void Init(Form form)
         {

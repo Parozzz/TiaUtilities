@@ -3,11 +3,11 @@ using FastColoredTextBoxNS;
 using InfoBox;
 using Jint;
 using Microsoft.WindowsAPICodePack.Dialogs;
-using TiaXmlReader.Generation.GridHandler.CustomColumns;
-using TiaXmlReader.Languages;
-using TiaXmlReader.Utility;
+using TiaUtilities.Generation.GridHandler.CustomColumns;
+using TiaUtilities.Languages;
+using TiaUtilities.Utility;
 
-namespace TiaXmlReader
+namespace TiaUtilities
 {
     internal static class Program
     {
@@ -31,14 +31,17 @@ namespace TiaXmlReader
 
             try
             {
-                AppDomain.CurrentDomain.FirstChanceException += (sender, args) =>
+                AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
                 {
-                    if (args.Exception.Source == "Jint" || args.Exception.Source == "Acornima")
+                    if(args.ExceptionObject is Exception exception)
                     {
-                        return;
-                    }
+                        if (exception.Source == "Jint" || exception.Source == "Acornima")
+                        {
+                            return;
+                        }
 
-                    Utils.ShowExceptionMessage(args.Exception);
+                        Utils.ShowExceptionMessage(exception);
+                    }
                 };
 
                 Application.EnableVisualStyles();

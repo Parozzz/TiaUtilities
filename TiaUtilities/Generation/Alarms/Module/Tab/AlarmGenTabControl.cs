@@ -1,23 +1,21 @@
-﻿using TiaUtilities.Generation.Alarms;
-using TiaUtilities.Generation.Alarms.Module;
-using TiaUtilities.Generation.Alarms.Module.Template;
+﻿using TiaUtilities.Generation.Alarms.Module.Template;
 using TiaUtilities.Generation.Configuration.Utility;
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Languages;
-using TiaXmlReader;
-using TiaXmlReader.Generation.Alarms;
-using TiaXmlReader.Generation.Configuration;
-using TiaXmlReader.Languages;
+using TiaUtilities.Editors.ErrorReporting;
+using TiaUtilities.Generation.Configuration;
 
-namespace TiaUtilities.Generation.GenModules.Alarm.Tab
+namespace TiaUtilities.Generation.Alarms.Module.Tab
 {
     public partial class AlarmGenTabControl : UserControl
     {
+        private readonly ErrorReportThread errorThread;
         private readonly AlarmGenTemplateHandler templateHandler;
         private readonly DataGridView dataGridView;
 
-        public AlarmGenTabControl(AlarmGenTemplateHandler templateHandler, DataGridView dataGridView)
+        public AlarmGenTabControl(ErrorReportThread errorThread, AlarmGenTemplateHandler templateHandler, DataGridView dataGridView)
         {
+            this.errorThread = errorThread;
             this.templateHandler = templateHandler;
             this.dataGridView = dataGridView;
 
@@ -169,7 +167,9 @@ namespace TiaUtilities.Generation.GenModules.Alarm.Tab
 
                     var mainGroup = configForm.Init().ControlWidth(600);
                     mainGroup.AddLabel().Label("Custom Placeholders JSON object");
-                    mainGroup.AddJSON().Height(500).BindText(() => tabConfig.CustomPlaceholdersJSON);
+                    mainGroup.AddJSON().Height(500)
+                                        .BindText(() => tabConfig.CustomPlaceholdersJSON)
+                                        .RegisterErrorThreadWithForm(this.errorThread, configForm);
 
                     SetupConfigForm(button, configForm);
                 };

@@ -1,4 +1,4 @@
-﻿namespace TiaUtilities.Generation.GenModules.Alarm.Tab
+﻿namespace TiaUtilities.Generation.Alarms.Module.Tab
 {
     partial class AlarmGenTabControl
     {
@@ -36,7 +36,7 @@
             editTemplateConfigButton = new Button();
             groupingTypeTableLayout = new TableLayoutPanel();
             groupingTypeLabel = new Label();
-            groupingTypeComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
+            groupingTypeComboBox = new TiaUtilities.CustomControls.FlatComboBox();
             customPlaceholdersButton = new Button();
             mainTableLayout.SuspendLayout();
             configFlowLayout.SuspendLayout();
@@ -205,7 +205,7 @@
         public Button valuesPrefixesConfigButton;
         public TableLayoutPanel groupingTypeTableLayout;
         public Label groupingTypeLabel;
-        public TiaXmlReader.CustomControls.FlatComboBox groupingTypeComboBox;
+        public TiaUtilities.CustomControls.FlatComboBox groupingTypeComboBox;
         public Button editTemplateConfigButton;
         public Button customPlaceholdersButton;
     }

@@ -1,4 +1,5 @@
-﻿namespace TiaUtilities
+﻿using TiaUtilities;
+namespace TiaUtilities.DbVisualization
 {
     partial class TreeViewDBVisualization
     {

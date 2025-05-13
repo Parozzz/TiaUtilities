@@ -1,8 +1,7 @@
-﻿using TiaUtilities.Generation.Configuration;
-using TiaUtilities.Languages;
-using TiaXmlReader.Utility;
+﻿using TiaUtilities.Languages;
+using TiaUtilities.Utility;
 
-namespace TiaXmlReader.Generation.Configuration
+namespace TiaUtilities.Generation.Configuration
 {
     public partial class ConfigForm : Form
     {

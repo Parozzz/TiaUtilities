@@ -1,4 +1,7 @@
-﻿namespace TiaUtilities.Generation.Alarms.Module
+﻿using TiaUtilities.Generation.Alarms.Module.Template;
+using TiaUtilities.Generation.Alarms.Module;
+
+namespace TiaUtilities.Generation.Alarms.Module.Template
 {
     partial class AlarmGenTemplateForm
     {
@@ -33,7 +36,7 @@
             topPanel = new FlowLayoutPanel();
             selectPanel = new TableLayoutPanel();
             selectLabel = new Label();
-            selectComboBox = new TiaXmlReader.CustomControls.FlatComboBox();
+            selectComboBox = new TiaUtilities.CustomControls.FlatComboBox();
             addButton = new Button();
             removeButton = new Button();
             renameButton = new Button();
@@ -224,7 +227,7 @@
         private FlowLayoutPanel topPanel;
         private TableLayoutPanel selectPanel;
         private Label selectLabel;
-        private TiaXmlReader.CustomControls.FlatComboBox selectComboBox;
+        private TiaUtilities.CustomControls.FlatComboBox selectComboBox;
         private Button addButton;
         private Button removeButton;
         private Button renameButton;

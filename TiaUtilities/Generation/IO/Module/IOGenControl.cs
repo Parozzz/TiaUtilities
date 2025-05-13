@@ -1,10 +1,7 @@
 ﻿using TiaUtilities.Generation.Configuration.Utility;
 using TiaUtilities.Languages;
-using TiaXmlReader;
-using TiaXmlReader.Generation;
-using TiaXmlReader.Generation.Configuration;
-using TiaXmlReader.Generation.IO;
-using TiaXmlReader.Generation.Placeholders;
+using TiaUtilities.Generation.Configuration;
+using TiaUtilities.Generation.Placeholders;
 
 namespace TiaUtilities.Generation.IO.Module
 {

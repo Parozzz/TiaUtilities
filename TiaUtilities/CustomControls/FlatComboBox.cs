@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.InteropServices;
 
-namespace TiaXmlReader.CustomControls
+namespace TiaUtilities.CustomControls
 {
     public class FlatComboBox : ComboBox
     {

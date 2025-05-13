@@ -4,18 +4,17 @@ using System.Collections.ObjectModel;
 using TiaUtilities.Configuration;
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Utility.Extensions;
-using TiaXmlReader.Javascript;
-using TiaXmlReader.Utility;
-using TiaXmlReader.Utility.Extensions;
+using TiaUtilities.Editors.ErrorReporting;
+using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.GridHandler.JSScript
 {
-    public class GridScriptHandler(JavascriptErrorReportThread jsErrorThread) : ICleanable, ISaveable<GridScriptSave>, IGridBindable
+    public class GridScriptHandler(ErrorReportThread errorThread) : ICleanable, ISaveable<GridScriptSave>, IGridBindable
     {
         public const string ENGINE_LOG_FUNCTION = "log";
         public const string ENGINE_ROW_VARIABLE = "row";
 
-        public JavascriptErrorReportThread JSErrorThread { get; init; } = jsErrorThread;
+        public ErrorReportThread ErrorThread { get; init; } = errorThread;
 
         public ObservableCollection<ScriptInfo> Scripts { get; init; } = [];
         private readonly ObservableCollection<GridScriptVariable> gridVariables = [];

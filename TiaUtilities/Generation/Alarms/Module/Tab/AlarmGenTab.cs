@@ -1,15 +1,10 @@
 ﻿using TiaUtilities.Generation.Alarms.Module.Template;
-using TiaUtilities.Generation.GenModules.Alarm.Tab;
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.Placeholders;
-using TiaXmlReader;
-using TiaXmlReader.Generation;
-using TiaXmlReader.Generation.Alarms;
-using TiaXmlReader.Generation.GridHandler;
-using TiaXmlReader.Generation.GridHandler.CustomColumns;
-using TiaXmlReader.Generation.IO;
+using TiaUtilities.Generation.GridHandler;
+using TiaUtilities.Generation.GridHandler.CustomColumns;
 
 namespace TiaUtilities.Generation.Alarms.Module.Tab
 {
@@ -46,7 +41,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             this.deviceDataPreview = new();
             this.deviceGridHandler = new(MainForm.Settings.GridSettings, this.gridBindContainer, this.deviceDataPreview, placeholdersHandler) { RowCount = 499 };
             
-            this.TabControl = new(this.templateHandler, deviceGridHandler.DataGridView);
+            this.TabControl = new(bindContainer.GridScriptHandler.ErrorThread, this.templateHandler, deviceGridHandler.DataGridView);
         }
 
         public void Init()

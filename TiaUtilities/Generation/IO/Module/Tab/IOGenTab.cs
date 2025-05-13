@@ -1,18 +1,11 @@
 ﻿using SimaticML;
 using SimaticML.Enums;
-using System.Collections.Immutable;
-using TiaUtilities.Generation.GenModules.IO.Tab;
 using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.Placeholders;
-using TiaXmlReader;
-using TiaXmlReader.Generation;
-using TiaXmlReader.Generation.GridHandler;
-using TiaXmlReader.Generation.GridHandler.CustomColumns;
-using TiaXmlReader.Generation.IO;
-using TiaXmlReader.Javascript;
+using TiaUtilities.Generation.GridHandler.CustomColumns;
 
 namespace TiaUtilities.Generation.IO.Module.Tab
 {

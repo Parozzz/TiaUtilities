@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using TiaUtilities.Utility;
 
-namespace TiaXmlReader.Generation.GridHandler.CustomColumns
+namespace TiaUtilities.Generation.GridHandler.CustomColumns
 {
     public class DropDownMenuScrollWheelHandler : IMessageFilter
     {

@@ -3,32 +3,27 @@ using Jint;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using SimaticML;
 using SimaticML.API;
-using SimaticML.Blocks;
-using SimaticML.Blocks.FlagNet;
-using SimaticML.Enums;
 using System.Globalization;
 using System.Xml;
-using TiaUtilities;
 using TiaUtilities.Generation.Alarms.Module;
 using TiaUtilities.Generation.Configuration.Utility;
-using TiaUtilities.Generation.GenModules;
 using TiaUtilities.Generation.IO.Module;
 using TiaUtilities.Languages;
-using TiaXmlReader.Generation;
-using TiaXmlReader.Generation.Configuration;
-using TiaXmlReader.Javascript;
-using TiaXmlReader.Languages;
-using TiaXmlReader.Utility;
 using Timer = System.Windows.Forms.Timer;
+using TiaUtilities.DbVisualization;
+using TiaUtilities.Editors.ErrorReporting;
+using TiaUtilities.Generation;
+using TiaUtilities.Generation.Configuration;
+using TiaUtilities.Utility;
 
-namespace TiaXmlReader
+namespace TiaUtilities
 {
     public partial class MainForm : Form
     {
         public static ProgramSettings Settings { get; private set; } = new();
 
         private readonly TimedSaveHandler autoSaveHandler;
-        private readonly JavascriptErrorReportThread jsErrorHandlingThread;
+        private readonly ErrorReportThread errorThread;
 
         public MainForm()
         {
@@ -38,7 +33,7 @@ namespace TiaXmlReader
             Settings.Save(); //To create file if not exist!
 
             this.autoSaveHandler = new TimedSaveHandler();
-            this.jsErrorHandlingThread = new JavascriptErrorReportThread();
+            this.errorThread = new();
 
             Init();
         }
@@ -56,8 +51,8 @@ namespace TiaXmlReader
             LogHandler.INSTANCE.Init();
             LogHandler.INSTANCE.Start();
 
-            jsErrorHandlingThread.Init();
-            jsErrorHandlingThread.Start();
+            this.errorThread.Init();
+            this.errorThread.Start();
 
             this.tiaVersionComboBox.SelectedIndexChanged += (sender, args) =>
             {
@@ -203,7 +198,7 @@ namespace TiaXmlReader
 
         private GenModuleForm OpenIOGenModuleForm()
         {
-            IOGenModule ioGenProject = new(jsErrorHandlingThread);
+            IOGenModule ioGenProject = new(this.errorThread);
             GenModuleForm projectForm = new(ioGenProject, autoSaveHandler)
             {
                 Width = 1400,
@@ -215,7 +210,7 @@ namespace TiaXmlReader
 
         private GenModuleForm OpenAlarmGenModuleForm()
         {
-            AlarmGenModule alarmGenProject = new(jsErrorHandlingThread);
+            AlarmGenModule alarmGenProject = new(this.errorThread);
             GenModuleForm projectForm = new(alarmGenProject, autoSaveHandler)
             {
                 Width = 1400,

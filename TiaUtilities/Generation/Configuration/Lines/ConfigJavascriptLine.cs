@@ -1,8 +1,8 @@
 ﻿using FastColoredTextBoxNS;
 using System.Linq.Expressions;
 using TiaUtilities.Generation.Configuration.Utility;
-using TiaXmlReader.Generation.Configuration;
-using TiaXmlReader.Javascript;
+using TiaUtilities.Editors;
+using TiaUtilities.Editors.ErrorReporting;
 
 namespace TiaUtilities.Generation.Configuration.Lines
 {
@@ -10,8 +10,8 @@ namespace TiaUtilities.Generation.Configuration.Lines
     {
         private readonly IConfigGroup configGroup;
 
-        private readonly JavascriptEditor jsFCTB;
-        private readonly FastColoredTextBox control;
+        private readonly JavascriptEditor editor;
+        private FastColoredTextBox Control {  get => editor.GetTextBox(); }
 
         private Action<string>? textChangedAction;
         private Action? transferToOtherTextAction;
@@ -20,23 +20,22 @@ namespace TiaUtilities.Generation.Configuration.Lines
         {
             this.configGroup = configGroup;
 
-            jsFCTB = new JavascriptEditor();
-            jsFCTB.InitControl();
+            this.editor = new JavascriptEditor();
+            this.editor.InitControl();
 
-            control = jsFCTB.GetTextBox();
-            control.TextChanged += TextChangedEventHandler;
+            this.Control.TextChanged += TextChangedEventHandler;
         }
 
         private void TextChangedEventHandler(object? sender, EventArgs args)
         {
-            var text = control.Text;
+            var text = Control.Text;
             textChangedAction?.Invoke(text);
         }
 
         public override ConfigJavascriptLine ControlText(IConvertible? value)
         {
             base.ControlText(value);
-            control.ClearUndo(); //Avoid beeing able to undo after the text has been added.
+            Control.ClearUndo(); //Avoid beeing able to undo after the text has been added.
             return this;
         }
         
@@ -54,7 +53,7 @@ namespace TiaUtilities.Generation.Configuration.Lines
             this.textChangedAction = str => propertyInfo.SetValue(configuration, nullable ? str : (str ?? ""));
             this.transferToOtherTextAction = () =>
             {
-                var str = this.control.Text;
+                var str = this.Control.Text;
                 foreach (var otherConfig in otherConfigurations)
                 {
                     propertyInfo.SetValue(otherConfig, str);
@@ -68,14 +67,21 @@ namespace TiaUtilities.Generation.Configuration.Lines
             transferToOtherTextAction?.Invoke();
         }
 
-        public JavascriptEditor GetJavascriptFCTB()
+        public ConfigJavascriptLine RegisterErrorThreadWithForm(ErrorReportThread errorThread, Form form)
         {
-            return jsFCTB;
+            this.editor.RegisterErrorReporter(errorThread);
+            form.FormClosing += (sender, args) => this.editor.UnregisterErrorReporter(errorThread);
+            return this;
+        }
+
+        public JavascriptEditor GetEditor()
+        {
+            return editor;
         }
 
         public override Control GetControl()
         {
-            return control;
+            return Control;
         }
     }
 }

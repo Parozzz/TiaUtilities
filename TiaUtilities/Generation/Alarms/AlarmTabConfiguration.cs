@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using TiaUtilities.Configuration;
-using TiaXmlReader.Generation.Alarms;
-using TiaXmlReader.Generation.Placeholders;
+using TiaUtilities.Generation.Placeholders;
 
 namespace TiaUtilities.Generation.Alarms
 {

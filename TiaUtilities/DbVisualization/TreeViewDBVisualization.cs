@@ -3,7 +3,7 @@ using SimaticML.API;
 using SimaticML.Blocks;
 using TiaUtilities.CustomControls;
 
-namespace TiaUtilities
+namespace TiaUtilities.DbVisualization
 {
     public partial class TreeViewDBVisualization : Form
     {

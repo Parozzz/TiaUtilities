@@ -1,6 +1,4 @@
-﻿using TiaUtilities.Generation.GenModules;
-
-namespace TiaUtilities.Generation
+﻿namespace TiaUtilities.Generation
 {
     public interface IGenModule : ICleanable, ISaveable<object>
     {

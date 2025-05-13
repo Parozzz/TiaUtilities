@@ -2,10 +2,7 @@
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.GridHandler.JSScript;
-using TiaXmlReader;
-using TiaXmlReader.Generation.Alarms;
-using TiaXmlReader.Generation.GridHandler;
-using TiaXmlReader.Generation.Placeholders;
+using TiaUtilities.Generation.Placeholders;
 
 namespace TiaUtilities.Generation.Alarms.Module.Template
 {
