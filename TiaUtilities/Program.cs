@@ -31,14 +31,17 @@ namespace TiaXmlReader
 
             try
             {
-                AppDomain.CurrentDomain.FirstChanceException += (sender, args) =>
+                AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
                 {
-                    if (args.Exception.Source == "Jint" || args.Exception.Source == "Acornima")
+                    if(args.ExceptionObject is Exception exception)
                     {
-                        return;
-                    }
+                        if (exception.Source == "Jint" || exception.Source == "Acornima")
+                        {
+                            return;
+                        }
 
-                    Utils.ShowExceptionMessage(args.Exception);
+                        Utils.ShowExceptionMessage(exception);
+                    }
                 };
 
                 Application.EnableVisualStyles();

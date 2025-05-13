@@ -46,7 +46,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             this.deviceDataPreview = new();
             this.deviceGridHandler = new(MainForm.Settings.GridSettings, this.gridBindContainer, this.deviceDataPreview, placeholdersHandler) { RowCount = 499 };
             
-            this.TabControl = new(this.templateHandler, deviceGridHandler.DataGridView);
+            this.TabControl = new(bindContainer.GridScriptHandler.ErrorThread, this.templateHandler, deviceGridHandler.DataGridView);
         }
 
         public void Init()

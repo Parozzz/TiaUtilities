@@ -1,9 +1,9 @@
 ﻿using FastColoredTextBoxNS;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Schema;
 using System.Linq.Expressions;
 using System.Text.Json;
 using TiaUtilities.Generation.Configuration.Utility;
+using TiaUtilities.Javascript;
+using TiaUtilities.Javascript.ErrorReporting;
 using TiaXmlReader.Generation.Configuration;
 
 namespace TiaUtilities.Generation.Configuration.Lines
@@ -11,7 +11,9 @@ namespace TiaUtilities.Generation.Configuration.Lines
     public class ConfigJSONLine : ConfigLine<ConfigJSONLine>
     {
         private readonly IConfigGroup configGroup;
-        private readonly FastColoredTextBox control;
+        private readonly JsonEditor editor;
+
+        private FastColoredTextBox Control { get => editor.GetTextBox(); }
 
         private Action<string>? textChangedAction;
         private Action? transferToOtherTextAction;
@@ -19,53 +21,30 @@ namespace TiaUtilities.Generation.Configuration.Lines
         public ConfigJSONLine(IConfigGroup configGroup)
         {
             this.configGroup = configGroup;
-            this.control = new FastColoredTextBox
-            {
-                Language = Language.JSON,
-                ReadOnly = false,
-                // == INDENTATION ==
-                AutoIndent = true,
-                AutoIndentExistingLines = true,
-                AutoIndentChars = true,
-                TabLength = 4,
-                // == LINE NUMBERS ==
-                ShowLineNumbers = false,
-                LineNumberStartValue = 0,
-                // == CARET ==
-                CaretVisible = true,
-                CaretBlinking = true,
-                ShowCaretWhenInactive = true,
-                WideCaret = false,
 
-                CharHeight = 16, //Default 14
-                LineInterval = 4, //Default 0
+            this.editor = new JsonEditor();
+            this.editor.InitControl();
 
-                AcceptsTab = true,
-                AcceptsReturn = true,
-                ShowFoldingLines = true,
-            };
-
-
-            control.TextChanged += TextChangedEventHandler;
+            this.Control.TextChanged += TextChangedEventHandler;
         }
 
         private void TextChangedEventHandler(object? sender, EventArgs args)
         {
-            var text = control.Text;
+            var text = Control.Text;
             textChangedAction?.Invoke(text);
         }
 
         public ConfigJSONLine Readonly()
         {
-            control.ReadOnly = true;
-            control.BackColor = SystemColors.Control;
+            Control.ReadOnly = true;
+            Control.BackColor = SystemColors.Control;
             return this;
         }
 
         public override ConfigJSONLine ControlText(IConvertible? value)
         {
             base.ControlText(value);
-            control.ClearUndo(); //Avoid beeing able to undo after the text has been added.
+            Control.ClearUndo(); //Avoid beeing able to undo after the text has been added.
             return this;
         }
 
@@ -83,7 +62,7 @@ namespace TiaUtilities.Generation.Configuration.Lines
             this.textChangedAction = str => propertyInfo.SetValue(configuration, nullable ? str : (str ?? ""));
             this.transferToOtherTextAction = () =>
             {
-                var str = this.control.Text;
+                var str = this.Control.Text;
                 foreach (var otherConfig in otherConfigurations)
                 {
                     propertyInfo.SetValue(otherConfig, str);
@@ -97,28 +76,16 @@ namespace TiaUtilities.Generation.Configuration.Lines
             transferToOtherTextAction?.Invoke();
         }
 
-        public ConfigJSONLine RegisterLinter(Form form)
+        public ConfigJSONLine RegisterErrorThreadWithForm(ErrorReportThread errorThread, Form form)
         {
-            System.Windows.Forms.Timer timer = new() { Interval = 500 };
-            timer.Tick += (sender, args) =>
-            {
-                try
-                {
-                    var jsonDocument = JsonDocument.Parse(this.control.Text);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"{ex.GetType().Name}, {ex.Message}");
-                }
-            };
-            timer.Start();
-            form.FormClosing += (sender, args) => timer.Stop();
+            this.editor.RegisterErrorReporter(errorThread);
+            form.FormClosing += (sender, args) => this.editor.UnregisterErrorReporter(errorThread);
             return this;
         }
 
         public override Control GetControl()
         {
-            return control;
+            return Control;
         }
     }
 }

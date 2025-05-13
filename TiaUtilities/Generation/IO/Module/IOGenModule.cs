@@ -11,12 +11,12 @@ using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.IO.Module.ExcelImporter;
 using TiaUtilities.Generation.IO.Module.Tab;
+using TiaUtilities.Javascript.ErrorReporting;
 using TiaUtilities.Languages;
 using TiaXmlReader;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Generation.IO;
-using TiaXmlReader.Javascript;
 using TiaXmlReader.Languages;
 using TiaXmlReader.Utility.Extensions;
 
@@ -38,9 +38,9 @@ namespace TiaUtilities.Generation.IO.Module
 
         private readonly List<IOGenTab> genTabList;
 
-        public IOGenModule(JavascriptErrorReportThread jsErrorHandlingThread)
+        public IOGenModule(ErrorReportThread errorThread)
         {
-            this.gridBindContainer = new(jsErrorHandlingThread);
+            this.gridBindContainer = new(errorThread);
 
             this.mainConfig = new();
             GenUtils.CopyJsonFieldsAndProperties(MainForm.Settings.PresetIOMainConfiguration, this.mainConfig);

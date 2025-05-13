@@ -12,7 +12,6 @@ using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.GridHandler;
 using TiaXmlReader.Generation.GridHandler.CustomColumns;
 using TiaXmlReader.Generation.IO;
-using TiaXmlReader.Javascript;
 
 namespace TiaUtilities.Generation.IO.Module.Tab
 {

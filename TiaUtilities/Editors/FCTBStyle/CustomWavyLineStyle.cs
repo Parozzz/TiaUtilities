@@ -1,6 +1,6 @@
 ﻿using FastColoredTextBoxNS;
 
-namespace TiaXmlReader.Javascript.FCTB
+namespace TiaUtilities.Javascript.FCTB
 {
     internal class CustomWavyLineStyle : Style
     {
@@ -21,7 +21,7 @@ namespace TiaXmlReader.Javascript.FCTB
 
         public override void Draw(Graphics graphics, Point position, FastColoredTextBoxNS.Range range)
         {
-            Size sizeOfRange = Style.GetSizeOfRange(range);
+            Size sizeOfRange = GetSizeOfRange(range);
             Point start = new Point(position.X, position.Y + sizeOfRange.Height - WAVE_DISTANCE_FROM_TEXT);
             Point end = new Point(position.X + sizeOfRange.Width, position.Y + sizeOfRange.Height - WAVE_DISTANCE_FROM_TEXT);
 

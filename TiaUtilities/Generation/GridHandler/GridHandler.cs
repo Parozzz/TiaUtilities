@@ -9,11 +9,9 @@ using TiaXmlReader.Generation.GridHandler.CustomColumns;
 using TiaXmlReader.Generation.GridHandler.Data;
 using TiaXmlReader.Generation.GridHandler.Events;
 using TiaXmlReader.Generation.Placeholders;
-using TiaXmlReader.Javascript;
 using TiaXmlReader.UndoRedo;
 using TiaXmlReader.Utility;
 using TiaXmlReader.Utility.Extensions;
-using static TiaUtilities.Generation.GridHandler.GridFindForm;
 
 namespace TiaXmlReader.Generation.GridHandler
 {

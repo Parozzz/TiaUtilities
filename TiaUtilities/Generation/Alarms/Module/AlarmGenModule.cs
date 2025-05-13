@@ -4,11 +4,11 @@ using TiaUtilities.Generation.GenModules;
 using TiaUtilities.Generation.GenModules.Alarm;
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.JSScript;
+using TiaUtilities.Javascript.ErrorReporting;
 using TiaUtilities.Languages;
 using TiaXmlReader;
 using TiaXmlReader.Generation;
 using TiaXmlReader.Generation.Alarms;
-using TiaXmlReader.Javascript;
 
 namespace TiaUtilities.Generation.Alarms.Module
 {
@@ -24,9 +24,9 @@ namespace TiaUtilities.Generation.Alarms.Module
         private readonly List<AlarmGenTab> genTabList;
         public IEnumerable<AlarmTabConfiguration> TabConfigurations { get => this.genTabList.Select(tab => tab.TabConfig); }
 
-        public AlarmGenModule(JavascriptErrorReportThread jsErrorHandlingThread)
+        public AlarmGenModule(ErrorReportThread errorThread)
         {
-            this.gridBindContainer = new(jsErrorHandlingThread);
+            this.gridBindContainer = new(errorThread);
 
             this.control = new();
             this.mainConfig = new();

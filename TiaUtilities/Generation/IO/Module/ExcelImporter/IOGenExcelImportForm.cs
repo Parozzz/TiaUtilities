@@ -9,11 +9,11 @@ using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.IO.Module;
 using TiaUtilities.Generation.IO.Module.ExcelImporter;
+using TiaUtilities.Javascript.ErrorReporting;
 using TiaUtilities.Languages;
 using TiaXmlReader;
 using TiaXmlReader.Generation.Configuration;
 using TiaXmlReader.Generation.GridHandler;
-using TiaXmlReader.Javascript;
 using TiaXmlReader.Utility;
 
 namespace TiaUtilities.Generation.GenModules.IO.ExcelImporter
@@ -22,7 +22,7 @@ namespace TiaUtilities.Generation.GenModules.IO.ExcelImporter
     {
         public const string ROW_SPECIAL_CHAR = "$";
 
-        private readonly JavascriptErrorReportThread jsErrorThread;
+        private readonly ErrorReportThread errorThread;
         private readonly IOExcelImportConfiguration importConfig;
         private readonly GridHandler<IOGenExcelImportData> gridHandler;
 
@@ -32,7 +32,7 @@ namespace TiaUtilities.Generation.GenModules.IO.ExcelImporter
         {
             InitializeComponent();
 
-            this.jsErrorThread = gridBindContainer.GridScriptHandler.JSErrorThread;
+            this.errorThread = gridBindContainer.GridScriptHandler.ErrorThread;
             this.importConfig = configuration;
             this.gridHandler = new(gridSettings, gridBindContainer, new(), new()) { RowCount = 1999 };
 
@@ -94,7 +94,7 @@ namespace TiaUtilities.Generation.GenModules.IO.ExcelImporter
                 mainGroup.AddJavascript().Label(Locale.IO_GEN_EXCELIMPORT_EXPRESSION)
                                             .BindText(() => importConfig.IgnoreRowExpressionConfig)
                                             .Height(200)
-                                            .RegisterErrorThreadWithForm(jsErrorThread, configForm);
+                                            .RegisterErrorThreadWithForm(errorThread, configForm);
 
                 configForm.StartShowingAtControl(this.configButton);
                 configForm.Init();
