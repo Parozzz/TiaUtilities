@@ -23,6 +23,7 @@ namespace SimaticML.nBlockAttributeList
         public SimaticDataType SimaticDataType { get => SimaticDataType.FromSimaticMLString(this.MemberDataType); }
         public string StartValue { get => this.startValue.AsString; set => this.startValue.AsString = value; }
         public string Version { get => this.version.AsString; set => this.version.AsString = value; }
+        public uint Offset { get => this.GetAttribute<uint>("Offset")?.AsUInt ?? 0; } //If not found, returns 0
 
         public Comment Comment { get => this.comment; }
 
