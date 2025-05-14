@@ -253,7 +253,7 @@ namespace SpinAddin.Utility
 
         public static bool Export(ExportDelegate exportDelegate, string filePath)
         {
-            return Export(exportDelegate, filePath, ExportOptions.None);
+            return Export(exportDelegate, filePath, ExportOptions.WithReadOnly);
         }
 
         public static bool Export(ExportDelegate exportDelegate, string filePath, ExportOptions options)

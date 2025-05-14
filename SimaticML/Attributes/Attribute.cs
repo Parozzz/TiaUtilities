@@ -1,4 +1,5 @@
-﻿using SimaticML.XMLClasses;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using SimaticML.XMLClasses;
 using System.Xml;
 
 namespace SimaticML.Attributes
@@ -11,6 +12,7 @@ namespace SimaticML.Attributes
             {
                 BooleanAttribute.NODE_NAME => new BooleanAttribute(),
                 StringAttribute.NODE_NAME => new StringAttribute(),
+                IntegerAttribute.NODE_NAME => new IntegerAttribute(),
                 _ => null,
             };
         }
@@ -47,5 +49,12 @@ namespace SimaticML.Attributes
         public const string NODE_NAME = "StringAttribute";
 
         public override string AttributeValue { get => this.AsString; set => this.AsString = value; }
+    }
+
+    public class IntegerAttribute() : IAttribute<uint>(IntegerAttribute.NODE_NAME, defaultInnerText: "")
+    {
+        public const string NODE_NAME = "IntegerAttribute";
+
+        public override uint AttributeValue { get => this.AsUInt; set => this.AsUInt = value; }
     }
 }

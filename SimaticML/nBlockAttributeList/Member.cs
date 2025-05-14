@@ -156,6 +156,21 @@ namespace SimaticML.nBlockAttributeList
             return attributeList.GetItems();
         }
 
+        //Attribute for the offset in the DB espressed in bits.
+        //<IntegerAttribute Name="Offset" Informative="true" SystemDefined="true">240</IntegerAttribute>
+        public IAttribute<V>? GetAttribute<V>(string name)
+        {
+            foreach (var node in attributeList.GetItems())
+            {
+                if(node is IAttribute<V> attribute && attribute.AttributeName == name)
+                {
+                    return attribute;
+                }
+            }
+
+            return null;
+        }
+
         public Dictionary<CultureInfo, string> GetComments()
         {
             var dict = new Dictionary<CultureInfo, string>();
