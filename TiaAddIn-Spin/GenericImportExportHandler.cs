@@ -193,7 +193,7 @@ namespace SpinAddIn
                     }
                 }
 
-                var namesText = String.Join("\n", names) + "\n";
+                var namesText = String.Join("\r\n", names) + "\r\n";
                 Clipboard.SetText(namesText, TextDataFormat.Text);
             }
             catch (Exception)

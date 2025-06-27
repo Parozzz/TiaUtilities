@@ -105,7 +105,9 @@ namespace TiaUtilities.Generation.GridHandler
                 var clipboardText = "";
 
                 int startingRowIndex = -999;
-                foreach (var cell in selectedCellList.Where(c => dataGridView.Columns[c.ColumnIndex].Visible))
+
+                var visibleSelectedCells = selectedCellList.Where(c => dataGridView.Columns[c.ColumnIndex].Visible);
+                foreach (var cell in visibleSelectedCells)
                 {
                     if (startingRowIndex == -999)
                     {
@@ -124,8 +126,16 @@ namespace TiaUtilities.Generation.GridHandler
                     var stringValue = cell.Value == null ? "" : cell.Value.ToString();
                     clipboardText += stringValue;
                 }
+                
+                if(visibleSelectedCells.Count() > 1)
+                {
+                    if (clipboardText.Contains('\t')) //If is a multiple column copy, there needs to be a tab at the end required by some software
+                    {
+                        clipboardText += '\t';
+                    }
 
-                clipboardText += "\r\n"; //Add since some software requires it.
+                    clipboardText += "\r\n"; //Add since some software requires it for multiple rows.
+                }
 
                 //The clipboard cannot have an empty string as text
                 if (string.IsNullOrEmpty(clipboardText))
@@ -166,12 +176,14 @@ namespace TiaUtilities.Generation.GridHandler
 
                 var pasteString = (string)clipboardData;
 
-                bool containsExcelChars = pasteString.Contains("\r\n") || pasteString.Contains('\t');
-                if (!containsExcelChars)
+                var returnCount = pasteString.Count(c => c == '\t' || c == '\n');
+                //If the text has only one return or tab AND it does not end with a special char, i will treat it as a single line/column
+                if (returnCount == 0 || (returnCount == 1 && (pasteString.EndsWith('\t') || pasteString.EndsWith('\n'))))
                 {//If is a normal string, i will paste in ALL the selected cells!
+                    var strippedPasteString = pasteString.Replace("\t", "").Replace("\r", "").Replace("\n", "");
                     return dataGridView.SelectedCells
                         .Cast<DataGridViewCell>()
-                        .Select(c => new GridCellChange(c) { NewValue = pasteString })
+                        .Select(c => new GridCellChange(c) { NewValue = strippedPasteString })
                         .ToList();
                 }
 
