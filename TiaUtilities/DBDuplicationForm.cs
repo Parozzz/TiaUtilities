@@ -1,4 +1,5 @@
-﻿using SimaticML.API;
+﻿using SimaticML;
+using SimaticML.API;
 using SimaticML.Blocks;
 using SimaticML.nBlockAttributeList;
 
@@ -89,6 +90,8 @@ namespace TiaUtilities
 
         private void ReplaceAndExportButton_MouseClick(object sender, MouseEventArgs e)
         {
+            var directory = Path.GetDirectoryName(dbXMLPathTextBox.Text);
+
             var startingDBNumber = uint.Parse(startingDBNumberTextBox.Text);
 
             var replacementArray1 = this.replacementList1TextBox.Text.Split('\n');
@@ -130,15 +133,11 @@ namespace TiaUtilities
                 }
 
                 attributeList.BlockNumber = startingDBNumber++;
-                /*
-                if(!string.IsNullOrEmpty(programSettings.lastXMLExportPath))
-                {
-                    attributeList.GetParentConfiguration().UpdateID_UId(new IDGenerator());
+                attributeList.GetParentConfiguration().UpdateID_UId(new IDGenerator());
 
-                    var xmlDocument = SimaticMLParser.CreateDocument();
-                    xmlDocument.DocumentElement.AppendChild(attributeList.GetParentConfiguration().Generate(xmlDocument));
-                    xmlDocument.Save(programSettings.lastXMLExportPath + "/DB" + attributeList.GetBlockNumber() + "_" + attributeList.GetBlockName() + ".xml");
-                }*/
+                var xmlDocument = SimaticMLAPI.CreateDocument();
+                xmlDocument.DocumentElement.AppendChild(attributeList.GetParentConfiguration().Generate(xmlDocument));
+                xmlDocument.Save(directory + "/DB" + attributeList.BlockNumber + "_" + attributeList.BlockName + ".xml");
             }
         }
         private void ReplaceMemberNames(Member member, string toReplace, string replacement)
