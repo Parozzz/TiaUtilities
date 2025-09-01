@@ -83,6 +83,15 @@ namespace TiaUtilities.Generation.Alarms
                 placeholdersHandler.LoadJSONObject(tabConfig.CustomPlaceholdersJSON);
                 placeholdersHandler.TabName = name;
 
+                if (deviceData.Placeholders != null)
+                {
+                    var placeholders = deviceData.Placeholders.Split(GenPlaceholders.Alarms.DEVICE_PLACEHOLDERS_GENERIC_SPLITTER);
+                    for (int x = 0; x < placeholders.Length; x++)
+                    {
+                        placeholdersHandler.AddGenericPlaceholder(x + 1, placeholders[x]);
+                    }
+                }
+
                 var startAlarmNum = nextAlarmNum;
                 foreach (var alarmData in alarmDataList)
                 {
@@ -181,6 +190,24 @@ namespace TiaUtilities.Generation.Alarms
 
             GenerateEmptyAlarms(placeholdersHandler, tabConfig, nextAlarmNum, tabConfig.EmptyAlarmAtEnd);
 
+            if (nextAlarmNum < (tabConfig.TotalAlarmNum + tabConfig.StartingAlarmNum))
+            {
+                placeholdersHandler.Clear(); 
+                placeholdersHandler.LoadJSONObject(tabConfig.CustomPlaceholdersJSON);
+                placeholdersHandler.TabName = name;
+
+                for (uint x = nextAlarmNum; x < (tabConfig.TotalAlarmNum + tabConfig.StartingAlarmNum); x++)
+                {
+                    placeholdersHandler.SetAlarmNum(x, mainConfig.AlarmNumFormat);
+
+                    var alarmItem = this.CreateHmiAlarmItem(ref hmiID, placeholdersHandler, alarmData: null, x, tabConfig, empty: true);
+                    hmiAlarmItems.Add(alarmItem);
+
+                    fullAlarmList += placeholdersHandler.ParseNotNull(mainConfig.AlarmCommentTemplateSpare) + '\n';
+                }
+
+            }
+
             BlockUDT blockUDT = new();
             blockUDT.Init();
             blockUDT.AttributeList.BlockName = placeholdersHandler.ParseNotNull(mainConfig.UDTBlockName);
@@ -195,12 +222,12 @@ namespace TiaUtilities.Generation.Alarms
             this.alarmGroupDict.Add(name, item);
         }
 
-        private AlarmDataXmlItem CreateHmiAlarmItem(ref uint ID, AlarmGenPlaceholdersHandler placeholdersHandler, AlarmData? alarmData, uint alarmNum, AlarmTabConfiguration tabConfig)
+        private AlarmDataXmlItem CreateHmiAlarmItem(ref uint ID, AlarmGenPlaceholdersHandler placeholdersHandler, AlarmData? alarmData, uint alarmNum, AlarmTabConfiguration tabConfig, bool empty = false)
         {
             var alarmVariableName = placeholdersHandler.ParseNotNull(mainConfig.AlarmNameTemplate);
 
             var hmiAlarmName = placeholdersHandler.ParseNotNull(mainConfig.HmiNameTemplate);
-            var hmiAlarmText = placeholdersHandler.ParseNotNull(mainConfig.AlarmCommentTemplate);
+            var hmiAlarmText = empty ? "" : placeholdersHandler.ParseNotNull(mainConfig.AlarmCommentTemplate);
             var hmiTriggerTag = placeholdersHandler.ParseNotNull(mainConfig.HmiTriggerTagTemplate);
             var hmiAlarmClass = placeholdersHandler.ParseNotNull(string.IsNullOrEmpty(alarmData?.HmiAlarmClass) ? tabConfig.DefaultHmiAlarmClass : alarmData?.HmiAlarmClass);
 

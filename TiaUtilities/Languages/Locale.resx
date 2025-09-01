@@ -616,4 +616,7 @@ for row validation</value>
   <data name="ALARM_DATA_HMI_CLASS" xml:space="preserve">
     <value>Hmi Class</value>
   </data>
+  <data name="DEVICE_DATA_PLACEHOLDERS" xml:space="preserve">
+    <value>Placeholders</value>
+  </data>
 </root>

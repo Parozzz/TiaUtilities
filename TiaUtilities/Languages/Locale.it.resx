@@ -616,4 +616,7 @@ validità riga</value>
   <data name="ALARM_DATA_HMI_CLASS" xml:space="preserve">
     <value>Classe Hmi</value>
   </data>
+  <data name="DEVICE_DATA_PLACEHOLDERS" xml:space="preserve">
+    <value>Placeholders</value>
+  </data>
 </root>

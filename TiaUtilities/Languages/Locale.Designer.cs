@@ -817,6 +817,15 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Placeholders.
+        /// </summary>
+        internal static string DEVICE_DATA_PLACEHOLDERS {
+            get {
+                return ResourceManager.GetString("DEVICE_DATA_PLACEHOLDERS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Template.
         /// </summary>
         internal static string DEVICE_DATA_TEMPLATE {

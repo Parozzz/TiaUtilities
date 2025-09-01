@@ -13,6 +13,7 @@ namespace TiaUtilities.Generation.Alarms
         public static readonly GridDataColumn NAME;
         public static readonly GridDataColumn TEMPLATE;
         public static readonly GridDataColumn DESCRIPTION;
+        public static readonly GridDataColumn PLACEHOLDERS;
         public static readonly IReadOnlyList<GridDataColumn> COLUMN_LIST;
 
         static DeviceData()
@@ -20,6 +21,7 @@ namespace TiaUtilities.Generation.Alarms
             var type = typeof(DeviceData);
             NAME = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(DeviceData.Name));
             TEMPLATE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(DeviceData.Template));
+            PLACEHOLDERS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(DeviceData.Placeholders));
             DESCRIPTION = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(DeviceData.Description));
 
             var columnList = GridDataColumn.GetStaticColumnList(type);
@@ -30,6 +32,7 @@ namespace TiaUtilities.Generation.Alarms
         [JsonProperty][Locale(nameof(Locale.DEVICE_DATA_NAME), append: $" > {GenPlaceholders.Alarms.DEVICE_NAME}")] public string? Name { get; set; }
         [JsonProperty][Locale(nameof(Locale.DEVICE_DATA_DESCRIPTION), append: $" > {GenPlaceholders.Alarms.DEVICE_DESCRIPTION}")] public string? Description { get; set; }
         [JsonProperty][Locale(nameof(Locale.DEVICE_DATA_TEMPLATE), append: $" > {GenPlaceholders.Alarms.DEVICE_TEMPLATE}")] public string? Template { get; set; }
+        [JsonProperty][Locale(nameof(Locale.DEVICE_DATA_PLACEHOLDERS), append: $" > {GenPlaceholders.Alarms.DEVICE_PLACEHOLDERS_GENERIC}")] public string? Placeholders { get; set; }
 
         [JsonProperty] public GridSave<AlarmData>? AlarmGridSave {  get; set; }
         public object? this[int column]
@@ -57,13 +60,13 @@ namespace TiaUtilities.Generation.Alarms
 
         public void Clear()
         {
-            this.Name = this.Description = null;
+            this.Name = this.Description = this.Placeholders = null;
             this.AlarmGridSave = null;
         }
 
         public bool IsEmpty()
         {
-            return string.IsNullOrEmpty(this.Name) && string.IsNullOrEmpty(this.Description) && this.AlarmGridSave == null;
+            return string.IsNullOrEmpty(this.Name) && string.IsNullOrEmpty(this.Description) && string.IsNullOrEmpty(this.Placeholders) && this.AlarmGridSave == null;
         }
 
         public override bool Equals(object? obj)

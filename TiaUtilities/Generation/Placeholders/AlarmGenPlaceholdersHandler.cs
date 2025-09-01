@@ -45,5 +45,11 @@ namespace TiaUtilities.Generation.Placeholders
                 Function = (value) => value.ToString(alarmNumFormat)
             });
         }
+
+        public void AddGenericPlaceholder(int num, string value)
+        {
+            var placeholder = GenPlaceholders.Alarms.DEVICE_PLACEHOLDERS_GENERIC.Replace("x", num.ToString());
+            AddOrReplace(placeholder, new StringGenPlaceholderData() { Value = value });
+        }
     }
 }
