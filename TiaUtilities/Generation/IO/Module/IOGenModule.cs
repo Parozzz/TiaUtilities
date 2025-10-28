@@ -14,6 +14,37 @@ using TiaUtilities.Utility.Extensions;
 
 namespace TiaUtilities.Generation.IO.Module
 {
+    public class IOSuggesttionRowComparare : IGridRowComparer<IOSuggestionData>
+    {
+        public bool CanSortColumn(int column) => true;
+
+        public int Compare(IOSuggestionData? x, IOSuggestionData? y)
+        {
+            if (String.IsNullOrWhiteSpace(x?.Value) && !String.IsNullOrWhiteSpace(y?.Value))
+            {
+                return 1;
+            }
+            else if (String.IsNullOrWhiteSpace(x?.Value) && String.IsNullOrWhiteSpace(y?.Value))
+            {
+                return 0;
+            }
+            else if (!String.IsNullOrWhiteSpace(x?.Value) && String.IsNullOrWhiteSpace(y?.Value))
+            {
+                return -1;
+            }
+            else
+            {
+                return string.Compare(x?.Value ?? "", y?.Value ?? "");
+            }
+        }
+
+        public SortOrder GetSortOrder() => SortOrder.Ascending;
+
+        public void SetSortedColumn(int column) { }
+
+        public void SetSortOrder(SortOrder sortOrder) { }
+    }
+
     public class IOGenModule : IGenModule
     {
         private record GenTabRowRecord(IOGenTab GenTab, IOData IOData, int Row);
@@ -41,7 +72,7 @@ namespace TiaUtilities.Generation.IO.Module
             GenUtils.CopyJsonFieldsAndProperties(MainForm.Settings.PresetIOExcelImportConfiguration, this.excelImportConfig);
 
             this.suggestionPreviewer = new();
-            this.suggestionGridHandler = new(MainForm.Settings.GridSettings, this.gridBindContainer, suggestionPreviewer, new()) { RowCount = 1999 };
+            this.suggestionGridHandler = new(MainForm.Settings.GridSettings, this.gridBindContainer, suggestionPreviewer, new(), new IOSuggesttionRowComparare()) { RowCount = 9999 };
 
             this.control = new(suggestionGridHandler.DataGridView);
 
@@ -114,6 +145,11 @@ namespace TiaUtilities.Generation.IO.Module
                             suggestionGridHandler.AddData(suggestionEnumerable);
 
                         }
+                        else if (xmlNodeConfiguration is BlockInstanceDB instanceDB)
+                        {
+                            var suggestionEnumerable = instanceDB.GetAllMemberAddress().Select(v => new IOSuggestionData() { Value = v });
+                            suggestionGridHandler.AddData(suggestionEnumerable);
+                        }
                         else if (xmlNodeConfiguration is XMLTagTable tagTable)
                         {
                             var suggestionEnumerable = tagTable.GetTags().Values.Select(t => t.TagName)
@@ -122,7 +158,7 @@ namespace TiaUtilities.Generation.IO.Module
                         }
                         else
                         {
-                            InformationBox.Show("The selected block is NOT a GlobalDB or file is invalid.", "Invalid imported xml", icon: InformationBoxIcon.Exclamation);
+                            InformationBox.Show("The selected block is NOT a GlobalDB, BlockInstanceDB or file is invalid.", "Invalid imported xml", icon: InformationBoxIcon.Exclamation);
                         }
                     }
 
@@ -396,7 +432,7 @@ namespace TiaUtilities.Generation.IO.Module
         public IEnumerable<string> GetSuggestions(bool filterAlreadyUsed = false)
         {
             IEnumerable<string> suggestions = suggestionGridHandler.DataSource.GetNotEmptyDataDict().Keys.Select(k => k.Value ?? "");
-            if(filterAlreadyUsed)
+            if (filterAlreadyUsed)
             {
                 foreach (var ioTab in this.genTabList)
                 {
