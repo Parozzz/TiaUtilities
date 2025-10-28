@@ -19,8 +19,9 @@ namespace TiaUtilities.Generation.Alarms
         public List<AlarmDataXmlItem> AlarmDataItems { get; init; } = alarmDataItems;
     }
 
-    public class AlarmDataXmlItem(string alarmVariableName, uint hmiID, string hmiAlarmName, string hmiAlarmText, string hmiAlarmClass, string hmiTriggerTag, uint hmiTriggerBit)
+    public class AlarmDataXmlItem(string tabName, string alarmVariableName, uint hmiID, string hmiAlarmName, string hmiAlarmText, string hmiAlarmClass, string hmiTriggerTag, uint hmiTriggerBit)
     {
+        public string TabName { get; init; } = tabName;
         public string AlarmVariableName { get; init; } = alarmVariableName;
 
         public uint HmiID { get; init; } = hmiID;
@@ -41,10 +42,10 @@ namespace TiaUtilities.Generation.Alarms
         {
         }
 
-        public void GenerateAlarms(string name, AlarmTabConfiguration tabConfig, AlarmGenTemplateHandler templateHandler, List<DeviceData> deviceDataList)
+        public void GenerateAlarms(string tabName, AlarmTabConfiguration tabConfig, AlarmGenTemplateHandler templateHandler, List<DeviceData> deviceDataList)
         {
             AlarmGenPlaceholdersHandler placeholdersHandler = new(this.mainConfig, tabConfig);
-            placeholdersHandler.TabName = name;
+            placeholdersHandler.TabName = tabName;
 
             BlockFC fc = new();
             fc.Init();
@@ -81,7 +82,7 @@ namespace TiaUtilities.Generation.Alarms
 
                 placeholdersHandler.Clear();
                 placeholdersHandler.LoadJSONObject(tabConfig.CustomPlaceholdersJSON);
-                placeholdersHandler.TabName = name;
+                placeholdersHandler.TabName = tabName;
 
                 if (deviceData.Placeholders != null)
                 {
@@ -110,15 +111,10 @@ namespace TiaUtilities.Generation.Alarms
                     placeholdersHandler.SetAlarmNum(alarmNum, mainConfig.AlarmNumFormat);
 
                     var comment = placeholdersHandler.ParseNotNull(mainConfig.AlarmCommentTemplate);
-
-                    var alarmName = placeholdersHandler.ParseNotNull(mainConfig.AlarmNameTemplate);
-                    var hmiAlarmName = placeholdersHandler.ParseNotNull(mainConfig.HmiNameTemplate);
-                    var hmiTriggerTag = placeholdersHandler.ParseNotNull(mainConfig.HmiTriggerTagTemplate);
-                    var alarmClass = placeholdersHandler.ParseNotNull(tabConfig.DefaultHmiAlarmClass);
-
-                    hmiAlarmItems.Add(this.CreateHmiAlarmItem(ref hmiID, placeholdersHandler, alarmData, alarmNum, tabConfig));
                     fullAlarmList += $"{comment}'\n'";
 
+                    hmiAlarmItems.Add(this.CreateHmiAlarmItem(ref hmiID, tabName, placeholdersHandler, alarmData, alarmNum, tabConfig));
+                    
                     if (tabConfig.GroupingType == AlarmGroupingType.ONE)
                     {
                         segment = new SimaticLADSegment();
@@ -157,7 +153,7 @@ namespace TiaUtilities.Generation.Alarms
                             var loopAlarmNum = (uint)(lastAlarmNum + x + 1);
                             placeholdersHandler.SetAlarmNum(loopAlarmNum, mainConfig.AlarmNumFormat);
 
-                            hmiAlarmItems.Add(this.CreateHmiAlarmItem(ref hmiID, placeholdersHandler, alarmData: null, loopAlarmNum, tabConfig));
+                            hmiAlarmItems.Add(this.CreateHmiAlarmItem(ref hmiID, tabName, placeholdersHandler, alarmData: null, loopAlarmNum, tabConfig));
                             fullAlarmList += placeholdersHandler.ParseNotNull(mainConfig.AlarmCommentTemplateSpare) + '\n';
                         }
 
@@ -181,7 +177,7 @@ namespace TiaUtilities.Generation.Alarms
                 {
                     var loopAlarmNum = nextAlarmNum + x;
 
-                    hmiAlarmItems.Add(this.CreateHmiAlarmItem(ref hmiID, placeholdersHandler, alarmData: null, loopAlarmNum, tabConfig));
+                    hmiAlarmItems.Add(this.CreateHmiAlarmItem(ref hmiID, tabName, placeholdersHandler, alarmData: null, loopAlarmNum, tabConfig));
                     fullAlarmList += '\n';
                 }
 
@@ -194,13 +190,13 @@ namespace TiaUtilities.Generation.Alarms
             {
                 placeholdersHandler.Clear(); 
                 placeholdersHandler.LoadJSONObject(tabConfig.CustomPlaceholdersJSON);
-                placeholdersHandler.TabName = name;
+                placeholdersHandler.TabName = tabName;
 
                 for (uint x = nextAlarmNum; x < (tabConfig.TotalAlarmNum + tabConfig.StartingAlarmNum); x++)
                 {
                     placeholdersHandler.SetAlarmNum(x, mainConfig.AlarmNumFormat);
 
-                    var alarmItem = this.CreateHmiAlarmItem(ref hmiID, placeholdersHandler, alarmData: null, x, tabConfig, empty: true);
+                    var alarmItem = this.CreateHmiAlarmItem(ref hmiID, tabName, placeholdersHandler, alarmData: null, x, tabConfig, empty: true);
                     hmiAlarmItems.Add(alarmItem);
 
                     fullAlarmList += placeholdersHandler.ParseNotNull(mainConfig.AlarmCommentTemplateSpare) + '\n';
@@ -219,15 +215,15 @@ namespace TiaUtilities.Generation.Alarms
             }
 
             AlarmGroupXmlItem item = new(fc, blockUDT, fullAlarmList, hmiAlarmItems);
-            this.alarmGroupDict.Add(name, item);
+            this.alarmGroupDict.Add(tabName, item);
         }
 
-        private AlarmDataXmlItem CreateHmiAlarmItem(ref uint ID, AlarmGenPlaceholdersHandler placeholdersHandler, AlarmData? alarmData, uint alarmNum, AlarmTabConfiguration tabConfig, bool empty = false)
+        private AlarmDataXmlItem CreateHmiAlarmItem(ref uint ID, string tabName, AlarmGenPlaceholdersHandler placeholdersHandler, AlarmData? alarmData, uint alarmNum, AlarmTabConfiguration tabConfig, bool empty = false)
         {
             var alarmVariableName = placeholdersHandler.ParseNotNull(mainConfig.AlarmNameTemplate);
 
             var hmiAlarmName = placeholdersHandler.ParseNotNull(mainConfig.HmiNameTemplate);
-            var hmiAlarmText = empty ? "" : placeholdersHandler.ParseNotNull(mainConfig.AlarmCommentTemplate);
+            var hmiAlarmText = empty ? "" : placeholdersHandler.ParseNotNull(mainConfig.HmiTextTemplate);
             var hmiTriggerTag = placeholdersHandler.ParseNotNull(mainConfig.HmiTriggerTagTemplate);
             var hmiAlarmClass = placeholdersHandler.ParseNotNull(string.IsNullOrEmpty(alarmData?.HmiAlarmClass) ? tabConfig.DefaultHmiAlarmClass : alarmData?.HmiAlarmClass);
 
@@ -236,7 +232,8 @@ namespace TiaUtilities.Generation.Alarms
             {
                 var triggerByte = (alarmNum - 1) / 16;
                 var triggerBit = (alarmNum - 1) % 16;
-                hmiItem = new(alarmVariableName: alarmVariableName,
+                hmiItem = new(tabName: tabName,
+                    alarmVariableName: alarmVariableName,
                     hmiID: ID,
                     hmiAlarmName: hmiAlarmName,
                     hmiAlarmText: hmiAlarmText,
@@ -246,7 +243,8 @@ namespace TiaUtilities.Generation.Alarms
             }
             else
             {
-                hmiItem = new(alarmVariableName: alarmVariableName,
+                hmiItem = new(tabName: tabName, 
+                    alarmVariableName: alarmVariableName,
                     hmiID: ID,
                     hmiAlarmName: hmiAlarmName,
                     hmiAlarmText: hmiAlarmText,
@@ -483,6 +481,15 @@ namespace TiaUtilities.Generation.Alarms
                 return;
             }
 
+            XLWorkbook beta80Excel = new();
+            var beta80Sheet = beta80Excel.Worksheets.Add("Allarmi");
+            //CD_ERROR	DSC_ERROR	ERROR_TYPE	CD_GROUP	CD_CONVEYOR
+            beta80Sheet.Cell(1, 1).Value = "CD_ERROR";
+            beta80Sheet.Cell(1, 2).Value = "DSC_ERROR";
+            beta80Sheet.Cell(1, 3).Value = "ERROR_TYPE";
+            beta80Sheet.Cell(1, 4).Value = "CD_GROUP";
+            beta80Sheet.Cell(1, 5).Value = "CD_CONVEYOR";
+
             XLWorkbook wb = new();
             var ws = wb.Worksheets.Add("DiscreteAlarms");
             ws.Cell(1, 1).Value = "ID";
@@ -507,6 +514,8 @@ namespace TiaUtilities.Generation.Alarms
                 using var stream = File.CreateText(exportPath + $"/Texts_{alarmGroupName.Replace("\\", "_").Replace("/", "_")}.txt");
                 stream.Write(alarmGroupItem.AlarmList);
 
+                var beta80AlarmNum = 1;
+
                 foreach (var alarmDataItem in alarmGroupItem.AlarmDataItems)
                 {
                     ws.Cell(excelRowIndex, 1).Value = alarmDataItem.HmiID;
@@ -515,6 +524,17 @@ namespace TiaUtilities.Generation.Alarms
                     ws.Cell(excelRowIndex, 4).Value = alarmDataItem.HmiAlarmText;
                     ws.Cell(excelRowIndex, 5).Value = alarmDataItem.TriggerTag;
                     ws.Cell(excelRowIndex, 6).Value = alarmDataItem.TriggerBit;
+
+                    if(!string.IsNullOrEmpty(alarmDataItem.HmiAlarmText))
+                    {
+                        beta80Sheet.Cell(excelRowIndex, 1).Value = beta80AlarmNum;
+                        beta80Sheet.Cell(excelRowIndex, 2).Value = alarmDataItem.HmiAlarmText;
+                        beta80Sheet.Cell(excelRowIndex, 3).Value = 4;
+                        beta80Sheet.Cell(excelRowIndex, 4).Value = alarmDataItem.TabName.Replace("Z", "");
+                        beta80Sheet.Cell(excelRowIndex, 5).Value = 1;
+                    }
+
+                    beta80AlarmNum++;
                     excelRowIndex++;
                 }
 
@@ -522,6 +542,9 @@ namespace TiaUtilities.Generation.Alarms
 
             var hmiAlarmsPath = exportPath + $"/HmiAlarms.xlsx";
             wb.SaveAs(hmiAlarmsPath);
+
+            var beta80Path = exportPath + $"/Beta80Alarms.xlsx";
+            beta80Excel.SaveAs(beta80Path);
         }
     }
 }

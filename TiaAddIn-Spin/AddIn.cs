@@ -122,7 +122,7 @@ namespace SpinAddIn
 
             plcSoftwareHandler = new PlcSoftwareHandler(plcBlockHandler, plcTagTableHandler, plcUDTHandler, plcWatchtableHandler);
 
-            var hmiScreenHandler = new GenericImportExportHandler<Screen, ScreenFolder>(descriptiveName: "HMI Screen",
+            var hmiScreenHandler = new GenericImportExportHandler<Screen, ScreenFolder>("HMI Screen",
                 exportDelegateFunction: plcWatchTable => plcWatchTable.Export,
                 groupNameFunction: group => group.Name,
                 objNameFunction: plcWatchTable => plcWatchTable.Name,
@@ -143,7 +143,7 @@ namespace SpinAddIn
                 });
             this.hmiScreenHandler = hmiScreenHandler;
 
-            var hmiVariableHandler = new GenericImportExportHandler<Siemens.Engineering.Hmi.Tag.TagTable, Siemens.Engineering.Hmi.Tag.TagFolder>(descriptiveName: "HMI Variable",
+            var hmiVariableHandler = new GenericImportExportHandler<Siemens.Engineering.Hmi.Tag.TagTable, Siemens.Engineering.Hmi.Tag.TagFolder>("HMI Variable",
                 exportDelegateFunction: plcWatchTable => plcWatchTable.Export,
                 groupNameFunction: group => group.Name,
                 objNameFunction: plcWatchTable => plcWatchTable.Name,

@@ -85,6 +85,7 @@ namespace TiaUtilities.Generation.Alarms.Module
                     var hmiGroup = mainGroup.AddGroup();
                     hmiGroup.AddLabel().Label(Locale.GENERICS_HMI);
                     hmiGroup.AddTextBox().Label(Locale.ALARM_CONFIG_FORMATTING_HMI_NAME).BindText(() => mainConfig.HmiNameTemplate);
+                    hmiGroup.AddTextBox().Label(Locale.ALARM_CONFIG_FORMATTING_HMI_TEXT).BindText(() => mainConfig.HmiTextTemplate);
                     hmiGroup.AddTextBox().Label(Locale.ALARM_CONFIG_FORMATTING_HMI_TRIGGER_TAG_TEMPLATE).BindText(() => mainConfig.HmiTriggerTagTemplate);
                     hmiGroup.AddCheckBox().Label(Locale.ALARM_CONFIG_FORMATTING_HMI_USE_WORD_ARRAY).BindChecked(() => mainConfig.HmiTriggerTagUseWordArray).ControlNoAdapt();
 

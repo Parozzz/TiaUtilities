@@ -619,4 +619,7 @@ validità riga</value>
   <data name="DEVICE_DATA_PLACEHOLDERS" xml:space="preserve">
     <value>Placeholders</value>
   </data>
+  <data name="ALARM_CONFIG_FORMATTING_HMI_TEXT" xml:space="preserve">
+    <value>Testo</value>
+  </data>
 </root>

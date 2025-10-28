@@ -1,6 +1,9 @@
 ﻿using Siemens.Engineering;
 using Siemens.Engineering.AddIn.Menu;
+using Siemens.Engineering.HW;
 using Siemens.Engineering.SW;
+using Siemens.Engineering.SW.Blocks;
+using Siemens.Engineering.SW.WatchAndForceTables;
 using SpinAddin.Utility;
 using System;
 using System.Collections.Generic;
@@ -70,6 +73,9 @@ namespace SpinAddIn
 
                 menuRoot.Items.AddActionItem<OBJ>($"Copia tutti i nomi dei {multipleDescriptiveName} selezionati", CopyAllSelectedNamesToClipboard);
                 menuRoot.Items.AddActionItem<OBJ>($"Sostituisci tutti i nomi dei {multipleDescriptiveName} selezionati", ChangeAllSelectedNames);
+                menuRoot.Items.AddActionItem<OBJ>($"Modifica numeri dei {multipleDescriptiveName} sequenzialmente", ChangeBlockNumberSequentially);
+                menuRoot.Items.AddActionItem<OBJ>($"Imposta {multipleDescriptiveName} come \"Ottimizzato\"", ChangeAllBlockToOptimized);
+                menuRoot.Items.AddActionItem<OBJ>($"Imposta {multipleDescriptiveName} come \"Non Ottimizzato\"", ChangeAllBlockToStandard);
                 menuRoot.Items.AddActionItem<OBJ>($"Esporta {multipleDescriptiveName} selez. su cartella", ExportAllToFolder);
                 menuRoot.Items.AddActionItem<OBJ>($"Importa {multipleDescriptiveName}", ImportDescrete);
                 menuRoot.Items.AddActionItem<OBJ>($"Importa {multipleDescriptiveName} da cartella", ImportOnlyTopFolder);
@@ -85,6 +91,9 @@ namespace SpinAddIn
 
                 menuRoot.Items.AddActionItem<OBJ>($"Copy the names of all selected {multipleDescriptiveName}", CopyAllSelectedNamesToClipboard);
                 menuRoot.Items.AddActionItem<OBJ>($"Replace all the names of selected {multipleDescriptiveName}", ChangeAllSelectedNames);
+                menuRoot.Items.AddActionItem<OBJ>($"Change number sequentially for {multipleDescriptiveName}", ChangeBlockNumberSequentially);
+                menuRoot.Items.AddActionItem<OBJ>($"Set \"Optimized block access\" to all", ChangeAllBlockToOptimized);
+                menuRoot.Items.AddActionItem<OBJ>($"Remove \"Optimized block access\" to all", ChangeAllBlockToStandard);
                 menuRoot.Items.AddActionItem<OBJ>($"Import {multipleDescriptiveName}", ImportDescrete);
                 menuRoot.Items.AddActionItem<OBJ>($"Import all {multipleDescriptiveName} from folder", ImportOnlyTopFolder);
                 menuRoot.Items.AddActionItem<OBJ>($"Import all {multipleDescriptiveName} from folder (Including sub-folder)", ImportAllSubFolders);
@@ -232,6 +241,108 @@ namespace SpinAddIn
             }
         }
 
+        private void ChangeBlockNumberSequentially(MenuSelectionProvider selectionProvider)
+        {
+            try
+            {
+                string str = "100";
+                var result = Util.ShowInputDialog(ref str);
+
+                if (result == DialogResult.OK)
+                {
+                    if (!Int32.TryParse(str, out Int32 blockNum))
+                    {
+                        return;
+                    }
+                    
+                    foreach (OBJ obj in selectionProvider.GetSelection())
+                    {
+                        if (obj is PlcBlock block)
+                        {
+                            block.AutoNumber = false;
+                            block.Number = blockNum;
+                            blockNum++;
+                        }
+                        /*
+                        var properties = obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+                        foreach (var property in properties)
+                        {
+                            if (property.Name == "AutoNumber")
+                            {
+                                property.SetValue(obj, false);
+                            }
+                            else if (property.Name == "Number")
+                            {
+                                property.SetValue(obj, blockNum);
+                                blockNum++;
+                            }
+                        }*/
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Util.ShowExceptionMessage(ex);
+            }
+        }
+
+        private void ChangeAllBlockToOptimized(MenuSelectionProvider selectionProvider)
+        {
+            try
+            {
+                foreach (OBJ obj in selectionProvider.GetSelection())
+                {
+                    if (obj is PlcBlock block)
+                    {
+                        block.MemoryLayout = MemoryLayout.Optimized;
+                    }
+                    /*
+                    var properties = obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+                    foreach (var property in properties)
+                    {
+                        if (property.Name == "MemoryLayout")
+                        {
+                            property.SetValue(obj, MemoryLayout.Optimized);
+                        }
+                    }*/
+                }
+            }
+            catch (Exception ex)
+            {
+                Util.ShowExceptionMessage(ex);
+            }
+        }
+
+        private void ChangeAllBlockToStandard(MenuSelectionProvider selectionProvider)
+        {
+            try
+            {
+                foreach (OBJ obj in selectionProvider.GetSelection())
+                {
+                    if(obj is PlcBlock block)
+                    {
+                        block.MemoryLayout = MemoryLayout.Standard;
+                    }
+                    /*
+                    var properties = obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+                    foreach (var property in properties)
+                    {
+                        if (property.Name == "MemoryLayout")
+                        {
+                            property.SetValue(obj, MemoryLayout.Standard);
+                        }
+                    }*/
+                }
+            }
+            catch (Exception ex)
+            {
+                Util.ShowExceptionMessage(ex);
+            }
+        }
+
         private void ImportDescrete(MenuSelectionProvider selectionProvider)
         {
             var selection = selectionProvider.GetSelection();
@@ -271,7 +382,6 @@ namespace SpinAddIn
             }
 
         }
-
         private void ImportOnlyTopFolder(MenuSelectionProvider selectionProvider)
         {
             ImportFolderGeneric(selectionProvider, false);

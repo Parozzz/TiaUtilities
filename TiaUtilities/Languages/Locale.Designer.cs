@@ -250,6 +250,15 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Text.
+        /// </summary>
+        internal static string ALARM_CONFIG_FORMATTING_HMI_TEXT {
+            get {
+                return ResourceManager.GetString("ALARM_CONFIG_FORMATTING_HMI_TEXT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Trigger tag template.
         /// </summary>
         internal static string ALARM_CONFIG_FORMATTING_HMI_TRIGGER_TAG_TEMPLATE {
