@@ -50,6 +50,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'V19|AnyCPU'">
     <OutputPath>bin\V19\</OutputPath>
+    <Optimize>false</Optimize>
+    <DefineConstants>#define TIA_V19</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Siemens.Engineering.AddIn">

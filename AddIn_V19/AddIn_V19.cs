@@ -14,8 +14,10 @@ using System.Reflection;
 
 namespace AddIn_V19
 {
+
     public class AddIn_V19 : ContextMenuAddIn
     {
+
         public static string TEMP_PATH = Path.Combine(Environment.ExpandEnvironmentVariables("%TEMP%"), AppDomain.CurrentDomain.FriendlyName);
 
         private readonly TiaPortal _tiaPortal;
@@ -48,34 +50,26 @@ namespace AddIn_V19
             var hmiScreenName = isItalian ? "schermate" : "screens";
             var hmiVariablesName = isItalian ? "variabili" : "variables";
 
-            var plcBlockHandler = new GenericImportExportHandler<PlcBlock, PlcBlockGroup>(blockName,
-            plcBlock => plcBlock.Export,
-            group => group.Name,
-            plcBlock => plcBlock.Name,
-            plcBlock => (PlcBlockGroup)plcBlock.Parent,
-            group => group.Blocks,
-            group => group.Groups,
-            importData =>
-            {
-                try
+            var plcBlockHandler = new GenericImportExportHandler<PlcBlock, PlcBlockGroup>(
+                blockName, 
+                nameof(PlcBlockGroup.Blocks), nameof(PlcBlockGroup.Groups),
+                importData =>
                 {
-                    importData.group.Blocks.Import(importData.fileInfo, importData.importOptions, importData.swImportOptions);
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    return Util.ShowExceptionMessage(ex); //Return false if the message box is cancelled
-                }
-            });
+                    try
+                    {
+                        importData.group.Blocks.Import(importData.fileInfo, importData.importOptions, importData.swImportOptions);
+                        return true;
+                    }
+                    catch (Exception ex)
+                    {
+                        return Util.ShowExceptionMessage(ex); //Return false if the message box is cancelled
+                    }
+                });
             this.plcBlockHandler = plcBlockHandler;
 
-            var plcTagTableHandler = new GenericImportExportHandler<PlcTagTable, PlcTagTableGroup>(plcTagName,
-                plcTagTable => plcTagTable.Export,
-                group => group.Name,
-                plcTagTable => plcTagTable.Name,
-                plcTagTable => (PlcTagTableGroup)plcTagTable.Parent,
-                group => group.TagTables,
-                group => group.Groups,
+            var plcTagTableHandler = new GenericImportExportHandler<PlcTagTable, PlcTagTableGroup>(
+                plcTagName,
+                nameof(PlcTagTableGroup.TagTables), nameof(PlcTagTableGroup.Groups),
                 importData =>
                 {
                     try
@@ -90,13 +84,9 @@ namespace AddIn_V19
                 });
             this.plcTagTableHandler = plcTagTableHandler;
 
-            var plcUDTHandler = new GenericImportExportHandler<PlcType, PlcTypeGroup>(udtName,
-                plcType => plcType.Export,
-                group => group.Name,
-                plcType => plcType.Name,
-                plcType => (PlcTypeGroup)plcType.Parent,
-                group => group.Types,
-                group => group.Groups,
+            var plcUDTHandler = new GenericImportExportHandler<PlcType, PlcTypeGroup>(
+                udtName,
+                nameof(PlcTypeGroup.Types), nameof(PlcTypeGroup.Groups),
                 importData =>
                 {
                     try
@@ -111,13 +101,9 @@ namespace AddIn_V19
                 });
             this.plcUDTHandler = plcUDTHandler;
 
-            var plcWatchtableHandler = new GenericImportExportHandler<PlcWatchTable, PlcWatchAndForceTableGroup>(watchTableName,
-                plcWatchTable => plcWatchTable.Export,
-                group => group.Name,
-                plcWatchTable => plcWatchTable.Name,
-                plcWatchTable => (PlcWatchAndForceTableGroup)plcWatchTable.Parent,
-                group => group.WatchTables,
-                group => group.Groups,
+            var plcWatchtableHandler = new GenericImportExportHandler<PlcWatchTable, PlcWatchAndForceTableGroup>(
+                watchTableName,
+                nameof(PlcWatchAndForceTableGroup.WatchTables), nameof(PlcWatchAndForceTableGroup.Groups),
                 importData =>
                 {
                     try
@@ -134,13 +120,9 @@ namespace AddIn_V19
 
             plcSoftwareHandler = new PlcSoftwareHandler(plcBlockHandler, plcTagTableHandler, plcUDTHandler, plcWatchtableHandler);
 
-            var hmiScreenHandler = new GenericImportExportHandler<Screen, ScreenFolder>(hmiScreenName,
-                exportDelegateFunction: plcWatchTable => plcWatchTable.Export,
-                groupNameFunction: group => group.Name,
-                objNameFunction: plcWatchTable => plcWatchTable.Name,
-                parentFunction: plcWatchTable => (ScreenFolder)plcWatchTable.Parent,
-                containedObjsFunction: group => group.Screens,
-                containedSubGroupsFunction: group => group.Folders,
+            var hmiScreenHandler = new GenericImportExportHandler<Screen, ScreenFolder>(
+                hmiScreenName,
+                nameof(ScreenFolder.Screens), nameof(ScreenFolder.Folders),
                 importPredicate: importData =>
                 {
                     try
@@ -155,13 +137,9 @@ namespace AddIn_V19
                 });
             this.hmiScreenHandler = hmiScreenHandler;
 
-            var hmiVariableHandler = new GenericImportExportHandler<TagTable, TagFolder>(hmiVariablesName,
-                exportDelegateFunction: plcWatchTable => plcWatchTable.Export,
-                groupNameFunction: group => group.Name,
-                objNameFunction: plcWatchTable => plcWatchTable.Name,
-                parentFunction: plcWatchTable => (Siemens.Engineering.Hmi.Tag.TagFolder)plcWatchTable.Parent,
-                containedObjsFunction: group => group.TagTables,
-                containedSubGroupsFunction: group => group.Folders,
+            var hmiVariableHandler = new GenericImportExportHandler<TagTable, TagFolder>(
+                hmiVariablesName,
+                nameof(TagFolder.TagTables), nameof(TagFolder.Folders),
                 importPredicate: importData =>
                 {
                     try

@@ -93,6 +93,7 @@ using System;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace SpinAddin.Utility
@@ -104,6 +105,15 @@ namespace SpinAddin.Utility
             return CultureInfo.InstalledUICulture.EnglishName.ToLowerInvariant().Contains("italy");
         }
 
+        public static string NewLines(int num)
+        {
+            string newLines = "";
+            for (int i = 0; i < num; i++)
+            {
+                newLines += Environment.NewLine;
+            }
+            return newLines;
+        }
 
         public static Form CreateForm()
         {
@@ -236,43 +246,24 @@ namespace SpinAddin.Utility
             MessageBox.Show(Util.CreateForm(), message, caption);
         }
 
-        public static bool ShowExceptionMessage(Exception ex)
+        public static bool ShowExceptionMessage(Exception ex, bool useInnerException = false)
         {
-            string message = "Message: " + ex.Message + "\r\nStackTrace: " + ex.StackTrace;
-            string caption = "An exception occoured while executing Spin Addin!";
+            Exception exToShow = ex;
+            if (useInnerException)
+            {
+                exToShow = ex.InnerException;
+            }
+
+            string exceptionType = useInnerException ? "InnerException" : "Exception";
+            string message = $"({exceptionType})" + Util.NewLines(2)
+                     + "Message: " + ex.Message + Util.NewLines(2)
+                     + "StackTrace: " + ex.StackTrace + Util.NewLines(1)
+                     + "HResult: " + ex.HResult.ToString("X");
+
+            
+            string caption = Util.IsItalian() ? "Un eccezzione è avvenuta durante l'esecuzione dell'Addin" : "An exception occoured while executing Addin!";
 
             return MessageBox.Show(Util.CreateForm(), message, caption, MessageBoxButtons.OKCancel, MessageBoxIcon.Error) == DialogResult.OK;
-        }
-    }
-
-    public static class ExportUtil
-    {
-        public delegate void ExportDelegate(FileInfo fileInfo, ExportOptions options);
-
-        public delegate String NameDelegate(Object obj);
-
-        public static bool Export(ExportDelegate exportDelegate, string filePath)
-        {
-            return Export(exportDelegate, filePath, ExportOptions.WithReadOnly);
-        }
-
-        public static bool Export(ExportDelegate exportDelegate, string filePath, ExportOptions options)
-        {
-            try
-            {
-                if (File.Exists(filePath))
-                {
-                    File.Delete(filePath);
-                }
-
-                exportDelegate(new FileInfo(filePath), options);
-            }
-            catch (Exception ex)
-            {
-                return Util.ShowExceptionMessage(ex); //If it return true it means that the error is ignored and will continue.
-            }
-
-            return true;
         }
     }
 }

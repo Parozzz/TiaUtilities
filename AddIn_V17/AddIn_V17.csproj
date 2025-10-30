@@ -35,6 +35,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'V17|AnyCPU'">
     <OutputPath>bin\V17\</OutputPath>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <DefineConstants>#define TIA_V17</DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />

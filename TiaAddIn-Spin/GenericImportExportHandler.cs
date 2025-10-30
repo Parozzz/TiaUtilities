@@ -1,9 +1,7 @@
 ﻿using Siemens.Engineering;
 using Siemens.Engineering.AddIn.Menu;
-using Siemens.Engineering.HW;
 using Siemens.Engineering.SW;
 using Siemens.Engineering.SW.Blocks;
-using Siemens.Engineering.SW.WatchAndForceTables;
 using SpinAddin.Utility;
 using System;
 using System.Collections.Generic;
@@ -11,7 +9,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
-using static SpinAddin.Utility.ExportUtil;
 
 namespace SpinAddIn
 {
@@ -31,73 +28,117 @@ namespace SpinAddIn
         }
     }
 
-
     public class GenericImportExportHandler<OBJ, GROUP> : SpinAddinMenuRegistrationService where OBJ : IEngineeringObject where GROUP : IEngineeringObject
     {
+        private readonly PropertyInfo objNameProperty;
+        private readonly PropertyInfo objParentProperty;
+        private readonly MethodInfo objExportMethod;
+        private readonly PropertyInfo objIsConsistent;
+
+        private readonly PropertyInfo groupNameProperty;
+        private readonly PropertyInfo groupItemCompositionProperty;
+        private readonly PropertyInfo groupCompositionProperty;
+
         private readonly string multipleDescriptiveName;
-        private readonly Func<OBJ, ExportDelegate> exportDelegateFunction;
-        private readonly Func<GROUP, string> groupNameFunction;
-        private readonly Func<OBJ, string> objNameFunction;
-        private readonly Func<OBJ, GROUP> parentFunction;
-        private readonly Func<GROUP, IEnumerable<OBJ>> containedObjsFunction;
-        private readonly Func<GROUP, IEnumerable<GROUP>> containedSubGroupsFunction;
         private readonly Predicate<ImportData<GROUP>> importPredicate;
-        public GenericImportExportHandler(string multipleDescriptiveName,
-            Func<OBJ, ExportDelegate> exportDelegateFunction,
-            Func<GROUP, string> groupNameFunction,
-            Func<OBJ, string> objNameFunction,
-            Func<OBJ, GROUP> parentFunction,
-            Func<GROUP, IEnumerable<OBJ>> containedObjsFunction,
-            Func<GROUP, IEnumerable<GROUP>> containedSubGroupsFunction,
+        
+        public GenericImportExportHandler( string multipleDescriptiveName,
+            string groupItemCompositionPropertyName, string groupCompositionPropertyName,
             Predicate<ImportData<GROUP>> importPredicate)
         {
             this.multipleDescriptiveName = multipleDescriptiveName;
-            this.exportDelegateFunction = exportDelegateFunction;
-            this.groupNameFunction = groupNameFunction;
-            this.objNameFunction = objNameFunction;
-            this.parentFunction = parentFunction;
-            this.containedObjsFunction = containedObjsFunction;
-            this.containedSubGroupsFunction = containedSubGroupsFunction;
             this.importPredicate = importPredicate;
+
+            var objType = typeof(OBJ);
+            this.objNameProperty = objType.GetProperty("Name", BindingFlags.Instance | BindingFlags.Public);
+            this.objParentProperty = objType.GetProperty("Parent", BindingFlags.Instance | BindingFlags.Public);
+            this.objExportMethod = objType.GetMethod("Export", BindingFlags.Instance | BindingFlags.Public, null, new Type[] { typeof(FileInfo), typeof(ExportOptions) }, null);
+            this.objIsConsistent = objType.GetProperty("IsConsistent", BindingFlags.Instance | BindingFlags.Public);
+
+            var groupType = typeof(GROUP);
+            this.groupNameProperty = groupType.GetProperty("Name", BindingFlags.Instance | BindingFlags.Public);
+            this.groupItemCompositionProperty = groupType.GetProperty(groupItemCompositionPropertyName, BindingFlags.Instance | BindingFlags.Public);
+            this.groupCompositionProperty = groupType.GetProperty(groupCompositionPropertyName, BindingFlags.Instance | BindingFlags.Public);
+
+        }
+
+        public string GetObjName(OBJ obj)
+        {
+            return (string)objNameProperty.GetValue(obj);
+        }
+
+        public GROUP GetObjParent(OBJ obj)
+        {
+            return (GROUP)objParentProperty.GetValue(obj);
+        }
+
+        public bool IsObjConsistent(OBJ obj)
+        {
+            return objIsConsistent == null ? true : (bool) objIsConsistent.GetValue(obj);
+        }
+
+        public IEnumerable<GROUP> GetAllGroups(GROUP group)
+        {
+            return (IEnumerable<GROUP>) groupCompositionProperty.GetValue(group);
+        }
+
+
+        public IEnumerable<OBJ> GetAllObjInGroup(GROUP group)
+        {
+            return (IEnumerable<OBJ>) groupItemCompositionProperty.GetValue(group);
+        }
+
+        public string GetGroupName(GROUP group)
+        {
+            return (string)groupNameProperty.GetValue(group);
         }
 
         public void Register(ContextMenuAddInRoot menuRoot)
         {
             if (Util.IsItalian())
             {
+                menuRoot.Items.AddActionItem<OBJ>($"Copia tutti i nomi dei {multipleDescriptiveName} selezionati", CopyAllSelectedNamesToClipboard);
+                menuRoot.Items.AddActionItem<OBJ>($"Sostituisci tutti i nomi dei {multipleDescriptiveName} selezionati", ChangeAllSelectedNames);
+                if (typeof(OBJ).IsAssignableFrom(typeof(PlcBlock)))
+                {
+
+                    menuRoot.Items.AddActionItem<OBJ>($"Modifica numeri dei {multipleDescriptiveName} sequenzialmente", ChangeBlockNumberSequentially);
+                    menuRoot.Items.AddActionItem<OBJ>($"Imposta {multipleDescriptiveName} come \"Ottimizzato\"", ChangeAllBlockToOptimized);
+                    menuRoot.Items.AddActionItem<OBJ>($"Imposta {multipleDescriptiveName} come \"Non Ottimizzato\"", ChangeAllBlockToStandard);
+                }
+
                 menuRoot.Items.AddActionItem<GROUP>($"Importa {multipleDescriptiveName} da file selezionati", ImportDescrete);
                 menuRoot.Items.AddActionItem<GROUP>($"Importa {multipleDescriptiveName} dalle cartelle selezionata", ImportOnlyTopFolder);
                 menuRoot.Items.AddActionItem<GROUP>($"Importa {multipleDescriptiveName} dalla cartella selezionata (Incluse sottocartelle)", ImportAllSubFolders);
-                menuRoot.Items.AddActionItem<GROUP>($"Esporta {multipleDescriptiveName} nella cartella selezionata", ExportOnlySelectedFolder);
-                menuRoot.Items.AddActionItem<GROUP>($"Esporta {multipleDescriptiveName} nella cartella selezionata (Comprese sotto-cartelle)", ExportAllFolders);
-
-                menuRoot.Items.AddActionItem<OBJ>($"Copia tutti i nomi dei {multipleDescriptiveName} selezionati", CopyAllSelectedNamesToClipboard);
-                menuRoot.Items.AddActionItem<OBJ>($"Sostituisci tutti i nomi dei {multipleDescriptiveName} selezionati", ChangeAllSelectedNames);
-                menuRoot.Items.AddActionItem<OBJ>($"Modifica numeri dei {multipleDescriptiveName} sequenzialmente", ChangeBlockNumberSequentially);
-                menuRoot.Items.AddActionItem<OBJ>($"Imposta {multipleDescriptiveName} come \"Ottimizzato\"", ChangeAllBlockToOptimized);
-                menuRoot.Items.AddActionItem<OBJ>($"Imposta {multipleDescriptiveName} come \"Non Ottimizzato\"", ChangeAllBlockToStandard);
-                menuRoot.Items.AddActionItem<OBJ>($"Esporta {multipleDescriptiveName} selez. su cartella", ExportAllToFolder);
                 menuRoot.Items.AddActionItem<OBJ>($"Importa {multipleDescriptiveName}", ImportDescrete);
                 menuRoot.Items.AddActionItem<OBJ>($"Importa {multipleDescriptiveName} da cartella", ImportOnlyTopFolder);
                 menuRoot.Items.AddActionItem<OBJ>($"Importa {multipleDescriptiveName} da cartella (comprese sotto-cartelle)", ImportAllSubFolders);
+
+                menuRoot.Items.AddActionItem<GROUP>($"Esporta {multipleDescriptiveName} nella cartella selezionata", ExportOnlySelectedFolder);
+                menuRoot.Items.AddActionItem<GROUP>($"Esporta {multipleDescriptiveName} nella cartella selezionata (Comprese sotto-cartelle)", ExportAllFolders);
+                menuRoot.Items.AddActionItem<OBJ>($"Esporta {multipleDescriptiveName} selez. su cartella", ExportAllToFolder);
             }
             else
             {
+                menuRoot.Items.AddActionItem<OBJ>($"Copy the names of all selected {multipleDescriptiveName}", CopyAllSelectedNamesToClipboard);
+                menuRoot.Items.AddActionItem<OBJ>($"Replace all the names of selected {multipleDescriptiveName}", ChangeAllSelectedNames);
+                if (typeof(OBJ).IsAssignableFrom(typeof(PlcBlock)))
+                {
+                    menuRoot.Items.AddActionItem<OBJ>($"Change number sequentially for {multipleDescriptiveName}", ChangeBlockNumberSequentially);
+                    menuRoot.Items.AddActionItem<OBJ>($"Set \"Optimized block access\" to all", ChangeAllBlockToOptimized);
+                    menuRoot.Items.AddActionItem<OBJ>($"Remove \"Optimized block access\" to all", ChangeAllBlockToStandard);
+                }
+
                 menuRoot.Items.AddActionItem<GROUP>($"Import {multipleDescriptiveName} from selected file(s)", ImportDescrete);
                 menuRoot.Items.AddActionItem<GROUP>($"Import {multipleDescriptiveName} from selected folder(s)", ImportOnlyTopFolder);
                 menuRoot.Items.AddActionItem<GROUP>($"Import {multipleDescriptiveName} from selected folder (Including sub-folders)", ImportAllSubFolders);
-                menuRoot.Items.AddActionItem<GROUP>($"Export all {multipleDescriptiveName} inside selected folder", ExportOnlySelectedFolder);
-                menuRoot.Items.AddActionItem<GROUP>($"Export {multipleDescriptiveName} inside selected folder (Including sub-folders)", ExportAllFolders);
-
-                menuRoot.Items.AddActionItem<OBJ>($"Copy the names of all selected {multipleDescriptiveName}", CopyAllSelectedNamesToClipboard);
-                menuRoot.Items.AddActionItem<OBJ>($"Replace all the names of selected {multipleDescriptiveName}", ChangeAllSelectedNames);
-                menuRoot.Items.AddActionItem<OBJ>($"Change number sequentially for {multipleDescriptiveName}", ChangeBlockNumberSequentially);
-                menuRoot.Items.AddActionItem<OBJ>($"Set \"Optimized block access\" to all", ChangeAllBlockToOptimized);
-                menuRoot.Items.AddActionItem<OBJ>($"Remove \"Optimized block access\" to all", ChangeAllBlockToStandard);
                 menuRoot.Items.AddActionItem<OBJ>($"Import {multipleDescriptiveName}", ImportDescrete);
                 menuRoot.Items.AddActionItem<OBJ>($"Import all {multipleDescriptiveName} from folder", ImportOnlyTopFolder);
                 menuRoot.Items.AddActionItem<OBJ>($"Import all {multipleDescriptiveName} from folder (Including sub-folder)", ImportAllSubFolders);
-                menuRoot.Items.AddActionItem<OBJ>($"Export all selected {multipleDescriptiveName} in folder", ExportAllToFolder);
+
+                menuRoot.Items.AddActionItem<GROUP>($"Export all {multipleDescriptiveName} inside selected folder", ExportOnlySelectedFolder);
+                menuRoot.Items.AddActionItem<GROUP>($"Export all {multipleDescriptiveName} inside selected folder (Including sub-folders)", ExportAllFolders);
+                menuRoot.Items.AddActionItem<OBJ>($"Export selected {multipleDescriptiveName} in folder", ExportAllToFolder);
             }
 
         }
@@ -134,10 +175,10 @@ namespace SpinAddIn
 
         public void ExportGroup(string mainDirectory, GROUP group, bool withSubfolders)
         {
-            var directory = mainDirectory + "\\" + groupNameFunction(group);
-            foreach (OBJ obj in containedObjsFunction(group))
+            var directory = mainDirectory + "\\" + this.GetGroupName(group);
+            foreach (OBJ obj in this.GetAllObjInGroup(group))
             {
-                var exportOK = ExportSingle(obj, directory + "\\" + objNameFunction(obj) + ".xml");
+                var exportOK = ExportSingle(obj, directory + "\\" + this.GetObjName(obj) + ".xml");
                 if (!exportOK)
                 {
                     return;
@@ -146,7 +187,7 @@ namespace SpinAddIn
 
             if (withSubfolders)
             {
-                foreach (GROUP subGroup in containedSubGroupsFunction(group))
+                foreach (GROUP subGroup in this.GetAllGroups(group))
                 {
                     ExportGroup(directory, subGroup, true);
                 }
@@ -162,7 +203,7 @@ namespace SpinAddIn
                 var directory = folderDialog.SelectedPath;
                 foreach (OBJ obj in selectionProvider.GetSelection())
                 {
-                    var exportOK = ExportSingle(obj, directory + "\\" + objNameFunction(obj) + ".xml");
+                    var exportOK = ExportSingle(obj, directory + "\\" + this.GetObjName(obj) + ".xml");
                     if (!exportOK)
                     {
                         return;
@@ -254,30 +295,12 @@ namespace SpinAddIn
                     {
                         return;
                     }
-                    
-                    foreach (OBJ obj in selectionProvider.GetSelection())
-                    {
-                        if (obj is PlcBlock block)
-                        {
-                            block.AutoNumber = false;
-                            block.Number = blockNum;
-                            blockNum++;
-                        }
-                        /*
-                        var properties = obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
-                        foreach (var property in properties)
-                        {
-                            if (property.Name == "AutoNumber")
-                            {
-                                property.SetValue(obj, false);
-                            }
-                            else if (property.Name == "Number")
-                            {
-                                property.SetValue(obj, blockNum);
-                                blockNum++;
-                            }
-                        }*/
+                    foreach (PlcBlock block in selectionProvider.GetSelection().Select(obj => obj is PlcBlock).Cast<PlcBlock>())
+                    {
+                        block.AutoNumber = false;
+                        block.Number = blockNum;
+                        blockNum++;
                     }
                 }
             }
@@ -291,22 +314,9 @@ namespace SpinAddIn
         {
             try
             {
-                foreach (OBJ obj in selectionProvider.GetSelection())
+                foreach (PlcBlock block in selectionProvider.GetSelection().Select(obj => obj is PlcBlock).Cast<PlcBlock>())
                 {
-                    if (obj is PlcBlock block)
-                    {
-                        block.MemoryLayout = MemoryLayout.Optimized;
-                    }
-                    /*
-                    var properties = obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-
-                    foreach (var property in properties)
-                    {
-                        if (property.Name == "MemoryLayout")
-                        {
-                            property.SetValue(obj, MemoryLayout.Optimized);
-                        }
-                    }*/
+                    block.MemoryLayout = MemoryLayout.Optimized;
                 }
             }
             catch (Exception ex)
@@ -319,22 +329,9 @@ namespace SpinAddIn
         {
             try
             {
-                foreach (OBJ obj in selectionProvider.GetSelection())
+                foreach (PlcBlock block in selectionProvider.GetSelection().Select(obj => obj is PlcBlock).Cast<PlcBlock>())
                 {
-                    if(obj is PlcBlock block)
-                    {
-                        block.MemoryLayout = MemoryLayout.Standard;
-                    }
-                    /*
-                    var properties = obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-
-                    foreach (var property in properties)
-                    {
-                        if (property.Name == "MemoryLayout")
-                        {
-                            property.SetValue(obj, MemoryLayout.Standard);
-                        }
-                    }*/
+                    block.MemoryLayout = MemoryLayout.Standard;
                 }
             }
             catch (Exception ex)
@@ -353,7 +350,7 @@ namespace SpinAddIn
                 selectedGroup = selectionProvider.GetSelection()
                     .Where(obj => obj is OBJ)
                     .Cast<OBJ>()
-                    .Select(parentFunction)
+                    .Select(this.GetObjParent)
                     .First();
             }
 
@@ -395,30 +392,29 @@ namespace SpinAddIn
         private void ImportFolderGeneric(MenuSelectionProvider selectionProvider, bool includeSubFolders)
         {
             GROUP group = default(GROUP);
-            foreach (GROUP loopGroup in selectionProvider.GetSelection())
+
+            group = selectionProvider.GetSelection().Select(obj => obj is GROUP).Cast<GROUP>().FirstOrDefault();
+            if (group == null)
             {
-                group = loopGroup;
-                break;
+                var firstObj = selectionProvider.GetSelection().Select(obj => obj is OBJ).Cast<OBJ>().FirstOrDefault();
+                if (firstObj == null)
+                {
+                    return;
+                }
+
+                group = this.GetObjParent(firstObj);
             }
 
             if (group == null)
             {
-                foreach (OBJ obj in selectionProvider.GetSelection())
-                {
-                    group = parentFunction(obj);
-                    break;
-                }
+                return;
             }
 
-            if (group != null)
+            var folderDialog = new FolderBrowserDialog();
+            if (folderDialog.ShowDialog(Util.CreateForm()) == DialogResult.OK)
             {
-                var folderDialog = new FolderBrowserDialog();
-                if (folderDialog.ShowDialog(Util.CreateForm()) == DialogResult.OK)
-                {
-                    this.ImportObjectsFromFolder(group, folderDialog.SelectedPath, includeSubFolders);
-                }
+                this.ImportObjectsFromFolder(group, folderDialog.SelectedPath, includeSubFolders);
             }
-
         }
 
         public bool ImportObjectsFromFolder(GROUP group, string folderName, bool searchSubDirectories)
@@ -445,9 +441,31 @@ namespace SpinAddIn
             return true;
         }
 
-        private bool ExportSingle(OBJ obj, string fileName)
-        {
-            return ExportUtil.Export(exportDelegateFunction(obj), fileName);
+        private bool ExportSingle(OBJ obj, string filePath)
+        {//return TRUE = continue other export, FALSE = block all other export.
+            try
+            {
+                if (!this.IsObjConsistent(obj))
+                {
+                    string message = Util.IsItalian() ? "Per favore, compila il blocco prima di esportarlo." : "Please compile the block before exporting";
+                    string caption = Util.IsItalian() ? "Blocco non consistente" : "Incosistent block";
+                    MessageBox.Show(message, caption, MessageBoxButtons.OK);
+                    return true;
+                }
+
+                if (File.Exists(filePath))
+                {
+                    File.Delete(filePath);
+                }
+
+                objExportMethod.Invoke(obj, new object[] { new FileInfo(filePath), ExportOptions.WithReadOnly });
+                return true;
+            }
+            catch (Exception ex)
+            {
+
+                return Util.ShowExceptionMessage(ex, useInnerException: true); //If it return true it means that the error is ignored and will continue.
+            }
         }
 
         private bool ImportBlock(GROUP group, string fileName)
@@ -456,12 +474,22 @@ namespace SpinAddIn
             {
                 try
                 {
+#if TIA_V19 || TIA_V20 || TIA_V21
+                    var importData = new ImportData<GROUP>(group,
+                        new FileInfo(fileName),
+                        ImportOptions.Override | ImportOptions.ActivateInactiveCultures,
+                        SWImportOptions.IgnoreMissingReferencedObjects |
+                        SWImportOptions.IgnoreStructuralChanges |
+                        SWImportOptions.IgnoreUnitAttributes);
+#else
                     var importData = new ImportData<GROUP>(group,
                         new FileInfo(fileName),
                         ImportOptions.Override,
                         SWImportOptions.IgnoreMissingReferencedObjects |
                         SWImportOptions.IgnoreStructuralChanges |
                         SWImportOptions.IgnoreUnitAttributes);
+#endif
+
                     return importPredicate(importData);
                 }
                 catch (Exception ex)
