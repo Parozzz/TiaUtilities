@@ -11,7 +11,11 @@ namespace TiaUtilities
 {
     internal static class Program
     {
-        public const string VERSION = "0.4.1";
+        //0.4.2
+        //Fixed a bug where comment for alarms where generated from the hmi placeholders instead of UDT placeholders
+        //Change device custom placeholder to {device_x}
+        //Added ChatGPT generated icon
+        public const string VERSION = "0.4.2";
 
         /// <summary>
         /// Punto di ingresso principale dell'applicazione.

@@ -133,7 +133,8 @@ namespace TiaUtilities
 
         private void Translate()
         {
-            this.Text = Locale.MAIN_FORM;
+            this.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            this.Text = $"{Locale.MAIN_FORM} V{Program.VERSION}";
 
             this.fileToolStripMenuItem.Text = Locale.GENERICS_FILE;
             this.loadToolStripMenuItem.Text = Locale.GENERICS_LOAD;

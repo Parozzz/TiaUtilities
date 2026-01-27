@@ -26,7 +26,7 @@
             public const string DEVICE_ADDRESS = "{device_address}";
             public const string DEVICE_DESCRIPTION = "{device_description}";
             public const string DEVICE_TEMPLATE = "{device_template}";
-            public const string DEVICE_PLACEHOLDERS_GENERIC = "{device_placeholder_x}";
+            public const string DEVICE_PLACEHOLDERS_GENERIC = "{device_x}";
             public const string DEVICE_PLACEHOLDERS_GENERIC_SPLITTER = "<>";
 
             public const string ALARM_DESCRIPTION = "{alarm_description}";

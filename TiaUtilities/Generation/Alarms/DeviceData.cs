@@ -32,7 +32,7 @@ namespace TiaUtilities.Generation.Alarms
         [JsonProperty][Locale(nameof(Locale.DEVICE_DATA_NAME), append: $" > {GenPlaceholders.Alarms.DEVICE_NAME}")] public string? Name { get; set; }
         [JsonProperty][Locale(nameof(Locale.DEVICE_DATA_DESCRIPTION), append: $" > {GenPlaceholders.Alarms.DEVICE_DESCRIPTION}")] public string? Description { get; set; }
         [JsonProperty][Locale(nameof(Locale.DEVICE_DATA_TEMPLATE), append: $" > {GenPlaceholders.Alarms.DEVICE_TEMPLATE}")] public string? Template { get; set; }
-        [JsonProperty][Locale(nameof(Locale.DEVICE_DATA_PLACEHOLDERS), append: $" > {GenPlaceholders.Alarms.DEVICE_PLACEHOLDERS_GENERIC}")] public string? Placeholders { get; set; }
+        [JsonProperty][Locale(nameof(Locale.DEVICE_DATA_PLACEHOLDERS), append: $" > {GenPlaceholders.Alarms.DEVICE_PLACEHOLDERS_GENERIC} ({GenPlaceholders.Alarms.DEVICE_PLACEHOLDERS_GENERIC_SPLITTER})")] public string? Placeholders { get; set; }
 
         [JsonProperty] public GridSave<AlarmData>? AlarmGridSave {  get; set; }
         public object? this[int column]

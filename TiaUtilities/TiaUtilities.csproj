@@ -8,6 +8,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <StartupObject>TiaUtilities.Program</StartupObject>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <BaseOutputPath></BaseOutputPath>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -20,6 +22,7 @@
 
   <ItemGroup>
     <Content Include="!!TO-DO!!.txt" />
+    <Content Include="icon.ico" />
   </ItemGroup>
 
   <ItemGroup>

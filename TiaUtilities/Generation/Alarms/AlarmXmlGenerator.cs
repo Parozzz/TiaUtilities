@@ -19,10 +19,11 @@ namespace TiaUtilities.Generation.Alarms
         public List<AlarmDataXmlItem> AlarmDataItems { get; init; } = alarmDataItems;
     }
 
-    public class AlarmDataXmlItem(string tabName, string alarmVariableName, uint hmiID, string hmiAlarmName, string hmiAlarmText, string hmiAlarmClass, string hmiTriggerTag, uint hmiTriggerBit)
+    public class AlarmDataXmlItem(string tabName, string alarmVariableName, string alarmVariableComment, uint hmiID, string hmiAlarmName, string hmiAlarmText, string hmiAlarmClass, string hmiTriggerTag, uint hmiTriggerBit)
     {
         public string TabName { get; init; } = tabName;
         public string AlarmVariableName { get; init; } = alarmVariableName;
+        public string AlarmVariableComment { get; init; } = alarmVariableComment;
 
         public uint HmiID { get; init; } = hmiID;
         public string HmiAlarmName { get; init; } = hmiAlarmName;
@@ -54,7 +55,7 @@ namespace TiaUtilities.Generation.Alarms
             fc.AttributeList.AutoNumber = (mainConfig.FCBlockNumber > 0);
 
             List<AlarmDataXmlItem> hmiAlarmItems = [];
-            var fullAlarmList = "";
+            var fullAlarmList = "\'";
 
             var segment = new SimaticLADSegment();
 
@@ -87,9 +88,17 @@ namespace TiaUtilities.Generation.Alarms
                 if (deviceData.Placeholders != null)
                 {
                     var placeholders = deviceData.Placeholders.Split(GenPlaceholders.Alarms.DEVICE_PLACEHOLDERS_GENERIC_SPLITTER);
-                    for (int x = 0; x < placeholders.Length; x++)
+
+                    int count = placeholders.Length;
+                    for (int x = 0; x < count; x++)
                     {
                         placeholdersHandler.AddGenericPlaceholder(x + 1, placeholders[x]);
+                    }
+
+                    //A little hack to allow empty placeholder to be "Removed"
+                    for(int x = count; x < 50; x++)
+                    {
+                        placeholdersHandler.AddGenericPlaceholder(x + 1, "");
                     }
                 }
 
@@ -110,11 +119,12 @@ namespace TiaUtilities.Generation.Alarms
                     placeholdersHandler.AlarmData = parsedAlarmData;
                     placeholdersHandler.SetAlarmNum(alarmNum, mainConfig.AlarmNumFormat);
 
+                    //Creation of AlarmItem for FULL Alarm
                     var comment = placeholdersHandler.ParseNotNull(mainConfig.AlarmCommentTemplate);
-                    fullAlarmList += $"{comment}'\n'";
 
-                    hmiAlarmItems.Add(this.CreateHmiAlarmItem(ref hmiID, tabName, placeholdersHandler, alarmData, alarmNum, tabConfig));
-                    
+                    var alarmItem = this.CreateHmiAlarmItem(ref hmiID, tabName, comment, placeholdersHandler, alarmData, alarmNum, tabConfig);
+                    hmiAlarmItems.Add(alarmItem);
+
                     if (tabConfig.GroupingType == AlarmGroupingType.ONE)
                     {
                         segment = new SimaticLADSegment();
@@ -153,8 +163,11 @@ namespace TiaUtilities.Generation.Alarms
                             var loopAlarmNum = (uint)(lastAlarmNum + x + 1);
                             placeholdersHandler.SetAlarmNum(loopAlarmNum, mainConfig.AlarmNumFormat);
 
-                            hmiAlarmItems.Add(this.CreateHmiAlarmItem(ref hmiID, tabName, placeholdersHandler, alarmData: null, loopAlarmNum, tabConfig));
-                            fullAlarmList += placeholdersHandler.ParseNotNull(mainConfig.AlarmCommentTemplateSpare) + '\n';
+                            //Creation of EMPTY Alarm item for slipping
+                            var comment = placeholdersHandler.ParseNotNull(mainConfig.AlarmCommentTemplateSpare);
+
+                            var alarmItem = this.CreateHmiAlarmItem(ref hmiID, tabName, comment, placeholdersHandler, alarmData: null, loopAlarmNum, tabConfig);
+                            hmiAlarmItems.Add(alarmItem);
                         }
 
                         if (tabConfig.GenerateEmptyAlarmAntiSlip)
@@ -176,9 +189,11 @@ namespace TiaUtilities.Generation.Alarms
                 for (uint x = 0; x < tabConfig.SkipNumberAfterGroup; x++)
                 {
                     var loopAlarmNum = nextAlarmNum + x;
+                    //Creation of EMPTY Alarm for Skip After Group
+                    var comment = "";
 
-                    hmiAlarmItems.Add(this.CreateHmiAlarmItem(ref hmiID, tabName, placeholdersHandler, alarmData: null, loopAlarmNum, tabConfig));
-                    fullAlarmList += '\n';
+                    var alarmItem = this.CreateHmiAlarmItem(ref hmiID, tabName, comment, placeholdersHandler, alarmData: null, loopAlarmNum, tabConfig);
+                    hmiAlarmItems.Add(alarmItem);
                 }
 
                 nextAlarmNum += tabConfig.SkipNumberAfterGroup;
@@ -196,10 +211,11 @@ namespace TiaUtilities.Generation.Alarms
                 {
                     placeholdersHandler.SetAlarmNum(x, mainConfig.AlarmNumFormat);
 
-                    var alarmItem = this.CreateHmiAlarmItem(ref hmiID, tabName, placeholdersHandler, alarmData: null, x, tabConfig, empty: true);
-                    hmiAlarmItems.Add(alarmItem);
+                    //Create of SPARE alarm from total alarms number
+                    var comment = placeholdersHandler.ParseNotNull(mainConfig.AlarmCommentTemplateSpare);
 
-                    fullAlarmList += placeholdersHandler.ParseNotNull(mainConfig.AlarmCommentTemplateSpare) + '\n';
+                    var alarmItem = this.CreateHmiAlarmItem(ref hmiID, tabName, comment, placeholdersHandler, alarmData: null, x, tabConfig, empty: true);
+                    hmiAlarmItems.Add(alarmItem);
                 }
 
             }
@@ -208,19 +224,22 @@ namespace TiaUtilities.Generation.Alarms
             blockUDT.Init();
             blockUDT.AttributeList.BlockName = placeholdersHandler.ParseNotNull(mainConfig.UDTBlockName);
 
-            foreach (var hmiAlarmItem in hmiAlarmItems)
+            foreach (var alarmItem in hmiAlarmItems)
             {
-                var member = blockUDT.AttributeList.NONE.AddMember(hmiAlarmItem.AlarmVariableName, SimaticDataType.BOOLEAN);
-                member.Comment[LocaleVariables.CULTURE] = hmiAlarmItem.HmiAlarmText;
+                var member = blockUDT.AttributeList.NONE.AddMember(alarmItem.AlarmVariableName, SimaticDataType.BOOLEAN);
+                member.Comment[LocaleVariables.CULTURE] = alarmItem.AlarmVariableComment;
+
+                fullAlarmList += $"{alarmItem.AlarmVariableComment}'\n'";
             }
 
             AlarmGroupXmlItem item = new(fc, blockUDT, fullAlarmList, hmiAlarmItems);
             this.alarmGroupDict.Add(tabName, item);
         }
 
-        private AlarmDataXmlItem CreateHmiAlarmItem(ref uint ID, string tabName, AlarmGenPlaceholdersHandler placeholdersHandler, AlarmData? alarmData, uint alarmNum, AlarmTabConfiguration tabConfig, bool empty = false)
+        private AlarmDataXmlItem CreateHmiAlarmItem(ref uint ID, string tabName, string comment, AlarmGenPlaceholdersHandler placeholdersHandler, AlarmData? alarmData, uint alarmNum, AlarmTabConfiguration tabConfig, bool empty = false)
         {
             var alarmVariableName = placeholdersHandler.ParseNotNull(mainConfig.AlarmNameTemplate);
+            var alarmVariableComment = comment;
 
             var hmiAlarmName = placeholdersHandler.ParseNotNull(mainConfig.HmiNameTemplate);
             var hmiAlarmText = empty ? "" : placeholdersHandler.ParseNotNull(mainConfig.HmiTextTemplate);
@@ -232,24 +251,26 @@ namespace TiaUtilities.Generation.Alarms
             {
                 var triggerByte = (alarmNum - 1) / 16;
                 var triggerBit = (alarmNum - 1) % 16;
-                hmiItem = new(tabName: tabName,
-                    alarmVariableName: alarmVariableName,
-                    hmiID: ID,
-                    hmiAlarmName: hmiAlarmName,
-                    hmiAlarmText: hmiAlarmText,
-                    hmiAlarmClass: hmiAlarmClass,
-                    hmiTriggerTag: hmiTriggerTag + $"[{triggerByte}]",
-                    hmiTriggerBit: triggerBit);
+                hmiItem = new(tabName,
+                    alarmVariableName,
+                    alarmVariableComment,
+                    ID,
+                    hmiAlarmName,
+                    hmiAlarmText,
+                    hmiAlarmClass,
+                    hmiTriggerTag + $"[{triggerByte}]",
+                    triggerBit);
             }
             else
             {
-                hmiItem = new(tabName: tabName, 
-                    alarmVariableName: alarmVariableName,
-                    hmiID: ID,
-                    hmiAlarmName: hmiAlarmName,
-                    hmiAlarmText: hmiAlarmText,
-                    hmiAlarmClass: hmiAlarmClass,
-                    hmiTriggerTag: hmiTriggerTag,
+                hmiItem = new(tabName, 
+                    alarmVariableName,
+                    alarmVariableComment,
+                    ID,
+                    hmiAlarmName,
+                    hmiAlarmText,
+                    hmiAlarmClass,
+                    hmiTriggerTag,
                     hmiTriggerBit: 0);
             }
 
