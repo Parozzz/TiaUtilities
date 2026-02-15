@@ -14,6 +14,8 @@ namespace TiaUtilities.Editors.ErrorReporting
         private readonly List<ErrorReporter> reporterList;
         private readonly List<ErrorReporter> asyncReporterList;
 
+        private bool init = false;
+
         public ErrorReportThread()
         {
             worker = new BackgroundWorker();
@@ -25,6 +27,13 @@ namespace TiaUtilities.Editors.ErrorReporting
 
         public void Init()
         {
+            if (init)
+            {
+                throw new InvalidOperationException("Trying to initialize ErrorReportThread twice");
+            }
+
+            init = true;
+
             worker.DoWork += (sender, args) => ExecuteAsync();
             timer.Tick += (sender, args) =>
             {

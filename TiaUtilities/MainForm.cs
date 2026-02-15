@@ -15,6 +15,7 @@ using TiaUtilities.Editors.ErrorReporting;
 using TiaUtilities.Generation;
 using TiaUtilities.Generation.Configuration;
 using TiaUtilities.Utility;
+using TiaUtilities.Generation.SettingsNew;
 
 namespace TiaUtilities
 {
@@ -24,6 +25,8 @@ namespace TiaUtilities
 
         private readonly TimedSaveHandler autoSaveHandler;
         private readonly ErrorReportThread errorThread;
+
+        public static readonly ErrorReportThread JavascriptErrorThread = new();
 
         public MainForm()
         {
@@ -50,6 +53,9 @@ namespace TiaUtilities
 
             LogHandler.INSTANCE.Init();
             LogHandler.INSTANCE.Start();
+
+            JavascriptErrorThread.Init();
+            JavascriptErrorThread.Start();
 
             this.errorThread.Init();
             this.errorThread.Start();
@@ -329,6 +335,11 @@ namespace TiaUtilities
         {
             TreeViewDBVisualization dbVisualizationForm = new();
             dbVisualizationForm.Show(this);
+        }
+
+        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SettingsParser.CreateTestForm()?.ShowDialog();
         }
     }
 }
