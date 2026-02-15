@@ -25,8 +25,8 @@ namespace TiaUtilities.Generation.SettingsNew
         {
             public string Name { get; init; } = name;
             public string Description { get; init; } = description;
-            public List<SettingsValue> Values { get; init; } = []; 
-            
+            public List<SettingsValue> Values { get; init; } = [];
+
             public override string ToString()
             {
                 return Name;
@@ -57,7 +57,7 @@ namespace TiaUtilities.Generation.SettingsNew
         }
 
         private void Init()
-        { 
+        {
             this.mainPanel.Dock = DockStyle.Fill;
             this.mainPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             this.mainPanel.AutoSize = true;
@@ -107,15 +107,15 @@ namespace TiaUtilities.Generation.SettingsNew
             this.leftSelectSectionListView.ItemSelectionChanged += (sender, args) =>
             {
                 var item = args.Item;
-                if(item == null)
+                if (item == null)
                 {
-                    return; 
+                    return;
                 }
 
                 var itemName = item.Text;
-                foreach(var section in sectionList)
+                foreach (var section in sectionList)
                 {
-                    if(section.Name == itemName)
+                    if (section.Name == itemName)
                     {
                         this.LoadSection(section);
                     }
@@ -150,17 +150,71 @@ namespace TiaUtilities.Generation.SettingsNew
 
         public void ParseBindings(SettingsBindings bindings)
         {
+            Group lastGroup = new("", "");
             foreach (var sectionBinding in bindings.SectionBindings)
             {
                 Section section = new(sectionBinding.Name, sectionBinding.Tooltip);
-                foreach(var groupBinding in bindings.GroupBindings)
+
+                foreach (var value in bindings.ValueList)
                 {
-                    if(groupBinding.Section == section.Name)
+                    if (lastGroup.Name == "")
+                    {
+                        var groupBinding = value.Binding.Group;
+                        if (groupBinding != null)
+                        {
+                            lastGroup = new(groupBinding.Name, groupBinding.Description);
+                        }
+                    }
+                    else
+                    {
+                        var groupBinding = value.Binding.Group;
+                        if (groupBinding != null)
+                        {
+                            if(groupBinding.Name != lastGroup.Name)
+                            {
+                                lastGroup = new(groupBinding.Name, groupBinding.Description);
+                            }
+                        }
+                        else
+                        {
+                            lastGroup = null;
+                        }
+                    }
+                }
+
+
+                foreach (var groupBinding in bindings.GroupBindings)
+                {
+                    if (lastGroup == null)
                     {
                         Group group = new(groupBinding.Name, groupBinding.Description);
-                        foreach(var value in bindings.ValueList)
+                        foreach (var value in bindings.ValueList)
                         {
-                            if(value.Binding.Group == group.Name)
+                            if (value.Binding.Group == group.Name)
+                            {
+                                group.Values.Add(value);
+                            }
+                        }
+
+                        lastGroup = group;
+                        section.Groups.Add(group);
+                    }
+                    else
+                    {
+                        foreach (var value in bindings.ValueList)
+                        {
+                            if (value.Binding.Group == lastGroup.Name)
+                            {
+                                group.Values.Add(value);
+                            }
+                        }
+                    }
+                    if (groupBinding.Section == section.Name)
+                    {
+                        Group group = new(groupBinding.Name, groupBinding.Description);
+                        foreach (var value in bindings.ValueList)
+                        {
+                            if (value.Binding.Group == group.Name)
                             {
                                 group.Values.Add(value);
                             }
@@ -253,8 +307,8 @@ namespace TiaUtilities.Generation.SettingsNew
                 Padding = Padding.Empty,
                 Margin = Padding.Empty,
                 Font = SettingsConstants.SETTINGS_GROUP_NAME_FONT,
-            }; 
-            
+            };
+
             Label descriptionLabel = new()
             {
                 Text = group.Description,
@@ -288,7 +342,7 @@ namespace TiaUtilities.Generation.SettingsNew
             };
 
             var valueName = value.Binding.Name;
-            if(!string.IsNullOrEmpty(valueName))
+            if (!string.IsNullOrEmpty(valueName))
             {
                 Label nameLabel = new()
                 {
@@ -341,7 +395,7 @@ namespace TiaUtilities.Generation.SettingsNew
         private void ListView_DrawSubItem(object? sender, DrawListViewSubItemEventArgs e)
         {
             var item = e.Item;
-            if(item == null)
+            if (item == null)
             {
                 return;
             }
@@ -361,7 +415,7 @@ namespace TiaUtilities.Generation.SettingsNew
             e.Graphics.FillRectangle(new SolidBrush(backColor), e.Bounds);
 
             //BORDER
-            if(borderWidth > 0)
+            if (borderWidth > 0)
             {
                 var borderBound = Rectangle.Inflate(e.Bounds, -borderWidth - rectsLeftPadding / 2, -borderWidth);
                 borderBound.Offset(rectsLeftPadding / 2, 0);
