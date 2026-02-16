@@ -41,7 +41,7 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
                 MaximumSize = new Size(80, 0),
                 Margin = new Padding(3, 0, 0, 0), //This is to align to the label since a the padding is automatically set to the left.
                 Padding = Padding.Empty,
-                Font = SettingsConstants.SETTINGS_VALUE_TEXTBOX_FONT,
+                Font = SettingsConstants.VALUE_TEXTBOX_FONT,
                 BackColor = Form.DefaultBackColor,
             };
             this.colorHexaTextBox.TextChanged += ColorTextBoxTextChangedEvent;

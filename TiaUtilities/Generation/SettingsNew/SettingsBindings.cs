@@ -4,21 +4,31 @@ using TiaUtilities.Configuration;
 namespace TiaUtilities.Generation.SettingsNew
 {
     //A Sections contains Groups that contains Values.
-    public record SettingsSectionBinding(SettingsBindings SettingsBindings, string Name, string Tooltip);
-    public record SettingsGroupBinding(SettingsBindings SettingsBindings, string Name, string Description, string Section);
-    public record SettingsValueBinding(SettingsBindings SettingsBindings, string PropertyName, string Name, string Description, SettingsEditorTypeEnum EditorType, SettingsSectionBinding SectionBinding, SettingsGroupBinding? GroupBinding);
+    public record SettingsMacroSectionBinding(SettingsBindings SettingsBindings, string Name);
+
+    public record SettingsSectionBinding(SettingsBindings SettingsBindings, 
+        string Name, string Description, 
+        SettingsMacroSectionBinding MacroSectionBinding,
+        List<SettingsValue> ValueList
+        );
+
+    public record SettingsValueBinding(SettingsBindings SettingsBindings,
+        string PropertyName, string Name, string Description, SettingsEditorTypeEnum EditorType,
+        SettingsMacroSectionBinding MacroSectionBinding,
+        SettingsSectionBinding SectionBinding
+    );
 
     public class SettingsBindings
     {
-        public List<SettingsSectionBinding> SectionBindings { get; init; } = [];
-        public List<SettingsValue> ValueList { get; init; } = [];
+        public List<SettingsMacroSectionBinding> MacroSectionList { get; init; } = [];
+        public List<SettingsSectionBinding> SectionList { get; init; } = [];
 
         public ObservableConfiguration ConfigurationObject { get; init; }
         public ObservableConfiguration? PresetConfigurationObject { get; private set; }
         public Func<IEnumerable<ObservableConfiguration>>? OtherConfigurationsFunc { get; private set; }
 
+        private SettingsMacroSectionBinding? lastMacroSection;
         private SettingsSectionBinding? lastSection;
-        private SettingsGroupBinding? lastGroup;
 
         public SettingsBindings(ObservableConfiguration configurationObject)
         {
@@ -33,7 +43,7 @@ namespace TiaUtilities.Generation.SettingsNew
 
         public SettingsBindings SetPresetConfiguration(ObservableConfiguration presetConfiguration)
         {
-            if(this.ConfigurationObject.GetType() == presetConfiguration.GetType())
+            if (this.ConfigurationObject.GetType() == presetConfiguration.GetType())
             {
                 this.PresetConfigurationObject = presetConfiguration;
             }
@@ -49,29 +59,20 @@ namespace TiaUtilities.Generation.SettingsNew
             }
         }
 
-        public SettingsBindings Section(string name, string tooltip = "")
+        public SettingsBindings MacroSection(string name)
         {
-            var sectionBinding = new SettingsSectionBinding(this, name, tooltip);
-
-            lastSection = sectionBinding;
-            lastGroup = null;
-
-            SectionBindings.Add(sectionBinding);
+            lastMacroSection = new(this, name);
+            this.MacroSectionList.Add(lastMacroSection);
             return this;
         }
 
-        public SettingsBindings Group(string name, string description = "")
+        public SettingsBindings Section(string name, string description = "")
         {
-            var section = lastSection ?? throw new InvalidOperationException("No Sections has been defined before");
+            var macroSection = lastMacroSection ?? throw new InvalidOperationException("No MacroSection has been defined before");
+            lastSection = new SettingsSectionBinding(this, name, description, macroSection, []);
 
-            var groupBinding = new SettingsGroupBinding(this, name, description, section.Name);
-            lastGroup = groupBinding;
-            return this;
-        }
+            this.SectionList.Add(lastSection);
 
-        public SettingsBindings NoGroup()
-        {
-            lastGroup = null;
             return this;
         }
 
@@ -86,6 +87,7 @@ namespace TiaUtilities.Generation.SettingsNew
 
         public SettingsBindings Add(string propertyName, string name, string description, SettingsEditorTypeEnum editorType)
         {
+            var macroSection = lastMacroSection ?? throw new InvalidOperationException("No MacroSection has been defined before");
             var section = lastSection ?? throw new InvalidOperationException("No Section has been defined before");
 
             var propertyInfo = ConfigurationObject.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
@@ -94,10 +96,10 @@ namespace TiaUtilities.Generation.SettingsNew
                 throw new InvalidOperationException($"No valid PropertyInfo has been found at Name: {propertyName} for Object: {ConfigurationObject.GetType().FullName}");
             }
 
-            SettingsValueBinding valueBinding = new(this, propertyName, name, description, editorType, section, lastGroup);
+            SettingsValueBinding valueBinding = new(this, propertyName, name, description, editorType, macroSection, section);
 
             SettingsValue settingsValue = new(this.ConfigurationObject, valueBinding, propertyInfo);
-            this.ValueList.Add(settingsValue);
+            this.lastSection.ValueList.Add(settingsValue);
 
             return this;
         }

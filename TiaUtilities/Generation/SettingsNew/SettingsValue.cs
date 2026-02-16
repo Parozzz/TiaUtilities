@@ -14,7 +14,6 @@ namespace TiaUtilities.Generation.SettingsNew
         public string Name { get => this.ValueBinding.Name; }
         public string Description { get => this.ValueBinding.Description; }
         public SettingsSectionBinding SectionBinding { get => this.ValueBinding.SectionBinding; }
-        public SettingsGroupBinding? GroupBinding { get => this.ValueBinding.GroupBinding; }
 
         public PropertyInfo PropertyInfo { get; init; }
 

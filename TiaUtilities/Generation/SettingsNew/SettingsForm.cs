@@ -10,45 +10,30 @@ namespace TiaUtilities.Generation.SettingsNew
 
     public partial class SettingsForm : Form
     {
-        private class Section(string name, string tooltip)
+        private class MacroSection(string name)
         {
             public string Name { get; init; } = name;
-            public string Tooltip { get; init; } = tooltip;
-            public List<Group> Groups { get; init; } = [];
-
-            public Section(SettingsSectionBinding binding) : this(binding.Name, binding.Tooltip)
-            {
-
-            }
-
-            public override string ToString()
-            {
-                return Name;
-            }
+            public override string ToString() => Name;
+            public List<Section> Sections { get; init; } = [];
         }
 
-        private class Group(string name, string description)
+        private class Section(MacroSection macroSection, string name, string tooltip)
         {
-            public static Group Empty { get => new("", ""); }
-
+            public MacroSection MacroSection { get; init;  } = macroSection;
             public string Name { get; init; } = name;
-            public string Description { get; init; } = description;
-            public List<SettingsValue> Values { get; init; } = [];
+            public string Description { get; init; } = tooltip;
+            public List<SettingsValue> ValueList { get; init; } = [];
 
-            public Group(SettingsGroupBinding binding) : this(binding.Name, binding.Description)
-            {
+            public TableLayoutPanel? Panel { get; set; } = null;
+            public int PanelTop { get; set; } = 0;
 
-            }
+            public override string ToString() => Name;
+        }
 
-            public bool IsEmpty()
-            {
-                return string.IsNullOrEmpty(this.Name);
-            }
-
-            public override string ToString()
-            {
-                return Name;
-            }
+        private class ListViewItemTag
+        {
+            public bool IsMacroSection { get; set; } = false;
+            public object? Value { get; set; } = null;
         }
 
         private readonly TableLayoutPanel mainPanel;
@@ -56,13 +41,17 @@ namespace TiaUtilities.Generation.SettingsNew
         private readonly TableLayoutPanel rightSettingsPanel;
 
         private readonly SettingsBindings bindings;
+        private readonly List<MacroSection> macroSectionList;
         private readonly List<Section> sectionList;
+
+        private MacroSection? loadedMacroSection;
 
         public SettingsForm(SettingsBindings bindings)
         {
             InitializeComponent();
 
             this.bindings = bindings;
+            this.macroSectionList = [];
             this.sectionList = [];
 
             this.mainPanel = new();
@@ -110,8 +99,8 @@ namespace TiaUtilities.Generation.SettingsNew
 
         private void InitLeftListView(string columnName)
         {
-            this.leftSelectSectionListView.Font = SettingsConstants.SECTIONS_FONT;
-            this.leftSelectSectionListView.View = View.Details; //This view shows group 
+            this.leftSelectSectionListView.Font = SettingsConstants.SECTIONS_LEFT_FONT;
+            this.leftSelectSectionListView.View = View.Tile; //This view shows group 
             this.leftSelectSectionListView.Dock = DockStyle.Fill;
             this.leftSelectSectionListView.HeaderStyle = ColumnHeaderStyle.Nonclickable;
             this.leftSelectSectionListView.Activation = ItemActivation.OneClick;
@@ -123,23 +112,23 @@ namespace TiaUtilities.Generation.SettingsNew
             this.leftSelectSectionListView.GridLines = false;
             this.leftSelectSectionListView.Sorting = SortOrder.None;
             this.leftSelectSectionListView.Scrollable = false;
-            this.leftSelectSectionListView.MaximumSize = new Size((int)SettingsConstants.SECTIONS_LIST_VIEW_WIDTH, 0);
+            this.leftSelectSectionListView.MaximumSize = new Size(SettingsConstants.SECTIONS_LIST_VIEW_WIDTH, 0);
             this.leftSelectSectionListView.MinimumSize = new Size(30, 80);
-
-            this.leftSelectSectionListView.ItemSelectionChanged += (sender, args) => LoadSection(args.Item?.Text);
-
-            var columnHeader = this.leftSelectSectionListView.Columns.Add(columnName, -2, HorizontalAlignment.Left); //Width of -2 indicates auto-size.
+            this.leftSelectSectionListView.TileSize = new Size(SettingsConstants.SECTIONS_LIST_VIEW_WIDTH, SettingsConstants.SECTIONS_LIST_TILE_HEIGHT);
 
             this.leftSelectSectionListView.OwnerDraw = true;
             this.leftSelectSectionListView.DrawColumnHeader += this.ListView_DrawColumnHeader;
-            //this.listView.DrawItem += this.ListView_DrawItem;
-            this.leftSelectSectionListView.DrawSubItem += this.ListView_DrawSubItem;
+            this.leftSelectSectionListView.DrawItem += this.ListView_DrawItem;
+            //this.leftSelectSectionListView.DrawSubItem += this.ListView_DrawSubItem;
+
+            this.leftSelectSectionListView.ItemSelectionChanged += (sender, args) => LoadFromItem(args.Item);
         }
 
         private void InitRightPanel()
         {
             //SystemInformation.VerticalScrollBarWidth
             this.rightSettingsPanel.AutoSize = true;
+            this.rightSettingsPanel.AutoScroll = true;
             //Anchors are needed for the ScrollableControl above!
             this.rightSettingsPanel.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right;
             this.rightSettingsPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
@@ -149,91 +138,89 @@ namespace TiaUtilities.Generation.SettingsNew
 
         public void ParseBindings()
         {
-            foreach (var sectionBinding in this.bindings.SectionBindings)
+            MacroSection? macroSection = null;
+            foreach (var sectionBinding in this.bindings.SectionList)
             {
-                bool firstGroup = true;
-                Group previousGroup = Group.Empty;
-
-                Section section = new(sectionBinding.Name, sectionBinding.Tooltip);
-
-                foreach (var value in this.bindings.ValueList)
+                if (macroSection == null || macroSection.Name != sectionBinding.MacroSectionBinding.Name)
                 {
-                    if (value.SectionBinding.Name != sectionBinding.Name)
+                    macroSection = new(sectionBinding.MacroSectionBinding.Name);
+                    this.macroSectionList.Add(macroSection);
+
+                    ListViewItem macroSectionListViewItem = new()
                     {
-                        continue;
-                    }
-
-                    Group nextGroup = previousGroup;
-
-                    var groupBinding = value.GroupBinding;
-                    if (groupBinding == null && !previousGroup.IsEmpty())
-                    {
-                        nextGroup = Group.Empty;
-                    }
-                    else if (groupBinding != null && groupBinding.Name != previousGroup.Name)
-                    {
-                        nextGroup = new(groupBinding);
-                    }
-
-                    if (firstGroup || previousGroup.Name != nextGroup.Name)
-                    {
-                        firstGroup = false;
-
-                        previousGroup = nextGroup;
-                        section.Groups.Add(nextGroup);
-                    }
-
-                    nextGroup.Values.Add(value);
+                        Text = macroSection.Name,
+                        Tag = new ListViewItemTag() { IsMacroSection = true, Value = macroSection }
+                    };
+                    this.leftSelectSectionListView.Items.Add(macroSectionListViewItem);
                 }
 
+                Section section = new(macroSection, sectionBinding.Name, sectionBinding.Description);
+                section.ValueList.AddRange(sectionBinding.ValueList);
+                this.sectionList.Add(section);
 
                 ListViewItem listViewItem = new()
                 {
                     Text = section.Name,
-                    ToolTipText = section.Tooltip,
+                    ToolTipText = section.Description,
+                    Tag = new ListViewItemTag() { IsMacroSection = false, Value = section }
                 };
                 this.leftSelectSectionListView.Items.Add(listViewItem);
-
-                this.sectionList.Add(section);
+ 
+                macroSection.Sections.Add(section);
             }
 
-            var items = this.leftSelectSectionListView.Items;
-
-            var firstItem = items.Count > 0 ? items[0] : null;
-            this.LoadSection(firstItem?.Text);
+            this.LoadFromItem(this.leftSelectSectionListView.Items[0]);
         }
 
-        private void LoadSection(string? sectionName)
+        private void LoadFromItem(ListViewItem? item)
         {
-            if (sectionName != null)
+            if (item?.Tag is ListViewItemTag tag)
             {
-                foreach (var section in sectionList)
+                if (tag.Value is Section section)
                 {
-                    if (section.Name == sectionName)
+                    if(section.MacroSection != this.loadedMacroSection)
                     {
-                        this.LoadSection(section);
+                        this.LoadMacroSection(section.MacroSection);
                     }
+
+                    if(section.Panel != null)
+                    {
+                        this.rightSettingsPanel.ScrollControlIntoView(section.Panel);
+                        //this.rightSettingsPanel.AutoScrollPosition = new Point(0, section.PanelTop);
+                    }
+                }
+                else if (tag.Value is MacroSection macroSection)
+                {
+                    this.LoadMacroSection(macroSection);
                 }
             }
         }
 
-        private void LoadSection(Section section)
+        private void LoadMacroSection(MacroSection macroSection)
         {
+            this.loadedMacroSection = macroSection;
+
             this.rightSettingsPanel.Controls.Clear();
-            foreach (var group in section.Groups)
+
+            foreach (var section in macroSection.Sections)
             {
                 TableLayoutPanel panel = new()
                 {
                     AutoSize = true,
                     AutoSizeMode = AutoSizeMode.GrowAndShrink,
                     Dock = DockStyle.Fill,
-                    RowStyles = { new RowStyle(SizeType.AutoSize) },
+                    ColumnStyles = { 
+                        new(SizeType.Absolute, SettingsConstants.SECTIONS_NAME_COLUMN_SIZE),
+                        new(SizeType.Absolute, SettingsConstants.SECTIONS_BORDER_COLUMN_SIZE),
+                        new(SizeType.AutoSize)
+                    },
+                    RowStyles = { new(SizeType.AutoSize) },
                     Padding = Padding.Empty,
-                    Margin = new Padding(0, 0, 0, (int) SettingsConstants.GROUP_SEPARATION),
+                    Margin = new Padding(0, 0, 0, (int)SettingsConstants.SECTIONS_SEPARATION),
                 };
                 Utils.SetDoubleBuffered(panel);
 
-                TableLayoutPanel settingsRightPanel = new()
+                TableLayoutPanel valuesPanel = new()
                 {
                     AutoSize = true,
                     AutoSizeMode = AutoSizeMode.GrowAndShrink,
@@ -243,55 +230,46 @@ namespace TiaUtilities.Generation.SettingsNew
                     Margin = Padding.Empty,
                 };
 
-                foreach (var value in group.Values)
+                foreach (var value in section.ValueList)
                 {
                     var valueControl = this.CreateValuePanel(value);
 
-                    settingsRightPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-                    settingsRightPanel.Controls.Add(valueControl);
+                    valuesPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+                    valuesPanel.Controls.Add(valueControl);
                 }
 
-                int columIndex = 0;
-
-                var groupLeftPanel = this.CreateGroupLeftPanel(group);
-                if(groupLeftPanel != null)
+                var sectionPanel = this.CreateSectionLeftPanel(section);
+                //This is just to view bettere the division
+                var sectionBorderLabel = new Label()
                 {
-                    panel.ColumnStyles.Add(new(SizeType.Absolute, SettingsConstants.GROUP_NAME_COLUMN_SIZE));
-                    panel.ColumnStyles.Add(new(SizeType.Absolute, SettingsConstants.GROUP_BORDER_COLUMN_SIZE));
+                    Text = "",
+                    Dock = DockStyle.Fill,
+                    BackColor = Color.DarkBlue,
+                    Padding = Padding.Empty,
+                    Margin = new Padding(0, 0, (int)(SettingsConstants.SECTIONS_BORDER_COLUMN_SIZE / 2f), 0),
+                };
 
-                    //This is just to view bettere the division
-                    var groupBorderRectLabel = new Label()
-                    {
-                        Text = "",
-                        Dock = DockStyle.Fill,
-                        BackColor = Color.DarkBlue,
-                        Padding = Padding.Empty,
-                        Margin = new Padding(0, 0, (int)(SettingsConstants.GROUP_BORDER_COLUMN_SIZE / 2f), 0),
-                    };
-
-                    panel.Controls.Add(groupLeftPanel, 0, 0);
-                    panel.Controls.Add(groupBorderRectLabel, 1, 0);
-
-                    columIndex = 2;
-                }
-
-                panel.ColumnStyles.Add(new(SizeType.AutoSize));
-                panel.Controls.Add(settingsRightPanel, columIndex, 0);
+                panel.Controls.Add(sectionPanel, 0, 0);
+                panel.Controls.Add(sectionBorderLabel, 1, 0);
+                panel.Controls.Add(valuesPanel, 2, 0);
 
                 this.rightSettingsPanel.RowStyles.Add(new(SizeType.AutoSize));
                 this.rightSettingsPanel.Controls.Add(panel);
+
+                section.Panel = panel;
+
+                panel.VisibleChanged += (sender, args) =>
+                {
+                    panel.AutoScrollPosition = new Point(0, panel.Top);
+                    section.PanelTop = panel.Top;
+                };
             }
         }
 
-        private TableLayoutPanel? CreateGroupLeftPanel(Group group)
+        private TableLayoutPanel CreateSectionLeftPanel(Section section)
         {
-            if (group.IsEmpty())
-            {
-                return null;
-            }
-
-            var groupNameTextSize = TextRenderer.MeasureText(group.Name, SettingsConstants.SETTINGS_GROUP_NAME_FONT, new Size((int)SettingsConstants.GROUP_NAME_COLUMN_SIZE, 0), TextFormatFlags.TextBoxControl | TextFormatFlags.WordBreak);
-            var groupDescriptionTextSize = TextRenderer.MeasureText(group.Description, SettingsConstants.SETTINGS_DESCRIPTIONS_FONT, new Size((int)SettingsConstants.GROUP_NAME_COLUMN_SIZE, 0), TextFormatFlags.TextBoxControl | TextFormatFlags.WordBreak);
+            var groupNameTextSize = TextRenderer.MeasureText(section.Name, SettingsConstants.SECTIONS_RIGHT_NAME_FONT, new Size((int)SettingsConstants.SECTIONS_NAME_COLUMN_SIZE, 0), TextFormatFlags.TextBoxControl | TextFormatFlags.WordBreak);
+            var groupDescriptionTextSize = TextRenderer.MeasureText(section.Description, SettingsConstants.DESCRIPTIONS_FONT, new Size((int)SettingsConstants.SECTIONS_NAME_COLUMN_SIZE, 0), TextFormatFlags.TextBoxControl | TextFormatFlags.WordBreak);
 
             TableLayoutPanel panel = new()
             {
@@ -306,7 +284,7 @@ namespace TiaUtilities.Generation.SettingsNew
 
             Label nameLabel = new()
             {
-                Text = group.Name,
+                Text = section.Name,
                 Dock = DockStyle.Fill,
                 BorderStyle = BorderStyle.None,
                 AutoSize = false,
@@ -314,12 +292,12 @@ namespace TiaUtilities.Generation.SettingsNew
                 BackColor = Form.DefaultBackColor,
                 Padding = Padding.Empty,
                 Margin = Padding.Empty,
-                Font = SettingsConstants.SETTINGS_GROUP_NAME_FONT,
+                Font = SettingsConstants.SECTIONS_RIGHT_NAME_FONT,
             };
 
             Label descriptionLabel = new()
             {
-                Text = group.Description,
+                Text = section.Description,
                 Dock = DockStyle.Fill,
                 BorderStyle = BorderStyle.None,
                 AutoSize = false, //This is to allow the text to wrap
@@ -327,7 +305,7 @@ namespace TiaUtilities.Generation.SettingsNew
                 BackColor = Form.DefaultBackColor,
                 Padding = Padding.Empty,
                 Margin = Padding.Empty,
-                Font = SettingsConstants.SETTINGS_DESCRIPTIONS_FONT,
+                Font = SettingsConstants.DESCRIPTIONS_FONT,
             };
 
             panel.Controls.Add(nameLabel, 0, 0);
@@ -366,7 +344,7 @@ namespace TiaUtilities.Generation.SettingsNew
                     BackColor = Color.Transparent,
                     Margin = hasDescription ? Padding.Empty : new(0, 0, 0, 3),
                     Padding = Padding.Empty,
-                    Font = SettingsConstants.SETTINGS_VALUE_TITLE_FONT,
+                    Font = SettingsConstants.VALUE_TITLE_FONT,
                     FlatStyle = FlatStyle.Standard,
                 };
 
@@ -389,7 +367,7 @@ namespace TiaUtilities.Generation.SettingsNew
                     BackColor = Color.Transparent,
                     Margin = new Padding(0, 0, 0, 3),
                     Padding = Padding.Empty,
-                    Font = SettingsConstants.SETTINGS_DESCRIPTIONS_FONT,
+                    Font = SettingsConstants.DESCRIPTIONS_FONT,
                     FlatStyle = FlatStyle.Standard,
                 };
 
@@ -403,11 +381,6 @@ namespace TiaUtilities.Generation.SettingsNew
             panel.Controls.Add(editor.GetControl(), 0, rowCount);
 
             return panel;
-        }
-
-        private void MainSplitContainer_SplitterMoved(object sender, SplitterEventArgs e)
-        {
-            this.leftSelectSectionListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
         }
 
         private void ListView_DrawColumnHeader(object? sender, DrawListViewColumnHeaderEventArgs e)
@@ -426,11 +399,12 @@ namespace TiaUtilities.Generation.SettingsNew
             TextRenderer.DrawText(e.Graphics, header?.Text, this.leftSelectSectionListView.Font, newBounds, Color.Black, flags);
         }
 
-        private void ListView_DrawItem(object? sender, DrawListViewItemEventArgs e)
+        private void ListView_DrawSubItem(object? sender, DrawListViewSubItemEventArgs e)
         {
+            e.DrawDefault = true;
         }
 
-        private void ListView_DrawSubItem(object? sender, DrawListViewSubItemEventArgs e)
+        private void ListView_DrawItem(object? sender, DrawListViewItemEventArgs e)
         {
             var item = e.Item;
             if (item == null)
@@ -438,38 +412,50 @@ namespace TiaUtilities.Generation.SettingsNew
                 return;
             }
 
-            var foreColor = SettingsConstants.SECTIONS_ITEM_FORE_COLOR;
-            var backColor = item.Focused ? SettingsConstants.SECTIONS_SELECTED_ITEM_BACK_COLOR : Color.Transparent;
-
-            var borderColor = item.Focused ? SettingsConstants.SECTIONS_SELECTED_ITEM_BORDER_COLOR : Color.Transparent;
-            var borderWidth = SettingsConstants.SECTIONS_SELECTED_ITEM_BORDER_WIDTH;
-
-            var rectsLeftPadding = 0;//(SECTIONS_LEFT_PADDING * 3) - 2;
-
-            //BACKGROUND
-            var backBounds = Rectangle.Inflate(e.Bounds, -rectsLeftPadding / 2, 0);
-            backBounds.Offset(rectsLeftPadding / 2, 0);
-
-            e.Graphics.FillRectangle(new SolidBrush(backColor), e.Bounds);
-
-            //BORDER
-            if (borderWidth > 0)
+            if (item.Tag is ListViewItemTag tag)
             {
-                var borderBound = Rectangle.Inflate(e.Bounds, -borderWidth - rectsLeftPadding / 2, -borderWidth);
-                borderBound.Offset(rectsLeftPadding / 2, 0);
+                var foreColor = SettingsConstants.SECTIONS_ITEM_FORE_COLOR;
+                var backColor = item.Focused ? SettingsConstants.SECTIONS_SELECTED_ITEM_BACK_COLOR : Color.Transparent;
 
-                var borderPen = new Pen(new SolidBrush(borderColor), borderWidth);
+                var borderColor = item.Focused ? SettingsConstants.SECTIONS_SELECTED_ITEM_BORDER_COLOR : Color.Transparent;
+                var borderWidth = SettingsConstants.SECTIONS_SELECTED_ITEM_BORDER_WIDTH;
 
-                e.Graphics.DrawRectangle(borderPen, borderBound);
+                var rectsLeftPadding = 0;//(SECTIONS_LEFT_PADDING * 3) - 2;
+
+                //BACKGROUND
+                var backBounds = e.Bounds;
+                backBounds = Rectangle.Inflate(backBounds, -rectsLeftPadding / 2, 0);
+                backBounds.Offset(rectsLeftPadding / 2, 0);
+
+                e.Graphics.FillRectangle(new SolidBrush(backColor), backBounds);
+
+                //BORDER
+                if (borderWidth > 0)
+                {
+                    var borderBound = Rectangle.Inflate(e.Bounds, -borderWidth - rectsLeftPadding / 2, -borderWidth);
+                    borderBound.Offset(rectsLeftPadding / 2, 0);
+
+                    var borderPen = new Pen(new SolidBrush(borderColor), borderWidth);
+
+                    e.Graphics.DrawRectangle(borderPen, borderBound);
+                }
+
+                //DRAW TEXT
+
+                var textBounds = e.Bounds;
+                textBounds = Rectangle.Inflate(textBounds, tag.IsMacroSection ? 0 : -SettingsConstants.SECTIONS_LEFT_PADDING * 3, 0);
+                TextRenderer.DrawText(e.Graphics, item.Text, this.leftSelectSectionListView.Font, textBounds, foreColor, TextFormatFlags.Left);
             }
 
-            //DRAW TEXT
-            var textBounds = Rectangle.Inflate(e.Bounds, -SettingsConstants.SECTIONS_LEFT_PADDING * 3, 0);
-            TextRenderer.DrawText(e.Graphics, item.Text, this.leftSelectSectionListView.Font, textBounds, foreColor, TextFormatFlags.Left);
+
         }
 
         class ListViewThatKeepsSelection : ListView
         {
+            private const int SETCURSOR = 0x0020;
+            private const int LBUTTONDOWN = 0x0201;
+            private const int MBUTTONDBLCLK = 0x0209;
+
             public ListViewThatKeepsSelection()
             {
                 this.DoubleBuffered = true;
@@ -477,8 +463,20 @@ namespace TiaUtilities.Generation.SettingsNew
 
             protected override void WndProc(ref Message m)
             {
+                //https://www.pinvoke.net/default.aspx/enums/windowsmessages.html
                 // Suppress mouse messages that are OUTSIDE of the items area
-                if (m.Msg >= 0x201 && m.Msg <= 0x209)
+                /*
+                    LBUTTONDOWN = 0x0201,
+                    LBUTTONUP = 0x0202,
+                    LBUTTONDBLCLK = 0x0203,
+                    RBUTTONDOWN = 0x0204,
+                    RBUTTONUP = 0x0205,
+                    RBUTTONDBLCLK = 0x0206,
+                    MBUTTONDOWN = 0x0207,
+                    MBUTTONUP = 0x0208,
+                    MBUTTONDBLCLK = 0x0209, 
+                */
+                if (m.Msg >= LBUTTONDOWN && m.Msg <= MBUTTONDBLCLK)
                 {
                     Point pos = new(m.LParam.ToInt32() & 0xffff, m.LParam.ToInt32() >> 16);
 
@@ -491,6 +489,7 @@ namespace TiaUtilities.Generation.SettingsNew
                         case ListViewHitTestLocations.RightOfClientArea:
                         case ListViewHitTestLocations.None:
                             return;
+
                     }
                 }
 

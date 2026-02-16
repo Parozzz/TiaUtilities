@@ -22,7 +22,7 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
 
             this.Control.Dock = DockStyle.Fill;
             this.Control.MinimumSize = new Size(0, 400);
-            this.Control.Font = SettingsConstants.SETTINGS_VALUE_TEXTBOX_FONT;
+            this.Control.Font = SettingsConstants.VALUE_TEXTBOX_FONT;
             this.Control.Text = "" + value.GetConfigurationValue();
 
             this.Control.TextChanged += TextChangedEventHandler;

@@ -55,28 +55,26 @@ namespace TiaUtilities.Generation.Alarms.Module
                     var bindings = new SettingsBindings(mainConfig)
                         .SetPresetConfiguration(MainForm.Settings.PresetAlarmMainConfiguration)
 
+                        .MacroSection("AlarmGenControl")
+
                         .Section(this.fcConfigButton.Text)
-                        .NoGroup()
                         .AddString(nameof(AlarmMainConfiguration.FCBlockName), Locale.GENERICS_NAME)
                         .AddUInt(nameof(AlarmMainConfiguration.FCBlockNumber), Locale.GENERICS_NUMBER)
 
                         .Section(this.segmentNameConfigButton.Text)
-                        .NoGroup()
                         .AddString(nameof(AlarmMainConfiguration.OneEachSegmentName), Locale.ALARM_CONFIG_SEGMENT_NAME_ONE_EACH)
                         .AddString(nameof(AlarmMainConfiguration.OneEachEmptyAlarmSegmentName), Locale.ALARM_CONFIG_SEGMENT_NAME_ONE_EACH_EMPTY)
                         .AddString(nameof(AlarmMainConfiguration.GroupSegmentName), Locale.ALARM_CONFIG_SEGMENT_NAME_GROUP_EACH)
                         .AddString(nameof(AlarmMainConfiguration.GroupEmptyAlarmSegmentName), Locale.ALARM_CONFIG_SEGMENT_NAME_GROUP_EACH_EMPTY)
 
-                        .Section(this.formattingButton.Text)
-
-                        .Group("UDT")
+                        .Section("UDT")
                         .AddString(nameof(AlarmMainConfiguration.UDTBlockName), Locale.ALARM_CONFIG_FORMATTING_UDT_NAME)
                         .AddString(nameof(AlarmMainConfiguration.AlarmNumFormat), Locale.ALARM_CONFIG_FORMATTING_FORMAT)
                         .AddString(nameof(AlarmMainConfiguration.AlarmNameTemplate), Locale.ALARM_CONFIG_FORMATTING_NAME_TEMPLATE)
                         .AddString(nameof(AlarmMainConfiguration.AlarmCommentTemplate), Locale.ALARM_CONFIG_FORMATTING_COMMENT_TEMPLATE)
                         .AddString(nameof(AlarmMainConfiguration.AlarmCommentTemplateSpare), Locale.ALARM_CONFIG_FORMATTING_COMMENT_TEMPLATE_SPARE)
 
-                        .Group(Locale.GENERICS_HMI)
+                        .Section(Locale.GENERICS_HMI)
                         .AddString(nameof(AlarmMainConfiguration.HmiNameTemplate), Locale.ALARM_CONFIG_FORMATTING_HMI_NAME)
                         .AddString(nameof(AlarmMainConfiguration.HmiTextTemplate), Locale.ALARM_CONFIG_FORMATTING_HMI_TEXT)
                         .AddString(nameof(AlarmMainConfiguration.HmiTriggerTagTemplate), Locale.ALARM_CONFIG_FORMATTING_HMI_TRIGGER_TAG_TEMPLATE)
