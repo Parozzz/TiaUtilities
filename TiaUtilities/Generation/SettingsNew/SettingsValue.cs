@@ -10,8 +10,14 @@ namespace TiaUtilities.Generation.SettingsNew
 {
     public class SettingsValue
     {
-        public SettingsValueBinding Binding { get; init; }
+        public SettingsValueBinding ValueBinding { get; init; }
+        public string Name { get => this.ValueBinding.Name; }
+        public string Description { get => this.ValueBinding.Description; }
+        public SettingsSectionBinding SectionBinding { get => this.ValueBinding.SectionBinding; }
+        public SettingsGroupBinding? GroupBinding { get => this.ValueBinding.GroupBinding; }
+
         public PropertyInfo PropertyInfo { get; init; }
+
 
         private readonly ObservableConfiguration configurationObject;
 
@@ -19,30 +25,50 @@ namespace TiaUtilities.Generation.SettingsNew
         {
             this.configurationObject = configurationObject;
 
-            this.Binding = binding;
+            this.ValueBinding = binding;
             this.PropertyInfo = propertyInfo;
         }
 
         public void SetConfigurationValue(object setValue)
         {
+            this.SetConfigurationValue(this.configurationObject, setValue);
+        }
+
+        public void SetConfigurationValue(ObservableConfiguration configuration, object setValue)
+        {
+            if (configuration.GetType() != this.configurationObject.GetType()) {
+                return;
+            }
+
             var propertyType = this.PropertyInfo.PropertyType;
             if (propertyType == setValue.GetType())
             {
-                this.PropertyInfo.SetValue(this.configurationObject, setValue);
+                this.PropertyInfo.SetValue(configuration, setValue);
             }
             else if(SettingsValue.IsSignedInt(propertyType) && setValue is long signedSetValue) //When parsed, always use maximun size!
             {
-                SettingsValue.SetCastedAsSignedInt(this.PropertyInfo, this.configurationObject, signedSetValue);
+                SettingsValue.SetCastedAsSignedInt(this.PropertyInfo, configuration, signedSetValue);
             }
             else if (SettingsValue.IsUnsignedInt(propertyType) && setValue is ulong unsignedSetValue) //When parsed, always use maximun size!
             {
-                SettingsValue.SetCastedAsUnsignedInt(this.PropertyInfo, this.configurationObject, unsignedSetValue);
+                SettingsValue.SetCastedAsUnsignedInt(this.PropertyInfo, configuration, unsignedSetValue);
             }
         }
 
         public object? GetConfigurationValue()
         {
             return this.PropertyInfo.GetValue(this.configurationObject);
+        }
+
+        public T? GetConfigurationValue<T>()
+        {
+            var value = this.PropertyInfo.GetValue(this.configurationObject); 
+            if(value is T t)
+            {
+                return t;
+            }
+
+            return default;
         }
 
         private static bool IsSignedInt(Type type)

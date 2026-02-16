@@ -28,6 +28,8 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
             };
 
             button.CheckedChanged += CheckedChangedEventHandler;
+
+            SettingsUtils.AddContextualMenu(this.button, value);
         }
 
         private void CheckedChangedEventHandler(object? sender, EventArgs args)

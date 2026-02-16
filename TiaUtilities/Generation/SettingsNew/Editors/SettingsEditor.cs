@@ -21,7 +21,7 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
         ENUM,
              */
 
-            switch (value.Binding.EditorType)
+            switch (value.ValueBinding.EditorType)
             {
                 default:
                 case SettingsEditorTypeEnum.STRING:

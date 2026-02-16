@@ -1,12 +1,5 @@
-﻿using DocumentFormat.OpenXml.Office2010.PowerPoint;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TiaUtilities.CustomControls;
+﻿using System.Reflection;
 using TiaUtilities.Generation.Configuration;
-using TiaUtilities.Generation.Configuration.Lines;
 using TiaUtilities.Utility;
 using TiaUtilities.Utility.Extensions;
 
@@ -15,33 +8,51 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
 
     public class SettingsColorEditor : SettingsEditor
     {
-        private readonly TextBox colorTextBox;
+
+        private readonly static Dictionary<string, Color> COLOR_DICTIONARY = [];
+        private static void ParseColors()
+        {
+            if(COLOR_DICTIONARY.Count > 0)
+            {
+                return;
+            }
+
+            foreach (KnownColor knownColorItem in Enum.GetValues(typeof(KnownColor)))
+            {
+                var color = Color.FromKnownColor(knownColorItem);
+                COLOR_DICTIONARY.Add(color.Name, color);
+            }
+        }
+
+        private readonly TextBox colorHexaTextBox;
         private readonly Button colorPickerButton;
 
         private Color lastColor = Color.White;
 
         public SettingsColorEditor(SettingsValue value) : base(value)
         {
-            this.colorTextBox = new()
+            this.colorHexaTextBox = new()
             {
                 Dock = DockStyle.Fill,
                 BorderStyle = BorderStyle.FixedSingle,
-                TextAlign = HorizontalAlignment.Left,
+                TextAlign = HorizontalAlignment.Center,
                 ReadOnly = false,
-                MaximumSize = new Size(150, 0),
+                MinimumSize = new Size(80, 0),
+                MaximumSize = new Size(80, 0),
                 Margin = new Padding(3, 0, 0, 0), //This is to align to the label since a the padding is automatically set to the left.
                 Padding = Padding.Empty,
                 Font = SettingsConstants.SETTINGS_VALUE_TEXTBOX_FONT,
                 BackColor = Form.DefaultBackColor,
             };
-            this.colorTextBox.TextChanged += ColorTextBoxTextChangedEvent;
+            this.colorHexaTextBox.TextChanged += ColorTextBoxTextChangedEvent;
 
             this.colorPickerButton = new Button()
             {
                 ForeColor = ConfigStyle.FORE_COLOR,
                 BackColor = ConfigStyle.BACK_COLOR,
                 Dock = DockStyle.Fill,
-                MaximumSize = new Size(50, 0),
+                MinimumSize = new(40, 0),
+                MaximumSize = new(40, 20),
                 AutoSize = true,
                 AutoSizeMode = AutoSizeMode.GrowAndShrink,
                 Padding = Padding.Empty,
@@ -53,13 +64,17 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
 
             this.colorPickerButton.Click += ColorPickerButtonClickEvent;
 
-            this.ApplyColor((Color)value.GetConfigurationValue());
+            this.ApplyColor(value.GetConfigurationValue<Color>());
+
+            SettingsUtils.AddContextualMenu(this.colorHexaTextBox, value);
+            SettingsUtils.AddContextualMenu(this.colorPickerButton, value);
         }
+
         private void ColorTextBoxTextChangedEvent(object? sender, EventArgs e)
         {
             try
             {
-                ApplyColor(ColorTranslator.FromHtml(colorTextBox.Text), overrideText: false);
+                ApplyColor(ColorTranslator.FromHtml(colorHexaTextBox.Text), overrideText: false);
             }
             catch { }
         }
@@ -85,27 +100,89 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
             lastColor = color;
             if (overrideText)
             {
-                colorTextBox.Text = color.ToHexString();
+                this.colorHexaTextBox.Text = color.ToHexString();
             }
-            colorPickerButton.BackColor = color;
+            this.colorPickerButton.BackColor = color;
 
             this.Value.SetConfigurationValue(color);
         }
 
         public override Control GetControl()
         {
-            return new TableLayoutPanel()
+            var panel = new TableLayoutPanel()
             {
                 AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
                 Dock = DockStyle.Fill,
                 Padding = Padding.Empty,
                 Margin = Padding.Empty,
-                ColumnCount = 2,
-                ColumnStyles = { new ColumnStyle(SizeType.Percent, 30f), new ColumnStyle(SizeType.Percent, 70f) },
-                RowCount = 1,
-                RowStyles = { new RowStyle(SizeType.AutoSize) },
-                Controls = { this.colorTextBox, this.colorPickerButton }
+                ColumnStyles =
+                {
+                    new(SizeType.AutoSize),
+                    new(SizeType.AutoSize)
+                },
+                RowStyles =
+                {
+                    new(SizeType.AutoSize)
+                },
             };
+
+            panel.Controls.Add(this.colorHexaTextBox, 0, 0);
+            //panel.Controls.Add(this.colorNameComboBox, 1, 0);
+            panel.Controls.Add(this.colorPickerButton, 1, 0);
+
+            return panel;
         }
     }
 }
+
+/*
+
+private readonly ComboBox colorNameComboBox;
+this.colorNameComboBox = new()
+{
+    Dock = DockStyle.Fill,
+    MinimumSize = new Size(150, 0),
+    MaximumSize = new Size(150, 0),
+    FlatStyle = FlatStyle.Flat,
+    DropDownStyle = ComboBoxStyle.DropDown,
+    Font = SettingsConstants.SETTINGS_VALUE_TEXTBOX_FONT,
+    BackColor = Form.DefaultBackColor,
+    DisplayMember = "Text",
+    ValueMember = "Value"
+};
+
+SettingsColorEditor.ParseColors();
+
+var dataSourceItems = new List<object>();
+foreach (var pair in COLOR_DICTIONARY)
+{
+    dataSourceItems.Add(new { Text = pair.Key, Value = pair.Value });
+}
+this.colorNameComboBox.DataSource = dataSourceItems;
+this.colorNameComboBox.SelectedIndexChanged += (sender, args) =>
+{
+    if(this.colorNameComboBox.SelectedItem is Color selectedColor)
+    {
+        this.ApplyColor(selectedColor);
+    }
+};
+
+this.colorNameComboBox.SelectedValue = color;
+
+
+        private string? GetColorName(Color color)
+        {
+            foreach (KnownColor knownColor in Enum.GetValues(typeof(KnownColor)))
+            {
+                var derivedColor = Color.FromKnownColor(knownColor);
+
+                if (derivedColor.ToHexaString() == color.ToHexaString())
+                {
+                    return Enum.GetName(knownColor);
+                }
+            }
+
+            return null;
+        }
+*/

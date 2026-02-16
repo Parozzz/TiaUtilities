@@ -109,6 +109,9 @@
     <None Update="Resources\Images\noun-rename-4926118.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\Images\noun-save-2433498.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\Images\noun-text-to-text-transfer-6855194.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

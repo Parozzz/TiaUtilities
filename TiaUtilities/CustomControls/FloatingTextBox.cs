@@ -64,5 +64,13 @@ namespace TiaUtilities.CustomControls
 
             return this.ShowDialog(owner);
         }
+
+        public DialogResult ShowDialogAtPosition(int x, int y)
+        {
+            this.StartPosition = FormStartPosition.Manual;
+            this.Location = new Point(x, y);
+
+            return this.ShowDialog();
+        }
     }
 }

@@ -27,7 +27,7 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
                 MinimumSize = new Size(150, 0)
             };
 
-            switch (value.Binding.EditorType)
+            switch (value.ValueBinding.EditorType)
             {
                 case SettingsEditorTypeEnum.ENUM:
                     this.comboBox.DropDownStyle = ComboBoxStyle.DropDownList; //Disable text Editing 
@@ -44,6 +44,7 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
                     }
                     this.comboBox.DataSource = dataSourceItems;
 
+                    this.comboBox.SelectedValue = this.Value.GetConfigurationValue();
                     comboBox.OnSelectedIndexChanged += (sender, args) =>
                     {
                         var selectedValue = this.comboBox.SelectedValue;
@@ -55,12 +56,14 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
 
                     break;
                 case SettingsEditorTypeEnum.STRING:
+                    this.comboBox.Text = "" + this.Value.GetConfigurationValue();
                     this.comboBox.TextChanged += (sender, args) =>
                     {
                         value.SetConfigurationValue(this.comboBox.Text);
                     };
                     break;
                 case SettingsEditorTypeEnum.INT:
+                    this.comboBox.Text = "" + this.Value.GetConfigurationValue();
                     this.comboBox.KeyPress += SignedKeyPressEventHandler;
                     this.comboBox.TextChanged += (sender, args) =>
                     {
@@ -73,6 +76,7 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
                     };
                     break;
                 case SettingsEditorTypeEnum.UINT:
+                    this.comboBox.Text = "" + this.Value.GetConfigurationValue();
                     this.comboBox.KeyPress += UnsignedKeyPressEventHandler;
                     this.comboBox.TextChanged += (sender, args) =>
                     {
@@ -84,7 +88,8 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
                     };
                     break;
             }
-
+            
+            SettingsUtils.AddContextualMenu(this.comboBox, value);
         }
 
         private void StringTextChangedEventHandler(object? sender, EventArgs args)

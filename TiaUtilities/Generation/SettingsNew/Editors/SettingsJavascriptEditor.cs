@@ -26,6 +26,8 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
             this.Control.Text = "" + value.GetConfigurationValue();
 
             this.Control.TextChanged += TextChangedEventHandler;
+
+            SettingsUtils.AddContextualMenu(this.Control, value);
         }
 
         private void TextChangedEventHandler(object? sender, EventArgs args)
