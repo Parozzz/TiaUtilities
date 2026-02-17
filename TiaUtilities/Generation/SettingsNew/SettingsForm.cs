@@ -69,13 +69,24 @@ namespace TiaUtilities.Generation.SettingsNew
             this.leftSelectSectionListView = new();
             this.rightSettingsPanel = new();
 
+            Utils.SetDoubleBuffered(this.mainPanel);
+            Utils.SetDoubleBuffered(this.leftSelectSectionListView);
+            Utils.SetDoubleBuffered(this.rightSettingsPanel);
+
             Init();
+
+            var millisInit = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            Debug.WriteLine($"Init Time: {millisInit - millisStart}ms");
+
             ParseBindings();
+
+            var millisParse = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            Debug.WriteLine($"Parse Time: {millisParse - millisInit}ms");
 
             this.Shown += (sender, args) =>
             {
                 var shownMillis = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-                Debug.WriteLine($"Shown Total Time: {shownMillis - millisStart}ms");
+                Debug.WriteLine($"Shown Time: {shownMillis - millisParse}ms");
                 var _ = "";
             };
         }
@@ -112,6 +123,7 @@ namespace TiaUtilities.Generation.SettingsNew
                 AutoScrollMinSize = new Size(100, 100),
                 Controls = { rightPanel }
             };
+            Utils.SetDoubleBuffered(scrollableControl);
 
             scrollableControl.Scroll += (sender, args) => UpdateSectionVisiblePercentage(scrollableControl, args.NewValue);
             scrollableControl.MouseWheel += (sender, args) => UpdateSectionVisiblePercentage(scrollableControl);
@@ -224,6 +236,10 @@ namespace TiaUtilities.Generation.SettingsNew
             this.rightSettingsPanel.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right;
             this.rightSettingsPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             this.rightSettingsPanel.Margin = Padding.Empty;
+
+
+            this.rightSettingsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, SettingsConstants.SECTIONS_NAME_COLUMN_SIZE));
+            this.rightSettingsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, SettingsConstants.SECTIONS_BORDER_COLUMN_SIZE));
             this.rightSettingsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100f));
         }
 
@@ -261,13 +277,20 @@ namespace TiaUtilities.Generation.SettingsNew
 
                 section.ListItem = listViewItem;
             }
-            
+
             LoadMacroSections();
         }
 
         private void LoadMacroSections()
         {
+            var millisStart = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+
             this.rightSettingsPanel.Controls.Clear();
+
+            var millisEnd = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            Debug.WriteLine($"Clear Panel: {millisEnd - millisStart}ms");
+
+            int rowCount = 0;
             foreach (var macroSection in macroSectionList)
             {
                 Label macroSectioNameLabel = new()
@@ -284,28 +307,16 @@ namespace TiaUtilities.Generation.SettingsNew
                 };
 
                 this.rightSettingsPanel.RowStyles.Add(new(SizeType.AutoSize));
-                this.rightSettingsPanel.Controls.Add(macroSectioNameLabel);
-                
+
+                this.rightSettingsPanel.Controls.Add(macroSectioNameLabel, 0, rowCount);
+                this.rightSettingsPanel.SetColumnSpan(macroSectioNameLabel, 3);
+
+                rowCount++;
+
                 macroSection.Label = macroSectioNameLabel;
                 
                 foreach (var section in macroSection.Sections)
                 {
-                    TableLayoutPanel sectionPanel = new()
-                    {
-                        //AutoScroll = true,
-                        AutoSize = true,
-                        AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                        Dock = DockStyle.Fill,
-                        ColumnStyles = {
-                            new(SizeType.Absolute, SettingsConstants.SECTIONS_NAME_COLUMN_SIZE),
-                            new(SizeType.Absolute, SettingsConstants.SECTIONS_BORDER_COLUMN_SIZE),
-                            new(SizeType.AutoSize)
-                        },
-                        RowStyles = { new(SizeType.AutoSize) },
-                        Padding = Padding.Empty,
-                        Margin = new Padding(0, 0, 0, (int)SettingsConstants.SECTIONS_SEPARATION),
-                    };
-
                     Label sectionNameLabel = new()
                     {
                         Text = section.Name,
@@ -328,12 +339,14 @@ namespace TiaUtilities.Generation.SettingsNew
                         Padding = Padding.Empty,
                         Margin = Padding.Empty,
                     };
+                    Utils.SetDoubleBuffered(valuesPanel);
 
-                    int rowCount = 0;
+                    int valueRowCount = 0;
                     foreach (var value in section.ValueList)
                     {
-                        this.AppendToValuePanel(valuesPanel, value, ref rowCount);
+                        this.AppendToValuePanel(valuesPanel, value, ref valueRowCount);
                     }
+                    
 
                     //This is just to view bettere the division
                     var sectionBorderLabel = new Label()
@@ -342,25 +355,31 @@ namespace TiaUtilities.Generation.SettingsNew
                         Dock = DockStyle.Fill,
                         BackColor = Color.DarkBlue,
                         Padding = Padding.Empty,
-                        Margin = new Padding(0, 0, (int)(SettingsConstants.SECTIONS_BORDER_COLUMN_SIZE / 2f), 0),
+                        Margin = new Padding(0, 6, (int)(SettingsConstants.SECTIONS_BORDER_COLUMN_SIZE / 2f), 6),
                     };
 
-                    sectionPanel.Controls.Add(sectionNameLabel, 0, 0);
-                    sectionPanel.Controls.Add(sectionBorderLabel, 1, 0);
-                    sectionPanel.Controls.Add(valuesPanel, 2, 0);
-
                     this.rightSettingsPanel.RowStyles.Add(new(SizeType.AutoSize));
-                    this.rightSettingsPanel.Controls.Add(sectionPanel);
 
-                    section.Panel = sectionPanel;
+                    this.rightSettingsPanel.Controls.Add(sectionNameLabel, 0, rowCount);
+                    this.rightSettingsPanel.Controls.Add(sectionBorderLabel, 1, rowCount);
+                    this.rightSettingsPanel.Controls.Add(valuesPanel, 2, rowCount);
+
+                    rowCount++;
+
+                    this.rightSettingsPanel.RowStyles.Add(new(SizeType.Absolute, SettingsConstants.SECTION_VALUE_SEPERATION));
+                    rowCount++;
+
+                    section.Panel = valuesPanel;
                 }
             }
         }
+
+        //DO NOT USE UseCompatibleTextRendering! IT WILL INCREASE TIME A LOT!
         private void AppendToValuePanel(TableLayoutPanel panel, SettingsValue value, ref int rowCount)
         {
             bool hasName = !string.IsNullOrEmpty(value.Name);
             bool hasDescription = !string.IsNullOrEmpty(value.Description);
-
+            
             if (hasName)
             {
                 Label nameLabel = new()
@@ -369,13 +388,11 @@ namespace TiaUtilities.Generation.SettingsNew
                     AutoSize = true,
                     Dock = DockStyle.Fill,
                     BorderStyle = BorderStyle.None,
-                    UseCompatibleTextRendering = true,
                     TextAlign = ContentAlignment.MiddleLeft,
                     BackColor = Color.Transparent,
                     Margin = hasDescription ? Padding.Empty : new(0, 0, 0, 3),
                     Padding = Padding.Empty,
                     Font = SettingsConstants.VALUE_NAME_LABEL_FONT,
-                    FlatStyle = FlatStyle.Standard,
                 };
 
                 panel.RowStyles.Add(new(SizeType.AutoSize));
@@ -383,7 +400,7 @@ namespace TiaUtilities.Generation.SettingsNew
                 panel.Controls.Add(nameLabel, 0, rowCount);
                 rowCount++;
             }
-
+            
             if (hasDescription)
             {
                 Label nameLabel = new()
@@ -392,13 +409,11 @@ namespace TiaUtilities.Generation.SettingsNew
                     AutoSize = false, //This is to allow the text to wrap
                     Dock = DockStyle.Fill,
                     BorderStyle = BorderStyle.None,
-                    UseCompatibleTextRendering = true,
                     TextAlign = ContentAlignment.MiddleLeft,
                     BackColor = Color.Transparent,
                     Margin = new Padding(0, 0, 0, 3),
                     Padding = Padding.Empty,
                     Font = SettingsConstants.DESCRIPTION_LABEL_FONT,
-                    FlatStyle = FlatStyle.Standard,
                 };
 
                 panel.RowStyles.Add(new(SizeType.AutoSize));
@@ -408,11 +423,12 @@ namespace TiaUtilities.Generation.SettingsNew
             }
 
             var editor = SettingsEditor.ObtainFromValue(this, value);
-
+            
             panel.RowStyles.Add(new(SizeType.AutoSize));
+
             panel.Controls.Add(editor.GetControl(), 0, rowCount);
             rowCount++;
-
+            
             panel.RowStyles.Add(new(SizeType.Absolute, SettingsConstants.SECTION_VALUE_SEPERATION));
             rowCount++;
         }

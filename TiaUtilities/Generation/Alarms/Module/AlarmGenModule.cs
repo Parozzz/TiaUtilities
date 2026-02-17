@@ -83,17 +83,19 @@ namespace TiaUtilities.Generation.Alarms.Module
         {
             tabPage.Text = save?.Name ?? "AlarmGen";
 
-            AlarmGenTab alarmGenTab = new(this.gridBindContainer, this, this.mainConfig, this.templateHandler, tabPage);
+            AlarmGenTab tab = new(this.gridBindContainer, this, this.mainConfig, this.templateHandler, tabPage);
 
-            alarmGenTab.Init();
+            tab.Init();
             if (save != null)
             {
-                alarmGenTab.LoadSave(save);
+                tab.LoadSave(save);
             }
-            tabPage.Tag = alarmGenTab;
-            tabPage.Controls.Add(alarmGenTab.TabControl);
+            tabPage.Tag = tab;
+            tabPage.Controls.Add(tab.TabControl);
 
-            genTabList.Add(alarmGenTab); //Do this AFTER. Otherwise the Selected event is called with Tag null.
+            tab.BindSettings(this.SettingsBindings);
+
+            genTabList.Add(tab); //Do this AFTER. Otherwise the Selected event is called with Tag null.
         }
 
         public void Clear()

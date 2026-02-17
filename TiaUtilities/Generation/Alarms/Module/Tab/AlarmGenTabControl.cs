@@ -14,8 +14,6 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
         private readonly AlarmGenTemplateHandler templateHandler;
         private readonly DataGridView dataGridView;
 
-
-
         public AlarmGenTabControl(ErrorReportThread errorThread, AlarmGenTemplateHandler templateHandler, DataGridView dataGridView)
         {
             this.errorThread = errorThread;

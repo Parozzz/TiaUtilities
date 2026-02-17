@@ -13,6 +13,7 @@ namespace TiaUtilities.Generation.SettingsNew
         public SettingsValueBinding ValueBinding { get; init; }
         public string Name { get => this.ValueBinding.Name; }
         public string Description { get => this.ValueBinding.Description; }
+        public SettingsMacroSectionBinding MacroSectionBinding { get => this.ValueBinding.MacroSectionBinding; }
         public SettingsSectionBinding SectionBinding { get => this.ValueBinding.SectionBinding; }
         public PropertyInfo PropertyInfo { get; init; }
 

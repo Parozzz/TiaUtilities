@@ -1,4 +1,5 @@
-﻿using TiaUtilities.CustomControls;
+﻿using System.ComponentModel;
+using TiaUtilities.CustomControls;
 
 namespace TiaUtilities.Generation.SettingsNew.Editors
 {
@@ -13,7 +14,6 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
             var size = TextRenderer.MeasureText("g", SettingsConstants.VALUE_CONTROL_FONT, Size.Empty, TextFormatFlags.TextBoxControl);
             this.textBox = new()
             {
-                Text = "" + value.GetConfigurationValue(),
                 Font = SettingsConstants.VALUE_CONTROL_FONT,
                 Dock = DockStyle.Fill,
                 BorderStyle = BorderStyle.None,
@@ -23,7 +23,19 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
                 Margin = new Padding(3, 0, 0, 0), //This is to align to the label since a the padding is automatically set to the left.
                 Padding = Padding.Empty,
                 BackColor = Form.DefaultBackColor,
+                Text = "" + value.GetConfigurationValue()
             };
+
+            PropertyChangedEventHandler propertyChanged = (sender, args) =>
+            {
+                if (args.PropertyName == value.PropertyInfo.Name)
+                {
+                    this.textBox.Text = "" + value.GetConfigurationValue();
+                }
+            };
+
+            this.Value.MacroSectionBinding.ConfigurationObject.PropertyChanged += propertyChanged;
+            this.textBox.Disposed += (sender, args) => this.Value.MacroSectionBinding.ConfigurationObject.PropertyChanged -= propertyChanged;
 
             var type = value.ValueBinding.EditorType;
             switch (type)

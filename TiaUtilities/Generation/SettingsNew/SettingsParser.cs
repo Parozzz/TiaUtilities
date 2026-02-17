@@ -46,6 +46,17 @@ namespace TiaUtilities.Generation.SettingsNew
                 .AddJavascript(nameof(TestConfiguration.TestJavascript), string.Empty, $"{GenPlaceholders.IO.IONAME}")
 
                 .MacroSection("Macro2", testConfiguration)
+                .Section("Section1")
+                .AddUInt(nameof(TestConfiguration.DBNumber), Locale.GENERICS_NAME, "Name again!?")
+
+                .Section("DB", "Very very long Db Description! Will it work?")
+                .AddString(nameof(TestConfiguration.DBName), Locale.GENERICS_NAME, "Mega Description1")
+                .AddUInt(nameof(TestConfiguration.DBNumber), Locale.GENERICS_NAME, "Mega Description2")
+
+                .Section("AnotherCoolSectionWithACoolName", "And what if it has also a very very very long description? That would be cool!")
+                .AddColor(nameof(TestConfiguration.TestColor), "Color", "Mega Description3")
+                .AddColor(nameof(TestConfiguration.TestColor), "Color2", "SameOld same old?")
+                .AddString(nameof(TestConfiguration.DBName), Locale.GENERICS_NAME, "DB NAME AGAIN!!")
 
                 .Section("AnotherCoolSectionWithACoolName", "And what if it has also a very very very long description? That would be cool!")
                 .AddColor(nameof(TestConfiguration.TestColor), "Color", "Mega Description3")
