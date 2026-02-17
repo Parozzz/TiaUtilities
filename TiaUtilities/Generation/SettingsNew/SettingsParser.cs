@@ -16,10 +16,10 @@ namespace TiaUtilities.Generation.SettingsNew
     public static class SettingsParser
     {
         private static readonly TestConfiguration testConfiguration = new();
-        public static SettingsForm? CreateTestForm()
+        public static SettingsForm CreateTestForm()
         {
-            SettingsBindings settingsBindings = new SettingsBindings(testConfiguration)
-                .MacroSection("Macro1")
+            SettingsBindings settingsBindings = new SettingsBindings()
+                .MacroSection("Macro1", testConfiguration)
 
                 .Section("Section1")
                 .AddUInt(nameof(TestConfiguration.DBNumber), Locale.GENERICS_NAME, "Name again!?")
@@ -43,12 +43,21 @@ namespace TiaUtilities.Generation.SettingsNew
                 .AddEnum(nameof(TestConfiguration.TestEnum), "Enum Fico", $"{GenPlaceholders.IO.IONAME}")
 
                 .Section("JAVASCRIPT!", "JAVASCRIPT??!!")
-                .AddJavascript(nameof(TestConfiguration.TestJavascript), string.Empty, $"{GenPlaceholders.IO.IONAME}");
+                .AddJavascript(nameof(TestConfiguration.TestJavascript), string.Empty, $"{GenPlaceholders.IO.IONAME}")
 
-            var form = new SettingsForm(settingsBindings);
-            form.ParseBindings();
+                .MacroSection("Macro2", testConfiguration)
 
-            return form;
+                .Section("AnotherCoolSectionWithACoolName", "And what if it has also a very very very long description? That would be cool!")
+                .AddColor(nameof(TestConfiguration.TestColor), "Color", "Mega Description3")
+                .AddColor(nameof(TestConfiguration.TestColor), "Color2", "SameOld same old?")
+                .AddString(nameof(TestConfiguration.DBName), Locale.GENERICS_NAME, "DB NAME AGAIN!!")
+
+                .Section("Object", "Object??")
+                .AddString(nameof(TestConfiguration.ObjName), Locale.GENERICS_NAME, $"{GenPlaceholders.IO.IONAME}")
+                .AddUInt(nameof(TestConfiguration.ObjNumber), Locale.GENERICS_NAME, $"{GenPlaceholders.IO.CONFIG_DB_NUMBER}")
+                .AddBool(nameof(TestConfiguration.TestBoolean), "Boolean", $"Cool Descr");
+
+            return new SettingsForm(settingsBindings);
         }
     }
 

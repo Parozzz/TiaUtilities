@@ -3,13 +3,14 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using SimaticML.API;
 using SimaticML.Blocks;
 using SimaticML.TagTable;
+using TiaUtilities.Editors.ErrorReporting;
 using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.IO.Module.ExcelImporter;
 using TiaUtilities.Generation.IO.Module.Tab;
+using TiaUtilities.Generation.SettingsNew;
 using TiaUtilities.Languages;
-using TiaUtilities.Editors.ErrorReporting;
 using TiaUtilities.Utility.Extensions;
 
 namespace TiaUtilities.Generation.IO.Module
@@ -61,6 +62,8 @@ namespace TiaUtilities.Generation.IO.Module
 
         private readonly List<IOGenTab> genTabList;
 
+        public SettingsBindings SettingsBindings { get; init; }
+
         public IOGenModule(ErrorReportThread errorThread)
         {
             this.gridBindContainer = new(errorThread);
@@ -77,6 +80,7 @@ namespace TiaUtilities.Generation.IO.Module
             this.control = new(suggestionGridHandler.DataGridView);
 
             this.genTabList = [];
+            this.SettingsBindings = new();
         }
 
         public void Init(GenModuleForm form)

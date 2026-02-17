@@ -1,5 +1,6 @@
 ﻿using InfoBox;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using TiaUtilities.Generation.SettingsNew;
 using TiaUtilities.Languages;
 using TiaUtilities.Utility;
 
@@ -82,6 +83,7 @@ namespace TiaUtilities.Generation
                 }
             };
             this.preferencesMenuItem.Click += (sender, args) => MainForm.Settings.GridSettings.ShowConfigForm(this);
+            this.settingsMenuItem.Click += (sender, args) => new SettingsForm(this.module.SettingsBindings).Show(this);
             #endregion
 
             #region AUTO_SAVE
@@ -130,6 +132,9 @@ namespace TiaUtilities.Generation
                     case Keys.L | Keys.Control:
                         this.ModuleLoad();
                         return true; //Return required otherwise will write the letter.
+                    case Keys.I | Keys.Control:
+                        new SettingsForm(this.module.SettingsBindings).Show(this);
+                        return true;
                 }
 
                 if (this.module.ProcessCmdKey(ref msg, keyData))

@@ -1,7 +1,10 @@
-﻿namespace TiaUtilities.Generation
+﻿using TiaUtilities.Generation.SettingsNew;
+
+namespace TiaUtilities.Generation
 {
     public interface IGenModule : ICleanable, ISaveable<object>
     {
+        public abstract SettingsBindings SettingsBindings { get; init; }
 
         public void Init(GenModuleForm form);
 

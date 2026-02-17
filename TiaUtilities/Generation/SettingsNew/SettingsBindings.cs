@@ -4,7 +4,23 @@ using TiaUtilities.Configuration;
 namespace TiaUtilities.Generation.SettingsNew
 {
     //A Sections contains Groups that contains Values.
-    public record SettingsMacroSectionBinding(SettingsBindings SettingsBindings, string Name);
+    public class SettingsMacroSectionBinding(SettingsBindings settingsBindings, string name, ObservableConfiguration configurationObject, ObservableConfiguration? presetConfigurationObject)
+    {
+        public SettingsBindings SettingsBindings { get; init; } = settingsBindings;
+        public string Name { get; init; } = name;
+        public ObservableConfiguration ConfigurationObject { get; init; } = configurationObject;
+        public ObservableConfiguration? PresetConfigurationObject { get; init; } = presetConfigurationObject;
+        public Func<IEnumerable<ObservableConfiguration>>? OtherConfigurationsFunc { get; set; } = null;
+
+        public void SaveToPresetConfiguration()
+        {
+            if (this.ConfigurationObject != null && this.PresetConfigurationObject != null)
+            {
+                GenUtils.CopySamePublicFieldsAndProperties(this.ConfigurationObject, this.PresetConfigurationObject);
+            }
+        }
+    }
+
 
     public record SettingsSectionBinding(SettingsBindings SettingsBindings, 
         string Name, string Description, 
@@ -23,45 +39,48 @@ namespace TiaUtilities.Generation.SettingsNew
         public List<SettingsMacroSectionBinding> MacroSectionList { get; init; } = [];
         public List<SettingsSectionBinding> SectionList { get; init; } = [];
 
-        public ObservableConfiguration ConfigurationObject { get; init; }
-        public ObservableConfiguration? PresetConfigurationObject { get; private set; }
-        public Func<IEnumerable<ObservableConfiguration>>? OtherConfigurationsFunc { get; private set; }
-
         private SettingsMacroSectionBinding? lastMacroSection;
         private SettingsSectionBinding? lastSection;
 
-        public SettingsBindings(ObservableConfiguration configurationObject)
+        public SettingsBindings() { }
+
+        public void Clear()
         {
-            this.ConfigurationObject = configurationObject;
+            this.MacroSectionList.Clear();
+            this.SectionList.Clear();
+
+            this.lastMacroSection = null;
+            this.lastSection = null;
         }
 
-        public SettingsBindings SetConfigureOtherConfigurations(Func<IEnumerable<ObservableConfiguration>> func)
+        public SettingsBindings RemoveMacroSectionWithSpecificConfiguration(ObservableConfiguration configuration)
         {
-            this.OtherConfigurationsFunc = func;
-            return this;
-        }
-
-        public SettingsBindings SetPresetConfiguration(ObservableConfiguration presetConfiguration)
-        {
-            if (this.ConfigurationObject.GetType() == presetConfiguration.GetType())
+            SettingsMacroSectionBinding? macroSectionToRemove = null;
+            foreach (var macroSection in this.MacroSectionList)
             {
-                this.PresetConfigurationObject = presetConfiguration;
+                if(macroSection.ConfigurationObject == configuration)
+                {
+                    macroSectionToRemove = macroSection;
+                    break;
+                }
+            }
+
+            if(macroSectionToRemove != null)
+            {
+                this.SectionList.RemoveAll(section => section.MacroSectionBinding == macroSectionToRemove);
+                this.MacroSectionList.Remove(macroSectionToRemove);
             }
 
             return this;
         }
 
-        public void SaveToPresetConfiguration()
+        public SettingsBindings MacroSection<T>(string name, T ConfigurationObject, T? PresetConfigurationObject = null, Func<IEnumerable<T>>? otherConfigurationsFunc = null) where T : ObservableConfiguration
         {
-            if (this.ConfigurationObject != null && this.PresetConfigurationObject != null)
+            lastMacroSection = new(this, name, ConfigurationObject, PresetConfigurationObject)
             {
-                GenUtils.CopySamePublicFieldsAndProperties(this.ConfigurationObject, this.PresetConfigurationObject);
-            }
-        }
+                OtherConfigurationsFunc = otherConfigurationsFunc
+            };
 
-        public SettingsBindings MacroSection(string name)
-        {
-            lastMacroSection = new(this, name);
             this.MacroSectionList.Add(lastMacroSection);
             return this;
         }
@@ -90,15 +109,15 @@ namespace TiaUtilities.Generation.SettingsNew
             var macroSection = lastMacroSection ?? throw new InvalidOperationException("No MacroSection has been defined before");
             var section = lastSection ?? throw new InvalidOperationException("No Section has been defined before");
 
-            var propertyInfo = ConfigurationObject.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
+            var propertyInfo = macroSection.ConfigurationObject.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
             if (propertyInfo == null || !propertyInfo.CanRead || !propertyInfo.CanWrite)
             {
-                throw new InvalidOperationException($"No valid PropertyInfo has been found at Name: {propertyName} for Object: {ConfigurationObject.GetType().FullName}");
+                throw new InvalidOperationException($"No valid PropertyInfo has been found at Name: {propertyName} for Object: {macroSection.ConfigurationObject.GetType().FullName}");
             }
 
             SettingsValueBinding valueBinding = new(this, propertyName, name, description, editorType, macroSection, section);
 
-            SettingsValue settingsValue = new(this.ConfigurationObject, valueBinding, propertyInfo);
+            SettingsValue settingsValue = new(valueBinding, propertyInfo);
             this.lastSection.ValueList.Add(settingsValue);
 
             return this;

@@ -11,9 +11,6 @@ namespace TiaUtilities.Generation.SettingsNew
         public static readonly Color SECTIONS_ITEM_FORE_COLOR = Color.Black;
         public static readonly Color SECTIONS_SELECTED_ITEM_BACK_COLOR = Color.FromArgb(60, Color.Gray);
 
-        public static readonly Color SECTIONS_SELECTED_ITEM_BORDER_COLOR = Color.FromArgb(125, Color.Gray);
-        public const int SECTIONS_SELECTED_ITEM_BORDER_WIDTH = 0;
-
         public const int SECTIONS_LIST_VIEW_WIDTH = 250;
         public const int SECTIONS_LIST_TILE_HEIGHT = 28;
         public const int SECTIONS_LEFT_PADDING = 5;
@@ -22,11 +19,15 @@ namespace TiaUtilities.Generation.SettingsNew
         public const float SECTIONS_BORDER_COLUMN_SIZE = 6;
         public const float SECTIONS_SEPARATION = 12f;
 
-        public static readonly Font SECTIONS_LEFT_FONT = new(SystemFonts.DefaultFont.FontFamily, 13f, FontStyle.Regular);
-        public static readonly Font SECTIONS_RIGHT_NAME_FONT = new(SystemFonts.DefaultFont.FontFamily, 13f, FontStyle.Regular);
-        public static readonly Font VALUE_TITLE_FONT = new(SystemFonts.DefaultFont.FontFamily, 11f, FontStyle.Bold);
-        public static readonly Font VALUE_TEXTBOX_FONT = new(SystemFonts.DefaultFont.FontFamily, 11f, FontStyle.Regular);
-        public static readonly Font DESCRIPTIONS_FONT = new(SystemFonts.DefaultFont.FontFamily, 8.5f, FontStyle.Regular);
+        public const float SECTION_VALUE_SEPERATION = 8f;
+
+        public static readonly Font LIST_LEFT_FONT = new(SystemFonts.DefaultFont.FontFamily, 11f, FontStyle.Regular);
+
+        public static readonly Font MACROSECTION_NAME_LABEL_FONT = new(SystemFonts.DefaultFont.FontFamily, 23f, FontStyle.Bold);
+        public static readonly Font SECTION_NAME_LABEL_FONT = new(SystemFonts.DefaultFont.FontFamily, 13f, FontStyle.Regular);
+        public static readonly Font VALUE_NAME_LABEL_FONT = new(SystemFonts.DefaultFont.FontFamily, 11f, FontStyle.Bold);
+        public static readonly Font VALUE_CONTROL_FONT = new(SystemFonts.DefaultFont.FontFamily, 11f, FontStyle.Regular);
+        public static readonly Font DESCRIPTION_LABEL_FONT = new(SystemFonts.DefaultFont.FontFamily, 8.5f, FontStyle.Regular);
 
     }
 }

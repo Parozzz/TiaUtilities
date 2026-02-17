@@ -9,30 +9,19 @@ namespace TiaUtilities.Generation.SettingsNew
 {
     public static class SettingsUtils
     {
-        public static void AddContextualMenu(Control control, SettingsValue settingsValue)
+        public static ContextMenuStrip AddContextualMenu(Control control, SettingsValue settingsValue)
         {
             ToolStripMenuItem saveItem = new(Locale.CONFIG_LINE_SAVE_DEFAULT_TOOLTIP) { Image = Image.FromFile("Resources/Images/noun-save-2433498.png") };
             saveItem.Click += (sender, args) =>
             {
-                settingsValue.ValueBinding.SettingsBindings.SaveToPresetConfiguration();
+                settingsValue.ValueBinding.MacroSectionBinding.SaveToPresetConfiguration();
             };
 
             ToolStripMenuItem setToOther = new(Locale.CONFIG_LINE_TRANSFER_TO_OTHERS) { Image = Image.FromFile("Resources/Images/noun-transfer-7710063.png") };
             setToOther.Click += (sender, args) =>
             {
-                var settingsBindings = settingsValue.ValueBinding.SettingsBindings;
-
-                var otherConfigurationsFunc = settingsBindings.OtherConfigurationsFunc;
-                if (otherConfigurationsFunc == null)
-                {
-                    return;
-                }
-
-                var otherConfigurationsEnumerable = otherConfigurationsFunc.Invoke();
-                if (!otherConfigurationsEnumerable.Any())
-                {
-                    return;
-                }
+                //This only transfers ONE value to the other configuration, the one contextMenu is applied
+                var macroSection = settingsValue.ValueBinding.MacroSectionBinding;
 
                 var mainConfigurationValue = settingsValue.GetConfigurationValue();
                 if (mainConfigurationValue == null)
@@ -40,16 +29,29 @@ namespace TiaUtilities.Generation.SettingsNew
                     return;
                 }
 
+                var otherConfigurationsEnumerable = macroSection.OtherConfigurationsFunc?.Invoke();
+                if (otherConfigurationsEnumerable == null || !otherConfigurationsEnumerable.Any())
+                {
+                    return;
+                }
+
                 foreach (var otherConfiguration in otherConfigurationsEnumerable)
                 {
-                    if (otherConfiguration != settingsBindings.ConfigurationObject)
+                    if (otherConfiguration.GetType() == macroSection.ConfigurationObject.GetType() && 
+                        otherConfiguration != macroSection.ConfigurationObject)
                     {
                         settingsValue.SetConfigurationValue(otherConfiguration, mainConfigurationValue);
                     }
                 }
             };
 
-            control.ContextMenuStrip = new() { Items = { saveItem, setToOther } };
+            ContextMenuStrip menuStrip = new()
+            {
+                Items = { saveItem, setToOther }
+            };
+            control.ContextMenuStrip = menuStrip;
+
+            return menuStrip;
         }
     }
 }

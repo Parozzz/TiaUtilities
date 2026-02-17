@@ -14,15 +14,12 @@ namespace TiaUtilities.Generation.SettingsNew
         public string Name { get => this.ValueBinding.Name; }
         public string Description { get => this.ValueBinding.Description; }
         public SettingsSectionBinding SectionBinding { get => this.ValueBinding.SectionBinding; }
-
         public PropertyInfo PropertyInfo { get; init; }
 
+        private ObservableConfiguration ConfigurationObject { get => this.ValueBinding.MacroSectionBinding.ConfigurationObject; }
 
-        private readonly ObservableConfiguration configurationObject;
-
-        public SettingsValue(ObservableConfiguration configurationObject, SettingsValueBinding binding, PropertyInfo propertyInfo)
+        public SettingsValue(SettingsValueBinding binding, PropertyInfo propertyInfo)
         {
-            this.configurationObject = configurationObject;
 
             this.ValueBinding = binding;
             this.PropertyInfo = propertyInfo;
@@ -30,12 +27,12 @@ namespace TiaUtilities.Generation.SettingsNew
 
         public void SetConfigurationValue(object setValue)
         {
-            this.SetConfigurationValue(this.configurationObject, setValue);
+            this.SetConfigurationValue(this.ConfigurationObject, setValue);
         }
 
         public void SetConfigurationValue(ObservableConfiguration configuration, object setValue)
         {
-            if (configuration.GetType() != this.configurationObject.GetType()) {
+            if (configuration.GetType() != this.ConfigurationObject.GetType()) {
                 return;
             }
 
@@ -56,12 +53,12 @@ namespace TiaUtilities.Generation.SettingsNew
 
         public object? GetConfigurationValue()
         {
-            return this.PropertyInfo.GetValue(this.configurationObject);
+            return this.PropertyInfo.GetValue(this.ConfigurationObject);
         }
 
         public T? GetConfigurationValue<T>()
         {
-            var value = this.PropertyInfo.GetValue(this.configurationObject); 
+            var value = this.PropertyInfo.GetValue(this.ConfigurationObject); 
             if(value is T t)
             {
                 return t;

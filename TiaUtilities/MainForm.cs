@@ -339,7 +339,7 @@ namespace TiaUtilities
 
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            SettingsParser.CreateTestForm()?.ShowDialog();
+            SettingsParser.CreateTestForm().Show(this);
         }
     }
 }

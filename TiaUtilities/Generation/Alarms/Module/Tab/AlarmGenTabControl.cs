@@ -4,6 +4,7 @@ using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Languages;
 using TiaUtilities.Editors.ErrorReporting;
 using TiaUtilities.Generation.Configuration;
+using TiaUtilities.Generation.SettingsNew;
 
 namespace TiaUtilities.Generation.Alarms.Module.Tab
 {
@@ -12,6 +13,8 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
         private readonly ErrorReportThread errorThread;
         private readonly AlarmGenTemplateHandler templateHandler;
         private readonly DataGridView dataGridView;
+
+
 
         public AlarmGenTabControl(ErrorReportThread errorThread, AlarmGenTemplateHandler templateHandler, DataGridView dataGridView)
         {
@@ -44,6 +47,37 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             //Seems every time a tab is shown, these have all the text selected. Not sure why. This fixes it.
             this.groupingTypeComboBox.VisibleChanged += (sender, args) => this.groupingTypeComboBox.SelectionLength = 0;
             #endregion
+        }
+
+        public void AddConfigurationBindings(SettingsBindings settingsBindings, string name, AlarmTabConfiguration tabConfig, IEnumerable<AlarmTabConfiguration> tabConfigs)
+        {
+            settingsBindings.
+                MacroSection(name, tabConfig, MainForm.Settings.PresetAlarmTabConfiguration, () => tabConfigs)
+
+                .Section("Grouping")
+                .AddEnum(nameof(AlarmTabConfiguration.GroupingType), "Raggruppamento")
+
+                .Section(Locale.ALARM_CONFIG_GENERATION)
+                .AddUInt(nameof(AlarmTabConfiguration.TotalAlarmNum), Locale.ALARM_CONFIG_GENERATION_TOTAL_NUM)
+                .AddUInt(nameof(AlarmTabConfiguration.StartingAlarmNum), Locale.ALARM_CONFIG_GENERATION_START_NUM)
+                .AddUInt(nameof(AlarmTabConfiguration.SkipNumberAfterGroup), Locale.ALARM_CONFIG_GENERATION_SKIP)
+
+                .Section(Locale.GENERICS_HMI)
+                .AddUInt(nameof(AlarmTabConfiguration.HmiStartID), Locale.ALARM_CONFIG_GENERATION_SKIP)
+                .AddString(nameof(AlarmTabConfiguration.DefaultHmiAlarmClass), Locale.ALARM_CONFIG_GENERATION_SKIP)
+
+                .Section(Locale.ALARM_CONFIG_GENERATION_ANTI_SLIP)
+                .AddUInt(nameof(AlarmTabConfiguration.AntiSlipNumber), Locale.ALARM_CONFIG_GENERATION_ANTI_SLIP_AMOUNT)
+                .AddBool(nameof(AlarmTabConfiguration.GenerateEmptyAlarmAntiSlip), Locale.ALARM_CONFIG_GENERATION_ANTI_SLIP_GEN_EMPTY)
+
+                .Section("EmptyAlarms")
+                .AddUInt(nameof(AlarmTabConfiguration.EmptyAlarmAtEnd), Locale.ALARM_CONFIG_GENERATION_EMPTY_NUM)
+                .AddString(nameof(AlarmTabConfiguration.EmptyAlarmContactAddress), Locale.ALARM_CONFIG_GENERATION_EMPTY_ALARM_ADDRESS)
+
+                .Section(Locale.ALARM_CONFIG_GENERATION_EMPTY_TIMER)
+                .AddString(nameof(AlarmTabConfiguration.EmptyAlarmTimerAddress), Locale.ALARM_CONFIG_GENERATION_EMPTY_TIMER_ADDRESS)
+                .AddString(nameof(AlarmTabConfiguration.EmptyAlarmTimerType), Locale.ALARM_CONFIG_GENERATION_EMPTY_TIMER_TYPE)
+                .AddString(nameof(AlarmTabConfiguration.EmptyAlarmTimerValue), Locale.ALARM_CONFIG_GENERATION_EMPTY_TIMER_VALUE);
         }
 
         public void BindConfig(GridBindContainer bindContainer, AlarmMainConfiguration mainConfig, AlarmTabConfiguration tabConfig, IEnumerable<AlarmTabConfiguration> tabConfigs)

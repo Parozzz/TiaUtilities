@@ -37,6 +37,7 @@
             exportXMLMenuItem = new ToolStripMenuItem();
             preferencesMenuItem = new ToolStripMenuItem();
             formTableLayout = new TableLayoutPanel();
+            settingsMenuItem = new ToolStripMenuItem();
             topMenuStrip.SuspendLayout();
             formTableLayout.SuspendLayout();
             SuspendLayout();
@@ -52,7 +53,7 @@
             // 
             // fileMenuItem
             // 
-            fileMenuItem.DropDownItems.AddRange(new ToolStripItem[] { saveMenuItem, saveAsMenuItem, loadMenuItem });
+            fileMenuItem.DropDownItems.AddRange(new ToolStripItem[] { saveMenuItem, saveAsMenuItem, loadMenuItem, settingsMenuItem });
             fileMenuItem.Name = "fileMenuItem";
             fileMenuItem.Size = new Size(37, 20);
             fileMenuItem.Text = "File";
@@ -60,32 +61,32 @@
             // saveMenuItem
             // 
             saveMenuItem.Name = "saveMenuItem";
-            saveMenuItem.Size = new Size(111, 22);
+            saveMenuItem.Size = new Size(180, 22);
             saveMenuItem.Text = "Save";
             // 
             // saveAsMenuItem
             // 
             saveAsMenuItem.Name = "saveAsMenuItem";
-            saveAsMenuItem.Size = new Size(111, 22);
+            saveAsMenuItem.Size = new Size(180, 22);
             saveAsMenuItem.Text = "SaveAs";
             // 
             // loadMenuItem
             // 
             loadMenuItem.Name = "loadMenuItem";
-            loadMenuItem.Size = new Size(111, 22);
+            loadMenuItem.Size = new Size(180, 22);
             loadMenuItem.Text = "Load";
             // 
             // importExportMenuItem
             // 
             importExportMenuItem.DropDownItems.AddRange(new ToolStripItem[] { exportXMLMenuItem });
             importExportMenuItem.Name = "importExportMenuItem";
-            importExportMenuItem.Size = new Size(94, 20);
+            importExportMenuItem.Size = new Size(93, 20);
             importExportMenuItem.Text = "Import/Export";
             // 
             // exportXMLMenuItem
             // 
             exportXMLMenuItem.Name = "exportXMLMenuItem";
-            exportXMLMenuItem.Size = new Size(135, 22);
+            exportXMLMenuItem.Size = new Size(134, 22);
             exportXMLMenuItem.Text = "Export XML";
             // 
             // preferencesMenuItem
@@ -107,6 +108,12 @@
             formTableLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             formTableLayout.Size = new Size(800, 450);
             formTableLayout.TabIndex = 0;
+            // 
+            // settingsMenuItem
+            // 
+            settingsMenuItem.Name = "settingsMenuItem";
+            settingsMenuItem.Size = new Size(180, 22);
+            settingsMenuItem.Text = "Settings";
             // 
             // GenModuleForm
             // 
@@ -134,5 +141,6 @@
         private ToolStripMenuItem preferencesMenuItem;
         private TableLayoutPanel formTableLayout;
         public ToolStripMenuItem importExportMenuItem;
+        private ToolStripMenuItem settingsMenuItem;
     }
 }
