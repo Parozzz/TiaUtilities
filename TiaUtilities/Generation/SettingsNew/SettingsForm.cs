@@ -1,11 +1,8 @@
 ﻿using System.Diagnostics;
-using System.Runtime.InteropServices;
-using TiaUtilities.Configuration;
-using TiaUtilities.Generation.IO;
+using System.Xml;
+using TiaUtilities.Generation.SettingsNew;
 using TiaUtilities.Generation.SettingsNew.Editors;
-using TiaUtilities.Languages;
 using TiaUtilities.Utility;
-using TiaUtilities.Utility.Extensions;
 
 namespace TiaUtilities.Generation.SettingsNew
 {
@@ -58,6 +55,7 @@ namespace TiaUtilities.Generation.SettingsNew
 
         public SettingsForm(SettingsBindings bindings)
         {
+            this.DoubleBuffered = true;
             InitializeComponent();
 
             var millisStart = DateTimeOffset.Now.ToUnixTimeMilliseconds();
@@ -281,14 +279,18 @@ namespace TiaUtilities.Generation.SettingsNew
             LoadMacroSections();
         }
 
+        const int SECTION_NAME_COLUMN = 0;
+        const int SECTION_BORDER_COLUMN = 1;
+        const int SECTION_VALUES_COLUMN = 2;
+
+        private record ControlPosition(Control Control, int Column, int Row, int ColumnSpan = 0, int RowSpan = 0);
+
         private void LoadMacroSections()
         {
-            var millisStart = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-
+            //I've tried many things and this seems to be the more efficient!
             this.rightSettingsPanel.Controls.Clear();
 
-            var millisEnd = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            Debug.WriteLine($"Clear Panel: {millisEnd - millisStart}ms");
+            List<ControlPosition> controlPositionList = [];
 
             int rowCount = 0;
             foreach (var macroSection in macroSectionList)
@@ -308,15 +310,18 @@ namespace TiaUtilities.Generation.SettingsNew
 
                 this.rightSettingsPanel.RowStyles.Add(new(SizeType.AutoSize));
 
-                this.rightSettingsPanel.Controls.Add(macroSectioNameLabel, 0, rowCount);
-                this.rightSettingsPanel.SetColumnSpan(macroSectioNameLabel, 3);
+                controlPositionList.Add(new(macroSectioNameLabel, 0, rowCount, ColumnSpan: 3));
+
+                //this.rightSettingsPanel.Controls.Add(macroSectioNameLabel, 0, rowCount);
+                //this.rightSettingsPanel.SetColumnSpan(macroSectioNameLabel, 3);
 
                 rowCount++;
 
                 macroSection.Label = macroSectioNameLabel;
-                
+
                 foreach (var section in macroSection.Sections)
                 {
+                    var sectionStartRowCount = rowCount;
                     Label sectionNameLabel = new()
                     {
                         Text = section.Name,
@@ -341,12 +346,15 @@ namespace TiaUtilities.Generation.SettingsNew
                     };
                     Utils.SetDoubleBuffered(valuesPanel);
 
-                    int valueRowCount = 0;
+                    List<ControlPosition> valuesControlPositionList = [];
+
+                    int valuesRowCount = 0;
                     foreach (var value in section.ValueList)
                     {
-                        this.AppendToValuePanel(valuesPanel, value, ref valueRowCount);
+                        this.AppendToValuePanel(valuesPanel, valuesControlPositionList, value, ref valuesRowCount);
                     }
-                    
+
+                    SettingsForm.ApplyControlPositions(valuesPanel, valuesControlPositionList);
 
                     //This is just to view bettere the division
                     var sectionBorderLabel = new Label()
@@ -359,12 +367,13 @@ namespace TiaUtilities.Generation.SettingsNew
                     };
 
                     this.rightSettingsPanel.RowStyles.Add(new(SizeType.AutoSize));
-
-                    this.rightSettingsPanel.Controls.Add(sectionNameLabel, 0, rowCount);
-                    this.rightSettingsPanel.Controls.Add(sectionBorderLabel, 1, rowCount);
-                    this.rightSettingsPanel.Controls.Add(valuesPanel, 2, rowCount);
-
                     rowCount++;
+
+                    controlPositionList.Add(new(sectionNameLabel, SECTION_NAME_COLUMN, rowCount - 1));
+                    controlPositionList.Add(new(sectionBorderLabel, SECTION_BORDER_COLUMN, rowCount - 1));
+                    controlPositionList.Add(new(valuesPanel, SECTION_VALUES_COLUMN, rowCount - 1));
+
+
 
                     this.rightSettingsPanel.RowStyles.Add(new(SizeType.Absolute, SettingsConstants.SECTION_VALUE_SEPERATION));
                     rowCount++;
@@ -372,13 +381,74 @@ namespace TiaUtilities.Generation.SettingsNew
                     section.Panel = valuesPanel;
                 }
             }
+
+
+            SettingsForm.ApplyControlPositions(this.rightSettingsPanel, controlPositionList);
+        }
+
+        private static void ApplyControlPositions(TableLayoutPanel panel, List<ControlPosition> controlPositionList)
+        {
+            panel.Controls.AddRange(controlPositionList.Select(c => c.Control).ToArray());
+            foreach (var controlPosition in controlPositionList)
+            {
+                panel.SetCellPosition(controlPosition.Control, new(controlPosition.Column, controlPosition.Row));
+                if (controlPosition.ColumnSpan > 0)
+                {
+                    panel.SetColumnSpan(controlPosition.Control, controlPosition.ColumnSpan);
+                }
+
+                if (controlPosition.RowSpan > 0)
+                {
+                    panel.SetRowSpan(controlPosition.Control, controlPosition.RowSpan);
+                }
+            }
         }
 
         //DO NOT USE UseCompatibleTextRendering! IT WILL INCREASE TIME A LOT!
-        private void AppendToValuePanel(TableLayoutPanel panel, SettingsValue value, ref int rowCount)
+        private void AppendToValuePanel(TableLayoutPanel panel, List<ControlPosition> controlPositionList, SettingsValue value, ref int rowCount)
         {
             bool hasName = !string.IsNullOrEmpty(value.Name);
             bool hasDescription = !string.IsNullOrEmpty(value.Description);
+            /*
+            RichTextBox richTextBox = new()
+            {
+                AutoSize = true,
+                Dock = DockStyle.Fill,
+                BorderStyle = BorderStyle.None,
+                BackColor = Form.DefaultBackColor,
+                Margin = new(0, 0, 0, 3),
+                Padding = Padding.Empty,
+                ReadOnly = true,
+                HideSelection = true,
+                
+                //Font = SettingsConstants.VALUE_NAME_LABEL_FONT,
+                Text = (hasName ? value.Name : "") + (hasDescription ? ('\n' + value.Description) : "")
+            };
+            
+            if(hasName)
+            {
+                int namePosition = richTextBox.Find(value.Name);
+                if (namePosition != -1)
+                {
+                    richTextBox.SelectionFont = SettingsConstants.VALUE_NAME_LABEL_FONT;
+                }
+            }
+
+            if(hasDescription)
+            {
+                int descriptionPosition = richTextBox.Find(value.Description);
+                if (descriptionPosition != -1)
+                {
+                    richTextBox.SelectionFont = SettingsConstants.DESCRIPTION_LABEL_FONT;
+                }
+            }
+            
+
+            panel.RowStyles.Add(new(SizeType.AutoSize));
+            rowCount++;
+
+            controlPositionList.Add(new(richTextBox, 0, rowCount - 1));
+            */
             
             if (hasName)
             {
@@ -394,16 +464,17 @@ namespace TiaUtilities.Generation.SettingsNew
                     Padding = Padding.Empty,
                     Font = SettingsConstants.VALUE_NAME_LABEL_FONT,
                 };
+                Utils.SetDoubleBuffered(nameLabel);
 
                 panel.RowStyles.Add(new(SizeType.AutoSize));
-
-                panel.Controls.Add(nameLabel, 0, rowCount);
                 rowCount++;
+
+                controlPositionList.Add(new(nameLabel, 0, rowCount-1));
             }
-            
+
             if (hasDescription)
             {
-                Label nameLabel = new()
+                Label descriptionLabel = new()
                 {
                     Text = value.Description,
                     AutoSize = false, //This is to allow the text to wrap
@@ -415,20 +486,20 @@ namespace TiaUtilities.Generation.SettingsNew
                     Padding = Padding.Empty,
                     Font = SettingsConstants.DESCRIPTION_LABEL_FONT,
                 };
+                Utils.SetDoubleBuffered(descriptionLabel);
 
                 panel.RowStyles.Add(new(SizeType.AutoSize));
-
-                panel.Controls.Add(nameLabel, 0, rowCount);
                 rowCount++;
+
+                controlPositionList.Add(new(descriptionLabel, 0, rowCount-1));
             }
 
-            var editor = SettingsEditor.ObtainFromValue(this, value);
-            
             panel.RowStyles.Add(new(SizeType.AutoSize));
-
-            panel.Controls.Add(editor.GetControl(), 0, rowCount);
             rowCount++;
-            
+
+            var editor = SettingsEditor.ObtainFromValue(this, value);
+            controlPositionList.Add(new(editor.GetControl(), 0, rowCount - 1));
+
             panel.RowStyles.Add(new(SizeType.Absolute, SettingsConstants.SECTION_VALUE_SEPERATION));
             rowCount++;
         }
@@ -547,6 +618,172 @@ namespace TiaUtilities.Generation.SettingsNew
 }
 
 /*
+                private void LoadMacroSections()
+        {
+            this.rightSettingsPanel.Controls.Clear();
+
+            List<ControlPosition> controlPositionList = [];
+
+            int rowCount = 0;
+            foreach (var macroSection in macroSectionList)
+            {
+                Label macroSectioNameLabel = new()
+                {
+                    Text = macroSection.Name,
+                    Dock = DockStyle.Fill,
+                    BorderStyle = BorderStyle.None,
+                    AutoSize = true,
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    BackColor = Form.DefaultBackColor,
+                    Padding = Padding.Empty,
+                    Margin = new Padding(0, 0, 0, 10),
+                    Font = SettingsConstants.MACROSECTION_NAME_LABEL_FONT,
+                };
+
+                this.rightSettingsPanel.RowStyles.Add(new(SizeType.AutoSize));
+
+                controlPositionList.Add(new(macroSectioNameLabel, 0, rowCount, ColumnSpan: 3));
+               
+                //this.rightSettingsPanel.Controls.Add(macroSectioNameLabel, 0, rowCount);
+                //this.rightSettingsPanel.SetColumnSpan(macroSectioNameLabel, 3);
+                
+                rowCount++;
+
+                macroSection.Label = macroSectioNameLabel;
+                
+                foreach (var section in macroSection.Sections)
+                {
+                    Label sectionNameLabel = new()
+                    {
+                        Text = section.Name,
+                        Dock = DockStyle.Fill,
+                        BorderStyle = BorderStyle.None,
+                        AutoSize = false,
+                        TextAlign = ContentAlignment.TopCenter,
+                        BackColor = Form.DefaultBackColor,
+                        Padding = Padding.Empty,
+                        Margin = Padding.Empty,
+                        Font = SettingsConstants.SECTION_NAME_LABEL_FONT,
+                    };
+
+                    TableLayoutPanel valuesPanel = new()
+                    {
+                        AutoSize = true,
+                        AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                        Dock = DockStyle.Fill,
+                        ColumnStyles = { new ColumnStyle(SizeType.AutoSize) },
+                        Padding = Padding.Empty,
+                        Margin = Padding.Empty,
+                    };
+                    Utils.SetDoubleBuffered(valuesPanel);
+
+
+                    List<ControlPosition> valuesControlPositionList = [];
+
+                    int valueRowCount = 0;
+                    foreach (var value in section.ValueList)
+                    {
+                        this.AppendToValuePanel(valuesPanel, value, valuesControlPositionList, ref valueRowCount);
+                    }
+
+                    SettingsForm.ApplyControlPositions(valuesPanel, valuesControlPositionList);
+
+                    //This is just to view bettere the division
+                    var sectionBorderLabel = new Label()
+                    {
+                        Text = "",
+                        Dock = DockStyle.Fill,
+                        BackColor = Color.DarkBlue,
+                        Padding = Padding.Empty,
+                        Margin = new Padding(0, 6, (int)(SettingsConstants.SECTIONS_BORDER_COLUMN_SIZE / 2f), 6),
+                    };
+
+                    this.rightSettingsPanel.RowStyles.Add(new(SizeType.AutoSize));
+
+                    
+                    controlPositionList.Add(new(sectionNameLabel, 0, rowCount));
+                    controlPositionList.Add(new(sectionBorderLabel, 1, rowCount));
+                    controlPositionList.Add(new(valuesPanel, 2, rowCount));
+                    
+                    
+                    this.rightSettingsPanel.Controls.Add(sectionNameLabel, 0, rowCount);
+                    this.rightSettingsPanel.Controls.Add(sectionBorderLabel, 1, rowCount);
+                    this.rightSettingsPanel.Controls.Add(valuesPanel, 2, rowCount);
+                    
+                    rowCount++;
+
+                    this.rightSettingsPanel.RowStyles.Add(new(SizeType.Absolute, SettingsConstants.SECTION_VALUE_SEPERATION));
+                    rowCount++;
+
+                    section.Panel = valuesPanel;
+                                    }
+                                }
+
+
+            SettingsForm.ApplyControlPositions(this.rightSettingsPanel, controlPositionList);
+        }
+
+        //DO NOT USE UseCompatibleTextRendering! IT WILL INCREASE TIME A LOT!
+        private void AppendToValuePanel(TableLayoutPanel panel, SettingsValue value, List<ControlPosition> controlPositionList, ref int rowCount)
+        {
+            bool hasName = !string.IsNullOrEmpty(value.Name);
+            bool hasDescription = !string.IsNullOrEmpty(value.Description);
+
+            if (hasName)
+            {
+                Label nameLabel = new()
+                {
+                    Text = value.Name,
+                    AutoSize = true,
+                    Dock = DockStyle.Fill,
+                    BorderStyle = BorderStyle.None,
+                    TextAlign = ContentAlignment.MiddleLeft,
+                    BackColor = Color.Transparent,
+                    Margin = hasDescription ? Padding.Empty : new(0, 0, 0, 3),
+                    Padding = Padding.Empty,
+                    Font = SettingsConstants.VALUE_NAME_LABEL_FONT,
+                };
+
+                panel.RowStyles.Add(new(SizeType.AutoSize));
+
+                controlPositionList.Add(new(nameLabel, 0, rowCount));
+                //panel.Controls.Add(nameLabel, 0, rowCount);
+                rowCount++;
+            }
+            
+            if (hasDescription)
+            {
+                Label descriptionLabel = new()
+                {
+                    Text = value.Description,
+                    AutoSize = false, //This is to allow the text to wrap
+                    Dock = DockStyle.Fill,
+                    BorderStyle = BorderStyle.None,
+                    TextAlign = ContentAlignment.MiddleLeft,
+                    BackColor = Color.Transparent,
+                    Margin = new Padding(0, 0, 0, 3),
+                    Padding = Padding.Empty,
+                    Font = SettingsConstants.DESCRIPTION_LABEL_FONT,
+                };
+
+                panel.RowStyles.Add(new(SizeType.AutoSize));
+
+                controlPositionList.Add(new(descriptionLabel, 0, rowCount));
+                //panel.Controls.Add(descriptionLabel, 0, rowCount);
+                rowCount++;
+            }
+
+            var editor = SettingsEditor.ObtainFromValue(this, value);
+
+            panel.RowStyles.Add(new(SizeType.AutoSize));
+
+            controlPositionList.Add(new(editor.GetControl(), 0, rowCount));
+            //panel.Controls.Add(editor.GetControl(), 0, rowCount);
+            rowCount++;
+
+            panel.RowStyles.Add(new(SizeType.Absolute, SettingsConstants.SECTION_VALUE_SEPERATION));
+            rowCount++;
+        }
 
         private void ListView_DrawColumnHeader(object? sender, DrawListViewColumnHeaderEventArgs e)
         {
