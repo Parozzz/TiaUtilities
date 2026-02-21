@@ -57,8 +57,6 @@ namespace TiaUtilities.Generation.SettingsNew
             this.DoubleBuffered = true;
             InitializeComponent();
 
-            var millisStart = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-
             this.bindings = bindings;
             this.macroSectionList = [];
 
@@ -71,20 +69,7 @@ namespace TiaUtilities.Generation.SettingsNew
             Utils.SetDoubleBuffered(this.rightSettingsPanel);
 
             Init();
-
-            var millisInit = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            Debug.WriteLine($"Init Time: {millisInit - millisStart}ms");
-
             ParseBindings();
-
-            var millisParse = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            Debug.WriteLine($"Parse Time: {millisParse - millisInit}ms");
-
-            this.Shown += (sender, args) =>
-            {
-                var shownMillis = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-                Debug.WriteLine($"Shown Time: {shownMillis - millisParse}ms");
-            };
         }
 
         private void Init()
