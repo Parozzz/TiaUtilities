@@ -1,4 +1,4 @@
-﻿using TiaUtilities.Generation.SettingsNew;
+﻿using TiaUtilities.Generation.SettingsNew.Bindings;
 
 namespace TiaUtilities.Generation
 {

@@ -1,22 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TiaUtilities.CustomControls;
-using TiaUtilities.Generation.Configuration;
+﻿using TiaUtilities.CustomControls;
 
 namespace TiaUtilities.Generation.SettingsNew.Editors
 {
     public class SettingsCheckBoxEditor : SettingsEditor
     {
 
-        private readonly RJToggleButton button;
+        private readonly RJToggleButton toggleButton;
         public SettingsCheckBoxEditor(SettingsValue value) : base(value)
         {
-            this.button = new RJToggleButton
+            this.toggleButton = new RJToggleButton
             {
-                Checked = (bool) value.GetConfigurationValue(),
                 FlatStyle = FlatStyle.Flat,
                 Text = "",
                 AutoSize = true,
@@ -26,20 +19,28 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
                 OnToggleColor = Color.DarkGreen,
                 OffToggleColor = Color.PaleVioletRed,
             };
+            toggleButton.CheckedChanged += (sender, args) => this.SaveToConfiguration();
 
-            button.CheckedChanged += CheckedChangedEventHandler;
+            var _ = SettingsUtils.AddContextualMenu(this.toggleButton, value);
 
-            SettingsUtils.AddContextualMenu(this.button, value);
-        }
-
-        private void CheckedChangedEventHandler(object? sender, EventArgs args)
-        {
-            this.Value.SetConfigurationValue(this.button.Checked);
+            base.RegisterPropertyChanged(this.toggleButton);
+            this.LoadFromConfiguration();
         }
 
         public override Control GetControl()
         {
-            return this.button;
+            return this.toggleButton;
+        }
+
+        public override void LoadFromConfiguration()
+        {
+            var boolValue = base.Value.GetConfigurationValue<bool>();
+            this.toggleButton.Checked = boolValue;
+        }
+
+        public override void SaveToConfiguration()
+        {
+            this.Value.SetConfigurationValue(this.toggleButton.Checked);
         }
     }
 }

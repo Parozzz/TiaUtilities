@@ -34,7 +34,7 @@
             // 
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
-            ClientSize = new Size(884, 461);
+            ClientSize = new Size(934, 761);
             DoubleBuffered = true;
             Name = "SettingsForm";
             Text = "SettingsForm";

@@ -9,7 +9,7 @@ namespace TiaUtilities.Generation.SettingsNew
     public static class SettingsConstants
     {
         public static readonly Color SECTIONS_ITEM_FORE_COLOR = Color.Black;
-        public static readonly Color SECTIONS_SELECTED_ITEM_BACK_COLOR = Color.FromArgb(60, Color.Gray);
+        public static readonly Color SECTIONS_SELECTED_ITEM_BACK_COLOR = ControlPaint.LightLight(Color.LightGray);
 
         public const int SECTIONS_LIST_VIEW_WIDTH = 250;
         public const int SECTIONS_LIST_TILE_HEIGHT = 28;

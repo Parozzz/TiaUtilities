@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,17 +11,6 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
     {
         public static SettingsEditor ObtainFromValue(Form form, SettingsValue value)
         {
-            /*
-             *         STRING,
-        INT,
-        UINT,
-        BOOLEAN,
-        JSON,
-        JAVASCRIPT,
-        COLOR,
-        ENUM,
-             */
-
             switch (value.ValueBinding.EditorType)
             {
                 default:
@@ -44,11 +34,30 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
         }
 
         public SettingsValue Value { get; init; }
+
         public SettingsEditor(SettingsValue value)
         {
             this.Value = value;
         }
 
         public abstract Control GetControl();
+
+        public abstract void LoadFromConfiguration();
+
+        public abstract void SaveToConfiguration();
+
+        protected void RegisterPropertyChanged(Control control)
+        {
+            void propertyChanged(object? sender, PropertyChangedEventArgs args)
+            {
+                if (!this.Value.SetInProgress && args.PropertyName == this.Value.PropertyInfo.Name)
+                {
+                    this.LoadFromConfiguration();
+                }
+            }
+
+            this.Value.ConfigurationObject.PropertyChanged += propertyChanged;
+            control.Disposed += (sender, args) => this.Value.ConfigurationObject.PropertyChanged -= propertyChanged;
+        }
     }
 }

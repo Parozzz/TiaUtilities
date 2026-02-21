@@ -21,21 +21,27 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
             this.Control.Dock = DockStyle.Fill;
             this.Control.MinimumSize = new Size(0, 500);
             this.Control.Font = SettingsConstants.VALUE_CONTROL_FONT;
-            this.Control.Text = "" + value.GetConfigurationValue();
+            this.Control.TextChanged += (sender, args) => this.SaveToConfiguration();
 
-            this.Control.TextChanged += TextChangedEventHandler;
+            var _ = SettingsUtils.AddContextualMenu(this.Control, value);
 
-            SettingsUtils.AddContextualMenu(this.Control, value);
-        }
-        private void TextChangedEventHandler(object? sender, EventArgs args)
-        {
-            var text = this.Control.Text;
-            this.Value.SetConfigurationValue(text);
+            base.RegisterPropertyChanged(this.Control);
+            this.LoadFromConfiguration();
         }
 
         public override Control GetControl()
         {
             return this.Control;
+        }
+
+        public override void LoadFromConfiguration()
+        {
+            this.Control.Text = "" + this.Value.GetConfigurationValue();
+        }
+
+        public override void SaveToConfiguration()
+        {
+            this.Value.SetConfigurationValue(this.Control.Text);
         }
     }
 }

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using TiaUtilities.Configuration;
 using TiaUtilities.Generation.IO;
 using TiaUtilities.Generation.Placeholders;
+using TiaUtilities.Generation.SettingsNew.Bindings;
 using TiaUtilities.Languages;
 using TiaUtilities.Utility.Extensions;
 
@@ -19,13 +20,13 @@ namespace TiaUtilities.Generation.SettingsNew
         public static SettingsForm CreateTestForm()
         {
             SettingsBindings settingsBindings = new SettingsBindings()
-                .MacroSection("Macro1", testConfiguration)
+                .MacroSection(() => "Macro1", () => testConfiguration)
 
                 .Section("Section1")
                 .AddUInt(nameof(TestConfiguration.DBNumber), Locale.GENERICS_NAME, "Name again!?")
 
                 .Section("DB", "Very very long Db Description! Will it work?")
-                .AddString(nameof(TestConfiguration.DBName), Locale.GENERICS_NAME, "Mega Description1")
+                .AddString(nameof(TestConfiguration.DBName), Locale.GENERICS_NAME, "Very very long Db Description! Will it work? Very very long Db Description! Will it work? Very very long Db Description! Will it work? Mega Description1")
                 .AddUInt(nameof(TestConfiguration.DBNumber), Locale.GENERICS_NAME, "Mega Description2")
 
                 .Section("AnotherCoolSectionWithACoolName", "And what if it has also a very very very long description? That would be cool!")
@@ -45,7 +46,7 @@ namespace TiaUtilities.Generation.SettingsNew
                 .Section("JAVASCRIPT!", "JAVASCRIPT??!!")
                 .AddJavascript(nameof(TestConfiguration.TestJavascript), string.Empty, $"{GenPlaceholders.IO.IONAME}")
 
-                .MacroSection("Macro2", testConfiguration)
+                .MacroSection(() => "Macro2", () => testConfiguration)
                 .Section("Section1")
                 .AddUInt(nameof(TestConfiguration.DBNumber), Locale.GENERICS_NAME, "Name again!?")
 

@@ -1,10 +1,9 @@
-﻿using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
-using TiaUtilities.Editors.ErrorReporting;
+﻿using TiaUtilities.Editors.ErrorReporting;
 using TiaUtilities.Generation.Alarms.Module.Tab;
 using TiaUtilities.Generation.Alarms.Module.Template;
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.JSScript;
-using TiaUtilities.Generation.SettingsNew;
+using TiaUtilities.Generation.SettingsNew.Bindings;
 using TiaUtilities.Languages;
 
 namespace TiaUtilities.Generation.Alarms.Module
@@ -50,19 +49,11 @@ namespace TiaUtilities.Generation.Alarms.Module
                 }
             };
 
-            this.control.tabControl.Deselecting += (sender, args) =>
-            {
-                if (args.TabPage?.Tag is AlarmGenTab tab)
-                {
-                    tab.UnbindSettings(this.SettingsBindings);
-                }
-            };
             this.control.tabControl.Selected += (sender, args) =>
             {
                 if (args.TabPage?.Tag is AlarmGenTab tab)
                 {
                     tab.Selected();
-                    tab.BindSettings(this.SettingsBindings);
                 }
             };
 
@@ -76,7 +67,7 @@ namespace TiaUtilities.Generation.Alarms.Module
                 }
             };
 
-            this.AddMainConfigurationSettingsBindings(this.SettingsBindings);
+            this.AddConfigurationBindings(this.SettingsBindings);
         }
 
         private void TabCreation(TabPage tabPage, AlarmGenTabSave? save = null)
@@ -92,8 +83,6 @@ namespace TiaUtilities.Generation.Alarms.Module
             }
             tabPage.Tag = tab;
             tabPage.Controls.Add(tab.TabControl);
-
-            tab.BindSettings(this.SettingsBindings);
 
             genTabList.Add(tab); //Do this AFTER. Otherwise the Selected event is called with Tag null.
         }
@@ -157,13 +146,12 @@ namespace TiaUtilities.Generation.Alarms.Module
                 this.control.tabControl.TabPages.Add(tabPage);
             }
 
-            this.AddMainConfigurationSettingsBindings(this.SettingsBindings);
+            this.AddConfigurationBindings(this.SettingsBindings);
 
             //Seems that the Selected event is not called in this case. Doing it manually.
             if (this.control.tabControl.SelectedTab?.Tag is AlarmGenTab tab)
             {
                 tab.Selected();
-                tab.BindSettings(this.SettingsBindings);
             }
         }
 
@@ -199,10 +187,10 @@ namespace TiaUtilities.Generation.Alarms.Module
             return false;
         }
 
-        private void AddMainConfigurationSettingsBindings(SettingsBindings settingsBindings)
+        private void AddConfigurationBindings(SettingsBindings settingsBindings)
         {
             settingsBindings
-                .MacroSection("AlarmGenControl", mainConfig, MainForm.Settings.PresetAlarmMainConfiguration)
+                .MacroSection(() => "AlarmGenControl", () => this.mainConfig, MainForm.Settings.PresetAlarmMainConfiguration)
 
                 .Section("Enables")
                 .AddBool(nameof(AlarmMainConfiguration.EnableCustomVariable), Locale.ALARM_CONFIG_ENABLE_CUSTOM_VAR)
@@ -230,6 +218,45 @@ namespace TiaUtilities.Generation.Alarms.Module
                 .AddString(nameof(AlarmMainConfiguration.HmiTextTemplate), Locale.ALARM_CONFIG_FORMATTING_HMI_TEXT)
                 .AddString(nameof(AlarmMainConfiguration.HmiTriggerTagTemplate), Locale.ALARM_CONFIG_FORMATTING_HMI_TRIGGER_TAG_TEMPLATE)
                 .AddBool(nameof(AlarmMainConfiguration.HmiTriggerTagUseWordArray), Locale.ALARM_CONFIG_FORMATTING_HMI_USE_WORD_ARRAY);
+
+            settingsBindings
+                .MacroSection(this.GetCurrentTabName, this.GetCurrentTabConfiguration, MainForm.Settings.PresetAlarmTabConfiguration, () => this.TabConfigurations)
+
+                .Section("Grouping")
+                .AddEnum(nameof(AlarmTabConfiguration.GroupingType), "Raggruppamento")
+
+                .Section(Locale.ALARM_CONFIG_GENERATION)
+                .AddUInt(nameof(AlarmTabConfiguration.TotalAlarmNum), Locale.ALARM_CONFIG_GENERATION_TOTAL_NUM)
+                .AddUInt(nameof(AlarmTabConfiguration.StartingAlarmNum), Locale.ALARM_CONFIG_GENERATION_START_NUM)
+                .AddUInt(nameof(AlarmTabConfiguration.SkipNumberAfterGroup), Locale.ALARM_CONFIG_GENERATION_SKIP)
+
+                .Section(Locale.GENERICS_HMI)
+                .AddUInt(nameof(AlarmTabConfiguration.HmiStartID), Locale.ALARM_CONFIG_GENERATION_SKIP)
+                .AddString(nameof(AlarmTabConfiguration.DefaultHmiAlarmClass), Locale.ALARM_CONFIG_GENERATION_SKIP)
+
+                .Section(Locale.ALARM_CONFIG_GENERATION_ANTI_SLIP)
+                .AddUInt(nameof(AlarmTabConfiguration.AntiSlipNumber), Locale.ALARM_CONFIG_GENERATION_ANTI_SLIP_AMOUNT)
+                .AddBool(nameof(AlarmTabConfiguration.GenerateEmptyAlarmAntiSlip), Locale.ALARM_CONFIG_GENERATION_ANTI_SLIP_GEN_EMPTY)
+
+                .Section("EmptyAlarms")
+                .AddUInt(nameof(AlarmTabConfiguration.EmptyAlarmAtEnd), Locale.ALARM_CONFIG_GENERATION_EMPTY_NUM)
+                .AddString(nameof(AlarmTabConfiguration.EmptyAlarmContactAddress), Locale.ALARM_CONFIG_GENERATION_EMPTY_ALARM_ADDRESS)
+
+                .Section(Locale.ALARM_CONFIG_GENERATION_EMPTY_TIMER)
+                .AddString(nameof(AlarmTabConfiguration.EmptyAlarmTimerAddress), Locale.ALARM_CONFIG_GENERATION_EMPTY_TIMER_ADDRESS)
+                .AddString(nameof(AlarmTabConfiguration.EmptyAlarmTimerType), Locale.ALARM_CONFIG_GENERATION_EMPTY_TIMER_TYPE)
+                .AddString(nameof(AlarmTabConfiguration.EmptyAlarmTimerValue), Locale.ALARM_CONFIG_GENERATION_EMPTY_TIMER_VALUE);
+        }
+
+        private string GetCurrentTabName()
+        {
+            var tabPage = this.control.tabControl.SelectedTab;
+            return tabPage == null ? "" : tabPage.Text;
+        }
+
+        private AlarmTabConfiguration? GetCurrentTabConfiguration()
+        {
+            return this.control.tabControl.SelectedTab?.Tag is AlarmGenTab genTab ? genTab.TabConfig : null;
         }
     }
 }

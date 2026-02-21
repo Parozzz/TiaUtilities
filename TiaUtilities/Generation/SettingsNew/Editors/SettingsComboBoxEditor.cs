@@ -26,65 +26,35 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
             {
                 case SettingsEditorTypeEnum.ENUM:
                     this.comboBox.DropDownStyle = ComboBoxStyle.DropDownList; //Disable text Editing 
-
-                    var enumValues = Enum.GetValues(value.PropertyInfo.PropertyType);
-
                     this.comboBox.DisplayMember = "Text";
                     this.comboBox.ValueMember = "Value";
 
                     var dataSourceItems = new List<object>();
-                    foreach (Enum enumItem in enumValues)
+                    foreach (Enum enumItem in Enum.GetValues(value.PropertyInfo.PropertyType))
                     {
                         dataSourceItems.Add(new { Text = enumItem.GetTranslation(), Value = enumItem });
                     }
                     this.comboBox.DataSource = dataSourceItems;
 
-                    this.comboBox.SelectedValue = this.Value.GetConfigurationValue();
-                    comboBox.OnSelectedIndexChanged += (sender, args) =>
-                    {
-                        var selectedValue = this.comboBox.SelectedValue;
-                        if(selectedValue != null)
-                        {
-                            this.Value.SetConfigurationValue(selectedValue);
-                        }
-                    };
-
+                    this.comboBox.OnSelectedIndexChanged += (sender, args) => this.SaveToConfiguration(); ;
                     break;
                 case SettingsEditorTypeEnum.STRING:
-                    this.comboBox.Text = "" + this.Value.GetConfigurationValue();
-                    this.comboBox.TextChanged += (sender, args) =>
-                    {
-                        value.SetConfigurationValue(this.comboBox.Text);
-                    };
+                    this.comboBox.TextChanged += (sender, args) => this.SaveToConfiguration();
                     break;
                 case SettingsEditorTypeEnum.INT:
-                    this.comboBox.Text = "" + this.Value.GetConfigurationValue();
                     this.comboBox.KeyPress += SignedKeyPressEventHandler;
-                    this.comboBox.TextChanged += (sender, args) =>
-                    {
-                        var ret = long.TryParse(this.comboBox.Text, out var signedValue);
-                        if (ret)
-                        {
-                            value.SetConfigurationValue(signedValue);
-                        }
-
-                    };
+                    this.comboBox.TextChanged += (sender, args) => this.SaveToConfiguration();
                     break;
                 case SettingsEditorTypeEnum.UINT:
-                    this.comboBox.Text = "" + this.Value.GetConfigurationValue();
                     this.comboBox.KeyPress += UnsignedKeyPressEventHandler;
-                    this.comboBox.TextChanged += (sender, args) =>
-                    {
-                        var ret = ulong.TryParse(this.comboBox.Text, out var signedValue);
-                        if (ret)
-                        {
-                            value.SetConfigurationValue(signedValue);
-                        }
-                    };
+                    this.comboBox.TextChanged += (sender, args) => this.SaveToConfiguration();
                     break;
             }
-            
-            SettingsUtils.AddContextualMenu(this.comboBox, value);
+
+            var _ = SettingsUtils.AddContextualMenu(this.comboBox, value);
+
+            base.RegisterPropertyChanged(this.comboBox);
+            this.LoadFromConfiguration();
         }
 
         private void StringTextChangedEventHandler(object? sender, EventArgs args)
@@ -108,6 +78,50 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
         public override Control GetControl()
         {
             return comboBox;
+        }
+
+        public override void LoadFromConfiguration()
+        {
+            switch (base.Value.ValueBinding.EditorType)
+            {
+                case SettingsEditorTypeEnum.ENUM:
+                    this.comboBox.SelectedValue = this.Value.GetConfigurationValue();
+                    break;
+                case SettingsEditorTypeEnum.STRING:
+                case SettingsEditorTypeEnum.INT:
+                case SettingsEditorTypeEnum.UINT:
+                    this.comboBox.Text = "" + this.Value.GetConfigurationValue();
+                    break;
+            }
+        }
+
+        public override void SaveToConfiguration()
+        {
+            switch (this.Value.ValueBinding.EditorType)
+            {
+                case SettingsEditorTypeEnum.ENUM:
+                    var selectedValue = this.comboBox.SelectedValue;
+                    if (selectedValue != null)
+                    {
+                        this.Value.SetConfigurationValue(selectedValue);
+                    }
+                    break;
+                case SettingsEditorTypeEnum.STRING:
+                    this.Value.SetConfigurationValue(this.comboBox.Text);
+                    break;
+                case SettingsEditorTypeEnum.INT:
+                    if (long.TryParse(this.comboBox.Text, out var signedValue))
+                    {
+                        this.Value.SetConfigurationValue(signedValue);
+                    }
+                    break;
+                case SettingsEditorTypeEnum.UINT:
+                    if (ulong.TryParse(this.comboBox.Text, out var unsignedValue))
+                    {
+                        this.Value.SetConfigurationValue(unsignedValue);
+                    }
+                    break;
+            }
         }
     }
 }

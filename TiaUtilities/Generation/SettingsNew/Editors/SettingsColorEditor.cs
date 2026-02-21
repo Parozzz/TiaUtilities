@@ -8,11 +8,20 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
 
     public class SettingsColorEditor : SettingsEditor
     {
+        private enum LastColorChangeCauseEnum
+        {
+            NONE,
+            LOAD,
+            TEXT_BOX,
+            COLOR_PICKER,
+        };
+
+        private record LastColorChange(Color Color, LastColorChangeCauseEnum Cause);
 
         private readonly static Dictionary<string, Color> COLOR_DICTIONARY = [];
         private static void ParseColors()
         {
-            if(COLOR_DICTIONARY.Count > 0)
+            if (COLOR_DICTIONARY.Count > 0)
             {
                 return;
             }
@@ -27,7 +36,7 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
         private readonly TextBox colorHexaTextBox;
         private readonly Button colorPickerButton;
 
-        private Color lastColor = Color.White;
+        private LastColorChange lastColorChange = new(Color.White, LastColorChangeCauseEnum.NONE);
 
         public SettingsColorEditor(SettingsValue value) : base(value)
         {
@@ -48,8 +57,6 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
 
             this.colorPickerButton = new Button()
             {
-                ForeColor = ConfigStyle.FORE_COLOR,
-                BackColor = ConfigStyle.BACK_COLOR,
                 Dock = DockStyle.Fill,
                 MinimumSize = new(40, 0),
                 MaximumSize = new(40, 20),
@@ -64,17 +71,22 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
 
             this.colorPickerButton.Click += ColorPickerButtonClickEvent;
 
-            this.ApplyColor(value.GetConfigurationValue<Color>());
+            var _ = SettingsUtils.AddContextualMenu(this.colorHexaTextBox, value);
+            _ = SettingsUtils.AddContextualMenu(this.colorPickerButton, value);
 
-            SettingsUtils.AddContextualMenu(this.colorHexaTextBox, value);
-            SettingsUtils.AddContextualMenu(this.colorPickerButton, value);
+            base.RegisterPropertyChanged(this.colorHexaTextBox);
+            this.LoadFromConfiguration();
         }
 
         private void ColorTextBoxTextChangedEvent(object? sender, EventArgs e)
         {
             try
             {
-                ApplyColor(ColorTranslator.FromHtml(colorHexaTextBox.Text), overrideText: false);
+                var color = ColorTranslator.FromHtml(colorHexaTextBox.Text);
+                this.lastColorChange = new(color, LastColorChangeCauseEnum.TEXT_BOX);
+                this.colorPickerButton.BackColor = color;
+
+                this.SaveToConfiguration();
             }
             catch { }
         }
@@ -83,28 +95,19 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
         {
             try
             {
-                var colorDialog = new ColorDialog() { Color = lastColor, };
+                var colorDialog = new ColorDialog() { Color = lastColorChange.Color };
                 if (colorDialog.ShowDialog() == DialogResult.OK)
                 {
-                    ApplyColor(colorDialog.Color);
+                    this.lastColorChange = new(colorDialog.Color, LastColorChangeCauseEnum.COLOR_PICKER);
+                    this.colorPickerButton.BackColor = colorDialog.Color;
+
+                    this.SaveToConfiguration();
                 }
             }
             catch (Exception ex)
             {
                 Utils.ShowExceptionMessage(ex);
             }
-        }
-
-        public void ApplyColor(Color color, bool overrideText = true)
-        {
-            lastColor = color;
-            if (overrideText)
-            {
-                this.colorHexaTextBox.Text = color.ToHexString();
-            }
-            this.colorPickerButton.BackColor = color;
-
-            this.Value.SetConfigurationValue(color);
         }
 
         public override Control GetControl()
@@ -130,8 +133,34 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
             panel.Controls.Add(this.colorHexaTextBox, 0, 0);
             //panel.Controls.Add(this.colorNameComboBox, 1, 0);
             panel.Controls.Add(this.colorPickerButton, 1, 0);
-            
+
             return panel;
+        }
+
+        public override void LoadFromConfiguration()
+        {
+            var color = this.Value.GetConfigurationValue<Color>();
+            lastColorChange = new(color, LastColorChangeCauseEnum.LOAD);
+
+            switch (lastColorChange.Cause)
+            {
+                case LastColorChangeCauseEnum.TEXT_BOX:
+                    this.colorPickerButton.BackColor = color;
+                    break;
+                case LastColorChangeCauseEnum.COLOR_PICKER:
+                    this.colorHexaTextBox.Text = color.ToHexString();
+                    break;
+                default:
+                    this.colorHexaTextBox.Text = color.ToHexString();
+                    this.colorPickerButton.BackColor = color;
+                    break;
+            }
+        }
+
+        public override void SaveToConfiguration()
+        {
+            var color = this.colorPickerButton.BackColor;
+            this.Value.SetConfigurationValue(color);
         }
     }
 }

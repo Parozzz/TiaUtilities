@@ -1,0 +1,65 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
+using TiaUtilities.Configuration;
+
+namespace TiaUtilities.Generation.SettingsNew.Bindings
+{
+    public class SettingsMacroSectionBinding<T> where T : ObservableConfiguration
+    {
+        public string Name { get => getNameFunc(); }
+        public T? PresetConfigurationObject { get; init; }
+        public IEnumerable<T>? OtherConfigurations { get => this.getOtherConfigurationsFunc?.Invoke(); }
+
+        public List<SettingsSectionBinding> SectionsList { get; init; }
+
+        private readonly Func<string> getNameFunc;
+        private readonly Type configurationType;
+        private readonly Func<T?> getConfigurationObject;
+        private readonly Func<IEnumerable<T>>? getOtherConfigurationsFunc = null;
+
+        public SettingsMacroSectionBinding(Func<string> getNameFunc, Type configurationType,
+            Func<T?> getConfigurationFunc, T? presetConfigurationObject, Func<IEnumerable<T>>? getOtherConfigurationsFunc)
+        {
+            this.getNameFunc = getNameFunc;
+            this.configurationType = configurationType;
+            this.getConfigurationObject = getConfigurationFunc;
+            this.PresetConfigurationObject = presetConfigurationObject;
+            this.getOtherConfigurationsFunc = getOtherConfigurationsFunc;
+
+            this.SectionsList = [];
+        }
+
+        public T? GetConfigurationObject()
+        {
+            return getConfigurationObject.Invoke();
+        }
+
+        public Type GetConfigurationType()
+        {
+            return configurationType;
+        }
+
+        public void SaveToPresetConfiguration()
+        {
+            var configurationObject = this.getConfigurationObject();
+            if (configurationObject != null && this.PresetConfigurationObject != null)
+            {
+                GenUtils.CopySamePublicFieldsAndProperties(configurationObject, this.PresetConfigurationObject);
+            }
+        }
+    }
+
+    public record SettingsSectionBinding(string Name, string Description,
+        SettingsMacroSectionBinding<ObservableConfiguration> MacroSectionBinding,
+        List<SettingsValueBinding> ValueList
+    );
+
+    public record SettingsValueBinding(PropertyInfo PropertyInfo, string Name, string Description,
+        SettingsEditorTypeEnum EditorType,
+        SettingsSectionBinding SectionBinding
+    );
+}

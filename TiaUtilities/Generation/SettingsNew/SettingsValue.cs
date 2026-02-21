@@ -5,26 +5,22 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using TiaUtilities.Configuration;
+using TiaUtilities.Generation.SettingsNew.Bindings;
 
 namespace TiaUtilities.Generation.SettingsNew
 {
-    public class SettingsValue
+    public class SettingsValue(SettingsValueBinding binding, ObservableConfiguration ConfigurationObject)
     {
-        public SettingsValueBinding ValueBinding { get; init; }
+        public SettingsValueBinding ValueBinding { get; init; } = binding;
+        public ObservableConfiguration ConfigurationObject { get; init; } = ConfigurationObject;
+
         public string Name { get => this.ValueBinding.Name; }
         public string Description { get => this.ValueBinding.Description; }
-        public SettingsMacroSectionBinding MacroSectionBinding { get => this.ValueBinding.MacroSectionBinding; }
+        public PropertyInfo PropertyInfo { get => this.ValueBinding.PropertyInfo; }
+        public SettingsMacroSectionBinding<ObservableConfiguration> MacroSectionBinding { get => this.ValueBinding.SectionBinding.MacroSectionBinding; }
         public SettingsSectionBinding SectionBinding { get => this.ValueBinding.SectionBinding; }
-        public PropertyInfo PropertyInfo { get; init; }
 
-        private ObservableConfiguration ConfigurationObject { get => this.ValueBinding.MacroSectionBinding.ConfigurationObject; }
-
-        public SettingsValue(SettingsValueBinding binding, PropertyInfo propertyInfo)
-        {
-
-            this.ValueBinding = binding;
-            this.PropertyInfo = propertyInfo;
-        }
+        public bool SetInProgress { get; private set; } = false;
 
         public void SetConfigurationValue(object setValue)
         {
@@ -33,23 +29,26 @@ namespace TiaUtilities.Generation.SettingsNew
 
         public void SetConfigurationValue(ObservableConfiguration configuration, object setValue)
         {
-            if (configuration.GetType() != this.ConfigurationObject.GetType()) {
-                return;
+            this.SetInProgress = true;
+
+            if (configuration.GetType() == this.ConfigurationObject.GetType())
+            {
+                var propertyType = this.PropertyInfo.PropertyType;
+                if (propertyType == setValue.GetType())
+                {
+                    this.PropertyInfo.SetValue(configuration, setValue);
+                }
+                else if (SettingsValue.IsSignedInt(propertyType) && setValue is long signedSetValue) //When parsed, always use maximun size!
+                {
+                    SettingsValue.SetCastedAsSignedInt(this.PropertyInfo, configuration, signedSetValue);
+                }
+                else if (SettingsValue.IsUnsignedInt(propertyType) && setValue is ulong unsignedSetValue) //When parsed, always use maximun size!
+                {
+                    SettingsValue.SetCastedAsUnsignedInt(this.PropertyInfo, configuration, unsignedSetValue);
+                }
             }
 
-            var propertyType = this.PropertyInfo.PropertyType;
-            if (propertyType == setValue.GetType())
-            {
-                this.PropertyInfo.SetValue(configuration, setValue);
-            }
-            else if(SettingsValue.IsSignedInt(propertyType) && setValue is long signedSetValue) //When parsed, always use maximun size!
-            {
-                SettingsValue.SetCastedAsSignedInt(this.PropertyInfo, configuration, signedSetValue);
-            }
-            else if (SettingsValue.IsUnsignedInt(propertyType) && setValue is ulong unsignedSetValue) //When parsed, always use maximun size!
-            {
-                SettingsValue.SetCastedAsUnsignedInt(this.PropertyInfo, configuration, unsignedSetValue);
-            }
+            this.SetInProgress = false;
         }
 
         public object? GetConfigurationValue()
@@ -59,8 +58,8 @@ namespace TiaUtilities.Generation.SettingsNew
 
         public T? GetConfigurationValue<T>()
         {
-            var value = this.PropertyInfo.GetValue(this.ConfigurationObject); 
-            if(value is T t)
+            var value = this.PropertyInfo.GetValue(this.ConfigurationObject);
+            if (value is T t)
             {
                 return t;
             }
@@ -78,9 +77,9 @@ namespace TiaUtilities.Generation.SettingsNew
             var type = propertyInfo.PropertyType;
             if (type == typeof(sbyte))
             {
-                propertyInfo.SetValue(instance, (sbyte) value);
+                propertyInfo.SetValue(instance, (sbyte)value);
             }
-            else if(type == typeof(short))
+            else if (type == typeof(short))
             {
                 propertyInfo.SetValue(instance, (short)value);
             }

@@ -23,55 +23,28 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
                 Margin = new Padding(3, 0, 0, 3), //This is to align to the label since a the padding is automatically set to the left.
                 Padding = Padding.Empty,
                 BackColor = Form.DefaultBackColor,
-                Text = "" + value.GetConfigurationValue()
             };
-
-            PropertyChangedEventHandler propertyChanged = (sender, args) =>
-            {
-                if (args.PropertyName == value.PropertyInfo.Name)
-                {
-                    this.textBox.Text = "" + value.GetConfigurationValue();
-                }
-            };
-
-            this.Value.MacroSectionBinding.ConfigurationObject.PropertyChanged += propertyChanged;
-            this.textBox.Disposed += (sender, args) => this.Value.MacroSectionBinding.ConfigurationObject.PropertyChanged -= propertyChanged;
 
             var type = value.ValueBinding.EditorType;
             switch (type)
             {
                 case SettingsEditorTypeEnum.STRING:
-                    this.textBox.TextChanged += (sender, args) =>
-                    {
-                        value.SetConfigurationValue(this.textBox.Text);
-                    };
+                    this.textBox.TextChanged += (sender, args) => this.SaveToConfiguration();
                     break;
                 case SettingsEditorTypeEnum.INT:
                     this.textBox.KeyPress += SignedKeyPressEventHandler;
-                    this.textBox.TextChanged += (sender, args) =>
-                    {
-                        var ret = long.TryParse(this.textBox.Text, out var signedValue);
-                        if (ret)
-                        {
-                            value.SetConfigurationValue(signedValue);
-                        }
-
-                    };
+                    this.textBox.TextChanged += (sender, args) => this.SaveToConfiguration();
                     break;
                 case SettingsEditorTypeEnum.UINT:
                     this.textBox.KeyPress += UnsignedKeyPressEventHandler;
-                    this.textBox.TextChanged += (sender, args) =>
-                    {
-                        var ret = ulong.TryParse(this.textBox.Text, out var signedValue);
-                        if (ret)
-                        {
-                            value.SetConfigurationValue(signedValue);
-                        }
-                    };
+                    this.textBox.TextChanged += (sender, args) => this.SaveToConfiguration();
                     break;
             }
 
             var _ = SettingsUtils.AddContextualMenu(this.textBox, value);
+
+            base.RegisterPropertyChanged(this.textBox);
+            this.LoadFromConfiguration();
         }
 
         private void SignedKeyPressEventHandler(object? sender, KeyPressEventArgs args)
@@ -89,6 +62,33 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
         public override Control GetControl()
         {
             return this.textBox;
+        }
+
+        public override void LoadFromConfiguration()
+        {
+            this.textBox.Text = "" + this.Value.GetConfigurationValue();
+        }
+
+        public override void SaveToConfiguration()
+        {
+            switch (this.Value.ValueBinding.EditorType)
+            {
+                case SettingsEditorTypeEnum.STRING:
+                    this.Value.SetConfigurationValue(this.textBox.Text);
+                    break;
+                case SettingsEditorTypeEnum.INT:
+                    if (long.TryParse(this.textBox.Text, out var signedValue))
+                    {
+                        this.Value.SetConfigurationValue(signedValue);
+                    }
+                    break;
+                case SettingsEditorTypeEnum.UINT:
+                    if (ulong.TryParse(this.textBox.Text, out var unsignedValue))
+                    {
+                        this.Value.SetConfigurationValue(unsignedValue);
+                    }
+                    break;
+            }
         }
     }
 }

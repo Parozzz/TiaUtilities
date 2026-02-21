@@ -5,7 +5,7 @@ using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.CustomColumns;
-using TiaUtilities.Generation.SettingsNew;
+using TiaUtilities.Generation.SettingsNew.Bindings;
 
 namespace TiaUtilities.Generation.Alarms.Module.Tab
 {
@@ -45,18 +45,6 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             this.deviceGridHandler = new(MainForm.Settings.GridSettings, this.gridBindContainer, this.deviceDataPreview, placeholdersHandler) { RowCount = 499 };
             
             this.TabControl = new(bindContainer.GridScriptHandler.ErrorThread, this.templateHandler, deviceGridHandler.DataGridView);
-        }
-
-        public void BindSettings(SettingsBindings settingsBindings)
-        {
-            this.TabControl.AddConfigurationBindings(settingsBindings, this.TabPage.Text, this.TabConfig, this.module.TabConfigurations);
-            this.settingsBindings = settingsBindings;
-        }
-
-        public void UnbindSettings(SettingsBindings settingsBindings)
-        {
-            settingsBindings.RemoveMacroSectionWithSpecificConfiguration(this.TabConfig);
-            this.settingsBindings = null;
         }
 
         public void Init()

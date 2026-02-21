@@ -9,7 +9,7 @@ using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.IO.Module.ExcelImporter;
 using TiaUtilities.Generation.IO.Module.Tab;
-using TiaUtilities.Generation.SettingsNew;
+using TiaUtilities.Generation.SettingsNew.Bindings;
 using TiaUtilities.Languages;
 using TiaUtilities.Utility.Extensions;
 
