@@ -6,7 +6,7 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
     {
 
         private readonly RJToggleButton toggleButton;
-        public SettingsCheckBoxEditor(SettingsValue value) : base(value)
+        public SettingsCheckBoxEditor(SettingsFormValueImpl value) : base(value)
         {
             this.toggleButton = new RJToggleButton
             {

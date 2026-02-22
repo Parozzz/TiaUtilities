@@ -117,32 +117,26 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ALARM_CONFIG_COIL2_TYPE" xml:space="preserve">
-    <value>Tipo Bobina 2</value>
-  </data>
-  <data name="ALARM_CONFIG_COIL_TYPE_COIL" xml:space="preserve">
+  <data name="ALARM_SETTINGS_COIL_TYPE_COIL" xml:space="preserve">
     <value>Bobina</value>
   </data>
-  <data name="ALARM_CONFIG_COIL_TYPE_NONE" xml:space="preserve">
+  <data name="ALARM_SETTINGS_COIL_TYPE_NONE" xml:space="preserve">
     <value>Ignora</value>
   </data>
-  <data name="ALARM_CONFIG_COIL_TYPE_RESET" xml:space="preserve">
+  <data name="ALARM_SETTINGS_COIL_TYPE_RESET" xml:space="preserve">
     <value>Reset</value>
   </data>
-  <data name="ALARM_CONFIG_COIL_TYPE_SET" xml:space="preserve">
+  <data name="ALARM_SETTINGS_COIL_TYPE_SET" xml:space="preserve">
     <value>Set</value>
   </data>
-  <data name="ALARM_CONFIG_DEFAULTS" xml:space="preserve">
-    <value>Valori default campi</value>
+  <data name="ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS" xml:space="preserve">
+    <value>Default template</value>
   </data>
-  <data name="ALARM_CONFIG_DEFAULTS_COIL1" xml:space="preserve">
-    <value>Bobina 1</value>
+  <data name="ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_COIL1" xml:space="preserve">
+    <value>Default Bobina 1</value>
   </data>
-  <data name="ALARM_CONFIG_DEFAULTS_COIL2" xml:space="preserve">
-    <value>Bobina 2</value>
-  </data>
-  <data name="ALARM_CONFIG_DEFAULTS_TIMER" xml:space="preserve">
-    <value>Timer</value>
+  <data name="ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_COIL2" xml:space="preserve">
+    <value>Default Bobina 2</value>
   </data>
   <data name="GENERICS_ADDRESS" xml:space="preserve">
     <value>Indirizzo</value>
@@ -199,109 +193,94 @@ validità riga</value>
   <data name="IO_GEN_EXCELIMPORT_IMPORT" xml:space="preserve">
     <value>Importa Excel</value>
   </data>
-  <data name="ALARM_CONFIG_FC" xml:space="preserve">
+  <data name="ALARM_SETTINGS_FC" xml:space="preserve">
     <value>FC</value>
   </data>
-  <data name="ALARM_CONFIG_GENERATION" xml:space="preserve">
-    <value>Generazione</value>
+  <data name="ALARM_SETTINGS_TAB_ALARM_NUMS" xml:space="preserve">
+    <value>Numero allarmi</value>
   </data>
-  <data name="ALARM_CONFIG_GENERATION_ANTI_SLIP" xml:space="preserve">
-    <value>Anti-Slip</value>
+  <data name="ALARM_SETTINGS_TAB_SPARE_ANTI_SLIP" xml:space="preserve">
+    <value>Anti-Slittamento</value>
   </data>
-  <data name="ALARM_CONFIG_GENERATION_ANTI_SLIP_AMOUNT" xml:space="preserve">
+  <data name="ALARM_SETTINGS__GENERATION_ANTI_SLIP_AMOUNT" xml:space="preserve">
     <value>Dimensioni Gruppo</value>
   </data>
-  <data name="ALARM_CONFIG_GENERATION_ANTI_SLIP_GEN_EMPTY" xml:space="preserve">
-    <value>Genera Vuoti</value>
+  <data name="ALARM_SETTINGS_TAB_SPARE_ANTI_SLIP_GEN_EMPTY" xml:space="preserve">
+    <value>Genera Vuoti per Anti-Slittamento</value>
   </data>
-  <data name="ALARM_CONFIG_GENERATION_EMPTY" xml:space="preserve">
-    <value>Generazione Vuoti</value>
-  </data>
-  <data name="ALARM_CONFIG_GENERATION_EMPTY_ALARM_ADDRESS" xml:space="preserve">
+  <data name="ALARM_SETTINGS_TAB_SPARE_ADDRESS" xml:space="preserve">
     <value>Indirizzo Allarme</value>
   </data>
-  <data name="ALARM_CONFIG_GENERATION_EMPTY_ANTI_SLIP" xml:space="preserve">
-    <value>Genera durante anti-slip</value>
-  </data>
-  <data name="ALARM_CONFIG_GENERATION_EMPTY_NUM" xml:space="preserve">
+  <data name="ALARM_SETTINGS_TAB_SPARE_EMPTY_NUM_AT_END" xml:space="preserve">
     <value>Quantità alla fine</value>
   </data>
-  <data name="ALARM_CONFIG_GENERATION_EMPTY_TIMER" xml:space="preserve">
-    <value>Timer</value>
+  <data name="ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_TIMER" xml:space="preserve">
+    <value>Default Timer</value>
   </data>
-  <data name="ALARM_CONFIG_GENERATION_EMPTY_TIMER_ADDRESS" xml:space="preserve">
-    <value>Indirizzo</value>
+  <data name="ALARM_SETTINGS_ALARM_NUM_PLACEHOLDER_FORMAT" xml:space="preserve">
+    <value>Formato numero allarme</value>
   </data>
-  <data name="ALARM_CONFIG_GENERATION_EMPTY_TIMER_TYPE" xml:space="preserve">
-    <value>Tipo</value>
+  <data name="ALARM_SETTINGS_TAB_SPARE_GROUP_SKIP" xml:space="preserve">
+    <value>Quantity a fine gruppo</value>
   </data>
-  <data name="ALARM_CONFIG_GENERATION_EMPTY_TIMER_VALUE" xml:space="preserve">
-    <value>Tempo</value>
+  <data name="ALARM_SETTINGS_TAB_ALARM_NUMS_START" xml:space="preserve">
+    <value>Partenza</value>
   </data>
-  <data name="ALARM_CONFIG_FORMATTING_FORMAT" xml:space="preserve">
-    <value>Formato</value>
-  </data>
-  <data name="ALARM_CONFIG_GENERATION_SKIP" xml:space="preserve">
-    <value>Salta a fine gruppo</value>
-  </data>
-  <data name="ALARM_CONFIG_GENERATION_START_NUM" xml:space="preserve">
-    <value>Num. allarme di partenza</value>
-  </data>
-  <data name="ALARM_CONFIG_GROUPING_TYPE" xml:space="preserve">
+  <data name="ALARM_SETTINGS_GROUPING_TYPE" xml:space="preserve">
     <value>Tipo raggruppamento</value>
   </data>
-  <data name="ALARM_CONFIG_GROUPING_TYPE_GROUP" xml:space="preserve">
-    <value>GruppoPerSegmento</value>
-  </data>
-  <data name="ALARM_CONFIG_GROUPING_TYPE_ONE" xml:space="preserve">
-    <value>UnoPerSegmento</value>
-  </data>
-  <data name="ALARM_CONFIG_PARTITION_TYPE" xml:space="preserve">
-    <value>Tipo ripartizione</value>
-  </data>
-  <data name="ALARM_CONFIG_PARTITION_TYPE_ALARM_TYPE" xml:space="preserve">
-    <value>PerTipoAllarme</value>
-  </data>
-  <data name="ALARM_CONFIG_PARTITION_TYPE_DEVICE" xml:space="preserve">
-    <value>PerUtenza</value>
-  </data>
-  <data name="ALARM_CONFIG_PREFIX" xml:space="preserve">
-    <value>Prefissi Campi</value>
-  </data>
-  <data name="ALARM_CONFIG_PREFIX_ALARM" xml:space="preserve">
-    <value>Indirizzo Allarme</value>
-  </data>
-  <data name="ALARM_CONFIG_PREFIX_COIL1" xml:space="preserve">
-    <value>Indirizzo Bobina 1</value>
-  </data>
-  <data name="ALARM_CONFIG_PREFIX_COIL2" xml:space="preserve">
-    <value>Indirizzo Bobina 2</value>
-  </data>
-  <data name="ALARM_CONFIG_PREFIX_TIMER" xml:space="preserve">
-    <value>Indirizzo Timer</value>
-  </data>
-  <data name="ALARM_CONFIG_SEGMENT_NAME" xml:space="preserve">
-    <value>Nomi segmenti</value>
-  </data>
-  <data name="ALARM_CONFIG_SEGMENT_NAME_GROUP_EACH" xml:space="preserve">
+  <data name="ALARM_SETTINGS_GROUPING_TYPE_GROUP" xml:space="preserve">
     <value>Raggruppati</value>
   </data>
-  <data name="ALARM_CONFIG_SEGMENT_NAME_GROUP_EACH_EMPTY" xml:space="preserve">
-    <value>Raggruppati(Vuoti)</value>
-  </data>
-  <data name="ALARM_CONFIG_SEGMENT_NAME_ONE_EACH" xml:space="preserve">
+  <data name="ALARM_SETTINGS_GROUPING_TYPE_ONE" xml:space="preserve">
     <value>Singoli</value>
   </data>
-  <data name="ALARM_CONFIG_SEGMENT_NAME_ONE_EACH_EMPTY" xml:space="preserve">
-    <value>Singoli(Vuoti)</value>
+  <data name="ALARM_SETTINGS_PARTITION_TYPE" xml:space="preserve">
+    <value>Tipo ripartizione</value>
   </data>
-  <data name="ALARM_CONFIG_TEXT_LIST" xml:space="preserve">
+  <data name="ALARM_SETTINGS_PARTITION_TYPE_ALARM_TYPE" xml:space="preserve">
+    <value>PerTipoAllarme</value>
+  </data>
+  <data name="ALARM_SETTINGS_PARTITION_TYPE_DEVICE" xml:space="preserve">
+    <value>PerUtenza</value>
+  </data>
+  <data name="ALARM_SETTINGS_PREFIX" xml:space="preserve">
+    <value>Prefissi Campi</value>
+  </data>
+  <data name="ALARM_SETTINGS_PREFIX_ALARM" xml:space="preserve">
+    <value>Indirizzo Allarme</value>
+  </data>
+  <data name="ALARM_SETTINGS_PREFIX_COIL1" xml:space="preserve">
+    <value>Indirizzo Bobina 1</value>
+  </data>
+  <data name="ALARM_SETTINGS_PREFIX_COIL2" xml:space="preserve">
+    <value>Indirizzo Bobina 2</value>
+  </data>
+  <data name="ALARM_SETTINGS_PREFIX_TIMER" xml:space="preserve">
+    <value>Indirizzo Timer</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_SEGMENT_NAME" xml:space="preserve">
+    <value>Nomi segmenti</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_SEGMENT_NAME_GROUP_EACH" xml:space="preserve">
+    <value>Raggruppati</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_SEGMENT_NAME_GROUP_EACH_SPARE" xml:space="preserve">
+    <value>Raggruppati (Spare)</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_SEGMENT_NAME_ONE_EACH" xml:space="preserve">
+    <value>Singoli</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_SEGMENT_NAME_ONE_EACH_SPARE" xml:space="preserve">
+    <value>Singoli (Spare)</value>
+  </data>
+  <data name="ALARM_SETTINGS_TEXT_LIST" xml:space="preserve">
     <value>Lista Testi Allarmi</value>
   </data>
-  <data name="ALARM_CONFIG_TEXT_LIST_EMPTY" xml:space="preserve">
+  <data name="ALARM_SETTINGS_TEXT_LIST_EMPTY" xml:space="preserve">
     <value>Vuoto</value>
   </data>
-  <data name="ALARM_CONFIG_TEXT_LIST_FULL" xml:space="preserve">
+  <data name="ALARM_SETTINGS_TEXT_LIST_FULL" xml:space="preserve">
     <value>Pieno</value>
   </data>
   <data name="ALARM_DATA_ALM_VARIABLE" xml:space="preserve">
@@ -348,9 +327,6 @@ validità riga</value>
   </data>
   <data name="DEVICE_DATA_NAME" xml:space="preserve">
     <value>Nome</value>
-  </data>
-  <data name="ALARM_CONFIG_COIL1_TYPE" xml:space="preserve">
-    <value>Tipo Bobina 1</value>
   </data>
   <data name="GRID_PREFERENCES" xml:space="preserve">
     <value>Preferenze Griglia</value>
@@ -538,17 +514,17 @@ validità riga</value>
   <data name="MAIN_FORM_TOP_IO_GENERATION" xml:space="preserve">
     <value>Generatore Appoggi</value>
   </data>
-  <data name="ALARM_CONFIG_COIL_TYPE_NCOIL" xml:space="preserve">
+  <data name="ALARM_SETTINGS_COIL_TYPE_NCOIL" xml:space="preserve">
     <value>N-Coil</value>
   </data>
-  <data name="ALARM_CONFIG_DEFAULTS_CUSTOM_VAR" xml:space="preserve">
-    <value>Variabile custom</value>
+  <data name="ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_CUSTOM_VAR" xml:space="preserve">
+    <value>Default Variabile custom</value>
   </data>
-  <data name="ALARM_CONFIG_ENABLE_CUSTOM_VAR" xml:space="preserve">
-    <value>Abilita variable custom</value>
+  <data name="ALARM_SETTINGS_ENABLE_CUSTOM_VAR" xml:space="preserve">
+    <value>Variable custom</value>
   </data>
-  <data name="ALARM_CONFIG_ENABLE_TIMER" xml:space="preserve">
-    <value>Abilita timer</value>
+  <data name="ALARM_SETTINGS_ENABLE_TIMER" xml:space="preserve">
+    <value>Timer</value>
   </data>
   <data name="DEVICE_DATA_TEMPLATE" xml:space="preserve">
     <value>Template</value>
@@ -559,7 +535,7 @@ validità riga</value>
   <data name="ALARM_TEMPLATE_SELECT_TEMPLATE" xml:space="preserve">
     <value>Selezione Template</value>
   </data>
-  <data name="ALARM_CONFIG_EDIT_TEMPLATE" xml:space="preserve">
+  <data name="ALARM_SETTINGS_EDIT_TEMPLATE" xml:space="preserve">
     <value>Modifica Template</value>
   </data>
   <data name="CONFIRM_DELETE_DIALOG_CAPTION" xml:space="preserve">
@@ -574,34 +550,31 @@ validità riga</value>
   <data name="CONFIG_LINE_SAVE_DEFAULT_TOOLTIP" xml:space="preserve">
     <value>Salva configurazione attuale come default</value>
   </data>
-  <data name="ALARM_CONFIG_GENERATION_TOTAL_NUM" xml:space="preserve">
-    <value>Num. totale di allarmi</value>
+  <data name="ALARM_SETTINGS_TAB_ALARM_NUMS_TOTAL" xml:space="preserve">
+    <value>Totale</value>
   </data>
-  <data name="ALARM_CONFIG_FORMATTING_NAME_TEMPLATE" xml:space="preserve">
-    <value>Nome</value>
+  <data name="ALARM_SETTINGS_UDT_ALARM_VARIABLE_NAME" xml:space="preserve">
+    <value>Nome allarme</value>
   </data>
-  <data name="ALARM_CONFIG_FORMATTING_COMMENT_TEMPLATE" xml:space="preserve">
-    <value>Commento</value>
+  <data name="ALARM_SETTINGS_UDT_ALARM_VARIABLE_COMMENT" xml:space="preserve">
+    <value>Commento allarme</value>
   </data>
-  <data name="ALARM_CONFIG_FORMATTING_COMMENT_TEMPLATE_SPARE" xml:space="preserve">
-    <value>Commento spare</value>
+  <data name="ALARM_SETTINGS_UDT_ALARM_VARIABLE_SPARE_COMMENT" xml:space="preserve">
+    <value>Commento allarme SPARE</value>
   </data>
-  <data name="ALARM_CONFIG_FORMATTING_UDT_NAME" xml:space="preserve">
-    <value>Nome UDT</value>
+  <data name="ALARM_SETTINGS_UDT" xml:space="preserve">
+    <value>UDT</value>
   </data>
-  <data name="ALARM_CONFIG_FORMATTING" xml:space="preserve">
-    <value>Formattazione / UDT</value>
-  </data>
-  <data name="ALARM_CONFIG_GENERATION_HMI_START_ID" xml:space="preserve">
+  <data name="ALARM_SETTINGS_TAB_HMI_START_ID" xml:space="preserve">
     <value>ID iniziale</value>
   </data>
-  <data name="ALARM_CONFIG_FORMATTING_HMI_TRIGGER_TAG_TEMPLATE" xml:space="preserve">
-    <value>Template trigger tag</value>
+  <data name="ALARM_SETTINGS_HMI_TRIGGER_TAG" xml:space="preserve">
+    <value>Trigger tag</value>
   </data>
-  <data name="ALARM_CONFIG_FORMATTING_HMI_USE_WORD_ARRAY" xml:space="preserve">
-    <value>Array di word come trigger</value>
+  <data name="ALARM_SETTINGS_HMI_USE_WORD_ARRAY" xml:space="preserve">
+    <value>Array di word come trigger (Unified)</value>
   </data>
-  <data name="ALARM_CONFIG_FORMATTING_HMI_NAME" xml:space="preserve">
+  <data name="ALARM_SETTINGS_HMI_NAME" xml:space="preserve">
     <value>Nome</value>
   </data>
   <data name="ALARM_DATA_ALM_NEGATED" xml:space="preserve">
@@ -610,7 +583,7 @@ validità riga</value>
   <data name="GENERICS_HMI" xml:space="preserve">
     <value>HMI</value>
   </data>
-  <data name="ALARM_CONFIG_GENERATION_HMI_DEFAULT_ALARM_CLASS" xml:space="preserve">
+  <data name="ALARM_SETTINGS_TAB_HMI_DEFAULT_ALARM_CLASS" xml:space="preserve">
     <value>Default Classe Allarme</value>
   </data>
   <data name="ALARM_DATA_HMI_CLASS" xml:space="preserve">
@@ -619,7 +592,85 @@ validità riga</value>
   <data name="DEVICE_DATA_PLACEHOLDERS" xml:space="preserve">
     <value>Placeholders</value>
   </data>
-  <data name="ALARM_CONFIG_FORMATTING_HMI_TEXT" xml:space="preserve">
-    <value>Testo</value>
+  <data name="ALARM_SETTINGS_HMI_ITEM_TEXT" xml:space="preserve">
+    <value>Testo allarme</value>
+  </data>
+  <data name="ALARM_SETTINGS_HMI_ITEM_NAME" xml:space="preserve">
+    <value>Nome allarme</value>
+  </data>
+  <data name="ALARM_SETTINGS_UDT_ALARM_VARIABLE" xml:space="preserve">
+    <value>Variabile allarme UDT</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_GROUPING_TYPE" xml:space="preserve">
+    <value>Tipo raggruppamento</value>
+  </data>
+  <data name="GENERICS_QUANTITY" xml:space="preserve">
+    <value>Quantità</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_SPARE" xml:space="preserve">
+    <value>Allarmi spare</value>
+  </data>
+  <data name="GENERICS_VARIABLE" xml:space="preserve">
+    <value>Variabile</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_GROUPING_TYPE_DESCR" xml:space="preserve">
+    <value>Definisce se un segmento della FC contiene un intero template o un solo singolo allarme</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_SPARE_ANTI_SLIP_DESCR" xml:space="preserve">
+    <value>Quantità di allarmi per ogni template per evita lo slittamento. Se la quantità dentro ad template è minore di questo valore, salta gli allarmi per far tornare la quantità (Oppure genera spare se abilitato). Imposta 0 per disabilitare.</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_SEGMENT_NAME_GROUP_EACH_DESCR" xml:space="preserve">
+    <value>Nome segmento dentro blocco FC per gli allarmi raggruppati.</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_SEGMENT_NAME_ONE_EACH_DESCR" xml:space="preserve">
+    <value>Nome segmento dentro blocco FC per gli allarmi singoli (Non raggruppati).</value>
+  </data>
+  <data name="ALARM_SETTINGS_UDT_DESCR" xml:space="preserve">
+    <value>Nome da dare alla UDT generata</value>
+  </data>
+  <data name="ALARM_SETTINGS_ALARM_NUM_PLACEHOLDER_FORMAT_DESCR" xml:space="preserve">
+    <value>Formato stringa per tutti placeholder con numeri allarmi. Per favore, segui la guida per String.Format in C#.</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_ALARM_NUMS_TOTAL_DESCR" xml:space="preserve">
+    <value>Numero totale di allarmi generati nella UDT. La quantità generata dentro il blocco FC dipende dai template ed altre impostazioni.</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_ALARM_NUMS_START_DESCR" xml:space="preserve">
+    <value>Offset di partenza per la generazione degli allarmi. Valido sia UDT che FC.</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_SPARE_EMPTY_NUM_AT_END_DESCR" xml:space="preserve">
+    <value>Quantità di allarmi spare da generare alla fine del blocco FC.</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_SPARE_GROUP_SKIP_DESCR" xml:space="preserve">
+    <value>Quantità di allarmi da generare alla fine di ogni template.</value>
+  </data>
+  <data name="GENERICS_DESCR_SET_SLASH_TO_DISABLE" xml:space="preserve">
+    <value>Imposta a / per disabilitare.</value>
+  </data>
+  <data name="ALARM_SETTINGS_ENABLE" xml:space="preserve">
+    <value>Abilitazioni</value>
+  </data>
+  <data name="ALARM_SETTINGS_ENABLE_CUSTOM_VAR_DESCR" xml:space="preserve">
+    <value>Abilita la variabile custom dentro ai template.</value>
+  </data>
+  <data name="ALARM_SETTINGS_ENABLE_TIMER_DESCR" xml:space="preserve">
+    <value>Abilita il timer dentro ai template.</value>
+  </data>
+  <data name="ALARM_SETTINGS_HMI_ITEM_NAME_DESCR" xml:space="preserve">
+    <value>Valore da usare per la colonna "Nome" dentro a WinCC.</value>
+  </data>
+  <data name="ALARM_SETTINGS_HMI_ITEM_TEXT_DESCR" xml:space="preserve">
+    <value>Valore da usare per la colonna "Testo Allarme" dentro a WinCC.</value>
+  </data>
+  <data name="ALARM_SETTINGS_HMI_TRIGGER_TAG_DESCR" xml:space="preserve">
+    <value>Valore da usare per la colonna "Tag Trigger" dentro a WinCC.</value>
+  </data>
+  <data name="ALARM_SETTINGS_HMI_USE_WORD_ARRAY_DESCR" xml:space="preserve">
+    <value>Definisce se la "Tag Trigger" deve usare i singoli elementi di Array[*] of Word (Ad esempio HmiAlm[0], aumentando "Bit Trigger" fino a 15) invece di usare la tag intera (Incrementando "Bit Trigger" all'infinito). Usata per i pannelli WinCC Unified.</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_HMI_START_ID_DESCR" xml:space="preserve">
+    <value>Definisce il numero di partenza per la colonna "ID" in WinCC.</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_HMI_DEFAULT_ALARM_CLASS_DESCR" xml:space="preserve">
+    <value>Definisce valore di default per colonna "Classe" in WinCC dentro ai template.</value>
   </data>
 </root>

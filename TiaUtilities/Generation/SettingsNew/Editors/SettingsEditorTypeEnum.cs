@@ -1,7 +1,8 @@
-﻿namespace TiaUtilities.Generation.SettingsNew
+﻿namespace TiaUtilities.Generation.SettingsNew.Editors
 {
     public enum SettingsEditorTypeEnum
     {
+        NONE,
         STRING,
         INT,
         UINT,
@@ -10,5 +11,6 @@
         JAVASCRIPT,
         COLOR,
         ENUM,
+        LIST,
     }
 }

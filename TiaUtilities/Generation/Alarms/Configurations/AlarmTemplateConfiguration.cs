@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using TiaUtilities.Configuration;
 
-namespace TiaUtilities.Generation.Alarms
+namespace TiaUtilities.Generation.Alarms.Configurations
 {
     public class AlarmTemplateConfiguration : ObservableConfiguration
     {

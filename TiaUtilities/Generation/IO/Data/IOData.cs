@@ -2,10 +2,11 @@
 using SimaticML;
 using SimaticML.Enums;
 using TiaUtilities.Generation.GridHandler.Data;
+using TiaUtilities.Generation.IO.Configurations;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Languages;
 
-namespace TiaUtilities.Generation.IO
+namespace TiaUtilities.Generation.IO.Data
 {
     public class IOData : IGridData
     {

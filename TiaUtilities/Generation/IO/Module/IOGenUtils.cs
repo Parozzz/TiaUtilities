@@ -3,6 +3,7 @@ using SimaticML.Enums;
 using TiaUtilities.Generation.GridHandler.Events;
 using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.Data;
+using TiaUtilities.Generation.IO.Data;
 
 namespace TiaUtilities.Generation.IO.Module
 {

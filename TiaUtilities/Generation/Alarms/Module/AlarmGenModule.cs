@@ -1,8 +1,11 @@
-﻿using TiaUtilities.Editors.ErrorReporting;
+﻿using SimaticML.Enums;
+using TiaUtilities.Editors.ErrorReporting;
+using TiaUtilities.Generation.Alarms.Configurations;
 using TiaUtilities.Generation.Alarms.Module.Tab;
 using TiaUtilities.Generation.Alarms.Module.Template;
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.JSScript;
+using TiaUtilities.Generation.SettingsNew;
 using TiaUtilities.Generation.SettingsNew.Bindings;
 using TiaUtilities.Languages;
 
@@ -37,6 +40,19 @@ namespace TiaUtilities.Generation.Alarms.Module
 
         public void Init(GenModuleForm form)
         {
+            this.control.settingsButton.Click += (sender, args) => new SettingsForm(this.SettingsBindings).Show(this.control);
+
+            this.control.templateButton.Click += (sender, args) =>
+            {
+                var currentTabConfig = GetCurrentTabConfiguration();
+                if(currentTabConfig != null)
+                {
+                    var deviceTemplateForm = new AlarmGenTemplateForm(mainConfig, currentTabConfig, this.gridBindContainer, templateHandler);
+                    deviceTemplateForm.Init();
+                    deviceTemplateForm.ShowDialog(this.control);
+                }
+            };
+
             this.gridBindContainer.Init(form);
             this.templateHandler.Init([]);
 
@@ -49,13 +65,16 @@ namespace TiaUtilities.Generation.Alarms.Module
                 }
             };
 
+            this.control.tabControl.TabNameUserChanged += (sender, args) => this.SettingsBindings.RequestUpdate();
             this.control.tabControl.Selected += (sender, args) =>
             {
                 if (args.TabPage?.Tag is AlarmGenTab tab)
                 {
                     tab.Selected();
+                    this.SettingsBindings.RequestUpdate();
                 }
             };
+
 
             form.Shown += (sender, args) =>
             {
@@ -192,60 +211,77 @@ namespace TiaUtilities.Generation.Alarms.Module
             settingsBindings
                 .MacroSection(() => "AlarmGenControl", () => this.mainConfig, MainForm.Settings.PresetAlarmMainConfiguration)
 
-                .Section("Enables")
-                .AddBool(nameof(AlarmMainConfiguration.EnableCustomVariable), Locale.ALARM_CONFIG_ENABLE_CUSTOM_VAR)
-                .AddBool(nameof(AlarmMainConfiguration.EnableTimer), Locale.ALARM_CONFIG_ENABLE_TIMER)
+                .Section(Locale.ALARM_SETTINGS_ENABLE)
+                .AddBool(nameof(AlarmMainConfiguration.EnableCustomVariable), Locale.ALARM_SETTINGS_ENABLE_CUSTOM_VAR, Locale.ALARM_SETTINGS_ENABLE_CUSTOM_VAR_DESCR)
+                .AddBool(nameof(AlarmMainConfiguration.EnableTimer), Locale.ALARM_SETTINGS_ENABLE_TIMER, Locale.ALARM_SETTINGS_ENABLE_TIMER_DESCR)
 
-                .Section(Locale.ALARM_CONFIG_FC)
+                .Section(Locale.ALARM_SETTINGS_ALARM_NUM_PLACEHOLDER_FORMAT)
+                .AddString(nameof(AlarmMainConfiguration.AlarmNumFormat), description: Locale.ALARM_SETTINGS_ALARM_NUM_PLACEHOLDER_FORMAT_DESCR)
+
+                .Section(Locale.ALARM_SETTINGS_FC)
                 .AddString(nameof(AlarmMainConfiguration.FCBlockName), Locale.GENERICS_NAME)
                 .AddUInt(nameof(AlarmMainConfiguration.FCBlockNumber), Locale.GENERICS_NUMBER)
 
-                .Section(Locale.ALARM_CONFIG_SEGMENT_NAME)
-                .AddString(nameof(AlarmMainConfiguration.OneEachSegmentName), Locale.ALARM_CONFIG_SEGMENT_NAME_ONE_EACH)
-                .AddString(nameof(AlarmMainConfiguration.OneEachEmptyAlarmSegmentName), Locale.ALARM_CONFIG_SEGMENT_NAME_ONE_EACH_EMPTY)
-                .AddString(nameof(AlarmMainConfiguration.GroupSegmentName), Locale.ALARM_CONFIG_SEGMENT_NAME_GROUP_EACH)
-                .AddString(nameof(AlarmMainConfiguration.GroupEmptyAlarmSegmentName), Locale.ALARM_CONFIG_SEGMENT_NAME_GROUP_EACH_EMPTY)
+                .Section(Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME)
+                .AddString(nameof(AlarmMainConfiguration.OneEachSegmentName), Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME_ONE_EACH, Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME_ONE_EACH_DESCR)
+                .AddString(nameof(AlarmMainConfiguration.OneEachEmptyAlarmSegmentName), Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME_ONE_EACH_SPARE)
+                .AddString(nameof(AlarmMainConfiguration.GroupSegmentName), Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME_GROUP_EACH, Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME_GROUP_EACH_DESCR)
+                .AddString(nameof(AlarmMainConfiguration.GroupEmptyAlarmSegmentName), Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME_GROUP_EACH_SPARE)
 
-                .Section(Locale.ALARM_CONFIG_FORMATTING)
-                .AddString(nameof(AlarmMainConfiguration.UDTBlockName), Locale.ALARM_CONFIG_FORMATTING_UDT_NAME)
-                .AddString(nameof(AlarmMainConfiguration.AlarmNumFormat), Locale.ALARM_CONFIG_FORMATTING_FORMAT)
-                .AddString(nameof(AlarmMainConfiguration.AlarmNameTemplate), Locale.ALARM_CONFIG_FORMATTING_NAME_TEMPLATE)
-                .AddString(nameof(AlarmMainConfiguration.AlarmCommentTemplate), Locale.ALARM_CONFIG_FORMATTING_COMMENT_TEMPLATE)
-                .AddString(nameof(AlarmMainConfiguration.AlarmCommentTemplateSpare), Locale.ALARM_CONFIG_FORMATTING_COMMENT_TEMPLATE_SPARE)
+                .Section(Locale.ALARM_SETTINGS_UDT)
+                .AddString(nameof(AlarmMainConfiguration.UDTBlockName), Locale.GENERICS_NAME, Locale.ALARM_SETTINGS_UDT_DESCR)
+
+                .Section(Locale.ALARM_SETTINGS_UDT_ALARM_VARIABLE)
+                .AddString(nameof(AlarmMainConfiguration.AlarmNameTemplate), Locale.ALARM_SETTINGS_UDT_ALARM_VARIABLE_NAME)
+                .AddString(nameof(AlarmMainConfiguration.AlarmCommentTemplate), Locale.ALARM_SETTINGS_UDT_ALARM_VARIABLE_COMMENT)
+                .AddString(nameof(AlarmMainConfiguration.AlarmCommentTemplateSpare), Locale.ALARM_SETTINGS_UDT_ALARM_VARIABLE_SPARE_COMMENT)
 
                 .Section(Locale.GENERICS_HMI)
-                .AddString(nameof(AlarmMainConfiguration.HmiNameTemplate), Locale.ALARM_CONFIG_FORMATTING_HMI_NAME)
-                .AddString(nameof(AlarmMainConfiguration.HmiTextTemplate), Locale.ALARM_CONFIG_FORMATTING_HMI_TEXT)
-                .AddString(nameof(AlarmMainConfiguration.HmiTriggerTagTemplate), Locale.ALARM_CONFIG_FORMATTING_HMI_TRIGGER_TAG_TEMPLATE)
-                .AddBool(nameof(AlarmMainConfiguration.HmiTriggerTagUseWordArray), Locale.ALARM_CONFIG_FORMATTING_HMI_USE_WORD_ARRAY);
+                .AddString(nameof(AlarmMainConfiguration.HmiNameTemplate), Locale.ALARM_SETTINGS_HMI_ITEM_NAME, Locale.ALARM_SETTINGS_HMI_ITEM_NAME_DESCR)
+                .AddString(nameof(AlarmMainConfiguration.HmiTextTemplate), Locale.ALARM_SETTINGS_HMI_ITEM_TEXT, Locale.ALARM_SETTINGS_HMI_ITEM_TEXT_DESCR)
+                .AddString(nameof(AlarmMainConfiguration.HmiTriggerTagTemplate), Locale.ALARM_SETTINGS_HMI_TRIGGER_TAG, Locale.ALARM_SETTINGS_HMI_TRIGGER_TAG_DESCR)
+                .AddBool(nameof(AlarmMainConfiguration.HmiTriggerTagUseWordArray), Locale.ALARM_SETTINGS_HMI_USE_WORD_ARRAY, Locale.ALARM_SETTINGS_HMI_USE_WORD_ARRAY_DESCR);
+
+            
 
             settingsBindings
                 .MacroSection(this.GetCurrentTabName, this.GetCurrentTabConfiguration, MainForm.Settings.PresetAlarmTabConfiguration, () => this.TabConfigurations)
 
-                .Section("Grouping")
-                .AddEnum(nameof(AlarmTabConfiguration.GroupingType), "Raggruppamento")
+                .Section(Locale.ALARM_SETTINGS_TAB_GROUPING_TYPE)
+                .AddEnum(nameof(AlarmTabConfiguration.GroupingType), description: Locale.ALARM_SETTINGS_TAB_GROUPING_TYPE_DESCR)
 
-                .Section(Locale.ALARM_CONFIG_GENERATION)
-                .AddUInt(nameof(AlarmTabConfiguration.TotalAlarmNum), Locale.ALARM_CONFIG_GENERATION_TOTAL_NUM)
-                .AddUInt(nameof(AlarmTabConfiguration.StartingAlarmNum), Locale.ALARM_CONFIG_GENERATION_START_NUM)
-                .AddUInt(nameof(AlarmTabConfiguration.SkipNumberAfterGroup), Locale.ALARM_CONFIG_GENERATION_SKIP)
+                .Section(Locale.ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_COIL1)
+                .AddString(nameof(AlarmTabConfiguration.DefaultCoil1Address), Locale.GENERICS_ADDRESS, Locale.GENERICS_DESCR_SET_SLASH_TO_DISABLE)
+                .AddEnum(nameof(AlarmTabConfiguration.DefaultCoil1Type), Locale.GENERICS_TYPE)
+
+                .Section(Locale.ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_COIL2)
+                .AddString(nameof(AlarmTabConfiguration.DefaultCoil2Address), Locale.GENERICS_ADDRESS, Locale.GENERICS_DESCR_SET_SLASH_TO_DISABLE)
+                .AddEnum(nameof(AlarmTabConfiguration.DefaultCoil2Type), Locale.GENERICS_TYPE)
+
+                .Section(Locale.ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_TIMER)
+                .AddString(nameof(AlarmTabConfiguration.DefaultTimerAddress), Locale.GENERICS_ADDRESS, Locale.GENERICS_DESCR_SET_SLASH_TO_DISABLE)
+                .AddList(nameof(AlarmTabConfiguration.DefaultTimerType), ["TON", "TOF"], Locale.GENERICS_TYPE)
+                .AddString(nameof(AlarmTabConfiguration.DefaultTimerValue), Locale.GENERICS_TYPE)
+
+                .Section(Locale.ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_CUSTOM_VAR)
+                .AddString(nameof(AlarmTabConfiguration.DefaultCustomVarAddress), Locale.GENERICS_ADDRESS, Locale.GENERICS_DESCR_SET_SLASH_TO_DISABLE)
+                .AddString(nameof(AlarmTabConfiguration.DefaultCustomVarValue), Locale.GENERICS_VALUE)
+
+                .Section(Locale.ALARM_SETTINGS_TAB_ALARM_NUMS)
+                .AddUInt(nameof(AlarmTabConfiguration.TotalAlarmNum), Locale.ALARM_SETTINGS_TAB_ALARM_NUMS_TOTAL, Locale.ALARM_SETTINGS_TAB_ALARM_NUMS_TOTAL_DESCR)
+                .AddUInt(nameof(AlarmTabConfiguration.StartingAlarmNum), Locale.ALARM_SETTINGS_TAB_ALARM_NUMS_START, Locale.ALARM_SETTINGS_TAB_ALARM_NUMS_START_DESCR)
+
+
+                .Section(Locale.ALARM_SETTINGS_TAB_SPARE)
+                .AddString(nameof(AlarmTabConfiguration.EmptyAlarmContactAddress), Locale.ALARM_SETTINGS_TAB_SPARE_ADDRESS)
+                .AddUInt(nameof(AlarmTabConfiguration.EmptyAlarmAtEnd), Locale.ALARM_SETTINGS_TAB_SPARE_EMPTY_NUM_AT_END, Locale.ALARM_SETTINGS_TAB_SPARE_EMPTY_NUM_AT_END_DESCR)
+                .AddUInt(nameof(AlarmTabConfiguration.SkipNumberAfterGroup), Locale.ALARM_SETTINGS_TAB_SPARE_GROUP_SKIP, Locale.ALARM_SETTINGS_TAB_SPARE_GROUP_SKIP_DESCR)
+                .AddUInt(nameof(AlarmTabConfiguration.AntiSlipNumber), Locale.ALARM_SETTINGS_TAB_SPARE_ANTI_SLIP, Locale.ALARM_SETTINGS_TAB_SPARE_ANTI_SLIP_DESCR)
+                .AddBool(nameof(AlarmTabConfiguration.GenerateEmptyAlarmAntiSlip), Locale.ALARM_SETTINGS_TAB_SPARE_ANTI_SLIP_GEN_EMPTY)
 
                 .Section(Locale.GENERICS_HMI)
-                .AddUInt(nameof(AlarmTabConfiguration.HmiStartID), Locale.ALARM_CONFIG_GENERATION_SKIP)
-                .AddString(nameof(AlarmTabConfiguration.DefaultHmiAlarmClass), Locale.ALARM_CONFIG_GENERATION_SKIP)
-
-                .Section(Locale.ALARM_CONFIG_GENERATION_ANTI_SLIP)
-                .AddUInt(nameof(AlarmTabConfiguration.AntiSlipNumber), Locale.ALARM_CONFIG_GENERATION_ANTI_SLIP_AMOUNT)
-                .AddBool(nameof(AlarmTabConfiguration.GenerateEmptyAlarmAntiSlip), Locale.ALARM_CONFIG_GENERATION_ANTI_SLIP_GEN_EMPTY)
-
-                .Section("EmptyAlarms")
-                .AddUInt(nameof(AlarmTabConfiguration.EmptyAlarmAtEnd), Locale.ALARM_CONFIG_GENERATION_EMPTY_NUM)
-                .AddString(nameof(AlarmTabConfiguration.EmptyAlarmContactAddress), Locale.ALARM_CONFIG_GENERATION_EMPTY_ALARM_ADDRESS)
-
-                .Section(Locale.ALARM_CONFIG_GENERATION_EMPTY_TIMER)
-                .AddString(nameof(AlarmTabConfiguration.EmptyAlarmTimerAddress), Locale.ALARM_CONFIG_GENERATION_EMPTY_TIMER_ADDRESS)
-                .AddString(nameof(AlarmTabConfiguration.EmptyAlarmTimerType), Locale.ALARM_CONFIG_GENERATION_EMPTY_TIMER_TYPE)
-                .AddString(nameof(AlarmTabConfiguration.EmptyAlarmTimerValue), Locale.ALARM_CONFIG_GENERATION_EMPTY_TIMER_VALUE);
+                .AddUInt(nameof(AlarmTabConfiguration.HmiStartID), Locale.ALARM_SETTINGS_TAB_HMI_START_ID, Locale.ALARM_SETTINGS_TAB_HMI_START_ID_DESCR)
+                .AddString(nameof(AlarmTabConfiguration.DefaultHmiAlarmClass), Locale.ALARM_SETTINGS_TAB_HMI_DEFAULT_ALARM_CLASS, Locale.ALARM_SETTINGS_TAB_HMI_DEFAULT_ALARM_CLASS_DESCR);
         }
 
         private string GetCurrentTabName()

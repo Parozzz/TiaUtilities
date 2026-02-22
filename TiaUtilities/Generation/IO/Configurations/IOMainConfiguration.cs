@@ -3,7 +3,7 @@ using TiaUtilities.Configuration;
 using TiaUtilities.Languages;
 using TiaUtilities.Generation.Placeholders;
 
-namespace TiaUtilities.Generation.IO
+namespace TiaUtilities.Generation.IO.Configurations
 {
     public enum IOGroupingTypeEnum
     {

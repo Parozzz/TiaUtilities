@@ -254,5 +254,17 @@ namespace TiaUtilities.Utility
             aProp.SetValue(c, true, null);
         }
 
+        public static ToolTip CreateStandardToolTip()
+        {
+            return new()
+            {
+                InitialDelay = 1500,
+                ReshowDelay = 800,
+                AutomaticDelay = 1000,
+                UseFading = false,
+                UseAnimation = false,
+            };
+        }
+
     }
 }

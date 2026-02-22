@@ -9,7 +9,7 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
         private readonly JavascriptEditor editor;
         private FastColoredTextBox Control { get => editor.GetTextBox(); }
 
-        public SettingsJavascriptEditor(SettingsValue value) : base(value)
+        public SettingsJavascriptEditor(SettingsFormValueImpl value) : base(value)
         {
             this.editor = new JavascriptEditor();
             this.editor.InitControl();

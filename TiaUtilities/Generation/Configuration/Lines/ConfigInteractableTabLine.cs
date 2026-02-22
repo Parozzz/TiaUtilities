@@ -10,7 +10,7 @@ namespace TiaUtilities.Generation.Configuration.Lines
         private Action<TabPage>? tabAddedAction;
         private Action<TabPage>? tabRemovedAction;
         private Action<TabPage?>? tabSelectedChangedAction;
-        private Action<TabPage, string>? tabChangedNameAction;
+        private Action<TabPage>? tabChangedNameAction;
 
         public ReadOnlyCollection<TabPage> TabPages
         {
@@ -50,7 +50,7 @@ namespace TiaUtilities.Generation.Configuration.Lines
             this.tabControl.TabNameUserChanged += (sender, args) =>
             {
                 var tabPage = args.TabPage;
-                tabChangedNameAction?.Invoke(tabPage, args.NewName);
+                tabChangedNameAction?.Invoke(tabPage);
             };
 
             this.tabControl.VisibleChanged += (sender, args) =>
@@ -87,7 +87,7 @@ namespace TiaUtilities.Generation.Configuration.Lines
             return this;
         }
 
-        public ConfigInteractableTabLine TabNameUserChanged(Action<TabPage, string> action)
+        public ConfigInteractableTabLine TabNameUserChanged(Action<TabPage> action)
         {
             this.tabChangedNameAction = action;
             return this;

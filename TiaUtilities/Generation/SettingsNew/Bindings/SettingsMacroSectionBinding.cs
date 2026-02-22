@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using TiaUtilities.Configuration;
+using TiaUtilities.Generation.SettingsNew.Editors;
 
 namespace TiaUtilities.Generation.SettingsNew.Bindings
 {
@@ -53,13 +54,16 @@ namespace TiaUtilities.Generation.SettingsNew.Bindings
         }
     }
 
-    public record SettingsSectionBinding(string Name, string Description,
-        SettingsMacroSectionBinding<ObservableConfiguration> MacroSectionBinding,
+    public record SettingsSectionBinding(SettingsMacroSectionBinding<ObservableConfiguration> MacroSectionBinding,
+        string Name, string ToolTip,
         List<SettingsValueBinding> ValueList
     );
 
-    public record SettingsValueBinding(PropertyInfo PropertyInfo, string Name, string Description,
+    public record SettingsValueBinding(SettingsSectionBinding SectionBinding, 
+        string PropertyName, string Name, string Description,
         SettingsEditorTypeEnum EditorType,
-        SettingsSectionBinding SectionBinding
+        Object? Tag = null
     );
+
+    public record SettingsValueListTag(List<string> List);
 }

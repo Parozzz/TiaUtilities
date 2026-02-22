@@ -13,7 +13,7 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
         private readonly JsonEditor editor;
         private FastColoredTextBox Control { get => editor.GetTextBox(); }
 
-        public SettingsJSONEditor(SettingsValue value) : base(value)
+        public SettingsJSONEditor(SettingsFormValueImpl value) : base(value)
         {
             this.editor = new JsonEditor();
             this.editor.InitControl();

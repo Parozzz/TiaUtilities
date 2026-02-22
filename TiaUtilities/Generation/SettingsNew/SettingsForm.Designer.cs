@@ -37,6 +37,7 @@
             ClientSize = new Size(934, 761);
             DoubleBuffered = true;
             Name = "SettingsForm";
+            StartPosition = FormStartPosition.CenterParent;
             Text = "SettingsForm";
             ResumeLayout(false);
         }

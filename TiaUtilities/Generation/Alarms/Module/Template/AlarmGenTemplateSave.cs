@@ -1,4 +1,6 @@
 ﻿using Newtonsoft.Json;
+using TiaUtilities.Generation.Alarms.Configurations;
+using TiaUtilities.Generation.Alarms.Data;
 using TiaUtilities.Generation.GridHandler;
 
 namespace TiaUtilities.Generation.Alarms.Module.Template

@@ -4,7 +4,7 @@ using TiaUtilities.Languages;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.Placeholders;
 
-namespace TiaUtilities.Generation.Alarms
+namespace TiaUtilities.Generation.Alarms.Data
 {
     public class DeviceData : IGridData
     {

@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
-using TiaUtilities.Generation.Alarms;
+using TiaUtilities.Generation.Alarms.Data;
 using TiaUtilities.Generation.GridHandler.Data;
-using TiaUtilities.Generation.IO;
+using TiaUtilities.Generation.IO.Data;
 using TiaUtilities.Generation.Placeholders.Data;
 using TiaUtilities.Utility.Extensions;
 

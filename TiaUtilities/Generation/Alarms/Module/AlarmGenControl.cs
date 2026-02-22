@@ -1,7 +1,8 @@
-﻿using TiaUtilities.Generation.Configuration.Utility;
-using TiaUtilities.Languages;
-using TiaUtilities.Generation.Configuration;
+﻿using TiaUtilities.Generation.Configuration;
+using TiaUtilities.Generation.Configuration.Utility;
 using TiaUtilities.Generation.SettingsNew;
+using TiaUtilities.Languages;
+using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.Alarms.Module
 {
@@ -19,12 +20,10 @@ namespace TiaUtilities.Generation.Alarms.Module
 
         private void Translate()
         {
-            this.fcConfigButton.Text = Locale.ALARM_CONFIG_FC;
-            this.segmentNameConfigButton.Text = Locale.ALARM_CONFIG_SEGMENT_NAME;
-            this.formattingButton.Text = Locale.ALARM_CONFIG_FORMATTING;
+            this.settingsButton.Text = "Settings";
+            Utils.CreateStandardToolTip().SetToolTip(this.settingsButton, "CTRL + I");
 
-            this.enableCustomVarLabel.Text = Locale.ALARM_CONFIG_ENABLE_CUSTOM_VAR;
-            this.enableTimerLabel.Text = Locale.ALARM_CONFIG_ENABLE_TIMER;
+            this.templateButton.Text = Locale.ALARM_SETTINGS_EDIT_TEMPLATE;
         }
     }
 }

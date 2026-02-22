@@ -1,5 +1,6 @@
 ﻿using TiaUtilities.CustomControls;
 using TiaUtilities.Generation.Configuration;
+using TiaUtilities.Generation.SettingsNew.Bindings;
 using TiaUtilities.Languages;
 
 namespace TiaUtilities.Generation.SettingsNew.Editors
@@ -7,7 +8,7 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
     public class SettingsComboBoxEditor : SettingsEditor
     {
         private readonly RJComboBox comboBox;
-        public SettingsComboBoxEditor(SettingsValue value) : base(value)
+        public SettingsComboBoxEditor(SettingsFormValueImpl value) : base(value)
         {
             this.comboBox = new RJComboBox()
             {
@@ -19,24 +20,49 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
                 BorderStyle = BorderStyle.None,
                 Underlined = true,
                 UnderlineColor = ConfigStyle.UNDERLINE_COLOR,
-                MinimumSize = new Size(150, 0)
+                MinimumSize = new Size(150, 0),
+                Anchor = AnchorStyles.Left,  //This allows centering if no label is present!
             };
 
-            switch (value.ValueBinding.EditorType)
+            switch (value.Binding.EditorType)
             {
                 case SettingsEditorTypeEnum.ENUM:
+                    if(value.PropertyInfo.PropertyType.IsAssignableFrom(typeof(Enum)))
+                    {
+                        throw new InvalidCastException($"Using SettingsEditorTypeEnum ENUM with a PropertyInfo that is not an Enumeration for {value.PropertyInfo.Name}");
+                    }
+
                     this.comboBox.DropDownStyle = ComboBoxStyle.DropDownList; //Disable text Editing 
                     this.comboBox.DisplayMember = "Text";
                     this.comboBox.ValueMember = "Value";
 
-                    var dataSourceItems = new List<object>();
+                    var enumDataSourceItems = new List<object>();
                     foreach (Enum enumItem in Enum.GetValues(value.PropertyInfo.PropertyType))
                     {
-                        dataSourceItems.Add(new { Text = enumItem.GetTranslation(), Value = enumItem });
+                        enumDataSourceItems.Add(new { Text = enumItem.GetTranslation(), Value = enumItem });
                     }
-                    this.comboBox.DataSource = dataSourceItems;
+                    this.comboBox.DataSource = enumDataSourceItems;
 
-                    this.comboBox.OnSelectedIndexChanged += (sender, args) => this.SaveToConfiguration(); ;
+                    this.comboBox.OnSelectedIndexChanged += (sender, args) => this.SaveToConfiguration();
+                    break;
+                case SettingsEditorTypeEnum.LIST:
+                    if(value.Binding.Tag is not SettingsValueListTag listTag)
+                    {
+                        throw new InvalidCastException($"Using SettingsEditorTypeEnum LIST without a Tag that is not SettingsValueListTag for {value.PropertyInfo.Name}");
+                    }
+
+                    this.comboBox.DropDownStyle = ComboBoxStyle.DropDownList; //Disable text Editing 
+                    this.comboBox.DisplayMember = "Text";
+                    this.comboBox.ValueMember = "Value";
+
+                    var listDataSourceItems = new List<object>();
+                    foreach (var listValue in listTag.List)
+                    {
+                        listDataSourceItems.Add(new { Text = listValue, Value = listValue });
+                    }
+                    this.comboBox.DataSource = listDataSourceItems;
+
+                    this.comboBox.OnSelectedIndexChanged += (sender, args) => this.SaveToConfiguration();
                     break;
                 case SettingsEditorTypeEnum.STRING:
                     this.comboBox.TextChanged += (sender, args) => this.SaveToConfiguration();
@@ -82,12 +108,13 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
 
         public override void LoadFromConfiguration()
         {
-            switch (base.Value.ValueBinding.EditorType)
+            switch (base.Value.Binding.EditorType)
             {
                 case SettingsEditorTypeEnum.ENUM:
                     this.comboBox.SelectedValue = this.Value.GetConfigurationValue();
                     break;
                 case SettingsEditorTypeEnum.STRING:
+                case SettingsEditorTypeEnum.LIST:
                 case SettingsEditorTypeEnum.INT:
                 case SettingsEditorTypeEnum.UINT:
                     this.comboBox.Text = "" + this.Value.GetConfigurationValue();
@@ -97,9 +124,10 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
 
         public override void SaveToConfiguration()
         {
-            switch (this.Value.ValueBinding.EditorType)
+            switch (this.Value.Binding.EditorType)
             {
                 case SettingsEditorTypeEnum.ENUM:
+                case SettingsEditorTypeEnum.LIST:
                     var selectedValue = this.comboBox.SelectedValue;
                     if (selectedValue != null)
                     {

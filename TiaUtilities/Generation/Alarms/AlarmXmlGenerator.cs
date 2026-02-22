@@ -4,6 +4,8 @@ using SimaticML.Blocks;
 using SimaticML.Blocks.FlagNet;
 using SimaticML.Blocks.FlagNet.nPart;
 using SimaticML.Enums;
+using TiaUtilities.Generation.Alarms.Configurations;
+using TiaUtilities.Generation.Alarms.Data;
 using TiaUtilities.Generation.Alarms.Module.Template;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Languages;
@@ -138,6 +140,7 @@ namespace TiaUtilities.Generation.Alarms
                         segment.Create(fc);
                     }
                 }
+
 
                 var lastAlarmNum = nextAlarmNum - 1;
                 var alarmCount = (lastAlarmNum - startAlarmNum) + 1;
@@ -288,9 +291,9 @@ namespace TiaUtilities.Generation.Alarms
                 Coil1Type = tabConfig.DefaultCoil1Type.ToString(),
                 Coil2Address = tabConfig.DefaultCoil2Address,
                 Coil2Type = tabConfig.DefaultCoil2Type.ToString(),
-                TimerAddress = tabConfig.EmptyAlarmTimerAddress,
-                TimerType = tabConfig.EmptyAlarmTimerType,
-                TimerValue = tabConfig.EmptyAlarmTimerValue,
+                TimerAddress = tabConfig.DefaultTimerAddress,
+                TimerType = tabConfig.DefaultTimerType,
+                TimerValue = tabConfig.DefaultTimerValue,
                 Description = "",
                 Enable = true
             };

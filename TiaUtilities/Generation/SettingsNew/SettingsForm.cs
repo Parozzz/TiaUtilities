@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Xml;
+using TiaUtilities.Configuration;
+using TiaUtilities.CustomControls;
 using TiaUtilities.Generation.SettingsNew.Bindings;
 using TiaUtilities.Generation.SettingsNew.Editors;
 using TiaUtilities.Utility;
@@ -9,21 +11,24 @@ namespace TiaUtilities.Generation.SettingsNew
 
     public partial class SettingsForm : Form
     {
-        private class MacroSection(string name)
+        private class MacroSection(SettingsMacroSectionBinding<ObservableConfiguration> binding)
         {
-            public string Name { get; init; } = name;
-            public override string ToString() => Name;
+            public SettingsMacroSectionBinding<ObservableConfiguration> Binding { get; init; } = binding;
+            public string Name { get => this.Binding.Name; }
             public List<Section> Sections { get; init; } = [];
+
+            public override string ToString() => Name;
 
             public Label? Label { get; set; } = null;
         }
 
-        private class Section(MacroSection macroSection, string name, string tooltip)
+        private class Section(SettingsSectionBinding binding, MacroSection macroSection)
         {
+            public SettingsSectionBinding Binding { get; init; } = binding;
             public MacroSection MacroSection { get; init; } = macroSection;
-            public string Name { get; init; } = name;
-            public string Description { get; init; } = tooltip;
-            public List<SettingsValue> ValueList { get; init; } = [];
+            public string Name { get => this.Binding.Name; }
+            public string ToolTip { get => this.Binding.ToolTip; }
+            public List<SettingsFormValue> FormValueList { get; init; } = [];
 
             public ListViewItem? ListItem { get; set; } = null;
             public TableLayoutPanel? Panel { get; set; } = null;
@@ -231,12 +236,12 @@ namespace TiaUtilities.Generation.SettingsNew
             foreach (var macroSectionBinding in this.bindings.MacroSectionList)
             {
                 var configurationObject = macroSectionBinding.GetConfigurationObject();
-                if(configurationObject == null)
+                if (configurationObject == null)
                 {
                     continue;
                 }
 
-                MacroSection macroSection = new(macroSectionBinding.Name);
+                MacroSection macroSection = new(macroSectionBinding);
                 this.macroSectionList.Add(macroSection);
 
                 ListViewItem macroSectionListViewItem = new()
@@ -246,18 +251,18 @@ namespace TiaUtilities.Generation.SettingsNew
                 };
                 this.leftSelectSectionListView.Items.Add(macroSectionListViewItem);
 
-                foreach(var sectionBinding in macroSectionBinding.SectionsList)
+                foreach (var sectionBinding in macroSectionBinding.SectionsList)
                 {
-                    Section section = new(macroSection, sectionBinding.Name, sectionBinding.Description);
+                    Section section = new(sectionBinding, macroSection);
                     macroSection.Sections.Add(section);
 
-                    var valueList = sectionBinding.ValueList.Select(bindings => new SettingsValue(bindings, configurationObject)).ToArray();
-                    section.ValueList.AddRange(valueList);
+                    var valueList = sectionBinding.ValueList.Select(bindings => SettingsFormValue.FromBinding(bindings, configurationObject, this)).ToArray();
+                    section.FormValueList.AddRange(valueList);
 
                     ListViewItem listViewItem = new()
                     {
                         Text = section.Name,
-                        ToolTipText = section.Description,
+                        ToolTipText = section.ToolTip,
                         Tag = new ListViewItemSectionTag(section)
                     };
                     this.leftSelectSectionListView.Items.Add(listViewItem);
@@ -267,6 +272,35 @@ namespace TiaUtilities.Generation.SettingsNew
             }
 
             LoadMacroSections();
+
+            void UpdateRequest(object? sender, SettingsBindingsUpdateRequestEventArgs args)
+            {
+                foreach (ListViewItem item in this.leftSelectSectionListView.Items)
+                {
+                    if (item.Tag is ListViewItemMacroSectionTag macroSectionTag)
+                    {
+                        item.Text = macroSectionTag.MacroSection.Name;
+                    }
+                }
+
+                foreach (var macroSection in this.macroSectionList)
+                {
+                    var newConfigurationObject = macroSection.Binding.GetConfigurationObject() ?? throw new InvalidOperationException($"Cannot RequestUpdate with a null ConfigurationObject inside a SettingsMacroSectionBinding. Name: {macroSection.Name}");
+                    foreach (var formValue in macroSection.Sections.SelectMany(section => section.FormValueList))
+                    {
+                        formValue.UpdateConfigurationObject(newConfigurationObject);
+
+                        formValue.Editor?.LoadFromConfiguration();
+                    }
+                }
+
+            }
+
+            this.bindings.UpdateRequest += UpdateRequest;
+            this.FormClosed += (sender, args) =>
+            {
+                this.bindings.UpdateRequest -= UpdateRequest;
+            };
         }
 
         const int SECTION_NAME_COLUMN = 0;
@@ -299,13 +333,9 @@ namespace TiaUtilities.Generation.SettingsNew
                 };
 
                 this.rightSettingsPanel.RowStyles.Add(new(SizeType.AutoSize));
-
-                controlPositionList.Add(new(macroSectioNameLabel, 0, rowCount, ColumnSpan: 3));
-
-                //this.rightSettingsPanel.Controls.Add(macroSectioNameLabel, 0, rowCount);
-                //this.rightSettingsPanel.SetColumnSpan(macroSectioNameLabel, 3);
-
                 rowCount++;
+
+                controlPositionList.Add(new(macroSectioNameLabel, 0, rowCount-1, ColumnSpan: 3));
 
                 macroSection.Label = macroSectioNameLabel;
 
@@ -315,24 +345,16 @@ namespace TiaUtilities.Generation.SettingsNew
                     Label sectionNameLabel = new()
                     {
                         Text = section.Name,
-                        Dock = DockStyle.Fill,
+                        Anchor = AnchorStyles.Top,
                         BorderStyle = BorderStyle.None,
-                        AutoSize = false,
+                        AutoSize = true,
                         TextAlign = ContentAlignment.TopCenter,
                         BackColor = Form.DefaultBackColor,
                         Padding = Padding.Empty,
                         Margin = Padding.Empty,
                         Font = SettingsConstants.SECTION_NAME_LABEL_FONT,
                     };
-                    ToolTip toolTip = new()
-                    {
-                        InitialDelay = 1500,
-                        ReshowDelay = 800,
-                        AutomaticDelay = 1000,
-                        UseFading = false,
-                        UseAnimation = false,
-                    };
-                    toolTip.SetToolTip(sectionNameLabel, section.Description);
+                    Utils.CreateStandardToolTip().SetToolTip(sectionNameLabel, section.ToolTip);
 
                     TableLayoutPanel valuesPanel = new()
                     {
@@ -348,14 +370,14 @@ namespace TiaUtilities.Generation.SettingsNew
                     List<ControlPosition> valuesControlPositionList = [];
 
                     int valuesRowCount = 0;
-                    foreach (var value in section.ValueList)
+                    foreach (var value in section.FormValueList)
                     {
                         this.AppendToValuePanel(valuesPanel, valuesControlPositionList, value, ref valuesRowCount);
                     }
 
                     SettingsForm.ApplyControlPositions(valuesPanel, valuesControlPositionList);
 
-                    //This is just to view bettere the division
+                    //This is just to view better the division in sections
                     var sectionBorderLabel = new Label()
                     {
                         Text = "",
@@ -372,7 +394,7 @@ namespace TiaUtilities.Generation.SettingsNew
                     controlPositionList.Add(new(sectionBorderLabel, SECTION_BORDER_COLUMN, rowCount - 1));
                     controlPositionList.Add(new(valuesPanel, SECTION_VALUES_COLUMN, rowCount - 1));
 
-                    this.rightSettingsPanel.RowStyles.Add(new(SizeType.Absolute, SettingsConstants.SECTION_VALUE_SEPERATION));
+                    this.rightSettingsPanel.RowStyles.Add(new(SizeType.Absolute, SettingsConstants.SECTIONS_SEPARATION));
                     rowCount++;
 
                     section.Panel = valuesPanel;
@@ -402,7 +424,7 @@ namespace TiaUtilities.Generation.SettingsNew
         }
 
         //DO NOT USE UseCompatibleTextRendering! IT WILL INCREASE TIME A LOT!
-        private void AppendToValuePanel(TableLayoutPanel panel, List<ControlPosition> controlPositionList, SettingsValue value, ref int rowCount)
+        private void AppendToValuePanel(TableLayoutPanel panel, List<ControlPosition> controlPositionList, SettingsFormValue value, ref int rowCount)
         {
             bool hasName = !string.IsNullOrEmpty(value.Name);
             bool hasDescription = !string.IsNullOrEmpty(value.Description);
@@ -426,7 +448,7 @@ namespace TiaUtilities.Generation.SettingsNew
                 panel.RowStyles.Add(new(SizeType.AutoSize));
                 rowCount++;
 
-                controlPositionList.Add(new(nameLabel, 0, rowCount-1));
+                controlPositionList.Add(new(nameLabel, 0, rowCount - 1));
             }
 
             if (hasDescription)
@@ -442,23 +464,26 @@ namespace TiaUtilities.Generation.SettingsNew
                     Margin = new Padding(0, 0, 0, 3),
                     Padding = Padding.Empty,
                     Font = SettingsConstants.DESCRIPTION_LABEL_FONT,
-                    MaximumSize = new Size(450, 0) //Since last columns is to fill the all control, set a maximun size to allow wrapping of text
+                    MaximumSize = new Size(SettingsConstants.VALUE_DESCRIPTION_MAX_SIZE, 0) //Since last columns is to fill the all control, set a maximun size to allow wrapping of text
                 };
                 Utils.SetDoubleBuffered(descriptionLabel);
 
                 panel.RowStyles.Add(new(SizeType.AutoSize));
                 rowCount++;
 
-                controlPositionList.Add(new(descriptionLabel, 0, rowCount-1));
+                controlPositionList.Add(new(descriptionLabel, 0, rowCount - 1));
             }
 
-            panel.RowStyles.Add(new(SizeType.AutoSize));
-            rowCount++;
+            var editorControl = value.Editor?.GetControl();
+            if (editorControl != null)
+            {
+                panel.RowStyles.Add(new(SizeType.AutoSize));
+                rowCount++;
 
-            var editor = SettingsEditor.ObtainFromValue(this, value);
-            controlPositionList.Add(new(editor.GetControl(), 0, rowCount - 1));
+                controlPositionList.Add(new(editorControl, 0, rowCount - 1));
+            }
 
-            panel.RowStyles.Add(new(SizeType.Absolute, SettingsConstants.SECTION_VALUE_SEPERATION));
+            panel.RowStyles.Add(new(SizeType.Absolute, SettingsConstants.VALUES_SEPERATION));
             rowCount++;
         }
 
@@ -470,7 +495,7 @@ namespace TiaUtilities.Generation.SettingsNew
                 return;
             }
 
-            if(e.State == 0)
+            if (e.State == 0)
             {
                 return;
             }
@@ -486,18 +511,18 @@ namespace TiaUtilities.Generation.SettingsNew
                 var backBounds = e.Bounds;
                 backBounds = Rectangle.Inflate(backBounds, -rectsLeftPadding / 2, 0);
                 backBounds.Offset(rectsLeftPadding / 2, 0);
-                e.Graphics.FillRectangle(new SolidBrush(backColor), backBounds);
+                using (var backBrush = new SolidBrush(backColor))
+                {
+                    e.Graphics.FillRectangle(backBrush, backBounds);
+                }
 
                 //DRAW TEXT
                 var textBounds = e.Bounds;
                 textBounds = Rectangle.Inflate(textBounds, tag is ListViewItemMacroSectionTag ? 0 : -SettingsConstants.SECTIONS_LEFT_PADDING * 3, 0);
                 TextRenderer.DrawText(e.Graphics, item.Text, this.leftSelectSectionListView.Font, textBounds, foreColor, TextFormatFlags.Left);
-
-
             }
-
-
         }
+
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             try
@@ -507,6 +532,31 @@ namespace TiaUtilities.Generation.SettingsNew
                     case Keys.Escape:
                         this.Close();
                         return true; //Return required otherwise will write the letter.
+                    case Keys.Enter | Keys.Control:
+                        var activeControl = this.ActiveControl;
+                        if (activeControl is IButtonControl button)
+                        {
+                            button.PerformClick();
+                            return true;
+                        }
+                        else if (activeControl is CheckBox checkBox)
+                        {
+                            checkBox.Checked = !checkBox.Checked;
+                            return true;
+                        }
+                        else if (activeControl is ComboBox comboBox)
+                        {
+                            comboBox.DroppedDown = true;
+                            return true;
+                        }
+                        else if (activeControl is RJComboBox rjComboBox)
+                        {
+                            rjComboBox.DroppedDrown = true;
+                        }
+                        break;
+                    case Keys.Enter:
+                        this.rightSettingsPanel.SelectNextControl(ActiveControl, true, true, true, false);
+                        return true;
                 }
             }
             catch (Exception ex)

@@ -1,4 +1,5 @@
-﻿using TiaUtilities.Generation.Alarms;
+﻿using TiaUtilities.Generation.Alarms.Configurations;
+using TiaUtilities.Generation.Alarms.Data;
 using TiaUtilities.Generation.Placeholders.Data;
 
 namespace TiaUtilities.Generation.Placeholders

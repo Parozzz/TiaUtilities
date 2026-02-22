@@ -9,7 +9,7 @@ namespace TiaUtilities.Generation.SettingsNew
 {
     public static class SettingsUtils
     {
-        public static ContextMenuStrip AddContextualMenu(Control control, SettingsValue settingsValue)
+        public static ContextMenuStrip AddContextualMenu(Control control, SettingsFormValue settingsValue)
         {
             ToolStripMenuItem saveItem = new(Locale.CONFIG_LINE_SAVE_DEFAULT_TOOLTIP) { Image = Image.FromFile("Resources/Images/noun-save-2433498.png") };
             saveItem.Click += (sender, args) =>

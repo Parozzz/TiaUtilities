@@ -16,12 +16,24 @@ using TiaUtilities.Generation;
 using TiaUtilities.Generation.Configuration;
 using TiaUtilities.Utility;
 using TiaUtilities.Generation.SettingsNew;
+using TiaUtilities.Generation.SettingsNew.Bindings;
 
 namespace TiaUtilities
 {
     public partial class MainForm : Form
     {
         public static ProgramSettings Settings { get; private set; } = new();
+        public static SettingsBindings SettingsBindings { get; private set; } = new();
+        static MainForm()
+        {
+            MainForm.SettingsBindings
+                .MacroSection<ProgramSettings>(() => "Save", () => MainForm.Settings)
+
+                .Section("Program Settings")
+                .AddInt(nameof(ProgramSettings.AutoSaveTime), "Autosave Time")
+                .AddList(nameof(ProgramSettings.IetfLanguage), ["it-IT", "en-US"], "Language");
+                //.AddList(nameof(ProgramSettings), [16, 17, 18, 19]);
+        }
 
         private readonly TimedSaveHandler autoSaveHandler;
         private readonly ErrorReportThread errorThread;

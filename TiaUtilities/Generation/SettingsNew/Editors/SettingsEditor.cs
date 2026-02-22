@@ -9,10 +9,12 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
 {
     public abstract class SettingsEditor
     {
-        public static SettingsEditor ObtainFromValue(Form form, SettingsValue value)
+        public static SettingsEditor? ObtainFromValue(Form form, SettingsFormValueImpl value)
         {
-            switch (value.ValueBinding.EditorType)
+            switch (value.Binding.EditorType)
             {
+                case SettingsEditorTypeEnum.NONE:
+                    return null;
                 default:
                 case SettingsEditorTypeEnum.STRING:
                 case SettingsEditorTypeEnum.UINT:
@@ -29,13 +31,14 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
                     jsEditor.RegisterErrorThreadWithForm(MainForm.JavascriptErrorThread, form);
                     return jsEditor;
                 case SettingsEditorTypeEnum.ENUM:
+                case SettingsEditorTypeEnum.LIST:
                     return new SettingsComboBoxEditor(value);
             }
         }
 
-        public SettingsValue Value { get; init; }
+        public SettingsFormValueImpl Value { get; init; }
 
-        public SettingsEditor(SettingsValue value)
+        public SettingsEditor(SettingsFormValueImpl value)
         {
             this.Value = value;
         }

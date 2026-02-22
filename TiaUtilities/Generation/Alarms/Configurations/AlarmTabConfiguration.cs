@@ -2,7 +2,7 @@
 using TiaUtilities.Configuration;
 using TiaUtilities.Generation.Placeholders;
 
-namespace TiaUtilities.Generation.Alarms
+namespace TiaUtilities.Generation.Alarms.Configurations
 {
     public class AlarmTabConfiguration : ObservableConfiguration
     {
@@ -19,9 +19,6 @@ namespace TiaUtilities.Generation.Alarms
         [JsonProperty] public bool GenerateEmptyAlarmAntiSlip { get => this.GetAs<bool>(); set => this.Set(value); }
         [JsonProperty] public uint EmptyAlarmAtEnd { get => this.GetAs<uint>(); set => this.Set(value); }
         [JsonProperty] public string EmptyAlarmContactAddress { get => this.GetAs<string>(); set => this.Set(value); }
-        [JsonProperty] public string EmptyAlarmTimerAddress { get => this.GetAs<string>(); set => this.Set(value); }
-        [JsonProperty] public string EmptyAlarmTimerType { get => this.GetAs<string>(); set => this.Set(value); }
-        [JsonProperty] public string EmptyAlarmTimerValue { get => this.GetAs<string>(); set => this.Set(value); }
 
         [JsonProperty] public string DefaultCustomVarAddress { get => this.GetAs<string>(); set => this.Set(value); }
         [JsonProperty] public string DefaultCustomVarValue { get => this.GetAs<string>(); set => this.Set(value); }
@@ -55,9 +52,6 @@ namespace TiaUtilities.Generation.Alarms
             this.GenerateEmptyAlarmAntiSlip = false;
             this.EmptyAlarmAtEnd = 0;
             this.EmptyAlarmContactAddress = "FALSE";
-            this.EmptyAlarmTimerAddress = "\\";
-            this.EmptyAlarmTimerType = "TON";
-            this.EmptyAlarmTimerValue = "T#0s";
 
             this.DefaultCustomVarAddress = $"Alm.Level[{GenPlaceholders.Alarms.ALARM_NUM}]";
             this.DefaultCustomVarValue = "0";

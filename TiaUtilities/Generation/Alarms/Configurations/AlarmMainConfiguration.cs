@@ -3,21 +3,21 @@ using TiaUtilities.Configuration;
 using TiaUtilities.Languages;
 using TiaUtilities.Generation.Placeholders;
 
-namespace TiaUtilities.Generation.Alarms
+namespace TiaUtilities.Generation.Alarms.Configurations
 {
     public enum AlarmGroupingType
     {
-        [Locale(nameof(Locale.ALARM_CONFIG_GROUPING_TYPE_GROUP))] GROUP,
-        [Locale(nameof(Locale.ALARM_CONFIG_GROUPING_TYPE_ONE))] ONE
+        [Locale(nameof(Locale.ALARM_SETTINGS_GROUPING_TYPE_GROUP))] GROUP,
+        [Locale(nameof(Locale.ALARM_SETTINGS_GROUPING_TYPE_ONE))] ONE
     }
 
     public enum AlarmCoilType
     {
-        [Locale(nameof(Locale.ALARM_CONFIG_COIL_TYPE_NONE))] NONE,
-        [Locale(nameof(Locale.ALARM_CONFIG_COIL_TYPE_COIL))] COIL,
-        [Locale(nameof(Locale.ALARM_CONFIG_COIL_TYPE_NCOIL))] NCOIL,
-        [Locale(nameof(Locale.ALARM_CONFIG_COIL_TYPE_SET))] SET,
-        [Locale(nameof(Locale.ALARM_CONFIG_COIL_TYPE_RESET))] RESET
+        [Locale(nameof(Locale.ALARM_SETTINGS_COIL_TYPE_NONE))] NONE,
+        [Locale(nameof(Locale.ALARM_SETTINGS_COIL_TYPE_COIL))] COIL,
+        [Locale(nameof(Locale.ALARM_SETTINGS_COIL_TYPE_NCOIL))] NCOIL,
+        [Locale(nameof(Locale.ALARM_SETTINGS_COIL_TYPE_SET))] SET,
+        [Locale(nameof(Locale.ALARM_SETTINGS_COIL_TYPE_RESET))] RESET
     }
 
     public class AlarmMainConfiguration : ObservableConfiguration

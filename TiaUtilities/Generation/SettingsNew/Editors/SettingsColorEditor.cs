@@ -38,7 +38,9 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
 
         private LastColorChange lastColorChange = new(Color.White, LastColorChangeCauseEnum.NONE);
 
-        public SettingsColorEditor(SettingsValue value) : base(value)
+        private bool loading = false;
+
+        public SettingsColorEditor(SettingsFormValueImpl value) : base(value)
         {
             this.colorHexaTextBox = new()
             {
@@ -80,10 +82,16 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
 
         private void ColorTextBoxTextChangedEvent(object? sender, EventArgs e)
         {
+            if(loading)
+            {
+                return;
+            }
+
             try
             {
                 var color = ColorTranslator.FromHtml(colorHexaTextBox.Text);
                 this.lastColorChange = new(color, LastColorChangeCauseEnum.TEXT_BOX);
+
                 this.colorPickerButton.BackColor = color;
 
                 this.SaveToConfiguration();
@@ -99,6 +107,8 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
                 if (colorDialog.ShowDialog() == DialogResult.OK)
                 {
                     this.lastColorChange = new(colorDialog.Color, LastColorChangeCauseEnum.COLOR_PICKER);
+
+                    this.colorHexaTextBox.Text = colorDialog.Color.ToHexString();
                     this.colorPickerButton.BackColor = colorDialog.Color;
 
                     this.SaveToConfiguration();
@@ -139,22 +149,15 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
 
         public override void LoadFromConfiguration()
         {
+            loading = true;
+
             var color = this.Value.GetConfigurationValue<Color>();
             lastColorChange = new(color, LastColorChangeCauseEnum.LOAD);
 
-            switch (lastColorChange.Cause)
-            {
-                case LastColorChangeCauseEnum.TEXT_BOX:
-                    this.colorPickerButton.BackColor = color;
-                    break;
-                case LastColorChangeCauseEnum.COLOR_PICKER:
-                    this.colorHexaTextBox.Text = color.ToHexString();
-                    break;
-                default:
-                    this.colorHexaTextBox.Text = color.ToHexString();
-                    this.colorPickerButton.BackColor = color;
-                    break;
-            }
+            this.colorHexaTextBox.Text = color.ToHexString();
+            this.colorPickerButton.BackColor = color;
+
+            loading = false;
         }
 
         public override void SaveToConfiguration()

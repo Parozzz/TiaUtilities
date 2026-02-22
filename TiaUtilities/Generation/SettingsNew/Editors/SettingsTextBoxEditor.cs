@@ -9,13 +9,13 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
 
         private readonly TextBox textBox;
 
-        public SettingsTextBoxEditor(SettingsValue value) : base(value)
+        public SettingsTextBoxEditor(SettingsFormValueImpl value) : base(value)
         {
             var size = TextRenderer.MeasureText("AaGg", SettingsConstants.VALUE_CONTROL_FONT, Size.Empty, TextFormatFlags.TextBoxControl);
             this.textBox = new()
             {
                 Font = SettingsConstants.VALUE_CONTROL_FONT,
-                Dock = DockStyle.Fill,
+                Anchor = AnchorStyles.Left | AnchorStyles.Right, //This allows centering if no label is present!
                 BorderStyle = BorderStyle.None,
                 TextAlign = HorizontalAlignment.Left,
                 ReadOnly = false,
@@ -25,7 +25,7 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
                 BackColor = Form.DefaultBackColor,
             };
 
-            var type = value.ValueBinding.EditorType;
+            var type = value.Binding.EditorType;
             switch (type)
             {
                 case SettingsEditorTypeEnum.STRING:
@@ -66,12 +66,13 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
 
         public override void LoadFromConfiguration()
         {
-            this.textBox.Text = "" + this.Value.GetConfigurationValue();
+            var configurationValue = this.Value.GetConfigurationValue();
+            this.textBox.Text = "" + configurationValue;
         }
 
         public override void SaveToConfiguration()
         {
-            switch (this.Value.ValueBinding.EditorType)
+            switch (this.Value.Binding.EditorType)
             {
                 case SettingsEditorTypeEnum.STRING:
                     this.Value.SetConfigurationValue(this.textBox.Text);

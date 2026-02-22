@@ -9,6 +9,7 @@ using TiaUtilities.Configuration;
 using TiaUtilities.Generation.IO;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Generation.SettingsNew.Bindings;
+using TiaUtilities.Generation.SettingsNew.Editors;
 using TiaUtilities.Languages;
 using TiaUtilities.Utility.Extensions;
 

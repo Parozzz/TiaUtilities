@@ -6,6 +6,8 @@ using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.CustomColumns;
 using TiaUtilities.Generation.SettingsNew.Bindings;
+using TiaUtilities.Generation.Alarms.Configurations;
+using TiaUtilities.Generation.Alarms.Data;
 
 namespace TiaUtilities.Generation.Alarms.Module.Tab
 {
@@ -47,10 +49,15 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             this.TabControl = new(bindContainer.GridScriptHandler.ErrorThread, this.templateHandler, deviceGridHandler.DataGridView);
         }
 
+        /*
+            var deviceTemplateForm = new AlarmGenTemplateForm(mainConfig, tabConfig, bindContainer, templateHandler);
+            deviceTemplateForm.Init();
+            deviceTemplateForm.ShowDialog(this);
+         */
+
         public void Init()
         {
             this.TabControl.Init(); //This before configHandler.
-            this.TabControl.BindConfig(this.gridBindContainer, this.mainConfig, this.TabConfig, this.module.TabConfigurations);
 
             #region DEVICE_GRID_SETUP
             this.deviceGridHandler.Events.ExcelDragPreview += (sender, args) => GridUtils.DragPreview(args, deviceGridHandler);

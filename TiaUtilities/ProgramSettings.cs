@@ -1,12 +1,12 @@
 ﻿using Newtonsoft.Json;
 using TiaUtilities.Configuration;
-using TiaUtilities.Generation.Alarms;
-using TiaUtilities.Generation.IO;
 using TiaUtilities.Generation.IO.Module.ExcelImporter;
 using TiaUtilities.Generation;
 using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Languages;
 using TiaUtilities.Utility;
+using TiaUtilities.Generation.Alarms.Configurations;
+using TiaUtilities.Generation.IO.Configurations;
 
 namespace TiaUtilities
 {
