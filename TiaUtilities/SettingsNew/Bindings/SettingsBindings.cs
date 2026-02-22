@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 using TiaUtilities.Configuration;
-using TiaUtilities.Generation.SettingsNew.Editors;
+using TiaUtilities.SettingsNew.Editors;
 
-namespace TiaUtilities.Generation.SettingsNew.Bindings
+namespace TiaUtilities.SettingsNew.Bindings
 {
 
     public record SettingsBindingsUpdateRequestEventArgs();
@@ -56,7 +56,10 @@ namespace TiaUtilities.Generation.SettingsNew.Bindings
         public SettingsBindings AddJavascript(string propertyName, string name = "", string description = "") => Add(propertyName, name, description, SettingsEditorTypeEnum.JAVASCRIPT);
         public SettingsBindings AddColor(string propertyName, string name = "", string description = "") => Add(propertyName, name, description, SettingsEditorTypeEnum.COLOR);
         public SettingsBindings AddEnum(string propertyName, string name = "", string description = "") => Add(propertyName, name, description, SettingsEditorTypeEnum.ENUM);
-        public SettingsBindings AddList(string propertyName, List<string> list, string name = "", string description = "") => Add(propertyName, name, description, SettingsEditorTypeEnum.LIST, new SettingsValueListTag(list));
+        public SettingsBindings AddStringList(string propertyName, List<string> list, string name = "", string description = "") => Add(propertyName, name, description, SettingsEditorTypeEnum.STRING_LIST, new SettingsValueListStringTag(list));
+        public SettingsBindings AddSignedNumberList(string propertyName, List<long> list, string name = "", string description = "") => Add(propertyName, name, description, SettingsEditorTypeEnum.SIGNED_LIST, new SettingsValueListSignedTag(list));
+        public SettingsBindings AddUnsignedNumberList(string propertyName, List<ulong> list, string name = "", string description = "") => Add(propertyName, name, description, SettingsEditorTypeEnum.UNSIGNED_LIST, new SettingsValueListUnsignedTag(list));
+
         public SettingsBindings AddLabel(string name = "", string description = "") => Add("", name, description, SettingsEditorTypeEnum.NONE);
 
         public SettingsBindings Add(string propertyName, string name, string description, SettingsEditorTypeEnum editorType, Object? tag = null)

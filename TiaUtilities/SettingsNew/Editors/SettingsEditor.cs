@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 
-namespace TiaUtilities.Generation.SettingsNew.Editors
+namespace TiaUtilities.SettingsNew.Editors
 {
     public abstract class SettingsEditor
     {
@@ -31,7 +26,9 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
                     jsEditor.RegisterErrorThreadWithForm(MainForm.JavascriptErrorThread, form);
                     return jsEditor;
                 case SettingsEditorTypeEnum.ENUM:
-                case SettingsEditorTypeEnum.LIST:
+                case SettingsEditorTypeEnum.STRING_LIST:
+                case SettingsEditorTypeEnum.UNSIGNED_LIST:
+                case SettingsEditorTypeEnum.SIGNED_LIST:
                     return new SettingsComboBoxEditor(value);
             }
         }

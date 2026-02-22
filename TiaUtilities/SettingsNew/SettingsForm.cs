@@ -1,9 +1,7 @@
-﻿using System.Diagnostics;
-using System.Xml;
-using TiaUtilities.Configuration;
+﻿using TiaUtilities.Configuration;
 using TiaUtilities.CustomControls;
-using TiaUtilities.Generation.SettingsNew.Bindings;
-using TiaUtilities.Generation.SettingsNew.Editors;
+using TiaUtilities.SettingsNew;
+using TiaUtilities.SettingsNew.Bindings;
 using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.SettingsNew
@@ -345,13 +343,14 @@ namespace TiaUtilities.Generation.SettingsNew
                     Label sectionNameLabel = new()
                     {
                         Text = section.Name,
-                        Anchor = AnchorStyles.Top,
+                        Dock = DockStyle.Fill,
+                        //Anchor = AnchorStyles.Top,
                         BorderStyle = BorderStyle.None,
                         AutoSize = true,
-                        TextAlign = ContentAlignment.TopCenter,
+                        TextAlign = ContentAlignment.MiddleRight,
                         BackColor = Form.DefaultBackColor,
                         Padding = Padding.Empty,
-                        Margin = Padding.Empty,
+                        Margin = new Padding(0,0,4,0),
                         Font = SettingsConstants.SECTION_NAME_LABEL_FONT,
                     };
                     Utils.CreateStandardToolTip().SetToolTip(sectionNameLabel, section.ToolTip);

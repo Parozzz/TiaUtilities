@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TiaUtilities.Languages;
 
-namespace TiaUtilities.Generation.SettingsNew
+namespace TiaUtilities.SettingsNew
 {
     public static class SettingsUtils
     {

@@ -1,9 +1,10 @@
 ﻿using System.Reflection;
 using TiaUtilities.Generation.Configuration;
+using TiaUtilities.SettingsNew;
 using TiaUtilities.Utility;
 using TiaUtilities.Utility.Extensions;
 
-namespace TiaUtilities.Generation.SettingsNew.Editors
+namespace TiaUtilities.SettingsNew.Editors
 {
 
     public class SettingsColorEditor : SettingsEditor
@@ -60,7 +61,7 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
             this.colorPickerButton = new Button()
             {
                 Dock = DockStyle.Fill,
-                MinimumSize = new(40, 0),
+                MinimumSize = new(40, 20),
                 MaximumSize = new(40, 20),
                 AutoSize = true,
                 AutoSizeMode = AutoSizeMode.GrowAndShrink,
@@ -127,6 +128,7 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
                 AutoSize = true,
                 AutoSizeMode = AutoSizeMode.GrowAndShrink,
                 Dock = DockStyle.Fill,
+                //Anchor = AnchorStyles.Left | AnchorStyles.Right,
                 Padding = Padding.Empty,
                 Margin = Padding.Empty,
                 ColumnStyles =

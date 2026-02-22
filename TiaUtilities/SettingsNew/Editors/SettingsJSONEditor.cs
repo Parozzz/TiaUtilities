@@ -5,8 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TiaUtilities.Editors;
+using TiaUtilities.SettingsNew;
 
-namespace TiaUtilities.Generation.SettingsNew.Editors
+namespace TiaUtilities.SettingsNew.Editors
 {
     public class SettingsJSONEditor : SettingsEditor
     {

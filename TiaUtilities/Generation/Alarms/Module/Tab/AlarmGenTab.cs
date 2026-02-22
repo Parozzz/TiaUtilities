@@ -5,9 +5,9 @@ using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.CustomColumns;
-using TiaUtilities.Generation.SettingsNew.Bindings;
 using TiaUtilities.Generation.Alarms.Configurations;
 using TiaUtilities.Generation.Alarms.Data;
+using TiaUtilities.SettingsNew.Bindings;
 
 namespace TiaUtilities.Generation.Alarms.Module.Tab
 {

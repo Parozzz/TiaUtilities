@@ -6,10 +6,10 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using TiaUtilities.Configuration;
-using TiaUtilities.Generation.SettingsNew.Bindings;
-using TiaUtilities.Generation.SettingsNew.Editors;
+using TiaUtilities.SettingsNew.Bindings;
+using TiaUtilities.SettingsNew.Editors;
 
-namespace TiaUtilities.Generation.SettingsNew
+namespace TiaUtilities.SettingsNew
 {
     public abstract class SettingsFormValue
     {

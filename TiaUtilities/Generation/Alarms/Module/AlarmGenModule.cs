@@ -6,8 +6,8 @@ using TiaUtilities.Generation.Alarms.Module.Template;
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.SettingsNew;
-using TiaUtilities.Generation.SettingsNew.Bindings;
 using TiaUtilities.Languages;
+using TiaUtilities.SettingsNew.Bindings;
 
 namespace TiaUtilities.Generation.Alarms.Module
 {
@@ -260,7 +260,7 @@ namespace TiaUtilities.Generation.Alarms.Module
 
                 .Section(Locale.ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_TIMER)
                 .AddString(nameof(AlarmTabConfiguration.DefaultTimerAddress), Locale.GENERICS_ADDRESS, Locale.GENERICS_DESCR_SET_SLASH_TO_DISABLE)
-                .AddList(nameof(AlarmTabConfiguration.DefaultTimerType), ["TON", "TOF"], Locale.GENERICS_TYPE)
+                .AddStringList(nameof(AlarmTabConfiguration.DefaultTimerType), ["TON", "TOF"], Locale.GENERICS_TYPE)
                 .AddString(nameof(AlarmTabConfiguration.DefaultTimerValue), Locale.GENERICS_TYPE)
 
                 .Section(Locale.ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_CUSTOM_VAR)

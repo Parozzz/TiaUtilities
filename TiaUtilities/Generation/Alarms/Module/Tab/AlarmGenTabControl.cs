@@ -1,10 +1,5 @@
 ﻿using TiaUtilities.Generation.Alarms.Module.Template;
-using TiaUtilities.Generation.Configuration.Utility;
-using TiaUtilities.Generation.GridHandler.Binds;
-using TiaUtilities.Languages;
 using TiaUtilities.Editors.ErrorReporting;
-using TiaUtilities.Generation.Configuration;
-using TiaUtilities.Generation.SettingsNew.Bindings;
 
 namespace TiaUtilities.Generation.Alarms.Module.Tab
 {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TiaUtilities.Generation.SettingsNew
+namespace TiaUtilities.SettingsNew
 {
     public static class SettingsConstants
     {

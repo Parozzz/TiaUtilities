@@ -1,6 +1,7 @@
 ﻿using TiaUtilities.CustomControls;
+using TiaUtilities.SettingsNew;
 
-namespace TiaUtilities.Generation.SettingsNew.Editors
+namespace TiaUtilities.SettingsNew.Editors
 {
     public class SettingsCheckBoxEditor : SettingsEditor
     {

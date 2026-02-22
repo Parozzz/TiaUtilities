@@ -5,9 +5,10 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using TiaUtilities.Configuration;
-using TiaUtilities.Generation.SettingsNew.Editors;
+using TiaUtilities.Generation;
+using TiaUtilities.SettingsNew.Editors;
 
-namespace TiaUtilities.Generation.SettingsNew.Bindings
+namespace TiaUtilities.SettingsNew.Bindings
 {
     public class SettingsMacroSectionBinding<T> where T : ObservableConfiguration
     {
@@ -65,5 +66,7 @@ namespace TiaUtilities.Generation.SettingsNew.Bindings
         Object? Tag = null
     );
 
-    public record SettingsValueListTag(List<string> List);
+    public record SettingsValueListStringTag(List<string> List);
+    public record SettingsValueListSignedTag(List<long> List);
+    public record SettingsValueListUnsignedTag(List<ulong> List);
 }

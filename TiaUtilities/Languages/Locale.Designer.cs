@@ -1078,6 +1078,15 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Program.
+        /// </summary>
+        internal static string GENERICS_PROGRAM {
+            get {
+                return ResourceManager.GetString("GENERICS_PROGRAM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Quantity.
         /// </summary>
         internal static string GENERICS_QUANTITY {
@@ -1101,6 +1110,15 @@ namespace TiaUtilities.Languages {
         internal static string GENERICS_SAVE_AS {
             get {
                 return ResourceManager.GetString("GENERICS_SAVE_AS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Settings.
+        /// </summary>
+        internal static string GENERICS_SETTINGS {
+            get {
+                return ResourceManager.GetString("GENERICS_SETTINGS", resourceCulture);
             }
         }
         
@@ -1191,51 +1209,6 @@ namespace TiaUtilities.Languages {
         internal static string GRID_FIND_SEARCH_COMPLETED {
             get {
                 return ResourceManager.GetString("GRID_FIND_SEARCH_COMPLETED", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Grid Preferences.
-        /// </summary>
-        internal static string GRID_PREFERENCES {
-            get {
-                return ResourceManager.GetString("GRID_PREFERENCES", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Drag triangle.
-        /// </summary>
-        internal static string GRID_PREFERENCES_DRAG_TRIANGLE_COLOR {
-            get {
-                return ResourceManager.GetString("GRID_PREFERENCES_DRAG_TRIANGLE_COLOR", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Dragged cell background.
-        /// </summary>
-        internal static string GRID_PREFERENCES_DRAGGED_CELL_BACK {
-            get {
-                return ResourceManager.GetString("GRID_PREFERENCES_DRAGGED_CELL_BACK", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Preview.
-        /// </summary>
-        internal static string GRID_PREFERENCES_PREVIEW_FORE {
-            get {
-                return ResourceManager.GetString("GRID_PREFERENCES_PREVIEW_FORE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Selected cell border.
-        /// </summary>
-        internal static string GRID_PREFERENCES_SELECTED_CELL_BORDER {
-            get {
-                return ResourceManager.GetString("GRID_PREFERENCES_SELECTED_CELL_BORDER", resourceCulture);
             }
         }
         
@@ -1673,24 +1646,6 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Language.
-        /// </summary>
-        internal static string MAIN_FORM_LANGUAGE {
-            get {
-                return ResourceManager.GetString("MAIN_FORM_LANGUAGE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a TIA Portal Version.
-        /// </summary>
-        internal static string MAIN_FORM_TIA_VERSION {
-            get {
-                return ResourceManager.GetString("MAIN_FORM_TIA_VERSION", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Cerca una stringa localizzata simile a Alarm Generator.
         /// </summary>
         internal static string MAIN_FORM_TOP_ALARM_GENERATOR {
@@ -1709,20 +1664,92 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a AutoSave (s).
-        /// </summary>
-        internal static string MAIN_FORM_TOP_FILE_AUTO_SAVE {
-            get {
-                return ResourceManager.GetString("MAIN_FORM_TOP_FILE_AUTO_SAVE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Cerca una stringa localizzata simile a Alias Generator.
         /// </summary>
         internal static string MAIN_FORM_TOP_IO_GENERATION {
             get {
                 return ResourceManager.GetString("MAIN_FORM_TOP_IO_GENERATION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Auto-Save (s).
+        /// </summary>
+        internal static string PROGRAM_SETTINGS_AUTO_SAVE {
+            get {
+                return ResourceManager.GetString("PROGRAM_SETTINGS_AUTO_SAVE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Grid Preferences.
+        /// </summary>
+        internal static string PROGRAM_SETTINGS_GRID_PREFERENCES {
+            get {
+                return ResourceManager.GetString("PROGRAM_SETTINGS_GRID_PREFERENCES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Colors.
+        /// </summary>
+        internal static string PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS {
+            get {
+                return ResourceManager.GetString("PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Drag triangle.
+        /// </summary>
+        internal static string PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_DRAG_TRIANGLE_COLOR {
+            get {
+                return ResourceManager.GetString("PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_DRAG_TRIANGLE_COLOR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Dragged cell background.
+        /// </summary>
+        internal static string PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_DRAGGED_CELL_BACK {
+            get {
+                return ResourceManager.GetString("PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_DRAGGED_CELL_BACK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Preview.
+        /// </summary>
+        internal static string PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_PREVIEW_FORE {
+            get {
+                return ResourceManager.GetString("PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_PREVIEW_FORE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Selected cell border.
+        /// </summary>
+        internal static string PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_SELECTED_CELL_BORDER {
+            get {
+                return ResourceManager.GetString("PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_SELECTED_CELL_BORDER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Language.
+        /// </summary>
+        internal static string PROGRAM_SETTINGS_LANGUAGE {
+            get {
+                return ResourceManager.GetString("PROGRAM_SETTINGS_LANGUAGE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a TIA Portal Version.
+        /// </summary>
+        internal static string PROGRAM_SETTINGS_TIA_VERSION {
+            get {
+                return ResourceManager.GetString("PROGRAM_SETTINGS_TIA_VERSION", resourceCulture);
             }
         }
     }

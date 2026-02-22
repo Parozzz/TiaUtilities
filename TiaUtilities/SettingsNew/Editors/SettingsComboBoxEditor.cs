@@ -1,9 +1,10 @@
 ﻿using TiaUtilities.CustomControls;
 using TiaUtilities.Generation.Configuration;
-using TiaUtilities.Generation.SettingsNew.Bindings;
 using TiaUtilities.Languages;
+using TiaUtilities.SettingsNew;
+using TiaUtilities.SettingsNew.Bindings;
 
-namespace TiaUtilities.Generation.SettingsNew.Editors
+namespace TiaUtilities.SettingsNew.Editors
 {
     public class SettingsComboBoxEditor : SettingsEditor
     {
@@ -24,6 +25,20 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
                 Anchor = AnchorStyles.Left,  //This allows centering if no label is present!
             };
 
+            switch(value.Binding.EditorType)
+            {
+                case SettingsEditorTypeEnum.ENUM:
+                case SettingsEditorTypeEnum.STRING_LIST:
+                case SettingsEditorTypeEnum.UNSIGNED_LIST:
+                case SettingsEditorTypeEnum.SIGNED_LIST:
+
+                    this.comboBox.DropDownStyle = ComboBoxStyle.DropDownList; //Disable text Editing 
+                    this.comboBox.DisplayMember = "Text";
+                    this.comboBox.ValueMember = "Value";
+
+                    break;
+            }
+
             switch (value.Binding.EditorType)
             {
                 case SettingsEditorTypeEnum.ENUM:
@@ -31,10 +46,6 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
                     {
                         throw new InvalidCastException($"Using SettingsEditorTypeEnum ENUM with a PropertyInfo that is not an Enumeration for {value.PropertyInfo.Name}");
                     }
-
-                    this.comboBox.DropDownStyle = ComboBoxStyle.DropDownList; //Disable text Editing 
-                    this.comboBox.DisplayMember = "Text";
-                    this.comboBox.ValueMember = "Value";
 
                     var enumDataSourceItems = new List<object>();
                     foreach (Enum enumItem in Enum.GetValues(value.PropertyInfo.PropertyType))
@@ -45,22 +56,48 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
 
                     this.comboBox.OnSelectedIndexChanged += (sender, args) => this.SaveToConfiguration();
                     break;
-                case SettingsEditorTypeEnum.LIST:
-                    if(value.Binding.Tag is not SettingsValueListTag listTag)
+                case SettingsEditorTypeEnum.STRING_LIST:
+                    if(value.Binding.Tag is not SettingsValueListStringTag listTag)
                     {
                         throw new InvalidCastException($"Using SettingsEditorTypeEnum LIST without a Tag that is not SettingsValueListTag for {value.PropertyInfo.Name}");
                     }
 
-                    this.comboBox.DropDownStyle = ComboBoxStyle.DropDownList; //Disable text Editing 
-                    this.comboBox.DisplayMember = "Text";
-                    this.comboBox.ValueMember = "Value";
-
-                    var listDataSourceItems = new List<object>();
+                    var listStringDataSourceItems = new List<object>();
                     foreach (var listValue in listTag.List)
                     {
-                        listDataSourceItems.Add(new { Text = listValue, Value = listValue });
+                        listStringDataSourceItems.Add(new { Text = listValue, Value = listValue });
                     }
-                    this.comboBox.DataSource = listDataSourceItems;
+                    this.comboBox.DataSource = listStringDataSourceItems;
+
+                    this.comboBox.OnSelectedIndexChanged += (sender, args) => this.SaveToConfiguration();
+                    break;
+                case SettingsEditorTypeEnum.UNSIGNED_LIST:
+                    if (value.Binding.Tag is not SettingsValueListUnsignedTag unsignedTag)
+                    {
+                        throw new InvalidCastException($"Using SettingsEditorTypeEnum UNSIGNED_LIST without a Tag that is not SettingsValueListUnsignedTag for {value.PropertyInfo.Name}");
+                    }
+
+                    var listUnsignedDataSourceItems = new List<object>();
+                    foreach (var listValue in unsignedTag.List)
+                    {
+                        listUnsignedDataSourceItems.Add(new { Text = "" + listValue, Value = listValue });
+                    }
+                    this.comboBox.DataSource = listUnsignedDataSourceItems;
+
+                    this.comboBox.OnSelectedIndexChanged += (sender, args) => this.SaveToConfiguration();
+                    break;
+                case SettingsEditorTypeEnum.SIGNED_LIST:
+                    if (value.Binding.Tag is not SettingsValueListSignedTag signedTag)
+                    {
+                        throw new InvalidCastException($"Using SettingsEditorTypeEnum SIGNED_LIST without a Tag that is not SettingsValueListSignedTag for {value.PropertyInfo.Name}");
+                    }
+
+                    var listSignedDataSourceItems = new List<object>();
+                    foreach (var listValue in signedTag.List)
+                    {
+                        listSignedDataSourceItems.Add(new { Text = "" + listValue, Value = listValue });
+                    }
+                    this.comboBox.DataSource = listSignedDataSourceItems;
 
                     this.comboBox.OnSelectedIndexChanged += (sender, args) => this.SaveToConfiguration();
                     break;
@@ -114,7 +151,9 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
                     this.comboBox.SelectedValue = this.Value.GetConfigurationValue();
                     break;
                 case SettingsEditorTypeEnum.STRING:
-                case SettingsEditorTypeEnum.LIST:
+                case SettingsEditorTypeEnum.STRING_LIST:
+                case SettingsEditorTypeEnum.UNSIGNED_LIST:
+                case SettingsEditorTypeEnum.SIGNED_LIST:
                 case SettingsEditorTypeEnum.INT:
                 case SettingsEditorTypeEnum.UINT:
                     this.comboBox.Text = "" + this.Value.GetConfigurationValue();
@@ -127,7 +166,9 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
             switch (this.Value.Binding.EditorType)
             {
                 case SettingsEditorTypeEnum.ENUM:
-                case SettingsEditorTypeEnum.LIST:
+                case SettingsEditorTypeEnum.STRING_LIST:
+                case SettingsEditorTypeEnum.UNSIGNED_LIST:
+                case SettingsEditorTypeEnum.SIGNED_LIST:
                     var selectedValue = this.comboBox.SelectedValue;
                     if (selectedValue != null)
                     {

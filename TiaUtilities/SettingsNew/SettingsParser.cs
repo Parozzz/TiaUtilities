@@ -8,12 +8,13 @@ using System.Threading.Tasks;
 using TiaUtilities.Configuration;
 using TiaUtilities.Generation.IO;
 using TiaUtilities.Generation.Placeholders;
-using TiaUtilities.Generation.SettingsNew.Bindings;
-using TiaUtilities.Generation.SettingsNew.Editors;
+using TiaUtilities.Generation.SettingsNew;
 using TiaUtilities.Languages;
+using TiaUtilities.SettingsNew.Bindings;
+using TiaUtilities.SettingsNew.Editors;
 using TiaUtilities.Utility.Extensions;
 
-namespace TiaUtilities.Generation.SettingsNew
+namespace TiaUtilities.SettingsNew
 {
     public static class SettingsParser
     {

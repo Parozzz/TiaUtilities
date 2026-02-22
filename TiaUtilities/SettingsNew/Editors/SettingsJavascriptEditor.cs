@@ -1,8 +1,9 @@
 ﻿using FastColoredTextBoxNS;
 using TiaUtilities.Editors;
 using TiaUtilities.Editors.ErrorReporting;
+using TiaUtilities.SettingsNew;
 
-namespace TiaUtilities.Generation.SettingsNew.Editors
+namespace TiaUtilities.SettingsNew.Editors
 {
     public class SettingsJavascriptEditor : SettingsEditor
     {

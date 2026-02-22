@@ -33,18 +33,18 @@
             saveMenuItem = new ToolStripMenuItem();
             saveAsMenuItem = new ToolStripMenuItem();
             loadMenuItem = new ToolStripMenuItem();
+            programMenuItem = new ToolStripMenuItem();
+            programSettingsMenuItem = new ToolStripMenuItem();
             importExportMenuItem = new ToolStripMenuItem();
             exportXMLMenuItem = new ToolStripMenuItem();
-            preferencesMenuItem = new ToolStripMenuItem();
             formTableLayout = new TableLayoutPanel();
-            settingsMenuItem = new ToolStripMenuItem();
             topMenuStrip.SuspendLayout();
             formTableLayout.SuspendLayout();
             SuspendLayout();
             // 
             // topMenuStrip
             // 
-            topMenuStrip.Items.AddRange(new ToolStripItem[] { fileMenuItem, importExportMenuItem, preferencesMenuItem });
+            topMenuStrip.Items.AddRange(new ToolStripItem[] { fileMenuItem, programMenuItem, importExportMenuItem });
             topMenuStrip.Location = new Point(0, 0);
             topMenuStrip.Name = "topMenuStrip";
             topMenuStrip.Size = new Size(800, 24);
@@ -53,7 +53,7 @@
             // 
             // fileMenuItem
             // 
-            fileMenuItem.DropDownItems.AddRange(new ToolStripItem[] { saveMenuItem, saveAsMenuItem, loadMenuItem, settingsMenuItem });
+            fileMenuItem.DropDownItems.AddRange(new ToolStripItem[] { loadMenuItem, saveMenuItem, saveAsMenuItem });
             fileMenuItem.Name = "fileMenuItem";
             fileMenuItem.Size = new Size(37, 20);
             fileMenuItem.Text = "File";
@@ -61,20 +61,34 @@
             // saveMenuItem
             // 
             saveMenuItem.Name = "saveMenuItem";
-            saveMenuItem.Size = new Size(180, 22);
+            saveMenuItem.Size = new Size(111, 22);
             saveMenuItem.Text = "Save";
             // 
             // saveAsMenuItem
             // 
             saveAsMenuItem.Name = "saveAsMenuItem";
-            saveAsMenuItem.Size = new Size(180, 22);
+            saveAsMenuItem.Size = new Size(111, 22);
             saveAsMenuItem.Text = "SaveAs";
             // 
             // loadMenuItem
             // 
             loadMenuItem.Name = "loadMenuItem";
-            loadMenuItem.Size = new Size(180, 22);
+            loadMenuItem.Size = new Size(111, 22);
             loadMenuItem.Text = "Load";
+            // 
+            // programMenuItem
+            // 
+            programMenuItem.DropDownItems.AddRange(new ToolStripItem[] { programSettingsMenuItem });
+            programMenuItem.Font = new Font("Segoe UI", 9F);
+            programMenuItem.Name = "programMenuItem";
+            programMenuItem.Size = new Size(65, 20);
+            programMenuItem.Text = "Program";
+            // 
+            // programSettingsMenuItem
+            // 
+            programSettingsMenuItem.Name = "programSettingsMenuItem";
+            programSettingsMenuItem.Size = new Size(180, 22);
+            programSettingsMenuItem.Text = "Settings";
             // 
             // importExportMenuItem
             // 
@@ -89,12 +103,6 @@
             exportXMLMenuItem.Size = new Size(134, 22);
             exportXMLMenuItem.Text = "Export XML";
             // 
-            // preferencesMenuItem
-            // 
-            preferencesMenuItem.Name = "preferencesMenuItem";
-            preferencesMenuItem.Size = new Size(80, 20);
-            preferencesMenuItem.Text = "Preferences";
-            // 
             // formTableLayout
             // 
             formTableLayout.ColumnCount = 1;
@@ -108,12 +116,6 @@
             formTableLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             formTableLayout.Size = new Size(800, 450);
             formTableLayout.TabIndex = 0;
-            // 
-            // settingsMenuItem
-            // 
-            settingsMenuItem.Name = "settingsMenuItem";
-            settingsMenuItem.Size = new Size(180, 22);
-            settingsMenuItem.Text = "Settings";
             // 
             // GenModuleForm
             // 
@@ -138,9 +140,9 @@
         private ToolStripMenuItem saveAsMenuItem;
         private ToolStripMenuItem loadMenuItem;
         private ToolStripMenuItem exportXMLMenuItem;
-        private ToolStripMenuItem preferencesMenuItem;
         private TableLayoutPanel formTableLayout;
         public ToolStripMenuItem importExportMenuItem;
-        private ToolStripMenuItem settingsMenuItem;
+        private ToolStripMenuItem programMenuItem;
+        private ToolStripMenuItem programSettingsMenuItem;
     }
 }

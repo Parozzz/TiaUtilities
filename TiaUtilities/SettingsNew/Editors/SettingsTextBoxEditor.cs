@@ -1,7 +1,8 @@
 ﻿using System.ComponentModel;
 using TiaUtilities.CustomControls;
+using TiaUtilities.SettingsNew;
 
-namespace TiaUtilities.Generation.SettingsNew.Editors
+namespace TiaUtilities.SettingsNew.Editors
 {
     public class SettingsTextBoxEditor : SettingsEditor
     {
@@ -49,14 +50,24 @@ namespace TiaUtilities.Generation.SettingsNew.Editors
 
         private void SignedKeyPressEventHandler(object? sender, KeyPressEventArgs args)
         {
-            var isKeyValid = char.IsLetter(args.KeyChar) && args.KeyChar != '+' && args.KeyChar != '-';
-            args.Handled = isKeyValid;
+            if(args.KeyChar == (char) Keys.Cancel ||  args.KeyChar == (char)Keys.Enter || args.KeyChar == (char)Keys.Back)
+            {
+                return;
+            }
+
+            var isKeyValid = char.IsNumber(args.KeyChar) || args.KeyChar == '+' || args.KeyChar == '-';
+            args.Handled = !isKeyValid;
         }
 
         private void UnsignedKeyPressEventHandler(object? sender, KeyPressEventArgs args)
         {
-            var isKeyValid = char.IsLetter(args.KeyChar);
-            args.Handled = isKeyValid;
+            if (args.KeyChar == (char)Keys.Cancel || args.KeyChar == (char)Keys.Enter || args.KeyChar == (char)Keys.Back)
+            {
+                return;
+            }
+
+            var isKeyInvalid = char.IsLetter(args.KeyChar);
+            args.Handled = isKeyInvalid;
         }
 
         public override Control GetControl()

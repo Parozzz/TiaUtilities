@@ -328,19 +328,19 @@ validità riga</value>
   <data name="DEVICE_DATA_NAME" xml:space="preserve">
     <value>Nome</value>
   </data>
-  <data name="GRID_PREFERENCES" xml:space="preserve">
+  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES" xml:space="preserve">
     <value>Preferenze Griglia</value>
   </data>
-  <data name="GRID_PREFERENCES_DRAGGED_CELL_BACK" xml:space="preserve">
+  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_DRAGGED_CELL_BACK" xml:space="preserve">
     <value>Sfondo cella trascinamento</value>
   </data>
-  <data name="GRID_PREFERENCES_DRAG_TRIANGLE_COLOR" xml:space="preserve">
+  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_DRAG_TRIANGLE_COLOR" xml:space="preserve">
     <value>Triangolo trascinamento</value>
   </data>
-  <data name="GRID_PREFERENCES_PREVIEW_FORE" xml:space="preserve">
+  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_PREVIEW_FORE" xml:space="preserve">
     <value>Anteprima</value>
   </data>
-  <data name="GRID_PREFERENCES_SELECTED_CELL_BORDER" xml:space="preserve">
+  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_SELECTED_CELL_BORDER" xml:space="preserve">
     <value>Bordo cella selezionata</value>
   </data>
   <data name="GRID_SCRIPT_JS_EXPRESSION" xml:space="preserve">
@@ -496,10 +496,10 @@ validità riga</value>
   <data name="MAIN_FORM" xml:space="preserve">
     <value>Tia Utilities</value>
   </data>
-  <data name="MAIN_FORM_LANGUAGE" xml:space="preserve">
+  <data name="PROGRAM_SETTINGS_LANGUAGE" xml:space="preserve">
     <value>Lingua</value>
   </data>
-  <data name="MAIN_FORM_TIA_VERSION" xml:space="preserve">
+  <data name="PROGRAM_SETTINGS_TIA_VERSION" xml:space="preserve">
     <value>Versione TIA Portal</value>
   </data>
   <data name="MAIN_FORM_TOP_ALARM_GENERATOR" xml:space="preserve">
@@ -508,8 +508,8 @@ validità riga</value>
   <data name="MAIN_FORM_TOP_DB_DUPLICATION" xml:space="preserve">
     <value>Duplicazione DB</value>
   </data>
-  <data name="MAIN_FORM_TOP_FILE_AUTO_SAVE" xml:space="preserve">
-    <value>AutoSalvataggio (s)</value>
+  <data name="PROGRAM_SETTINGS_AUTO_SAVE" xml:space="preserve">
+    <value>Auto-Salva (s)</value>
   </data>
   <data name="MAIN_FORM_TOP_IO_GENERATION" xml:space="preserve">
     <value>Generatore Appoggi</value>
@@ -672,5 +672,14 @@ validità riga</value>
   </data>
   <data name="ALARM_SETTINGS_TAB_HMI_DEFAULT_ALARM_CLASS_DESCR" xml:space="preserve">
     <value>Definisce valore di default per colonna "Classe" in WinCC dentro ai template.</value>
+  </data>
+  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS" xml:space="preserve">
+    <value>Colori</value>
+  </data>
+  <data name="GENERICS_SETTINGS" xml:space="preserve">
+    <value>Impostazioni</value>
+  </data>
+  <data name="GENERICS_PROGRAM" xml:space="preserve">
+    <value>Programma</value>
   </data>
 </root>

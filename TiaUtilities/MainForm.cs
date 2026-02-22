@@ -1,22 +1,25 @@
-﻿using InfoBox;
+﻿using DocumentFormat.OpenXml.Bibliography;
+using InfoBox;
 using Jint;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using SimaticML;
 using SimaticML.API;
 using System.Globalization;
 using System.Xml;
-using TiaUtilities.Generation.Alarms.Module;
-using TiaUtilities.Generation.Configuration.Utility;
-using TiaUtilities.Generation.IO.Module;
-using TiaUtilities.Languages;
-using Timer = System.Windows.Forms.Timer;
 using TiaUtilities.DbVisualization;
 using TiaUtilities.Editors.ErrorReporting;
 using TiaUtilities.Generation;
+using TiaUtilities.Generation.Alarms.Module;
 using TiaUtilities.Generation.Configuration;
-using TiaUtilities.Utility;
+using TiaUtilities.Generation.Configuration.Utility;
+using TiaUtilities.Generation.GridHandler;
+using TiaUtilities.Generation.IO.Module;
 using TiaUtilities.Generation.SettingsNew;
-using TiaUtilities.Generation.SettingsNew.Bindings;
+using TiaUtilities.Languages;
+using TiaUtilities.SettingsNew;
+using TiaUtilities.SettingsNew.Bindings;
+using TiaUtilities.Utility;
+using Timer = System.Windows.Forms.Timer;
 
 namespace TiaUtilities
 {
@@ -24,15 +27,23 @@ namespace TiaUtilities
     {
         public static ProgramSettings Settings { get; private set; } = new();
         public static SettingsBindings SettingsBindings { get; private set; } = new();
-        static MainForm()
-        {
-            MainForm.SettingsBindings
-                .MacroSection<ProgramSettings>(() => "Save", () => MainForm.Settings)
 
-                .Section("Program Settings")
-                .AddInt(nameof(ProgramSettings.AutoSaveTime), "Autosave Time")
-                .AddList(nameof(ProgramSettings.IetfLanguage), ["it-IT", "en-US"], "Language");
-                //.AddList(nameof(ProgramSettings), [16, 17, 18, 19]);
+        private static void LoadLanguage()
+        {
+            try
+            {
+                var culture = CultureInfo.GetCultureInfo(MainForm.Settings.IetfLanguage);
+                LocaleVariables.LANG = culture.IetfLanguageTag;
+            }
+            catch (CultureNotFoundException ex)
+            {
+                Utils.ShowExceptionMessage(ex);
+            }
+        }
+
+        private static void LoadTIAVersion()
+        {
+            SimaticMLAPI.TIA_VERSION = MainForm.Settings.TIAVersion;
         }
 
         private readonly TimedSaveHandler autoSaveHandler;
@@ -55,13 +66,14 @@ namespace TiaUtilities
 
         private void Init()
         {
+            this.saveMenuItem.Click += (sender, args) => MainForm.Settings.Save();
+            this.programSettingsMenuItem.Click += (sender, args) => new SettingsForm(MainForm.SettingsBindings).ShowDialog(this);
+
             this.sampleXMLMenuItem.Click += (sender, args) =>
             {
                 SimaticMLExamples.CreateFCExample();
                 SimaticMLExamples.CreateGlobalDBExample();
             };
-
-            var ignoreSettingsAtStartup = true;
 
             LogHandler.INSTANCE.Init();
             LogHandler.INSTANCE.Start();
@@ -72,67 +84,56 @@ namespace TiaUtilities
             this.errorThread.Init();
             this.errorThread.Start();
 
-            this.tiaVersionComboBox.SelectedIndexChanged += (sender, args) =>
-            {
-                if (uint.TryParse(tiaVersionComboBox.Text, out var version))
-                {
-                    SimaticMLAPI.TIA_VERSION = version;
+            MainForm.LoadLanguage();
+            MainForm.LoadTIAVersion();
+            this.autoSaveHandler.Start(MainForm.Settings.AutoSaveTime * 1000);
 
-                    if (!ignoreSettingsAtStartup)
-                    {
-                        Settings.TIAVersion = version;
-                        Settings.Save();
-                    }
+            MainForm.SettingsBindings
+                .MacroSection(() => Locale.GENERICS_PROGRAM, () => MainForm.Settings)
+
+                .Section(Locale.PROGRAM_SETTINGS_AUTO_SAVE)
+                .AddInt(nameof(ProgramSettings.AutoSaveTime))
+
+                .Section(Locale.PROGRAM_SETTINGS_LANGUAGE)
+                .AddStringList(nameof(ProgramSettings.IetfLanguage), ["it-IT", "en-US"])
+
+                .Section(Locale.PROGRAM_SETTINGS_TIA_VERSION)
+                .AddUnsignedNumberList(nameof(ProgramSettings.TIAVersion), [16, 17, 18, 19])
+
+                .MacroSection(() => Locale.PROGRAM_SETTINGS_GRID_PREFERENCES, () => MainForm.Settings.GridSettings)
+
+                .Section(Locale.PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS)
+                .AddColor(nameof(GridSettings.SingleSelectedCellBorderColor), Locale.PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_SELECTED_CELL_BORDER)
+                .AddColor(nameof(GridSettings.DragSelectedCellBorderColor), Locale.PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_SELECTED_CELL_BORDER)
+                .AddColor(nameof(GridSettings.SelectedCellTriangleColor), Locale.PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_DRAGGED_CELL_BACK)
+                .AddColor(nameof(GridSettings.PreviewColor), Locale.PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_PREVIEW_FORE);
+
+            MainForm.Settings.PropertyChanged += (sender, args) =>
+            {
+                if (args.PropertyName == nameof(ProgramSettings.AutoSaveTime))
+                {
+                    this.autoSaveHandler.Start(MainForm.Settings.AutoSaveTime * 1000);
                 }
-            };
-            this.tiaVersionComboBox.Text = "" + Settings.TIAVersion; //After the event so is applied!
-
-            this.languageComboBox.Items.AddRange(["it-IT", "en-US"]);
-            this.languageComboBox.TextChanged += (sender, args) =>
-            {
-                try
+                else if (args.PropertyName == nameof(ProgramSettings.TIAVersion))
                 {
-                    var culture = CultureInfo.GetCultureInfo(this.languageComboBox.Text);
-                    LocaleVariables.LANG = culture.IetfLanguageTag;
-
-                    if (ignoreSettingsAtStartup)
-                    {
-                        return;
-                    }
-
-                    //Without save, after restart it would restore the old (Meaning it would be useless)
-                    Settings.IetfLanguage = culture.IetfLanguageTag;
-                    Settings.Save();
-
+                    MainForm.LoadTIAVersion();
+                }
+                else if (args.PropertyName == nameof(ProgramSettings.IetfLanguage))
+                {
                     //This should stay always in english. In case someone set an unkown language, this will be neautral.
                     var result = InformationBox.Show("Do you want to restart application?", "Restart to change language", buttons: InformationBoxButtons.YesNo);
                     if (result == InformationBoxResult.Yes)
                     {
+                        MainForm.Settings.Save();
+
                         Application.Restart();
                         Environment.Exit(0);
+                        return;
                     }
                 }
-                catch (CultureNotFoundException ex)
-                {
-                    this.languageComboBox.SelectedItem = this.languageComboBox.Items[0];
-                    Utils.ShowExceptionMessage(ex);
-                }
-            };
-            this.languageComboBox.Text = Settings.IetfLanguage; //Call this after so the text changed event changes the system lang.
 
-            this.autoSaveTimeTextBox.TextChanged += (sender, args) =>
-            {
-                if (int.TryParse(autoSaveTimeTextBox.Text, out int time))
-                {
-                    this.autoSaveHandler.Start(time * 1000);
-                    if (!ignoreSettingsAtStartup)
-                    {
-                        Settings.AutoSaveTime = time;
-                        Settings.Save(); //To create file if not exist!
-                    }
-                }
+                MainForm.Settings.Save();
             };
-            this.autoSaveTimeTextBox.Text = "" + Settings.AutoSaveTime; //Call this after so it start auto save
 
             Timer settingsDirtyTimer = new() { Interval = 1000 };
             settingsDirtyTimer.Tick += (sender, args) =>
@@ -145,8 +146,6 @@ namespace TiaUtilities
             settingsDirtyTimer.Start();
 
             Translate();
-
-            ignoreSettingsAtStartup = false;
         }
 
         private void Translate()
@@ -155,22 +154,29 @@ namespace TiaUtilities
             this.Text = $"{Locale.MAIN_FORM} V{Program.VERSION}";
 
             this.fileToolStripMenuItem.Text = Locale.GENERICS_FILE;
-            this.loadToolStripMenuItem.Text = Locale.GENERICS_LOAD;
-            this.autoSaveMenuItem.Text = Locale.MAIN_FORM_TOP_FILE_AUTO_SAVE;
+            this.saveMenuItem.Text = Locale.GENERICS_SAVE + " (CTRL+S)";
+            this.loadToolStripMenuItem.Text = Locale.GENERICS_LOAD + " (CTRL+L)";
+
+            this.programMenuItem.Text = Locale.GENERICS_PROGRAM;
+            this.programSettingsMenuItem.Text = Locale.GENERICS_SETTINGS + " (CTRL+I)";
 
             this.dbDuplicationMenuItem.Text = Locale.MAIN_FORM_TOP_DB_DUPLICATION;
             this.generateIOMenuItem.Text = Locale.MAIN_FORM_TOP_IO_GENERATION;
             this.generateAlarmsMenuItem.Text = Locale.MAIN_FORM_TOP_ALARM_GENERATOR;
-
-            this.tiaVersionLabel.Text = Locale.MAIN_FORM_TIA_VERSION;
-            this.languageLabel.Text = Locale.MAIN_FORM_LANGUAGE;
         }
+
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             try
             {
                 switch (keyData)
                 {
+                    case Keys.I | Keys.Control:
+                        new SettingsForm(MainForm.SettingsBindings).ShowDialog(this);
+                        return true;
+                    case Keys.S | Keys.Control:
+                        MainForm.Settings.Save();
+                        return true;
                     case Keys.L | Keys.Control:
                         this.loadToolStripMenuItem.PerformClick();
                         return true; //Return required otherwise will write the letter.
@@ -204,6 +210,7 @@ namespace TiaUtilities
             {
                 return;
             }
+
 
             genForm.SetLastFilePath(filePath);
             genForm.ModuleLoad(saveObject);

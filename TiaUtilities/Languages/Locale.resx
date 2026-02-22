@@ -328,19 +328,19 @@ for row validation</value>
   <data name="DEVICE_DATA_NAME" xml:space="preserve">
     <value>Name</value>
   </data>
-  <data name="GRID_PREFERENCES" xml:space="preserve">
+  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES" xml:space="preserve">
     <value>Grid Preferences</value>
   </data>
-  <data name="GRID_PREFERENCES_DRAGGED_CELL_BACK" xml:space="preserve">
+  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_DRAGGED_CELL_BACK" xml:space="preserve">
     <value>Dragged cell background</value>
   </data>
-  <data name="GRID_PREFERENCES_DRAG_TRIANGLE_COLOR" xml:space="preserve">
+  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_DRAG_TRIANGLE_COLOR" xml:space="preserve">
     <value>Drag triangle</value>
   </data>
-  <data name="GRID_PREFERENCES_PREVIEW_FORE" xml:space="preserve">
+  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_PREVIEW_FORE" xml:space="preserve">
     <value>Preview</value>
   </data>
-  <data name="GRID_PREFERENCES_SELECTED_CELL_BORDER" xml:space="preserve">
+  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_SELECTED_CELL_BORDER" xml:space="preserve">
     <value>Selected cell border</value>
   </data>
   <data name="GRID_SCRIPT_JS_EXPRESSION" xml:space="preserve">
@@ -496,10 +496,10 @@ for row validation</value>
   <data name="MAIN_FORM" xml:space="preserve">
     <value>Tia Utilities</value>
   </data>
-  <data name="MAIN_FORM_LANGUAGE" xml:space="preserve">
+  <data name="PROGRAM_SETTINGS_LANGUAGE" xml:space="preserve">
     <value>Language</value>
   </data>
-  <data name="MAIN_FORM_TIA_VERSION" xml:space="preserve">
+  <data name="PROGRAM_SETTINGS_TIA_VERSION" xml:space="preserve">
     <value>TIA Portal Version</value>
   </data>
   <data name="MAIN_FORM_TOP_ALARM_GENERATOR" xml:space="preserve">
@@ -508,8 +508,8 @@ for row validation</value>
   <data name="MAIN_FORM_TOP_DB_DUPLICATION" xml:space="preserve">
     <value>DB Duplication</value>
   </data>
-  <data name="MAIN_FORM_TOP_FILE_AUTO_SAVE" xml:space="preserve">
-    <value>AutoSave (s)</value>
+  <data name="PROGRAM_SETTINGS_AUTO_SAVE" xml:space="preserve">
+    <value>Auto-Save (s)</value>
   </data>
   <data name="MAIN_FORM_TOP_IO_GENERATION" xml:space="preserve">
     <value>Alias Generator</value>
@@ -672,5 +672,14 @@ for row validation</value>
   </data>
   <data name="ALARM_SETTINGS_TAB_HMI_DEFAULT_ALARM_CLASS_DESCR" xml:space="preserve">
     <value>Define default value for column "Class" in WinCC inside templates.</value>
+  </data>
+  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS" xml:space="preserve">
+    <value>Colors</value>
+  </data>
+  <data name="GENERICS_SETTINGS" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="GENERICS_PROGRAM" xml:space="preserve">
+    <value>Program</value>
   </data>
 </root>

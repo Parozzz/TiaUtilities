@@ -82,8 +82,7 @@ namespace TiaUtilities.Generation
                     Utils.ShowExceptionMessage(ex);
                 }
             };
-            this.preferencesMenuItem.Click += (sender, args) => MainForm.Settings.GridSettings.ShowConfigForm(this);
-            this.settingsMenuItem.Click += (sender, args) => new SettingsForm(this.module.SettingsBindings).Show(this);
+            this.programSettingsMenuItem.Click += (sender, args) => new SettingsForm(MainForm.SettingsBindings).Show(this);
             #endregion
 
             #region AUTO_SAVE
@@ -110,14 +109,15 @@ namespace TiaUtilities.Generation
             this.SetLocalizedFormText("");
 
             this.fileMenuItem.Text = Locale.GENERICS_FILE;
-            this.saveMenuItem.Text = Locale.GENERICS_SAVE;
+            this.saveMenuItem.Text = Locale.GENERICS_SAVE + " (CTRL+S)"; ;
             this.saveAsMenuItem.Text = Locale.GENERICS_SAVE_AS;
-            this.loadMenuItem.Text = Locale.GENERICS_LOAD;
+            this.loadMenuItem.Text = Locale.GENERICS_LOAD + " (CTRL+L)";
+
+            this.programMenuItem.Text = Locale.GENERICS_PROGRAM;
+            this.programSettingsMenuItem.Text = Locale.GENERICS_SETTINGS;
 
             this.importExportMenuItem.Text = Locale.IO_GEN_FORM_IMPEXP;
             this.exportXMLMenuItem.Text = Locale.IO_GEN_FORM_IMPEXP_EXPORT_XML;
-
-            this.preferencesMenuItem.Text = Locale.GRID_PREFERENCES;
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)

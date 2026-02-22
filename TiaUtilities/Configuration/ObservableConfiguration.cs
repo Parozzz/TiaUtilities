@@ -148,7 +148,7 @@ namespace TiaUtilities.Configuration
         {
             if (!objectDict.TryGetValue(key, out var obj))
             {
-                throw new ArgumentException($"{key} does not exists inside {this.GetType().FullName}");
+                throw new ArgumentException($"Trying to get {key} from {this.GetType().FullName} but does not exists. Has it been initialized inside Contructor?");
             }
 
             return obj.GetAs<T>();
