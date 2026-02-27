@@ -114,7 +114,7 @@ namespace TiaUtilities.Generation
             this.loadMenuItem.Text = Locale.GENERICS_LOAD + " (CTRL+L)";
 
             this.programMenuItem.Text = Locale.GENERICS_PROGRAM;
-            this.programSettingsMenuItem.Text = Locale.GENERICS_SETTINGS;
+            this.programSettingsMenuItem.Text = Locale.GENERICS_SETTINGS + " (CTRL+P)";
 
             this.importExportMenuItem.Text = Locale.IO_GEN_FORM_IMPEXP;
             this.exportXMLMenuItem.Text = Locale.IO_GEN_FORM_IMPEXP_EXPORT_XML;
@@ -126,6 +126,9 @@ namespace TiaUtilities.Generation
             {
                 switch (keyData)
                 {
+                    case Keys.P | Keys.Control:
+                        this.programSettingsMenuItem.PerformClick();
+                        return true;
                     case Keys.S | Keys.Control:
                         this.ModuleSave(force: true);
                         return true; //Return required otherwise will write the letter.

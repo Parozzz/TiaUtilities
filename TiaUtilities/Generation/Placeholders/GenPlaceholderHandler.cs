@@ -88,7 +88,7 @@ namespace TiaUtilities.Generation.Placeholders
 
         protected void AddOrReplace(string placeholder, IGenPlaceholderData placeholderData)
         {
-            placeholdersDict.Compute(placeholder, placeholderData);
+            placeholdersDict.AddOrReplace(placeholder, placeholderData);
         }
 
         public string ParseNotNull(string? str)

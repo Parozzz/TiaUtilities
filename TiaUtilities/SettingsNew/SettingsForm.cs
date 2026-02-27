@@ -1,59 +1,43 @@
-﻿using TiaUtilities.Configuration;
+﻿using System.Runtime.CompilerServices;
+using TiaUtilities.Configuration;
 using TiaUtilities.CustomControls;
+using TiaUtilities.Languages;
 using TiaUtilities.SettingsNew;
 using TiaUtilities.SettingsNew.Bindings;
 using TiaUtilities.Utility;
+using TiaUtilities.Utility.Extensions;
 
 namespace TiaUtilities.Generation.SettingsNew
 {
 
     public partial class SettingsForm : Form
     {
-        private class MacroSection(SettingsMacroSectionBinding<ObservableConfiguration> binding)
-        {
-            public SettingsMacroSectionBinding<ObservableConfiguration> Binding { get; init; } = binding;
-            public string Name { get => this.Binding.Name; }
-            public List<Section> Sections { get; init; } = [];
-
-            public override string ToString() => Name;
-
-            public Label? Label { get; set; } = null;
-        }
-
-        private class Section(SettingsSectionBinding binding, MacroSection macroSection)
-        {
-            public SettingsSectionBinding Binding { get; init; } = binding;
-            public MacroSection MacroSection { get; init; } = macroSection;
-            public string Name { get => this.Binding.Name; }
-            public string ToolTip { get => this.Binding.ToolTip; }
-            public List<SettingsFormValue> FormValueList { get; init; } = [];
-
-            public ListViewItem? ListItem { get; set; } = null;
-            public TableLayoutPanel? Panel { get; set; } = null;
-            public float VisiblePercentage { get; set; } = 0f;
-
-            public override string ToString() => $"{Name}, {VisiblePercentage}";
-        }
-
         private class ListViewItemTag() { }
 
-        private class ListViewItemSectionTag(Section section) : ListViewItemTag
+        private class ListViewItemSectionTag(SettingsFormSection section) : ListViewItemTag
         {
             public bool IsSectionVisible { get; set; } = false;
-            public Section Section { get; init; } = section; //Section or MacroSection
+            public SettingsFormSection Section { get; init; } = section; //Section or MacroSection
         }
 
-        private class ListViewItemMacroSectionTag(MacroSection macroSection) : ListViewItemTag
+        private class ListViewItemMacroSectionTag(SettingsFormMacroSection macroSection) : ListViewItemTag
         {
-            public MacroSection MacroSection { get; init; } = macroSection;
+            public SettingsFormMacroSection MacroSection { get; init; } = macroSection;
         }
+
+        private class SettingsFormLastOpenInformation()
+        {
+            public bool CommentVisibility { get; set; } = SettingsConstants.DEFAULT_VALUE_DESCRIPTION_VISIBILITY;
+        }
+
+        private static readonly Dictionary<Guid, SettingsFormLastOpenInformation> MACRO_SECTION_LAST_OPEN_INFO_DICT = []; //This might leak a bit but i don't think it will matter a lot.
 
         private readonly TableLayoutPanel mainPanel;
         private readonly ListViewThatKeepsSelection leftSelectSectionListView;
         private readonly TableLayoutPanel rightSettingsPanel;
 
         private readonly SettingsBindings bindings;
-        private readonly List<MacroSection> macroSectionList;
+        private readonly List<SettingsFormMacroSection> macroSectionList;
 
         public SettingsForm(SettingsBindings bindings)
         {
@@ -223,7 +207,6 @@ namespace TiaUtilities.Generation.SettingsNew
             this.rightSettingsPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             this.rightSettingsPanel.Margin = Padding.Empty;
 
-
             this.rightSettingsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, SettingsConstants.SECTIONS_NAME_COLUMN_SIZE));
             this.rightSettingsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, SettingsConstants.SECTIONS_BORDER_COLUMN_SIZE));
             this.rightSettingsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100f));
@@ -231,6 +214,7 @@ namespace TiaUtilities.Generation.SettingsNew
 
         private void ParseBindings()
         {
+            this.macroSectionList.Clear();
             foreach (var macroSectionBinding in this.bindings.MacroSectionList)
             {
                 var configurationObject = macroSectionBinding.GetConfigurationObject();
@@ -239,7 +223,7 @@ namespace TiaUtilities.Generation.SettingsNew
                     continue;
                 }
 
-                MacroSection macroSection = new(macroSectionBinding);
+                SettingsFormMacroSection macroSection = new(macroSectionBinding);
                 this.macroSectionList.Add(macroSection);
 
                 ListViewItem macroSectionListViewItem = new()
@@ -251,7 +235,7 @@ namespace TiaUtilities.Generation.SettingsNew
 
                 foreach (var sectionBinding in macroSectionBinding.SectionsList)
                 {
-                    Section section = new(sectionBinding, macroSection);
+                    SettingsFormSection section = new(sectionBinding, macroSection);
                     macroSection.Sections.Add(section);
 
                     var valueList = sectionBinding.ValueList.Select(bindings => SettingsFormValue.FromBinding(bindings, configurationObject, this)).ToArray();
@@ -317,6 +301,8 @@ namespace TiaUtilities.Generation.SettingsNew
             int rowCount = 0;
             foreach (var macroSection in macroSectionList)
             {
+                var lastOpenInformation = MACRO_SECTION_LAST_OPEN_INFO_DICT.GetOrAdd(macroSection.Guid, () => new());
+                
                 Label macroSectioNameLabel = new()
                 {
                     Text = macroSection.Name,
@@ -326,16 +312,68 @@ namespace TiaUtilities.Generation.SettingsNew
                     TextAlign = ContentAlignment.MiddleCenter,
                     BackColor = Form.DefaultBackColor,
                     Padding = Padding.Empty,
-                    Margin = new Padding(0, 0, 0, 10),
+                    Margin = Padding.Empty,
                     Font = SettingsConstants.MACROSECTION_NAME_LABEL_FONT,
                 };
+                macroSection.Label = macroSectioNameLabel;
 
                 this.rightSettingsPanel.RowStyles.Add(new(SizeType.AutoSize));
                 rowCount++;
 
                 controlPositionList.Add(new(macroSectioNameLabel, 0, rowCount-1, ColumnSpan: 3));
 
-                macroSection.Label = macroSectioNameLabel;
+                FlowLayoutPanel buttonFlowPanel = new()
+                {
+                    AutoSize = true,
+                    Anchor = AnchorStyles.None,
+                    BorderStyle = BorderStyle.None,
+                    Padding = Padding.Empty,
+                    Margin = new Padding(0, 0, 0, 10),
+                };
+
+                Button toggleCommentsVisibilityButton = new()
+                {
+                    AutoSize = true,
+                    BackgroundImage = Image.FromFile("Resources/Images/subtitle-8187463.png"),
+                    BackgroundImageLayout = ImageLayout.Zoom,
+                    MaximumSize = new(SettingsConstants.BUTTONS_SIZE, SettingsConstants.BUTTONS_SIZE),
+                    MinimumSize = new(SettingsConstants.BUTTONS_SIZE, SettingsConstants.BUTTONS_SIZE),
+                    FlatStyle = FlatStyle.Flat,
+                    FlatAppearance = { BorderSize = 1, BorderColor = Color.Black, MouseDownBackColor = Color.LightGray },
+                    BackColor = Color.Transparent,
+                };
+                toggleCommentsVisibilityButton.Click += (sender, args) =>
+                {
+                    this.rightSettingsPanel.SuspendLayout();
+
+                    lastOpenInformation.CommentVisibility = !lastOpenInformation.CommentVisibility;
+                    macroSection.SetDescriptionLabelVisibility(lastOpenInformation.CommentVisibility);
+
+                    this.rightSettingsPanel.ResumeLayout(true);
+                    this.rightSettingsPanel.PerformLayout();
+                };
+
+                Button saveDefaultButton = new()
+                {
+                    AutoSize = true,
+                    BackgroundImage = Image.FromFile("Resources/Images/favorite-8250509.png"),
+                    BackgroundImageLayout = ImageLayout.Zoom,
+                    MaximumSize = new(SettingsConstants.BUTTONS_SIZE, SettingsConstants.BUTTONS_SIZE),
+                    MinimumSize = new(SettingsConstants.BUTTONS_SIZE, SettingsConstants.BUTTONS_SIZE),
+                    FlatStyle = FlatStyle.Flat,
+                    FlatAppearance = { BorderSize = 1, BorderColor = Color.Black, MouseDownBackColor = Color.LightGray },
+                    BackColor = Color.Transparent,
+                };
+                saveDefaultButton.Click += (sender, args) => macroSection.Binding.SaveToPresetConfiguration();
+                Utils.CreateStandardToolTip().SetToolTip(saveDefaultButton, Locale.CONFIG_LINE_SAVE_DEFAULT_TOOLTIP);
+
+                buttonFlowPanel.Controls.Add(saveDefaultButton);
+                buttonFlowPanel.Controls.Add(toggleCommentsVisibilityButton);
+
+                this.rightSettingsPanel.RowStyles.Add(new(SizeType.AutoSize));
+                rowCount++;
+
+                controlPositionList.Add(new(buttonFlowPanel, 0, rowCount - 1, ColumnSpan: 3));
 
                 foreach (var section in macroSection.Sections)
                 {
@@ -353,6 +391,7 @@ namespace TiaUtilities.Generation.SettingsNew
                         Margin = new Padding(0,0,4,0),
                         Font = SettingsConstants.SECTION_NAME_LABEL_FONT,
                     };
+                    Utils.SetDoubleBuffered(sectionNameLabel);
                     Utils.CreateStandardToolTip().SetToolTip(sectionNameLabel, section.ToolTip);
 
                     TableLayoutPanel valuesPanel = new()
@@ -369,9 +408,9 @@ namespace TiaUtilities.Generation.SettingsNew
                     List<ControlPosition> valuesControlPositionList = [];
 
                     int valuesRowCount = 0;
-                    foreach (var value in section.FormValueList)
+                    foreach (var formValue in section.FormValueList)
                     {
-                        this.AppendToValuePanel(valuesPanel, valuesControlPositionList, value, ref valuesRowCount);
+                        this.AppendToValuePanel(macroSection, lastOpenInformation, valuesPanel, valuesControlPositionList, formValue, ref valuesRowCount);
                     }
 
                     SettingsForm.ApplyControlPositions(valuesPanel, valuesControlPositionList);
@@ -385,6 +424,7 @@ namespace TiaUtilities.Generation.SettingsNew
                         Padding = Padding.Empty,
                         Margin = new Padding(0, 6, (int)(SettingsConstants.SECTIONS_BORDER_COLUMN_SIZE / 2f), 6),
                     };
+                    Utils.SetDoubleBuffered(sectionBorderLabel);
 
                     this.rightSettingsPanel.RowStyles.Add(new(SizeType.AutoSize));
                     rowCount++;
@@ -423,16 +463,17 @@ namespace TiaUtilities.Generation.SettingsNew
         }
 
         //DO NOT USE UseCompatibleTextRendering! IT WILL INCREASE TIME A LOT!
-        private void AppendToValuePanel(TableLayoutPanel panel, List<ControlPosition> controlPositionList, SettingsFormValue value, ref int rowCount)
+        private void AppendToValuePanel(SettingsFormMacroSection formMacroSection, SettingsFormLastOpenInformation lastOpenInformation,
+            TableLayoutPanel panel, List<ControlPosition> controlPositionList, SettingsFormValue formValue, ref int rowCount)
         {
-            bool hasName = !string.IsNullOrEmpty(value.Name);
-            bool hasDescription = !string.IsNullOrEmpty(value.Description);
+            bool hasName = !string.IsNullOrEmpty(formValue.Name);
+            bool hasDescription = !string.IsNullOrEmpty(formValue.Description);
 
             if (hasName)
             {
                 Label nameLabel = new()
                 {
-                    Text = value.Name,
+                    Text = formValue.Name,
                     AutoSize = true,
                     Dock = DockStyle.Fill,
                     BorderStyle = BorderStyle.None,
@@ -454,7 +495,7 @@ namespace TiaUtilities.Generation.SettingsNew
             {
                 Label descriptionLabel = new()
                 {
-                    Text = value.Description,
+                    Text = formValue.Description,
                     AutoSize = true,
                     Dock = DockStyle.Fill,
                     BorderStyle = BorderStyle.None,
@@ -463,9 +504,11 @@ namespace TiaUtilities.Generation.SettingsNew
                     Margin = new Padding(0, 0, 0, 3),
                     Padding = Padding.Empty,
                     Font = SettingsConstants.DESCRIPTION_LABEL_FONT,
-                    MaximumSize = new Size(SettingsConstants.VALUE_DESCRIPTION_MAX_SIZE, 0) //Since last columns is to fill the all control, set a maximun size to allow wrapping of text
+                    MaximumSize = new Size(SettingsConstants.VALUE_DESCRIPTION_MAX_SIZE, 0), //Since last columns is to fill the all control, set a maximun size to allow wrapping of text
+                    Visible = lastOpenInformation.CommentVisibility,
                 };
                 Utils.SetDoubleBuffered(descriptionLabel);
+                formMacroSection.ValueDescriptionLabelList.Add(descriptionLabel);
 
                 panel.RowStyles.Add(new(SizeType.AutoSize));
                 rowCount++;
@@ -473,7 +516,7 @@ namespace TiaUtilities.Generation.SettingsNew
                 controlPositionList.Add(new(descriptionLabel, 0, rowCount - 1));
             }
 
-            var editorControl = value.Editor?.GetControl();
+            var editorControl = formValue.Editor?.GetControl();
             if (editorControl != null)
             {
                 panel.RowStyles.Add(new(SizeType.AutoSize));

@@ -97,6 +97,9 @@
     <None Update="Resources\Images\arrow-left.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\Images\favorite-8250509.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\Images\noun-clone-5410291.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -116,6 +119,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Images\noun-transfer-7710063.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Images\subtitle-8187463.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

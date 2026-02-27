@@ -12,6 +12,8 @@ namespace TiaUtilities.SettingsNew.Bindings
 {
     public class SettingsMacroSectionBinding<T> where T : ObservableConfiguration
     {
+        public Guid Guid { get; init; } = Guid.NewGuid();
+
         public string Name { get => getNameFunc(); }
         public T? PresetConfigurationObject { get; init; }
         public IEnumerable<T>? OtherConfigurations { get => this.getOtherConfigurationsFunc?.Invoke(); }

@@ -11,13 +11,17 @@ namespace TiaUtilities.SettingsNew
     {
         public static ContextMenuStrip AddContextualMenu(Control control, SettingsFormValue settingsValue)
         {
+            /*
             ToolStripMenuItem saveItem = new(Locale.CONFIG_LINE_SAVE_DEFAULT_TOOLTIP) { Image = Image.FromFile("Resources/Images/noun-save-2433498.png") };
             saveItem.Click += (sender, args) =>
             {
                 settingsValue.MacroSectionBinding.SaveToPresetConfiguration();
             };
+            */
 
-            ToolStripMenuItem setToOther = new(Locale.CONFIG_LINE_TRANSFER_TO_OTHERS) { Image = Image.FromFile("Resources/Images/noun-transfer-7710063.png") };
+            var count = settingsValue.MacroSectionBinding.OtherConfigurations?.Count() ?? 0;
+
+            ToolStripMenuItem setToOther = new($"{Locale.CONFIG_LINE_TRANSFER_TO_OTHERS} ({count})") { Image = Image.FromFile("Resources/Images/noun-transfer-7710063.png") };
             setToOther.Click += (sender, args) =>
             {
                 //This only transfers ONE value to the other configuration, the one contextMenu is applied
@@ -47,7 +51,7 @@ namespace TiaUtilities.SettingsNew
 
             ContextMenuStrip menuStrip = new()
             {
-                Items = { saveItem, setToOther }
+                Items = { setToOther }
             };
             control.ContextMenuStrip = menuStrip;
 

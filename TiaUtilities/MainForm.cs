@@ -158,7 +158,7 @@ namespace TiaUtilities
             this.loadToolStripMenuItem.Text = Locale.GENERICS_LOAD + " (CTRL+L)";
 
             this.programMenuItem.Text = Locale.GENERICS_PROGRAM;
-            this.programSettingsMenuItem.Text = Locale.GENERICS_SETTINGS + " (CTRL+I)";
+            this.programSettingsMenuItem.Text = Locale.GENERICS_SETTINGS + " (CTRL+P)";
 
             this.dbDuplicationMenuItem.Text = Locale.MAIN_FORM_TOP_DB_DUPLICATION;
             this.generateIOMenuItem.Text = Locale.MAIN_FORM_TOP_IO_GENERATION;
@@ -171,7 +171,7 @@ namespace TiaUtilities
             {
                 switch (keyData)
                 {
-                    case Keys.I | Keys.Control:
+                    case Keys.P | Keys.Control:
                         new SettingsForm(MainForm.SettingsBindings).ShowDialog(this);
                         return true;
                     case Keys.S | Keys.Control:

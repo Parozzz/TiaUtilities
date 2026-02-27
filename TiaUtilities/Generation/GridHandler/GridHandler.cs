@@ -738,7 +738,7 @@ namespace TiaUtilities.Generation.GridHandler
                 }
 
                 var index = emptyIndexList[i++];
-                dataDict.Compute(index, data);
+                dataDict.AddOrReplace(index, data);
             }
             this.ChangeMultipleRows(dataDict);
         }

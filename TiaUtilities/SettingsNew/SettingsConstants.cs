@@ -8,6 +8,8 @@ namespace TiaUtilities.SettingsNew
 {
     public static class SettingsConstants
     {
+        public static int BUTTONS_SIZE { get; } = 30;
+
         public static Color SECTIONS_ITEM_FORE_COLOR { get; } = Color.Black;
         public static Color SECTIONS_SELECTED_ITEM_BACK_COLOR { get; } = ControlPaint.LightLight(Color.LightGray);
 
@@ -22,6 +24,7 @@ namespace TiaUtilities.SettingsNew
         public static float SECTIONS_SEPERATION { get; } = 12f;
         public static float VALUES_SEPERATION { get; } = 8f;
 
+        public static bool DEFAULT_VALUE_DESCRIPTION_VISIBILITY { get; } = true;
         public static int VALUE_DESCRIPTION_MAX_SIZE { get; } = 400;
 
         public static Font LIST_LEFT_FONT { get; } = new(SystemFonts.DefaultFont.FontFamily, 11f, FontStyle.Regular);
