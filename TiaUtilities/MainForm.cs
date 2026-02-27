@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.Bibliography;
-using InfoBox;
+﻿using InfoBox;
 using Jint;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using SimaticML;
