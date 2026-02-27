@@ -9,7 +9,7 @@
     <StartupObject>TiaUtilities.Program</StartupObject>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <BaseOutputPath></BaseOutputPath>
-    <ApplicationIcon>icon.ico</ApplicationIcon>
+    <ApplicationIcon>TiaUtilities_Icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <Content Include="!!TO-DO!!.txt" />
-    <Content Include="icon.ico" />
+    <Content Include="TiaUtilities_Icon.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -94,7 +94,16 @@
     <None Update="Mentions.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\Images\AlarmGenerator.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Images\AliasGenerator.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\Images\arrow-left.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Images\DuplicateDB.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Images\favorite-8250509.png">
@@ -122,6 +131,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Images\subtitle-8187463.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Images\TiaUtilities_Icon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

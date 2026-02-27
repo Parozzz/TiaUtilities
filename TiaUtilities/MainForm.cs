@@ -145,6 +145,18 @@ namespace TiaUtilities
             };
             settingsDirtyTimer.Start();
 
+            this.ioGenButton.BackgroundImage = Image.FromFile("Resources/Images/AliasGenerator.png");
+            this.ioGenButton.BackgroundImageLayout = ImageLayout.Zoom;
+            this.ioGenButton.Click += (sender, args) => OpenIOGenModuleForm();
+
+            this.alarmGenButton.BackgroundImage = Image.FromFile("Resources/Images/AlarmGenerator.png");
+            this.alarmGenButton.BackgroundImageLayout = ImageLayout.Zoom;
+            this.alarmGenButton.Click += (sender, args) => OpenAlarmGenModuleForm();
+
+            this.duplicateDBButton.BackgroundImage = Image.FromFile("Resources/Images/DuplicateDB.png");
+            this.duplicateDBButton.BackgroundImageLayout = ImageLayout.Zoom;
+            this.duplicateDBButton.Click += (sender, args) => new DBDuplicationForm(Settings) { ShowInTaskbar = false }.ShowDialog();
+
             Translate();
         }
 
@@ -160,9 +172,10 @@ namespace TiaUtilities
             this.programMenuItem.Text = Locale.GENERICS_PROGRAM;
             this.programSettingsMenuItem.Text = Locale.GENERICS_SETTINGS + " (CTRL+P)";
 
-            this.dbDuplicationMenuItem.Text = Locale.MAIN_FORM_TOP_DB_DUPLICATION;
-            this.generateIOMenuItem.Text = Locale.MAIN_FORM_TOP_IO_GENERATION;
-            this.generateAlarmsMenuItem.Text = Locale.MAIN_FORM_TOP_ALARM_GENERATOR;
+
+            this.ioGenButton.Text = Locale.MAIN_FORM_TOP_IO_GENERATION;
+            this.alarmGenButton.Text = Locale.MAIN_FORM_TOP_ALARM_GENERATOR;
+            this.duplicateDBButton.Text = Locale.MAIN_FORM_TOP_DB_DUPLICATION;
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -215,12 +228,6 @@ namespace TiaUtilities
             genForm.SetLastFilePath(filePath);
             genForm.ModuleLoad(saveObject);
         }
-
-        private void DbDuplicationMenuItem_Click(object sender, EventArgs e) => new DBDuplicationForm(Settings) { ShowInTaskbar = false }.ShowDialog();
-
-        private void GenerateIOMenuItem_Click(object sender, EventArgs e) => OpenIOGenModuleForm();
-
-        private void GenerateAlarmsToolStripMenuItem_Click(object sender, EventArgs e) => OpenAlarmGenModuleForm();
 
         private GenModuleForm OpenIOGenModuleForm()
         {

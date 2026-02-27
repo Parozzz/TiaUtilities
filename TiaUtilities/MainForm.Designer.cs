@@ -35,10 +35,6 @@
             toolStripSeparator2 = new ToolStripSeparator();
             programMenuItem = new ToolStripMenuItem();
             programSettingsMenuItem = new ToolStripMenuItem();
-            dbDuplicationMenuItem = new ToolStripMenuItem();
-            toolStripMenuItem1 = new ToolStripMenuItem();
-            generateIOMenuItem = new ToolStripMenuItem();
-            generateAlarmsMenuItem = new ToolStripMenuItem();
             testToolStripMenuItem = new ToolStripMenuItem();
             importXMLToolStripMenuItem = new ToolStripMenuItem();
             jSToolStripMenuItem = new ToolStripMenuItem();
@@ -49,14 +45,19 @@
             settingsToolStripMenuItem = new ToolStripMenuItem();
             LogWorker = new System.ComponentModel.BackgroundWorker();
             MainLayoutPanel = new TableLayoutPanel();
+            bottomPanel = new FlowLayoutPanel();
+            ioGenButton = new Button();
+            alarmGenButton = new Button();
+            duplicateDBButton = new Button();
             TopMenuStrip.SuspendLayout();
             MainLayoutPanel.SuspendLayout();
+            bottomPanel.SuspendLayout();
             SuspendLayout();
             // 
             // TopMenuStrip
             // 
             TopMenuStrip.ImageScalingSize = new Size(20, 20);
-            TopMenuStrip.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, programMenuItem, dbDuplicationMenuItem, toolStripMenuItem1, generateIOMenuItem, generateAlarmsMenuItem, testToolStripMenuItem });
+            TopMenuStrip.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, programMenuItem, testToolStripMenuItem });
             TopMenuStrip.Location = new Point(0, 0);
             TopMenuStrip.Name = "TopMenuStrip";
             TopMenuStrip.Padding = new Padding(5, 2, 0, 2);
@@ -103,35 +104,6 @@
             programSettingsMenuItem.Name = "programSettingsMenuItem";
             programSettingsMenuItem.Size = new Size(136, 26);
             programSettingsMenuItem.Text = "Settings";
-            // 
-            // dbDuplicationMenuItem
-            // 
-            dbDuplicationMenuItem.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            dbDuplicationMenuItem.Name = "dbDuplicationMenuItem";
-            dbDuplicationMenuItem.Size = new Size(125, 25);
-            dbDuplicationMenuItem.Text = "DB Duplication";
-            dbDuplicationMenuItem.Click += DbDuplicationMenuItem_Click;
-            // 
-            // toolStripMenuItem1
-            // 
-            toolStripMenuItem1.Name = "toolStripMenuItem1";
-            toolStripMenuItem1.Size = new Size(12, 25);
-            // 
-            // generateIOMenuItem
-            // 
-            generateIOMenuItem.Font = new Font("Segoe UI", 12F);
-            generateIOMenuItem.Name = "generateIOMenuItem";
-            generateIOMenuItem.Size = new Size(105, 25);
-            generateIOMenuItem.Text = "Generate IO";
-            generateIOMenuItem.Click += GenerateIOMenuItem_Click;
-            // 
-            // generateAlarmsMenuItem
-            // 
-            generateAlarmsMenuItem.Font = new Font("Segoe UI", 12F);
-            generateAlarmsMenuItem.Name = "generateAlarmsMenuItem";
-            generateAlarmsMenuItem.Size = new Size(138, 25);
-            generateAlarmsMenuItem.Text = "Generate Alarms";
-            generateAlarmsMenuItem.Click += GenerateAlarmsToolStripMenuItem_Click;
             // 
             // testToolStripMenuItem
             // 
@@ -195,6 +167,7 @@
             MainLayoutPanel.ColumnCount = 1;
             MainLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             MainLayoutPanel.Controls.Add(TopMenuStrip, 0, 0);
+            MainLayoutPanel.Controls.Add(bottomPanel, 0, 1);
             MainLayoutPanel.Dock = DockStyle.Fill;
             MainLayoutPanel.Location = new Point(0, 0);
             MainLayoutPanel.Margin = new Padding(4, 3, 4, 3);
@@ -202,14 +175,79 @@
             MainLayoutPanel.RowCount = 2;
             MainLayoutPanel.RowStyles.Add(new RowStyle());
             MainLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            MainLayoutPanel.Size = new Size(906, 49);
+            MainLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            MainLayoutPanel.Size = new Size(906, 331);
             MainLayoutPanel.TabIndex = 14;
+            // 
+            // bottomPanel
+            // 
+            bottomPanel.Anchor = AnchorStyles.None;
+            bottomPanel.AutoSize = true;
+            bottomPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            bottomPanel.Controls.Add(ioGenButton);
+            bottomPanel.Controls.Add(alarmGenButton);
+            bottomPanel.Controls.Add(duplicateDBButton);
+            bottomPanel.Location = new Point(59, 49);
+            bottomPanel.Name = "bottomPanel";
+            bottomPanel.Size = new Size(787, 262);
+            bottomPanel.TabIndex = 1;
+            // 
+            // ioGenButton
+            // 
+            ioGenButton.AutoSize = true;
+            ioGenButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            ioGenButton.BackColor = SystemColors.ControlDark;
+            ioGenButton.FlatStyle = FlatStyle.Flat;
+            ioGenButton.Font = new Font("Segoe UI", 21.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            ioGenButton.ForeColor = SystemColors.ButtonFace;
+            ioGenButton.Location = new Point(3, 3);
+            ioGenButton.MinimumSize = new Size(256, 256);
+            ioGenButton.Name = "ioGenButton";
+            ioGenButton.Size = new Size(256, 256);
+            ioGenButton.TabIndex = 0;
+            ioGenButton.Text = "IO Generation";
+            ioGenButton.TextAlign = ContentAlignment.BottomCenter;
+            ioGenButton.UseVisualStyleBackColor = false;
+            // 
+            // alarmGenButton
+            // 
+            alarmGenButton.AutoSize = true;
+            alarmGenButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            alarmGenButton.BackColor = SystemColors.ControlDark;
+            alarmGenButton.FlatStyle = FlatStyle.Flat;
+            alarmGenButton.Font = new Font("Segoe UI", 20.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            alarmGenButton.ForeColor = SystemColors.ButtonFace;
+            alarmGenButton.Location = new Point(265, 3);
+            alarmGenButton.MinimumSize = new Size(256, 256);
+            alarmGenButton.Name = "alarmGenButton";
+            alarmGenButton.Size = new Size(257, 256);
+            alarmGenButton.TabIndex = 1;
+            alarmGenButton.Text = "Alarm Generation";
+            alarmGenButton.TextAlign = ContentAlignment.BottomCenter;
+            alarmGenButton.UseVisualStyleBackColor = false;
+            // 
+            // duplicateDBButton
+            // 
+            duplicateDBButton.AutoSize = true;
+            duplicateDBButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            duplicateDBButton.BackColor = SystemColors.ControlDark;
+            duplicateDBButton.FlatStyle = FlatStyle.Flat;
+            duplicateDBButton.Font = new Font("Segoe UI", 20.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            duplicateDBButton.ForeColor = SystemColors.ButtonFace;
+            duplicateDBButton.Location = new Point(528, 3);
+            duplicateDBButton.MinimumSize = new Size(256, 256);
+            duplicateDBButton.Name = "duplicateDBButton";
+            duplicateDBButton.Size = new Size(256, 256);
+            duplicateDBButton.TabIndex = 2;
+            duplicateDBButton.Text = "Duplicate DB";
+            duplicateDBButton.TextAlign = ContentAlignment.BottomCenter;
+            duplicateDBButton.UseVisualStyleBackColor = false;
             // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(906, 49);
+            ClientSize = new Size(906, 331);
             Controls.Add(MainLayoutPanel);
             MainMenuStrip = TopMenuStrip;
             Margin = new Padding(4, 3, 4, 3);
@@ -219,16 +257,14 @@
             TopMenuStrip.PerformLayout();
             MainLayoutPanel.ResumeLayout(false);
             MainLayoutPanel.PerformLayout();
+            bottomPanel.ResumeLayout(false);
+            bottomPanel.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
 
         #endregion
         private System.Windows.Forms.MenuStrip TopMenuStrip;
-        private System.Windows.Forms.ToolStripMenuItem dbDuplicationMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
-        private System.Windows.Forms.ToolStripMenuItem generateIOMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem generateAlarmsMenuItem;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem testToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem importXMLToolStripMenuItem;
@@ -245,6 +281,12 @@
         private ToolStripSeparator toolStripSeparator2;
         private ToolStripMenuItem programMenuItem;
         private ToolStripMenuItem programSettingsMenuItem;
+        private FlowLayoutPanel ioGenPanel;
+        private Button ioGenButton;
+        private FlowLayoutPanel bottomPanel;
+        private Button alarmGenButton;
+        private Button button1;
+        private Button duplicateDBButton;
     }
 }
 
