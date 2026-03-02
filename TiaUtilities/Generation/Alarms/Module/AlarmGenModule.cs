@@ -1,5 +1,4 @@
-﻿using SimaticML.Enums;
-using TiaUtilities.Editors.ErrorReporting;
+﻿using TiaUtilities.Editors.ErrorReporting;
 using TiaUtilities.Generation.Alarms.Configurations;
 using TiaUtilities.Generation.Alarms.Module.Tab;
 using TiaUtilities.Generation.Alarms.Module.Template;
@@ -14,8 +13,8 @@ namespace TiaUtilities.Generation.Alarms.Module
 {
     public class AlarmGenModule : IGenModule
     {
-        public const int DEVICE_GRID_ROW_COUNT = 1999;
-        public const int TEMPLATE_GRID_ROW_COUNT = 199;
+        public const int DEVICE_GRID_ROW_COUNT = 199;
+        public const int TEMPLATE_GRID_ROW_COUNT = 499;
 
         private readonly GridBindContainer gridBindContainer;
         private GridScriptHandler GridScriptHandler { get => this.gridBindContainer.GridScriptHandler; }
