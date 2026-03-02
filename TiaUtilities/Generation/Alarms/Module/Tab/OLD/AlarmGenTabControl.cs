@@ -5,6 +5,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
 {
     public partial class AlarmGenTabControl : UserControl
     {
+        //UNUSED
         private readonly ErrorReportThread errorThread;
         private readonly AlarmGenTemplateHandler templateHandler;
         private readonly DataGridView dataGridView;

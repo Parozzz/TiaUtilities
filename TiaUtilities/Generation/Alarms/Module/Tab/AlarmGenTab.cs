@@ -24,12 +24,10 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
         private readonly GridDataPreviewer<DeviceData> deviceDataPreview;
         private readonly GridHandler<DeviceData> deviceGridHandler;
 
-        public AlarmGenTabControl TabControl { get; init; }
+        public DataGridView DataGridViewControl { get => deviceGridHandler.DataGridView; }
         public List<DeviceData> DeviceDataList { get => new(deviceGridHandler.DataSource.GetNotEmptyClonedDataDict().Keys); } //Return CLONED data, otherwise operations on the xml generation will affect the table!
 
         private bool dirty = false;
-
-        private SettingsBindings? settingsBindings = null;
 
         public AlarmGenTab(GridBindContainer bindContainer, AlarmGenModule module, AlarmMainConfiguration mainConfig, AlarmGenTemplateHandler templateHandler, TabPage tabPage)
         {
@@ -45,8 +43,6 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             AlarmGenPlaceholdersHandler placeholdersHandler = new(mainConfig, this.TabConfig);
             this.deviceDataPreview = new();
             this.deviceGridHandler = new(MainForm.Settings.GridSettings, this.gridBindContainer, this.deviceDataPreview, placeholdersHandler) { RowCount = 499 };
-            
-            this.TabControl = new(bindContainer.GridScriptHandler.ErrorThread, this.templateHandler, deviceGridHandler.DataGridView);
         }
 
         /*
@@ -57,8 +53,6 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
 
         public void Init()
         {
-            this.TabControl.Init(); //This before configHandler.
-
             #region DEVICE_GRID_SETUP
             this.deviceGridHandler.Events.ExcelDragPreview += (sender, args) => GridUtils.DragPreview(args, deviceGridHandler);
             this.deviceGridHandler.Events.ExcelDragDone += (sender, args) => GridUtils.DragDone(args, deviceGridHandler);
@@ -79,7 +73,6 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             #endregion
 
             this.TabPage.TextChanged += (sender, args) => this.dirty = true;
-
             this.Translate();
         }
 
@@ -90,7 +83,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
 
         private void Translate()
         {
-            TabControl.Translate();
+            //
         }
 
         public bool IsDirty() => this.dirty || this.TabConfig.IsDirty() || this.deviceGridHandler.IsDirty();

@@ -10,7 +10,7 @@ using TiaUtilities.Generation.Alarms.Module.Template;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Languages;
 
-namespace TiaUtilities.Generation.Alarms.XmlGenerator
+namespace TiaUtilities.Generation.Alarms.Xml
 {
 
     public class AlarmGroupXmlItem(BlockFC blockFC, BlockUDT blockUDT, string alarmList, List<AlarmXmlItem> items)

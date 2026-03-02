@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TiaUtilities.Utility;
+﻿using TiaUtilities.Utility;
 
-namespace TiaUtilities.Generation.Alarms.XmlGenerator
+namespace TiaUtilities.Generation.Alarms.Xml
 {
 
     public class AlarmXmlHmiField(string tag, string alignment = "Left")

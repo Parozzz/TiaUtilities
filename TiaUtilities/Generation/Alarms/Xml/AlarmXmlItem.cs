@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TiaUtilities.Generation.Alarms.XmlGenerator
+﻿namespace TiaUtilities.Generation.Alarms.Xml
 {
     public class AlarmXmlItem(string tabName, string alarmVariableName, string alarmVariableComment, uint hmiID, string hmiAlarmName, string hmiAlarmText, string hmiAlarmClass, string hmiTriggerTag, uint hmiTriggerBit)
     {

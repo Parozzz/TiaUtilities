@@ -3,6 +3,7 @@ using TiaUtilities.Editors.ErrorReporting;
 using TiaUtilities.Generation.Alarms.Configurations;
 using TiaUtilities.Generation.Alarms.Module.Tab;
 using TiaUtilities.Generation.Alarms.Module.Template;
+using TiaUtilities.Generation.Alarms.Xml;
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.SettingsNew;
@@ -101,7 +102,7 @@ namespace TiaUtilities.Generation.Alarms.Module
                 tab.LoadSave(save);
             }
             tabPage.Tag = tab;
-            tabPage.Controls.Add(tab.TabControl);
+            tabPage.Controls.Add(tab.DataGridViewControl);
 
             genTabList.Add(tab); //Do this AFTER. Otherwise the Selected event is called with Tag null.
         }
@@ -176,8 +177,7 @@ namespace TiaUtilities.Generation.Alarms.Module
 
         public void ExportXML(string folderPath)
         {
-            var ioXmlGenerator = new AlarmXmlGenerator(mainConfig);
-            ioXmlGenerator.Init();
+            AlarmXmlGenerator ioXmlGenerator = new(mainConfig);
             foreach (var tab in genTabList)
             {
                 ioXmlGenerator.GenerateAlarms(tab.TabPage.Text, tab.TabConfig, this.templateHandler, tab.DeviceDataList);
