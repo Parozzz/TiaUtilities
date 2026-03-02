@@ -21,7 +21,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
         public TemplateAlarmGridWrapper(GenPlaceholderHandler placeholderHandler, GridBindContainer bindContainer)
         {
             previewer = new();
-            gridHandler = new(MainForm.Settings.GridSettings, bindContainer, previewer, placeholderHandler) { RowCount = 1999 };
+            gridHandler = new(MainForm.Settings.GridSettings, bindContainer, previewer, placeholderHandler) { RowCount = AlarmGenModule.TEMPLATE_GRID_ROW_COUNT };
         }
 
         public void Init(AlarmMainConfiguration mainConfig, AlarmTabConfiguration tabConfig, Func<AlarmTemplateConfiguration> getTemplateConfig)

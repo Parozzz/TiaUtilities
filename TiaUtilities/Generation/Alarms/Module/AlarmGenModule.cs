@@ -14,6 +14,9 @@ namespace TiaUtilities.Generation.Alarms.Module
 {
     public class AlarmGenModule : IGenModule
     {
+        public const int DEVICE_GRID_ROW_COUNT = 1999;
+        public const int TEMPLATE_GRID_ROW_COUNT = 199;
+
         private readonly GridBindContainer gridBindContainer;
         private GridScriptHandler GridScriptHandler { get => this.gridBindContainer.GridScriptHandler; }
 

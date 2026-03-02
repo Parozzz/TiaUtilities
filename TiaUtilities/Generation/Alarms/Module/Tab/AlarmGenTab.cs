@@ -42,7 +42,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             
             AlarmGenPlaceholdersHandler placeholdersHandler = new(mainConfig, this.TabConfig);
             this.deviceDataPreview = new();
-            this.deviceGridHandler = new(MainForm.Settings.GridSettings, this.gridBindContainer, this.deviceDataPreview, placeholdersHandler) { RowCount = 499 };
+            this.deviceGridHandler = new(MainForm.Settings.GridSettings, this.gridBindContainer, this.deviceDataPreview, placeholdersHandler) { RowCount = AlarmGenModule.DEVICE_GRID_ROW_COUNT };
         }
 
         /*
