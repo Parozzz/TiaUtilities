@@ -1,4 +1,5 @@
 ﻿using InfoBox;
+using System.Globalization;
 
 namespace TiaUtilities.Utility
 {
@@ -264,6 +265,13 @@ namespace TiaUtilities.Utility
                 UseFading = false,
                 UseAnimation = false,
             };
+        }
+
+        public static string ToTitleCase(this string source) => ToTitleCase(source, null);
+        public static string ToTitleCase(this string source, CultureInfo? culture)
+        {
+            culture = culture ?? CultureInfo.CurrentUICulture;
+            return culture.TextInfo.ToTitleCase(source.ToLower());
         }
 
     }
