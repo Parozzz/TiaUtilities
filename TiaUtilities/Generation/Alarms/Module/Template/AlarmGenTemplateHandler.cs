@@ -5,10 +5,17 @@ using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.Alarms.Module.Template
 {
-    public delegate void AlarmGenTemplateSelectedChanged(object? sender, AlarmGenTemplateSelectedChangedArgs args);
-    public class AlarmGenTemplateSelectedChangedArgs : EventArgs
+    public delegate void AlarmTemplateSelectedChanged(object? sender, AlarmTemplateSelectedChangedArgs args);
+    public class AlarmTemplateSelectedChangedArgs : EventArgs
     {
         public AlarmGenTemplate? OldTemplate { get; set; }
+    }
+
+    public delegate void AlarmTemplateRenamedEvent(object? sender, AlarmTemplateRenamedEventArgs args);
+    public class AlarmTemplateRenamedEventArgs(string oldName, string newName) : EventArgs
+    {
+        public string OldName { get; init; } = oldName;
+        public string NewName { get; init; } = newName;
     }
 
     public class AlarmGenTemplateHandler : ICleanable
@@ -32,7 +39,8 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
             }
         }
 
-        public event AlarmGenTemplateSelectedChanged SelectedTemplateChanged = delegate { };
+        public event AlarmTemplateSelectedChanged SelectedTemplateChanged = delegate { };
+        public event AlarmTemplateRenamedEvent TemplateRenamed = delegate { };
 
         private bool dirty = false;
 
@@ -129,7 +137,12 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
             var floatingTextBox = new FloatingTextBox(SelectedTemplate.Name) { Width = 400 };
             if (floatingTextBox.ShowDialogAtCursor(window) == DialogResult.OK)
             {
-                SelectedTemplate.Name = floatingTextBox.InputText;
+                var oldName = this.SelectedTemplate.Name;
+                var newName = floatingTextBox.InputText;
+
+                TemplateRenamed(this, new(oldName, newName));
+
+                this.SelectedTemplate.Name = newName;
                 this.BindingList.ResetBindings();
 
                 this.dirty = true;

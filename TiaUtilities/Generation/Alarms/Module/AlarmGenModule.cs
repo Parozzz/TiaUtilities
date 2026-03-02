@@ -59,6 +59,13 @@ namespace TiaUtilities.Generation.Alarms.Module
 
             this.gridBindContainer.Init(form);
             this.templateHandler.Init([]);
+            this.templateHandler.TemplateRenamed += (sender, args) =>
+            {
+                foreach(var tab in this.genTabList)
+                {
+                    tab.ParseTemplateRenamed(args.OldName, args.NewName);
+                }
+            };
 
             this.control.tabControl.TabPreAdded += (sender, args) => TabCreation(args.TabPage);
             this.control.tabControl.TabPreRemoved += (sender, args) =>

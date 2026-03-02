@@ -119,5 +119,20 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
         {
             return deviceGridHandler.ProcessCmdKey(ref msg, keyData);
         }
+
+        public void ParseTemplateRenamed(string oldName, string newName)
+        {
+            var indexes = deviceGridHandler.DataSource.GetNotEmptyIndexes();
+            foreach (var index in indexes)
+            {
+                var data = deviceGridHandler.DataSource[index];
+                if(oldName.Equals(data.Template))
+                {
+                    data.Template = newName;
+                }
+            }
+
+            this.deviceGridHandler.Refresh();
+        }
     }
 }
