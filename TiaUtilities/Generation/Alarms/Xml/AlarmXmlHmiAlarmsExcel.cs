@@ -63,32 +63,40 @@ namespace TiaUtilities.Generation.Alarms.Xml
 
         public void AddData(AlarmXmlItem item)
         {
-            this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_ID).Value = item.HmiID;
-            this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_NAME).Value = item.HmiAlarmName;
-            this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_CLASS).Value = item.HmiAlarmClass;
-            this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_ALARM_TEXT).Value = item.HmiAlarmText;
-            this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_TRIGGER_TAG).Value = item.HmiTriggerTag;
-            this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_TRIGGER_BIT).Value = item.HmiTriggerBit;
-
-            for(int i = 0; i < 10; i++)
+            try
             {
-                this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_PARAM_1 + i).Value = CELL_NO_VALUE;
+                this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_ID).Value = item.HmiID;
+                this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_NAME).Value = item.HmiAlarmName;
+                this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_CLASS).Value = item.HmiAlarmClass;
+                this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_ALARM_TEXT).Value = item.HmiAlarmText;
+                this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_TRIGGER_TAG).Value = item.HmiTriggerTag;
+                this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_TRIGGER_BIT).Value = item.HmiTriggerBit;
+
+                for (int i = 0; i < 10; i++)
+                {
+                    this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_PARAM_1 + i).Value = CELL_NO_VALUE;
+                }
+
+                int refId = 0;
+                int parameterNumber = 1;
+
+                var fieldStr = "";
+                foreach (var field in item.HmiFields)
+                {
+                    fieldStr = fieldStr + field.GetAsString(refId, parameterNumber) + '\n';
+
+                    this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_PARAM_1 + parameterNumber - 1).Value = field.Tag;
+
+                    refId++;
+                    parameterNumber++;
+                }
+                this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_FIELD_INFO).Value = fieldStr;
             }
-
-            int refId = 0;
-            int parameterNumber = 1;
-
-            var fieldStr = "";
-            foreach(var field in item.HmiFields)
+            catch (Exception) { } 
+            finally
             {
-                fieldStr = fieldStr + field.GetAsString(refId, parameterNumber) + '\n';
-
-                this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_PARAM_1 + parameterNumber - 1).Value = field.Tag;
-
-                refId++;
-                parameterNumber++;
+                rowIndex++;
             }
-            this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_FIELD_INFO).Value = fieldStr;
         }
 
         public void SaveAs(string filePath)
