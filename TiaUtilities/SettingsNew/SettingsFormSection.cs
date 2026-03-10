@@ -14,6 +14,6 @@ namespace TiaUtilities.SettingsNew
         public TableLayoutPanel? Panel { get; set; } = null;
         public float VisiblePercentage { get; set; } = 0f;
 
-        public override string ToString() => $"{Name}, {VisiblePercentage}";
+        public override string ToString() => $"{Name};{VisiblePercentage};{MacroSection.Name}";
     }
 }

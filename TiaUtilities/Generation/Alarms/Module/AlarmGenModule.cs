@@ -28,6 +28,8 @@ namespace TiaUtilities.Generation.Alarms.Module
 
         public SettingsBindings SettingsBindings { get; init; }
 
+        private AlarmGenTemplateForm? shownTemplateForm = null;
+
         public AlarmGenModule(ErrorReportThread errorThread)
         {
             this.gridBindContainer = new(errorThread);
@@ -49,9 +51,10 @@ namespace TiaUtilities.Generation.Alarms.Module
                 var currentTabConfig = GetCurrentTabConfiguration();
                 if(currentTabConfig != null)
                 {
-                    var deviceTemplateForm = new AlarmGenTemplateForm(mainConfig, currentTabConfig, this.gridBindContainer, templateHandler);
-                    deviceTemplateForm.Init();
-                    deviceTemplateForm.ShowDialog(this.control);
+                    shownTemplateForm = new AlarmGenTemplateForm(mainConfig, currentTabConfig, this.gridBindContainer, templateHandler);
+                    shownTemplateForm.Init();
+                    shownTemplateForm.Show(this.control);
+                    shownTemplateForm.FormClosed += (sender, args) => shownTemplateForm = null;
                 }
             };
 
@@ -217,7 +220,7 @@ namespace TiaUtilities.Generation.Alarms.Module
         private void AddConfigurationBindings(SettingsBindings settingsBindings)
         {
             settingsBindings
-                .MacroSection(() => "AlarmGenControl", () => this.mainConfig, MainForm.Settings.PresetAlarmMainConfiguration)
+                .MacroSection(() => "AlarmGenControl", () => true, () => this.mainConfig, MainForm.Settings.PresetAlarmMainConfiguration)
 
                 .Section(Locale.ALARM_SETTINGS_ENABLE)
                 .AddBool(nameof(AlarmMainConfiguration.EnableCustomVariable), Locale.ALARM_SETTINGS_ENABLE_CUSTOM_VAR, Locale.ALARM_SETTINGS_ENABLE_CUSTOM_VAR_DESCR)
@@ -253,7 +256,7 @@ namespace TiaUtilities.Generation.Alarms.Module
             
 
             settingsBindings
-                .MacroSection(this.GetCurrentTabName, this.GetCurrentTabConfiguration, MainForm.Settings.PresetAlarmTabConfiguration, () => this.TabConfigurations)
+                .MacroSection(this.GetCurrentTabName, () => true, this.GetCurrentTabConfiguration, MainForm.Settings.PresetAlarmTabConfiguration, () => this.TabConfigurations)
 
                 .Section(Locale.ALARM_SETTINGS_TAB_GROUPING_TYPE)
                 .AddEnum(nameof(AlarmTabConfiguration.GroupingType), description: Locale.ALARM_SETTINGS_TAB_GROUPING_TYPE_DESCR)
@@ -290,7 +293,26 @@ namespace TiaUtilities.Generation.Alarms.Module
                 .Section(Locale.GENERICS_HMI)
                 .AddUInt(nameof(AlarmTabConfiguration.HmiStartID), Locale.ALARM_SETTINGS_TAB_HMI_START_ID, Locale.ALARM_SETTINGS_TAB_HMI_START_ID_DESCR)
                 .AddString(nameof(AlarmTabConfiguration.DefaultHmiAlarmClass), Locale.ALARM_SETTINGS_TAB_HMI_DEFAULT_ALARM_CLASS, Locale.ALARM_SETTINGS_TAB_HMI_DEFAULT_ALARM_CLASS_DESCR);
+
+
+            settingsBindings
+                .MacroSection(GetActiveTemplateName, () => shownTemplateForm != null && shownTemplateForm.Visible, GetActiveTemplateConfiguration, MainForm.Settings.PresetTemplateConfiguration)
+
+                .Section("")
+                .AddBool(nameof(AlarmTemplateConfiguration.StandaloneAlarms), Locale.ALARM_SETTINGS_TEMPLATE_STANDALONE_ALARMS, Locale.ALARM_SETTINGS_TEMPLATE_STANDALONE_ALARMS_DESC);
         }
+
+        private string GetActiveTemplateName()
+        {
+            var selectedTemplate = this.templateHandler.SelectedTemplate;
+            return selectedTemplate == null ? "" : selectedTemplate.Name;
+        }
+
+        private AlarmTemplateConfiguration? GetActiveTemplateConfiguration()
+        {
+            return this.templateHandler.SelectedTemplate?.TemplateConfig;
+        }
+
 
         private string GetCurrentTabName()
         {

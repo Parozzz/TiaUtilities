@@ -685,4 +685,10 @@ for row validation</value>
   <data name="GENERICS_SETUP" xml:space="preserve">
     <value>Setup</value>
   </data>
+  <data name="ALARM_SETTINGS_TEMPLATE_STANDALONE_ALARMS" xml:space="preserve">
+    <value>Standalone Alarms</value>
+  </data>
+  <data name="ALARM_SETTINGS_TEMPLATE_STANDALONE_ALARMS_DESC" xml:space="preserve">
+    <value>Allows to ignore all the default values from the alarm setup. Useful for generating standalone alarms that are not linked to a device.</value>
+  </data>
 </root>

@@ -5,14 +5,15 @@ using TiaUtilities.SettingsNew.Editors;
 namespace TiaUtilities.SettingsNew.Bindings
 {
 
-    public record SettingsBindingsUpdateRequestEventArgs();
+    public delegate void SettingsBindingsUpdateRequestEvent(object? sender, EventArgs e);
 
-    public delegate void SettingsBindingsUpdateRequestEvent(object? sender, SettingsBindingsUpdateRequestEventArgs e);
+    public delegate void SettingsBindingsReloadtEvent(object? sender, EventArgs e);
 
     public class SettingsBindings
     {
         
-        public event SettingsBindingsUpdateRequestEvent UpdateRequest = delegate { };
+        public event SettingsBindingsUpdateRequestEvent UpdateRequestEvent = delegate { };
+        public event SettingsBindingsUpdateRequestEvent ReloadEvent = delegate { };
 
         public List<SettingsMacroSectionBinding<ObservableConfiguration>> MacroSectionList { get; init; } = [];
 
@@ -29,10 +30,12 @@ namespace TiaUtilities.SettingsNew.Bindings
             this.lastSection = null;
         }
 
-        public SettingsBindings MacroSection<T>(Func<string> getNameFunc, Func<T?> GetConfigurationFunc,
-            T? PresetConfigurationObject = null, Func<IEnumerable<T>>? otherConfigurationsFunc = null) where T : ObservableConfiguration
+        public SettingsBindings MacroSection<T>(Func<string> getNameFunc, Func<bool> isVisibleFunc,
+            Func<T?> GetConfigurationFunc,  T? PresetConfigurationObject = null, Func<IEnumerable<T>>? otherConfigurationsFunc = null) 
+            where T : ObservableConfiguration
         {
-            lastMacroSection = new(getNameFunc, typeof(T), GetConfigurationFunc, PresetConfigurationObject, otherConfigurationsFunc);
+            lastMacroSection = new(getNameFunc, isVisibleFunc, typeof(T), GetConfigurationFunc, PresetConfigurationObject, otherConfigurationsFunc);
+            lastSection = null;
 
             this.MacroSectionList.Add(lastMacroSection);
             return this;
@@ -75,7 +78,12 @@ namespace TiaUtilities.SettingsNew.Bindings
 
         public void RequestUpdate()
         {
-            UpdateRequest.Invoke(this, new());
+            UpdateRequestEvent.Invoke(this, new());
+        }
+
+        public void Reload()
+        {
+            ReloadEvent.Invoke(this, new());
         }
     }
 }

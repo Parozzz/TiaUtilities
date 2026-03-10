@@ -799,6 +799,24 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Standalone Alarms.
+        /// </summary>
+        internal static string ALARM_SETTINGS_TEMPLATE_STANDALONE_ALARMS {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_TEMPLATE_STANDALONE_ALARMS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Allows to ignore all the default values from the alarm setup. Useful for generating standalone alarms that are not linked to a device..
+        /// </summary>
+        internal static string ALARM_SETTINGS_TEMPLATE_STANDALONE_ALARMS_DESC {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_TEMPLATE_STANDALONE_ALARMS_DESC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Alarm Text List.
         /// </summary>
         internal static string ALARM_SETTINGS_TEXT_LIST {

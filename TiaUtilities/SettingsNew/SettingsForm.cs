@@ -214,11 +214,13 @@ namespace TiaUtilities.Generation.SettingsNew
 
         private void ParseBindings()
         {
+            this.leftSelectSectionListView.Clear();
             this.macroSectionList.Clear();
+
             foreach (var macroSectionBinding in this.bindings.MacroSectionList)
             {
                 var configurationObject = macroSectionBinding.GetConfigurationObject();
-                if (configurationObject == null)
+                if (!macroSectionBinding.Visible || configurationObject == null)
                 {
                     continue;
                 }
@@ -255,34 +257,39 @@ namespace TiaUtilities.Generation.SettingsNew
 
             LoadMacroSections();
 
-            void UpdateRequest(object? sender, SettingsBindingsUpdateRequestEventArgs args)
-            {
-                foreach (ListViewItem item in this.leftSelectSectionListView.Items)
-                {
-                    if (item.Tag is ListViewItemMacroSectionTag macroSectionTag)
-                    {
-                        item.Text = macroSectionTag.MacroSection.Name;
-                    }
-                }
+            void UpdateRequestEvent(object? sender, EventArgs args) => UpdateAll();
+            this.bindings.UpdateRequestEvent += UpdateRequestEvent;
 
-                foreach (var macroSection in this.macroSectionList)
-                {
-                    var newConfigurationObject = macroSection.Binding.GetConfigurationObject() ?? throw new InvalidOperationException($"Cannot RequestUpdate with a null ConfigurationObject inside a SettingsMacroSectionBinding. Name: {macroSection.Name}");
-                    foreach (var formValue in macroSection.Sections.SelectMany(section => section.FormValueList))
-                    {
-                        formValue.UpdateConfigurationObject(newConfigurationObject);
+            void ReloadEvent(object? sender, EventArgs args) => this.ParseBindings();
+            this.bindings.ReloadEvent += ReloadEvent;
 
-                        formValue.Editor?.LoadFromConfiguration();
-                    }
-                }
-
-            }
-
-            this.bindings.UpdateRequest += UpdateRequest;
             this.FormClosed += (sender, args) =>
             {
-                this.bindings.UpdateRequest -= UpdateRequest;
+                this.bindings.UpdateRequestEvent -= UpdateRequestEvent;
+                this.bindings.ReloadEvent -= ReloadEvent;
             };
+
+        }
+
+        private void UpdateAll()
+        {
+            foreach (ListViewItem item in this.leftSelectSectionListView.Items)
+            {
+                if (item.Tag is ListViewItemMacroSectionTag macroSectionTag)
+                {
+                    item.Text = macroSectionTag.MacroSection.Name;
+                }
+            }
+
+            foreach (var macroSection in this.macroSectionList)
+            {
+                var newConfigurationObject = macroSection.Binding.GetConfigurationObject() ?? throw new InvalidOperationException($"Cannot RequestUpdate with a null ConfigurationObject inside a SettingsMacroSectionBinding. Name: {macroSection.Name}");
+                foreach (var formValue in macroSection.Sections.SelectMany(section => section.FormValueList))
+                {
+                    formValue.UpdateConfigurationObject(newConfigurationObject);
+                    formValue.Editor?.LoadFromConfiguration();
+                }
+            }
         }
 
         const int SECTION_NAME_COLUMN = 0;

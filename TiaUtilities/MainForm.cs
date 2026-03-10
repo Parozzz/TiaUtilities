@@ -88,7 +88,7 @@ namespace TiaUtilities
             this.autoSaveHandler.Start(MainForm.Settings.AutoSaveTime * 1000);
 
             MainForm.SettingsBindings
-                .MacroSection(() => Locale.GENERICS_PROGRAM, () => MainForm.Settings)
+                .MacroSection(() => Locale.GENERICS_PROGRAM, () => true, () => MainForm.Settings)
 
                 .Section(Locale.PROGRAM_SETTINGS_AUTO_SAVE)
                 .AddInt(nameof(ProgramSettings.AutoSaveTime))
@@ -99,7 +99,7 @@ namespace TiaUtilities
                 .Section(Locale.PROGRAM_SETTINGS_TIA_VERSION)
                 .AddUnsignedNumberList(nameof(ProgramSettings.TIAVersion), [16, 17, 18, 19])
 
-                .MacroSection(() => Locale.PROGRAM_SETTINGS_GRID_PREFERENCES, () => MainForm.Settings.GridSettings)
+                .MacroSection(() => Locale.PROGRAM_SETTINGS_GRID_PREFERENCES, () => true, () => MainForm.Settings.GridSettings)
 
                 .Section(Locale.PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS)
                 .AddColor(nameof(GridSettings.SingleSelectedCellBorderColor), Locale.PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_SELECTED_CELL_BORDER)

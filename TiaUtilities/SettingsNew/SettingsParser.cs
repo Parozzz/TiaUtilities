@@ -22,7 +22,7 @@ namespace TiaUtilities.SettingsNew
         public static SettingsForm CreateTestForm()
         {
             SettingsBindings settingsBindings = new SettingsBindings()
-                .MacroSection(() => "Macro1", () => testConfiguration)
+                .MacroSection(() => "Macro1", () => true, () => testConfiguration)
 
                 .Section("Section1")
                 .AddUInt(nameof(TestConfiguration.DBNumber), Locale.GENERICS_NAME, "Name again!?")
@@ -48,7 +48,7 @@ namespace TiaUtilities.SettingsNew
                 .Section("JAVASCRIPT!", "JAVASCRIPT??!!")
                 .AddJavascript(nameof(TestConfiguration.TestJavascript), string.Empty, $"{GenPlaceholders.IO.IONAME}")
 
-                .MacroSection(() => "Macro2", () => testConfiguration)
+                .MacroSection(() => "Macro2", () => true, () => testConfiguration)
                 .Section("Section1")
                 .AddUInt(nameof(TestConfiguration.DBNumber), Locale.GENERICS_NAME, "Name again!?")
 

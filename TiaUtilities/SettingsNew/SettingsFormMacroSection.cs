@@ -8,6 +8,7 @@ namespace TiaUtilities.SettingsNew
         public SettingsMacroSectionBinding<ObservableConfiguration> Binding { get; init; } = binding;
         public Guid Guid { get => this.Binding.Guid; }
         public string Name { get => this.Binding.Name; }
+        public bool Visible { get => this.Binding.Visible; }
         public List<SettingsFormSection> Sections { get; init; } = [];
         public List<Label> ValueDescriptionLabelList { get; init; } = [];
 
@@ -21,7 +22,7 @@ namespace TiaUtilities.SettingsNew
             }
         }
 
-        public override string ToString() => Name;
+        public override string ToString() => $"{Binding}";
 
     }
 }

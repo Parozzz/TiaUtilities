@@ -58,15 +58,10 @@ namespace TiaUtilities.SettingsNew
         public T? GetConfigurationValue<T>() => this.GetConfigurationValue() is T t ? t : default;
     }
 
-    public class EmptySettingsFormValueImpl : SettingsFormValue
+    public class EmptySettingsFormValueImpl(Form form, SettingsValueBinding binding, ObservableConfiguration configurationObject) 
+        : SettingsFormValue(form, binding, configurationObject)
     {
-        public override SettingsEditor? Editor { get; init; }
-
-        public EmptySettingsFormValueImpl(Form form, SettingsValueBinding binding, ObservableConfiguration configurationObject) : base(form, binding, configurationObject)
-        {
-            this.Editor = null;
-        }
-
+        public override SettingsEditor? Editor { get; init; } = null;
 
         public override object? GetConfigurationValue() => null;
 
@@ -184,5 +179,7 @@ namespace TiaUtilities.SettingsNew
 
             return true;
         }
+
+        public override string ToString() => $"{Name};{Binding.EditorType};{Binding.SectionBinding.Name}";
     }
 }

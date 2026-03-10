@@ -10,32 +10,25 @@ using TiaUtilities.SettingsNew.Editors;
 
 namespace TiaUtilities.SettingsNew.Bindings
 {
-    public class SettingsMacroSectionBinding<T> where T : ObservableConfiguration
+    public class SettingsMacroSectionBinding<T>(Func<string> getNameFunc, Func<bool> isVisibleFunc,
+        Type configurationType,
+        Func<T?> getConfigurationFunc, T? presetConfigurationObject, Func<IEnumerable<T>>? getOtherConfigurationsFunc) 
+        where T : ObservableConfiguration
     {
         public Guid Guid { get; init; } = Guid.NewGuid();
 
         public string Name { get => getNameFunc(); }
-        public T? PresetConfigurationObject { get; init; }
+        public bool Visible { get => isVisibleFunc(); }
+        public T? PresetConfigurationObject { get; init; } = presetConfigurationObject;
         public IEnumerable<T>? OtherConfigurations { get => this.getOtherConfigurationsFunc?.Invoke(); }
 
-        public List<SettingsSectionBinding> SectionsList { get; init; }
+        public List<SettingsSectionBinding> SectionsList { get; init; } = [];
 
-        private readonly Func<string> getNameFunc;
-        private readonly Type configurationType;
-        private readonly Func<T?> getConfigurationObject;
-        private readonly Func<IEnumerable<T>>? getOtherConfigurationsFunc = null;
-
-        public SettingsMacroSectionBinding(Func<string> getNameFunc, Type configurationType,
-            Func<T?> getConfigurationFunc, T? presetConfigurationObject, Func<IEnumerable<T>>? getOtherConfigurationsFunc)
-        {
-            this.getNameFunc = getNameFunc;
-            this.configurationType = configurationType;
-            this.getConfigurationObject = getConfigurationFunc;
-            this.PresetConfigurationObject = presetConfigurationObject;
-            this.getOtherConfigurationsFunc = getOtherConfigurationsFunc;
-
-            this.SectionsList = [];
-        }
+        private readonly Func<string> getNameFunc = getNameFunc;
+        private readonly Func<bool> isVisibleFunc = isVisibleFunc;
+        private readonly Type configurationType = configurationType;
+        private readonly Func<T?> getConfigurationObject = getConfigurationFunc;
+        private readonly Func<IEnumerable<T>>? getOtherConfigurationsFunc = getOtherConfigurationsFunc;
 
         public T? GetConfigurationObject()
         {
@@ -55,6 +48,8 @@ namespace TiaUtilities.SettingsNew.Bindings
                 GenUtils.CopySamePublicFieldsAndProperties(configurationObject, this.PresetConfigurationObject);
             }
         }
+
+        public override string ToString() => $"{Guid};{Name};{Visible}";
     }
 
     public record SettingsSectionBinding(SettingsMacroSectionBinding<ObservableConfiguration> MacroSectionBinding,

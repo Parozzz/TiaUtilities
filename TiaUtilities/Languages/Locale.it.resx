@@ -685,4 +685,10 @@ validità riga</value>
   <data name="GENERICS_SETUP" xml:space="preserve">
     <value>Setup</value>
   </data>
+  <data name="ALARM_SETTINGS_TEMPLATE_STANDALONE_ALARMS" xml:space="preserve">
+    <value>Allarmi Indipendenti</value>
+  </data>
+  <data name="ALARM_SETTINGS_TEMPLATE_STANDALONE_ALARMS_DESC" xml:space="preserve">
+    <value>Permette di generare allarmi ignorando i valori di default. Utile per generare allarmi indipendenti non legati ad un dispositivo.</value>
+  </data>
 </root>
