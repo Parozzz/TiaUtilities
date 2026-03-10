@@ -20,10 +20,10 @@ namespace TiaUtilities.Generation.Alarms.Module
 
         private void Translate()
         {
-            this.settingsButton.Text = "Settings";
-            Utils.CreateStandardToolTip().SetToolTip(this.settingsButton, "CTRL + I");
+            this.setupButton.Text = Locale.GENERICS_SETUP;
+            Utils.CreateStandardToolTip().SetToolTip(this.setupButton, "CTRL + I");
 
-            this.templateButton.Text = Locale.ALARM_SETTINGS_EDIT_TEMPLATE;
+            this.changeTemplateButton.Text = Locale.ALARM_SETTINGS_EDIT_TEMPLATE;
         }
     }
 }

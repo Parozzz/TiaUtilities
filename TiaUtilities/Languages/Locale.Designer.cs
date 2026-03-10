@@ -1123,6 +1123,15 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Setup.
+        /// </summary>
+        internal static string GENERICS_SETUP {
+            get {
+                return ResourceManager.GetString("GENERICS_SETUP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Type.
         /// </summary>
         internal static string GENERICS_TYPE {

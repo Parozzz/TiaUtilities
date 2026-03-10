@@ -682,4 +682,7 @@ for row validation</value>
   <data name="GENERICS_PROGRAM" xml:space="preserve">
     <value>Program</value>
   </data>
+  <data name="GENERICS_SETUP" xml:space="preserve">
+    <value>Setup</value>
+  </data>
 </root>

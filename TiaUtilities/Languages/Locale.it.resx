@@ -682,4 +682,7 @@ validità riga</value>
   <data name="GENERICS_PROGRAM" xml:space="preserve">
     <value>Programma</value>
   </data>
+  <data name="GENERICS_SETUP" xml:space="preserve">
+    <value>Setup</value>
+  </data>
 </root>

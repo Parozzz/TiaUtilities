@@ -33,9 +33,9 @@ namespace TiaUtilities.Generation.Alarms.Module
             PlaceholdersLabel = new Label();
             mainTableLayout = new TableLayoutPanel();
             configButtonPanel = new FlowLayoutPanel();
+            setupButton = new Button();
+            changeTemplateButton = new Button();
             tabControl = new InteractableTabControl();
-            templateButton = new Button();
-            settingsButton = new Button();
             mainTableLayout.SuspendLayout();
             configButtonPanel.SuspendLayout();
             SuspendLayout();
@@ -73,14 +73,42 @@ namespace TiaUtilities.Generation.Alarms.Module
             // 
             configButtonPanel.AutoSize = true;
             configButtonPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            configButtonPanel.Controls.Add(settingsButton);
-            configButtonPanel.Controls.Add(templateButton);
+            configButtonPanel.Controls.Add(setupButton);
+            configButtonPanel.Controls.Add(changeTemplateButton);
             configButtonPanel.Dock = DockStyle.Left;
             configButtonPanel.Location = new Point(0, 19);
             configButtonPanel.Margin = new Padding(0, 3, 0, 0);
             configButtonPanel.Name = "configButtonPanel";
-            configButtonPanel.Size = new Size(222, 30);
+            configButtonPanel.Size = new Size(270, 30);
             configButtonPanel.TabIndex = 15;
+            // 
+            // setupButton
+            // 
+            setupButton.AutoSize = true;
+            setupButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            setupButton.Font = new Font("Microsoft Sans Serif", 12.75F, FontStyle.Bold);
+            setupButton.Location = new Point(3, 0);
+            setupButton.Margin = new Padding(3, 0, 0, 0);
+            setupButton.Name = "setupButton";
+            setupButton.Padding = new Padding(8, 0, 8, 0);
+            setupButton.Size = new Size(83, 30);
+            setupButton.TabIndex = 23;
+            setupButton.Text = "Setup";
+            setupButton.UseVisualStyleBackColor = true;
+            // 
+            // changeTemplateButton
+            // 
+            changeTemplateButton.AutoSize = true;
+            changeTemplateButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            changeTemplateButton.Font = new Font("Microsoft Sans Serif", 12.75F, FontStyle.Bold);
+            changeTemplateButton.Location = new Point(89, 0);
+            changeTemplateButton.Margin = new Padding(3, 0, 0, 0);
+            changeTemplateButton.Name = "changeTemplateButton";
+            changeTemplateButton.Padding = new Padding(8, 0, 8, 0);
+            changeTemplateButton.Size = new Size(181, 30);
+            changeTemplateButton.TabIndex = 22;
+            changeTemplateButton.Text = "Change Template";
+            changeTemplateButton.UseVisualStyleBackColor = true;
             // 
             // tabControl
             // 
@@ -93,34 +121,6 @@ namespace TiaUtilities.Generation.Alarms.Module
             tabControl.SelectedIndex = 0;
             tabControl.Size = new Size(1394, 674);
             tabControl.TabIndex = 16;
-            // 
-            // templateButton
-            // 
-            templateButton.AutoSize = true;
-            templateButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            templateButton.Font = new Font("Microsoft Sans Serif", 12.75F, FontStyle.Bold);
-            templateButton.Location = new Point(110, 0);
-            templateButton.Margin = new Padding(3, 0, 0, 0);
-            templateButton.Name = "templateButton";
-            templateButton.Padding = new Padding(8, 0, 8, 0);
-            templateButton.Size = new Size(112, 30);
-            templateButton.TabIndex = 22;
-            templateButton.Text = "Template";
-            templateButton.UseVisualStyleBackColor = true;
-            // 
-            // settingsButton
-            // 
-            settingsButton.AutoSize = true;
-            settingsButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            settingsButton.Font = new Font("Microsoft Sans Serif", 12.75F, FontStyle.Bold);
-            settingsButton.Location = new Point(3, 0);
-            settingsButton.Margin = new Padding(3, 0, 0, 0);
-            settingsButton.Name = "settingsButton";
-            settingsButton.Padding = new Padding(8, 0, 8, 0);
-            settingsButton.Size = new Size(104, 30);
-            settingsButton.TabIndex = 23;
-            settingsButton.Text = "Settings";
-            settingsButton.UseVisualStyleBackColor = true;
             // 
             // AlarmGenControl
             // 
@@ -144,7 +144,7 @@ namespace TiaUtilities.Generation.Alarms.Module
         private TableLayoutPanel mainTableLayout;
         private FlowLayoutPanel configButtonPanel;
         public InteractableTabControl tabControl;
-        public Button settingsButton;
-        public Button templateButton;
+        public Button setupButton;
+        public Button changeTemplateButton;
     }
 }

@@ -43,9 +43,8 @@ namespace TiaUtilities.Generation.Alarms.Module
 
         public void Init(GenModuleForm form)
         {
-            this.control.settingsButton.Click += (sender, args) => new SettingsForm(this.SettingsBindings).Show(this.control);
-
-            this.control.templateButton.Click += (sender, args) =>
+            this.control.setupButton.Click += (sender, args) => new SettingsForm(this.SettingsBindings).Show(this.control);
+            this.control.changeTemplateButton.Click += (sender, args) =>
             {
                 var currentTabConfig = GetCurrentTabConfiguration();
                 if(currentTabConfig != null)
