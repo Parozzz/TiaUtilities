@@ -298,8 +298,8 @@ namespace TiaUtilities.Generation.Alarms.Module
             settingsBindings
                 .MacroSection(GetActiveTemplateName, () => shownTemplateForm != null && shownTemplateForm.Visible, GetActiveTemplateConfiguration, MainForm.Settings.PresetTemplateConfiguration)
 
-                .Section("")
-                .AddBool(nameof(AlarmTemplateConfiguration.StandaloneAlarms), Locale.ALARM_SETTINGS_TEMPLATE_STANDALONE_ALARMS, Locale.ALARM_SETTINGS_TEMPLATE_STANDALONE_ALARMS_DESC);
+                .Section(Locale.ALARM_SETTINGS_TEMPLATE_STANDALONE_ALARMS)
+                .AddBool(nameof(AlarmTemplateConfiguration.StandaloneAlarms), "", Locale.ALARM_SETTINGS_TEMPLATE_STANDALONE_ALARMS_DESC);
         }
 
         private string GetActiveTemplateName()
