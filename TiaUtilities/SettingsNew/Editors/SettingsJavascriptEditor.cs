@@ -1,7 +1,7 @@
 ﻿using FastColoredTextBoxNS;
 using TiaUtilities.Editors;
 using TiaUtilities.Editors.ErrorReporting;
-using TiaUtilities.SettingsNew;
+using TiaUtilities.SettingsNew.FormHelpers;
 
 namespace TiaUtilities.SettingsNew.Editors
 {

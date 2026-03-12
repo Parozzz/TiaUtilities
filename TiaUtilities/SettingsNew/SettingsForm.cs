@@ -1,62 +1,38 @@
-﻿using System.Runtime.CompilerServices;
-using TiaUtilities.Configuration;
-using TiaUtilities.CustomControls;
+﻿using TiaUtilities.CustomControls;
 using TiaUtilities.Languages;
 using TiaUtilities.SettingsNew;
 using TiaUtilities.SettingsNew.Bindings;
+using TiaUtilities.SettingsNew.FormHelpers;
 using TiaUtilities.Utility;
 using TiaUtilities.Utility.Extensions;
 
 namespace TiaUtilities.Generation.SettingsNew
 {
-
     public partial class SettingsForm : Form
     {
-        private class ListViewItemTag() { }
-
-        private class ListViewItemSectionTag(SettingsFormSection section) : ListViewItemTag
-        {
-            public bool IsSectionVisible { get; set; } = false;
-            public SettingsFormSection Section { get; init; } = section; //Section or MacroSection
-        }
-
-        private class ListViewItemMacroSectionTag(SettingsFormMacroSection macroSection) : ListViewItemTag
-        {
-            public SettingsFormMacroSection MacroSection { get; init; } = macroSection;
-        }
-
-        private class SettingsFormLastOpenInformation()
-        {
-            public bool CommentVisibility { get; set; } = SettingsConstants.DEFAULT_VALUE_DESCRIPTION_VISIBILITY;
-        }
-
-        private static readonly Dictionary<Guid, SettingsFormLastOpenInformation> MACRO_SECTION_LAST_OPEN_INFO_DICT = []; //This might leak a bit but i don't think it will matter a lot.
-
         private readonly TableLayoutPanel mainPanel;
-        private readonly ListViewThatKeepsSelection leftSelectSectionListView;
+        private readonly SettingsFormSectionListView leftSectionListView;
         private readonly TableLayoutPanel rightSettingsPanel;
 
-        private readonly SettingsBindings bindings;
-        private readonly List<SettingsFormMacroSection> macroSectionList;
+        private readonly SettingsFormBindingLoader bindingsLoader;
 
         public SettingsForm(SettingsBindings bindings)
         {
             this.DoubleBuffered = true;
             InitializeComponent();
 
-            this.bindings = bindings;
-            this.macroSectionList = [];
-
             this.mainPanel = new();
-            this.leftSelectSectionListView = new();
-            this.rightSettingsPanel = new();
-
             Utils.SetDoubleBuffered(this.mainPanel);
-            Utils.SetDoubleBuffered(this.leftSelectSectionListView);
+
+            this.leftSectionListView = new();
+            Utils.SetDoubleBuffered(this.leftSectionListView);
+
+            this.rightSettingsPanel = new();
             Utils.SetDoubleBuffered(this.rightSettingsPanel);
 
+            this.bindingsLoader = new(bindings, this);
+
             Init();
-            ParseBindings();
         }
 
         private void Init()
@@ -73,10 +49,72 @@ namespace TiaUtilities.Generation.SettingsNew
             this.InitLeftListView();
             this.InitRightPanel();
 
-            this.mainPanel.Controls.Add(this.leftSelectSectionListView, 0, 0);
+            this.mainPanel.Controls.Add(this.leftSectionListView, 0, 0);
             this.mainPanel.Controls.Add(this.WrapRightPanelInScrollable(this.rightSettingsPanel), 1, 0);
-
             this.Controls.Add(this.mainPanel);
+
+            this.bindingsLoader.Load();
+            this.bindingsLoader.Add(this.leftSectionListView, this.rightSettingsPanel);
+
+            void UpdateRequestEvent(object? sender, EventArgs args) => this.bindingsLoader.UpdateValues();
+            this.bindingsLoader.Bindings.UpdateRequestEvent += UpdateRequestEvent;
+
+            void ReloadEvent(object? sender, EventArgs args)
+            {
+                this.SuspendAll();
+
+                this.leftSectionListView.Items.Clear();
+                this.rightSettingsPanel.Controls.Clear();
+
+                this.bindingsLoader.Load();
+                this.bindingsLoader.Add(this.leftSectionListView, this.rightSettingsPanel);
+
+                this.ResumeAll();
+            }
+            ;
+            this.bindingsLoader.Bindings.ReloadEvent += ReloadEvent;
+
+            this.FormClosed += (sender, args) =>
+            {
+                this.bindingsLoader.Bindings.UpdateRequestEvent -= UpdateRequestEvent;
+                this.bindingsLoader.Bindings.ReloadEvent -= ReloadEvent;
+            };
+
+        }
+
+        private void InitLeftListView()
+        {
+            this.leftSectionListView.ItemSelectionChanged += (sender, args) =>
+            {
+                if (this.rightSettingsPanel.Parent is ScrollableControl scrollableControl)
+                {
+                    if (args.Item?.Tag is SettingsFormSectionListView.ItemSectionTag sectionTag && sectionTag.Section.Panel != null)
+                    {
+                        scrollableControl.VerticalScroll.Value = sectionTag.Section.Panel.Top;
+                    }
+                    else if (args.Item?.Tag is SettingsFormSectionListView.ItemMacroSectionTag macroSectionTag && macroSectionTag.MacroSection.Label != null)
+                    {
+                        scrollableControl.VerticalScroll.Value = macroSectionTag.MacroSection.Label.Top;
+                    }
+
+                    scrollableControl.PerformLayout(); //This immediately updates the control since the Function below uses client side values for calculation!
+                    this.UpdateSectionVisiblePercentage(scrollableControl);
+                }
+            };
+        }
+
+        private void InitRightPanel()
+        {
+            //SystemInformation.VerticalScrollBarWidth
+            this.rightSettingsPanel.AutoSize = true;
+            this.rightSettingsPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            //Anchors are needed for the ScrollableControl above!
+            this.rightSettingsPanel.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right;
+            this.rightSettingsPanel.Margin = Padding.Empty;
+
+            this.rightSettingsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, SettingsConstants.SECTIONS_NAME_COLUMN_SIZE));
+            this.rightSettingsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, SettingsConstants.SECTIONS_BORDER_COLUMN_SIZE));
+            this.rightSettingsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100f));
         }
 
         private ScrollableControl WrapRightPanelInScrollable(TableLayoutPanel rightPanel)
@@ -103,473 +141,33 @@ namespace TiaUtilities.Generation.SettingsNew
 
         private void UpdateSectionVisiblePercentage(ScrollableControl scrollableControl, int scrollPositionNew = -1)
         {
-            this.leftSelectSectionListView.SuspendLayout();
+            this.leftSectionListView.SuspendLayout();
 
             var scrollableVisibleTop = scrollPositionNew >= 0 ? scrollPositionNew : scrollableControl.VerticalScroll.Value; //Effectively the scroll position
             var scrollableVisibleBottom = scrollableVisibleTop + scrollableControl.Height;
 
-            foreach (var macroSection in this.macroSectionList)
-            {
-                foreach (var section in macroSection.Sections)
-                {
-                    var panel = section.Panel;
-                    if (panel == null)
-                    {
-                        continue;
-                    }
+            this.bindingsLoader.UpdateVisiblePercentages(scrollableVisibleTop, scrollableVisibleBottom);
 
-                    var top = panel.Top;
-                    var bottom = panel.Bottom;
-
-                    var height = (float)panel.Height;
-                    if (bottom <= scrollableVisibleTop || top >= scrollableVisibleBottom)
-                    {
-                        section.VisiblePercentage = 0;
-                    }
-                    else
-                    {
-                        var minBottom = Math.Min(bottom, scrollableVisibleBottom);
-                        var maxTop = Math.Max(scrollableVisibleTop, top);
-
-                        section.VisiblePercentage = (minBottom - maxTop) / height;
-                    }
-
-                    var listItem = section.ListItem;
-                    if (listItem != null && listItem.Tag is ListViewItemSectionTag sectionTag)
-                    {
-                        var oldVisible = sectionTag.IsSectionVisible;
-                        sectionTag.IsSectionVisible = (section.VisiblePercentage > 0.3f);
-
-                        if (oldVisible != sectionTag.IsSectionVisible)
-                        {
-                            listItem.Text = listItem.Text; //This force a redraw of the item!
-                        }
-                    }
-                }
-            }
-
-            this.leftSelectSectionListView.ResumeLayout(true);
-        }
-
-        private void InitLeftListView()
-        {
-            this.leftSelectSectionListView.Font = SettingsConstants.LIST_LEFT_FONT;
-            this.leftSelectSectionListView.View = View.Tile; //This view shows group 
-            this.leftSelectSectionListView.Dock = DockStyle.Fill;
-            this.leftSelectSectionListView.HeaderStyle = ColumnHeaderStyle.Nonclickable;
-            this.leftSelectSectionListView.Activation = ItemActivation.OneClick;
-            this.leftSelectSectionListView.BorderStyle = BorderStyle.None;
-            this.leftSelectSectionListView.LabelEdit = false;
-            this.leftSelectSectionListView.AllowColumnReorder = false;
-            this.leftSelectSectionListView.CheckBoxes = false;
-            this.leftSelectSectionListView.FullRowSelect = true;
-            this.leftSelectSectionListView.GridLines = false;
-            this.leftSelectSectionListView.Sorting = SortOrder.None;
-            this.leftSelectSectionListView.Scrollable = false;
-            this.leftSelectSectionListView.MaximumSize = new Size(SettingsConstants.SECTIONS_LIST_VIEW_WIDTH, 0);
-            this.leftSelectSectionListView.MinimumSize = new Size(30, 80);
-
-            var textSize = TextRenderer.MeasureText("AaGg", SettingsConstants.LIST_LEFT_FONT);
-            this.leftSelectSectionListView.TileSize = new Size(SettingsConstants.SECTIONS_LIST_VIEW_WIDTH, textSize.Height + 4);
-
-            this.leftSelectSectionListView.OwnerDraw = true;
-            this.leftSelectSectionListView.DrawItem += this.ListView_DrawItem;
-            //this.leftSelectSectionListView.DrawColumnHeader += this.ListView_DrawColumnHeader;
-            //this.leftSelectSectionListView.DrawSubItem += this.ListView_DrawSubItem;
-
-
-            this.leftSelectSectionListView.ItemSelectionChanged += (sender, args) =>
-            {
-                if (this.rightSettingsPanel.Parent is ScrollableControl scrollableControl)
-                {
-                    if (args.Item?.Tag is ListViewItemSectionTag sectionTag && sectionTag.Section.Panel != null)
-                    {
-                        scrollableControl.VerticalScroll.Value = sectionTag.Section.Panel.Top;
-                    }
-                    else if (args.Item?.Tag is ListViewItemMacroSectionTag macroSectionTag && macroSectionTag.MacroSection.Label != null)
-                    {
-                        scrollableControl.VerticalScroll.Value = macroSectionTag.MacroSection.Label.Top;
-                    }
-
-                    scrollableControl.PerformLayout(); //This immediately updates the control since the Function below uses client side values for calculation!
-                    this.UpdateSectionVisiblePercentage(scrollableControl);
-                }
-            };
-        }
-
-        private void InitRightPanel()
-        {
-            //SystemInformation.VerticalScrollBarWidth
-            this.rightSettingsPanel.AutoSize = true;
-            this.rightSettingsPanel.AutoScroll = true;
-            //Anchors are needed for the ScrollableControl above!
-            this.rightSettingsPanel.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right;
-            this.rightSettingsPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            this.rightSettingsPanel.Margin = Padding.Empty;
-
-            this.rightSettingsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, SettingsConstants.SECTIONS_NAME_COLUMN_SIZE));
-            this.rightSettingsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, SettingsConstants.SECTIONS_BORDER_COLUMN_SIZE));
-            this.rightSettingsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100f));
+            this.leftSectionListView.ResumeLayout(true);
         }
 
         private void ParseBindings()
         {
-            this.leftSelectSectionListView.Clear();
-            this.macroSectionList.Clear();
-
-            foreach (var macroSectionBinding in this.bindings.MacroSectionList)
-            {
-                var configurationObject = macroSectionBinding.GetConfigurationObject();
-                if (!macroSectionBinding.Visible || configurationObject == null)
-                {
-                    continue;
-                }
-
-                SettingsFormMacroSection macroSection = new(macroSectionBinding);
-                this.macroSectionList.Add(macroSection);
-
-                ListViewItem macroSectionListViewItem = new()
-                {
-                    Text = macroSection.Name,
-                    Tag = new ListViewItemMacroSectionTag(macroSection)
-                };
-                this.leftSelectSectionListView.Items.Add(macroSectionListViewItem);
-
-                foreach (var sectionBinding in macroSectionBinding.SectionsList)
-                {
-                    SettingsFormSection section = new(sectionBinding, macroSection);
-                    macroSection.Sections.Add(section);
-
-                    var valueList = sectionBinding.ValueList.Select(bindings => SettingsFormValue.FromBinding(bindings, configurationObject, this)).ToArray();
-                    section.FormValueList.AddRange(valueList);
-
-                    ListViewItem listViewItem = new()
-                    {
-                        Text = section.Name,
-                        ToolTipText = section.ToolTip,
-                        Tag = new ListViewItemSectionTag(section)
-                    };
-                    this.leftSelectSectionListView.Items.Add(listViewItem);
-
-                    section.ListItem = listViewItem;
-                }
-            }
-
-            LoadMacroSections();
-
-            void UpdateRequestEvent(object? sender, EventArgs args) => UpdateAll();
-            this.bindings.UpdateRequestEvent += UpdateRequestEvent;
-
-            void ReloadEvent(object? sender, EventArgs args) => this.ParseBindings();
-            this.bindings.ReloadEvent += ReloadEvent;
-
-            this.FormClosed += (sender, args) =>
-            {
-                this.bindings.UpdateRequestEvent -= UpdateRequestEvent;
-                this.bindings.ReloadEvent -= ReloadEvent;
-            };
 
         }
 
-        private void UpdateAll()
+        public void SuspendAll()
         {
-            foreach (ListViewItem item in this.leftSelectSectionListView.Items)
-            {
-                if (item.Tag is ListViewItemMacroSectionTag macroSectionTag)
-                {
-                    item.Text = macroSectionTag.MacroSection.Name;
-                }
-            }
-
-            foreach (var macroSection in this.macroSectionList)
-            {
-                var newConfigurationObject = macroSection.Binding.GetConfigurationObject() ?? throw new InvalidOperationException($"Cannot RequestUpdate with a null ConfigurationObject inside a SettingsMacroSectionBinding. Name: {macroSection.Name}");
-                foreach (var formValue in macroSection.Sections.SelectMany(section => section.FormValueList))
-                {
-                    formValue.UpdateConfigurationObject(newConfigurationObject);
-                    formValue.Editor?.LoadFromConfiguration();
-                }
-            }
+            this.leftSectionListView.SuspendLayout();
+            this.rightSettingsPanel.SuspendLayout();
+            this.rightSettingsPanel.Parent?.SuspendLayout();
         }
 
-        const int SECTION_NAME_COLUMN = 0;
-        const int SECTION_BORDER_COLUMN = 1;
-        const int SECTION_VALUES_COLUMN = 2;
-
-        private record ControlPosition(Control Control, int Column, int Row, int ColumnSpan = 0, int RowSpan = 0);
-
-        private void LoadMacroSections()
+        public void ResumeAll()
         {
-            //I've tried many things and this seems to be the more efficient!
-            this.rightSettingsPanel.Controls.Clear();
-
-            List<ControlPosition> controlPositionList = [];
-
-            int rowCount = 0;
-            foreach (var macroSection in macroSectionList)
-            {
-                var lastOpenInformation = MACRO_SECTION_LAST_OPEN_INFO_DICT.GetOrAdd(macroSection.Guid, () => new());
-                
-                Label macroSectioNameLabel = new()
-                {
-                    Text = macroSection.Name,
-                    Dock = DockStyle.Fill,
-                    BorderStyle = BorderStyle.None,
-                    AutoSize = true,
-                    TextAlign = ContentAlignment.MiddleCenter,
-                    BackColor = Form.DefaultBackColor,
-                    Padding = Padding.Empty,
-                    Margin = Padding.Empty,
-                    Font = SettingsConstants.MACROSECTION_NAME_LABEL_FONT,
-                };
-                macroSection.Label = macroSectioNameLabel;
-
-                this.rightSettingsPanel.RowStyles.Add(new(SizeType.AutoSize));
-                rowCount++;
-
-                controlPositionList.Add(new(macroSectioNameLabel, 0, rowCount-1, ColumnSpan: 3));
-
-                FlowLayoutPanel buttonFlowPanel = new()
-                {
-                    AutoSize = true,
-                    Anchor = AnchorStyles.None,
-                    BorderStyle = BorderStyle.None,
-                    Padding = Padding.Empty,
-                    Margin = new Padding(0, 0, 0, 10),
-                };
-
-                Button toggleCommentsVisibilityButton = new()
-                {
-                    AutoSize = true,
-                    BackgroundImage = Image.FromFile("Resources/Images/subtitle-8187463.png"),
-                    BackgroundImageLayout = ImageLayout.Zoom,
-                    MaximumSize = new(SettingsConstants.BUTTONS_SIZE, SettingsConstants.BUTTONS_SIZE),
-                    MinimumSize = new(SettingsConstants.BUTTONS_SIZE, SettingsConstants.BUTTONS_SIZE),
-                    FlatStyle = FlatStyle.Flat,
-                    FlatAppearance = { BorderSize = 1, BorderColor = Color.Black, MouseDownBackColor = Color.LightGray },
-                    BackColor = Color.Transparent,
-                };
-                toggleCommentsVisibilityButton.Click += (sender, args) =>
-                {
-                    this.rightSettingsPanel.SuspendLayout();
-
-                    lastOpenInformation.CommentVisibility = !lastOpenInformation.CommentVisibility;
-                    macroSection.SetDescriptionLabelVisibility(lastOpenInformation.CommentVisibility);
-
-                    this.rightSettingsPanel.ResumeLayout(true);
-                    this.rightSettingsPanel.PerformLayout();
-                };
-
-                Button saveDefaultButton = new()
-                {
-                    AutoSize = true,
-                    BackgroundImage = Image.FromFile("Resources/Images/favorite-8250509.png"),
-                    BackgroundImageLayout = ImageLayout.Zoom,
-                    MaximumSize = new(SettingsConstants.BUTTONS_SIZE, SettingsConstants.BUTTONS_SIZE),
-                    MinimumSize = new(SettingsConstants.BUTTONS_SIZE, SettingsConstants.BUTTONS_SIZE),
-                    FlatStyle = FlatStyle.Flat,
-                    FlatAppearance = { BorderSize = 1, BorderColor = Color.Black, MouseDownBackColor = Color.LightGray },
-                    BackColor = Color.Transparent,
-                };
-                saveDefaultButton.Click += (sender, args) => macroSection.Binding.SaveToPresetConfiguration();
-                Utils.CreateStandardToolTip().SetToolTip(saveDefaultButton, Locale.CONFIG_LINE_SAVE_DEFAULT_TOOLTIP);
-
-                buttonFlowPanel.Controls.Add(saveDefaultButton);
-                buttonFlowPanel.Controls.Add(toggleCommentsVisibilityButton);
-
-                this.rightSettingsPanel.RowStyles.Add(new(SizeType.AutoSize));
-                rowCount++;
-
-                controlPositionList.Add(new(buttonFlowPanel, 0, rowCount - 1, ColumnSpan: 3));
-
-                foreach (var section in macroSection.Sections)
-                {
-                    var sectionStartRowCount = rowCount;
-                    Label sectionNameLabel = new()
-                    {
-                        Text = section.Name,
-                        Dock = DockStyle.Fill,
-                        //Anchor = AnchorStyles.Top,
-                        BorderStyle = BorderStyle.None,
-                        AutoSize = true,
-                        TextAlign = ContentAlignment.MiddleRight,
-                        BackColor = Form.DefaultBackColor,
-                        Padding = Padding.Empty,
-                        Margin = new Padding(0,0,4,0),
-                        Font = SettingsConstants.SECTION_NAME_LABEL_FONT,
-                    };
-                    Utils.SetDoubleBuffered(sectionNameLabel);
-                    Utils.CreateStandardToolTip().SetToolTip(sectionNameLabel, section.ToolTip);
-
-                    TableLayoutPanel valuesPanel = new()
-                    {
-                        AutoSize = true,
-                        AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                        Dock = DockStyle.Fill,
-                        ColumnStyles = { new ColumnStyle(SizeType.AutoSize) },
-                        Padding = Padding.Empty,
-                        Margin = Padding.Empty,
-                    };
-                    Utils.SetDoubleBuffered(valuesPanel);
-
-                    List<ControlPosition> valuesControlPositionList = [];
-
-                    int valuesRowCount = 0;
-                    foreach (var formValue in section.FormValueList)
-                    {
-                        this.AppendToValuePanel(macroSection, lastOpenInformation, valuesPanel, valuesControlPositionList, formValue, ref valuesRowCount);
-                    }
-
-                    SettingsForm.ApplyControlPositions(valuesPanel, valuesControlPositionList);
-
-                    //This is just to view better the division in sections
-                    var sectionBorderLabel = new Label()
-                    {
-                        Text = "",
-                        Dock = DockStyle.Fill,
-                        BackColor = Color.DarkBlue,
-                        Padding = Padding.Empty,
-                        Margin = new Padding(0, 6, (int)(SettingsConstants.SECTIONS_BORDER_COLUMN_SIZE / 2f), 6),
-                    };
-                    Utils.SetDoubleBuffered(sectionBorderLabel);
-
-                    this.rightSettingsPanel.RowStyles.Add(new(SizeType.AutoSize));
-                    rowCount++;
-
-                    controlPositionList.Add(new(sectionNameLabel, SECTION_NAME_COLUMN, rowCount - 1));
-                    controlPositionList.Add(new(sectionBorderLabel, SECTION_BORDER_COLUMN, rowCount - 1));
-                    controlPositionList.Add(new(valuesPanel, SECTION_VALUES_COLUMN, rowCount - 1));
-
-                    this.rightSettingsPanel.RowStyles.Add(new(SizeType.Absolute, SettingsConstants.SECTIONS_SEPARATION));
-                    rowCount++;
-
-                    section.Panel = valuesPanel;
-                }
-            }
-
-
-            SettingsForm.ApplyControlPositions(this.rightSettingsPanel, controlPositionList);
-        }
-
-        private static void ApplyControlPositions(TableLayoutPanel panel, List<ControlPosition> controlPositionList)
-        {
-            panel.Controls.AddRange(controlPositionList.Select(c => c.Control).ToArray());
-            foreach (var controlPosition in controlPositionList)
-            {
-                panel.SetCellPosition(controlPosition.Control, new(controlPosition.Column, controlPosition.Row));
-                if (controlPosition.ColumnSpan > 0)
-                {
-                    panel.SetColumnSpan(controlPosition.Control, controlPosition.ColumnSpan);
-                }
-
-                if (controlPosition.RowSpan > 0)
-                {
-                    panel.SetRowSpan(controlPosition.Control, controlPosition.RowSpan);
-                }
-            }
-        }
-
-        //DO NOT USE UseCompatibleTextRendering! IT WILL INCREASE TIME A LOT!
-        private void AppendToValuePanel(SettingsFormMacroSection formMacroSection, SettingsFormLastOpenInformation lastOpenInformation,
-            TableLayoutPanel panel, List<ControlPosition> controlPositionList, SettingsFormValue formValue, ref int rowCount)
-        {
-            bool hasName = !string.IsNullOrEmpty(formValue.Name);
-            bool hasDescription = !string.IsNullOrEmpty(formValue.Description);
-
-            if (hasName)
-            {
-                Label nameLabel = new()
-                {
-                    Text = formValue.Name,
-                    AutoSize = true,
-                    Dock = DockStyle.Fill,
-                    BorderStyle = BorderStyle.None,
-                    TextAlign = ContentAlignment.MiddleLeft,
-                    BackColor = Color.Transparent,
-                    Margin = hasDescription ? Padding.Empty : new(0, 0, 0, 3),
-                    Padding = Padding.Empty,
-                    Font = SettingsConstants.VALUE_NAME_LABEL_FONT,
-                };
-                Utils.SetDoubleBuffered(nameLabel);
-
-                panel.RowStyles.Add(new(SizeType.AutoSize));
-                rowCount++;
-
-                controlPositionList.Add(new(nameLabel, 0, rowCount - 1));
-            }
-
-            if (hasDescription)
-            {
-                Label descriptionLabel = new()
-                {
-                    Text = formValue.Description,
-                    AutoSize = true,
-                    Dock = DockStyle.Fill,
-                    BorderStyle = BorderStyle.None,
-                    TextAlign = ContentAlignment.MiddleLeft,
-                    BackColor = Color.Transparent,
-                    Margin = new Padding(0, 0, 0, 3),
-                    Padding = Padding.Empty,
-                    Font = SettingsConstants.DESCRIPTION_LABEL_FONT,
-                    MaximumSize = new Size(SettingsConstants.VALUE_DESCRIPTION_MAX_SIZE, 0), //Since last columns is to fill the all control, set a maximun size to allow wrapping of text
-                    Visible = lastOpenInformation.CommentVisibility,
-                };
-                Utils.SetDoubleBuffered(descriptionLabel);
-                formMacroSection.ValueDescriptionLabelList.Add(descriptionLabel);
-
-                panel.RowStyles.Add(new(SizeType.AutoSize));
-                rowCount++;
-
-                controlPositionList.Add(new(descriptionLabel, 0, rowCount - 1));
-            }
-
-            var editorControl = formValue.Editor?.GetControl();
-            if (editorControl != null)
-            {
-                panel.RowStyles.Add(new(SizeType.AutoSize));
-                rowCount++;
-
-                controlPositionList.Add(new(editorControl, 0, rowCount - 1));
-            }
-
-            panel.RowStyles.Add(new(SizeType.Absolute, SettingsConstants.VALUES_SEPERATION));
-            rowCount++;
-        }
-
-        private void ListView_DrawItem(object? sender, DrawListViewItemEventArgs e)
-        {
-            var item = e.Item;
-            if (item == null)
-            {
-                return;
-            }
-
-            if (e.State == 0)
-            {
-                return;
-            }
-
-            if (item.Tag is ListViewItemTag tag)
-            {
-                var rectsLeftPadding = 0;//(SECTIONS_LEFT_PADDING * 3) - 2;
-
-                var foreColor = SettingsConstants.SECTIONS_ITEM_FORE_COLOR;
-                var backColor = tag is ListViewItemSectionTag sectionTag && sectionTag.IsSectionVisible ? SettingsConstants.SECTIONS_SELECTED_ITEM_BACK_COLOR : Color.Transparent;
-
-                //BACKGROUND
-                var backBounds = e.Bounds;
-                backBounds = Rectangle.Inflate(backBounds, -rectsLeftPadding / 2, 0);
-                backBounds.Offset(rectsLeftPadding / 2, 0);
-                using (var backBrush = new SolidBrush(backColor))
-                {
-                    e.Graphics.FillRectangle(backBrush, backBounds);
-                }
-
-                //DRAW TEXT
-                var textBounds = e.Bounds;
-                textBounds = Rectangle.Inflate(textBounds, tag is ListViewItemMacroSectionTag ? 0 : -SettingsConstants.SECTIONS_LEFT_PADDING * 3, 0);
-                TextRenderer.DrawText(e.Graphics, item.Text, this.leftSelectSectionListView.Font, textBounds, foreColor, TextFormatFlags.Left);
-            }
+            this.leftSectionListView.ResumeLayout(true);
+            this.rightSettingsPanel.ResumeLayout(true);
+            this.rightSettingsPanel.Parent?.ResumeLayout(true);
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -617,254 +215,5 @@ namespace TiaUtilities.Generation.SettingsNew
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
-        class ListViewThatKeepsSelection : ListView
-        {
-            private const int SETCURSOR = 0x0020;
-            private const int LBUTTONDOWN = 0x0201;
-            private const int MBUTTONDBLCLK = 0x0209;
-
-            public ListViewThatKeepsSelection()
-            {
-                this.DoubleBuffered = true;
-            }
-
-            protected override void WndProc(ref Message m)
-            {
-                //https://www.pinvoke.net/default.aspx/enums/windowsmessages.html
-                // Suppress mouse messages that are OUTSIDE of the items area
-                /*
-                    LBUTTONDOWN = 0x0201,
-                    LBUTTONUP = 0x0202,
-                    LBUTTONDBLCLK = 0x0203,
-                    RBUTTONDOWN = 0x0204,
-                    RBUTTONUP = 0x0205,
-                    RBUTTONDBLCLK = 0x0206,
-                    MBUTTONDOWN = 0x0207,
-                    MBUTTONUP = 0x0208,
-                    MBUTTONDBLCLK = 0x0209, 
-                */
-                if (m.Msg >= LBUTTONDOWN && m.Msg <= MBUTTONDBLCLK)
-                {
-                    Point pos = new(m.LParam.ToInt32() & 0xffff, m.LParam.ToInt32() >> 16);
-
-                    var hit = this.HitTest(pos);
-                    switch (hit.Location)
-                    {
-                        case ListViewHitTestLocations.AboveClientArea:
-                        case ListViewHitTestLocations.BelowClientArea:
-                        case ListViewHitTestLocations.LeftOfClientArea:
-                        case ListViewHitTestLocations.RightOfClientArea:
-                        case ListViewHitTestLocations.None:
-                            return;
-
-                    }
-                }
-
-                base.WndProc(ref m);
-            }
-
-            public bool IsVerticalScrollbarVisible()
-            {
-                var delta = (this.Width - this.ClientSize.Width);
-                return this.BorderStyle switch
-                {
-                    BorderStyle.None => (delta > 0),
-                    BorderStyle.FixedSingle => (delta > 2),
-                    BorderStyle.Fixed3D => (delta > 4),
-                    _ => throw new NotImplementedException(),
-                };
-            }
-
-        }
-
     }
 }
-
-/*
-                private void LoadMacroSections()
-        {
-            this.rightSettingsPanel.Controls.Clear();
-
-            List<ControlPosition> controlPositionList = [];
-
-            int rowCount = 0;
-            foreach (var macroSection in macroSectionList)
-            {
-                Label macroSectioNameLabel = new()
-                {
-                    Text = macroSection.Name,
-                    Dock = DockStyle.Fill,
-                    BorderStyle = BorderStyle.None,
-                    AutoSize = true,
-                    TextAlign = ContentAlignment.MiddleCenter,
-                    BackColor = Form.DefaultBackColor,
-                    Padding = Padding.Empty,
-                    Margin = new Padding(0, 0, 0, 10),
-                    Font = SettingsConstants.MACROSECTION_NAME_LABEL_FONT,
-                };
-
-                this.rightSettingsPanel.RowStyles.Add(new(SizeType.AutoSize));
-
-                controlPositionList.Add(new(macroSectioNameLabel, 0, rowCount, ColumnSpan: 3));
-               
-                //this.rightSettingsPanel.Controls.Add(macroSectioNameLabel, 0, rowCount);
-                //this.rightSettingsPanel.SetColumnSpan(macroSectioNameLabel, 3);
-                
-                rowCount++;
-
-                macroSection.Label = macroSectioNameLabel;
-                
-                foreach (var section in macroSection.Sections)
-                {
-                    Label sectionNameLabel = new()
-                    {
-                        Text = section.Name,
-                        Dock = DockStyle.Fill,
-                        BorderStyle = BorderStyle.None,
-                        AutoSize = false,
-                        TextAlign = ContentAlignment.TopCenter,
-                        BackColor = Form.DefaultBackColor,
-                        Padding = Padding.Empty,
-                        Margin = Padding.Empty,
-                        Font = SettingsConstants.SECTION_NAME_LABEL_FONT,
-                    };
-
-                    TableLayoutPanel valuesPanel = new()
-                    {
-                        AutoSize = true,
-                        AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                        Dock = DockStyle.Fill,
-                        ColumnStyles = { new ColumnStyle(SizeType.AutoSize) },
-                        Padding = Padding.Empty,
-                        Margin = Padding.Empty,
-                    };
-                    Utils.SetDoubleBuffered(valuesPanel);
-
-
-                    List<ControlPosition> valuesControlPositionList = [];
-
-                    int valueRowCount = 0;
-                    foreach (var value in section.ValueList)
-                    {
-                        this.AppendToValuePanel(valuesPanel, value, valuesControlPositionList, ref valueRowCount);
-                    }
-
-                    SettingsForm.ApplyControlPositions(valuesPanel, valuesControlPositionList);
-
-                    //This is just to view bettere the division
-                    var sectionBorderLabel = new Label()
-                    {
-                        Text = "",
-                        Dock = DockStyle.Fill,
-                        BackColor = Color.DarkBlue,
-                        Padding = Padding.Empty,
-                        Margin = new Padding(0, 6, (int)(SettingsConstants.SECTIONS_BORDER_COLUMN_SIZE / 2f), 6),
-                    };
-
-                    this.rightSettingsPanel.RowStyles.Add(new(SizeType.AutoSize));
-
-                    
-                    controlPositionList.Add(new(sectionNameLabel, 0, rowCount));
-                    controlPositionList.Add(new(sectionBorderLabel, 1, rowCount));
-                    controlPositionList.Add(new(valuesPanel, 2, rowCount));
-                    
-                    
-                    this.rightSettingsPanel.Controls.Add(sectionNameLabel, 0, rowCount);
-                    this.rightSettingsPanel.Controls.Add(sectionBorderLabel, 1, rowCount);
-                    this.rightSettingsPanel.Controls.Add(valuesPanel, 2, rowCount);
-                    
-                    rowCount++;
-
-                    this.rightSettingsPanel.RowStyles.Add(new(SizeType.Absolute, SettingsConstants.SECTION_VALUE_SEPERATION));
-                    rowCount++;
-
-                    section.Panel = valuesPanel;
-                                    }
-                                }
-
-
-            SettingsForm.ApplyControlPositions(this.rightSettingsPanel, controlPositionList);
-        }
-
-        //DO NOT USE UseCompatibleTextRendering! IT WILL INCREASE TIME A LOT!
-        private void AppendToValuePanel(TableLayoutPanel panel, SettingsValue value, List<ControlPosition> controlPositionList, ref int rowCount)
-        {
-            bool hasName = !string.IsNullOrEmpty(value.Name);
-            bool hasDescription = !string.IsNullOrEmpty(value.Description);
-
-            if (hasName)
-            {
-                Label nameLabel = new()
-                {
-                    Text = value.Name,
-                    AutoSize = true,
-                    Dock = DockStyle.Fill,
-                    BorderStyle = BorderStyle.None,
-                    TextAlign = ContentAlignment.MiddleLeft,
-                    BackColor = Color.Transparent,
-                    Margin = hasDescription ? Padding.Empty : new(0, 0, 0, 3),
-                    Padding = Padding.Empty,
-                    Font = SettingsConstants.VALUE_NAME_LABEL_FONT,
-                };
-
-                panel.RowStyles.Add(new(SizeType.AutoSize));
-
-                controlPositionList.Add(new(nameLabel, 0, rowCount));
-                //panel.Controls.Add(nameLabel, 0, rowCount);
-                rowCount++;
-            }
-            
-            if (hasDescription)
-            {
-                Label descriptionLabel = new()
-                {
-                    Text = value.Description,
-                    AutoSize = false, //This is to allow the text to wrap
-                    Dock = DockStyle.Fill,
-                    BorderStyle = BorderStyle.None,
-                    TextAlign = ContentAlignment.MiddleLeft,
-                    BackColor = Color.Transparent,
-                    Margin = new Padding(0, 0, 0, 3),
-                    Padding = Padding.Empty,
-                    Font = SettingsConstants.DESCRIPTION_LABEL_FONT,
-                };
-
-                panel.RowStyles.Add(new(SizeType.AutoSize));
-
-                controlPositionList.Add(new(descriptionLabel, 0, rowCount));
-                //panel.Controls.Add(descriptionLabel, 0, rowCount);
-                rowCount++;
-            }
-
-            var editor = SettingsEditor.ObtainFromValue(this, value);
-
-            panel.RowStyles.Add(new(SizeType.AutoSize));
-
-            controlPositionList.Add(new(editor.GetControl(), 0, rowCount));
-            //panel.Controls.Add(editor.GetControl(), 0, rowCount);
-            rowCount++;
-
-            panel.RowStyles.Add(new(SizeType.Absolute, SettingsConstants.SECTION_VALUE_SEPERATION));
-            rowCount++;
-        }
-
-        private void ListView_DrawColumnHeader(object? sender, DrawListViewColumnHeaderEventArgs e)
-        {
-            var header = e.Header;
-
-            HorizontalAlignment hAlign = header?.TextAlign ?? HorizontalAlignment.Left;
-            TextFormatFlags flags = (hAlign == HorizontalAlignment.Left) ? TextFormatFlags.Left :
-                                    ((hAlign == HorizontalAlignment.Center) ? TextFormatFlags.HorizontalCenter :
-                                     TextFormatFlags.Right);
-            flags |= TextFormatFlags.WordEllipsis;
-
-            Rectangle newBounds = Rectangle.Inflate(e.Bounds, -SettingsConstants.SECTIONS_LEFT_PADDING, 0);
-            TextRenderer.DrawText(e.Graphics, header?.Text, this.leftSelectSectionListView.Font, newBounds, Color.Black, flags);
-        }
-
-        private void ListView_DrawSubItem(object? sender, DrawListViewSubItemEventArgs e)
-        {
-            e.DrawDefault = true;
-        }
-
-*/

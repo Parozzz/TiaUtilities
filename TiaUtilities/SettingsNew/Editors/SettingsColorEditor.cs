@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using TiaUtilities.Generation.Configuration;
-using TiaUtilities.SettingsNew;
+using TiaUtilities.SettingsNew.FormHelpers;
 using TiaUtilities.Utility;
 using TiaUtilities.Utility.Extensions;
 

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TiaUtilities.Editors;
-using TiaUtilities.SettingsNew;
+using TiaUtilities.SettingsNew.FormHelpers;
 
 namespace TiaUtilities.SettingsNew.Editors
 {

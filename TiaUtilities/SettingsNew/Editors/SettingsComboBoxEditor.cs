@@ -1,8 +1,8 @@
 ﻿using TiaUtilities.CustomControls;
 using TiaUtilities.Generation.Configuration;
 using TiaUtilities.Languages;
-using TiaUtilities.SettingsNew;
 using TiaUtilities.SettingsNew.Bindings;
+using TiaUtilities.SettingsNew.FormHelpers;
 
 namespace TiaUtilities.SettingsNew.Editors
 {

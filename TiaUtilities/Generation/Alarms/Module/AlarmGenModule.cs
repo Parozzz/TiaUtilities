@@ -49,12 +49,18 @@ namespace TiaUtilities.Generation.Alarms.Module
             this.control.changeTemplateButton.Click += (sender, args) =>
             {
                 var currentTabConfig = GetCurrentTabConfiguration();
-                if(currentTabConfig != null)
+                if (currentTabConfig != null)
                 {
                     shownTemplateForm = new AlarmGenTemplateForm(mainConfig, currentTabConfig, this.gridBindContainer, templateHandler);
                     shownTemplateForm.Init();
                     shownTemplateForm.Show(this.control);
-                    shownTemplateForm.FormClosed += (sender, args) => shownTemplateForm = null;
+                    shownTemplateForm.FormClosed += (sender, args) =>
+                    {
+                        shownTemplateForm = null;
+                        this.SettingsBindings.Reload();
+                    };
+
+                    this.SettingsBindings.Reload();
                 }
             };
 
@@ -62,11 +68,14 @@ namespace TiaUtilities.Generation.Alarms.Module
             this.templateHandler.Init([]);
             this.templateHandler.TemplateRenamed += (sender, args) =>
             {
-                foreach(var tab in this.genTabList)
+                foreach (var tab in this.genTabList)
                 {
                     tab.ParseTemplateRenamed(args.OldName, args.NewName);
                 }
+
+                this.SettingsBindings.RequestUpdate();
             };
+            this.templateHandler.SelectedTemplateChanged += (sender, args) => this.SettingsBindings.RequestUpdate();
 
             this.control.tabControl.TabPreAdded += (sender, args) => TabCreation(args.TabPage);
             this.control.tabControl.TabPreRemoved += (sender, args) =>
@@ -241,7 +250,7 @@ namespace TiaUtilities.Generation.Alarms.Module
 
                 .Section(Locale.ALARM_SETTINGS_UDT)
                 .AddString(nameof(AlarmMainConfiguration.UDTBlockName), Locale.GENERICS_NAME, Locale.ALARM_SETTINGS_UDT_DESCR)
-
+                
                 .Section(Locale.ALARM_SETTINGS_UDT_ALARM_VARIABLE)
                 .AddString(nameof(AlarmMainConfiguration.AlarmNameTemplate), Locale.ALARM_SETTINGS_UDT_ALARM_VARIABLE_NAME)
                 .AddString(nameof(AlarmMainConfiguration.AlarmCommentTemplate), Locale.ALARM_SETTINGS_UDT_ALARM_VARIABLE_COMMENT)
@@ -253,10 +262,8 @@ namespace TiaUtilities.Generation.Alarms.Module
                 .AddString(nameof(AlarmMainConfiguration.HmiTriggerTagTemplate), Locale.ALARM_SETTINGS_HMI_TRIGGER_TAG, Locale.ALARM_SETTINGS_HMI_TRIGGER_TAG_DESCR)
                 .AddBool(nameof(AlarmMainConfiguration.HmiTriggerTagUseWordArray), Locale.ALARM_SETTINGS_HMI_USE_WORD_ARRAY, Locale.ALARM_SETTINGS_HMI_USE_WORD_ARRAY_DESCR);
 
-            
-
             settingsBindings
-                .MacroSection(this.GetCurrentTabName, () => true, this.GetCurrentTabConfiguration, MainForm.Settings.PresetAlarmTabConfiguration, () => this.TabConfigurations)
+                .MacroSection(this.GetCurrentTabName, () => this.control.tabControl.SelectedTab != null, this.GetCurrentTabConfiguration, MainForm.Settings.PresetAlarmTabConfiguration, () => this.TabConfigurations)
 
                 .Section(Locale.ALARM_SETTINGS_TAB_GROUPING_TYPE)
                 .AddEnum(nameof(AlarmTabConfiguration.GroupingType), description: Locale.ALARM_SETTINGS_TAB_GROUPING_TYPE_DESCR)
@@ -294,7 +301,7 @@ namespace TiaUtilities.Generation.Alarms.Module
                 .AddUInt(nameof(AlarmTabConfiguration.HmiStartID), Locale.ALARM_SETTINGS_TAB_HMI_START_ID, Locale.ALARM_SETTINGS_TAB_HMI_START_ID_DESCR)
                 .AddString(nameof(AlarmTabConfiguration.DefaultHmiAlarmClass), Locale.ALARM_SETTINGS_TAB_HMI_DEFAULT_ALARM_CLASS, Locale.ALARM_SETTINGS_TAB_HMI_DEFAULT_ALARM_CLASS_DESCR);
 
-
+            
             settingsBindings
                 .MacroSection(GetActiveTemplateName, () => shownTemplateForm != null && shownTemplateForm.Visible, GetActiveTemplateConfiguration, MainForm.Settings.PresetTemplateConfiguration)
 

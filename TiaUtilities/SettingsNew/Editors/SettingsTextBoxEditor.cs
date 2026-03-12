@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 using TiaUtilities.CustomControls;
-using TiaUtilities.SettingsNew;
+using TiaUtilities.SettingsNew.FormHelpers;
 
 namespace TiaUtilities.SettingsNew.Editors
 {
