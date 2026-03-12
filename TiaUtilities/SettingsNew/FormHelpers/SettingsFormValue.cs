@@ -55,9 +55,11 @@ namespace TiaUtilities.SettingsNew.FormHelpers
 
         public abstract void SetConfigurationValue(ObservableConfiguration configuration, object setValue);
 
-        public abstract object? GetConfigurationValue();
+        public abstract object? GetConfigurationValue(ObservableConfiguration configuration);
 
         public T? GetConfigurationValue<T>() => this.GetConfigurationValue() is T t ? t : default;
+
+        public object? GetConfigurationValue() => this.GetConfigurationValue(this.ConfigurationObject);
     }
 
     public class EmptySettingsFormValueImpl(SettingsValueBinding binding, ObservableConfiguration configurationObject) 
@@ -65,7 +67,7 @@ namespace TiaUtilities.SettingsNew.FormHelpers
     {
         public override SettingsEditor? Editor { get; init; } = null;
 
-        public override object? GetConfigurationValue() => null;
+        public override object? GetConfigurationValue(ObservableConfiguration configuration) => null;
 
         public override void SetConfigurationValue(ObservableConfiguration configuration, object setValue) { }
     }
@@ -107,9 +109,9 @@ namespace TiaUtilities.SettingsNew.FormHelpers
             this.SetInProgress = false;
         }
 
-        public override object? GetConfigurationValue()
+        public override object? GetConfigurationValue(ObservableConfiguration configuration)
         {
-            return this.PropertyInfo.GetValue(this.ConfigurationObject);
+            return this.PropertyInfo.GetValue(configuration);
         }
 
         private static bool IsSignedInt(Type type)
