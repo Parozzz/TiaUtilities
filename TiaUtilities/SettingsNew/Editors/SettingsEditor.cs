@@ -5,33 +5,40 @@ namespace TiaUtilities.SettingsNew.Editors
 {
     public abstract class SettingsEditor
     {
-        public static SettingsEditor? ObtainFromValue(Form form, SettingsFormValueImpl value)
+        public static SettingsEditor? ObtainFromValue(SettingsFormValueImpl value)
         {
+            SettingsEditor? editor = null;
             switch (value.Binding.EditorType)
             {
                 case SettingsEditorTypeEnum.NONE:
-                    return null;
+                    break;
                 default:
                 case SettingsEditorTypeEnum.STRING:
                 case SettingsEditorTypeEnum.UINT:
                 case SettingsEditorTypeEnum.INT:
-                    return new SettingsTextBoxEditor(value);
+                    editor = new SettingsTextBoxEditor(value);
+                    break;
                 case SettingsEditorTypeEnum.BOOLEAN:
-                    return new SettingsCheckBoxEditor(value);
+                    editor = new SettingsCheckBoxEditor(value);
+                    break;
                 case SettingsEditorTypeEnum.COLOR:
-                    return new SettingsColorEditor(value);
+                    editor = new SettingsColorEditor(value);
+                    break;
                 case SettingsEditorTypeEnum.JSON:
-                    return new SettingsJSONEditor(value);
+                    editor = new SettingsJSONEditor(value);
+                    break;
                 case SettingsEditorTypeEnum.JAVASCRIPT:
-                    var jsEditor = new SettingsJavascriptEditor(value);
-                    jsEditor.RegisterErrorThreadWithForm(MainForm.JavascriptErrorThread, form);
-                    return jsEditor;
+                    editor = new SettingsJavascriptEditor(value);
+                    break;
                 case SettingsEditorTypeEnum.ENUM:
                 case SettingsEditorTypeEnum.STRING_LIST:
                 case SettingsEditorTypeEnum.UNSIGNED_LIST:
                 case SettingsEditorTypeEnum.SIGNED_LIST:
-                    return new SettingsComboBoxEditor(value);
+                    editor = new SettingsComboBoxEditor(value);
+                    break;
             }
+
+            return editor;
         }
 
         public SettingsFormValueImpl Value { get; init; }
@@ -60,5 +67,7 @@ namespace TiaUtilities.SettingsNew.Editors
             this.Value.ConfigurationObject.PropertyChanged += propertyChanged;
             control.Disposed += (sender, args) => this.Value.ConfigurationObject.PropertyChanged -= propertyChanged;
         }
+
+        public virtual void AddFormCallbacks(Form form) { }
     }
 }

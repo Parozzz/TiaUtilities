@@ -15,7 +15,6 @@ using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.IO.Module;
 using TiaUtilities.Generation.SettingsNew;
 using TiaUtilities.Languages;
-using TiaUtilities.SettingsNew;
 using TiaUtilities.SettingsNew.Bindings;
 using TiaUtilities.Utility;
 using Timer = System.Windows.Forms.Timer;
@@ -360,11 +359,6 @@ namespace TiaUtilities
         {
             TreeViewDBVisualization dbVisualizationForm = new();
             dbVisualizationForm.Show(this);
-        }
-
-        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            SettingsParser.CreateTestForm().Show(this);
         }
     }
 }

@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using TiaUtilities.Configuration;
+﻿using TiaUtilities.Configuration;
 using TiaUtilities.Generation;
-using TiaUtilities.SettingsNew.Editors;
 
 namespace TiaUtilities.SettingsNew.Bindings
 {
@@ -52,18 +45,4 @@ namespace TiaUtilities.SettingsNew.Bindings
         public override string ToString() => $"{Guid};{Name};{Visible}";
     }
 
-    public record SettingsSectionBinding(SettingsMacroSectionBinding<ObservableConfiguration> MacroSectionBinding,
-        string Name, string ToolTip,
-        List<SettingsValueBinding> ValueList
-    );
-
-    public record SettingsValueBinding(SettingsSectionBinding SectionBinding, 
-        string PropertyName, string Name, string Description,
-        SettingsEditorTypeEnum EditorType,
-        Object? Tag = null
-    );
-
-    public record SettingsValueListStringTag(List<string> List);
-    public record SettingsValueListSignedTag(List<long> List);
-    public record SettingsValueListUnsignedTag(List<ulong> List);
 }

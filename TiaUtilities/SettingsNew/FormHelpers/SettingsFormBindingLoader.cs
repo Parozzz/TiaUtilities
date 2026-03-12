@@ -5,28 +5,52 @@ using TiaUtilities.Utility;
 
 namespace TiaUtilities.SettingsNew.FormHelpers
 {
-    public class SettingsFormBindingLoader
+    public class SettingsFormBindingLoader (SettingsBindings bindings, SettingsForm form)
     {
         private record ControlPosition(Control? Control, int Column, int Row, SizeType RowSizeType = SizeType.AutoSize, float RowSize = 0f, int ColumnSpan = 0, int RowSpan = 0);
+
+        private static void ApplyControlPositions(TableLayoutPanel panel, List<ControlPosition> controlPositionList)
+        {
+            var controlList = controlPositionList.Select(controlPosition => controlPosition.Control).Where(c => c is not null).Cast<Control>();
+            panel.Controls.AddRange([.. controlList]);
+
+            int lastRow = -1;
+
+            var orderedCollection = controlPositionList.OrderBy((controlPosition) => controlPosition.Row);
+            foreach (var controlPosition in orderedCollection)
+            {
+                if (lastRow != controlPosition.Row)
+                {
+                    panel.RowStyles.Add(new RowStyle(controlPosition.RowSizeType, controlPosition.RowSize));
+                    lastRow = controlPosition.Row;
+                }
+
+                var control = controlPosition.Control;
+                if (control != null)
+                {
+                    panel.SetCellPosition(control, new(controlPosition.Column, controlPosition.Row));
+                    if (controlPosition.ColumnSpan > 0)
+                    {
+                        panel.SetColumnSpan(control, controlPosition.ColumnSpan);
+                    }
+
+                    if (controlPosition.RowSpan > 0)
+                    {
+                        panel.SetRowSpan(control, controlPosition.RowSpan);
+                    }
+                }
+            }
+        }
 
         const int SECTION_NAME_COLUMN = 0;
         const int SECTION_BORDER_COLUMN = 1;
         const int SECTION_VALUES_COLUMN = 2;
 
-        public SettingsBindings Bindings { get; init; }
-        private readonly SettingsForm settingsForm;
+        public SettingsBindings Bindings { get; init; } = bindings;
+        private readonly SettingsForm settingsForm = form;
 
-        private readonly List<SettingsFormMacroSection> macroSectionList;
-        private readonly List<ControlPosition> loadedControls;
-
-        public SettingsFormBindingLoader(SettingsBindings bindings, SettingsForm settingsForm)
-        {
-            this.Bindings = bindings;
-            this.settingsForm = settingsForm;
-
-            this.macroSectionList = [];
-            this.loadedControls = [];
-        }
+        private readonly List<SettingsFormMacroSection> macroSectionList = [];
+        private readonly List<ControlPosition> createdControlPositionList = [];
 
         public void UpdateValues()
         {
@@ -105,11 +129,12 @@ namespace TiaUtilities.SettingsNew.FormHelpers
 
                 foreach (var sectionBinding in macroSectionBinding.SectionsList)
                 {
-                    SettingsFormSection formSection = new(sectionBinding, formMacroSection);
-                    formMacroSection.Sections.Add(formSection);
+                    var formValuesArray = sectionBinding.ValueList.Select(bindings => SettingsFormValue.FromBinding(bindings, configurationObject, settingsForm)).ToArray();
 
-                    var valueList = sectionBinding.ValueList.Select(bindings => SettingsFormValue.FromBinding(bindings, configurationObject, settingsForm)).ToArray();
-                    formSection.FormValueList.AddRange(valueList);
+                    SettingsFormSection formSection = new(sectionBinding, formMacroSection);
+                    formSection.FormValueList.AddRange(formValuesArray);
+
+                    formMacroSection.Sections.Add(formSection);
                 }
             }
 
@@ -119,12 +144,12 @@ namespace TiaUtilities.SettingsNew.FormHelpers
         private void CreateControls()
         {
             //I've tried many things and this seems to be the more efficient!
-            this.loadedControls.Clear();
+            this.createdControlPositionList.Clear();
 
             int rowCount = 0;
             foreach (var formMacroSection in macroSectionList)
             {
-                var lastOpenInformation = SettingsFormLastOpenInformation.GetLastOpenInformartionFromGuid(formMacroSection.Guid);
+                var lastOpenInformation = SettingsFormLastOpenInformation.GetFromGuid(formMacroSection.Guid);
 
                 Label macroSectioNameLabel = new()
                 {
@@ -140,11 +165,11 @@ namespace TiaUtilities.SettingsNew.FormHelpers
                 };
                 formMacroSection.Label = macroSectioNameLabel;
 
-                this.loadedControls.Add(new(macroSectioNameLabel, 0, rowCount, ColumnSpan: 3));
+                this.createdControlPositionList.Add(new(macroSectioNameLabel, 0, rowCount, ColumnSpan: 3));
                 rowCount++;
 
                 var macroSectionButtonToolbar = this.CreateButtonToolbar(formMacroSection, lastOpenInformation);
-                this.loadedControls.Add(new(macroSectionButtonToolbar, 0, rowCount, ColumnSpan: 3));
+                this.createdControlPositionList.Add(new(macroSectionButtonToolbar, 0, rowCount, ColumnSpan: 3));
                 rowCount++;
 
                 foreach (var formSection in formMacroSection.Sections)
@@ -253,12 +278,12 @@ namespace TiaUtilities.SettingsNew.FormHelpers
                     };
                     Utils.SetDoubleBuffered(sectionBorderLabel);
 
-                    this.loadedControls.Add(new(sectionNameLabel, SECTION_NAME_COLUMN, rowCount));
-                    this.loadedControls.Add(new(sectionBorderLabel, SECTION_BORDER_COLUMN, rowCount));
-                    this.loadedControls.Add(new(valuesPanel, SECTION_VALUES_COLUMN, rowCount));
+                    this.createdControlPositionList.Add(new(sectionNameLabel, SECTION_NAME_COLUMN, rowCount));
+                    this.createdControlPositionList.Add(new(sectionBorderLabel, SECTION_BORDER_COLUMN, rowCount));
+                    this.createdControlPositionList.Add(new(valuesPanel, SECTION_VALUES_COLUMN, rowCount));
                     rowCount++;
 
-                    this.loadedControls.Add(new(null, 0, rowCount, SizeType.Absolute, SettingsConstants.SECTIONS_SEPARATION, RowSpan: 3));
+                    this.createdControlPositionList.Add(new(null, 0, rowCount, SizeType.Absolute, SettingsConstants.SECTIONS_SEPARATION, RowSpan: 3));
                     rowCount++;
 
                     formSection.Panel = valuesPanel;
@@ -327,41 +352,15 @@ namespace TiaUtilities.SettingsNew.FormHelpers
                 }
             }
 
-            SettingsFormBindingLoader.ApplyControlPositions(panel, this.loadedControls);
+            SettingsFormBindingLoader.ApplyControlPositions(panel, this.createdControlPositionList);
         }
 
-        private static void ApplyControlPositions(TableLayoutPanel panel, List<ControlPosition> controlPositionList)
+        public void ClearAllLastOpenInformation()
         {
-            var controlList = controlPositionList.Select(controlPosition => controlPosition.Control).Where(c => c is not null).Cast<Control>();
-            panel.Controls.AddRange([.. controlList]);
-
-            int lastRow = -1;
-
-            var orderedCollection = controlPositionList.OrderBy((controlPosition) => controlPosition.Row);
-            foreach (var controlPosition in orderedCollection)
+            foreach(var formMacroSection in this.macroSectionList)
             {
-                if (lastRow != controlPosition.Row)
-                {
-                    panel.RowStyles.Add(new RowStyle(controlPosition.RowSizeType, controlPosition.RowSize));
-                    lastRow = controlPosition.Row;
-                }
-
-                var control = controlPosition.Control;
-                if (control != null)
-                {
-                    panel.SetCellPosition(control, new(controlPosition.Column, controlPosition.Row));
-                    if (controlPosition.ColumnSpan > 0)
-                    {
-                        panel.SetColumnSpan(control, controlPosition.ColumnSpan);
-                    }
-
-                    if (controlPosition.RowSpan > 0)
-                    {
-                        panel.SetRowSpan(control, controlPosition.RowSpan);
-                    }
-                }
+                SettingsFormLastOpenInformation.RemoveGuid(formMacroSection.Guid);
             }
         }
-
     }
 }

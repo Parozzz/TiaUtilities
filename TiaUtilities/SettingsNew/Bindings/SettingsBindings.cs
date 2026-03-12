@@ -1,19 +1,18 @@
-﻿using System.Reflection;
-using TiaUtilities.Configuration;
+﻿using TiaUtilities.Configuration;
 using TiaUtilities.SettingsNew.Editors;
 
 namespace TiaUtilities.SettingsNew.Bindings
 {
 
-    public delegate void SettingsBindingsUpdateRequestEvent(object? sender, EventArgs e);
+    public delegate void SettingsBindingsUpdateEvent(object? sender, EventArgs e);
 
-    public delegate void SettingsBindingsReloadtEvent(object? sender, EventArgs e);
+    public delegate void SettingsBindingsReloadEvent(object? sender, EventArgs e);
 
     public class SettingsBindings
     {
         
-        public event SettingsBindingsUpdateRequestEvent UpdateRequestEvent = delegate { };
-        public event SettingsBindingsUpdateRequestEvent ReloadEvent = delegate { };
+        public event SettingsBindingsUpdateEvent UpdateEvent = delegate { };
+        public event SettingsBindingsUpdateEvent ReloadEvent = delegate { };
 
         public List<SettingsMacroSectionBinding<ObservableConfiguration>> MacroSectionList { get; init; } = [];
 
@@ -45,7 +44,7 @@ namespace TiaUtilities.SettingsNew.Bindings
         {
             var macroSection = lastMacroSection ?? throw new InvalidOperationException("No MacroSection has been defined before");
 
-            lastSection = new SettingsSectionBinding(macroSection, name, description, []);
+            lastSection = new SettingsSectionBinding(macroSection, name, description);
             macroSection.SectionsList.Add(lastSection);
 
             return this;
@@ -67,7 +66,7 @@ namespace TiaUtilities.SettingsNew.Bindings
 
         public SettingsBindings Add(string propertyName, string name, string description, SettingsEditorTypeEnum editorType, Object? tag = null)
         {
-            var macroSection = lastMacroSection ?? throw new InvalidOperationException("No MacroSection has been defined before");
+            var _ = lastMacroSection ?? throw new InvalidOperationException("No MacroSection has been defined before");
             var section = lastSection ?? throw new InvalidOperationException("No Section has been defined before");
 
             SettingsValueBinding valueBinding = new(section, propertyName, name, description, editorType, tag);
@@ -76,9 +75,9 @@ namespace TiaUtilities.SettingsNew.Bindings
             return this;
         }
 
-        public void RequestUpdate()
+        public void Update()
         {
-            UpdateRequestEvent.Invoke(this, new());
+            UpdateEvent.Invoke(this, new());
         }
 
         public void Reload()

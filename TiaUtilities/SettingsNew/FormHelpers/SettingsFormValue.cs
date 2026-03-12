@@ -11,10 +11,18 @@ namespace TiaUtilities.SettingsNew.FormHelpers
         {
             if(string.IsNullOrEmpty(binding.PropertyName) || binding.EditorType == SettingsEditorTypeEnum.NONE)
             {
-                return new EmptySettingsFormValueImpl(form, binding, configurationObject);
+                return new EmptySettingsFormValueImpl(binding, configurationObject);
             }
 
-            return new SettingsFormValueImpl(form, binding, configurationObject);
+            var propertyInfo = configurationObject.GetType().GetProperty(binding.PropertyName, BindingFlags.Public | BindingFlags.Instance);
+            if (propertyInfo == null || !propertyInfo.CanRead || !propertyInfo.CanWrite)
+            {
+                throw new InvalidOperationException($"No valid PropertyInfo has been found named \"{binding.PropertyName}\" for Object: {configurationObject.GetType().FullName}");
+            }
+
+            SettingsFormValueImpl valueImpl = new(binding, configurationObject, propertyInfo);
+            valueImpl.Editor?.AddFormCallbacks(form);
+            return valueImpl;
         }
 
         public SettingsValueBinding Binding { get; init; }
@@ -27,7 +35,7 @@ namespace TiaUtilities.SettingsNew.FormHelpers
 
         public abstract SettingsEditor? Editor { get; init; } //if Binding.Type is SettingsEditorTypeEnum.NONE, returns null.
 
-        public SettingsFormValue(Form form, SettingsValueBinding binding, ObservableConfiguration configurationObject)
+        public SettingsFormValue(SettingsValueBinding binding, ObservableConfiguration configurationObject)
         {
             this.Binding = binding;
             this.ConfigurationObject = configurationObject;
@@ -52,8 +60,8 @@ namespace TiaUtilities.SettingsNew.FormHelpers
         public T? GetConfigurationValue<T>() => this.GetConfigurationValue() is T t ? t : default;
     }
 
-    public class EmptySettingsFormValueImpl(Form form, SettingsValueBinding binding, ObservableConfiguration configurationObject) 
-        : SettingsFormValue(form, binding, configurationObject)
+    public class EmptySettingsFormValueImpl(SettingsValueBinding binding, ObservableConfiguration configurationObject) 
+        : SettingsFormValue(binding, configurationObject)
     {
         public override SettingsEditor? Editor { get; init; } = null;
 
@@ -69,16 +77,10 @@ namespace TiaUtilities.SettingsNew.FormHelpers
 
         public bool SetInProgress { get; private set; } = false;
 
-        public SettingsFormValueImpl(Form form, SettingsValueBinding binding, ObservableConfiguration configurationObject) : base(form, binding, configurationObject)
+        public SettingsFormValueImpl(SettingsValueBinding binding, ObservableConfiguration configurationObject, PropertyInfo propertyInfo) : base(binding, configurationObject)
         {
-            var propertyInfo = configurationObject.GetType().GetProperty(this.Binding.PropertyName, BindingFlags.Public | BindingFlags.Instance);
-            if (propertyInfo == null || !propertyInfo.CanRead || !propertyInfo.CanWrite)
-            {
-                throw new InvalidOperationException($"No valid PropertyInfo has been found named \"{this.Binding.PropertyName}\" for Object: {configurationObject.GetType().FullName}");
-            }
             this.PropertyInfo = propertyInfo;
-
-            this.Editor = SettingsEditor.ObtainFromValue(form, this);
+            this.Editor = SettingsEditor.ObtainFromValue(this);
         }
 
         public override void SetConfigurationValue(ObservableConfiguration configuration, object setValue)

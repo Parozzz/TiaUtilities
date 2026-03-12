@@ -42,7 +42,6 @@
             testProjectMenuItem = new ToolStripMenuItem();
             svgToolStripMenuItem = new ToolStripMenuItem();
             dbVisualizationMenuItem = new ToolStripMenuItem();
-            settingsToolStripMenuItem = new ToolStripMenuItem();
             LogWorker = new System.ComponentModel.BackgroundWorker();
             MainLayoutPanel = new TableLayoutPanel();
             bottomPanel = new FlowLayoutPanel();
@@ -107,7 +106,7 @@
             // 
             // testToolStripMenuItem
             // 
-            testToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { importXMLToolStripMenuItem, jSToolStripMenuItem, sampleXMLMenuItem, testProjectMenuItem, svgToolStripMenuItem, dbVisualizationMenuItem, settingsToolStripMenuItem });
+            testToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { importXMLToolStripMenuItem, jSToolStripMenuItem, sampleXMLMenuItem, testProjectMenuItem, svgToolStripMenuItem, dbVisualizationMenuItem });
             testToolStripMenuItem.Font = new Font("Segoe UI", 12F);
             testToolStripMenuItem.Name = "testToolStripMenuItem";
             testToolStripMenuItem.Size = new Size(48, 25);
@@ -152,13 +151,6 @@
             dbVisualizationMenuItem.Size = new Size(188, 26);
             dbVisualizationMenuItem.Text = "DbVisualization";
             dbVisualizationMenuItem.Click += dbVisualizationMenuItem_Click;
-            // 
-            // settingsToolStripMenuItem
-            // 
-            settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            settingsToolStripMenuItem.Size = new Size(188, 26);
-            settingsToolStripMenuItem.Text = "Settings";
-            settingsToolStripMenuItem.Click += settingsToolStripMenuItem_Click;
             // 
             // MainLayoutPanel
             // 
@@ -276,7 +268,6 @@
         private ToolStripMenuItem loadToolStripMenuItem;
         private ToolStripMenuItem svgToolStripMenuItem;
         private ToolStripMenuItem dbVisualizationMenuItem;
-        private ToolStripMenuItem settingsToolStripMenuItem;
         private ToolStripMenuItem saveMenuItem;
         private ToolStripSeparator toolStripSeparator2;
         private ToolStripMenuItem programMenuItem;

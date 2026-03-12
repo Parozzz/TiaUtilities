@@ -1,10 +1,8 @@
 ﻿using TiaUtilities.CustomControls;
-using TiaUtilities.Languages;
 using TiaUtilities.SettingsNew;
 using TiaUtilities.SettingsNew.Bindings;
 using TiaUtilities.SettingsNew.FormHelpers;
 using TiaUtilities.Utility;
-using TiaUtilities.Utility.Extensions;
 
 namespace TiaUtilities.Generation.SettingsNew
 {
@@ -57,29 +55,16 @@ namespace TiaUtilities.Generation.SettingsNew
             this.bindingsLoader.Add(this.leftSectionListView, this.rightSettingsPanel);
 
             void UpdateRequestEvent(object? sender, EventArgs args) => this.bindingsLoader.UpdateValues();
-            this.bindingsLoader.Bindings.UpdateRequestEvent += UpdateRequestEvent;
+            this.bindingsLoader.Bindings.UpdateEvent += UpdateRequestEvent;
 
-            void ReloadEvent(object? sender, EventArgs args)
-            {
-                this.SuspendAll();
-
-                this.leftSectionListView.Items.Clear();
-                this.rightSettingsPanel.Controls.Clear();
-
-                this.bindingsLoader.Load();
-                this.bindingsLoader.Add(this.leftSectionListView, this.rightSettingsPanel);
-
-                this.ResumeAll();
-            }
-            ;
+            void ReloadEvent(object? sender, EventArgs args) => this.ReloadBindings();
             this.bindingsLoader.Bindings.ReloadEvent += ReloadEvent;
 
             this.FormClosed += (sender, args) =>
             {
-                this.bindingsLoader.Bindings.UpdateRequestEvent -= UpdateRequestEvent;
+                this.bindingsLoader.Bindings.UpdateEvent -= UpdateRequestEvent;
                 this.bindingsLoader.Bindings.ReloadEvent -= ReloadEvent;
             };
-
         }
 
         private void InitLeftListView()
@@ -151,9 +136,17 @@ namespace TiaUtilities.Generation.SettingsNew
             this.leftSectionListView.ResumeLayout(true);
         }
 
-        private void ParseBindings()
+        private void ReloadBindings()
         {
+            this.SuspendAll();
 
+            this.leftSectionListView.Items.Clear();
+            this.rightSettingsPanel.Controls.Clear();
+
+            this.bindingsLoader.Load();
+            this.bindingsLoader.Add(this.leftSectionListView, this.rightSettingsPanel);
+
+            this.ResumeAll();
         }
 
         public void SuspendAll()

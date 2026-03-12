@@ -1,4 +1,5 @@
-﻿using FastColoredTextBoxNS;
+﻿using DocumentFormat.OpenXml.Bibliography;
+using FastColoredTextBoxNS;
 using TiaUtilities.Editors;
 using TiaUtilities.Editors.ErrorReporting;
 using TiaUtilities.SettingsNew.FormHelpers;
@@ -26,12 +27,6 @@ namespace TiaUtilities.SettingsNew.Editors
             this.LoadFromConfiguration();
         }
 
-        public void RegisterErrorThreadWithForm(ErrorReportThread errorThread, Form form)
-        {
-            this.editor.RegisterErrorReporter(errorThread);
-            form.FormClosing += (sender, args) => this.editor.UnregisterErrorReporter(errorThread);
-        }
-
         public override Control GetControl()
         {
             return this.Control;
@@ -45,6 +40,12 @@ namespace TiaUtilities.SettingsNew.Editors
         public override void SaveToConfiguration()
         {
             this.Value.SetConfigurationValue(this.Control.Text);
+        }
+
+        public override void AddFormCallbacks(Form form)
+        {
+            this.editor.RegisterErrorReporter(MainForm.JavascriptErrorThread);
+            form.FormClosing += (sender, args) => this.editor.UnregisterErrorReporter(MainForm.JavascriptErrorThread);
         }
     }
 }

@@ -73,9 +73,9 @@ namespace TiaUtilities.Generation.Alarms.Module
                     tab.ParseTemplateRenamed(args.OldName, args.NewName);
                 }
 
-                this.SettingsBindings.RequestUpdate();
+                this.SettingsBindings.Update();
             };
-            this.templateHandler.SelectedTemplateChanged += (sender, args) => this.SettingsBindings.RequestUpdate();
+            this.templateHandler.SelectedTemplateChanged += (sender, args) => this.SettingsBindings.Update();
 
             this.control.tabControl.TabPreAdded += (sender, args) => TabCreation(args.TabPage);
             this.control.tabControl.TabPreRemoved += (sender, args) =>
@@ -86,13 +86,13 @@ namespace TiaUtilities.Generation.Alarms.Module
                 }
             };
 
-            this.control.tabControl.TabNameUserChanged += (sender, args) => this.SettingsBindings.RequestUpdate();
+            this.control.tabControl.TabNameUserChanged += (sender, args) => this.SettingsBindings.Update();
             this.control.tabControl.Selected += (sender, args) =>
             {
                 if (args.TabPage?.Tag is AlarmGenTab tab)
                 {
                     tab.Selected();
-                    this.SettingsBindings.RequestUpdate();
+                    this.SettingsBindings.Update();
                 }
             };
 
