@@ -42,25 +42,6 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
             this.removeButton.Click += (sender, args) => this.templateHandler.RemoveSelectedTemplate();
             this.renameButton.Click += (sender, args) => this.templateHandler.RenameSelectedTemplate(this);
             this.cloneButton.Click += (sender, args) => this.templateHandler.CloneSelectedTemplate();
-            this.configurationButton.Click += (sender, args) =>
-            {
-                var templateConfig = this.SelectedTemplate?.TemplateConfig;
-                if (templateConfig == null)
-                {
-                    return;
-                }
-
-                var configForm = new ConfigForm("Configuration") { ControlWidth = 300 };
-                configForm.SetConfiguration(templateConfig, MainForm.Settings.PresetTemplateConfiguration);
-
-                var mainGroup = configForm.Init().ControlWidth(150);
-                mainGroup.AddCheckBox().Label("Allarmi Indipendenti").BindChecked(() => templateConfig.StandaloneAlarms);
-
-                configForm.StartShowingAtControl(this.configurationButton);
-                configForm.Show(this);
-
-                configForm.FormClosed += (sender, args) => this.alarmDataGridWrapper.Refresh();
-            };
 
             this.selectComboBox.DataSource = new BindingSource() { DataSource = this.templateHandler.BindingList };
             this.selectComboBox.DisplayMember = "Name";
