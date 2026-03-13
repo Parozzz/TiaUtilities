@@ -116,10 +116,15 @@ namespace TiaUtilities.CustomControls
                 if (floatingTextBox.ShowDialog(this) == DialogResult.OK)
                 {
                     var oldName = tabPage.Text;
-                    tabPage.Text = floatingTextBox.InputText;
+                    var newName = floatingTextBox.InputText;
 
-                    InteractableTabNameChangedEventArgs args = new(tabPage, oldName);
+                    InteractableTabNameChangedEventArgs args = new(tabPage, newName, oldName);
                     TabNameUserChanged(this, args);
+
+                    if(!args.Handled)
+                    {
+                        tabPage.Text = args.NewName;
+                    }
                 }
             }
         }
@@ -225,10 +230,12 @@ namespace TiaUtilities.CustomControls
     }
 
     public delegate void InteractableTabNameChangedEventHandler(object? sender, InteractableTabNameChangedEventArgs args);
-    public class InteractableTabNameChangedEventArgs(TabPage tabPage, string oldName) : EventArgs
+    public class InteractableTabNameChangedEventArgs(TabPage tabPage, string newName, string oldName) : EventArgs
     {
         public TabPage TabPage { get; init; } = tabPage;
+        public string NewName { get; set; } = newName;
         public string OldName { get; init; } = oldName;
+        public bool Handled { get; set; } = false;
     }
 
     public class InteractableNewTabPage : TabPage

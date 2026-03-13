@@ -30,7 +30,7 @@ namespace TiaUtilities.SettingsNew.Bindings
         }
 
         public SettingsBindings MacroSection<T>(Func<string> getNameFunc, Func<bool> isVisibleFunc,
-            Func<T?> GetConfigurationFunc,  T? PresetConfigurationObject = null, Func<IEnumerable<T>>? otherConfigurationsFunc = null) 
+            Func<T?> GetConfigurationFunc,  T? PresetConfigurationObject = null, Func<Dictionary<string, ObservableConfiguration>>? otherConfigurationsFunc = null) 
             where T : ObservableConfiguration
         {
             lastMacroSection = new(getNameFunc, isVisibleFunc, typeof(T), GetConfigurationFunc, PresetConfigurationObject, otherConfigurationsFunc);

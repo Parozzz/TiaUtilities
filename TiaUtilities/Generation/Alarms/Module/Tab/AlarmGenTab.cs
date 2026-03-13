@@ -18,6 +18,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
         private readonly AlarmMainConfiguration mainConfig;
         private readonly AlarmGenTemplateHandler templateHandler;
 
+        public string Name { get => this.TabPage.Text; set => this.TabPage.Text = value; }
         public TabPage TabPage { get; init; }
         public AlarmTabConfiguration TabConfig { get; init; }
 
@@ -44,12 +45,6 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             this.deviceDataPreview = new();
             this.deviceGridHandler = new(MainForm.Settings.GridSettings, this.gridBindContainer, this.deviceDataPreview, placeholdersHandler) { RowCount = AlarmGenModule.DEVICE_GRID_ROW_COUNT };
         }
-
-        /*
-            var deviceTemplateForm = new AlarmGenTemplateForm(mainConfig, tabConfig, bindContainer, templateHandler);
-            deviceTemplateForm.Init();
-            deviceTemplateForm.ShowDialog(this);
-         */
 
         public void Init()
         {

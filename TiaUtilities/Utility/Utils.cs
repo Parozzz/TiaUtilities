@@ -274,5 +274,25 @@ namespace TiaUtilities.Utility
             return culture.TextInfo.ToTitleCase(source.ToLower());
         }
 
+        public static string CheckEqualityAndAddNumberAtEnd(string name, IEnumerable<string> otherNames)
+        {
+            int count = 1;
+
+            var fixedName = $"{name}";
+            while (true)
+            {
+                var found = otherNames.Any(s => s == fixedName);
+                if (!found)
+                {
+                    break;
+                }
+
+                fixedName = $"{name}({count})";
+                count++;
+            }
+
+            return fixedName;
+        }
+
     }
 }

@@ -5,7 +5,7 @@ namespace TiaUtilities.SettingsNew.Bindings
 {
     public class SettingsMacroSectionBinding<T>(Func<string> getNameFunc, Func<bool> isVisibleFunc,
         Type configurationType,
-        Func<T?> getConfigurationFunc, T? presetConfigurationObject, Func<IEnumerable<T>>? getOtherConfigurationsFunc) 
+        Func<T?> getConfigurationFunc, T? presetConfigurationObject, Func<Dictionary<string, T>>? getOtherConfigurationsFunc)
         where T : ObservableConfiguration
     {
         public Guid Guid { get; init; } = Guid.NewGuid();
@@ -13,7 +13,7 @@ namespace TiaUtilities.SettingsNew.Bindings
         public string Name { get => getNameFunc(); }
         public bool Visible { get => isVisibleFunc(); }
         public T? PresetConfigurationObject { get; init; } = presetConfigurationObject;
-        public IEnumerable<T>? OtherConfigurations { get => this.getOtherConfigurationsFunc?.Invoke(); }
+        public Dictionary<string, T>? OtherConfigurationDict { get => this.getOtherConfigurationsFunc?.Invoke(); }
 
         public List<SettingsSectionBinding> SectionsList { get; init; } = [];
 
@@ -21,7 +21,7 @@ namespace TiaUtilities.SettingsNew.Bindings
         private readonly Func<bool> isVisibleFunc = isVisibleFunc;
         private readonly Type configurationType = configurationType;
         private readonly Func<T?> getConfigurationObject = getConfigurationFunc;
-        private readonly Func<IEnumerable<T>>? getOtherConfigurationsFunc = getOtherConfigurationsFunc;
+        private readonly Func<Dictionary<string, T>>? getOtherConfigurationsFunc = getOtherConfigurationsFunc;
 
         public T? GetConfigurationObject()
         {

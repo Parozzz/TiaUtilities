@@ -25,13 +25,14 @@ namespace TiaUtilities.SettingsNew
                 var configurationObject = formValue.ConfigurationObject;
 
                 var mainConfigurationValue = formValue.GetConfigurationValue();
-                var otherConfigurationsEnumerable = formValue.MacroSectionBinding.OtherConfigurations;
-                if (mainConfigurationValue == null || otherConfigurationsEnumerable == null || !otherConfigurationsEnumerable.Any())
+                var otherConfigurationDict = formValue.MacroSectionBinding.OtherConfigurationDict;
+                if (mainConfigurationValue == null || otherConfigurationDict == null || !otherConfigurationDict.Any())
                 {
                     return;
                 }
 
-                otherConfigurationsEnumerable
+                otherConfigurationDict
+                    .Values
                     .Where(otherConf => otherConf.GetType() == configurationObject.GetType())
                     .Where(otherConf => otherConf != configurationObject)
                     .ForEach(otherConf => formValue.SetConfigurationValue(otherConf, mainConfigurationValue));
@@ -42,12 +43,13 @@ namespace TiaUtilities.SettingsNew
                 AutoSize = true,
                 Dock = DockStyle.Fill,
                 Margin = new Padding(10),
-                //MinimumSize = new(0, 300),
+                MinimumSize = new(0, 150),
                 MaximumSize = new(0, 300),
                 AllowUserToResizeColumns = false,
                 AllowUserToResizeRows = false,
                 ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing,
                 RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing,
+                BorderStyle = BorderStyle.None,
             };
 
             var column1Name = new DataGridViewTextBoxColumn()
@@ -55,12 +57,14 @@ namespace TiaUtilities.SettingsNew
                 Name = "Name",
                 HeaderText = "Name",
                 ReadOnly = true,
+                SortMode = DataGridViewColumnSortMode.NotSortable
             };
             var column2Value = new DataGridViewTextBoxColumn()
             {
                 HeaderText = "Value",
                 ReadOnly = false,
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+                SortMode = DataGridViewColumnSortMode.NotSortable,
             };
 
             dataGridView.Columns.AddRange([column1Name, column2Value]);
@@ -78,17 +82,38 @@ namespace TiaUtilities.SettingsNew
             {
                 if (setToOther.Visible)
                 {
-                    var otherConfigurationsEnumerable = formValue.MacroSectionBinding.OtherConfigurations;
-                    setToOther.Enabled = otherConfigurationsEnumerable != null && otherConfigurationsEnumerable.Any(otherConf => otherConf != formValue.ConfigurationObject);
+                    var otherConfigurationDict = formValue.MacroSectionBinding.OtherConfigurationDict;
+                    setToOther.Enabled = otherConfigurationDict != null && otherConfigurationDict
+                                                                                .Select(pair => pair.Value)
+                                                                                .Any(otherConf => otherConf != formValue.ConfigurationObject);
 
-                    if(otherConfigurationsEnumerable != null)
+                    if (otherConfigurationDict != null)
                     {
-                        dataGridView.RowCount = otherConfigurationsEnumerable.Count();
+                        dataGridView.RowCount = otherConfigurationDict.Count;
+
+                        if (dataGridView.RowCount < 5)
+                        {
+                            dataGridView.MinimumSize = new(0, 80);
+                            menuStrip.MinimumSize = new(0, 100);
+                        }
+                        else if (dataGridView.RowCount < 12)
+                        {
+                            dataGridView.MinimumSize = new(0, 170);
+                            menuStrip.MinimumSize = new(0, 190);
+                        }
+                        else
+                        {
+                            dataGridView.MinimumSize = new(0, 240);
+                            menuStrip.MinimumSize = new(0, 260);
+                        }
 
                         int rowCount = 0;
-                        foreach (var otherConf in otherConfigurationsEnumerable)
+                        foreach (var pair in otherConfigurationDict)
                         {
-                            dataGridView.Rows[rowCount].Cells[0].Value = formValue.MacroSectionBinding.Name.ToString();
+                            var name = pair.Key;
+                            var otherConf = pair.Value;
+
+                            dataGridView.Rows[rowCount].Cells[0].Value = name;
                             dataGridView.Rows[rowCount].Cells[1].Value = formValue.GetConfigurationValue(otherConf)?.ToString();
                             rowCount++;
                         }
@@ -107,7 +132,7 @@ namespace TiaUtilities.SettingsNew
 
         private static string GetSetToOtherText(SettingsFormValue formValue)
         {
-            var count = formValue.MacroSectionBinding.OtherConfigurations?.Count() ?? 0;
+            var count = formValue.MacroSectionBinding.OtherConfigurationDict?.Count() ?? 0;
             return $"{Locale.CONFIG_LINE_TRANSFER_TO_OTHERS} ({count})";
         }
     }

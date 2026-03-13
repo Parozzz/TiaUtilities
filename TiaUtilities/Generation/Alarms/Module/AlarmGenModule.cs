@@ -1,4 +1,5 @@
-﻿using TiaUtilities.Editors.ErrorReporting;
+﻿using TiaUtilities.Configuration;
+using TiaUtilities.Editors.ErrorReporting;
 using TiaUtilities.Generation.Alarms.Configurations;
 using TiaUtilities.Generation.Alarms.Module.Tab;
 using TiaUtilities.Generation.Alarms.Module.Template;
@@ -8,6 +9,7 @@ using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.SettingsNew;
 using TiaUtilities.Languages;
 using TiaUtilities.SettingsNew.Bindings;
+using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.Alarms.Module
 {
@@ -23,8 +25,8 @@ namespace TiaUtilities.Generation.Alarms.Module
         private readonly AlarmMainConfiguration mainConfig;
         private readonly AlarmGenTemplateHandler templateHandler;
 
-        private readonly List<AlarmGenTab> genTabList;
-        public IEnumerable<AlarmTabConfiguration> TabConfigurations { get => this.genTabList.Select(tab => tab.TabConfig); }
+        private readonly List<AlarmGenTab> alarmTabList;
+        public IEnumerable<AlarmTabConfiguration> TabConfigurations { get => this.alarmTabList.Select(tab => tab.TabConfig); }
 
         public SettingsBindings SettingsBindings { get; init; }
 
@@ -39,7 +41,7 @@ namespace TiaUtilities.Generation.Alarms.Module
             this.templateHandler = new();
             GenUtils.CopyJsonFieldsAndProperties(MainForm.Settings.PresetAlarmMainConfiguration, this.mainConfig);
 
-            this.genTabList = [];
+            this.alarmTabList = [];
             this.SettingsBindings = new();
         }
 
@@ -68,7 +70,7 @@ namespace TiaUtilities.Generation.Alarms.Module
             this.templateHandler.Init([]);
             this.templateHandler.TemplateRenamed += (sender, args) =>
             {
-                foreach (var tab in this.genTabList)
+                foreach (var tab in this.alarmTabList)
                 {
                     tab.ParseTemplateRenamed(args.OldName, args.NewName);
                 }
@@ -82,11 +84,28 @@ namespace TiaUtilities.Generation.Alarms.Module
             {
                 if (args.TabPage.Tag is AlarmGenTab tab)
                 {
-                    genTabList.Remove(tab);
+                    alarmTabList.Remove(tab);
                 }
             };
 
-            this.control.tabControl.TabNameUserChanged += (sender, args) => this.SettingsBindings.Update();
+            this.control.tabControl.TabNameUserChanged += (sender, args) =>
+            {
+                var newName = args.NewName;
+                foreach(var loopTab in this.alarmTabList)
+                {
+                    if(newName == loopTab.Name)
+                    {
+                        var tabNames = this.alarmTabList
+                                            .Where(tab => tab.TabPage != args.TabPage)
+                                            .Select(tab => tab.Name);
+
+                        var fixedNewName = Utils.CheckEqualityAndAddNumberAtEnd(newName, tabNames);
+                        args.NewName = fixedNewName;
+                    }
+                }
+
+                this.SettingsBindings.Update();
+            };
             this.control.tabControl.Selected += (sender, args) =>
             {
                 if (args.TabPage?.Tag is AlarmGenTab tab)
@@ -112,34 +131,38 @@ namespace TiaUtilities.Generation.Alarms.Module
 
         private void TabCreation(TabPage tabPage, AlarmGenTabSave? save = null)
         {
-            tabPage.Text = save?.Name ?? "AlarmGen";
+            AlarmGenTab alarmTab = new(this.gridBindContainer, this, this.mainConfig, this.templateHandler, tabPage);
+            alarmTab.Init();
 
-            AlarmGenTab tab = new(this.gridBindContainer, this, this.mainConfig, this.templateHandler, tabPage);
-
-            tab.Init();
+            if(save == null)
+            {
+                alarmTab.Name = Utils.CheckEqualityAndAddNumberAtEnd("AlarmTab", this.alarmTabList.Select(tab => tab.Name));
+            }
             if (save != null)
             {
-                tab.LoadSave(save);
+                alarmTab.LoadSave(save);
+                alarmTab.Name = Utils.CheckEqualityAndAddNumberAtEnd(alarmTab.Name, this.alarmTabList.Select(tab => tab.Name)); //In case the loaded file has a duplicated name!
             }
-            tabPage.Tag = tab;
-            tabPage.Controls.Add(tab.DataGridViewControl);
 
-            genTabList.Add(tab); //Do this AFTER. Otherwise the Selected event is called with Tag null.
+            tabPage.Tag = alarmTab;
+            tabPage.Controls.Add(alarmTab.DataGridViewControl);
+
+            alarmTabList.Add(alarmTab); //Do this AFTER. Otherwise the Selected event is called with Tag null.
         }
 
         public void Clear()
         {
             this.SettingsBindings.Clear();
 
-            this.genTabList.Clear();
+            this.alarmTabList.Clear();
             this.control.tabControl.TabPages.Clear();
         }
 
-        public bool IsDirty() => this.mainConfig.IsDirty() || this.genTabList.Any(x => x.IsDirty()) || this.GridScriptHandler.IsDirty() || this.templateHandler.IsDirty();
+        public bool IsDirty() => this.mainConfig.IsDirty() || this.alarmTabList.Any(x => x.IsDirty()) || this.GridScriptHandler.IsDirty() || this.templateHandler.IsDirty();
         public void Wash()
         {
             this.mainConfig.Wash();
-            foreach (var tab in this.genTabList)
+            foreach (var tab in this.alarmTabList)
             {
                 tab.Wash();
             }
@@ -157,7 +180,7 @@ namespace TiaUtilities.Generation.Alarms.Module
 
             GenUtils.CopyJsonFieldsAndProperties(mainConfig, projectSave.AlarmMainConfig);
 
-            foreach (var tab in genTabList)
+            foreach (var tab in alarmTabList)
             {
                 var tabSave = tab.CreateSave();
                 projectSave.TabSaves.Add(tabSave);
@@ -198,7 +221,7 @@ namespace TiaUtilities.Generation.Alarms.Module
         public void ExportXML(string folderPath)
         {
             AlarmXmlGenerator ioXmlGenerator = new(mainConfig);
-            foreach (var tab in genTabList)
+            foreach (var tab in alarmTabList)
             {
                 ioXmlGenerator.GenerateAlarms(tab.TabPage.Text, tab.TabConfig, this.templateHandler, tab.DeviceDataList);
             }
@@ -250,7 +273,7 @@ namespace TiaUtilities.Generation.Alarms.Module
 
                 .Section(Locale.ALARM_SETTINGS_UDT)
                 .AddString(nameof(AlarmMainConfiguration.UDTBlockName), Locale.GENERICS_NAME, Locale.ALARM_SETTINGS_UDT_DESCR)
-                
+
                 .Section(Locale.ALARM_SETTINGS_UDT_ALARM_VARIABLE)
                 .AddString(nameof(AlarmMainConfiguration.AlarmNameTemplate), Locale.ALARM_SETTINGS_UDT_ALARM_VARIABLE_NAME)
                 .AddString(nameof(AlarmMainConfiguration.AlarmCommentTemplate), Locale.ALARM_SETTINGS_UDT_ALARM_VARIABLE_COMMENT)
@@ -263,7 +286,7 @@ namespace TiaUtilities.Generation.Alarms.Module
                 .AddBool(nameof(AlarmMainConfiguration.HmiTriggerTagUseWordArray), Locale.ALARM_SETTINGS_HMI_USE_WORD_ARRAY, Locale.ALARM_SETTINGS_HMI_USE_WORD_ARRAY_DESCR);
 
             settingsBindings
-                .MacroSection(this.GetCurrentTabName, () => this.control.tabControl.SelectedTab != null, this.GetCurrentTabConfiguration, MainForm.Settings.PresetAlarmTabConfiguration, () => this.TabConfigurations)
+                .MacroSection(this.GetCurrentTabName, () => this.control.tabControl.SelectedTab != null, this.GetCurrentTabConfiguration, MainForm.Settings.PresetAlarmTabConfiguration, this.GetTabConfigurationDict)
 
                 .Section(Locale.ALARM_SETTINGS_TAB_GROUPING_TYPE)
                 .AddEnum(nameof(AlarmTabConfiguration.GroupingType), description: Locale.ALARM_SETTINGS_TAB_GROUPING_TYPE_DESCR)
@@ -301,7 +324,7 @@ namespace TiaUtilities.Generation.Alarms.Module
                 .AddUInt(nameof(AlarmTabConfiguration.HmiStartID), Locale.ALARM_SETTINGS_TAB_HMI_START_ID, Locale.ALARM_SETTINGS_TAB_HMI_START_ID_DESCR)
                 .AddString(nameof(AlarmTabConfiguration.DefaultHmiAlarmClass), Locale.ALARM_SETTINGS_TAB_HMI_DEFAULT_ALARM_CLASS, Locale.ALARM_SETTINGS_TAB_HMI_DEFAULT_ALARM_CLASS_DESCR);
 
-            
+
             settingsBindings
                 .MacroSection(GetActiveTemplateName, () => shownTemplateForm != null && shownTemplateForm.Visible, GetActiveTemplateConfiguration, MainForm.Settings.PresetTemplateConfiguration)
 
@@ -320,7 +343,6 @@ namespace TiaUtilities.Generation.Alarms.Module
             return this.templateHandler.SelectedTemplate?.TemplateConfig;
         }
 
-
         private string GetCurrentTabName()
         {
             var tabPage = this.control.tabControl.SelectedTab;
@@ -330,6 +352,16 @@ namespace TiaUtilities.Generation.Alarms.Module
         private AlarmTabConfiguration? GetCurrentTabConfiguration()
         {
             return this.control.tabControl.SelectedTab?.Tag is AlarmGenTab genTab ? genTab.TabConfig : null;
+        }
+
+        private Dictionary<string, ObservableConfiguration> GetTabConfigurationDict()
+        {
+            Dictionary<string, ObservableConfiguration> dict = [];
+            foreach (var tab in this.alarmTabList)
+            {
+                dict.Add(tab.Name, tab.TabConfig);
+            }
+            return dict;
         }
     }
 }
