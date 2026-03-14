@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
+using TiaUtilities.Configuration;
 using TiaUtilities.Languages;
 using TiaUtilities.SettingsNew.Bindings;
 using TiaUtilities.SettingsNew.FormHelpers;
@@ -38,89 +40,37 @@ namespace TiaUtilities.SettingsNew
                     .ForEach(otherConf => formValue.SetConfigurationValue(otherConf, mainConfigurationValue));
             };
 
-            DataGridView dataGridView = new()
+            ToolStripMenuItem showOtherConf = new()
             {
-                AutoSize = true,
-                Dock = DockStyle.Fill,
-                Margin = new Padding(10),
-                MinimumSize = new(0, 150),
-                MaximumSize = new(0, 300),
-                AllowUserToResizeColumns = false,
-                AllowUserToResizeRows = false,
-                ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing,
-                RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing,
-                BorderStyle = BorderStyle.None,
+                Text = "ShowOtherConf",
+                Image = Image.FromFile("Resources/Images/edit-5260657.png")
             };
-
-            var column1Name = new DataGridViewTextBoxColumn()
+            showOtherConf.Click += (sender, args) => 
             {
-                Name = "Name",
-                HeaderText = "Name",
-                ReadOnly = true,
-                SortMode = DataGridViewColumnSortMode.NotSortable
-            };
-            var column2Value = new DataGridViewTextBoxColumn()
-            {
-                HeaderText = "Value",
-                ReadOnly = false,
-                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
-                SortMode = DataGridViewColumnSortMode.NotSortable,
-            };
-
-            dataGridView.Columns.AddRange([column1Name, column2Value]);
-            ToolStripControlHost panel = new(dataGridView)
-            {
+                if (showOtherConf.Owner is ContextMenuStrip contextMenuStrip)
+                {
+                    var form = contextMenuStrip.SourceControl?.FindForm(); 
+                    if(form != null)
+                    {
+                        OpenOtherConfigurationForm(formValue, form);
+                    }
+                }
             };
 
             ContextMenuStrip menuStrip = new()
             {
                 AutoSize = true,
-                MaximumSize = new(300, 0),
-                Items = { setToOther, panel },
+                Items = { setToOther, showOtherConf },
             };
             menuStrip.VisibleChanged += (sender, args) =>
             {
+
                 if (setToOther.Visible)
                 {
                     var otherConfigurationDict = formValue.MacroSectionBinding.OtherConfigurationDict;
                     setToOther.Enabled = otherConfigurationDict != null && otherConfigurationDict
                                                                                 .Select(pair => pair.Value)
                                                                                 .Any(otherConf => otherConf != formValue.ConfigurationObject);
-
-                    if (otherConfigurationDict != null)
-                    {
-                        dataGridView.RowCount = otherConfigurationDict.Count;
-
-                        if (dataGridView.RowCount < 5)
-                        {
-                            dataGridView.MinimumSize = new(0, 80);
-                            menuStrip.MinimumSize = new(0, 100);
-                        }
-                        else if (dataGridView.RowCount < 12)
-                        {
-                            dataGridView.MinimumSize = new(0, 170);
-                            menuStrip.MinimumSize = new(0, 190);
-                        }
-                        else
-                        {
-                            dataGridView.MinimumSize = new(0, 240);
-                            menuStrip.MinimumSize = new(0, 260);
-                        }
-
-                        int rowCount = 0;
-                        foreach (var pair in otherConfigurationDict)
-                        {
-                            var name = pair.Key;
-                            var otherConf = pair.Value;
-
-                            dataGridView.Rows[rowCount].Cells[0].Value = name;
-                            dataGridView.Rows[rowCount].Cells[1].Value = formValue.GetConfigurationValue(otherConf)?.ToString();
-                            rowCount++;
-                        }
-
-                        dataGridView.Refresh();
-                        dataGridView.PerformLayout();
-                    }
 
                     setToOther.Text = SettingsUtils.GetSetToOtherText(formValue);
                 }
@@ -134,6 +84,105 @@ namespace TiaUtilities.SettingsNew
         {
             var count = formValue.MacroSectionBinding.OtherConfigurationDict?.Count() ?? 0;
             return $"{Locale.CONFIG_LINE_TRANSFER_TO_OTHERS} ({count})";
+        }
+
+        private static void OpenOtherConfigurationForm(SettingsFormValue formValue, Form parentForm)
+        {
+            var dict = formValue.MacroSectionBinding.OtherConfigurationDict;
+            if (dict == null)
+            {
+                return;
+            }
+
+            TableLayoutPanel tableLayoutPanel = new()
+            {
+                AutoSize = true,
+                Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top,
+                BorderStyle = BorderStyle.None,
+                ColumnStyles = { new(SizeType.AutoSize), new(SizeType.Percent, 100f) },
+                CellBorderStyle = TableLayoutPanelCellBorderStyle.None,
+                BackColor = Color.Transparent,
+            };
+
+            tableLayoutPanel.SuspendLayout();
+            tableLayoutPanel.Controls.Clear();
+
+            int rowCount = 0;
+            foreach (var pair in dict)
+            {
+                var name = pair.Key;
+                var otherConf = pair.Value;
+
+                var otherFormValue = formValue.Clone();
+                otherFormValue.UpdateConfigurationObject(otherConf);
+
+                var editor = otherFormValue.Editor;
+                if (editor == null)
+                {
+                    continue;
+                }
+
+                Label nameLabel = new()
+                {
+                    Text = name,
+                    Anchor = AnchorStyles.Left | AnchorStyles.Right,
+                    BorderStyle = BorderStyle.None,
+                    AutoSize = true,
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    BackColor = Form.DefaultBackColor,
+                    Padding = Padding.Empty,
+                    Margin = Padding.Empty,
+                };
+
+                tableLayoutPanel.RowStyles.Add(new(SizeType.Absolute, 30f));
+
+                tableLayoutPanel.Controls.Add(nameLabel, 0, rowCount);
+                tableLayoutPanel.Controls.Add(editor.GetControl(), 1, rowCount);
+                rowCount++;
+            }
+
+            tableLayoutPanel.RowStyles.Add(new(SizeType.Absolute, 30f));
+
+            var endLabel = new Label()
+            {
+                Text = "",
+                Dock = DockStyle.Fill,
+                BackColor = Color.Transparent,
+                Padding = Padding.Empty,
+                Margin = new Padding(2),
+            };
+
+            tableLayoutPanel.Controls.Add(endLabel, 0, rowCount);
+            tableLayoutPanel.SetColumnSpan(endLabel, 2);
+            rowCount++;
+
+            tableLayoutPanel.Refresh();
+            tableLayoutPanel.ResumeLayout(true);
+
+
+            ScrollableControl scrollableControl = new()
+            {
+                Dock = DockStyle.Fill,
+                AutoScroll = true,
+                AutoScrollMinSize = new Size(100, 100),
+                Controls = { tableLayoutPanel }
+            };
+
+            var location = Cursor.Position;
+            location.Offset(-20, -20);
+            OtherConfigurationForm form = new()
+            {
+                Text = $"{formValue.SectionBinding.Name} - {formValue.Name}",
+                Size = new(300, 300),
+                Controls = { scrollableControl },
+                TopLevel = true,
+                ControlBox = false,
+                FormBorderStyle = FormBorderStyle.FixedToolWindow,
+                StartPosition = FormStartPosition.Manual,
+                Location = location,
+                ShowInTaskbar = false,
+            };
+            form.Show(parentForm);
         }
     }
 }

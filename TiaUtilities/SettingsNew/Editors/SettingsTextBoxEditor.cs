@@ -19,7 +19,7 @@ namespace TiaUtilities.SettingsNew.Editors
                 TextAlign = HorizontalAlignment.Left,
                 ReadOnly = false,
                 MinimumSize = new Size(TEXT_BOX_MIN_WIDTH, size.Height + 8), //Padding does not work :'(
-                Margin = new Padding(3, 0, 0, 3), //This is to align to the label since a the padding is automatically set to the left.
+                Margin = new Padding(3), //This is to align to the label since a the padding is automatically set to the left.
                 Padding = Padding.Empty,
                 BackColor = Form.DefaultBackColor,
             };

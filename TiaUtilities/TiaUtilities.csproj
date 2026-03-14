@@ -106,6 +106,9 @@
     <None Update="Resources\Images\DuplicateDB.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\Images\edit-5260657.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\Images\favorite-8250509.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

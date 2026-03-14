@@ -49,6 +49,7 @@ namespace TiaUtilities.SettingsNew.FormHelpers
             }
 
             this.ConfigurationObject = newConfigurationObject;
+            this.Editor?.LoadFromConfiguration();
         }
 
         public void SetConfigurationValue(object setValue) => this.SetConfigurationValue(this.ConfigurationObject, setValue);
@@ -60,9 +61,13 @@ namespace TiaUtilities.SettingsNew.FormHelpers
         public T? GetConfigurationValue<T>() => this.GetConfigurationValue() is T t ? t : default;
 
         public object? GetConfigurationValue() => this.GetConfigurationValue(this.ConfigurationObject);
+
+        public abstract SettingsFormValue Clone();
+
+        public override string ToString() => $"{Name};{Binding.EditorType};{Binding.SectionBinding.Name}";
     }
 
-    public class EmptySettingsFormValueImpl(SettingsValueBinding binding, ObservableConfiguration configurationObject) 
+    public class EmptySettingsFormValueImpl(SettingsValueBinding binding, ObservableConfiguration configurationObject)
         : SettingsFormValue(binding, configurationObject)
     {
         public override SettingsEditor? Editor { get; init; } = null;
@@ -70,6 +75,8 @@ namespace TiaUtilities.SettingsNew.FormHelpers
         public override object? GetConfigurationValue(ObservableConfiguration configuration) => null;
 
         public override void SetConfigurationValue(ObservableConfiguration configuration, object setValue) { }
+
+        public override SettingsFormValue Clone() => new EmptySettingsFormValueImpl(base.Binding, base.ConfigurationObject);
     }
 
     public class SettingsFormValueImpl : SettingsFormValue
@@ -178,6 +185,6 @@ namespace TiaUtilities.SettingsNew.FormHelpers
             return true;
         }
 
-        public override string ToString() => $"{Name};{Binding.EditorType};{Binding.SectionBinding.Name}";
+        public override SettingsFormValue Clone() => new SettingsFormValueImpl(base.Binding, base.ConfigurationObject, this.PropertyInfo);
     }
 }
