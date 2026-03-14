@@ -41,9 +41,6 @@ namespace TiaUtilities.SettingsNew.Editors
             }
 
             var _ = SettingsUtils.AddContextualMenu(this.textBox, value);
-
-            base.RegisterPropertyChanged(this.textBox);
-            this.LoadFromConfiguration();
         }
 
         private void SignedKeyPressEventHandler(object? sender, KeyPressEventArgs args)
@@ -69,6 +66,11 @@ namespace TiaUtilities.SettingsNew.Editors
         }
 
         public override Control GetControl()
+        {
+            return this.textBox;
+        }
+
+        protected override Control GetControlForEvents()
         {
             return this.textBox;
         }

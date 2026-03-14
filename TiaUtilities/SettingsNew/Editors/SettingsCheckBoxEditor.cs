@@ -23,12 +23,14 @@ namespace TiaUtilities.SettingsNew.Editors
             toggleButton.CheckedChanged += (sender, args) => this.SaveToConfiguration();
 
             var _ = SettingsUtils.AddContextualMenu(this.toggleButton, value);
-
-            base.RegisterPropertyChanged(this.toggleButton);
-            this.LoadFromConfiguration();
         }
 
         public override Control GetControl()
+        {
+            return this.toggleButton;
+        }
+
+        protected override Control GetControlForEvents()
         {
             return this.toggleButton;
         }

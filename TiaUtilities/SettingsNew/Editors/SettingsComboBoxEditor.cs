@@ -115,9 +115,6 @@ namespace TiaUtilities.SettingsNew.Editors
             }
 
             var _ = SettingsUtils.AddContextualMenu(this.comboBox, value);
-
-            base.RegisterPropertyChanged(this.comboBox);
-            this.LoadFromConfiguration();
         }
 
         private void StringTextChangedEventHandler(object? sender, EventArgs args)
@@ -141,6 +138,11 @@ namespace TiaUtilities.SettingsNew.Editors
         public override Control GetControl()
         {
             return comboBox;
+        }
+
+        protected override Control GetControlForEvents()
+        {
+            return this.comboBox;
         }
 
         public override void LoadFromConfiguration()

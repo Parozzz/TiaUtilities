@@ -76,9 +76,6 @@ namespace TiaUtilities.SettingsNew.Editors
 
             var _ = SettingsUtils.AddContextualMenu(this.colorHexaTextBox, value);
             _ = SettingsUtils.AddContextualMenu(this.colorPickerButton, value);
-
-            base.RegisterPropertyChanged(this.colorHexaTextBox);
-            this.LoadFromConfiguration();
         }
 
         private void ColorTextBoxTextChangedEvent(object? sender, EventArgs e)
@@ -148,6 +145,11 @@ namespace TiaUtilities.SettingsNew.Editors
             panel.Controls.Add(this.colorPickerButton, 1, 0);
 
             return panel;
+        }
+
+        protected override Control GetControlForEvents()
+        {
+            return this.colorHexaTextBox;
         }
 
         public override void LoadFromConfiguration()

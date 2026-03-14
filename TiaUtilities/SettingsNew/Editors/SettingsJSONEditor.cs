@@ -20,12 +20,14 @@ namespace TiaUtilities.SettingsNew.Editors
             this.Control.TextChanged += (sender, args) => this.SaveToConfiguration();
 
             var _ = SettingsUtils.AddContextualMenu(this.Control, value);
-
-            base.RegisterPropertyChanged(this.Control);
-            this.LoadFromConfiguration();
         }
 
         public override Control GetControl()
+        {
+            return this.Control;
+        }
+
+        protected override Control GetControlForEvents()
         {
             return this.Control;
         }

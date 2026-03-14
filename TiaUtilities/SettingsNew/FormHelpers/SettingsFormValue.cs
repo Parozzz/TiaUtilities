@@ -48,13 +48,17 @@ namespace TiaUtilities.SettingsNew.FormHelpers
                 throw new ArgumentException($"New Configuration Object type is different from already present configuration. New: {newConfigurationObject.GetType().FullName}, Old: {this.ConfigurationObject.GetType().FullName}");
             }
 
+            this.Editor?.UnRegisterPropertyChangedToCurrentConfiguration();
+
             this.ConfigurationObject = newConfigurationObject;
+
+            this.Editor?.RegisterPropertyChangedToCurrentConfiguration();
             this.Editor?.LoadFromConfiguration();
         }
 
-        public void SetConfigurationValue(object setValue) => this.SetConfigurationValue(this.ConfigurationObject, setValue);
-
         public abstract void SetConfigurationValue(ObservableConfiguration configuration, object setValue);
+
+        public void SetConfigurationValue(object setValue) => this.SetConfigurationValue(this.ConfigurationObject, setValue);
 
         public abstract object? GetConfigurationValue(ObservableConfiguration configuration);
 
