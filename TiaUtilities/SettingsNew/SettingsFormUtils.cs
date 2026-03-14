@@ -28,7 +28,7 @@ namespace TiaUtilities.SettingsNew
 
                 var mainConfigurationValue = formValue.GetConfigurationValue();
                 var otherConfigurationDict = formValue.MacroSectionBinding.OtherConfigurationDict;
-                if (mainConfigurationValue == null || otherConfigurationDict == null || !otherConfigurationDict.Any())
+                if (mainConfigurationValue == null || otherConfigurationDict == null || otherConfigurationDict.Count == 0)
                 {
                     return;
                 }
