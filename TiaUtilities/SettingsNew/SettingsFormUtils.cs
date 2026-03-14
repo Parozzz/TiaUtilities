@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using TiaUtilities.Configuration;
-using TiaUtilities.Languages;
-using TiaUtilities.SettingsNew.Bindings;
+﻿using TiaUtilities.Languages;
 using TiaUtilities.SettingsNew.FormHelpers;
 using TiaUtilities.Utility.Extensions;
 
