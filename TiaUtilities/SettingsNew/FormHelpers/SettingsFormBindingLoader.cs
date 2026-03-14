@@ -161,7 +161,7 @@ namespace TiaUtilities.SettingsNew.FormHelpers
                     BackColor = Form.DefaultBackColor,
                     Padding = Padding.Empty,
                     Margin = Padding.Empty,
-                    Font = SettingsConstants.MACROSECTION_NAME_LABEL_FONT,
+                    Font = SettingsFormConstants.MACROSECTION_NAME_LABEL_FONT,
                 };
                 formMacroSection.Label = macroSectioNameLabel;
 
@@ -186,7 +186,7 @@ namespace TiaUtilities.SettingsNew.FormHelpers
                         BackColor = Form.DefaultBackColor,
                         Padding = Padding.Empty,
                         Margin = new Padding(0, 0, 4, 0),
-                        Font = SettingsConstants.SECTION_NAME_LABEL_FONT,
+                        Font = SettingsFormConstants.SECTION_NAME_LABEL_FONT,
                     };
                     Utils.SetDoubleBuffered(sectionNameLabel);
                     Utils.CreateStandardToolTip().SetToolTip(sectionNameLabel, formSection.ToolTip);
@@ -223,7 +223,7 @@ namespace TiaUtilities.SettingsNew.FormHelpers
                                 BackColor = Color.Transparent,
                                 Margin = hasDescription ? Padding.Empty : new(0, 0, 0, 3),
                                 Padding = Padding.Empty,
-                                Font = SettingsConstants.VALUE_NAME_LABEL_FONT,
+                                Font = SettingsFormConstants.VALUE_NAME_LABEL_FONT,
                             };
                             Utils.SetDoubleBuffered(valueNameLabel);
 
@@ -243,8 +243,8 @@ namespace TiaUtilities.SettingsNew.FormHelpers
                                 BackColor = Color.Transparent,
                                 Margin = new Padding(0, 0, 0, 3),
                                 Padding = Padding.Empty,
-                                Font = SettingsConstants.DESCRIPTION_LABEL_FONT,
-                                MaximumSize = new Size(SettingsConstants.VALUE_DESCRIPTION_MAX_SIZE, 0), //Since last columns is to fill the all control, set a maximun size to allow wrapping of text
+                                Font = SettingsFormConstants.DESCRIPTION_LABEL_FONT,
+                                MaximumSize = new Size(SettingsFormConstants.VALUE_DESCRIPTION_MAX_SIZE, 0), //Since last columns is to fill the all control, set a maximun size to allow wrapping of text
                                 Visible = lastOpenInformation.CommentVisibility,
                             };
                             Utils.SetDoubleBuffered(valueDescriptionLabel);
@@ -261,7 +261,7 @@ namespace TiaUtilities.SettingsNew.FormHelpers
                             valuesRowCount++;
                         }
 
-                        valuesControlPositionList.Add(new(null, 0, valuesRowCount, SizeType.Absolute, SettingsConstants.VALUES_SEPERATION));
+                        valuesControlPositionList.Add(new(null, 0, valuesRowCount, SizeType.Absolute, SettingsFormConstants.VALUES_SEPERATION));
                         valuesRowCount++;
                     }
 
@@ -274,7 +274,7 @@ namespace TiaUtilities.SettingsNew.FormHelpers
                         Dock = DockStyle.Fill,
                         BackColor = Color.DarkBlue,
                         Padding = Padding.Empty,
-                        Margin = new Padding(0, 6, (int)(SettingsConstants.SECTIONS_BORDER_COLUMN_SIZE / 2f), 6),
+                        Margin = new Padding(0, 6, (int)(SettingsFormConstants.SECTIONS_BORDER_COLUMN_SIZE / 2f), 6),
                     };
                     Utils.SetDoubleBuffered(sectionBorderLabel);
 
@@ -283,7 +283,7 @@ namespace TiaUtilities.SettingsNew.FormHelpers
                     this.createdControlPositionList.Add(new(valuesPanel, SECTION_VALUES_COLUMN, rowCount));
                     rowCount++;
 
-                    this.createdControlPositionList.Add(new(null, 0, rowCount, SizeType.Absolute, SettingsConstants.SECTIONS_SEPARATION, RowSpan: 3));
+                    this.createdControlPositionList.Add(new(null, 0, rowCount, SizeType.Absolute, SettingsFormConstants.SECTIONS_SEPARATION, RowSpan: 3));
                     rowCount++;
 
                     formSection.Panel = valuesPanel;
@@ -298,8 +298,8 @@ namespace TiaUtilities.SettingsNew.FormHelpers
                 AutoSize = true,
                 BackgroundImage = Image.FromFile("Resources/Images/subtitle-8187463.png"),
                 BackgroundImageLayout = ImageLayout.Zoom,
-                MaximumSize = new(SettingsConstants.BUTTONS_SIZE, SettingsConstants.BUTTONS_SIZE),
-                MinimumSize = new(SettingsConstants.BUTTONS_SIZE, SettingsConstants.BUTTONS_SIZE),
+                MaximumSize = new(SettingsFormConstants.BUTTONS_SIZE, SettingsFormConstants.BUTTONS_SIZE),
+                MinimumSize = new(SettingsFormConstants.BUTTONS_SIZE, SettingsFormConstants.BUTTONS_SIZE),
                 FlatStyle = FlatStyle.Flat,
                 FlatAppearance = { BorderSize = 1, BorderColor = Color.Black, MouseDownBackColor = Color.LightGray },
                 BackColor = Color.Transparent,
@@ -319,8 +319,8 @@ namespace TiaUtilities.SettingsNew.FormHelpers
                 AutoSize = true,
                 BackgroundImage = Image.FromFile("Resources/Images/favorite-8250509.png"),
                 BackgroundImageLayout = ImageLayout.Zoom,
-                MaximumSize = new(SettingsConstants.BUTTONS_SIZE, SettingsConstants.BUTTONS_SIZE),
-                MinimumSize = new(SettingsConstants.BUTTONS_SIZE, SettingsConstants.BUTTONS_SIZE),
+                MaximumSize = new(SettingsFormConstants.BUTTONS_SIZE, SettingsFormConstants.BUTTONS_SIZE),
+                MinimumSize = new(SettingsFormConstants.BUTTONS_SIZE, SettingsFormConstants.BUTTONS_SIZE),
                 FlatStyle = FlatStyle.Flat,
                 FlatAppearance = { BorderSize = 1, BorderColor = Color.Black, MouseDownBackColor = Color.LightGray },
                 BackColor = Color.Transparent,

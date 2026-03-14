@@ -68,7 +68,7 @@ namespace TiaUtilities.Generation.Alarms.Configurations
             this.Coil2AddressPrefix = "";
             this.TimerAddressPrefix = "";
 
-            this.CustomPlaceholdersJSON = "{}";
+            this.CustomPlaceholdersJSON = "{\r\n    placeholder: \"cool\",\r\n}";
         }
     }
 }

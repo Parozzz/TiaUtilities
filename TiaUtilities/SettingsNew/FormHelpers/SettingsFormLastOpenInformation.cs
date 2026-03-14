@@ -15,6 +15,6 @@ namespace TiaUtilities.SettingsNew.FormHelpers
             MACRO_SECTION_LAST_OPEN_INFO_DICT.Remove(guid);
         }
 
-        public bool CommentVisibility { get; set; } = SettingsConstants.DEFAULT_VALUE_DESCRIPTION_VISIBILITY;
+        public bool CommentVisibility { get; set; } = SettingsFormConstants.DEFAULT_VALUE_DESCRIPTION_VISIBILITY;
     }
 }

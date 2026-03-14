@@ -16,10 +16,10 @@ namespace TiaUtilities.SettingsNew.Editors
 
             this.Control.Dock = DockStyle.Fill;
             this.Control.MinimumSize = new Size(0, 500);
-            this.Control.Font = SettingsConstants.VALUE_CONTROL_FONT;
+            this.Control.Font = SettingsFormConstants.VALUE_CONTROL_FONT;
             this.Control.TextChanged += (sender, args) => this.SaveToConfiguration();
 
-            var _ = SettingsUtils.AddContextualMenu(this.Control, value);
+            var _ = SettingsFormUtils.AddContextualMenu(this.Control, value);
         }
 
         public override Control GetControl()

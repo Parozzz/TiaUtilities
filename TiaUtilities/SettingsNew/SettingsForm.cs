@@ -1,4 +1,5 @@
-﻿using TiaUtilities.CustomControls;
+﻿using FastColoredTextBoxNS;
+using TiaUtilities.CustomControls;
 using TiaUtilities.SettingsNew;
 using TiaUtilities.SettingsNew.Bindings;
 using TiaUtilities.SettingsNew.FormHelpers;
@@ -39,7 +40,7 @@ namespace TiaUtilities.Generation.SettingsNew
             this.mainPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             this.mainPanel.AutoSize = true;
 
-            this.mainPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, SettingsConstants.SECTIONS_LIST_VIEW_WIDTH));
+            this.mainPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, SettingsFormConstants.SECTIONS_LIST_VIEW_WIDTH));
             this.mainPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100f));
 
             this.mainPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100f));
@@ -97,8 +98,8 @@ namespace TiaUtilities.Generation.SettingsNew
             this.rightSettingsPanel.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right;
             this.rightSettingsPanel.Margin = Padding.Empty;
 
-            this.rightSettingsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, SettingsConstants.SECTIONS_NAME_COLUMN_SIZE));
-            this.rightSettingsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, SettingsConstants.SECTIONS_BORDER_COLUMN_SIZE));
+            this.rightSettingsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, SettingsFormConstants.SECTIONS_NAME_COLUMN_SIZE));
+            this.rightSettingsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, SettingsFormConstants.SECTIONS_BORDER_COLUMN_SIZE));
             this.rightSettingsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100f));
         }
 
@@ -195,8 +196,12 @@ namespace TiaUtilities.Generation.SettingsNew
                         }
                         break;
                     case Keys.Enter:
-                        this.rightSettingsPanel.SelectNextControl(ActiveControl, true, true, true, false);
-                        return true;
+                        if(this.ActiveControl is not FastColoredTextBox)
+                        {
+                            this.rightSettingsPanel.SelectNextControl(ActiveControl, true, true, true, false);
+                            return true;
+                        }
+                        break;
                 }
             }
             catch (Exception ex)

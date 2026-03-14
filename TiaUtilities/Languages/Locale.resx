@@ -544,7 +544,7 @@ for row validation</value>
   <data name="CONFIRM_DELETE_DIALOG_TEXT" xml:space="preserve">
     <value>Are you sure you want to delete {delete_item}?</value>
   </data>
-  <data name="CONFIG_LINE_TRANSFER_TO_OTHERS" xml:space="preserve">
+  <data name="SETTINGS_FORM_CONTEXT_MENU_SET_TO_OTHERS" xml:space="preserve">
     <value>Transfer values to all others configurations</value>
   </data>
   <data name="CONFIG_LINE_SAVE_DEFAULT_TOOLTIP" xml:space="preserve">
@@ -589,7 +589,7 @@ for row validation</value>
   <data name="ALARM_DATA_HMI_CLASS" xml:space="preserve">
     <value>Hmi Class</value>
   </data>
-  <data name="DEVICE_DATA_PLACEHOLDERS" xml:space="preserve">
+  <data name="ALARM_SETTINGS_TAB_PLACEHOLDERS" xml:space="preserve">
     <value>Placeholders</value>
   </data>
   <data name="ALARM_SETTINGS_HMI_ITEM_TEXT" xml:space="preserve">
@@ -690,5 +690,14 @@ for row validation</value>
   </data>
   <data name="ALARM_SETTINGS_TEMPLATE_STANDALONE_ALARMS_DESC" xml:space="preserve">
     <value>Allows to ignore all the default values from the alarm setup. Useful for generating standalone alarms that are not linked to a device.</value>
+  </data>
+  <data name="SETTINGS_FORM_CONTEXT_MENU_OPEN_OTHER_CONF_FAST_EDIT" xml:space="preserve">
+    <value>Open other configuration fast edit</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_PLACEHOLDERS_DESC" xml:space="preserve">
+    <value>Allows to add custom placeholders to use during .xml file generation. Create a simple JSON Object and each value will be treated as placeholder. {YOUR_PLACEHOLDER_NAME_HERE}</value>
+  </data>
+  <data name="DEVICE_DATA_PLACEHOLDERS" xml:space="preserve">
+    <value>Placeholders</value>
   </data>
 </root>

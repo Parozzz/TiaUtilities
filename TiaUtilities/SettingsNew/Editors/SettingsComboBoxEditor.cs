@@ -114,7 +114,7 @@ namespace TiaUtilities.SettingsNew.Editors
                     break;
             }
 
-            var _ = SettingsUtils.AddContextualMenu(this.comboBox, value);
+            var _ = SettingsFormUtils.AddContextualMenu(this.comboBox, value);
         }
 
         private void StringTextChangedEventHandler(object? sender, EventArgs args)

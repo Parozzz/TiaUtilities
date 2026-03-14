@@ -172,7 +172,7 @@ namespace TiaUtilities.Generation.Configuration
                 control.Dock = line.IsControlNoAdapt() ? DockStyle.None : DockStyle.Fill;
                 control.Font = configForm?.ControlFont ?? ConfigStyle.CONTROL_FONT;
 
-                ToolStripMenuItem item = new(Locale.CONFIG_LINE_TRANSFER_TO_OTHERS) { Image = Image.FromFile("Resources/Images/noun-transfer-7710063.png") };
+                ToolStripMenuItem item = new(Locale.SETTINGS_FORM_CONTEXT_MENU_SET_TO_OTHERS) { Image = Image.FromFile("Resources/Images/noun-transfer-7710063.png") };
                 item.Click += (sender, args) => line.TrasferToAllConfigurations();
                 control.ContextMenuStrip = new() { Items = { item } };
 

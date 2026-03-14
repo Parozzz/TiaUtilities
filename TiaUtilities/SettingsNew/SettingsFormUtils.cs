@@ -12,13 +12,13 @@ using TiaUtilities.Utility.Extensions;
 
 namespace TiaUtilities.SettingsNew
 {
-    public static class SettingsUtils
+    public static class SettingsFormUtils
     {
         public static ContextMenuStrip AddContextualMenu(Control control, SettingsFormValue formValue)
         {
             ToolStripMenuItem setToOther = new()
             {
-                Text = SettingsUtils.GetSetToOtherText(formValue),
+                Text = SettingsFormUtils.GetSetToOtherText(formValue),
                 Image = Image.FromFile("Resources/Images/noun-transfer-7710063.png")
             };
             setToOther.Click += (sender, args) =>
@@ -42,7 +42,7 @@ namespace TiaUtilities.SettingsNew
 
             ToolStripMenuItem showOtherConf = new()
             {
-                Text = "ShowOtherConf",
+                Text = Locale.SETTINGS_FORM_CONTEXT_MENU_OPEN_OTHER_CONF_FAST_EDIT,
                 Image = Image.FromFile("Resources/Images/edit-5260657.png")
             };
             showOtherConf.Click += (sender, args) => 
@@ -72,7 +72,7 @@ namespace TiaUtilities.SettingsNew
                                                                                 .Select(pair => pair.Value)
                                                                                 .Any(otherConf => otherConf != formValue.ConfigurationObject);
 
-                    setToOther.Text = SettingsUtils.GetSetToOtherText(formValue);
+                    setToOther.Text = SettingsFormUtils.GetSetToOtherText(formValue);
                 }
             };
             control.ContextMenuStrip = menuStrip;
@@ -82,8 +82,8 @@ namespace TiaUtilities.SettingsNew
 
         private static string GetSetToOtherText(SettingsFormValue formValue)
         {
-            var count = formValue.MacroSectionBinding.OtherConfigurationDict?.Count() ?? 0;
-            return $"{Locale.CONFIG_LINE_TRANSFER_TO_OTHERS} ({count})";
+            var count = formValue.MacroSectionBinding.OtherConfigurationDict?.Count ?? 0;
+            return $"{Locale.SETTINGS_FORM_CONTEXT_MENU_SET_TO_OTHERS} ({count})";
         }
 
         private static void OpenOtherConfigurationForm(SettingsFormValue formValue, Form parentForm)
@@ -134,7 +134,7 @@ namespace TiaUtilities.SettingsNew
                     Margin = Padding.Empty,
                 };
 
-                tableLayoutPanel.RowStyles.Add(new(SizeType.Absolute, 30f));
+                tableLayoutPanel.RowStyles.Add(new(SizeType.AutoSize, 30f));
 
                 tableLayoutPanel.Controls.Add(nameLabel, 0, rowCount);
                 tableLayoutPanel.Controls.Add(editor.GetControl(), 1, rowCount);

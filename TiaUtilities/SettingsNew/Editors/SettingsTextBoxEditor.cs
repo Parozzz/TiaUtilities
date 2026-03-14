@@ -10,10 +10,10 @@ namespace TiaUtilities.SettingsNew.Editors
 
         public SettingsTextBoxEditor(SettingsFormValueImpl value) : base(value)
         {
-            var size = TextRenderer.MeasureText("AaGg", SettingsConstants.VALUE_CONTROL_FONT, Size.Empty, TextFormatFlags.TextBoxControl);
+            var size = TextRenderer.MeasureText("AaGg", SettingsFormConstants.VALUE_CONTROL_FONT, Size.Empty, TextFormatFlags.TextBoxControl);
             this.textBox = new()
             {
-                Font = SettingsConstants.VALUE_CONTROL_FONT,
+                Font = SettingsFormConstants.VALUE_CONTROL_FONT,
                 Anchor = AnchorStyles.Left | AnchorStyles.Right, //This allows centering if no label is present!
                 BorderStyle = BorderStyle.None,
                 TextAlign = HorizontalAlignment.Left,
@@ -40,7 +40,7 @@ namespace TiaUtilities.SettingsNew.Editors
                     break;
             }
 
-            var _ = SettingsUtils.AddContextualMenu(this.textBox, value);
+            var _ = SettingsFormUtils.AddContextualMenu(this.textBox, value);
         }
 
         private void SignedKeyPressEventHandler(object? sender, KeyPressEventArgs args)

@@ -23,7 +23,7 @@
         public SettingsFormSectionListView()
         {
             this.DoubleBuffered = true; 
-            this.Font = SettingsConstants.LIST_LEFT_FONT;
+            this.Font = SettingsFormConstants.LIST_LEFT_FONT;
             this.View = View.Tile; //This view shows group 
             this.Dock = DockStyle.Fill;
             this.HeaderStyle = ColumnHeaderStyle.Nonclickable;
@@ -36,11 +36,11 @@
             this.GridLines = false;
             this.Sorting = SortOrder.None;
             this.Scrollable = false;
-            this.MaximumSize = new Size(SettingsConstants.SECTIONS_LIST_VIEW_WIDTH, 0);
+            this.MaximumSize = new Size(SettingsFormConstants.SECTIONS_LIST_VIEW_WIDTH, 0);
             this.MinimumSize = new Size(30, 80); 
             
-            var textSize = TextRenderer.MeasureText("AaGg", SettingsConstants.LIST_LEFT_FONT);
-            this.TileSize = new Size(SettingsConstants.SECTIONS_LIST_VIEW_WIDTH, textSize.Height + 4);
+            var textSize = TextRenderer.MeasureText("AaGg", SettingsFormConstants.LIST_LEFT_FONT);
+            this.TileSize = new Size(SettingsFormConstants.SECTIONS_LIST_VIEW_WIDTH, textSize.Height + 4);
 
             this.OwnerDraw = true;
         }
@@ -57,8 +57,8 @@
             {
                 var rectsLeftPadding = 0;//(SECTIONS_LEFT_PADDING * 3) - 2;
 
-                var foreColor = SettingsConstants.SECTIONS_ITEM_FORE_COLOR;
-                var backColor = tag is SettingsFormSectionListView.ItemSectionTag sectionTag && sectionTag.IsSectionVisible ? SettingsConstants.SECTIONS_SELECTED_ITEM_BACK_COLOR : Color.Transparent;
+                var foreColor = SettingsFormConstants.SECTIONS_ITEM_FORE_COLOR;
+                var backColor = tag is SettingsFormSectionListView.ItemSectionTag sectionTag && sectionTag.IsSectionVisible ? SettingsFormConstants.SECTIONS_SELECTED_ITEM_BACK_COLOR : Color.Transparent;
 
                 //BACKGROUND
                 var backBounds = e.Bounds;
@@ -71,7 +71,7 @@
 
                 //DRAW TEXT
                 var textBounds = e.Bounds;
-                textBounds = Rectangle.Inflate(textBounds, tag is SettingsFormSectionListView.ItemMacroSectionTag ? 0 : -SettingsConstants.SECTIONS_LEFT_PADDING * 3, 0);
+                textBounds = Rectangle.Inflate(textBounds, tag is SettingsFormSectionListView.ItemMacroSectionTag ? 0 : -SettingsFormConstants.SECTIONS_LEFT_PADDING * 3, 0);
                 TextRenderer.DrawText(e.Graphics, item.Text, this.Font, textBounds, foreColor, TextFormatFlags.Left);
             }
         }

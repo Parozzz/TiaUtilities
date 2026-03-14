@@ -1,6 +1,6 @@
 ﻿namespace TiaUtilities.SettingsNew
 {
-    public static class SettingsConstants
+    public static class SettingsFormConstants
     {
         public static int BUTTONS_SIZE { get; } = 30;
 

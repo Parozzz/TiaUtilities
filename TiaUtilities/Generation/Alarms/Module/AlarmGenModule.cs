@@ -322,7 +322,10 @@ namespace TiaUtilities.Generation.Alarms.Module
 
                 .Section(Locale.GENERICS_HMI)
                 .AddUInt(nameof(AlarmTabConfiguration.HmiStartID), Locale.ALARM_SETTINGS_TAB_HMI_START_ID, Locale.ALARM_SETTINGS_TAB_HMI_START_ID_DESCR)
-                .AddString(nameof(AlarmTabConfiguration.DefaultHmiAlarmClass), Locale.ALARM_SETTINGS_TAB_HMI_DEFAULT_ALARM_CLASS, Locale.ALARM_SETTINGS_TAB_HMI_DEFAULT_ALARM_CLASS_DESCR);
+                .AddString(nameof(AlarmTabConfiguration.DefaultHmiAlarmClass), Locale.ALARM_SETTINGS_TAB_HMI_DEFAULT_ALARM_CLASS, Locale.ALARM_SETTINGS_TAB_HMI_DEFAULT_ALARM_CLASS_DESCR)
+                
+                .Section(Locale.ALARM_SETTINGS_TAB_PLACEHOLDERS)
+                .AddJSON(nameof(AlarmTabConfiguration.CustomPlaceholdersJSON), description: Locale.ALARM_SETTINGS_TAB_PLACEHOLDERS_DESC);
 
 
             settingsBindings

@@ -22,7 +22,7 @@ namespace TiaUtilities.SettingsNew.Editors
             };
             toggleButton.CheckedChanged += (sender, args) => this.SaveToConfiguration();
 
-            var _ = SettingsUtils.AddContextualMenu(this.toggleButton, value);
+            var _ = SettingsFormUtils.AddContextualMenu(this.toggleButton, value);
         }
 
         public override Control GetControl()

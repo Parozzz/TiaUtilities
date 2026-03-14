@@ -51,7 +51,7 @@ namespace TiaUtilities.SettingsNew.Editors
                 MaximumSize = new Size(80, 0),
                 Margin = new Padding(3, 0, 0, 0), //This is to align to the label since a the padding is automatically set to the left.
                 Padding = Padding.Empty,
-                Font = SettingsConstants.VALUE_CONTROL_FONT,
+                Font = SettingsFormConstants.VALUE_CONTROL_FONT,
                 BackColor = Form.DefaultBackColor,
             };
             Utils.SetDoubleBuffered(this.colorHexaTextBox);
@@ -74,8 +74,8 @@ namespace TiaUtilities.SettingsNew.Editors
 
             this.colorPickerButton.Click += ColorPickerButtonClickEvent;
 
-            var _ = SettingsUtils.AddContextualMenu(this.colorHexaTextBox, value);
-            _ = SettingsUtils.AddContextualMenu(this.colorPickerButton, value);
+            var _ = SettingsFormUtils.AddContextualMenu(this.colorHexaTextBox, value);
+            _ = SettingsFormUtils.AddContextualMenu(this.colorPickerButton, value);
         }
 
         private void ColorTextBoxTextChangedEvent(object? sender, EventArgs e)

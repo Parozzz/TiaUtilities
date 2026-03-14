@@ -610,6 +610,24 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Placeholders.
+        /// </summary>
+        internal static string ALARM_SETTINGS_TAB_PLACEHOLDERS {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_TAB_PLACEHOLDERS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Allows to add custom placeholders to use during .xml file generation. Create a simple JSON Object and each value will be treated as placeholder. {YOUR_PLACEHOLDER_NAME_HERE}.
+        /// </summary>
+        internal static string ALARM_SETTINGS_TAB_PLACEHOLDERS_DESC {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_TAB_PLACEHOLDERS_DESC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Segment Names.
         /// </summary>
         internal static string ALARM_SETTINGS_TAB_SEGMENT_NAME {
@@ -921,15 +939,6 @@ namespace TiaUtilities.Languages {
         internal static string CONFIG_LINE_SAVE_DEFAULT_TOOLTIP {
             get {
                 return ResourceManager.GetString("CONFIG_LINE_SAVE_DEFAULT_TOOLTIP", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Transfer values to all others configurations.
-        /// </summary>
-        internal static string CONFIG_LINE_TRANSFER_TO_OTHERS {
-            get {
-                return ResourceManager.GetString("CONFIG_LINE_TRANSFER_TO_OTHERS", resourceCulture);
             }
         }
         
@@ -1777,6 +1786,24 @@ namespace TiaUtilities.Languages {
         internal static string PROGRAM_SETTINGS_TIA_VERSION {
             get {
                 return ResourceManager.GetString("PROGRAM_SETTINGS_TIA_VERSION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Open other configuration fast edit.
+        /// </summary>
+        internal static string SETTINGS_FORM_CONTEXT_MENU_OPEN_OTHER_CONF_FAST_EDIT {
+            get {
+                return ResourceManager.GetString("SETTINGS_FORM_CONTEXT_MENU_OPEN_OTHER_CONF_FAST_EDIT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Transfer values to all others configurations.
+        /// </summary>
+        internal static string SETTINGS_FORM_CONTEXT_MENU_SET_TO_OTHERS {
+            get {
+                return ResourceManager.GetString("SETTINGS_FORM_CONTEXT_MENU_SET_TO_OTHERS", resourceCulture);
             }
         }
     }

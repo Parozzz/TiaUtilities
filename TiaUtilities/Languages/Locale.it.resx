@@ -544,7 +544,7 @@ validità riga</value>
   <data name="CONFIRM_DELETE_DIALOG_TEXT" xml:space="preserve">
     <value>Sei sicuro di voler cancellare {delete_item}?</value>
   </data>
-  <data name="CONFIG_LINE_TRANSFER_TO_OTHERS" xml:space="preserve">
+  <data name="SETTINGS_FORM_CONTEXT_MENU_SET_TO_OTHERS" xml:space="preserve">
     <value>Trasferisci valore a tutte le configurazioni</value>
   </data>
   <data name="CONFIG_LINE_SAVE_DEFAULT_TOOLTIP" xml:space="preserve">
@@ -589,7 +589,7 @@ validità riga</value>
   <data name="ALARM_DATA_HMI_CLASS" xml:space="preserve">
     <value>Classe Hmi</value>
   </data>
-  <data name="DEVICE_DATA_PLACEHOLDERS" xml:space="preserve">
+  <data name="ALARM_SETTINGS_TAB_PLACEHOLDERS" xml:space="preserve">
     <value>Placeholders</value>
   </data>
   <data name="ALARM_SETTINGS_HMI_ITEM_TEXT" xml:space="preserve">
@@ -690,5 +690,14 @@ validità riga</value>
   </data>
   <data name="ALARM_SETTINGS_TEMPLATE_STANDALONE_ALARMS_DESC" xml:space="preserve">
     <value>Permette di generare allarmi ignorando i valori di default. Utile per generare allarmi indipendenti non legati ad un dispositivo.</value>
+  </data>
+  <data name="SETTINGS_FORM_CONTEXT_MENU_OPEN_OTHER_CONF_FAST_EDIT" xml:space="preserve">
+    <value>Apri fast edit per altre configurazioni</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_PLACEHOLDERS_DESC" xml:space="preserve">
+    <value>Permette di create placeholder da usare durante la generazione del file .xml. Definisci i vari placeholder come oggetti di un oggetto JSON. {NOME_PLACEHOLDER_QUA}</value>
+  </data>
+  <data name="DEVICE_DATA_PLACEHOLDERS" xml:space="preserve">
+    <value>Placeholders</value>
   </data>
 </root>
