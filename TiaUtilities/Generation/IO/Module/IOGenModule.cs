@@ -377,7 +377,7 @@ namespace TiaUtilities.Generation.IO.Module
 
         public object CreateSave()
         {
-            IOGenSave save = new()
+            IOGenSaveV1 save = new()
             {
                 SuggestionGrid = this.suggestionGridHandler.CreateSave(),
                 ScriptSave = this.gridBindContainer.GridScriptHandler.CreateSave()
@@ -397,7 +397,7 @@ namespace TiaUtilities.Generation.IO.Module
 
         public void LoadSave(object saveObject)
         {
-            if (saveObject is not IOGenSave loadedSave)
+            if (saveObject is not IOGenSaveV1 loadedSave)
             {
                 return;
             }

@@ -8,7 +8,7 @@ using TiaUtilities.Generation.IO.Module.Tab;
 
 namespace TiaUtilities.Generation.IO
 {
-    public class IOGenSave
+    public class IOGenSaveV1
     {
         public static readonly int VERSION = 1; //Read via Reflection
 

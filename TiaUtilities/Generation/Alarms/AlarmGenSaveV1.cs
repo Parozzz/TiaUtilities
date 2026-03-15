@@ -6,7 +6,7 @@ using TiaUtilities.Generation.GridHandler.JSScript;
 
 namespace TiaUtilities.Generation.Alarms
 {
-    public class AlarmGenSave
+    public class AlarmGenSaveV1
     {
         public static readonly int VERSION = 1; //Read via Reflection
 

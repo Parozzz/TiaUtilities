@@ -10,7 +10,7 @@ using TiaUtilities.Generation.IO.Configurations;
 
 namespace TiaUtilities
 {
-    public class ProgramSettings : ObservableConfiguration
+    public class ProgramSettingsV1 : ObservableConfiguration
     {
         public static readonly int VERSION = 1;
 
@@ -38,7 +38,7 @@ namespace TiaUtilities
         [JsonProperty] public AlarmTabConfiguration PresetAlarmTabConfiguration { get => this.GetAs<AlarmTabConfiguration>(); set => this.Set(value); }
         [JsonProperty] public AlarmTemplateConfiguration PresetTemplateConfiguration { get => this.GetAs<AlarmTemplateConfiguration>(); set => this.Set(value); }
 
-        public ProgramSettings()
+        public ProgramSettingsV1()
         {
             this.LastDBDuplicationFileName = "";
 
@@ -72,7 +72,7 @@ namespace TiaUtilities
 
         public void Save()
         {
-            SavesLoader.CreateFileAndSave(this, ProgramSettings.VERSION, ProgramSettings.GetFilePath(), Constants.SAVE_FILE_EXTENSION); //To create file if not exist!
+            SavesLoader.CreateFileAndSave(this, ProgramSettingsV1.VERSION, ProgramSettingsV1.GetFilePath(), Constants.SAVE_FILE_EXTENSION); //To create file if not exist!
             this.Wash();
         }
 

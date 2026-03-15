@@ -172,7 +172,7 @@ namespace TiaUtilities.Generation.Alarms.Module
 
         public object CreateSave()
         {
-            var projectSave = new AlarmGenSave()
+            var projectSave = new AlarmGenSaveV1()
             {
                 ScriptSave = this.GridScriptHandler.CreateSave(),
                 TemplateSaves = this.templateHandler.CreateSave()
@@ -191,7 +191,7 @@ namespace TiaUtilities.Generation.Alarms.Module
 
         public void LoadSave(object saveObject)
         {
-            if (saveObject is not AlarmGenSave loadedSave)
+            if (saveObject is not AlarmGenSaveV1 loadedSave)
             {
                 return;
             }

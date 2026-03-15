@@ -7,10 +7,10 @@ namespace TiaUtilities
 {
     public partial class DBDuplicationForm : Form
     {
-        private readonly ProgramSettings programSettings;
+        private readonly ProgramSettingsV1 programSettings;
         private readonly Dictionary<string, uint> memberWordDict;
 
-        public DBDuplicationForm(ProgramSettings saveData)
+        public DBDuplicationForm(ProgramSettingsV1 saveData)
         {
             InitializeComponent();
             this.programSettings = saveData;

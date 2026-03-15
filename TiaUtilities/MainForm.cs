@@ -25,7 +25,7 @@ namespace TiaUtilities
 {
     public partial class MainForm : Form
     {
-        public static ProgramSettings Settings { get; private set; } = new();
+        public static ProgramSettingsV1 Settings { get; private set; } = new();
         public static SettingsBindings SettingsBindings { get; private set; } = new();
 
         private static void LoadLanguage()
@@ -55,7 +55,7 @@ namespace TiaUtilities
         {
             InitializeComponent();
 
-            Settings = SavesLoader.LoadWithoutDialog(ProgramSettings.GetFilePath(), "json") is ProgramSettings loadedSave ? loadedSave : new();
+            Settings = SavesLoader.LoadWithoutDialog(ProgramSettingsV1.GetFilePath(), "json") is ProgramSettingsV1 loadedSave ? loadedSave : new();
             Settings.Save(); //To create file if not exist!
 
             this.autoSaveHandler = new TimedSaveHandler();
@@ -92,13 +92,13 @@ namespace TiaUtilities
                 .MacroSection(() => Locale.GENERICS_PROGRAM, () => true, () => MainForm.Settings)
 
                 .Section(Locale.PROGRAM_SETTINGS_AUTO_SAVE)
-                .AddInt(nameof(ProgramSettings.AutoSaveTime))
+                .AddInt(nameof(ProgramSettingsV1.AutoSaveTime))
 
                 .Section(Locale.PROGRAM_SETTINGS_LANGUAGE)
-                .AddStringList(nameof(ProgramSettings.IetfLanguage), ["it-IT", "en-US"])
+                .AddStringList(nameof(ProgramSettingsV1.IetfLanguage), ["it-IT", "en-US"])
 
                 .Section(Locale.PROGRAM_SETTINGS_TIA_VERSION)
-                .AddUnsignedNumberList(nameof(ProgramSettings.TIAVersion), [16, 17, 18, 19])
+                .AddUnsignedNumberList(nameof(ProgramSettingsV1.TIAVersion), [16, 17, 18, 19])
 
                 .MacroSection(() => Locale.PROGRAM_SETTINGS_GRID_PREFERENCES, () => true, () => MainForm.Settings.GridSettings)
 
@@ -110,15 +110,15 @@ namespace TiaUtilities
 
             MainForm.Settings.PropertyChanged += (sender, args) =>
             {
-                if (args.PropertyName == nameof(ProgramSettings.AutoSaveTime))
+                if (args.PropertyName == nameof(ProgramSettingsV1.AutoSaveTime))
                 {
                     this.autoSaveHandler.Start(MainForm.Settings.AutoSaveTime * 1000);
                 }
-                else if (args.PropertyName == nameof(ProgramSettings.TIAVersion))
+                else if (args.PropertyName == nameof(ProgramSettingsV1.TIAVersion))
                 {
                     MainForm.LoadTIAVersion();
                 }
-                else if (args.PropertyName == nameof(ProgramSettings.IetfLanguage))
+                else if (args.PropertyName == nameof(ProgramSettingsV1.IetfLanguage))
                 {
                     //This should stay always in english. In case someone set an unkown language, this will be neautral.
                     var result = InformationBox.Show("Do you want to restart application?", "Restart to change language", buttons: InformationBoxButtons.YesNo);
@@ -211,11 +211,11 @@ namespace TiaUtilities
             var saveObject = SavesLoader.LoadWithDialog(ref filePath, Constants.SAVE_FILE_EXTENSION);
 
             GenModuleForm genForm;
-            if (saveObject is IOGenSave)
+            if (saveObject is IOGenSaveV1)
             {
                 genForm = OpenIOGenModuleForm();
             }
-            else if (saveObject is AlarmGenSave)
+            else if (saveObject is AlarmGenSaveV1)
             {
                 genForm = OpenAlarmGenModuleForm();
             }

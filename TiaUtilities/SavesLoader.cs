@@ -32,9 +32,9 @@ namespace TiaUtilities
 
         static SavesLoader()
         {
-            SavesLoader.RegisterType(typeof(ProgramSettings), "ProgramSettings");
-            SavesLoader.RegisterType(typeof(AlarmGenSave), "AlarmGeneration");
-            SavesLoader.RegisterType(typeof(IOGenSave), "IOGeneration");
+            SavesLoader.RegisterType(typeof(ProgramSettingsV1), "ProgramSettings");
+            SavesLoader.RegisterType(typeof(AlarmGenSaveV1), "AlarmGeneration");
+            SavesLoader.RegisterType(typeof(IOGenSaveV1), "IOGeneration");
         }
 
         public static CommonOpenFileDialog CreateFileDialog(bool ensureFileExists, string? filePath, string extension)
