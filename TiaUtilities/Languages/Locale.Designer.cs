@@ -61,132 +61,6 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Negated.
-        /// </summary>
-        internal static string ALARM_DATA_ALM_NEGATED {
-            get {
-                return ResourceManager.GetString("ALARM_DATA_ALM_NEGATED", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Alarm Variable.
-        /// </summary>
-        internal static string ALARM_DATA_ALM_VARIABLE {
-            get {
-                return ResourceManager.GetString("ALARM_DATA_ALM_VARIABLE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Coil1 Address.
-        /// </summary>
-        internal static string ALARM_DATA_COIL1_ADDRESS {
-            get {
-                return ResourceManager.GetString("ALARM_DATA_COIL1_ADDRESS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Type.
-        /// </summary>
-        internal static string ALARM_DATA_COIL1_TYPE {
-            get {
-                return ResourceManager.GetString("ALARM_DATA_COIL1_TYPE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Coil2 Address.
-        /// </summary>
-        internal static string ALARM_DATA_COIL2_ADDRESS {
-            get {
-                return ResourceManager.GetString("ALARM_DATA_COIL2_ADDRESS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Type.
-        /// </summary>
-        internal static string ALARM_DATA_COIL2_TYPE {
-            get {
-                return ResourceManager.GetString("ALARM_DATA_COIL2_TYPE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Custom Variable.
-        /// </summary>
-        internal static string ALARM_DATA_CUSTOM_VAR_ADDR {
-            get {
-                return ResourceManager.GetString("ALARM_DATA_CUSTOM_VAR_ADDR", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Value.
-        /// </summary>
-        internal static string ALARM_DATA_CUSTOM_VAR_VALUE {
-            get {
-                return ResourceManager.GetString("ALARM_DATA_CUSTOM_VAR_VALUE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Description.
-        /// </summary>
-        internal static string ALARM_DATA_DESCRIPTION {
-            get {
-                return ResourceManager.GetString("ALARM_DATA_DESCRIPTION", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Enable.
-        /// </summary>
-        internal static string ALARM_DATA_ENABLE {
-            get {
-                return ResourceManager.GetString("ALARM_DATA_ENABLE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Hmi Class.
-        /// </summary>
-        internal static string ALARM_DATA_HMI_CLASS {
-            get {
-                return ResourceManager.GetString("ALARM_DATA_HMI_CLASS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Timer Address.
-        /// </summary>
-        internal static string ALARM_DATA_TIMER_ADDRESS {
-            get {
-                return ResourceManager.GetString("ALARM_DATA_TIMER_ADDRESS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Type.
-        /// </summary>
-        internal static string ALARM_DATA_TIMER_TYPE {
-            get {
-                return ResourceManager.GetString("ALARM_DATA_TIMER_TYPE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Time.
-        /// </summary>
-        internal static string ALARM_DATA_TIMER_VALUE {
-            get {
-                return ResourceManager.GetString("ALARM_DATA_TIMER_VALUE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Cerca una stringa localizzata simile a Alarms generator. Project file: {file_path}.
         /// </summary>
         internal static string ALARM_GEN_FORM {
@@ -912,6 +786,132 @@ namespace TiaUtilities.Languages {
         internal static string ALARM_SETTINGS_UDT_DESCR {
             get {
                 return ResourceManager.GetString("ALARM_SETTINGS_UDT_DESCR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Negated.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_DATA_ALM_NEGATED {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_DATA_ALM_NEGATED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Alarm Variable.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_DATA_ALM_VARIABLE {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_DATA_ALM_VARIABLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Coil1 Address.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_DATA_COIL1_ADDRESS {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_DATA_COIL1_ADDRESS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Type.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_DATA_COIL1_TYPE {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_DATA_COIL1_TYPE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Coil2 Address.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_DATA_COIL2_ADDRESS {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_DATA_COIL2_ADDRESS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Type.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_DATA_COIL2_TYPE {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_DATA_COIL2_TYPE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Custom Variable.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_DATA_CUSTOM_VAR_ADDR {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_DATA_CUSTOM_VAR_ADDR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Value.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_DATA_CUSTOM_VAR_VALUE {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_DATA_CUSTOM_VAR_VALUE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Description.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_DATA_DESCRIPTION {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_DATA_DESCRIPTION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Enable.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_DATA_ENABLE {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_DATA_ENABLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Hmi Class.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_DATA_HMI_CLASS {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_DATA_HMI_CLASS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Timer Address.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_DATA_TIMER_ADDRESS {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_DATA_TIMER_ADDRESS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Type.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_DATA_TIMER_TYPE {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_DATA_TIMER_TYPE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Time.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_DATA_TIMER_VALUE {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_DATA_TIMER_VALUE", resourceCulture);
             }
         }
         

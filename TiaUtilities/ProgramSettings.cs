@@ -12,6 +12,8 @@ namespace TiaUtilities
 {
     public class ProgramSettings : ObservableConfiguration
     {
+        public static readonly int VERSION = 1;
+
         [JsonProperty] public string LastDBDuplicationFileName { get => this.GetAs<string>(); set => this.Set(value); }
 
         [JsonProperty] public string DBDuplicationNewMemberName { get => this.GetAs<string>(); set => this.Set(value); }
@@ -70,7 +72,7 @@ namespace TiaUtilities
 
         public void Save()
         {
-            SavesLoader.CreateFileAndSave(this, ProgramSettings.GetFilePath(), Constants.SAVE_FILE_EXTENSION); //To create file if not exist!
+            SavesLoader.CreateFileAndSave(this, ProgramSettings.VERSION, ProgramSettings.GetFilePath(), Constants.SAVE_FILE_EXTENSION); //To create file if not exist!
             this.Wash();
         }
 

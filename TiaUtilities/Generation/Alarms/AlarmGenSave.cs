@@ -4,10 +4,12 @@ using TiaUtilities.Generation.Alarms.Module.Tab;
 using TiaUtilities.Generation.Alarms.Module.Template;
 using TiaUtilities.Generation.GridHandler.JSScript;
 
-namespace TiaUtilities.Generation.Alarms.Module
+namespace TiaUtilities.Generation.Alarms
 {
     public class AlarmGenSave
     {
+        public static readonly int VERSION = 1; //Read via Reflection
+
         [JsonProperty] public GridScriptSave ScriptSave { get; set; } = new();
 
         [JsonProperty] public AlarmMainConfiguration AlarmMainConfig { get; set; } = new();

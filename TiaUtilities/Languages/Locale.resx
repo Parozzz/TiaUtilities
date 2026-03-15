@@ -283,40 +283,40 @@ for row validation</value>
   <data name="ALARM_SETTINGS_TEXT_LIST_FULL" xml:space="preserve">
     <value>Full</value>
   </data>
-  <data name="ALARM_DATA_ALM_VARIABLE" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_ALM_VARIABLE" xml:space="preserve">
     <value>Alarm Variable</value>
   </data>
-  <data name="ALARM_DATA_CUSTOM_VAR_ADDR" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_CUSTOM_VAR_ADDR" xml:space="preserve">
     <value>Custom Variable</value>
   </data>
-  <data name="ALARM_DATA_CUSTOM_VAR_VALUE" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_CUSTOM_VAR_VALUE" xml:space="preserve">
     <value>Value</value>
   </data>
-  <data name="ALARM_DATA_COIL1_ADDRESS" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_COIL1_ADDRESS" xml:space="preserve">
     <value>Coil1 Address</value>
   </data>
-  <data name="ALARM_DATA_COIL1_TYPE" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_COIL1_TYPE" xml:space="preserve">
     <value>Type</value>
   </data>
-  <data name="ALARM_DATA_COIL2_TYPE" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_COIL2_TYPE" xml:space="preserve">
     <value>Type</value>
   </data>
-  <data name="ALARM_DATA_COIL2_ADDRESS" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_COIL2_ADDRESS" xml:space="preserve">
     <value>Coil2 Address</value>
   </data>
-  <data name="ALARM_DATA_DESCRIPTION" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_DESCRIPTION" xml:space="preserve">
     <value>Description</value>
   </data>
-  <data name="ALARM_DATA_ENABLE" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_ENABLE" xml:space="preserve">
     <value>Enable</value>
   </data>
-  <data name="ALARM_DATA_TIMER_ADDRESS" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_TIMER_ADDRESS" xml:space="preserve">
     <value>Timer Address</value>
   </data>
-  <data name="ALARM_DATA_TIMER_TYPE" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_TIMER_TYPE" xml:space="preserve">
     <value>Type</value>
   </data>
-  <data name="ALARM_DATA_TIMER_VALUE" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_TIMER_VALUE" xml:space="preserve">
     <value>Time</value>
   </data>
   <data name="ALARM_GEN_FORM" xml:space="preserve">
@@ -577,7 +577,7 @@ for row validation</value>
   <data name="ALARM_SETTINGS_HMI_NAME" xml:space="preserve">
     <value>Name</value>
   </data>
-  <data name="ALARM_DATA_ALM_NEGATED" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_ALM_NEGATED" xml:space="preserve">
     <value>Negated</value>
   </data>
   <data name="GENERICS_HMI" xml:space="preserve">
@@ -586,7 +586,7 @@ for row validation</value>
   <data name="ALARM_SETTINGS_TAB_HMI_DEFAULT_ALARM_CLASS" xml:space="preserve">
     <value>Default Alarm Class</value>
   </data>
-  <data name="ALARM_DATA_HMI_CLASS" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_HMI_CLASS" xml:space="preserve">
     <value>Hmi Class</value>
   </data>
   <data name="ALARM_SETTINGS_TAB_PLACEHOLDERS" xml:space="preserve">

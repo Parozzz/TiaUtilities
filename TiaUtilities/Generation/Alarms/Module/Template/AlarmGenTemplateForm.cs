@@ -11,7 +11,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
     {
         private readonly AlarmMainConfiguration mainConfig;
         private readonly AlarmTabConfiguration tabConfig;
-        private readonly TemplateAlarmGridWrapper alarmDataGridWrapper;
+        private readonly TemplateAlarmGridWrapper templateDataGridWrapper;
 
         private readonly AlarmGenTemplateHandler templateHandler;
         private AlarmGenTemplate? SelectedTemplate { get => this.templateHandler.SelectedTemplate; set => this.templateHandler.SelectedTemplate = value; }
@@ -23,7 +23,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
             this.tabConfig = tabConfig;
 
             AlarmGenPlaceholdersHandler placeholdersHandler = new(mainConfig, tabConfig);
-            this.alarmDataGridWrapper = new(placeholdersHandler, bindContainer);
+            this.templateDataGridWrapper = new(placeholdersHandler, bindContainer);
 
             this.templateHandler = templateHandler;
 
@@ -32,9 +32,9 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
 
         public void Init()
         {
-            this.alarmDataGridWrapper.Init(this.mainConfig, this.tabConfig, () => this.SelectedTemplate?.TemplateConfig ?? new());
+            this.templateDataGridWrapper.Init(this.mainConfig, this.tabConfig, () => this.SelectedTemplate?.TemplateConfig ?? new());
 
-            this.mainPanel.Controls.Add(this.alarmDataGridWrapper.GetDataGridView());
+            this.mainPanel.Controls.Add(this.templateDataGridWrapper.GetDataGridView());
 
             this.templateHandler.SelectedTemplateChanged += (sender, args) => this.HandleTemplateChanged(args.OldTemplate);
 
@@ -66,7 +66,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
         {
             if (oldTemplate != null)
             {
-                oldTemplate.AlarmGridSave = this.alarmDataGridWrapper.CreateSave();
+                oldTemplate.AlarmGridSave = this.templateDataGridWrapper.CreateSave();
             }
 
             if (this.SelectedTemplate == null || oldTemplate == this.SelectedTemplate)
@@ -74,8 +74,8 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
                 return;
             }
 
-            this.alarmDataGridWrapper.LoadSave(this.SelectedTemplate.AlarmGridSave);
-            this.alarmDataGridWrapper.Wash();
+            this.templateDataGridWrapper.LoadSave(this.SelectedTemplate.AlarmGridSave);
+            this.templateDataGridWrapper.Wash();
 
             this.selectComboBox.SelectedItem = this.SelectedTemplate;
         }
@@ -88,7 +88,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            return this.alarmDataGridWrapper.ProcessCmdKey(ref msg, keyData) || base.ProcessCmdKey(ref msg, keyData);
+            return this.templateDataGridWrapper.ProcessCmdKey(ref msg, keyData) || base.ProcessCmdKey(ref msg, keyData);
         }
     }
 }

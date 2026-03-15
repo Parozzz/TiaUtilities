@@ -35,9 +35,9 @@ namespace TiaUtilities.Generation.Placeholders
                     {
                         alarmPlaceholderHandler.DeviceData = deviceData;
                     }
-                    else if (value is AlarmData alarmData)
+                    else if (value is TemplateData templateData)
                     {
-                        alarmPlaceholderHandler.AlarmData = alarmData;
+                        alarmPlaceholderHandler.TemplateData = templateData;
                     }
                 }
             }

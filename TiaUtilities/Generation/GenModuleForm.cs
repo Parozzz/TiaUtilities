@@ -1,5 +1,6 @@
 ﻿using InfoBox;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using System.Reflection;
 using TiaUtilities.Generation.SettingsNew;
 using TiaUtilities.Languages;
 using TiaUtilities.Utility;
@@ -168,8 +169,14 @@ namespace TiaUtilities.Generation
             }
 
             var projectSave = this.module.CreateSave();
+            if(projectSave == null)
+            {
+                return;
+            }
 
-            var saveOK = SavesLoader.Save(projectSave, ref lastFilePath, Constants.SAVE_FILE_EXTENSION, saveAs || !File.Exists(lastFilePath));
+            var version = GetProjectSaveVersion(projectSave);
+
+            var saveOK = SavesLoader.Save(projectSave, version, ref lastFilePath, Constants.SAVE_FILE_EXTENSION, saveAs || !File.Exists(lastFilePath));
             if (!saveOK)
             {
                 return;
@@ -204,6 +211,22 @@ namespace TiaUtilities.Generation
         public void SetLastFilePath(string? filePath)
         {
             this.lastFilePath = filePath;
+        }
+
+        private int GetProjectSaveVersion(Object obj)
+        {
+            const int LEGACY_VERSION = 1;
+
+            var type = obj.GetType();
+
+            var versionPropertyType = type.GetProperty("VERSION", BindingFlags.Static);
+            if(versionPropertyType == null)
+            {
+                return LEGACY_VERSION; //If no version is found, i consider it a legacy V1.
+            }
+
+            var version = versionPropertyType.GetValue(null);
+            return version is int intVersion ? intVersion : LEGACY_VERSION; 
         }
     }
 }

@@ -283,40 +283,40 @@ validità riga</value>
   <data name="ALARM_SETTINGS_TEXT_LIST_FULL" xml:space="preserve">
     <value>Pieno</value>
   </data>
-  <data name="ALARM_DATA_ALM_VARIABLE" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_ALM_VARIABLE" xml:space="preserve">
     <value>Variabile allarme</value>
   </data>
-  <data name="ALARM_DATA_CUSTOM_VAR_ADDR" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_CUSTOM_VAR_ADDR" xml:space="preserve">
     <value>Variabile Custom</value>
   </data>
-  <data name="ALARM_DATA_CUSTOM_VAR_VALUE" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_CUSTOM_VAR_VALUE" xml:space="preserve">
     <value>Value</value>
   </data>
-  <data name="ALARM_DATA_COIL1_ADDRESS" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_COIL1_ADDRESS" xml:space="preserve">
     <value>Indirizzo bobina1</value>
   </data>
-  <data name="ALARM_DATA_COIL1_TYPE" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_COIL1_TYPE" xml:space="preserve">
     <value>Tipo</value>
   </data>
-  <data name="ALARM_DATA_COIL2_TYPE" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_COIL2_TYPE" xml:space="preserve">
     <value>Tipo</value>
   </data>
-  <data name="ALARM_DATA_COIL2_ADDRESS" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_COIL2_ADDRESS" xml:space="preserve">
     <value>Indirizzo bobina2</value>
   </data>
-  <data name="ALARM_DATA_DESCRIPTION" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_DESCRIPTION" xml:space="preserve">
     <value>Descrizione</value>
   </data>
-  <data name="ALARM_DATA_ENABLE" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_ENABLE" xml:space="preserve">
     <value>Abilita</value>
   </data>
-  <data name="ALARM_DATA_TIMER_ADDRESS" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_TIMER_ADDRESS" xml:space="preserve">
     <value>Indirizzo timer</value>
   </data>
-  <data name="ALARM_DATA_TIMER_TYPE" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_TIMER_TYPE" xml:space="preserve">
     <value>Tipo</value>
   </data>
-  <data name="ALARM_DATA_TIMER_VALUE" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_TIMER_VALUE" xml:space="preserve">
     <value>Tempo</value>
   </data>
   <data name="ALARM_GEN_FORM" xml:space="preserve">
@@ -577,7 +577,7 @@ validità riga</value>
   <data name="ALARM_SETTINGS_HMI_NAME" xml:space="preserve">
     <value>Nome</value>
   </data>
-  <data name="ALARM_DATA_ALM_NEGATED" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_ALM_NEGATED" xml:space="preserve">
     <value>Negato</value>
   </data>
   <data name="GENERICS_HMI" xml:space="preserve">
@@ -586,7 +586,7 @@ validità riga</value>
   <data name="ALARM_SETTINGS_TAB_HMI_DEFAULT_ALARM_CLASS" xml:space="preserve">
     <value>Default Classe Allarme</value>
   </data>
-  <data name="ALARM_DATA_HMI_CLASS" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_HMI_CLASS" xml:space="preserve">
     <value>Classe Hmi</value>
   </data>
   <data name="ALARM_SETTINGS_TAB_PLACEHOLDERS" xml:space="preserve">

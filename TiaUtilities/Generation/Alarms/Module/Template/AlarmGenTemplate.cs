@@ -8,7 +8,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
     {
         public string Name { get; set; } = name;
         public AlarmTemplateConfiguration TemplateConfig { get; init; } = new();
-        public GridSave<AlarmData> AlarmGridSave { get; set; } = new();
+        public GridSave<TemplateData> AlarmGridSave { get; set; } = new(); //This should be TemplateGridSave. But for compatibility, won't be renamed yet
 
 
         public AlarmGenTemplate Clone()

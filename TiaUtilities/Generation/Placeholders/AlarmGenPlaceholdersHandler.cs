@@ -15,7 +15,7 @@ namespace TiaUtilities.Generation.Placeholders
             }
         }
 
-        public AlarmData AlarmData
+        public TemplateData TemplateData
         {
             set
             {

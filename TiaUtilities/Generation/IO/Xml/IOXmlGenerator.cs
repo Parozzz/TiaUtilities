@@ -11,7 +11,7 @@ using TiaUtilities.Generation.IO.Data;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Languages;
 
-namespace TiaUtilities.Generation.IO
+namespace TiaUtilities.Generation.IO.Xml
 {
     internal class IOXmlGenerator(IOMainConfiguration mainConfig)
     {
