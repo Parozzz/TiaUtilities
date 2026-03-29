@@ -1,6 +1,6 @@
-﻿namespace TiaUtilities.Utility
+﻿namespace TiaUtilities.Constants
 {
-    public static class Constants
+    public static class ProgramConstants
     {
         public static uint VERSION { get; set; } = 17;
         public static string VERSION_STRING { get => "V" + VERSION; }

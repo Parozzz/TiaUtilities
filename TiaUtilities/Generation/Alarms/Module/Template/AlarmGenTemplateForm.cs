@@ -1,8 +1,6 @@
-﻿using TiaUtilities.Generation.Configuration.Utility;
-using TiaUtilities.Generation.GridHandler.Binds;
+﻿using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Languages;
-using TiaUtilities.Generation.Configuration;
 using TiaUtilities.Generation.Alarms.Configurations;
 
 namespace TiaUtilities.Generation.Alarms.Module.Template

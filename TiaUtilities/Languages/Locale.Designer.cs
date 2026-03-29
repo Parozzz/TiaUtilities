@@ -862,7 +862,7 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Description.
+        ///   Cerca una stringa localizzata simile a Alarm Text.
         /// </summary>
         internal static string ALARM_TEMPLATE_DATA_DESCRIPTION {
             get {
@@ -885,6 +885,24 @@ namespace TiaUtilities.Languages {
         internal static string ALARM_TEMPLATE_DATA_HMI_CLASS {
             get {
                 return ResourceManager.GetString("ALARM_TEMPLATE_DATA_HMI_CLASS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Hmi Parameters.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_DATA_HMI_PARAMETERS {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_DATA_HMI_PARAMETERS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a HMI Alarm Text.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_DATA_HMI_TEXT {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_DATA_HMI_TEXT", resourceCulture);
             }
         }
         

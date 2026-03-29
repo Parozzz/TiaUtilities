@@ -305,7 +305,7 @@ validità riga</value>
     <value>Indirizzo bobina2</value>
   </data>
   <data name="ALARM_TEMPLATE_DATA_DESCRIPTION" xml:space="preserve">
-    <value>Descrizione</value>
+    <value>Testo Allarme</value>
   </data>
   <data name="ALARM_TEMPLATE_DATA_ENABLE" xml:space="preserve">
     <value>Abilita</value>
@@ -699,5 +699,11 @@ validità riga</value>
   </data>
   <data name="DEVICE_DATA_PLACEHOLDERS" xml:space="preserve">
     <value>Placeholders</value>
+  </data>
+  <data name="ALARM_TEMPLATE_DATA_HMI_PARAMETERS" xml:space="preserve">
+    <value>Parametri Hmi</value>
+  </data>
+  <data name="ALARM_TEMPLATE_DATA_HMI_TEXT" xml:space="preserve">
+    <value>Testo Allarme HMI</value>
   </data>
 </root>

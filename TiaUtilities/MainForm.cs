@@ -5,6 +5,7 @@ using SimaticML;
 using SimaticML.API;
 using System.Globalization;
 using System.Xml;
+using TiaUtilities.Constants;
 using TiaUtilities.DbVisualization;
 using TiaUtilities.Editors.ErrorReporting;
 using TiaUtilities.Generation;
@@ -208,7 +209,7 @@ namespace TiaUtilities
         {
             var filePath = "";
 
-            var saveObject = SavesLoader.LoadWithDialog(ref filePath, Constants.SAVE_FILE_EXTENSION);
+            var saveObject = SavesLoader.LoadWithDialog(ref filePath, ProgramConstants.SAVE_FILE_EXTENSION);
 
             GenModuleForm genForm;
             if (saveObject is IOGenSaveV1)

@@ -20,7 +20,7 @@ namespace TiaUtilities.Generation.Placeholders
                 if (string.IsNullOrEmpty(value.Variable))
                 {
                     var preview = previewer.RequestPreview(IOData.VARIABLE, value);
-                    variable = preview.ComposeDefaultValue();
+                    variable = preview?.ComposeDefaultValue() ?? "/";
                 }
                 else
                 {
@@ -33,14 +33,14 @@ namespace TiaUtilities.Generation.Placeholders
                 if (string.IsNullOrEmpty(value.IOName))
                 {
                     var preview = previewer.RequestPreview(IOData.IO_NAME, value);
-                    ioName = preview.ComposeDefaultValue();
+                    ioName = preview?.ComposeDefaultValue() ?? "/";
                 }
                 else
                 {
                     ioName = value.IOName;
                 }
                 AddOrReplace(GenPlaceholders.IO.IONAME, new StringGenPlaceholderData() { Value = this.ParseNotNull(ioName) }); // This one the last (Comment is not useful here!). The io name can contains other placeholders!
-                AddOrReplace(GenPlaceholders.IO.COMMENT, new StringGenPlaceholderData() { Value = value.Comment });
+                AddOrReplace(GenPlaceholders.IO.COMMENT, new StringGenPlaceholderData() { Value = value.Comment ?? "/" });
 
                 AddOrReplace(GenPlaceholders.IO.CONFIG_DB_NAME, new StringGenPlaceholderData() { Value = mainConfig.DBName });
                 AddOrReplace(GenPlaceholders.IO.CONFIG_DB_NUMBER, new StringGenPlaceholderData() { Value = "" + mainConfig.DBNumber });

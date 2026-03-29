@@ -54,7 +54,7 @@ namespace TiaUtilities.Generation.Alarms.Configurations
             this.AlarmCommentTemplate = $"Alm{GenPlaceholders.Alarms.ALARM_NUM} - {GenPlaceholders.Alarms.DEVICE_NAME}: {GenPlaceholders.Alarms.ALARM_DESCRIPTION}";
             this.AlarmCommentTemplateSpare = $"Alm{GenPlaceholders.Alarms.ALARM_NUM} - SPARE";
             this.HmiNameTemplate = $"{GenPlaceholders.Generation.TAB_NAME}_Alm{GenPlaceholders.Alarms.ALARM_NUM}";
-            this.HmiTextTemplate = $"Alm{GenPlaceholders.Alarms.ALARM_NUM} - {GenPlaceholders.Alarms.DEVICE_NAME}: {GenPlaceholders.Alarms.ALARM_DESCRIPTION}";
+            this.HmiTextTemplate = $"Alm{GenPlaceholders.Alarms.ALARM_NUM} - {GenPlaceholders.Alarms.DEVICE_NAME}: {GenPlaceholders.Alarms.ALARM_HMI_TEXT}";
             this.HmiTriggerTagTemplate = $"AlmAux_Mem{GenPlaceholders.Generation.TAB_NAME}";
             this.HmiTriggerTagUseWordArray = true;
 

@@ -115,8 +115,7 @@ namespace TiaUtilities.Generation.Placeholders
                     break;
                 }
             }
-
-            //{mnemonic} {bit_address} {byte_address} {cad_address} {cad_comment1} {cad_comment2} {cad_comment3} {cad_comment4} {cad_page} {cad_panel} {cad_type}
+            
             return localStr;
         }
 

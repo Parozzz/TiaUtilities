@@ -1,5 +1,7 @@
 ﻿using InfoBox;
 using System.Globalization;
+using TiaUtilities.CustomControls;
+using TiaUtilities.Languages;
 
 namespace TiaUtilities.Utility
 {
@@ -294,5 +296,107 @@ namespace TiaUtilities.Utility
             return fixedName;
         }
 
+        public static void CreateComboBoxEnumDataSource(ComboBox comboBox, Type enumType, bool editable = false)
+        {
+            if(!editable)
+            {
+                comboBox.DropDownStyle = ComboBoxStyle.DropDownList; //Disable text Editing 
+            }
+
+            comboBox.DisplayMember = "Text";
+            comboBox.ValueMember = "Value";
+
+            var dataSourceList = new List<object>();
+            foreach (Enum enumItem in Enum.GetValues(enumType))
+            {
+                dataSourceList.Add(new { Text = enumItem.GetTranslation(), Value = enumItem });
+            }
+            comboBox.DataSource = dataSourceList;
+        }
+
+        public static void CreateComboBoxObjectDataSource<T>(ComboBox comboBox, List<T> objectList, bool editable = false)
+        {
+            if (!editable)
+            {
+                comboBox.DropDownStyle = ComboBoxStyle.DropDownList; //Disable text Editing 
+            }
+
+            comboBox.DisplayMember = "Text";
+            comboBox.ValueMember = "Value";
+
+            var dataSourceList = new List<object>();
+            foreach (var obj in objectList)
+            {
+                if(obj == null)
+                {
+                    continue;
+                }
+
+                dataSourceList.Add(new { Text = "" + obj, Value = obj });
+            }
+            comboBox.DataSource = dataSourceList;
+        }
+        public static void CreateRJComboBoxEnumDataSource(RJComboBox comboBox, Type enumType, bool editable = false)
+        {
+            if (!editable)
+            {
+                comboBox.DropDownStyle = ComboBoxStyle.DropDownList; //Disable text Editing 
+            }
+
+            comboBox.DisplayMember = "Text";
+            comboBox.ValueMember = "Value";
+
+            var dataSourceList = new List<object>();
+            foreach (Enum enumItem in Enum.GetValues(enumType))
+            {
+                dataSourceList.Add(new { Text = enumItem.GetTranslation(), Value = enumItem });
+            }
+            comboBox.DataSource = dataSourceList;
+        }
+
+        public static void CreateRJComboBoxObjectDataSource<T>(RJComboBox comboBox, List<T> objectList, bool editable = false)
+        {
+            if (!editable)
+            {
+                comboBox.DropDownStyle = ComboBoxStyle.DropDownList; //Disable text Editing 
+            }
+
+            comboBox.DisplayMember = "Text";
+            comboBox.ValueMember = "Value";
+
+            var dataSourceList = new List<object>();
+            foreach (var obj in objectList)
+            {
+                if (obj == null)
+                {
+                    continue;
+                }
+
+                dataSourceList.Add(new { Text = "" + obj, Value = obj });
+            }
+            comboBox.DataSource = dataSourceList;
+        }
+
+        public static void SignedKeyPressEventHandler(object? sender, KeyPressEventArgs args)
+        {
+            if (args.KeyChar == (char)Keys.Cancel || args.KeyChar == (char)Keys.Enter || args.KeyChar == (char)Keys.Back)
+            {
+                return;
+            }
+
+            var isKeyValid = char.IsNumber(args.KeyChar) || args.KeyChar == '+' || args.KeyChar == '-';
+            args.Handled = !isKeyValid;
+        }
+
+        public static void UnsignedKeyPressEventHandler(object? sender, KeyPressEventArgs args)
+        {
+            if (args.KeyChar == (char)Keys.Cancel || args.KeyChar == (char)Keys.Enter || args.KeyChar == (char)Keys.Back)
+            {
+                return;
+            }
+
+            var isKeyValid = char.IsNumber(args.KeyChar);
+            args.Handled = !isKeyValid;
+        }
     }
 }

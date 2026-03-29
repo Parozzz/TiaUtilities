@@ -5,7 +5,7 @@ using System.Drawing.Drawing2D;
 namespace TiaUtilities.CustomControls
 {
     [DefaultEvent("OnSelectedIndexChanged")]
-    class RJComboBox : UserControl
+    public class RJComboBox : UserControl
     {
         [Category("RJ Code - Appearance")]
         public override Color BackColor

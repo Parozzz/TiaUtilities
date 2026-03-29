@@ -10,8 +10,8 @@ namespace TiaUtilities.Generation.Placeholders
         {
             set
             {
-                AddOrReplace(GenPlaceholders.Alarms.DEVICE_NAME, new StringGenPlaceholderData() { Value = value.Name });
-                AddOrReplace(GenPlaceholders.Alarms.DEVICE_DESCRIPTION, new StringGenPlaceholderData() { Value = value.Description });
+                AddOrReplace(GenPlaceholders.Alarms.DEVICE_NAME, new StringGenPlaceholderData() { Value = value.Name ?? "/" });
+                AddOrReplace(GenPlaceholders.Alarms.DEVICE_DESCRIPTION, new StringGenPlaceholderData() { Value = value.Description ?? "/" });
             }
         }
 
@@ -19,7 +19,12 @@ namespace TiaUtilities.Generation.Placeholders
         {
             set
             {
-                AddOrReplace(GenPlaceholders.Alarms.ALARM_DESCRIPTION, new StringGenPlaceholderData() { Value = value.Description });
+                AddOrReplace(GenPlaceholders.Alarms.ALARM_HMI_TEXT, new DoubleStringGenPlaceholderData() 
+                { 
+                    FirstValue = value.HmiAlarmText,
+                    SecondValue = value.Description ?? "/" 
+                });
+                AddOrReplace(GenPlaceholders.Alarms.ALARM_DESCRIPTION, new StringGenPlaceholderData() { Value = value.Description ?? "/" });
             }
         }
 

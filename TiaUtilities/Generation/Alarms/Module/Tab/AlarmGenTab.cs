@@ -7,7 +7,6 @@ using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.CustomColumns;
 using TiaUtilities.Generation.Alarms.Configurations;
 using TiaUtilities.Generation.Alarms.Data;
-using TiaUtilities.SettingsNew.Bindings;
 
 namespace TiaUtilities.Generation.Alarms.Module.Tab
 {

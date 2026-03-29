@@ -2,17 +2,12 @@
 {
     public class UIntGenPlaceholderData : IGenPlaceholderData
     {
-        public uint Value { get; set; }
-        public Func<uint, string> Function { get; set; }
-
-        public UIntGenPlaceholderData()
-        {
-
-        }
+        public required uint Value { get; set; }
+        public Func<uint, string>? Function { get; set; }
 
         public string GetSubstitution()
         {
-            return Function.Invoke(Value);
+            return Function == null ? this.Value.ToString() : Function.Invoke(Value);
         }
     }
 

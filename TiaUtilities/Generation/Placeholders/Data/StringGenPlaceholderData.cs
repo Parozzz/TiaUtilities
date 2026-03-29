@@ -2,17 +2,12 @@
 {
     public class StringGenPlaceholderData : IGenPlaceholderData
     {
-        public string Value { get; set; }
-        public Func<string, string> Function { get; set; }
-
-        public StringGenPlaceholderData()
-        {
-
-        }
+        public required string Value { get; set; }
+        public Func<string, string>? Function { get; set; }
 
         public string GetSubstitution()
         {
-            return Function != null ? Function.Invoke(Value) : Value;
+            return this.Function == null ? this.Value : this.Function.Invoke(Value);
         }
     }
 

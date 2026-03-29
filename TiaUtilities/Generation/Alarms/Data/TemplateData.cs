@@ -2,6 +2,7 @@
 using TiaUtilities.Languages;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.Placeholders;
+using System.Text.Json.Nodes;
 
 namespace TiaUtilities.Generation.Alarms.Data
 {
@@ -22,6 +23,8 @@ namespace TiaUtilities.Generation.Alarms.Data
         public static readonly GridDataColumn TIMER_TYPE;
         public static readonly GridDataColumn TIMER_VALUE;
         public static readonly GridDataColumn HMI_ALARM_CLASS;
+        public static readonly GridDataColumn HMI_PARAMETERS;
+        public static readonly GridDataColumn HMI_ALARM_TEXT;
         public static readonly GridDataColumn DESCRIPTION;
         public static readonly IReadOnlyList<GridDataColumn> COLUMN_LIST;
 
@@ -41,6 +44,8 @@ namespace TiaUtilities.Generation.Alarms.Data
             TIMER_TYPE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateData.TimerType), "timerType");
             TIMER_VALUE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateData.TimerValue), "timerValue");
             HMI_ALARM_CLASS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateData.HmiAlarmClass), "hmiClass");
+            HMI_PARAMETERS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateData.HmiParametersJsonString));
+            HMI_ALARM_TEXT = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateData.HmiAlarmText), "hmiAlarmText");
             DESCRIPTION = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateData.Description));
 
             var columnList = GridDataColumn.GetStaticColumnList(type);
@@ -61,7 +66,9 @@ namespace TiaUtilities.Generation.Alarms.Data
         [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_TIMER_TYPE))] public string? TimerType { get; set; }
         [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_TIMER_VALUE))] public string? TimerValue { get; set; }
         [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_HMI_CLASS))] public string? HmiAlarmClass { get; set; }
-        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_DESCRIPTION), append: " > " + GenPlaceholders.Alarms.ALARM_DESCRIPTION)] public string? Description { get; set; }
+        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_HMI_PARAMETERS), append: $" > {GenPlaceholders.Alarms.HMI_PARAMETER}")] public string? HmiParametersJsonString { get; set; }
+        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_HMI_TEXT), append: $" > {GenPlaceholders.Alarms.ALARM_HMI_TEXT}")] public string ? HmiAlarmText { get; set; }
+        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_DESCRIPTION), append: $" > {GenPlaceholders.Alarms.ALARM_DESCRIPTION}")] public string? Description { get; set; }
 
         public object? this[int column]
         {
@@ -94,8 +101,9 @@ namespace TiaUtilities.Generation.Alarms.Data
         public void Clear()
         {
             this.Enable = this.AlarmNegated = false;
-            this.AlarmVariable = this.CustomVariableAddress = this.CustomVariableValue = this.Coil1Address = this.Coil1Type
-               = this.Coil2Address = this.Coil2Type = this.TimerAddress = this.TimerType = this.TimerValue = this.Description = null;
+            this.AlarmVariable = this.CustomVariableAddress = this.CustomVariableValue = this.Coil1Address 
+                = this.Coil1Type = this.Coil2Address = this.Coil2Type = this.TimerAddress = this.TimerType = this.TimerValue 
+                = this.HmiParametersJsonString = this.HmiAlarmText = this.Description = null;
         }
 
         public bool IsEmpty()
@@ -105,7 +113,7 @@ namespace TiaUtilities.Generation.Alarms.Data
                 string.IsNullOrEmpty(this.Coil1Address) && string.IsNullOrEmpty(this.Coil1Type) &&
                 string.IsNullOrEmpty(this.Coil2Address) && string.IsNullOrEmpty(this.Coil2Type) &&
                 string.IsNullOrEmpty(this.TimerAddress) && string.IsNullOrEmpty(this.TimerType) && string.IsNullOrEmpty(this.TimerValue) &&
-                string.IsNullOrEmpty(this.Description);
+                string.IsNullOrEmpty(this.HmiParametersJsonString) && string.IsNullOrEmpty(this.HmiAlarmText) && string.IsNullOrEmpty(this.Description);
         }
 
         public TemplateData Clone()
@@ -124,6 +132,8 @@ namespace TiaUtilities.Generation.Alarms.Data
                 TimerAddress = this.TimerAddress,
                 TimerType = this.TimerType,
                 TimerValue = this.TimerValue,
+                HmiAlarmText = this.HmiAlarmText,
+                HmiParametersJsonString = this.HmiParametersJsonString,
                 Description = this.Description
             };
         }

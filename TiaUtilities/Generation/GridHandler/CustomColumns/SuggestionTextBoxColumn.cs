@@ -179,13 +179,7 @@ namespace TiaUtilities.Generation.GridHandler.CustomColumns
 
         private void EditingControlShowingEvent(object? sender, DataGridViewEditingControlShowingEventArgs args)
         {
-            if (sender is DataGridView == false)
-            {
-                return;
-            }
-
-            var dataGridView = (DataGridView)sender;
-            if (dropDown == null || !inEditMode)
+            if (sender is not DataGridView dataGridView || dropDown == null || !inEditMode)
             {
                 return;
             }
@@ -195,7 +189,8 @@ namespace TiaUtilities.Generation.GridHandler.CustomColumns
                 this.editingControl = editingControl;
 
                 // TEST EHEHEHEH
-                /*var btn = new Button
+                /*
+                var btn = new Button
                 {
                     Padding = new Padding(0),
                     Margin = new Padding(0),

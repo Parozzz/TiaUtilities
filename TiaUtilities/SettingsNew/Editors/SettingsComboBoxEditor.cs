@@ -3,6 +3,7 @@ using TiaUtilities.Generation.Configuration;
 using TiaUtilities.Languages;
 using TiaUtilities.SettingsNew.Bindings;
 using TiaUtilities.SettingsNew.FormHelpers;
+using TiaUtilities.Utility;
 
 namespace TiaUtilities.SettingsNew.Editors
 {
@@ -25,20 +26,6 @@ namespace TiaUtilities.SettingsNew.Editors
                 Anchor = AnchorStyles.Left,  //This allows centering if no label is present!
             };
 
-            switch(value.Binding.EditorType)
-            {
-                case SettingsEditorTypeEnum.ENUM:
-                case SettingsEditorTypeEnum.STRING_LIST:
-                case SettingsEditorTypeEnum.UNSIGNED_LIST:
-                case SettingsEditorTypeEnum.SIGNED_LIST:
-
-                    this.comboBox.DropDownStyle = ComboBoxStyle.DropDownList; //Disable text Editing 
-                    this.comboBox.DisplayMember = "Text";
-                    this.comboBox.ValueMember = "Value";
-
-                    break;
-            }
-
             switch (value.Binding.EditorType)
             {
                 case SettingsEditorTypeEnum.ENUM:
@@ -47,14 +34,10 @@ namespace TiaUtilities.SettingsNew.Editors
                         throw new InvalidCastException($"Using SettingsEditorTypeEnum ENUM with a PropertyInfo that is not an Enumeration for {value.PropertyInfo.Name}");
                     }
 
-                    var enumDataSourceItems = new List<object>();
-                    foreach (Enum enumItem in Enum.GetValues(value.PropertyInfo.PropertyType))
-                    {
-                        enumDataSourceItems.Add(new { Text = enumItem.GetTranslation(), Value = enumItem });
-                    }
-                    this.comboBox.DataSource = enumDataSourceItems;
 
+                    Utils.CreateRJComboBoxEnumDataSource(this.comboBox, value.PropertyInfo.PropertyType, editable: false);
                     this.comboBox.OnSelectedIndexChanged += (sender, args) => this.SaveToConfiguration();
+
                     break;
                 case SettingsEditorTypeEnum.STRING_LIST:
                     if(value.Binding.Tag is not SettingsValueListStringTag listTag)
@@ -62,14 +45,9 @@ namespace TiaUtilities.SettingsNew.Editors
                         throw new InvalidCastException($"Using SettingsEditorTypeEnum LIST without a Tag that is not SettingsValueListTag for {value.PropertyInfo.Name}");
                     }
 
-                    var listStringDataSourceItems = new List<object>();
-                    foreach (var listValue in listTag.List)
-                    {
-                        listStringDataSourceItems.Add(new { Text = listValue, Value = listValue });
-                    }
-                    this.comboBox.DataSource = listStringDataSourceItems;
-
+                    Utils.CreateRJComboBoxObjectDataSource(this.comboBox, listTag.List, editable: false);
                     this.comboBox.OnSelectedIndexChanged += (sender, args) => this.SaveToConfiguration();
+
                     break;
                 case SettingsEditorTypeEnum.UNSIGNED_LIST:
                     if (value.Binding.Tag is not SettingsValueListUnsignedTag unsignedTag)
@@ -77,14 +55,9 @@ namespace TiaUtilities.SettingsNew.Editors
                         throw new InvalidCastException($"Using SettingsEditorTypeEnum UNSIGNED_LIST without a Tag that is not SettingsValueListUnsignedTag for {value.PropertyInfo.Name}");
                     }
 
-                    var listUnsignedDataSourceItems = new List<object>();
-                    foreach (var listValue in unsignedTag.List)
-                    {
-                        listUnsignedDataSourceItems.Add(new { Text = "" + listValue, Value = listValue });
-                    }
-                    this.comboBox.DataSource = listUnsignedDataSourceItems;
-
+                    Utils.CreateRJComboBoxObjectDataSource(this.comboBox, unsignedTag.List, editable: false);
                     this.comboBox.OnSelectedIndexChanged += (sender, args) => this.SaveToConfiguration();
+
                     break;
                 case SettingsEditorTypeEnum.SIGNED_LIST:
                     if (value.Binding.Tag is not SettingsValueListSignedTag signedTag)
@@ -92,14 +65,9 @@ namespace TiaUtilities.SettingsNew.Editors
                         throw new InvalidCastException($"Using SettingsEditorTypeEnum SIGNED_LIST without a Tag that is not SettingsValueListSignedTag for {value.PropertyInfo.Name}");
                     }
 
-                    var listSignedDataSourceItems = new List<object>();
-                    foreach (var listValue in signedTag.List)
-                    {
-                        listSignedDataSourceItems.Add(new { Text = "" + listValue, Value = listValue });
-                    }
-                    this.comboBox.DataSource = listSignedDataSourceItems;
-
+                    Utils.CreateRJComboBoxObjectDataSource(this.comboBox, signedTag.List, editable: false);
                     this.comboBox.OnSelectedIndexChanged += (sender, args) => this.SaveToConfiguration();
+
                     break;
                 case SettingsEditorTypeEnum.STRING:
                     this.comboBox.TextChanged += (sender, args) => this.SaveToConfiguration();

@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using Newtonsoft.Json;
 using SimaticML.API;
 using SimaticML.Blocks;
 using SimaticML.Blocks.FlagNet;
@@ -23,6 +24,14 @@ namespace TiaUtilities.Generation.Alarms.Xml
 
     public class AlarmXmlGenerator(AlarmMainConfiguration mainConfig)
     {
+
+        private enum CommentTemplateTypeEnum
+        {
+            ALARM,
+            SPARE,
+            EMPTY,
+        }
+
         private readonly AlarmMainConfiguration mainConfig = mainConfig;
         private readonly Dictionary<string, AlarmGroupXmlItem> alarmGroupDict = [];
 
@@ -81,7 +90,7 @@ namespace TiaUtilities.Generation.Alarms.Xml
                     }
 
                     //A little hack to allow empty placeholder to be "Removed"
-                    for(int x = count; x < 50; x++)
+                    for (int x = count; x < 50; x++)
                     {
                         placeholdersHandler.AddGenericPlaceholder(x + 1, "");
                     }
@@ -105,9 +114,7 @@ namespace TiaUtilities.Generation.Alarms.Xml
                     placeholdersHandler.SetAlarmNum(alarmNum, mainConfig.AlarmNumFormat);
 
                     //Creation of AlarmItem for FULL Alarm
-                    var comment = placeholdersHandler.ParseNotNull(mainConfig.AlarmCommentTemplate);
-
-                    var alarmItem = this.CreateItem(ref hmiID, tabName, comment, placeholdersHandler, templateData, alarmNum, tabConfig);
+                    var alarmItem = this.CreateItem(ref hmiID, tabName, CommentTemplateTypeEnum.ALARM, placeholdersHandler, templateData, alarmNum, tabConfig);
                     items.Add(alarmItem);
 
                     if (tabConfig.GroupingType == AlarmGroupingType.ONE)
@@ -150,9 +157,7 @@ namespace TiaUtilities.Generation.Alarms.Xml
                             placeholdersHandler.SetAlarmNum(loopAlarmNum, mainConfig.AlarmNumFormat);
 
                             //Creation of EMPTY Alarm item for slipping
-                            var comment = placeholdersHandler.ParseNotNull(mainConfig.AlarmCommentTemplateSpare);
-
-                            var alarmItem = this.CreateItem(ref hmiID, tabName, comment, placeholdersHandler, templateData: null, loopAlarmNum, tabConfig);
+                            var alarmItem = this.CreateItem(ref hmiID, tabName, CommentTemplateTypeEnum.SPARE, placeholdersHandler, templateData: null, loopAlarmNum, tabConfig);
                             items.Add(alarmItem);
                         }
 
@@ -176,9 +181,7 @@ namespace TiaUtilities.Generation.Alarms.Xml
                 {
                     var loopAlarmNum = nextAlarmNum + x;
                     //Creation of EMPTY Alarm for Skip After Group
-                    var comment = "";
-
-                    var alarmItem = this.CreateItem(ref hmiID, tabName, comment, placeholdersHandler, templateData: null, loopAlarmNum, tabConfig);
+                    var alarmItem = this.CreateItem(ref hmiID, tabName, CommentTemplateTypeEnum.EMPTY, placeholdersHandler, templateData: null, loopAlarmNum, tabConfig);
                     items.Add(alarmItem);
                 }
 
@@ -189,7 +192,7 @@ namespace TiaUtilities.Generation.Alarms.Xml
 
             if (nextAlarmNum < (tabConfig.TotalAlarmNum + tabConfig.StartingAlarmNum))
             {
-                placeholdersHandler.Clear(); 
+                placeholdersHandler.Clear();
                 placeholdersHandler.LoadJSONObject(tabConfig.CustomPlaceholdersJSON);
                 placeholdersHandler.TabName = tabName;
 
@@ -198,9 +201,7 @@ namespace TiaUtilities.Generation.Alarms.Xml
                     placeholdersHandler.SetAlarmNum(x, mainConfig.AlarmNumFormat);
 
                     //Create of SPARE alarm from total alarms number
-                    var comment = placeholdersHandler.ParseNotNull(mainConfig.AlarmCommentTemplateSpare);
-
-                    var alarmItem = this.CreateItem(ref hmiID, tabName, comment, placeholdersHandler, templateData: null, x, tabConfig, empty: true);
+                    var alarmItem = this.CreateItem(ref hmiID, tabName, CommentTemplateTypeEnum.SPARE, placeholdersHandler, templateData: null, x, tabConfig, hmiEmpty: true);
                     items.Add(alarmItem);
                 }
 
@@ -222,15 +223,41 @@ namespace TiaUtilities.Generation.Alarms.Xml
             this.alarmGroupDict.Add(tabName, item);
         }
 
-        private AlarmXmlItem CreateItem(ref uint ID, string tabName, string comment, AlarmGenPlaceholdersHandler placeholdersHandler, TemplateData? templateData, uint alarmNum, AlarmTabConfiguration tabConfig, bool empty = false)
+        private AlarmXmlItem CreateItem(ref uint ID, string tabName, CommentTemplateTypeEnum commentTemplateType, AlarmGenPlaceholdersHandler placeholdersHandler, TemplateData? templateData, uint alarmNum, AlarmTabConfiguration tabConfig, bool hmiEmpty = false)
         {
+            var commentTemplate = commentTemplateType switch
+            {
+                CommentTemplateTypeEnum.ALARM => mainConfig.AlarmCommentTemplate,
+                CommentTemplateTypeEnum.SPARE => mainConfig.AlarmCommentTemplateSpare,
+                CommentTemplateTypeEnum.EMPTY => "",
+                _ => "",
+            };
+
             var alarmVariableName = placeholdersHandler.ParseNotNull(mainConfig.AlarmNameTemplate);
-            var alarmVariableComment = comment;
+            var alarmVariableComment = placeholdersHandler.ParseNotNull(commentTemplate);
 
             var hmiAlarmName = placeholdersHandler.ParseNotNull(mainConfig.HmiNameTemplate);
-            var hmiAlarmText = empty ? "" : placeholdersHandler.ParseNotNull(mainConfig.HmiTextTemplate);
+            var hmiAlarmText = hmiEmpty ? "" : placeholdersHandler.ParseNotNull(mainConfig.HmiTextTemplate);
             var hmiTriggerTag = placeholdersHandler.ParseNotNull(mainConfig.HmiTriggerTagTemplate);
             var hmiAlarmClass = placeholdersHandler.ParseNotNull(string.IsNullOrEmpty(templateData?.HmiAlarmClass) ? tabConfig.DefaultHmiAlarmClass : templateData?.HmiAlarmClass);
+
+            List<AlarmXmlHmiParameter> hmiParameters = [];
+
+            var jsonString = templateData?.HmiParametersJsonString;
+            if (!string.IsNullOrEmpty(jsonString))
+            {
+                try
+                {
+                    jsonString = placeholdersHandler.ParseNotNull(jsonString);
+
+                    var parametersJsonObject = JsonConvert.DeserializeObject<AlarmGenHmiParametersForm.ParameterJsonObject>(jsonString);
+                    if(parametersJsonObject != null)
+                    {
+                        hmiParameters.AddRange(parametersJsonObject.Dict.Values);
+                    }
+                }
+                catch { }
+            }
 
             AlarmXmlItem item;
             if (this.mainConfig.HmiTriggerTagUseWordArray)
@@ -245,11 +272,12 @@ namespace TiaUtilities.Generation.Alarms.Xml
                     hmiAlarmText,
                     hmiAlarmClass,
                     hmiTriggerTag + $"[{triggerByte}]",
-                    triggerBit);
+                    triggerBit,
+                    hmiParameters);
             }
             else
             {
-                item = new(tabName, 
+                item = new(tabName,
                     alarmVariableName,
                     alarmVariableComment,
                     ID,
@@ -257,7 +285,8 @@ namespace TiaUtilities.Generation.Alarms.Xml
                     hmiAlarmText,
                     hmiAlarmClass,
                     hmiTriggerTag,
-                    hmiTriggerBit: 0);
+                    hmiTriggerBit: 0,
+                    hmiParameters);
             }
 
             ID++;
@@ -277,6 +306,8 @@ namespace TiaUtilities.Generation.Alarms.Xml
                 TimerAddress = tabConfig.DefaultTimerAddress,
                 TimerType = tabConfig.DefaultTimerType,
                 TimerValue = tabConfig.DefaultTimerValue,
+                HmiParametersJsonString = "",
+                HmiAlarmText = "",
                 Description = "",
                 Enable = true
             };
@@ -336,6 +367,7 @@ namespace TiaUtilities.Generation.Alarms.Xml
                 TimerAddress = string.IsNullOrEmpty(templateData.TimerAddress) ? tabConfig.DefaultTimerAddress : (tabConfig.TimerAddressPrefix + templateData.TimerAddress),
                 TimerType = string.IsNullOrEmpty(templateData.TimerType) ? tabConfig.DefaultTimerType : templateData.TimerType,
                 TimerValue = string.IsNullOrEmpty(templateData.TimerValue) ? tabConfig.DefaultTimerValue : templateData.TimerValue,
+                HmiAlarmText = templateData.HmiAlarmText,
                 Description = templateData.Description,
                 Enable = templateData.Enable
             };
@@ -520,7 +552,7 @@ namespace TiaUtilities.Generation.Alarms.Xml
                 {
                     hmiAlarmsExcel.AddData(item);
 
-                    if(!string.IsNullOrEmpty(item.HmiAlarmText))
+                    if (!string.IsNullOrEmpty(item.HmiAlarmText))
                     {
                         beta80Sheet.Cell(excelRowIndex, 1).Value = beta80AlarmNum;
                         beta80Sheet.Cell(excelRowIndex, 2).Value = item.HmiAlarmText;

@@ -59,7 +59,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
             mainPanel.RowCount = 2;
             mainPanel.RowStyles.Add(new RowStyle());
             mainPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            mainPanel.Size = new Size(1184, 661);
+            mainPanel.Size = new Size(1584, 761);
             mainPanel.TabIndex = 0;
             // 
             // topPanel
@@ -74,7 +74,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
             topPanel.Dock = DockStyle.Fill;
             topPanel.Location = new Point(3, 3);
             topPanel.Name = "topPanel";
-            topPanel.Size = new Size(1178, 37);
+            topPanel.Size = new Size(1578, 37);
             topPanel.TabIndex = 0;
             // 
             // selectPanel
@@ -183,7 +183,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1184, 661);
+            ClientSize = new Size(1584, 761);
             Controls.Add(mainPanel);
             DoubleBuffered = true;
             MaximizeBox = false;

@@ -1,6 +1,7 @@
 ﻿using InfoBox;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Reflection;
+using TiaUtilities.Constants;
 using TiaUtilities.Generation.SettingsNew;
 using TiaUtilities.Languages;
 using TiaUtilities.Utility;
@@ -176,7 +177,7 @@ namespace TiaUtilities.Generation
 
             var version = GetProjectSaveVersion(projectSave);
 
-            var saveOK = SavesLoader.Save(projectSave, version, ref lastFilePath, Constants.SAVE_FILE_EXTENSION, saveAs || !File.Exists(lastFilePath));
+            var saveOK = SavesLoader.Save(projectSave, version, ref lastFilePath, ProgramConstants.SAVE_FILE_EXTENSION, saveAs || !File.Exists(lastFilePath));
             if (!saveOK)
             {
                 return;
@@ -191,7 +192,7 @@ namespace TiaUtilities.Generation
         {
             projectLoading = true;
 
-            saveObject ??= SavesLoader.LoadWithDialog(ref lastFilePath, Constants.SAVE_FILE_EXTENSION);
+            saveObject ??= SavesLoader.LoadWithDialog(ref lastFilePath, ProgramConstants.SAVE_FILE_EXTENSION);
             if (saveObject != null)
             {
                 this.module.LoadSave(saveObject);

@@ -30,9 +30,12 @@
             public const string DEVICE_PLACEHOLDERS_GENERIC_SPLITTER = "<>";
 
             public const string ALARM_DESCRIPTION = "{alarm_description}";
+            public const string ALARM_HMI_TEXT = "{alarm_hmi_text}";
             public const string ALARM_NUM = "{alarm_num}";
             public const string ALARM_NUM_START = "{alarm_num_start}";
             public const string ALARM_NUM_END = "{alarm_num_end}";
+
+            public const string HMI_PARAMETER = "<hmi_parameter_x>";
         }
     }
 }

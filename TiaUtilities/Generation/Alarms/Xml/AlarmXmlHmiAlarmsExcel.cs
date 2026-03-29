@@ -1,27 +1,28 @@
 ﻿using ClosedXML.Excel;
+using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Languages;
 
 namespace TiaUtilities.Generation.Alarms.Xml
 {
     public class AlarmXmlHmiAlarmsExcel
     {
-        private const int COLUMN_ID             = 1;
-        private const int COLUMN_NAME           = 2;
-        private const int COLUMN_CLASS          = 3;
-        private const int COLUMN_ALARM_TEXT     = 4;
-        private const int COLUMN_FIELD_INFO     = 5;
-        private const int COLUMN_TRIGGER_TAG    = 6;
-        private const int COLUMN_TRIGGER_BIT    = 7;
-        private const int COLUMN_PARAM_1        = 8;
-        private const int COLUMN_PARAM_2        = 9;
-        private const int COLUMN_PARAM_3        = 10;
-        private const int COLUMN_PARAM_4        = 11;
-        private const int COLUMN_PARAM_5        = 12;
-        private const int COLUMN_PARAM_6        = 13;
-        private const int COLUMN_PARAM_7        = 14;
-        private const int COLUMN_PARAM_8        = 15;
-        private const int COLUMN_PARAM_9        = 16;
-        private const int COLUMN_PARAM_10       = 17;
+        private const int COLUMN_ID = 1;
+        private const int COLUMN_NAME = 2;
+        private const int COLUMN_CLASS = 3;
+        private const int COLUMN_ALARM_TEXT = 4;
+        private const int COLUMN_FIELD_INFO = 5;
+        private const int COLUMN_TRIGGER_TAG = 6;
+        private const int COLUMN_TRIGGER_BIT = 7;
+        private const int COLUMN_PARAM_1 = 8;
+        private const int COLUMN_PARAM_2 = 9;
+        private const int COLUMN_PARAM_3 = 10;
+        private const int COLUMN_PARAM_4 = 11;
+        private const int COLUMN_PARAM_5 = 12;
+        private const int COLUMN_PARAM_6 = 13;
+        private const int COLUMN_PARAM_7 = 14;
+        private const int COLUMN_PARAM_8 = 15;
+        private const int COLUMN_PARAM_9 = 16;
+        private const int COLUMN_PARAM_10 = 17;
 
         private const string CELL_NO_VALUE = "<No value>";
 
@@ -65,18 +66,15 @@ namespace TiaUtilities.Generation.Alarms.Xml
         {
             try
             {
-                this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_ID).Value = item.HmiID;
-                this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_NAME).Value = item.HmiAlarmName;
-                this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_CLASS).Value = item.HmiAlarmClass;
-                this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_ALARM_TEXT).Value = item.HmiAlarmText;
-                this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_TRIGGER_TAG).Value = item.HmiTriggerTag;
-                this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_TRIGGER_BIT).Value = item.HmiTriggerBit;
-
                 for (int i = 0; i < 10; i++)
                 {
                     this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_PARAM_1 + i).Value = CELL_NO_VALUE;
                 }
 
+                var hmiAlarmText = item.HmiAlarmText;
+
+                //<field ref="0" />
+                //"<ref id = 0; type = AlarmParameterWithOrWithoutCommonTextList; Parameter = Parameter 1; Tag = IO_In_AsseY_ExtracorsaAvanti; DisplayType = Decimal; Length = 5; Precision = 0; Alignment = Right; ZeroPadding = False;>"
                 int refId = 0;
                 int parameterNumber = 1;
 
@@ -85,14 +83,25 @@ namespace TiaUtilities.Generation.Alarms.Xml
                 {
                     fieldStr = fieldStr + field.GetAsString(refId, parameterNumber) + '\n';
 
+                    var placeholderText = GenPlaceholders.Alarms.HMI_PARAMETER.Replace("x", parameterNumber.ToString());
+                    var fieldText = $"<field ref=\"{refId}\" />";
+                    hmiAlarmText = hmiAlarmText.Replace(placeholderText, fieldText);
+
                     this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_PARAM_1 + parameterNumber - 1).Value = field.Tag;
 
                     refId++;
                     parameterNumber++;
                 }
+
+                this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_ID).Value = item.HmiID;
+                this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_NAME).Value = item.HmiAlarmName;
+                this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_CLASS).Value = item.HmiAlarmClass;
+                this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_ALARM_TEXT).Value = hmiAlarmText;
+                this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_TRIGGER_TAG).Value = item.HmiTriggerTag;
+                this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_TRIGGER_BIT).Value = item.HmiTriggerBit;
                 this.discreteAlarmWorksheet.Cell(rowIndex, COLUMN_FIELD_INFO).Value = fieldStr;
             }
-            catch (Exception) { } 
+            catch (Exception) { }
             finally
             {
                 rowIndex++;

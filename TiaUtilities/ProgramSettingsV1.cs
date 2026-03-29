@@ -4,9 +4,9 @@ using TiaUtilities.Generation.IO.Module.ExcelImporter;
 using TiaUtilities.Generation;
 using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Languages;
-using TiaUtilities.Utility;
 using TiaUtilities.Generation.Alarms.Configurations;
 using TiaUtilities.Generation.IO.Configurations;
+using TiaUtilities.Constants;
 
 namespace TiaUtilities
 {
@@ -51,7 +51,7 @@ namespace TiaUtilities
             this.DBDuplicationReplacementList3 = "";
 
             this.AutoSaveTime = 60; //Seconds
-            this.TIAVersion = Constants.VERSION;
+            this.TIAVersion = ProgramConstants.VERSION;
             this.IetfLanguage = LocaleVariables.LANG;
 
             this.GridSettings = new();
@@ -67,12 +67,12 @@ namespace TiaUtilities
 
         public static string GetFilePath()
         {
-            return Directory.GetCurrentDirectory() + $@"/settings/ProgramSettings.{Constants.SAVE_FILE_EXTENSION}";
+            return Directory.GetCurrentDirectory() + $@"/settings/ProgramSettings.{ProgramConstants.SAVE_FILE_EXTENSION}";
         }
 
         public void Save()
         {
-            SavesLoader.CreateFileAndSave(this, ProgramSettingsV1.VERSION, ProgramSettingsV1.GetFilePath(), Constants.SAVE_FILE_EXTENSION); //To create file if not exist!
+            SavesLoader.CreateFileAndSave(this, ProgramSettingsV1.VERSION, ProgramSettingsV1.GetFilePath(), ProgramConstants.SAVE_FILE_EXTENSION); //To create file if not exist!
             this.Wash();
         }
 

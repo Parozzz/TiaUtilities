@@ -1,4 +1,5 @@
 ﻿using TiaUtilities.SettingsNew.FormHelpers;
+using TiaUtilities.Utility;
 
 namespace TiaUtilities.SettingsNew.Editors
 {
@@ -31,38 +32,16 @@ namespace TiaUtilities.SettingsNew.Editors
                     this.textBox.TextChanged += (sender, args) => this.SaveToConfiguration();
                     break;
                 case SettingsEditorTypeEnum.INT:
-                    this.textBox.KeyPress += SignedKeyPressEventHandler;
+                    this.textBox.KeyPress += Utils.SignedKeyPressEventHandler;
                     this.textBox.TextChanged += (sender, args) => this.SaveToConfiguration();
                     break;
                 case SettingsEditorTypeEnum.UINT:
-                    this.textBox.KeyPress += UnsignedKeyPressEventHandler;
+                    this.textBox.KeyPress += Utils.UnsignedKeyPressEventHandler;
                     this.textBox.TextChanged += (sender, args) => this.SaveToConfiguration();
                     break;
             }
 
             var _ = SettingsFormUtils.AddContextualMenu(this.textBox, value);
-        }
-
-        private void SignedKeyPressEventHandler(object? sender, KeyPressEventArgs args)
-        {
-            if(args.KeyChar == (char) Keys.Cancel ||  args.KeyChar == (char)Keys.Enter || args.KeyChar == (char)Keys.Back)
-            {
-                return;
-            }
-
-            var isKeyValid = char.IsNumber(args.KeyChar) || args.KeyChar == '+' || args.KeyChar == '-';
-            args.Handled = !isKeyValid;
-        }
-
-        private void UnsignedKeyPressEventHandler(object? sender, KeyPressEventArgs args)
-        {
-            if (args.KeyChar == (char)Keys.Cancel || args.KeyChar == (char)Keys.Enter || args.KeyChar == (char)Keys.Back)
-            {
-                return;
-            }
-
-            var isKeyInvalid = char.IsLetter(args.KeyChar);
-            args.Handled = isKeyInvalid;
         }
 
         public override Control GetControl()

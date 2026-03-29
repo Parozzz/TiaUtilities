@@ -305,7 +305,7 @@ for row validation</value>
     <value>Coil2 Address</value>
   </data>
   <data name="ALARM_TEMPLATE_DATA_DESCRIPTION" xml:space="preserve">
-    <value>Description</value>
+    <value>Alarm Text</value>
   </data>
   <data name="ALARM_TEMPLATE_DATA_ENABLE" xml:space="preserve">
     <value>Enable</value>
@@ -699,5 +699,11 @@ for row validation</value>
   </data>
   <data name="DEVICE_DATA_PLACEHOLDERS" xml:space="preserve">
     <value>Placeholders</value>
+  </data>
+  <data name="ALARM_TEMPLATE_DATA_HMI_PARAMETERS" xml:space="preserve">
+    <value>Hmi Parameters</value>
+  </data>
+  <data name="ALARM_TEMPLATE_DATA_HMI_TEXT" xml:space="preserve">
+    <value>HMI Alarm Text</value>
   </data>
 </root>
