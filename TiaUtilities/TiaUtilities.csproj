@@ -56,10 +56,9 @@
     <Compile Update="Generation\Configuration\ConfigForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Generation\IO\Module\ExcelImporter\IOGenExcelImportForm.cs">
+    <Compile Update="Generation\IO\IOGenExcelImportForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Generation\IO\Module\Tab\IOGenTabControl.cs" />
     <Compile Update="Languages\Locale.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

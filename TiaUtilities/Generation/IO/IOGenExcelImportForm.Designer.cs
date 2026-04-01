@@ -31,7 +31,7 @@
             MainTableLayoutPanel = new TableLayoutPanel();
             TopPanel = new TableLayoutPanel();
             importExcelButton = new Button();
-            configButton = new Button();
+            setupButton = new Button();
             BottomPanel = new TableLayoutPanel();
             cancelButton = new Button();
             acceptButton = new Button();
@@ -66,7 +66,7 @@
             TopPanel.ColumnStyles.Add(new ColumnStyle());
             TopPanel.ColumnStyles.Add(new ColumnStyle());
             TopPanel.Controls.Add(importExcelButton, 0, 0);
-            TopPanel.Controls.Add(configButton, 0, 0);
+            TopPanel.Controls.Add(setupButton, 0, 0);
             TopPanel.Dock = DockStyle.Top;
             TopPanel.Location = new Point(3, 3);
             TopPanel.Name = "TopPanel";
@@ -80,23 +80,23 @@
             // 
             importExcelButton.AutoSize = true;
             importExcelButton.Font = new Font("Microsoft Sans Serif", 15.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            importExcelButton.Location = new Point(190, 3);
+            importExcelButton.Location = new Point(112, 3);
             importExcelButton.Name = "importExcelButton";
             importExcelButton.Size = new Size(181, 35);
             importExcelButton.TabIndex = 0;
             importExcelButton.Text = "Importa Excel";
             importExcelButton.UseVisualStyleBackColor = true;
             // 
-            // configButton
+            // setupButton
             // 
-            configButton.AutoSize = true;
-            configButton.Font = new Font("Microsoft Sans Serif", 15.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            configButton.Location = new Point(3, 3);
-            configButton.Name = "configButton";
-            configButton.Size = new Size(181, 35);
-            configButton.TabIndex = 1;
-            configButton.Text = "Configurazione";
-            configButton.UseVisualStyleBackColor = true;
+            setupButton.AutoSize = true;
+            setupButton.Font = new Font("Microsoft Sans Serif", 15.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            setupButton.Location = new Point(3, 3);
+            setupButton.Name = "setupButton";
+            setupButton.Size = new Size(103, 35);
+            setupButton.TabIndex = 1;
+            setupButton.Text = "Setup";
+            setupButton.UseVisualStyleBackColor = true;
             // 
             // BottomPanel
             // 
@@ -173,6 +173,6 @@
         private System.Windows.Forms.TableLayoutPanel BottomPanel;
         private System.Windows.Forms.Button cancelButton;
         private System.Windows.Forms.Button acceptButton;
-        private System.Windows.Forms.Button configButton;
+        private System.Windows.Forms.Button setupButton;
     }
 }

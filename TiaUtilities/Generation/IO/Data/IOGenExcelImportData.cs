@@ -1,6 +1,6 @@
 ﻿using TiaUtilities.Generation.GridHandler.Data;
 
-namespace TiaUtilities.Generation.IO.Module.ExcelImporter
+namespace TiaUtilities.Generation.IO.Data
 {
     public class IOGenExcelImportData : IGridData
     {

@@ -181,7 +181,6 @@ namespace TiaUtilities.Generation.Alarms.Template
                 }
             };
             #endregion
-
         }
         public void Refresh()
         {

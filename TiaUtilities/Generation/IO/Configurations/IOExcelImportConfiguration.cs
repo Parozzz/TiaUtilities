@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using TiaUtilities.Configuration;
 
-namespace TiaUtilities.Generation.IO.Module.ExcelImporter
+namespace TiaUtilities.Generation.IO.Configurations
 {
     public class IOExcelImportConfiguration : ObservableConfiguration
     {

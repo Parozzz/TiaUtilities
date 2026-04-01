@@ -10,6 +10,10 @@ using TiaUtilities.Languages;
 using TiaUtilities.Editors.ErrorReporting;
 using TiaUtilities.Generation.Configuration;
 using TiaUtilities.Utility;
+using TiaUtilities.Generation.IO.Configurations;
+using TiaUtilities.Generation.IO.Data;
+using TiaUtilities.SettingsNew.Bindings;
+using TiaUtilities.Generation.SettingsNew;
 
 namespace TiaUtilities.Generation.IO.Module.ExcelImporter
 {
@@ -18,8 +22,10 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
         public const string ROW_SPECIAL_CHAR = "$";
 
         private readonly ErrorReportThread errorThread;
-        private readonly IOExcelImportConfiguration importConfig;
+        private readonly IOExcelImportConfiguration excelImportConfig;
         private readonly GridHandler<IOGenExcelImportData> gridHandler;
+
+        private readonly SettingsBindings settingsBindings;
 
         public IEnumerable<IOGenExcelImportData> ImportDataEnumerable { get => gridHandler.DataSource.GetNotEmptyDataDict().Keys; }
 
@@ -28,8 +34,10 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
             InitializeComponent();
 
             this.errorThread = gridBindContainer.GridScriptHandler.ErrorThread;
-            this.importConfig = configuration;
+            this.excelImportConfig = configuration;
             this.gridHandler = new(gridSettings, gridBindContainer, new(), new()) { RowCount = 1999 };
+
+            this.settingsBindings = new();
 
             Init();
         }
@@ -76,25 +84,8 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
 
             gridHandler.Init();
 
-            this.configButton.Click += (sender, args) =>
-            {
-                var configForm = new ConfigForm(Locale.GENERICS_CONFIGURATION) { ControlWidth = 500, CloseOnEnter = false };
-                configForm.SetConfiguration(this.importConfig, MainForm.Settings.PresetIOExcelImportConfiguration);
-
-                var mainGroup = configForm.Init();
-                mainGroup.AddTextBox().Label(Locale.GENERICS_ADDRESS).BindText(() => importConfig.AddressCellConfig);
-                mainGroup.AddTextBox().Label(Locale.IO_GEN_EXCELIMPORT_IO_NAME).BindText(() => importConfig.IONameCellConfig);
-                mainGroup.AddTextBox().Label(Locale.GENERICS_COMMENT).BindText(() => importConfig.CommentCellConfig);
-                mainGroup.AddTextBox().Label(Locale.IO_GEN_EXCELIMPORT_STARTING_ROW).BindUInt(() => importConfig.StartingRow);
-                mainGroup.AddJavascript().Label(Locale.IO_GEN_EXCELIMPORT_EXPRESSION)
-                                            .BindText(() => importConfig.IgnoreRowExpressionConfig)
-                                            .Height(200)
-                                            .RegisterErrorThreadWithForm(errorThread, configForm);
-
-                configForm.StartShowingAtControl(this.configButton);
-                configForm.Init();
-                configForm.Show(this);
-            };
+            IOGenModule.AddExcelImporterSettingsBindings(this.settingsBindings, this.excelImportConfig);
+            this.setupButton.Click += (sender, args) => new SettingsForm(this.settingsBindings).Show(this);
 
             this.importExcelButton.Click += (sender, args) =>
             {
@@ -121,7 +112,7 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
         private void Translate()
         {
             this.importExcelButton.Text = Locale.IO_GEN_FORM_IMPEXP_IMPORT_EXCEL;
-            this.configButton.Text = Locale.GENERICS_CONFIGURATION;
+            this.setupButton.Text = Locale.GENERICS_SETUP;
             this.acceptButton.Text = Locale.GENERICS_ACCEPT;
             this.cancelButton.Text = Locale.GENERICS_CANCEL;
         }
@@ -146,7 +137,7 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
                 var worksheet = configWorkbook.Worksheets.Worksheet(1);
 
                 var excelColumnsLetterList = AddMatchExpression([
-                                importConfig.AddressCellConfig, importConfig.CommentCellConfig, importConfig.IONameCellConfig, importConfig.IgnoreRowExpressionConfig
+                                excelImportConfig.AddressCellConfig, excelImportConfig.CommentCellConfig, excelImportConfig.IONameCellConfig, excelImportConfig.IgnoreRowExpressionConfig
                             ]);
 
                 var importDataList = new List<IOGenExcelImportData>();
@@ -155,7 +146,7 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
                 foreach (var row in usedRows)
                 {
                     var rowNumber = row.RowNumber();
-                    if (rowNumber < this.importConfig.StartingRow)
+                    if (rowNumber < this.excelImportConfig.StartingRow)
                     {
                         continue;
                     }
@@ -176,9 +167,9 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
                         continue;
                     }
 
-                    var address = importConfig.AddressCellConfig;
-                    var ioName = importConfig.IONameCellConfig;
-                    var comment = importConfig.CommentCellConfig;
+                    var address = excelImportConfig.AddressCellConfig;
+                    var ioName = excelImportConfig.IONameCellConfig;
+                    var comment = excelImportConfig.CommentCellConfig;
                     foreach (var entry in excelCellValueDict)
                     {
                         address = address.Replace(entry.Key, entry.Value);
@@ -216,7 +207,7 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
                     engine.SetValue(entry.Key, entry.Value);
                 }
 
-                var eval = engine.Evaluate(importConfig.IgnoreRowExpressionConfig);
+                var eval = engine.Evaluate(excelImportConfig.IgnoreRowExpressionConfig);
                 if (!eval.IsBoolean())
                 {
                     InformationBox.Show("Return must be boolean.", "Invalid ignore row operation", icon: InformationBoxIcon.Exclamation);

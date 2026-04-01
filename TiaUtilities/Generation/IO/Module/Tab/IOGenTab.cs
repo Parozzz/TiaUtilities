@@ -20,13 +20,12 @@ namespace TiaUtilities.Generation.IO.Module.Tab
         private readonly IOMainConfiguration mainConfig;
 
         public TabPage TabPage { get; init; }
+        public string Name { get => this.TabPage.Text; set => this.TabPage.Text = value; }
 
         public IOTabConfiguration TabConfig { get; init; }
 
         public GridDataPreviewer<IOData> Previewer { get; init; }
         public GridHandler<IOData> GridHandler { get; init; }
-
-        public IOGenTabControl TabControl { get; init; }
 
         private bool dirty = false;
 
@@ -45,8 +44,6 @@ namespace TiaUtilities.Generation.IO.Module.Tab
 
             IOGenPlaceholderHandler placeholdersHandler = new(this.Previewer, this.mainConfig, TabConfig);
             this.GridHandler = new(gridSettings, gridBindFactory, this.Previewer, placeholdersHandler, new IOGenComparer()) { RowCount = 2999 };
-
-            this.TabControl = new(this.GridHandler.DataGridView);
         }
 
         public void Init()
@@ -72,13 +69,10 @@ namespace TiaUtilities.Generation.IO.Module.Tab
             UpdateMerkerColumn(mainConfig.MemoryType);
             #endregion
 
-            GridHandler.Init();
-
-            TabControl.Init();
-            TabControl.BindConfig(TabConfig);
+            this.GridHandler.Init();
 
             #region SUGGESTION_GRIDS_EVENTS
-            GridHandler.Events.CellChange += (sender, args) =>
+            this.GridHandler.Events.CellChange += (sender, args) =>
             {
                 if (args.CellChangeList == null)
                 {
@@ -95,7 +89,7 @@ namespace TiaUtilities.Generation.IO.Module.Tab
                     UpdateDuplicatedIOValues();
                 }
             };
-            GridHandler.Events.PostSort += (sender, args) =>
+            this.GridHandler.Events.PostSort += (sender, args) =>
             {
                 module.UpdateSuggestionColors();
                 UpdateDuplicatedIOValues();

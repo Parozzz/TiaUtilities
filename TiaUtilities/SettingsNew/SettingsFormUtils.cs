@@ -60,9 +60,11 @@ namespace TiaUtilities.SettingsNew
                 if (setToOther.Visible)
                 {
                     var otherConfigurationDict = formValue.MacroSectionBinding.OtherConfigurationDict;
-                    setToOther.Enabled = otherConfigurationDict != null && otherConfigurationDict
+
+                    var enableOthers = otherConfigurationDict != null && otherConfigurationDict
                                                                                 .Select(pair => pair.Value)
                                                                                 .Any(otherConf => otherConf != formValue.ConfigurationObject);
+                    setToOther.Enabled = showOtherConf.Enabled = enableOthers;
 
                     setToOther.Text = SettingsFormUtils.GetSetToOtherText(formValue);
                 }
