@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{BB55F890-0182-4AD7-BA92-418A90604F75}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>AddIn_V21</RootNamespace>
+    <AssemblyName>AddIn_V21</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\V21\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;#define TIA_V21</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'V21|AnyCPU'">
+    <OutputPath>bin\V21\</OutputPath>
+    <DefineConstants>#define TIA_V21</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Siemens.Engineering.AddIn.Base">
+      <HintPath>..\SiemensAPI\V21\Siemens.Engineering.AddIn.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Siemens.Engineering.AddIn.Permissions">
+      <HintPath>..\SiemensAPI\V21\Siemens.Engineering.AddIn.Permissions.dll</HintPath>
+    </Reference>
+    <Reference Include="Siemens.Engineering.AddIn.Safety">
+      <HintPath>..\SiemensAPI\V21\Siemens.Engineering.AddIn.Safety.dll</HintPath>
+    </Reference>
+    <Reference Include="Siemens.Engineering.AddIn.Step7">
+      <HintPath>..\SiemensAPI\V21\Siemens.Engineering.AddIn.Step7.dll</HintPath>
+    </Reference>
+    <Reference Include="Siemens.Engineering.AddIn.Utilities">
+      <HintPath>..\SiemensAPI\V21\Siemens.Engineering.AddIn.Utilities.dll</HintPath>
+    </Reference>
+    <Reference Include="Siemens.Engineering.Base">
+      <HintPath>..\SiemensAPI\V21\Siemens.Engineering.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Siemens.Engineering.Safety">
+      <HintPath>..\SiemensAPI\V21\Siemens.Engineering.Safety.dll</HintPath>
+    </Reference>
+    <Reference Include="Siemens.Engineering.SafetyValidation">
+      <HintPath>..\SiemensAPI\V21\Siemens.Engineering.SafetyValidation.dll</HintPath>
+    </Reference>
+    <Reference Include="Siemens.Engineering.Startdrive">
+      <HintPath>..\SiemensAPI\V21\Siemens.Engineering.Startdrive.dll</HintPath>
+    </Reference>
+    <Reference Include="Siemens.Engineering.Step7">
+      <HintPath>..\SiemensAPI\V21\Siemens.Engineering.Step7.dll</HintPath>
+    </Reference>
+    <Reference Include="Siemens.Engineering.TeamcenterGateway">
+      <HintPath>..\SiemensAPI\V21\Siemens.Engineering.TeamcenterGateway.dll</HintPath>
+    </Reference>
+    <Reference Include="Siemens.Engineering.WinCC">
+      <HintPath>..\SiemensAPI\V21\Siemens.Engineering.WinCC.dll</HintPath>
+    </Reference>
+    <Reference Include="Siemens.Engineering.WinCC.Extension">
+      <HintPath>..\SiemensAPI\V21\Siemens.Engineering.WinCC.Extension.dll</HintPath>
+    </Reference>
+    <Reference Include="Siemens.Engineering.WinCCUnified">
+      <HintPath>..\SiemensAPI\V21\Siemens.Engineering.WinCCUnified.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\TiaAddIn-Spin\GenericImportExportHandler.cs">
+      <Link>GenericImportExportHandler.cs</Link>
+    </Compile>
+    <Compile Include="..\TiaAddIn-Spin\PlcSoftwareHandler.cs">
+      <Link>PlcSoftwareHandler.cs</Link>
+    </Compile>
+    <Compile Include="..\TiaAddIn-Spin\SpinAddinMenuRegistrationService.cs">
+      <Link>SpinAddinMenuRegistrationService.cs</Link>
+    </Compile>
+    <Compile Include="..\TiaAddIn-Spin\Util.cs">
+      <Link>Util.cs</Link>
+    </Compile>
+    <Compile Include="AddInProvider.cs" />
+    <Compile Include="AddIn_V21.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Config.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Logo_PNG_colori-Piccolo.ico" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>"$(SolutionDir)\sgen.exe" /f /v /a:$(TargetFileName)
+"$(SolutionDir)\SiemensAPI\V21\Siemens.Engineering.AddIn.Publisher.exe" -f "$(ProjectDir)Config.xml" -l "PostBuildLog.txt"</PostBuildEvent>
+  </PropertyGroup>
+</Project>

@@ -10,6 +10,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <BaseOutputPath></BaseOutputPath>
     <ApplicationIcon>TiaUtilities_Icon.ico</ApplicationIcon>
+    <Configurations>Debug;Release;V21</Configurations>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
