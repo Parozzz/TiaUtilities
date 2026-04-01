@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using TiaUtilities.Generation.Alarms.Configurations;
 using TiaUtilities.Generation.Alarms.Module.Tab;
-using TiaUtilities.Generation.Alarms.Module.Template;
+using TiaUtilities.Generation.Alarms.Template;
 using TiaUtilities.Generation.GridHandler.JSScript;
 
 namespace TiaUtilities.Generation.Alarms

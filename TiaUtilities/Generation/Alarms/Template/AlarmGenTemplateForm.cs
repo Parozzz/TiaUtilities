@@ -2,6 +2,7 @@
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Languages;
 using TiaUtilities.Generation.Alarms.Configurations;
+using TiaUtilities.Generation.Alarms.Template;
 
 namespace TiaUtilities.Generation.Alarms.Module.Template
 {

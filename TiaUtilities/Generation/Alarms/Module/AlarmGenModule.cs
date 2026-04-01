@@ -3,6 +3,7 @@ using TiaUtilities.Editors.ErrorReporting;
 using TiaUtilities.Generation.Alarms.Configurations;
 using TiaUtilities.Generation.Alarms.Module.Tab;
 using TiaUtilities.Generation.Alarms.Module.Template;
+using TiaUtilities.Generation.Alarms.Template;
 using TiaUtilities.Generation.Alarms.Xml;
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.JSScript;

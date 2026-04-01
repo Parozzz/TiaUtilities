@@ -706,4 +706,52 @@ validità riga</value>
   <data name="ALARM_TEMPLATE_DATA_HMI_TEXT" xml:space="preserve">
     <value>Testo Allarme HMI</value>
   </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE" xml:space="preserve">
+    <value>Tipo visualizzazione</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_TAG" xml:space="preserve">
+    <value>Tag</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_TEXT_LIST" xml:space="preserve">
+    <value>Lista di Testi</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_LENGTH" xml:space="preserve">
+    <value>Lunghezza</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_PRECISION" xml:space="preserve">
+    <value>Decimali</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_ALIGNMENT" xml:space="preserve">
+    <value>Allineamento</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_ZERO_PADDING" xml:space="preserve">
+    <value>Zero Padding</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_TEXT_LIST" xml:space="preserve">
+    <value>Lista di Testi</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_TEXT" xml:space="preserve">
+    <value>Testo</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_BINARY" xml:space="preserve">
+    <value>Binario</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_DECIMAL" xml:space="preserve">
+    <value>Decimale</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_FLOATING_POINT" xml:space="preserve">
+    <value>Reale</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_HEX" xml:space="preserve">
+    <value>Esadecimale</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_OCTAL" xml:space="preserve">
+    <value>Ottale</value>
+  </data>
+  <data name="GENERICS_LEFT" xml:space="preserve">
+    <value>Sinistra</value>
+  </data>
+  <data name="GENERICS_RIGHT" xml:space="preserve">
+    <value>Destra</value>
+  </data>
 </root>

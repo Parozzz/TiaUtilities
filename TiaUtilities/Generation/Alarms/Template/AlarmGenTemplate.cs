@@ -2,7 +2,7 @@
 using TiaUtilities.Generation.Alarms.Data;
 using TiaUtilities.Generation.GridHandler;
 
-namespace TiaUtilities.Generation.Alarms.Module.Template
+namespace TiaUtilities.Generation.Alarms.Template
 {
     public class AlarmGenTemplate(string name)
     {

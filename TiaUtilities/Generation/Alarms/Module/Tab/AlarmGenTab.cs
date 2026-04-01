@@ -1,5 +1,4 @@
-﻿using TiaUtilities.Generation.Alarms.Module.Template;
-using TiaUtilities.Generation.GridHandler.Binds;
+﻿using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.Placeholders;
@@ -7,6 +6,7 @@ using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.CustomColumns;
 using TiaUtilities.Generation.Alarms.Configurations;
 using TiaUtilities.Generation.Alarms.Data;
+using TiaUtilities.Generation.Alarms.Template;
 
 namespace TiaUtilities.Generation.Alarms.Module.Tab
 {

@@ -706,4 +706,52 @@ for row validation</value>
   <data name="ALARM_TEMPLATE_DATA_HMI_TEXT" xml:space="preserve">
     <value>HMI Alarm Text</value>
   </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE" xml:space="preserve">
+    <value>Display type</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_TAG" xml:space="preserve">
+    <value>Tag</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_TEXT_LIST" xml:space="preserve">
+    <value>Text list</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_LENGTH" xml:space="preserve">
+    <value>Length</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_PRECISION" xml:space="preserve">
+    <value>Decimals</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_ALIGNMENT" xml:space="preserve">
+    <value>Alignment</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_ZERO_PADDING" xml:space="preserve">
+    <value>Zero Padding</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_TEXT_LIST" xml:space="preserve">
+    <value>Text List</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_TEXT" xml:space="preserve">
+    <value>Text</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_BINARY" xml:space="preserve">
+    <value>Binary</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_DECIMAL" xml:space="preserve">
+    <value>Decimal</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_FLOATING_POINT" xml:space="preserve">
+    <value>Float</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_HEX" xml:space="preserve">
+    <value>Hexadecimal</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_OCTAL" xml:space="preserve">
+    <value>Octal</value>
+  </data>
+  <data name="GENERICS_LEFT" xml:space="preserve">
+    <value>Left</value>
+  </data>
+  <data name="GENERICS_RIGHT" xml:space="preserve">
+    <value>Right</value>
+  </data>
 </root>

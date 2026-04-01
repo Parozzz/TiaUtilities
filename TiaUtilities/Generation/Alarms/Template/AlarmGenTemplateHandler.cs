@@ -3,7 +3,7 @@ using TiaUtilities.CustomControls;
 using TiaUtilities.Languages;
 using TiaUtilities.Utility;
 
-namespace TiaUtilities.Generation.Alarms.Module.Template
+namespace TiaUtilities.Generation.Alarms.Template
 {
     public delegate void AlarmTemplateSelectedChanged(object? sender, AlarmTemplateSelectedChangedArgs args);
     public class AlarmTemplateSelectedChangedArgs : EventArgs

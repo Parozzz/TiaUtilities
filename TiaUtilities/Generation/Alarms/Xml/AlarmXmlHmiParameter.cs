@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using TiaUtilities.Languages;
 using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.Alarms.Xml
@@ -8,19 +9,19 @@ namespace TiaUtilities.Generation.Alarms.Xml
     {
         public enum DisplayTypeEnum
         {
-            TEXT_LIST,
-            TEXT,
-            BINARY,
-            DECIMAL,
-            FLOATING_POINT,
-            HEX,
-            OCTAL
+            [Locale(nameof(Locale.ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_TEXT_LIST))] TEXT_LIST,
+            [Locale(nameof(Locale.ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_TEXT))] TEXT,
+            [Locale(nameof(Locale.ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_BINARY))] BINARY,
+            [Locale(nameof(Locale.ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_DECIMAL))] DECIMAL,
+            [Locale(nameof(Locale.ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_FLOATING_POINT))] FLOATING_POINT,
+            [Locale(nameof(Locale.ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_HEX))] HEX,
+            [Locale(nameof(Locale.ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_OCTAL))] OCTAL
         }
 
         public enum AlignmentEnum
         {
-            LEFT,
-            RIGHT
+            [Locale(nameof(Locale.GENERICS_LEFT))] LEFT,
+            [Locale(nameof(Locale.GENERICS_RIGHT))] RIGHT
         }
 
         public static readonly string TYPE_PARAMETER = "AlarmParameterWithOrWithoutCommonTextList";

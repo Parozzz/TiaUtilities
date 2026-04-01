@@ -31,7 +31,6 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
             InitializeComponent();
 
             this.selectParametersRadioButtons = [];
-
             if (!string.IsNullOrEmpty(jsonString))
             {
                 try
@@ -146,6 +145,19 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
             this.UpdateAll();
 
             this.Shown += (sender, args) => formReadyToClose = true;
+
+            this.Translate();
+        }
+
+        private void Translate()
+        {
+            this.tagLabel.Text = Locale.ALARM_TEMPLATE_HMI_PARAM_TAG;
+            this.displayTypeLabel.Text = Locale.ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE;
+            this.textListLabel.Text = Locale.ALARM_TEMPLATE_HMI_PARAM_TEXT_LIST;
+            this.lengthLabel.Text = Locale.ALARM_TEMPLATE_HMI_PARAM_LENGTH;
+            this.precisionLabel.Text = Locale.ALARM_TEMPLATE_HMI_PARAM_PRECISION;
+            this.alignmentLabel.Text = Locale.ALARM_TEMPLATE_HMI_PARAM_ALIGNMENT;
+            this.zeroPaddingsLabel.Text = Locale.ALARM_TEMPLATE_HMI_PARAM_ZERO_PADDING;
         }
 
         public string GetJsonSerializedItems()

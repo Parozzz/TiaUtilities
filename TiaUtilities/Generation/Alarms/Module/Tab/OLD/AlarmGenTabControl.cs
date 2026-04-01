@@ -1,5 +1,5 @@
-﻿using TiaUtilities.Generation.Alarms.Module.Template;
-using TiaUtilities.Editors.ErrorReporting;
+﻿using TiaUtilities.Editors.ErrorReporting;
+using TiaUtilities.Generation.Alarms.Template;
 
 namespace TiaUtilities.Generation.Alarms.Module.Tab
 {

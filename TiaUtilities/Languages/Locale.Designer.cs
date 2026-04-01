@@ -943,6 +943,132 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Alignment.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_HMI_PARAM_ALIGNMENT {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_HMI_PARAM_ALIGNMENT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Display type.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Binary.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_BINARY {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_BINARY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Decimal.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_DECIMAL {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_DECIMAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Float.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_FLOATING_POINT {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_FLOATING_POINT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Hexadecimal.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_HEX {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_HEX", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Octal.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_OCTAL {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_OCTAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Text.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_TEXT {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_TEXT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Text List.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_TEXT_LIST {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_TEXT_LIST", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Length.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_HMI_PARAM_LENGTH {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_HMI_PARAM_LENGTH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Decimals.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_HMI_PARAM_PRECISION {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_HMI_PARAM_PRECISION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Tag.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_HMI_PARAM_TAG {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_HMI_PARAM_TAG", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Text list.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_HMI_PARAM_TEXT_LIST {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_HMI_PARAM_TEXT_LIST", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Zero Padding.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_HMI_PARAM_ZERO_PADDING {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_HMI_PARAM_ZERO_PADDING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Select Template.
         /// </summary>
         internal static string ALARM_TEMPLATE_SELECT_TEMPLATE {
@@ -1096,6 +1222,15 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Left.
+        /// </summary>
+        internal static string GENERICS_LEFT {
+            get {
+                return ResourceManager.GetString("GENERICS_LEFT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Load.
         /// </summary>
         internal static string GENERICS_LOAD {
@@ -1137,6 +1272,15 @@ namespace TiaUtilities.Languages {
         internal static string GENERICS_QUANTITY {
             get {
                 return ResourceManager.GetString("GENERICS_QUANTITY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Right.
+        /// </summary>
+        internal static string GENERICS_RIGHT {
+            get {
+                return ResourceManager.GetString("GENERICS_RIGHT", resourceCulture);
             }
         }
         

@@ -1,13 +1,15 @@
 ﻿using Newtonsoft.Json;
 using TiaUtilities.Generation.Alarms.Configurations;
 using TiaUtilities.Generation.Alarms.Data;
+using TiaUtilities.Generation.Alarms.Module;
+using TiaUtilities.Generation.Alarms.Module.Template;
 using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.Placeholders;
 
-namespace TiaUtilities.Generation.Alarms.Module.Template
+namespace TiaUtilities.Generation.Alarms.Template
 {
     public class TemplateAlarmGridWrapper : ICleanable
     {
@@ -145,11 +147,11 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
                 else if (column == TemplateData.HMI_ALARM_CLASS)
                 {
                     return new() { DefaultValue = tabConfig.DefaultHmiAlarmClass, Value = templateData.HmiAlarmClass };
-                }/*
-                else if (column == TemplateData.HMI_PARAMETERS)
+                }
+                else if (column == TemplateData.HMI_ALARM_TEXT)
                 {
-                    return new() { DefaultValue = "[]", Value = JsonConvert.SerializeObject(templateData.HmiParametersJsonString) };
-                }*/
+                    return new() { DefaultValue = templateData.Description, Value = templateData.HmiAlarmText };
+                }
 
                 return null;
             };
