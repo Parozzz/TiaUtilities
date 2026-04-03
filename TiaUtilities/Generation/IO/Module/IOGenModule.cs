@@ -607,7 +607,10 @@ namespace TiaUtilities.Generation.IO.Module
             Dictionary<string, ObservableConfiguration> dict = [];
             foreach (var tab in this.ioTabList)
             {
-                dict.Add(tab.Name, tab.TabConfig);
+                if(!dict.TryAdd(tab.Name, tab.TabConfig))
+                {
+                    dict.Add(tab.Name + "*", tab.TabConfig);
+                }
             }
             return dict;
         }

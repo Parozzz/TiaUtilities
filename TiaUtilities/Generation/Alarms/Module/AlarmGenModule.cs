@@ -363,7 +363,10 @@ namespace TiaUtilities.Generation.Alarms.Module
             Dictionary<string, ObservableConfiguration> dict = [];
             foreach (var tab in this.alarmTabList)
             {
-                dict.Add(tab.Name, tab.TabConfig);
+                if (!dict.TryAdd(tab.Name, tab.TabConfig))
+                {
+                    dict.Add(tab.Name + "*", tab.TabConfig);
+                }
             }
             return dict;
         }
