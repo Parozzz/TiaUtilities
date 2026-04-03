@@ -180,13 +180,13 @@
   <data name="GENERICS_CLEAR" xml:space="preserve">
     <value>Pulisci</value>
   </data>
-  <data name="IO_GEN_EXCELIMPORT_IO_NAME" xml:space="preserve">
+  <data name="IO_SETTINGS_EXCELIMPORT_IO_NAME" xml:space="preserve">
     <value>Nome IO</value>
   </data>
-  <data name="IO_GEN_EXCELIMPORT_STARTING_ROW" xml:space="preserve">
+  <data name="IO_SETTINGS_EXCELIMPORT_STARTING_ROW" xml:space="preserve">
     <value>Riga di partenza</value>
   </data>
-  <data name="IO_GEN_EXCELIMPORT_EXPRESSION" xml:space="preserve">
+  <data name="IO_SETTINGS_EXCELIMPORT_EXPRESSION" xml:space="preserve">
     <value>Espressione JS
 validità riga</value>
   </data>
@@ -424,13 +424,13 @@ validità riga</value>
   <data name="IO_GEN_CONFIG_ALIAS_DB" xml:space="preserve">
     <value>DB Appoggi</value>
   </data>
-  <data name="IO_GEN_CONFIG_ALIAS_DB_GENERATED_DEFINED_VARIABLES" xml:space="preserve">
+  <data name="IO_SETTINGS_ALIAS_DB_GENERATE_DEFINED_VARIABLES" xml:space="preserve">
     <value>Genera Variabili Definite</value>
   </data>
-  <data name="IO_GEN_CONFIG_ALIAS_DB_IN_DEFAULT" xml:space="preserve">
+  <data name="IO_SETTINGS_ALIAS_DB_INPUT_DEFAULT" xml:space="preserve">
     <value>Valore default Input</value>
   </data>
-  <data name="IO_GEN_CONFIG_ALIAS_DB_OUT_DEFAULT" xml:space="preserve">
+  <data name="IO_SETTINGS_ALIAS_DB_OUTPUT_DEFAULT" xml:space="preserve">
     <value>Valore default Output</value>
   </data>
   <data name="IO_GEN_CONFIG_ALIAS_TABLE" xml:space="preserve">
@@ -439,16 +439,16 @@ validità riga</value>
   <data name="IO_GEN_CONFIG_ALIAS_TABLE_INPUT_VARIABLE" xml:space="preserve">
     <value>Variable Input</value>
   </data>
-  <data name="IO_GEN_CONFIG_ALIAS_TABLE_NEW_EVERY" xml:space="preserve">
+  <data name="IO_SETTINGS_ALIAS_TABLE_SPLIT_EVERY" xml:space="preserve">
     <value>Nuova ogni n° bit</value>
   </data>
   <data name="IO_GEN_CONFIG_ALIAS_TABLE_OUTPUT_VARIABLE" xml:space="preserve">
     <value>Variabile Output</value>
   </data>
-  <data name="IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_DEFAULT" xml:space="preserve">
+  <data name="IO_SETTINGS_ALIAS_TABLE_INOUT_DEFAULT" xml:space="preserve">
     <value>Valore di Default</value>
   </data>
-  <data name="IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_START_ADDRESS" xml:space="preserve">
+  <data name="IO_SETTINGS_ALIAS_TABLE_INOUT_START_ADDRESS" xml:space="preserve">
     <value>Indirizzo di Partenza</value>
   </data>
   <data name="IO_GEN_CONFIG_FC" xml:space="preserve">
@@ -457,19 +457,19 @@ validità riga</value>
   <data name="IO_GEN_CONFIG_IO_TABLE" xml:space="preserve">
     <value>Tabella IN/OUT</value>
   </data>
-  <data name="IO_GEN_CONFIG_IO_TABLE_DEFAULT_NAME" xml:space="preserve">
+  <data name="IO_SETTINGS_IO_TABLE_DEFAULT_NAME" xml:space="preserve">
     <value>Nome default tag</value>
   </data>
-  <data name="IO_GEN_CONFIG_IO_TABLE_NEW_EVERY" xml:space="preserve">
+  <data name="IO_SETTINGS_IO_TABLE_SPLIT_EVERY" xml:space="preserve">
     <value>Nuova ogni n° bit</value>
   </data>
   <data name="IO_GEN_CONFIG_SEGMENT" xml:space="preserve">
     <value>Nomi Segmenti</value>
   </data>
-  <data name="IO_GEN_CONFIG_SEGMENT_BIT_DIVISION" xml:space="preserve">
+  <data name="IO_SETTINGS_SEGMENT_BIT_DIVISION" xml:space="preserve">
     <value>Divisione per bit</value>
   </data>
-  <data name="IO_GEN_CONFIG_SEGMENT_BYTE_DIVISION" xml:space="preserve">
+  <data name="IO_SETTINGS_SEGMENT_BYTE_DIVISION" xml:space="preserve">
     <value>Divisione per byte</value>
   </data>
   <data name="IO_GEN_FORM_NAME" xml:space="preserve">
@@ -753,5 +753,8 @@ validità riga</value>
   </data>
   <data name="GENERICS_RIGHT" xml:space="preserve">
     <value>Destra</value>
+  </data>
+  <data name="IO_SETTINGS_EXCELIMPORT" xml:space="preserve">
+    <value>Importa da Excel</value>
   </data>
 </root>

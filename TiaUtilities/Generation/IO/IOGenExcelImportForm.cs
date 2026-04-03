@@ -85,7 +85,7 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
             gridHandler.Init();
 
             IOGenModule.AddExcelImporterSettingsBindings(this.settingsBindings, this.excelImportConfig);
-            this.setupButton.Click += (sender, args) => new SettingsForm(this.settingsBindings).Show(this);
+            this.setupButton.Click += (sender, args) => new SettingsForm(this.settingsBindings).ShowDialog(this);
 
             this.importExcelButton.Click += (sender, args) =>
             {

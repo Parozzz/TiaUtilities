@@ -1591,33 +1591,6 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Genera Defined variables.
-        /// </summary>
-        internal static string IO_GEN_CONFIG_ALIAS_DB_GENERATED_DEFINED_VARIABLES {
-            get {
-                return ResourceManager.GetString("IO_GEN_CONFIG_ALIAS_DB_GENERATED_DEFINED_VARIABLES", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Default Input value.
-        /// </summary>
-        internal static string IO_GEN_CONFIG_ALIAS_DB_IN_DEFAULT {
-            get {
-                return ResourceManager.GetString("IO_GEN_CONFIG_ALIAS_DB_IN_DEFAULT", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Default Output value.
-        /// </summary>
-        internal static string IO_GEN_CONFIG_ALIAS_DB_OUT_DEFAULT {
-            get {
-                return ResourceManager.GetString("IO_GEN_CONFIG_ALIAS_DB_OUT_DEFAULT", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Cerca una stringa localizzata simile a Alias Table.
         /// </summary>
         internal static string IO_GEN_CONFIG_ALIAS_TABLE {
@@ -1636,38 +1609,11 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a New every n° bit.
-        /// </summary>
-        internal static string IO_GEN_CONFIG_ALIAS_TABLE_NEW_EVERY {
-            get {
-                return ResourceManager.GetString("IO_GEN_CONFIG_ALIAS_TABLE_NEW_EVERY", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Cerca una stringa localizzata simile a Output Variable.
         /// </summary>
         internal static string IO_GEN_CONFIG_ALIAS_TABLE_OUTPUT_VARIABLE {
             get {
                 return ResourceManager.GetString("IO_GEN_CONFIG_ALIAS_TABLE_OUTPUT_VARIABLE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Default Value.
-        /// </summary>
-        internal static string IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_DEFAULT {
-            get {
-                return ResourceManager.GetString("IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_DEFAULT", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Start Address.
-        /// </summary>
-        internal static string IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_START_ADDRESS {
-            get {
-                return ResourceManager.GetString("IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_START_ADDRESS", resourceCulture);
             }
         }
         
@@ -1690,24 +1636,6 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Default tag name.
-        /// </summary>
-        internal static string IO_GEN_CONFIG_IO_TABLE_DEFAULT_NAME {
-            get {
-                return ResourceManager.GetString("IO_GEN_CONFIG_IO_TABLE_DEFAULT_NAME", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a New every n° bit.
-        /// </summary>
-        internal static string IO_GEN_CONFIG_IO_TABLE_NEW_EVERY {
-            get {
-                return ResourceManager.GetString("IO_GEN_CONFIG_IO_TABLE_NEW_EVERY", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Cerca una stringa localizzata simile a Segment Name.
         /// </summary>
         internal static string IO_GEN_CONFIG_SEGMENT {
@@ -1717,57 +1645,11 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Division per bit.
-        /// </summary>
-        internal static string IO_GEN_CONFIG_SEGMENT_BIT_DIVISION {
-            get {
-                return ResourceManager.GetString("IO_GEN_CONFIG_SEGMENT_BIT_DIVISION", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Division per byte.
-        /// </summary>
-        internal static string IO_GEN_CONFIG_SEGMENT_BYTE_DIVISION {
-            get {
-                return ResourceManager.GetString("IO_GEN_CONFIG_SEGMENT_BYTE_DIVISION", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a JS Expressione
-        ///for row validation.
-        /// </summary>
-        internal static string IO_GEN_EXCELIMPORT_EXPRESSION {
-            get {
-                return ResourceManager.GetString("IO_GEN_EXCELIMPORT_EXPRESSION", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Cerca una stringa localizzata simile a Import Excel.
         /// </summary>
         internal static string IO_GEN_EXCELIMPORT_IMPORT {
             get {
                 return ResourceManager.GetString("IO_GEN_EXCELIMPORT_IMPORT", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a IO Name.
-        /// </summary>
-        internal static string IO_GEN_EXCELIMPORT_IO_NAME {
-            get {
-                return ResourceManager.GetString("IO_GEN_EXCELIMPORT_IO_NAME", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Starting row.
-        /// </summary>
-        internal static string IO_GEN_EXCELIMPORT_STARTING_ROW {
-            get {
-                return ResourceManager.GetString("IO_GEN_EXCELIMPORT_STARTING_ROW", resourceCulture);
             }
         }
         
@@ -1822,6 +1704,133 @@ namespace TiaUtilities.Languages {
         internal static string IO_GEN_FORM_NAME {
             get {
                 return ResourceManager.GetString("IO_GEN_FORM_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Genera Defined variables.
+        /// </summary>
+        internal static string IO_SETTINGS_ALIAS_DB_GENERATE_DEFINED_VARIABLES {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_ALIAS_DB_GENERATE_DEFINED_VARIABLES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Default Input value.
+        /// </summary>
+        internal static string IO_SETTINGS_ALIAS_DB_INPUT_DEFAULT {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_ALIAS_DB_INPUT_DEFAULT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Default Output value.
+        /// </summary>
+        internal static string IO_SETTINGS_ALIAS_DB_OUTPUT_DEFAULT {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_ALIAS_DB_OUTPUT_DEFAULT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Default Value.
+        /// </summary>
+        internal static string IO_SETTINGS_ALIAS_TABLE_INOUT_DEFAULT {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_ALIAS_TABLE_INOUT_DEFAULT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Start Address.
+        /// </summary>
+        internal static string IO_SETTINGS_ALIAS_TABLE_INOUT_START_ADDRESS {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_ALIAS_TABLE_INOUT_START_ADDRESS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a New every n° bit.
+        /// </summary>
+        internal static string IO_SETTINGS_ALIAS_TABLE_SPLIT_EVERY {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_ALIAS_TABLE_SPLIT_EVERY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Excel Importer.
+        /// </summary>
+        internal static string IO_SETTINGS_EXCELIMPORT {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_EXCELIMPORT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a JS Expressione
+        ///for row validation.
+        /// </summary>
+        internal static string IO_SETTINGS_EXCELIMPORT_EXPRESSION {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_EXCELIMPORT_EXPRESSION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a IO Name.
+        /// </summary>
+        internal static string IO_SETTINGS_EXCELIMPORT_IO_NAME {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_EXCELIMPORT_IO_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Starting row.
+        /// </summary>
+        internal static string IO_SETTINGS_EXCELIMPORT_STARTING_ROW {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_EXCELIMPORT_STARTING_ROW", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Default tag name.
+        /// </summary>
+        internal static string IO_SETTINGS_IO_TABLE_DEFAULT_NAME {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_IO_TABLE_DEFAULT_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a New every n° bit.
+        /// </summary>
+        internal static string IO_SETTINGS_IO_TABLE_SPLIT_EVERY {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_IO_TABLE_SPLIT_EVERY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Division per bit.
+        /// </summary>
+        internal static string IO_SETTINGS_SEGMENT_BIT_DIVISION {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_SEGMENT_BIT_DIVISION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Division per byte.
+        /// </summary>
+        internal static string IO_SETTINGS_SEGMENT_BYTE_DIVISION {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_SEGMENT_BYTE_DIVISION", resourceCulture);
             }
         }
         

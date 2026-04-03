@@ -28,12 +28,18 @@ namespace TiaUtilities.SettingsNew.Bindings
             this.lastMacroSection = null;
             this.lastSection = null;
         }
-
-        public SettingsBindings MacroSection<T>(Func<string> getNameFunc, Func<bool> isVisibleFunc,
-            Func<T?> GetConfigurationFunc,  T? PresetConfigurationObject = null, Func<Dictionary<string, ObservableConfiguration>>? otherConfigurationsFunc = null) 
+        public SettingsBindings MacroSection<T>(string name, bool isVisible,
+            T? configuration, T? presetConfigurationObject = null, Func<Dictionary<string, ObservableConfiguration>>? otherConfigurationsFunc = null)
             where T : ObservableConfiguration
         {
-            lastMacroSection = new(getNameFunc, isVisibleFunc, typeof(T), GetConfigurationFunc, PresetConfigurationObject, otherConfigurationsFunc);
+            return MacroSection(() => name, () => isVisible, () => configuration, presetConfigurationObject, otherConfigurationsFunc);
+        }
+
+        public SettingsBindings MacroSection<T>(Func<string> nameFunc, Func<bool> isVisibleFunc,
+            Func<T?> configurationFunc,  T? presetConfigurationObject = null, Func<Dictionary<string, ObservableConfiguration>>? otherConfigurationsFunc = null) 
+            where T : ObservableConfiguration
+        {
+            lastMacroSection = new(nameFunc, isVisibleFunc, typeof(T), configurationFunc, presetConfigurationObject, otherConfigurationsFunc);
             lastSection = null;
 
             this.MacroSectionList.Add(lastMacroSection);
