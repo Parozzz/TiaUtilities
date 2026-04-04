@@ -385,22 +385,22 @@ validità riga</value>
   <data name="GRID_FIND_FORM_NAME" xml:space="preserve">
     <value>Grid - Trova e Sostituisci</value>
   </data>
-  <data name="IO_CONFIG_GROUPING_TYPE" xml:space="preserve">
+  <data name="IO_SETTINGS_GROUPING_TYPE" xml:space="preserve">
     <value>Tipo Raggruppamento</value>
   </data>
-  <data name="IO_CONFIG_GROUPING_TYPE_BIT" xml:space="preserve">
-    <value>RaggruppaPerBit</value>
+  <data name="IO_GROUPING_TYPE_BIT" xml:space="preserve">
+    <value>Bit</value>
   </data>
-  <data name="IO_CONFIG_GROUPING_TYPE_BYTE" xml:space="preserve">
-    <value>RaggruppoPerByte</value>
+  <data name="IO_GROUPING_TYPE_BYTE" xml:space="preserve">
+    <value>Byte</value>
   </data>
-  <data name="IO_CONFIG_MEMORY_TYPE" xml:space="preserve">
+  <data name="IO_SETTINGS_MEMORY_TYPE" xml:space="preserve">
     <value>Tipo memoria</value>
   </data>
-  <data name="IO_CONFIG_MEMORY_TYPE_DB" xml:space="preserve">
+  <data name="IO_MEMORY_TYPE_DB" xml:space="preserve">
     <value>DB</value>
   </data>
-  <data name="IO_CONFIG_MEMORY_TYPE_MERKER" xml:space="preserve">
+  <data name="IO_MEMORY_TYPE_MERKER" xml:space="preserve">
     <value>Merker</value>
   </data>
   <data name="IO_DATA_ADDRESS" xml:space="preserve">
@@ -424,26 +424,17 @@ validità riga</value>
   <data name="IO_GEN_CONFIG_ALIAS_DB" xml:space="preserve">
     <value>DB Appoggi</value>
   </data>
-  <data name="IO_SETTINGS_ALIAS_DB_GENERATE_DEFINED_VARIABLES" xml:space="preserve">
-    <value>Genera Variabili Definite</value>
-  </data>
   <data name="IO_SETTINGS_ALIAS_DB_INPUT_DEFAULT" xml:space="preserve">
-    <value>Valore default Input</value>
+    <value>Input: Indirizzo di default</value>
   </data>
   <data name="IO_SETTINGS_ALIAS_DB_OUTPUT_DEFAULT" xml:space="preserve">
-    <value>Valore default Output</value>
+    <value>Output: Indirizzo di default</value>
   </data>
   <data name="IO_GEN_CONFIG_ALIAS_TABLE" xml:space="preserve">
     <value>Tabella Appoggi</value>
   </data>
-  <data name="IO_GEN_CONFIG_ALIAS_TABLE_INPUT_VARIABLE" xml:space="preserve">
-    <value>Variable Input</value>
-  </data>
   <data name="IO_SETTINGS_ALIAS_TABLE_SPLIT_EVERY" xml:space="preserve">
     <value>Nuova ogni n° bit</value>
-  </data>
-  <data name="IO_GEN_CONFIG_ALIAS_TABLE_OUTPUT_VARIABLE" xml:space="preserve">
-    <value>Variabile Output</value>
   </data>
   <data name="IO_SETTINGS_ALIAS_TABLE_INOUT_DEFAULT" xml:space="preserve">
     <value>Valore di Default</value>
@@ -458,7 +449,7 @@ validità riga</value>
     <value>Tabella IN/OUT</value>
   </data>
   <data name="IO_SETTINGS_IO_TABLE_DEFAULT_NAME" xml:space="preserve">
-    <value>Nome default tag</value>
+    <value>Preset nome tag di default</value>
   </data>
   <data name="IO_SETTINGS_IO_TABLE_SPLIT_EVERY" xml:space="preserve">
     <value>Nuova ogni n° bit</value>
@@ -466,11 +457,11 @@ validità riga</value>
   <data name="IO_GEN_CONFIG_SEGMENT" xml:space="preserve">
     <value>Nomi Segmenti</value>
   </data>
-  <data name="IO_SETTINGS_SEGMENT_BIT_DIVISION" xml:space="preserve">
-    <value>Divisione per bit</value>
+  <data name="IO_SETTINGS_SEGMENT_BIT_GROUPING" xml:space="preserve">
+    <value>Raggruppamento per bit</value>
   </data>
-  <data name="IO_SETTINGS_SEGMENT_BYTE_DIVISION" xml:space="preserve">
-    <value>Divisione per byte</value>
+  <data name="IO_SETTINGS_SEGMENT_BYTE_GROUPING" xml:space="preserve">
+    <value>Raggruppamento per byte</value>
   </data>
   <data name="IO_GEN_FORM_NAME" xml:space="preserve">
     <value>Generatore Appoggi Input/Output. Percorso progetto: {file_path}</value>
@@ -756,5 +747,61 @@ validità riga</value>
   </data>
   <data name="IO_SETTINGS_EXCELIMPORT" xml:space="preserve">
     <value>Importa da Excel</value>
+  </data>
+  <data name="IO_SETTINGS_ALIAS_DB_NUMBER_DESC" xml:space="preserve">
+    <value>Numero da dare alla DB generata. Use -1 per usare impostare su numerazione auto.
+Placeholder: &lt;placeholder&gt;.</value>
+  </data>
+  <data name="IO_SETTINGS_ALIAS_DB_NAME_DESC" xml:space="preserve">
+    <value>Nome da dare alla DB generata.
+Placeholder: &lt;placeholder&gt;.</value>
+  </data>
+  <data name="IO_SETTINGS_IO_TABLE_SPLIT_EVERY_DESC" xml:space="preserve">
+    <value>Genera un nuovo file xml raggiunto il numero di bit impostato. Tabelle grandi richiedono molto più tempo per essere importate.</value>
+  </data>
+  <data name="IO_SETTINGS_GROUPING_TYPE_DESC" xml:space="preserve">
+    <value>Decide come gli appoggi sono raggruppati dentro ai segmenti generati.
+Bit=Singolo bit dentro al segmento.
+Byte=Raggruppa il byte dentro al segmento.</value>
+  </data>
+  <data name="IO_SETTINGS_MEMORY_TYPE_DESC" xml:space="preserve">
+    <value>Decide il tipo di memoria dove gli appoggi vengono generati.</value>
+  </data>
+  <data name="IO_SETTINGS_ALIAS_TABLE_INPUT_START_NUMBER" xml:space="preserve">
+    <value>Input Merker: Numero di partenza</value>
+  </data>
+  <data name="IO_SETTINGS_ALIAS_TABLE_INPUT_DEFAULT_NAME" xml:space="preserve">
+    <value>Input Merker: Nome di default</value>
+  </data>
+  <data name="IO_SETTINGS_ALIAS_TABLE_OUTPUT_START_NUMBER" xml:space="preserve">
+    <value>Output Merker: Numero di partenza</value>
+  </data>
+  <data name="IO_SETTINGS_ALIAS_TABLE_OUTPUT_DEFAULT_NAME" xml:space="preserve">
+    <value>Output Merker: Nome di default</value>
+  </data>
+  <data name="IO_SETTINGS_IO_TABLE_NAME_DESC" xml:space="preserve">
+    <value>Nome della tabella tag contenente IO tags (%I /%Q)</value>
+  </data>
+  <data name="IO_SETTINGS_IO_TABLE_DEFAULT_NAME_DESC" xml:space="preserve">
+    <value>Nome di default che viene assegnato alla tag generata.</value>
+  </data>
+  <data name="IO_SETTINGS_ALIAS_TABLE_NAME_DESC" xml:space="preserve">
+    <value>Nome della tabella tag contenente Merker tags (%M)</value>
+  </data>
+  <data name="IO_SETTINGS_EXCELIMPORT_ADDRESS_DESC" xml:space="preserve">
+    <value>Template per riempire la colonna indirizzo.
+Usa $ seguito dal nome della colonna Excel per estrarre i valori dal foglio di calcolo importato (Supportato da tutti i valori).</value>
+  </data>
+  <data name="IO_SETTINGS_EXCELIMPORT_IO_NAME_DESC" xml:space="preserve">
+    <value>Template per riempire la colonna nome io.</value>
+  </data>
+  <data name="IO_SETTINGS_EXCELIMPORT_COMMENT_DESC" xml:space="preserve">
+    <value>Template per riempire la colonna commento.</value>
+  </data>
+  <data name="IO_SETTINGS_EXCELIMPORT_STARTING_ROW_DESC" xml:space="preserve">
+    <value>Decide da quale riga del foglio di calcolo partire per convertire i dati.</value>
+  </data>
+  <data name="IO_SETTINGS_EXCELIMPORT_EXPRESSION_DESC" xml:space="preserve">
+    <value>Espressione javascript per decidere se la riga del foglio di calcolo è valida per essere convertita.</value>
   </data>
 </root>

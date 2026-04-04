@@ -385,22 +385,22 @@ for row validation</value>
   <data name="GRID_FIND_FORM_NAME" xml:space="preserve">
     <value>Grid - Find and Replace</value>
   </data>
-  <data name="IO_CONFIG_GROUPING_TYPE" xml:space="preserve">
+  <data name="IO_SETTINGS_GROUPING_TYPE" xml:space="preserve">
     <value>Grouping Type</value>
   </data>
-  <data name="IO_CONFIG_GROUPING_TYPE_BIT" xml:space="preserve">
-    <value>GroupEachBit</value>
+  <data name="IO_GROUPING_TYPE_BIT" xml:space="preserve">
+    <value>Bit</value>
   </data>
-  <data name="IO_CONFIG_GROUPING_TYPE_BYTE" xml:space="preserve">
-    <value>GroupEachByte</value>
+  <data name="IO_GROUPING_TYPE_BYTE" xml:space="preserve">
+    <value>Byte</value>
   </data>
-  <data name="IO_CONFIG_MEMORY_TYPE" xml:space="preserve">
+  <data name="IO_SETTINGS_MEMORY_TYPE" xml:space="preserve">
     <value>Memory Type</value>
   </data>
-  <data name="IO_CONFIG_MEMORY_TYPE_DB" xml:space="preserve">
+  <data name="IO_MEMORY_TYPE_DB" xml:space="preserve">
     <value>DB</value>
   </data>
-  <data name="IO_CONFIG_MEMORY_TYPE_MERKER" xml:space="preserve">
+  <data name="IO_MEMORY_TYPE_MERKER" xml:space="preserve">
     <value>Merker</value>
   </data>
   <data name="IO_DATA_ADDRESS" xml:space="preserve">
@@ -424,26 +424,17 @@ for row validation</value>
   <data name="IO_GEN_CONFIG_ALIAS_DB" xml:space="preserve">
     <value>Alias DB</value>
   </data>
-  <data name="IO_SETTINGS_ALIAS_DB_GENERATE_DEFINED_VARIABLES" xml:space="preserve">
-    <value>Genera Defined variables</value>
-  </data>
   <data name="IO_SETTINGS_ALIAS_DB_INPUT_DEFAULT" xml:space="preserve">
-    <value>Default Input value</value>
+    <value>Input: Default address</value>
   </data>
   <data name="IO_SETTINGS_ALIAS_DB_OUTPUT_DEFAULT" xml:space="preserve">
-    <value>Default Output value</value>
+    <value>Output: Default address</value>
   </data>
   <data name="IO_GEN_CONFIG_ALIAS_TABLE" xml:space="preserve">
     <value>Alias Table</value>
   </data>
-  <data name="IO_GEN_CONFIG_ALIAS_TABLE_INPUT_VARIABLE" xml:space="preserve">
-    <value>Input Variable</value>
-  </data>
   <data name="IO_SETTINGS_ALIAS_TABLE_SPLIT_EVERY" xml:space="preserve">
     <value>New every n° bit</value>
-  </data>
-  <data name="IO_GEN_CONFIG_ALIAS_TABLE_OUTPUT_VARIABLE" xml:space="preserve">
-    <value>Output Variable</value>
   </data>
   <data name="IO_SETTINGS_ALIAS_TABLE_INOUT_DEFAULT" xml:space="preserve">
     <value>Default Value</value>
@@ -458,7 +449,7 @@ for row validation</value>
     <value>IN/OUT Table</value>
   </data>
   <data name="IO_SETTINGS_IO_TABLE_DEFAULT_NAME" xml:space="preserve">
-    <value>Default tag name</value>
+    <value>Default Tag name preset</value>
   </data>
   <data name="IO_SETTINGS_IO_TABLE_SPLIT_EVERY" xml:space="preserve">
     <value>New every n° bit</value>
@@ -466,11 +457,11 @@ for row validation</value>
   <data name="IO_GEN_CONFIG_SEGMENT" xml:space="preserve">
     <value>Segment Name</value>
   </data>
-  <data name="IO_SETTINGS_SEGMENT_BIT_DIVISION" xml:space="preserve">
-    <value>Division per bit</value>
+  <data name="IO_SETTINGS_SEGMENT_BIT_GROUPING" xml:space="preserve">
+    <value>Bit grouping</value>
   </data>
-  <data name="IO_SETTINGS_SEGMENT_BYTE_DIVISION" xml:space="preserve">
-    <value>Division per byte</value>
+  <data name="IO_SETTINGS_SEGMENT_BYTE_GROUPING" xml:space="preserve">
+    <value>Byte grouping</value>
   </data>
   <data name="IO_GEN_FORM_NAME" xml:space="preserve">
     <value>Input/Output alias generator. Project file: {file_path}</value>
@@ -756,5 +747,61 @@ for row validation</value>
   </data>
   <data name="IO_SETTINGS_EXCELIMPORT" xml:space="preserve">
     <value>Excel Importer</value>
+  </data>
+  <data name="IO_SETTINGS_ALIAS_DB_NUMBER_DESC" xml:space="preserve">
+    <value>Number to give to the generated DB. Set to -1 to use auto numeration.
+Placeholder: &lt;placeholder&gt;</value>
+  </data>
+  <data name="IO_SETTINGS_ALIAS_DB_NAME_DESC" xml:space="preserve">
+    <value>Name to give to the generated DB.
+Placeholder: &lt;placeholder&gt;.</value>
+  </data>
+  <data name="IO_SETTINGS_IO_TABLE_SPLIT_EVERY_DESC" xml:space="preserve">
+    <value>Generate a new xml file after the set number of bits. Big tables takes a lot more time to import.</value>
+  </data>
+  <data name="IO_SETTINGS_GROUPING_TYPE_DESC" xml:space="preserve">
+    <value>Decides how alarms are groupped inside a segments are generated.
+Bit=Single IO for each segment.
+Byte=Group the whole byte for each segnemt.</value>
+  </data>
+  <data name="IO_SETTINGS_MEMORY_TYPE_DESC" xml:space="preserve">
+    <value>Dicides the type of memory wherealias are generated.</value>
+  </data>
+  <data name="IO_SETTINGS_ALIAS_TABLE_INPUT_START_NUMBER" xml:space="preserve">
+    <value>Input Merker: Start number</value>
+  </data>
+  <data name="IO_SETTINGS_ALIAS_TABLE_INPUT_DEFAULT_NAME" xml:space="preserve">
+    <value>Input Merker: Default name</value>
+  </data>
+  <data name="IO_SETTINGS_ALIAS_TABLE_OUTPUT_START_NUMBER" xml:space="preserve">
+    <value>Output Merker: Start number</value>
+  </data>
+  <data name="IO_SETTINGS_ALIAS_TABLE_OUTPUT_DEFAULT_NAME" xml:space="preserve">
+    <value>Output Merker: Default name</value>
+  </data>
+  <data name="IO_SETTINGS_IO_TABLE_NAME_DESC" xml:space="preserve">
+    <value>Name to give to the table hosting IO tags (%I / %Q)</value>
+  </data>
+  <data name="IO_SETTINGS_IO_TABLE_DEFAULT_NAME_DESC" xml:space="preserve">
+    <value>Default name to give to the generated tag.</value>
+  </data>
+  <data name="IO_SETTINGS_ALIAS_TABLE_NAME_DESC" xml:space="preserve">
+    <value>Name to give to the table hosting Merker tags (%M)</value>
+  </data>
+  <data name="IO_SETTINGS_EXCELIMPORT_ADDRESS_DESC" xml:space="preserve">
+    <value>Template to use to fill address column.
+Use $ followed by Excel column name for extracting values from imported spreadsheet file (Supported by all values here).</value>
+  </data>
+  <data name="IO_SETTINGS_EXCELIMPORT_IO_NAME_DESC" xml:space="preserve">
+    <value>Template to use to fill io name column.</value>
+  </data>
+  <data name="IO_SETTINGS_EXCELIMPORT_COMMENT_DESC" xml:space="preserve">
+    <value>Template to use to fill comment column.</value>
+  </data>
+  <data name="IO_SETTINGS_EXCELIMPORT_STARTING_ROW_DESC" xml:space="preserve">
+    <value>Decideds at which spreadsheet row to start parsing data.</value>
+  </data>
+  <data name="IO_SETTINGS_EXCELIMPORT_EXPRESSION_DESC" xml:space="preserve">
+    <value>Javascript expression to decide if the spreadsheet row is valid to be parsed.</value>
   </data>
 </root>

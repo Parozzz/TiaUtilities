@@ -7,14 +7,14 @@ namespace TiaUtilities.Generation.IO.Configurations
 {
     public enum IOGroupingTypeEnum
     {
-        [Locale(nameof(Locale.IO_CONFIG_GROUPING_TYPE_BIT))] PER_BIT = 0, //DEFAULT
-        [Locale(nameof(Locale.IO_CONFIG_GROUPING_TYPE_BYTE))] PER_BYTE
+        [Locale(nameof(Locale.IO_GROUPING_TYPE_BIT))] PER_BIT = 0, //DEFAULT
+        [Locale(nameof(Locale.IO_GROUPING_TYPE_BYTE))] PER_BYTE
     }
 
     public enum IOMemoryTypeEnum
     {
-        [Locale(nameof(Locale.IO_CONFIG_MEMORY_TYPE_DB))] DB = 0, //DEFAULT
-        [Locale(nameof(Locale.IO_CONFIG_MEMORY_TYPE_MERKER))] MERKER
+        [Locale(nameof(Locale.IO_MEMORY_TYPE_DB))] DB = 0, //DEFAULT
+        [Locale(nameof(Locale.IO_MEMORY_TYPE_MERKER))] MERKER
     }
 
     public class IOMainConfiguration : ObservableConfiguration
@@ -24,7 +24,6 @@ namespace TiaUtilities.Generation.IO.Configurations
 
         [JsonProperty] public string DBName { get => this.GetAs<string>(); set => this.Set(value); }
         [JsonProperty] public uint DBNumber { get => this.GetAs<uint>(); set => this.Set(value); }
-        [JsonProperty] public bool GenerateDefinedVariableAnyway { get => this.GetAs<bool>(); set => this.Set(value); }
 
         [JsonProperty] public string IOTableName { get => this.GetAs<string>(); set => this.Set(value); }
         [JsonProperty] public uint IOTableSplitEvery { get => this.GetAs<uint>(); set => this.Set(value); }
@@ -48,7 +47,6 @@ namespace TiaUtilities.Generation.IO.Configurations
 
             this.DBName = "TestIO_DB";
             this.DBNumber = 196;
-            this.GenerateDefinedVariableAnyway = false;
 
             this.IOTableName = $"IN_OUT_{GenPlaceholders.Generation.TAB_NAME}Table";
             this.IOTableSplitEvery = 250;

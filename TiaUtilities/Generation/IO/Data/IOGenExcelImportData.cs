@@ -1,4 +1,5 @@
 ﻿using TiaUtilities.Generation.GridHandler.Data;
+using TiaUtilities.Languages;
 
 namespace TiaUtilities.Generation.IO.Data
 {
@@ -23,9 +24,9 @@ namespace TiaUtilities.Generation.IO.Data
             COLUMN_LIST = columnList.AsReadOnly();
         }
 
-        public string? Address { get; set; }
-        public string? IOName { get; set; }
-        public string? Comment { get; set; }
+        [Locale(nameof(Locale.GENERICS_ADDRESS))] public string? Address { get; set; }
+        [Locale(nameof(Locale.IO_SETTINGS_EXCELIMPORT_IO_NAME))] public string ? IOName { get; set; }
+        [Locale(nameof(Locale.GENERICS_COMMENT))] public string? Comment { get; set; }
 
         public object? this[int column]
         {

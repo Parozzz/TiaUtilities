@@ -1474,60 +1474,6 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Grouping Type.
-        /// </summary>
-        internal static string IO_CONFIG_GROUPING_TYPE {
-            get {
-                return ResourceManager.GetString("IO_CONFIG_GROUPING_TYPE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a GroupEachBit.
-        /// </summary>
-        internal static string IO_CONFIG_GROUPING_TYPE_BIT {
-            get {
-                return ResourceManager.GetString("IO_CONFIG_GROUPING_TYPE_BIT", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a GroupEachByte.
-        /// </summary>
-        internal static string IO_CONFIG_GROUPING_TYPE_BYTE {
-            get {
-                return ResourceManager.GetString("IO_CONFIG_GROUPING_TYPE_BYTE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Memory Type.
-        /// </summary>
-        internal static string IO_CONFIG_MEMORY_TYPE {
-            get {
-                return ResourceManager.GetString("IO_CONFIG_MEMORY_TYPE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a DB.
-        /// </summary>
-        internal static string IO_CONFIG_MEMORY_TYPE_DB {
-            get {
-                return ResourceManager.GetString("IO_CONFIG_MEMORY_TYPE_DB", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Merker.
-        /// </summary>
-        internal static string IO_CONFIG_MEMORY_TYPE_MERKER {
-            get {
-                return ResourceManager.GetString("IO_CONFIG_MEMORY_TYPE_MERKER", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Cerca una stringa localizzata simile a Address.
         /// </summary>
         internal static string IO_DATA_ADDRESS {
@@ -1596,24 +1542,6 @@ namespace TiaUtilities.Languages {
         internal static string IO_GEN_CONFIG_ALIAS_TABLE {
             get {
                 return ResourceManager.GetString("IO_GEN_CONFIG_ALIAS_TABLE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Input Variable.
-        /// </summary>
-        internal static string IO_GEN_CONFIG_ALIAS_TABLE_INPUT_VARIABLE {
-            get {
-                return ResourceManager.GetString("IO_GEN_CONFIG_ALIAS_TABLE_INPUT_VARIABLE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Output Variable.
-        /// </summary>
-        internal static string IO_GEN_CONFIG_ALIAS_TABLE_OUTPUT_VARIABLE {
-            get {
-                return ResourceManager.GetString("IO_GEN_CONFIG_ALIAS_TABLE_OUTPUT_VARIABLE", resourceCulture);
             }
         }
         
@@ -1708,16 +1636,43 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Genera Defined variables.
+        ///   Cerca una stringa localizzata simile a Bit.
         /// </summary>
-        internal static string IO_SETTINGS_ALIAS_DB_GENERATE_DEFINED_VARIABLES {
+        internal static string IO_GROUPING_TYPE_BIT {
             get {
-                return ResourceManager.GetString("IO_SETTINGS_ALIAS_DB_GENERATE_DEFINED_VARIABLES", resourceCulture);
+                return ResourceManager.GetString("IO_GROUPING_TYPE_BIT", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Default Input value.
+        ///   Cerca una stringa localizzata simile a Byte.
+        /// </summary>
+        internal static string IO_GROUPING_TYPE_BYTE {
+            get {
+                return ResourceManager.GetString("IO_GROUPING_TYPE_BYTE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a DB.
+        /// </summary>
+        internal static string IO_MEMORY_TYPE_DB {
+            get {
+                return ResourceManager.GetString("IO_MEMORY_TYPE_DB", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Merker.
+        /// </summary>
+        internal static string IO_MEMORY_TYPE_MERKER {
+            get {
+                return ResourceManager.GetString("IO_MEMORY_TYPE_MERKER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Input: Default address.
         /// </summary>
         internal static string IO_SETTINGS_ALIAS_DB_INPUT_DEFAULT {
             get {
@@ -1726,7 +1681,27 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Default Output value.
+        ///   Cerca una stringa localizzata simile a Name to give to the generated DB.
+        ///Placeholder: &lt;placeholder&gt;..
+        /// </summary>
+        internal static string IO_SETTINGS_ALIAS_DB_NAME_DESC {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_ALIAS_DB_NAME_DESC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Number to give to the generated DB. Set to -1 to use auto numeration.
+        ///Placeholder: &lt;placeholder&gt;.
+        /// </summary>
+        internal static string IO_SETTINGS_ALIAS_DB_NUMBER_DESC {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_ALIAS_DB_NUMBER_DESC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Output: Default address.
         /// </summary>
         internal static string IO_SETTINGS_ALIAS_DB_OUTPUT_DEFAULT {
             get {
@@ -1753,6 +1728,51 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Input Merker: Default name.
+        /// </summary>
+        internal static string IO_SETTINGS_ALIAS_TABLE_INPUT_DEFAULT_NAME {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_ALIAS_TABLE_INPUT_DEFAULT_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Input Merker: Start number.
+        /// </summary>
+        internal static string IO_SETTINGS_ALIAS_TABLE_INPUT_START_NUMBER {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_ALIAS_TABLE_INPUT_START_NUMBER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Name to give to the table hosting Merker tags (%M).
+        /// </summary>
+        internal static string IO_SETTINGS_ALIAS_TABLE_NAME_DESC {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_ALIAS_TABLE_NAME_DESC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Output Merker: Default name.
+        /// </summary>
+        internal static string IO_SETTINGS_ALIAS_TABLE_OUTPUT_DEFAULT_NAME {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_ALIAS_TABLE_OUTPUT_DEFAULT_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Output Merker: Start number.
+        /// </summary>
+        internal static string IO_SETTINGS_ALIAS_TABLE_OUTPUT_START_NUMBER {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_ALIAS_TABLE_OUTPUT_START_NUMBER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a New every n° bit.
         /// </summary>
         internal static string IO_SETTINGS_ALIAS_TABLE_SPLIT_EVERY {
@@ -1771,12 +1791,40 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Template to use to fill address column.
+        ///Use $ followed by Excel column name for extracting values from imported spreadsheet file (Supported by all values here)..
+        /// </summary>
+        internal static string IO_SETTINGS_EXCELIMPORT_ADDRESS_DESC {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_EXCELIMPORT_ADDRESS_DESC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Template to use to fill comment column..
+        /// </summary>
+        internal static string IO_SETTINGS_EXCELIMPORT_COMMENT_DESC {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_EXCELIMPORT_COMMENT_DESC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a JS Expressione
         ///for row validation.
         /// </summary>
         internal static string IO_SETTINGS_EXCELIMPORT_EXPRESSION {
             get {
                 return ResourceManager.GetString("IO_SETTINGS_EXCELIMPORT_EXPRESSION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Javascript expression to decide if the spreadsheet row is valid to be parsed..
+        /// </summary>
+        internal static string IO_SETTINGS_EXCELIMPORT_EXPRESSION_DESC {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_EXCELIMPORT_EXPRESSION_DESC", resourceCulture);
             }
         }
         
@@ -1790,6 +1838,15 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Template to use to fill io name column..
+        /// </summary>
+        internal static string IO_SETTINGS_EXCELIMPORT_IO_NAME_DESC {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_EXCELIMPORT_IO_NAME_DESC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Starting row.
         /// </summary>
         internal static string IO_SETTINGS_EXCELIMPORT_STARTING_ROW {
@@ -1799,11 +1856,58 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Default tag name.
+        ///   Cerca una stringa localizzata simile a Decideds at which spreadsheet row to start parsing data..
+        /// </summary>
+        internal static string IO_SETTINGS_EXCELIMPORT_STARTING_ROW_DESC {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_EXCELIMPORT_STARTING_ROW_DESC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Grouping Type.
+        /// </summary>
+        internal static string IO_SETTINGS_GROUPING_TYPE {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_GROUPING_TYPE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Decides how alarms are groupped inside a segments are generated.
+        ///Bit=Single IO for each segment.
+        ///Byte=Group the whole byte for each segnemt..
+        /// </summary>
+        internal static string IO_SETTINGS_GROUPING_TYPE_DESC {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_GROUPING_TYPE_DESC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Default Tag name preset.
         /// </summary>
         internal static string IO_SETTINGS_IO_TABLE_DEFAULT_NAME {
             get {
                 return ResourceManager.GetString("IO_SETTINGS_IO_TABLE_DEFAULT_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Default name to give to the generated tag..
+        /// </summary>
+        internal static string IO_SETTINGS_IO_TABLE_DEFAULT_NAME_DESC {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_IO_TABLE_DEFAULT_NAME_DESC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Name to give to the table hosting IO tags (%I / %Q).
+        /// </summary>
+        internal static string IO_SETTINGS_IO_TABLE_NAME_DESC {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_IO_TABLE_NAME_DESC", resourceCulture);
             }
         }
         
@@ -1817,20 +1921,47 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Division per bit.
+        ///   Cerca una stringa localizzata simile a Generate a new xml file after the set number of bits. Big tables takes a lot more time to import..
         /// </summary>
-        internal static string IO_SETTINGS_SEGMENT_BIT_DIVISION {
+        internal static string IO_SETTINGS_IO_TABLE_SPLIT_EVERY_DESC {
             get {
-                return ResourceManager.GetString("IO_SETTINGS_SEGMENT_BIT_DIVISION", resourceCulture);
+                return ResourceManager.GetString("IO_SETTINGS_IO_TABLE_SPLIT_EVERY_DESC", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Division per byte.
+        ///   Cerca una stringa localizzata simile a Memory Type.
         /// </summary>
-        internal static string IO_SETTINGS_SEGMENT_BYTE_DIVISION {
+        internal static string IO_SETTINGS_MEMORY_TYPE {
             get {
-                return ResourceManager.GetString("IO_SETTINGS_SEGMENT_BYTE_DIVISION", resourceCulture);
+                return ResourceManager.GetString("IO_SETTINGS_MEMORY_TYPE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Dicides the type of memory wherealias are generated..
+        /// </summary>
+        internal static string IO_SETTINGS_MEMORY_TYPE_DESC {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_MEMORY_TYPE_DESC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Bit grouping.
+        /// </summary>
+        internal static string IO_SETTINGS_SEGMENT_BIT_GROUPING {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_SEGMENT_BIT_GROUPING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Byte grouping.
+        /// </summary>
+        internal static string IO_SETTINGS_SEGMENT_BYTE_GROUPING {
+            get {
+                return ResourceManager.GetString("IO_SETTINGS_SEGMENT_BYTE_GROUPING", resourceCulture);
             }
         }
         
