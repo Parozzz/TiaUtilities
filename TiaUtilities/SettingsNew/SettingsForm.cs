@@ -13,7 +13,7 @@ namespace TiaUtilities.Generation.SettingsNew
         private readonly SettingsFormSectionListView leftSectionListView;
         private readonly TableLayoutPanel rightSettingsPanel;
 
-        private readonly SettingsFormBindingLoader bindingsLoader;
+        private readonly SettingsFormBindingControlLoader bindingsControlLoader;
 
         public SettingsForm(SettingsBindings bindings)
         {
@@ -29,7 +29,7 @@ namespace TiaUtilities.Generation.SettingsNew
             this.rightSettingsPanel = new();
             Utils.SetDoubleBuffered(this.rightSettingsPanel);
 
-            this.bindingsLoader = new(bindings, this);
+            this.bindingsControlLoader = new(bindings, this);
 
             Init();
         }
@@ -52,19 +52,19 @@ namespace TiaUtilities.Generation.SettingsNew
             this.mainPanel.Controls.Add(this.WrapRightPanelInScrollable(this.rightSettingsPanel), 1, 0);
             this.Controls.Add(this.mainPanel);
 
-            this.bindingsLoader.Load();
-            this.bindingsLoader.Add(this.leftSectionListView, this.rightSettingsPanel);
+            this.bindingsControlLoader.Load();
+            this.bindingsControlLoader.Add(this.leftSectionListView, this.rightSettingsPanel);
 
-            void UpdateRequestEvent(object? sender, EventArgs args) => this.bindingsLoader.UpdateValues();
-            this.bindingsLoader.Bindings.UpdateEvent += UpdateRequestEvent;
+            void UpdateRequestEvent(object? sender, EventArgs args) => this.bindingsControlLoader.UpdateValues();
+            this.bindingsControlLoader.Bindings.UpdateEvent += UpdateRequestEvent;
 
             void ReloadEvent(object? sender, EventArgs args) => this.ReloadBindings();
-            this.bindingsLoader.Bindings.ReloadEvent += ReloadEvent;
+            this.bindingsControlLoader.Bindings.ReloadEvent += ReloadEvent;
 
             this.FormClosed += (sender, args) =>
             {
-                this.bindingsLoader.Bindings.UpdateEvent -= UpdateRequestEvent;
-                this.bindingsLoader.Bindings.ReloadEvent -= ReloadEvent;
+                this.bindingsControlLoader.Bindings.UpdateEvent -= UpdateRequestEvent;
+                this.bindingsControlLoader.Bindings.ReloadEvent -= ReloadEvent;
             };
         }
 
@@ -132,7 +132,7 @@ namespace TiaUtilities.Generation.SettingsNew
             var scrollableVisibleTop = scrollPositionNew >= 0 ? scrollPositionNew : scrollableControl.VerticalScroll.Value; //Effectively the scroll position
             var scrollableVisibleBottom = scrollableVisibleTop + scrollableControl.Height;
 
-            this.bindingsLoader.UpdateVisiblePercentages(scrollableVisibleTop, scrollableVisibleBottom);
+            this.bindingsControlLoader.UpdateVisiblePercentages(scrollableVisibleTop, scrollableVisibleBottom);
 
             this.leftSectionListView.ResumeLayout(true);
         }
@@ -144,8 +144,8 @@ namespace TiaUtilities.Generation.SettingsNew
             this.leftSectionListView.Items.Clear();
             this.rightSettingsPanel.Controls.Clear();
 
-            this.bindingsLoader.Load();
-            this.bindingsLoader.Add(this.leftSectionListView, this.rightSettingsPanel);
+            this.bindingsControlLoader.Load();
+            this.bindingsControlLoader.Add(this.leftSectionListView, this.rightSettingsPanel);
 
             this.ResumeAll();
         }

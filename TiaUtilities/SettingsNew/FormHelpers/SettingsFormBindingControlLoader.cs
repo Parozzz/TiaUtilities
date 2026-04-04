@@ -5,7 +5,7 @@ using TiaUtilities.Utility;
 
 namespace TiaUtilities.SettingsNew.FormHelpers
 {
-    public class SettingsFormBindingLoader (SettingsBindings bindings, SettingsForm form)
+    public class SettingsFormBindingControlLoader (SettingsBindings bindings, SettingsForm form)
     {
         private record ControlPosition(Control? Control, int Column, int Row, SizeType RowSizeType = SizeType.AutoSize, float RowSize = 0f, int ColumnSpan = 0, int RowSpan = 0);
 
@@ -265,7 +265,7 @@ namespace TiaUtilities.SettingsNew.FormHelpers
                         valuesRowCount++;
                     }
 
-                    SettingsFormBindingLoader.ApplyControlPositions(valuesPanel, valuesControlPositionList);
+                    SettingsFormBindingControlLoader.ApplyControlPositions(valuesPanel, valuesControlPositionList);
 
                     //This is just to view better the division in sections
                     var sectionBorderLabel = new Label()
@@ -352,7 +352,7 @@ namespace TiaUtilities.SettingsNew.FormHelpers
                 }
             }
 
-            SettingsFormBindingLoader.ApplyControlPositions(panel, this.createdControlPositionList);
+            SettingsFormBindingControlLoader.ApplyControlPositions(panel, this.createdControlPositionList);
         }
 
         public void ClearAllLastOpenInformation()
