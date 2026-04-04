@@ -531,71 +531,23 @@ namespace TiaUtilities.Generation.IO.Module
 
         private void AddConfigurationBindings(SettingsBindings settingsBindings)
         {
-            settingsBindings
-                .MacroSection("IO Gen", true, this.mainConfig, MainForm.Settings.PresetIOMainConfiguration)
-
-                .Section(Locale.IO_GEN_CONFIG_ALIAS_DB)
-                .AddString(nameof(IOMainConfiguration.DBName), Locale.GENERICS_NAME, "")
-                .AddUInt(nameof(IOMainConfiguration.DBNumber), Locale.GENERICS_NUMBER, "")
-                .AddBool(nameof(IOMainConfiguration.GenerateDefinedVariableAnyway), Locale.IO_SETTINGS_ALIAS_DB_GENERATE_DEFINED_VARIABLES, "")
-                .AddString(nameof(IOMainConfiguration.DefaultDBInputVariable), Locale.IO_SETTINGS_ALIAS_DB_INPUT_DEFAULT, "")
-                .AddString(nameof(IOMainConfiguration.DefaultDBOutputVariable), Locale.IO_SETTINGS_ALIAS_DB_OUTPUT_DEFAULT, "")
-
-                .Section(Locale.IO_GEN_CONFIG_IO_TABLE)
-                .AddString(nameof(IOMainConfiguration.IOTableName), Locale.GENERICS_NAME, "")
-                .AddString(nameof(IOMainConfiguration.IOTableSplitEvery), Locale.IO_SETTINGS_IO_TABLE_SPLIT_EVERY, "")
-                .AddString(nameof(IOMainConfiguration.DefaultIoName), Locale.IO_SETTINGS_IO_TABLE_DEFAULT_NAME, "")
-
-                .Section(Locale.IO_GEN_CONFIG_ALIAS_TABLE)
-                .AddString(nameof(IOMainConfiguration.VariableTableName), Locale.GENERICS_NAME, "")
-                .AddUInt(nameof(IOMainConfiguration.VariableTableSplitEvery), Locale.IO_SETTINGS_ALIAS_TABLE_SPLIT_EVERY, "")
-
-                .Section(Locale.IO_GEN_CONFIG_ALIAS_TABLE_INPUT_VARIABLE)
-                .AddUInt(nameof(IOMainConfiguration.VariableTableInputStartAddress), Locale.IO_SETTINGS_ALIAS_TABLE_INOUT_START_ADDRESS, "")
-                .AddUInt(nameof(IOMainConfiguration.DefaultMerkerInputVariable), Locale.IO_SETTINGS_ALIAS_TABLE_INOUT_DEFAULT, "")
-
-                .Section(Locale.IO_GEN_CONFIG_ALIAS_TABLE_OUTPUT_VARIABLE)
-                .AddUInt(nameof(IOMainConfiguration.VariableTableOutputStartAddress), Locale.IO_SETTINGS_ALIAS_TABLE_INOUT_START_ADDRESS, "")
-                .AddUInt(nameof(IOMainConfiguration.DefaultMerkerOutputVariable), Locale.IO_SETTINGS_ALIAS_TABLE_INOUT_DEFAULT, "");
-
-
-            settingsBindings
-                .MacroSection(this.GetCurrentTabName, () => this.control.tabControl.SelectedTab != null, this.GetCurrentTabConfiguration, MainForm.Settings.PresetIOTabConfiguration, this.GetTabConfigurationDict)
-
-                .Section(Locale.IO_GEN_CONFIG_FC)
-                .AddString(nameof(IOTabConfiguration.FCBlockName), Locale.GENERICS_NAME, "")
-                .AddString(nameof(IOTabConfiguration.FCBlockNumber), Locale.GENERICS_NUMBER, "")
-
-                .Section(Locale.IO_GEN_CONFIG_SEGMENT)
-                .AddString(nameof(IOTabConfiguration.SegmentNameBitGrouping), Locale.IO_SETTINGS_SEGMENT_BIT_DIVISION, "")
-                .AddString(nameof(IOTabConfiguration.SegmentNameByteGrouping), Locale.IO_SETTINGS_SEGMENT_BYTE_DIVISION, "");
-        }
-
-        public static void AddExcelImporterSettingsBindings(SettingsBindings settingsBindings, IOExcelImportConfiguration excelImportConfig)
-        {
-            settingsBindings
-                .MacroSection(Locale.IO_SETTINGS_EXCELIMPORT, true, excelImportConfig, MainForm.Settings.PresetIOExcelImportConfiguration)
-
-                .Section(Locale.GENERICS_ADDRESS)
-                .AddString(nameof(IOExcelImportConfiguration.AddressCellConfig))
-
-                .Section(Locale.IO_SETTINGS_EXCELIMPORT_IO_NAME)
-                .AddString(nameof(IOExcelImportConfiguration.IONameCellConfig))
-
-                .Section(Locale.GENERICS_COMMENT)
-                .AddString(nameof(IOExcelImportConfiguration.CommentCellConfig))
-
-                .Section(Locale.IO_SETTINGS_EXCELIMPORT_STARTING_ROW)
-                .AddString(nameof(IOExcelImportConfiguration.StartingRow))
-
-                .Section(Locale.IO_SETTINGS_EXCELIMPORT_EXPRESSION)
-                .AddJavascript(nameof(IOExcelImportConfiguration.IgnoreRowExpressionConfig));
+            IOGenUtils.AddMainConfigBindings(settingsBindings, this.mainConfig);
+            IOGenUtils.AddTabConfigSettings(settingsBindings, 
+                this.GetCurrentTabName,
+                this.IsAnyTabSelected,
+                this.GetCurrentTabConfiguration, 
+                this.GetTabConfigurationDict);
         }
 
         private string GetCurrentTabName()
         {
             var tabPage = this.control.tabControl.SelectedTab;
             return tabPage == null ? "" : tabPage.Text;
+        }
+
+        private bool IsAnyTabSelected()
+        {
+            return this.control.tabControl.SelectedTab != null;
         }
 
         private IOTabConfiguration? GetCurrentTabConfiguration()
