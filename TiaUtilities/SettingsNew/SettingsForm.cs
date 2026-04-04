@@ -74,17 +74,23 @@ namespace TiaUtilities.Generation.SettingsNew
             {
                 if (this.rightSettingsPanel.Parent is ScrollableControl scrollableControl)
                 {
+                    int scrollValue = scrollableControl.VerticalScroll.Minimum;
                     if (args.Item?.Tag is SettingsFormSectionListView.ItemSectionTag sectionTag && sectionTag.Section.Panel != null)
                     {
-                        scrollableControl.VerticalScroll.Value = sectionTag.Section.Panel.Top;
+                        scrollValue = sectionTag.Section.Panel.Top;
                     }
                     else if (args.Item?.Tag is SettingsFormSectionListView.ItemMacroSectionTag macroSectionTag && macroSectionTag.MacroSection.Label != null)
                     {
-                        scrollableControl.VerticalScroll.Value = macroSectionTag.MacroSection.Label.Top;
+                        scrollValue = macroSectionTag.MacroSection.Label.Top;
                     }
 
-                    scrollableControl.PerformLayout(); //This immediately updates the control since the Function below uses client side values for calculation!
-                    this.UpdateSectionVisiblePercentage(scrollableControl);
+                    if(scrollValue >= scrollableControl.VerticalScroll.Minimum && scrollValue <= scrollableControl.VerticalScroll.Maximum)
+                    {
+                        scrollableControl.VerticalScroll.Value = scrollValue; 
+
+                        scrollableControl.PerformLayout(); //This immediately updates the control since the Function below uses client side values for calculation!
+                        this.UpdateSectionVisiblePercentage(scrollableControl);
+                    }
                 }
             };
         }
