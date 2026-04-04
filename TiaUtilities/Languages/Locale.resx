@@ -802,7 +802,7 @@ Use $ followed by Excel column name for extracting values from imported spreadsh
     <value>Decideds at which spreadsheet row to start parsing data.</value>
   </data>
   <data name="IO_SETTINGS_EXCELIMPORT_EXPRESSION_DESC" xml:space="preserve">
-    <value>Javascript expression to decide if the spreadsheet row is valid to be parsed.</value>
+    <value>Javascript boolean expression to decide if the spreadsheet row is valid to be parsed.</value>
   </data>
   <data name="SETTINGS_FORM_SECTION_HAS_PLACEHOLDER_TOOLTIP" xml:space="preserve">
     <value>Support placeholders.</value>

@@ -1820,7 +1820,7 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Javascript expression to decide if the spreadsheet row is valid to be parsed..
+        ///   Cerca una stringa localizzata simile a Javascript boolean expression to decide if the spreadsheet row is valid to be parsed..
         /// </summary>
         internal static string IO_SETTINGS_EXCELIMPORT_EXPRESSION_DESC {
             get {
