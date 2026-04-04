@@ -2108,5 +2108,14 @@ namespace TiaUtilities.Languages {
                 return ResourceManager.GetString("SETTINGS_FORM_CONTEXT_MENU_SET_TO_OTHERS", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Support placeholders..
+        /// </summary>
+        internal static string SETTINGS_FORM_SECTION_HAS_PLACEHOLDER_TOOLTIP {
+            get {
+                return ResourceManager.GetString("SETTINGS_FORM_SECTION_HAS_PLACEHOLDER_TOOLTIP", resourceCulture);
+            }
+        }
     }
 }

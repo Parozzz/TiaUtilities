@@ -6,6 +6,12 @@
 
         public static Color SECTIONS_ITEM_FORE_COLOR { get; } = Color.Black;
         public static Color SECTIONS_SELECTED_ITEM_BACK_COLOR { get; } = ControlPaint.LightLight(Color.LightGray);
+        public static Color SECTION_BORDER_ENABLED_COLOR { get;  } = Color.DarkBlue;
+        public static Color SECTION_BORDER_DISABLED_COLOR { get; } = Color.LightGray;
+
+
+        public static Color MARKER_DOT_BORDER_COLOR { get; } = Color.Gray;
+        public static Color MARKER_DOT_HAS_PLACEHOLDER_COLOR { get;  } = Color.LightGreen;
 
         public static int SECTIONS_LIST_VIEW_WIDTH { get; } = 290;
         public static int SECTIONS_LIST_TILE_HEIGHT { get; } = 26;

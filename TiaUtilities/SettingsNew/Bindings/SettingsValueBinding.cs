@@ -17,5 +17,7 @@ namespace TiaUtilities.SettingsNew.Bindings
         public string Description { get; init; } = description;
         public SettingsEditorTypeEnum EditorType { get; init; } = editorType;
         public Object? Tag { get; init; } = tag;
+
+        public bool HasPlaceholderDotMark { get; set; } = false;
     }
 }

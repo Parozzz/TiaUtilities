@@ -18,6 +18,7 @@ namespace TiaUtilities.SettingsNew.Bindings
 
         private SettingsMacroSectionBinding<ObservableConfiguration>? lastMacroSection;
         private SettingsSectionBinding? lastSection;
+        private SettingsValueBinding? lastValue;
 
         public SettingsBindings() { }
 
@@ -46,11 +47,11 @@ namespace TiaUtilities.SettingsNew.Bindings
             return this;
         }
 
-        public SettingsBindings Section(string name, string description = "")
+        public SettingsBindings Section(string name, string description = "", Func<bool>? enabledFunc = null)
         {
             var macroSection = lastMacroSection ?? throw new InvalidOperationException("No MacroSection has been defined before");
 
-            lastSection = new SettingsSectionBinding(macroSection, name, description);
+            lastSection = new SettingsSectionBinding(macroSection, name, description, enabledFunc ?? (() => true));
             macroSection.SectionsList.Add(lastSection);
 
             return this;
@@ -78,6 +79,17 @@ namespace TiaUtilities.SettingsNew.Bindings
             SettingsValueBinding valueBinding = new(section, propertyName, name, description, editorType, tag);
             this.lastSection.ValueList.Add(valueBinding);
 
+            this.lastValue = valueBinding;
+
+            return this;
+        }
+
+        public SettingsBindings SetHasPlaceholderDotMark()
+        {
+            if(this.lastValue != null)
+            {
+                this.lastValue.HasPlaceholderDotMark = true;
+            }
             return this;
         }
 

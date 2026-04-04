@@ -5,7 +5,7 @@ using TiaUtilities.Utility;
 
 namespace TiaUtilities.SettingsNew.FormHelpers
 {
-    public class SettingsFormBindingControlLoader (SettingsBindings bindings, SettingsForm form)
+    public class SettingsFormBindingControlLoader(SettingsBindings bindings, SettingsForm form)
     {
         private record ControlPosition(Control? Control, int Column, int Row, SizeType RowSizeType = SizeType.AutoSize, float RowSize = 0f, int ColumnSpan = 0, int RowSpan = 0);
 
@@ -196,7 +196,7 @@ namespace TiaUtilities.SettingsNew.FormHelpers
                         AutoSize = true,
                         AutoSizeMode = AutoSizeMode.GrowAndShrink,
                         //Dock = DockStyle.Fill,
-                        Anchor = AnchorStyles.Left  | AnchorStyles.Right,
+                        Anchor = AnchorStyles.Left | AnchorStyles.Right,
                         ColumnStyles = { new ColumnStyle(SizeType.AutoSize) },
                         Padding = Padding.Empty,
                         Margin = Padding.Empty,
@@ -213,7 +213,7 @@ namespace TiaUtilities.SettingsNew.FormHelpers
 
                         if (hasName)
                         {
-                            Label valueNameLabel = new()
+                            SettingsValueNameLabel valueNameLabel = new()
                             {
                                 Text = formValue.Name,
                                 AutoSize = true,
@@ -225,7 +225,14 @@ namespace TiaUtilities.SettingsNew.FormHelpers
                                 Padding = Padding.Empty,
                                 Font = SettingsFormConstants.VALUE_NAME_LABEL_FONT,
                             };
-                            Utils.SetDoubleBuffered(valueNameLabel);
+                            if(formValue.Binding.HasPlaceholderDotMark)
+                            {
+                                valueNameLabel.DotList.Add(new() 
+                                { 
+                                    Color = SettingsFormConstants.MARKER_DOT_HAS_PLACEHOLDER_COLOR, 
+                                    ToolTipText = Locale.SETTINGS_FORM_SECTION_HAS_PLACEHOLDER_TOOLTIP
+                                });
+                            }
 
                             valuesControlPositionList.Add(new(valueNameLabel, 0, valuesRowCount));
                             valuesRowCount++;
@@ -272,7 +279,7 @@ namespace TiaUtilities.SettingsNew.FormHelpers
                     {
                         Text = "",
                         Dock = DockStyle.Fill,
-                        BackColor = Color.DarkBlue,
+                        BackColor = SettingsFormConstants.SECTION_BORDER_ENABLED_COLOR,
                         Padding = Padding.Empty,
                         Margin = new Padding(0, 6, (int)(SettingsFormConstants.SECTIONS_BORDER_COLUMN_SIZE / 2f), 6),
                     };
@@ -287,8 +294,32 @@ namespace TiaUtilities.SettingsNew.FormHelpers
                     rowCount++;
 
                     formSection.Panel = valuesPanel;
+
+                    UpdateStateOfControlPositionList(formSection, sectionNameLabel, valuesControlPositionList, sectionBorderLabel);
+                    this.Bindings.UpdateEvent +=
+                        (sender, args) => UpdateStateOfControlPositionList(formSection, sectionNameLabel, valuesControlPositionList, sectionBorderLabel);
                 }
             }
+        }
+
+        private static void UpdateStateOfControlPositionList(SettingsFormSection formSection, 
+            Label sectionNameLabel, 
+            List<ControlPosition> controlPositionList, 
+            Label sectionBorderLabel)
+        {
+            var sectionEnabled = formSection.Binding.EnabledFunc();
+
+            sectionNameLabel.Enabled = sectionEnabled;
+            foreach (var valueControlPosition in controlPositionList)
+            {
+                var control = valueControlPosition.Control;
+                if (control != null)
+                {
+                    control.Enabled = sectionEnabled;
+                }
+            }
+
+            sectionBorderLabel.BackColor = sectionEnabled ? SettingsFormConstants.SECTION_BORDER_ENABLED_COLOR : SettingsFormConstants.SECTION_BORDER_DISABLED_COLOR;
         }
 
         private FlowLayoutPanel CreateButtonToolbar(SettingsFormMacroSection formMacroSection, SettingsFormLastOpenInformation lastOpenInformation)
@@ -357,7 +388,7 @@ namespace TiaUtilities.SettingsNew.FormHelpers
 
         public void ClearAllLastOpenInformation()
         {
-            foreach(var formMacroSection in this.macroSectionList)
+            foreach (var formMacroSection in this.macroSectionList)
             {
                 SettingsFormLastOpenInformation.RemoveGuid(formMacroSection.Guid);
             }

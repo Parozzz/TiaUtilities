@@ -804,4 +804,7 @@ Usa $ seguito dal nome della colonna Excel per estrarre i valori dal foglio di c
   <data name="IO_SETTINGS_EXCELIMPORT_EXPRESSION_DESC" xml:space="preserve">
     <value>Espressione javascript per decidere se la riga del foglio di calcolo è valida per essere convertita.</value>
   </data>
+  <data name="SETTINGS_FORM_SECTION_HAS_PLACEHOLDER_TOOLTIP" xml:space="preserve">
+    <value>Supporta i placeholder.</value>
+  </data>
 </root>
