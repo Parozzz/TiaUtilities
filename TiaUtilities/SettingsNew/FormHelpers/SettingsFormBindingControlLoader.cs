@@ -225,7 +225,7 @@ namespace TiaUtilities.SettingsNew.FormHelpers
                                 Padding = Padding.Empty,
                                 Font = SettingsFormConstants.VALUE_NAME_LABEL_FONT,
                             };
-                            if(formValue.Binding.HasPlaceholderDotMark)
+                            if(formValue.Binding.HasPlaceholderSupportDotMark)
                             {
                                 valueNameLabel.DotList.Add(new() 
                                 { 

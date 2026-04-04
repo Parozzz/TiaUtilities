@@ -84,11 +84,11 @@ namespace TiaUtilities.SettingsNew.Bindings
             return this;
         }
 
-        public SettingsBindings SetHasPlaceholderDotMark()
+        public SettingsBindings SetHasPlaceholderSupportDotMark()
         {
             if(this.lastValue != null)
             {
-                this.lastValue.HasPlaceholderDotMark = true;
+                this.lastValue.HasPlaceholderSupportDotMark = true;
             }
             return this;
         }

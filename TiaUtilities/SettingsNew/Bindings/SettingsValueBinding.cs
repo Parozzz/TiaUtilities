@@ -18,6 +18,6 @@ namespace TiaUtilities.SettingsNew.Bindings
         public SettingsEditorTypeEnum EditorType { get; init; } = editorType;
         public Object? Tag { get; init; } = tag;
 
-        public bool HasPlaceholderDotMark { get; set; } = false;
+        public bool HasPlaceholderSupportDotMark { get; set; } = false;
     }
 }

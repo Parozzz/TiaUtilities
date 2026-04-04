@@ -89,30 +89,30 @@ namespace TiaUtilities.Generation.IO
 
                 .Section(Locale.IO_GEN_CONFIG_IO_TABLE)
                 .AddString(nameof(IOMainConfiguration.IOTableName), Locale.GENERICS_NAME, Locale.IO_SETTINGS_IO_TABLE_NAME_DESC)
-                .SetHasPlaceholderDotMark()
+                .SetHasPlaceholderSupportDotMark()
                 .AddString(nameof(IOMainConfiguration.IOTableSplitEvery), Locale.IO_SETTINGS_IO_TABLE_SPLIT_EVERY, Locale.IO_SETTINGS_IO_TABLE_SPLIT_EVERY_DESC)
                 .AddString(nameof(IOMainConfiguration.DefaultIoName), Locale.IO_SETTINGS_IO_TABLE_DEFAULT_NAME, Locale.IO_SETTINGS_IO_TABLE_DEFAULT_NAME_DESC)
-                .SetHasPlaceholderDotMark()
+                .SetHasPlaceholderSupportDotMark()
 
                 .Section(Locale.IO_GEN_CONFIG_ALIAS_DB, enabledFunc: () => mainConfig.MemoryType == IOMemoryTypeEnum.DB)
-                .AddString(nameof(IOMainConfiguration.DBName), Locale.GENERICS_NAME, Locale.IO_SETTINGS_ALIAS_DB_NAME_DESC.Replace("<placeholder>", GenPlaceholders.IO.CONFIG_DB_NAME)).SetHasPlaceholderDotMark()
+                .AddString(nameof(IOMainConfiguration.DBName), Locale.GENERICS_NAME, Locale.IO_SETTINGS_ALIAS_DB_NAME_DESC.Replace("<placeholder>", GenPlaceholders.IO.CONFIG_DB_NAME)).SetHasPlaceholderSupportDotMark()
                 .AddUInt(nameof(IOMainConfiguration.DBNumber), Locale.GENERICS_NUMBER, Locale.IO_SETTINGS_ALIAS_DB_NUMBER_DESC.Replace("<placeholder>", GenPlaceholders.IO.CONFIG_DB_NAME))
                 .AddString(nameof(IOMainConfiguration.DefaultDBInputVariable), Locale.IO_SETTINGS_ALIAS_DB_INPUT_DEFAULT, "")
-                .SetHasPlaceholderDotMark()
+                .SetHasPlaceholderSupportDotMark()
                 .AddString(nameof(IOMainConfiguration.DefaultDBOutputVariable), Locale.IO_SETTINGS_ALIAS_DB_OUTPUT_DEFAULT, "")
-                .SetHasPlaceholderDotMark()
+                .SetHasPlaceholderSupportDotMark()
 
 
                 .Section(Locale.IO_GEN_CONFIG_ALIAS_TABLE, enabledFunc: () => mainConfig.MemoryType == IOMemoryTypeEnum.MERKER)
                 .AddString(nameof(IOMainConfiguration.VariableTableName), Locale.GENERICS_NAME, Locale.IO_SETTINGS_ALIAS_TABLE_NAME_DESC)
-                .SetHasPlaceholderDotMark()
+                .SetHasPlaceholderSupportDotMark()
                 .AddUInt(nameof(IOMainConfiguration.VariableTableSplitEvery), Locale.IO_SETTINGS_ALIAS_TABLE_SPLIT_EVERY, Locale.IO_SETTINGS_IO_TABLE_SPLIT_EVERY_DESC)
                 .AddUInt(nameof(IOMainConfiguration.VariableTableInputStartAddress), Locale.IO_SETTINGS_ALIAS_TABLE_INPUT_START_NUMBER, "")
                 .AddUInt(nameof(IOMainConfiguration.DefaultMerkerInputVariable), Locale.IO_SETTINGS_ALIAS_TABLE_INPUT_DEFAULT_NAME, "")
-                .SetHasPlaceholderDotMark()
+                .SetHasPlaceholderSupportDotMark()
                 .AddUInt(nameof(IOMainConfiguration.VariableTableOutputStartAddress), Locale.IO_SETTINGS_ALIAS_TABLE_OUTPUT_START_NUMBER, "")
                 .AddUInt(nameof(IOMainConfiguration.DefaultMerkerOutputVariable), Locale.IO_SETTINGS_ALIAS_TABLE_OUTPUT_DEFAULT_NAME, "")
-                .SetHasPlaceholderDotMark();
+                .SetHasPlaceholderSupportDotMark();
         }
 
         public static void AddTabConfigSettings(SettingsBindings settingsBindings, 
@@ -124,14 +124,14 @@ namespace TiaUtilities.Generation.IO
 
                 .Section(Locale.IO_GEN_CONFIG_FC)
                 .AddString(nameof(IOTabConfiguration.FCBlockName), Locale.GENERICS_NAME, "")
-                .SetHasPlaceholderDotMark()
+                .SetHasPlaceholderSupportDotMark()
                 .AddString(nameof(IOTabConfiguration.FCBlockNumber), Locale.GENERICS_NUMBER, "")
 
                 .Section(Locale.IO_GEN_CONFIG_SEGMENT)
                 .AddString(nameof(IOTabConfiguration.SegmentNameBitGrouping), Locale.IO_SETTINGS_SEGMENT_BIT_GROUPING, "")
-                .SetHasPlaceholderDotMark()
+                .SetHasPlaceholderSupportDotMark()
                 .AddString(nameof(IOTabConfiguration.SegmentNameByteGrouping), Locale.IO_SETTINGS_SEGMENT_BYTE_GROUPING, "")
-                .SetHasPlaceholderDotMark();
+                .SetHasPlaceholderSupportDotMark();
         }
 
         public static void AddExcelImporterSettingsBindings(SettingsBindings settingsBindings, IOExcelImportConfiguration excelImportConfig)
