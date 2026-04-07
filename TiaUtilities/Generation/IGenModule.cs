@@ -17,5 +17,7 @@ namespace TiaUtilities.Generation
         public string GetFormLocalizatedName();
 
         public bool ProcessCmdKey(ref Message msg, Keys keyData); //To be passed from the form!
+
+        public void OpenPlaceholderViewer();
     }
 }

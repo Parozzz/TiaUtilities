@@ -8,11 +8,14 @@ namespace TiaUtilities.SettingsNew.Bindings
 
     public delegate void SettingsBindingsReloadEvent(object? sender, EventArgs e);
 
+    public delegate void PlaceholderViewerRequestEvent(object? sender, EventArgs e);
+
     public class SettingsBindings
     {
         
         public event SettingsBindingsUpdateEvent UpdateEvent = delegate { };
         public event SettingsBindingsUpdateEvent ReloadEvent = delegate { };
+        public event PlaceholderViewerRequestEvent PlaceholderViewerRequestEvent = delegate { };
 
         public List<SettingsMacroSectionBinding<ObservableConfiguration>> MacroSectionList { get; init; } = [];
 
@@ -95,12 +98,17 @@ namespace TiaUtilities.SettingsNew.Bindings
 
         public void Update()
         {
-            UpdateEvent.Invoke(this, new());
+            this.UpdateEvent.Invoke(this, new());
         }
 
         public void Reload()
         {
-            ReloadEvent.Invoke(this, new());
+            this.ReloadEvent.Invoke(this, new());
+        }
+
+        public void PlaceholderViewerRequest()
+        {
+            this.PlaceholderViewerRequestEvent(this, new());
         }
     }
 }

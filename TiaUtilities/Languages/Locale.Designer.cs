@@ -1141,6 +1141,51 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Import/Export.
+        /// </summary>
+        internal static string GEN_FORM_IMPORT_EXPORT {
+            get {
+                return ResourceManager.GetString("GEN_FORM_IMPORT_EXPORT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Export XML.
+        /// </summary>
+        internal static string GEN_FORM_IMPORT_EXPORT_EXPORT_XML {
+            get {
+                return ResourceManager.GetString("GEN_FORM_IMPORT_EXPORT_EXPORT_XML", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Tools.
+        /// </summary>
+        internal static string GEN_FORM_TOOLS {
+            get {
+                return ResourceManager.GetString("GEN_FORM_TOOLS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Placeholder viewer.
+        /// </summary>
+        internal static string GEN_FORM_TOOLS_PLACEHOLDER_VIEWER {
+            get {
+                return ResourceManager.GetString("GEN_FORM_TOOLS_PLACEHOLDER_VIEWER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Placeholder Viewer.
+        /// </summary>
+        internal static string GEN_PLACEHOLDER_VIEWER_FORM {
+            get {
+                return ResourceManager.GetString("GEN_PLACEHOLDER_VIEWER_FORM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Accept.
         /// </summary>
         internal static string GENERICS_ACCEPT {
@@ -1578,24 +1623,6 @@ namespace TiaUtilities.Languages {
         internal static string IO_GEN_EXCELIMPORT_IMPORT {
             get {
                 return ResourceManager.GetString("IO_GEN_EXCELIMPORT_IMPORT", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Import/Export.
-        /// </summary>
-        internal static string IO_GEN_FORM_IMPEXP {
-            get {
-                return ResourceManager.GetString("IO_GEN_FORM_IMPEXP", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Export XML.
-        /// </summary>
-        internal static string IO_GEN_FORM_IMPEXP_EXPORT_XML {
-            get {
-                return ResourceManager.GetString("IO_GEN_FORM_IMPEXP_EXPORT_XML", resourceCulture);
             }
         }
         

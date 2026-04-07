@@ -208,6 +208,9 @@ namespace TiaUtilities.Generation.SettingsNew
                             return true;
                         }
                         break;
+                    case Keys.Q | Keys.Control:
+                        this.bindingsControlLoader.Bindings.PlaceholderViewerRequest();
+                        return true;
                 }
             }
             catch (Exception ex)

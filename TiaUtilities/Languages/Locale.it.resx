@@ -466,10 +466,10 @@ validità riga</value>
   <data name="IO_GEN_FORM_NAME" xml:space="preserve">
     <value>Generatore Appoggi Input/Output. Percorso progetto: {file_path}</value>
   </data>
-  <data name="IO_GEN_FORM_IMPEXP" xml:space="preserve">
+  <data name="GEN_FORM_IMPORT_EXPORT" xml:space="preserve">
     <value>Import/Export</value>
   </data>
-  <data name="IO_GEN_FORM_IMPEXP_EXPORT_XML" xml:space="preserve">
+  <data name="GEN_FORM_IMPORT_EXPORT_EXPORT_XML" xml:space="preserve">
     <value>Esporta XML</value>
   </data>
   <data name="IO_GEN_FORM_IMPEXP_IMPORT_EXCEL" xml:space="preserve">
@@ -806,5 +806,14 @@ Usa $ seguito dal nome della colonna Excel per estrarre i valori dal foglio di c
   </data>
   <data name="SETTINGS_FORM_SECTION_HAS_PLACEHOLDER_TOOLTIP" xml:space="preserve">
     <value>Supporta i placeholder.</value>
+  </data>
+  <data name="GEN_FORM_TOOLS" xml:space="preserve">
+    <value>Strumenti</value>
+  </data>
+  <data name="GEN_FORM_TOOLS_PLACEHOLDER_VIEWER" xml:space="preserve">
+    <value>Visualizza placeholders</value>
+  </data>
+  <data name="GEN_PLACEHOLDER_VIEWER_FORM" xml:space="preserve">
+    <value>Visualizzatore Placeholder</value>
   </data>
 </root>

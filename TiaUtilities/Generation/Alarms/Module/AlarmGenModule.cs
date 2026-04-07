@@ -7,6 +7,7 @@ using TiaUtilities.Generation.Alarms.Template;
 using TiaUtilities.Generation.Alarms.Xml;
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.JSScript;
+using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Generation.SettingsNew;
 using TiaUtilities.Languages;
 using TiaUtilities.SettingsNew.Bindings;
@@ -48,6 +49,7 @@ namespace TiaUtilities.Generation.Alarms.Module
 
         public void Init(GenModuleForm form)
         {
+            #region TOP_BUTTONS_STRIP
             this.control.setupButton.Click += (sender, args) => new SettingsForm(this.SettingsBindings).Show(this.control);
             this.control.changeTemplateButton.Click += (sender, args) =>
             {
@@ -66,8 +68,11 @@ namespace TiaUtilities.Generation.Alarms.Module
                     this.SettingsBindings.Reload();
                 }
             };
+            #endregion
 
             this.gridBindContainer.Init(form);
+
+            #region TEMPLATE_HANDLER
             this.templateHandler.Init([]);
             this.templateHandler.TemplateRenamed += (sender, args) =>
             {
@@ -79,7 +84,9 @@ namespace TiaUtilities.Generation.Alarms.Module
                 this.SettingsBindings.Update();
             };
             this.templateHandler.SelectedTemplateChanged += (sender, args) => this.SettingsBindings.Update();
+            #endregion
 
+            #region TAB_CONTROL
             this.control.tabControl.TabPreAdded += (sender, args) => TabCreation(args.TabPage);
             this.control.tabControl.TabPreRemoved += (sender, args) =>
             {
@@ -115,7 +122,17 @@ namespace TiaUtilities.Generation.Alarms.Module
                     this.SettingsBindings.Update();
                 }
             };
+            #endregion
 
+            #region SETTINGS_BINDINGS 
+            void placeholderRequestEvent(object? sender, EventArgs args) => this.OpenPlaceholderViewer();
+            this.SettingsBindings.PlaceholderViewerRequestEvent += placeholderRequestEvent;
+
+            form.FormClosed += (sender, args) =>
+            {
+                this.SettingsBindings.PlaceholderViewerRequestEvent -= placeholderRequestEvent;
+            };
+            #endregion
 
             form.Shown += (sender, args) =>
             {
@@ -232,6 +249,11 @@ namespace TiaUtilities.Generation.Alarms.Module
         public Control? GetControl()
         {
             return this.control;
+        }
+
+        public void OpenPlaceholderViewer()
+        {
+            new PlaceholderViewerForm(GenPlaceholders.Alarms.PLACEHOLDER_LIST).Show();
         }
 
         public string GetFormLocalizatedName()

@@ -30,7 +30,6 @@ namespace TiaUtilities.Generation.Alarms.Module
         /// </summary>
         private void InitializeComponent()
         {
-            PlaceholdersLabel = new Label();
             mainTableLayout = new TableLayoutPanel();
             configButtonPanel = new FlowLayoutPanel();
             setupButton = new Button();
@@ -40,23 +39,12 @@ namespace TiaUtilities.Generation.Alarms.Module
             configButtonPanel.SuspendLayout();
             SuspendLayout();
             // 
-            // PlaceholdersLabel
-            // 
-            PlaceholdersLabel.Dock = DockStyle.Top;
-            PlaceholdersLabel.Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            PlaceholdersLabel.Location = new Point(3, 0);
-            PlaceholdersLabel.Name = "PlaceholdersLabel";
-            PlaceholdersLabel.Size = new Size(1394, 16);
-            PlaceholdersLabel.TabIndex = 10;
-            PlaceholdersLabel.Text = "Placeholders: {tab_name} {device_name} {device_description} {alarm_num_start} {alarm_num_end} {alarm_num} {alarm_description}";
-            // 
             // mainTableLayout
             // 
             mainTableLayout.AutoSize = true;
             mainTableLayout.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             mainTableLayout.ColumnCount = 1;
             mainTableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            mainTableLayout.Controls.Add(PlaceholdersLabel, 0, 0);
             mainTableLayout.Controls.Add(configButtonPanel, 0, 1);
             mainTableLayout.Controls.Add(tabControl, 0, 2);
             mainTableLayout.Dock = DockStyle.Fill;
@@ -76,7 +64,7 @@ namespace TiaUtilities.Generation.Alarms.Module
             configButtonPanel.Controls.Add(setupButton);
             configButtonPanel.Controls.Add(changeTemplateButton);
             configButtonPanel.Dock = DockStyle.Left;
-            configButtonPanel.Location = new Point(0, 19);
+            configButtonPanel.Location = new Point(0, 3);
             configButtonPanel.Margin = new Padding(0, 3, 0, 0);
             configButtonPanel.Name = "configButtonPanel";
             configButtonPanel.Size = new Size(270, 30);
@@ -114,12 +102,12 @@ namespace TiaUtilities.Generation.Alarms.Module
             // 
             tabControl.Dock = DockStyle.Fill;
             tabControl.DrawMode = TabDrawMode.OwnerDrawFixed;
-            tabControl.Location = new Point(3, 52);
+            tabControl.Location = new Point(3, 36);
             tabControl.Name = "tabControl";
             tabControl.Padding = new Point(12, 5);
             tabControl.RequireConfirmationBeforeClosing = true;
             tabControl.SelectedIndex = 0;
-            tabControl.Size = new Size(1394, 674);
+            tabControl.Size = new Size(1394, 690);
             tabControl.TabIndex = 16;
             // 
             // AlarmGenControl
@@ -139,8 +127,6 @@ namespace TiaUtilities.Generation.Alarms.Module
         }
 
         #endregion
-
-        private Label PlaceholdersLabel;
         private TableLayoutPanel mainTableLayout;
         private FlowLayoutPanel configButtonPanel;
         public InteractableTabControl tabControl;

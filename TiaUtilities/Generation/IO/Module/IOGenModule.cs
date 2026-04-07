@@ -13,6 +13,7 @@ using TiaUtilities.Generation.IO.Data;
 using TiaUtilities.Generation.IO.Module.ExcelImporter;
 using TiaUtilities.Generation.IO.Module.Tab;
 using TiaUtilities.Generation.IO.Xml;
+using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Generation.SettingsNew;
 using TiaUtilities.Languages;
 using TiaUtilities.SettingsNew.Bindings;
@@ -91,7 +92,9 @@ namespace TiaUtilities.Generation.IO.Module
 
         public void Init(GenModuleForm form)
         {
+            #region TOP_BUTTONS_STRIP
             this.control.setupButton.Click += (sender, args) => new SettingsForm(this.SettingsBindings).Show(this.control);
+            #endregion
 
             #region IMPORT_EXPORT_MENU_ITEMS
             ToolStripMenuItem importExcelMenuItem = new(Locale.IO_GEN_FORM_IMPEXP_IMPORT_EXCEL);
@@ -296,6 +299,7 @@ namespace TiaUtilities.Generation.IO.Module
             this.suggestionPreviewer.Function = (column, ioData) => null;
             #endregion
 
+            #region TAB CONTROL
             this.control.tabControl.TabPreAdded += (sender, args) => TabCreation(args.TabPage);
             this.control.tabControl.TabPreRemoved += (sender, args) =>
             {
@@ -332,6 +336,17 @@ namespace TiaUtilities.Generation.IO.Module
                     this.SettingsBindings.Update();
                 }
             };
+            #endregion
+
+            #region SETTINGS_BINDINGS
+            void placeholderRequestEvent(object? sender, EventArgs args) => this.OpenPlaceholderViewer();
+            this.SettingsBindings.PlaceholderViewerRequestEvent += placeholderRequestEvent;
+
+            form.FormClosed += (sender, args) =>
+            {
+                this.SettingsBindings.PlaceholderViewerRequestEvent -= placeholderRequestEvent;
+            };
+            #endregion
 
             form.Shown += (sender, args) =>
             {
@@ -391,6 +406,11 @@ namespace TiaUtilities.Generation.IO.Module
         public Control? GetControl()
         {
             return this.control;
+        }
+
+        public void OpenPlaceholderViewer()
+        {
+            new PlaceholderViewerForm(GenPlaceholders.IO.PLACEHOLDER_LIST).Show();
         }
 
         public void ExportXML(string folderPath)

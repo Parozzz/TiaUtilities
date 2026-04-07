@@ -466,10 +466,10 @@ for row validation</value>
   <data name="IO_GEN_FORM_NAME" xml:space="preserve">
     <value>Input/Output alias generator. Project file: {file_path}</value>
   </data>
-  <data name="IO_GEN_FORM_IMPEXP" xml:space="preserve">
+  <data name="GEN_FORM_IMPORT_EXPORT" xml:space="preserve">
     <value>Import/Export</value>
   </data>
-  <data name="IO_GEN_FORM_IMPEXP_EXPORT_XML" xml:space="preserve">
+  <data name="GEN_FORM_IMPORT_EXPORT_EXPORT_XML" xml:space="preserve">
     <value>Export XML</value>
   </data>
   <data name="IO_GEN_FORM_IMPEXP_IMPORT_EXCEL" xml:space="preserve">
@@ -806,5 +806,14 @@ Use $ followed by Excel column name for extracting values from imported spreadsh
   </data>
   <data name="SETTINGS_FORM_SECTION_HAS_PLACEHOLDER_TOOLTIP" xml:space="preserve">
     <value>Support placeholders.</value>
+  </data>
+  <data name="GEN_FORM_TOOLS" xml:space="preserve">
+    <value>Tools</value>
+  </data>
+  <data name="GEN_FORM_TOOLS_PLACEHOLDER_VIEWER" xml:space="preserve">
+    <value>Placeholder viewer</value>
+  </data>
+  <data name="GEN_PLACEHOLDER_VIEWER_FORM" xml:space="preserve">
+    <value>Placeholder Viewer</value>
   </data>
 </root>
