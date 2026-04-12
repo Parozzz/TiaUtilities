@@ -253,7 +253,14 @@ namespace TiaUtilities.Generation.Alarms.Module
 
         public void OpenPlaceholderViewer()
         {
-            new PlaceholderViewerForm(GenPlaceholders.Alarms.PLACEHOLDER_LIST).Show();
+            var form = this.control.FindForm();
+            if(form == null)
+            {
+                return;
+            }
+
+            var placeholderForm = new PlaceholderViewerForm(GenPlaceholders.Alarms.PLACEHOLDER_LIST);
+            placeholderForm.Show(form);
         }
 
         public string GetFormLocalizatedName()

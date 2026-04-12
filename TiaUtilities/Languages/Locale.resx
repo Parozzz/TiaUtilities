@@ -816,4 +816,7 @@ Use $ followed by Excel column name for extracting values from imported spreadsh
   <data name="GEN_PLACEHOLDER_VIEWER_FORM" xml:space="preserve">
     <value>Placeholder Viewer</value>
   </data>
+  <data name="GENERICS_COPIED" xml:space="preserve">
+    <value>Copied</value>
+  </data>
 </root>

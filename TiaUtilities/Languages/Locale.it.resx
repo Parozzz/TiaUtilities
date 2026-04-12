@@ -816,4 +816,7 @@ Usa $ seguito dal nome della colonna Excel per estrarre i valori dal foglio di c
   <data name="GEN_PLACEHOLDER_VIEWER_FORM" xml:space="preserve">
     <value>Visualizzatore Placeholder</value>
   </data>
+  <data name="GENERICS_COPIED" xml:space="preserve">
+    <value>Copiato</value>
+  </data>
 </root>

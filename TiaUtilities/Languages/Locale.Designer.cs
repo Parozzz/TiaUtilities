@@ -1240,6 +1240,15 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Copied.
+        /// </summary>
+        internal static string GENERICS_COPIED {
+            get {
+                return ResourceManager.GetString("GENERICS_COPIED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Set / to disable..
         /// </summary>
         internal static string GENERICS_DESCR_SET_SLASH_TO_DISABLE {

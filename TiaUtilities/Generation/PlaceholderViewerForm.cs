@@ -22,12 +22,34 @@ namespace TiaUtilities.Generation
 
             this.placeholderListBox.Items.AddRange([.. placeholders]);
             this.Init();
+
+            this.Shown += (sender, args) =>
+            {
+                this.Focus();
+                this.placeholderListBox.Focus();
+
+                this.placeholderListBox.SelectedIndex = 0;
+            };
         }
 
         private void Init()
         {
             Utils.SetDoubleBuffered(this.placeholderListBox);
             this.placeholderListBox.DoubleClick += (sender, args) => this.CopySelectedItem();
+
+            this.placeholderListBox.MouseWheel += (sender, args) =>
+            {
+                var index = this.placeholderListBox.SelectedIndex;
+                if (args.Delta >= 0)
+                {
+                    index = Math.Max(0, index - 1);
+                }
+                else
+                {
+                    index = Math.Min(this.placeholderListBox.Items.Count - 1, index + 1);
+                }
+                this.placeholderListBox.SelectedIndex = index;
+            };
 
             this.StartPosition = FormStartPosition.Manual;
 
@@ -50,6 +72,17 @@ namespace TiaUtilities.Generation
             {
                 Clipboard.Clear();
                 Clipboard.SetText(selectedStr);
+
+
+                var owner = this.Owner;
+                if(owner != null)
+                {
+                    owner.Focus(); //If not focused, tooltip does not show.
+
+                    var tooltip = Utils.CreateQuickToolTip();
+                    tooltip.ShowAlways = true;
+                    tooltip.Show(Locale.GENERICS_COPIED, owner, owner.PointToClient(Cursor.Position), 1000);
+                }
 
                 this.Close();
             }

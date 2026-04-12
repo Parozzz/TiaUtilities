@@ -35,11 +35,11 @@
             saveAsMenuItem = new ToolStripMenuItem();
             programMenuItem = new ToolStripMenuItem();
             programSettingsMenuItem = new ToolStripMenuItem();
+            toolsMenuItem = new ToolStripMenuItem();
+            toolsPlaceholderViewerMenuItem = new ToolStripMenuItem();
             importExportMenuItem = new ToolStripMenuItem();
             exportXMLMenuItem = new ToolStripMenuItem();
             formTableLayout = new TableLayoutPanel();
-            toolsMenuItem = new ToolStripMenuItem();
-            toolsPlaceholderViewerMenuItem = new ToolStripMenuItem();
             topMenuStrip.SuspendLayout();
             formTableLayout.SuspendLayout();
             SuspendLayout();
@@ -63,19 +63,19 @@
             // loadMenuItem
             // 
             loadMenuItem.Name = "loadMenuItem";
-            loadMenuItem.Size = new Size(180, 22);
+            loadMenuItem.Size = new Size(111, 22);
             loadMenuItem.Text = "Load";
             // 
             // saveMenuItem
             // 
             saveMenuItem.Name = "saveMenuItem";
-            saveMenuItem.Size = new Size(180, 22);
+            saveMenuItem.Size = new Size(111, 22);
             saveMenuItem.Text = "Save";
             // 
             // saveAsMenuItem
             // 
             saveAsMenuItem.Name = "saveAsMenuItem";
-            saveAsMenuItem.Size = new Size(180, 22);
+            saveAsMenuItem.Size = new Size(111, 22);
             saveAsMenuItem.Text = "SaveAs";
             // 
             // programMenuItem
@@ -89,8 +89,21 @@
             // programSettingsMenuItem
             // 
             programSettingsMenuItem.Name = "programSettingsMenuItem";
-            programSettingsMenuItem.Size = new Size(180, 22);
+            programSettingsMenuItem.Size = new Size(116, 22);
             programSettingsMenuItem.Text = "Settings";
+            // 
+            // toolsMenuItem
+            // 
+            toolsMenuItem.DropDownItems.AddRange(new ToolStripItem[] { toolsPlaceholderViewerMenuItem });
+            toolsMenuItem.Name = "toolsMenuItem";
+            toolsMenuItem.Size = new Size(47, 20);
+            toolsMenuItem.Text = "Tools";
+            // 
+            // toolsPlaceholderViewerMenuItem
+            // 
+            toolsPlaceholderViewerMenuItem.Name = "toolsPlaceholderViewerMenuItem";
+            toolsPlaceholderViewerMenuItem.Size = new Size(173, 22);
+            toolsPlaceholderViewerMenuItem.Text = "Placeholder viewer";
             // 
             // importExportMenuItem
             // 
@@ -102,7 +115,7 @@
             // exportXMLMenuItem
             // 
             exportXMLMenuItem.Name = "exportXMLMenuItem";
-            exportXMLMenuItem.Size = new Size(180, 22);
+            exportXMLMenuItem.Size = new Size(134, 22);
             exportXMLMenuItem.Text = "Export XML";
             // 
             // formTableLayout
@@ -119,25 +132,13 @@
             formTableLayout.Size = new Size(800, 450);
             formTableLayout.TabIndex = 0;
             // 
-            // toolsMenuItem
-            // 
-            toolsMenuItem.DropDownItems.AddRange(new ToolStripItem[] { toolsPlaceholderViewerMenuItem });
-            toolsMenuItem.Name = "toolsMenuItem";
-            toolsMenuItem.Size = new Size(47, 20);
-            toolsMenuItem.Text = "Tools";
-            // 
-            // toolPlaceholderViewerMenuItem
-            // 
-            toolsPlaceholderViewerMenuItem.Name = "toolPlaceholderViewerMenuItem";
-            toolsPlaceholderViewerMenuItem.Size = new Size(180, 22);
-            toolsPlaceholderViewerMenuItem.Text = "Placeholder viewer";
-            // 
             // GenModuleForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
             Controls.Add(formTableLayout);
+            DoubleBuffered = true;
             Name = "GenModuleForm";
             Text = "GenerationProjectForm";
             topMenuStrip.ResumeLayout(false);

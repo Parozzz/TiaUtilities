@@ -410,7 +410,14 @@ namespace TiaUtilities.Generation.IO.Module
 
         public void OpenPlaceholderViewer()
         {
-            new PlaceholderViewerForm(GenPlaceholders.IO.PLACEHOLDER_LIST).Show();
+            var form = this.control.FindForm();
+            if (form == null)
+            {
+                return;
+            }
+
+            var placeholderForm = new PlaceholderViewerForm(GenPlaceholders.IO.PLACEHOLDER_LIST);
+            placeholderForm.Show(form);
         }
 
         public void ExportXML(string folderPath)

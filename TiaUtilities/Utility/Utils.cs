@@ -269,6 +269,18 @@ namespace TiaUtilities.Utility
             };
         }
 
+        public static ToolTip CreateQuickToolTip(bool fading = true)
+        {
+            return new()
+            {
+                InitialDelay = 500,
+                ReshowDelay = 100,
+                AutomaticDelay = 300,
+                UseFading = fading,
+                UseAnimation = false,
+            };
+        }
+
         public static string ToTitleCase(this string source) => ToTitleCase(source, null);
         public static string ToTitleCase(this string source, CultureInfo? culture)
         {
