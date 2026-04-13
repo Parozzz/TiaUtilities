@@ -60,7 +60,7 @@ namespace TiaUtilities.Generation
             #endregion
 
             #region TOP_MENU_TOOLS
-            this.toolsPlaceholderViewerMenuItem.Click += (sender, args) => this.module.OpenPlaceholderViewer();
+            this.toolsPlaceholderViewerMenuItem.Click += (sender, args) => this.module.OpenPlaceholderViewer(this);
             #endregion
 
             #region TOP_MENU_PROGRAM
@@ -156,7 +156,7 @@ namespace TiaUtilities.Generation
                         new SettingsForm(this.module.SettingsBindings).Show(this);
                         return true;
                     case Keys.Q | Keys.Control:
-                        this.module.OpenPlaceholderViewer();
+                        this.module.OpenPlaceholderViewer(this);
                         return true;
                 }
 

@@ -339,7 +339,7 @@ namespace TiaUtilities.Generation.IO.Module
             #endregion
 
             #region SETTINGS_BINDINGS
-            void placeholderRequestEvent(object? sender, EventArgs args) => this.OpenPlaceholderViewer();
+            void placeholderRequestEvent(object? sender, PlaceholderViewRequestEventArgs args) => this.OpenPlaceholderViewer(args.Form);
             this.SettingsBindings.PlaceholderViewerRequestEvent += placeholderRequestEvent;
 
             form.FormClosed += (sender, args) =>
@@ -408,9 +408,9 @@ namespace TiaUtilities.Generation.IO.Module
             return this.control;
         }
 
-        public void OpenPlaceholderViewer()
+        public void OpenPlaceholderViewer(IWin32Window? window = null)
         {
-            var form = this.control.FindForm();
+            var form = window ?? this.control.FindForm();
             if (form == null)
             {
                 return;

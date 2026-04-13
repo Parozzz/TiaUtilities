@@ -1,4 +1,6 @@
-﻿namespace TiaUtilities.Generation.IO.Module
+﻿using TiaUtilities.CustomControls.EditableTab;
+
+namespace TiaUtilities.Generation.IO.Module
 {
     partial class IOGenControl
     {
@@ -32,7 +34,7 @@
             configButtonPanel = new FlowLayoutPanel();
             setupButton = new Button();
             mainSplitContainer = new SplitContainer();
-            tabControl = new TiaUtilities.CustomControls.InteractableTabControl();
+            tabControl = new EditableTabControl();
             mainTableLayout.SuspendLayout();
             configButtonPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)mainSplitContainer).BeginInit();
@@ -134,7 +136,7 @@
 
         private TableLayoutPanel mainTableLayout;
         private SplitContainer mainSplitContainer;
-        public CustomControls.InteractableTabControl tabControl;
+        public EditableTabControl tabControl;
         private FlowLayoutPanel configButtonPanel;
         public Button setupButton;
     }

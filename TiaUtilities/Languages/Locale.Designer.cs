@@ -1141,6 +1141,33 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Close tab.
+        /// </summary>
+        internal static string EDITABLE_TAB_CONTROL_CONTEXT_MENU_CLOSE {
+            get {
+                return ResourceManager.GetString("EDITABLE_TAB_CONTROL_CONTEXT_MENU_CLOSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Edit name.
+        /// </summary>
+        internal static string EDITABLE_TAB_CONTROL_CONTEXT_MENU_EDIT_NAME {
+            get {
+                return ResourceManager.GetString("EDITABLE_TAB_CONTROL_CONTEXT_MENU_EDIT_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Quick edit.
+        /// </summary>
+        internal static string EDITABLE_TAB_CONTROL_CONTEXT_MENU_QUICK_EDIT {
+            get {
+                return ResourceManager.GetString("EDITABLE_TAB_CONTROL_CONTEXT_MENU_QUICK_EDIT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Import/Export.
         /// </summary>
         internal static string GEN_FORM_IMPORT_EXPORT {

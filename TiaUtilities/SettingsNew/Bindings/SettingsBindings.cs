@@ -1,4 +1,5 @@
 ﻿using TiaUtilities.Configuration;
+using TiaUtilities.Generation.SettingsNew;
 using TiaUtilities.SettingsNew.Editors;
 
 namespace TiaUtilities.SettingsNew.Bindings
@@ -8,7 +9,8 @@ namespace TiaUtilities.SettingsNew.Bindings
 
     public delegate void SettingsBindingsReloadEvent(object? sender, EventArgs e);
 
-    public delegate void PlaceholderViewerRequestEvent(object? sender, EventArgs e);
+    public delegate void PlaceholderViewerRequestEvent(object? sender, PlaceholderViewRequestEventArgs e);
+    public record PlaceholderViewRequestEventArgs(SettingsForm Form);
 
     public class SettingsBindings
     {
@@ -106,9 +108,9 @@ namespace TiaUtilities.SettingsNew.Bindings
             this.ReloadEvent.Invoke(this, new());
         }
 
-        public void PlaceholderViewerRequest()
+        public void PlaceholderViewerRequest(SettingsForm form)
         {
-            this.PlaceholderViewerRequestEvent(this, new());
+            this.PlaceholderViewerRequestEvent(this, new(form));
         }
     }
 }

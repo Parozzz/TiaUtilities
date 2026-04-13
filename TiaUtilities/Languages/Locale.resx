@@ -819,4 +819,13 @@ Use $ followed by Excel column name for extracting values from imported spreadsh
   <data name="GENERICS_COPIED" xml:space="preserve">
     <value>Copied</value>
   </data>
+  <data name="EDITABLE_TAB_CONTROL_CONTEXT_MENU_QUICK_EDIT" xml:space="preserve">
+    <value>Quick edit</value>
+  </data>
+  <data name="EDITABLE_TAB_CONTROL_CONTEXT_MENU_CLOSE" xml:space="preserve">
+    <value>Close tab</value>
+  </data>
+  <data name="EDITABLE_TAB_CONTROL_CONTEXT_MENU_EDIT_NAME" xml:space="preserve">
+    <value>Edit name</value>
+  </data>
 </root>

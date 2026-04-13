@@ -1,11 +1,11 @@
 ﻿using System.Collections.ObjectModel;
-using TiaUtilities.CustomControls;
+using TiaUtilities.CustomControls.EditableTab;
 
 namespace TiaUtilities.Generation.Configuration.Lines
 {
     public class ConfigInteractableTabLine : ConfigLine<ConfigInteractableTabLine>
     {
-        private readonly InteractableTabControl tabControl;
+        private readonly EditableTabControl tabControl;
 
         private Action<TabPage>? tabAddedAction;
         private Action<TabPage>? tabRemovedAction;

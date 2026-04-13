@@ -34,9 +34,9 @@ namespace TiaUtilities.Generation
 
         private void Init()
         {
-            Utils.SetDoubleBuffered(this.placeholderListBox);
+            this.Height = this.placeholderListBox.PreferredHeight + this.placeholderListBox.ItemHeight * 3;
+            
             this.placeholderListBox.DoubleClick += (sender, args) => this.CopySelectedItem();
-
             this.placeholderListBox.MouseWheel += (sender, args) =>
             {
                 var index = this.placeholderListBox.SelectedIndex;
@@ -78,6 +78,7 @@ namespace TiaUtilities.Generation
                 if(owner != null)
                 {
                     owner.Focus(); //If not focused, tooltip does not show.
+                    owner.ActiveControl?.Focus();
 
                     var tooltip = Utils.CreateQuickToolTip();
                     tooltip.ShowAlways = true;

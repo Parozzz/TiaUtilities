@@ -1,8 +1,6 @@
-﻿using TiaUtilities.CustomControls;
-
-namespace TiaUtilities.Generation
+﻿namespace TiaUtilities.CustomControls.EditableTab
 {
-    partial class PlaceholderViewerForm
+    partial class EditableTabControlQuickEditForm
     {
         /// <summary>
         /// Required designer variable.
@@ -30,40 +28,45 @@ namespace TiaUtilities.Generation
         /// </summary>
         private void InitializeComponent()
         {
-            placeholderListBox = new NoScrollbarListBox();
+            mainPanel = new TableLayoutPanel();
             SuspendLayout();
             // 
-            // placeholderListBox
+            // mainPanel
             // 
-            placeholderListBox.BorderStyle = BorderStyle.None;
-            placeholderListBox.Dock = DockStyle.Fill;
-            placeholderListBox.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            placeholderListBox.FormattingEnabled = true;
-            placeholderListBox.ItemHeight = 17;
-            placeholderListBox.Location = new Point(0, 0);
-            placeholderListBox.Name = "placeholderListBox";
-            placeholderListBox.ShowScrollbar = false;
-            placeholderListBox.Size = new Size(259, 161);
-            placeholderListBox.TabIndex = 0;
+            mainPanel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            mainPanel.AutoSize = true;
+            mainPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            mainPanel.ColumnCount = 1;
+            mainPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            mainPanel.Location = new Point(0, 0);
+            mainPanel.Name = "mainPanel";
+            mainPanel.RowCount = 1;
+            mainPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            mainPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            mainPanel.Size = new Size(0, 0);
+            mainPanel.TabIndex = 0;
             // 
-            // PlaceholderViewerForm
+            // EditableTabControlQuickEditForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            ClientSize = new Size(259, 161);
-            Controls.Add(placeholderListBox);
+            ClientSize = new Size(800, 450);
+            Controls.Add(mainPanel);
             DoubleBuffered = true;
-            FormBorderStyle = FormBorderStyle.SizableToolWindow;
-            Name = "PlaceholderViewerForm";
+            FormBorderStyle = FormBorderStyle.FixedToolWindow;
+            MaximizeBox = false;
+            MinimizeBox = false;
+            Name = "EditableTabControlQuickEditForm";
+            ShowIcon = false;
             ShowInTaskbar = false;
-            Text = "PlaceholderViewerForm";
             TopMost = true;
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
 
-        private NoScrollbarListBox placeholderListBox;
+        private TableLayoutPanel mainPanel;
     }
 }

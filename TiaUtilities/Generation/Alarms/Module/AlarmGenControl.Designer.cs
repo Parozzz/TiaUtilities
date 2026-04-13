@@ -1,4 +1,4 @@
-﻿using TiaUtilities.CustomControls;
+﻿using TiaUtilities.CustomControls.EditableTab;
 
 namespace TiaUtilities.Generation.Alarms.Module
 {
@@ -34,7 +34,7 @@ namespace TiaUtilities.Generation.Alarms.Module
             configButtonPanel = new FlowLayoutPanel();
             setupButton = new Button();
             changeTemplateButton = new Button();
-            tabControl = new InteractableTabControl();
+            tabControl = new EditableTabControl();
             mainTableLayout.SuspendLayout();
             configButtonPanel.SuspendLayout();
             SuspendLayout();
@@ -129,7 +129,7 @@ namespace TiaUtilities.Generation.Alarms.Module
         #endregion
         private TableLayoutPanel mainTableLayout;
         private FlowLayoutPanel configButtonPanel;
-        public InteractableTabControl tabControl;
+        public EditableTabControl tabControl;
         public Button setupButton;
         public Button changeTemplateButton;
     }

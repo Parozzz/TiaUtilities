@@ -819,4 +819,13 @@ Usa $ seguito dal nome della colonna Excel per estrarre i valori dal foglio di c
   <data name="GENERICS_COPIED" xml:space="preserve">
     <value>Copiato</value>
   </data>
+  <data name="EDITABLE_TAB_CONTROL_CONTEXT_MENU_QUICK_EDIT" xml:space="preserve">
+    <value>Editazione veloce</value>
+  </data>
+  <data name="EDITABLE_TAB_CONTROL_CONTEXT_MENU_CLOSE" xml:space="preserve">
+    <value>Chiudi tab</value>
+  </data>
+  <data name="EDITABLE_TAB_CONTROL_CONTEXT_MENU_EDIT_NAME" xml:space="preserve">
+    <value>Cambio nome</value>
+  </data>
 </root>

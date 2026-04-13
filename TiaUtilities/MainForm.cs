@@ -18,6 +18,7 @@ using TiaUtilities.Generation.IO;
 using TiaUtilities.Generation.IO.Module;
 using TiaUtilities.Generation.SettingsNew;
 using TiaUtilities.Languages;
+using TiaUtilities.Resources;
 using TiaUtilities.SettingsNew.Bindings;
 using TiaUtilities.Utility;
 using Timer = System.Windows.Forms.Timer;
@@ -146,15 +147,15 @@ namespace TiaUtilities
             };
             settingsDirtyTimer.Start();
 
-            this.ioGenButton.BackgroundImage = Image.FromFile("Resources/Images/AliasGenerator.png");
+            this.ioGenButton.BackgroundImage = ImageResources.ALIAS_GENERATOR;
             this.ioGenButton.BackgroundImageLayout = ImageLayout.Zoom;
             this.ioGenButton.Click += (sender, args) => OpenIOGenModuleForm();
 
-            this.alarmGenButton.BackgroundImage = Image.FromFile("Resources/Images/AlarmGenerator.png");
+            this.alarmGenButton.BackgroundImage = ImageResources.ALARM_GENERATOR;
             this.alarmGenButton.BackgroundImageLayout = ImageLayout.Zoom;
             this.alarmGenButton.Click += (sender, args) => OpenAlarmGenModuleForm();
 
-            this.duplicateDBButton.BackgroundImage = Image.FromFile("Resources/Images/DuplicateDB.png");
+            this.duplicateDBButton.BackgroundImage = ImageResources.DUPLICATE_DB;
             this.duplicateDBButton.BackgroundImageLayout = ImageLayout.Zoom;
             this.duplicateDBButton.Click += (sender, args) => new DBDuplicationForm(Settings) { ShowInTaskbar = false }.ShowDialog();
 

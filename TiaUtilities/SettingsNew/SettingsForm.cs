@@ -209,7 +209,7 @@ namespace TiaUtilities.Generation.SettingsNew
                         }
                         break;
                     case Keys.Q | Keys.Control:
-                        this.bindingsControlLoader.Bindings.PlaceholderViewerRequest();
+                        this.bindingsControlLoader.Bindings.PlaceholderViewerRequest(this);
                         return true;
                 }
             }
