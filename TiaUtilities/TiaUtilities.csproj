@@ -94,6 +94,12 @@
     <None Update="Mentions.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\Images\a-to-z-72773.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Images\add-501366-007435.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\Images\AlarmGenerator.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

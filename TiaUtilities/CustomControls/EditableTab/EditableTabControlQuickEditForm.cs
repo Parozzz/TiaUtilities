@@ -56,7 +56,7 @@ namespace TiaUtilities.CustomControls.EditableTab
             this.acceptButton.Click += (sender, args) => CloseWithResult(DialogResult.OK);
 
             LoadTabControl();
-            RedrawMainPanel();
+            DrawMainPanel();
         }
 
         private void LoadTabControl()
@@ -81,7 +81,7 @@ namespace TiaUtilities.CustomControls.EditableTab
         {
             RowDataInfo currentDataInfo = new() { Index = index };
 
-            Font regularFont = new(Font.SystemFontName, 11.5f, FontStyle.Regular);
+            Font regularFont = new(Font.SystemFontName, 12f, FontStyle.Regular);
 
             TextBox nameTextBox = new()
             {
@@ -97,13 +97,15 @@ namespace TiaUtilities.CustomControls.EditableTab
 
             Button dragButton = new()
             {
-                MaximumSize = new(buttonsSize, buttonsSize),
+                Anchor = AnchorStyles.None,
+                MaximumSize = new(buttonsSize*3/4, buttonsSize*3/4),
                 BackColor = this.BackColor,
                 BackgroundImage = ImageResources.DRAG_8187494,
                 BackgroundImageLayout = ImageLayout.Stretch,
                 FlatStyle = FlatStyle.Flat,
-                FlatAppearance = { BorderSize = 1, BorderColor = SystemColors.ActiveBorder },
-                Margin = new Padding(0, 0, 10, 0),
+                FlatAppearance = { BorderSize = 0, MouseOverBackColor = Color.Transparent, MouseDownBackColor = Color.Transparent },
+                Padding = Padding.Empty,
+                Margin = new Padding(0, 0, 3, 0),
                 AllowDrop = true,
                 TabStop = false
             };
@@ -118,8 +120,9 @@ namespace TiaUtilities.CustomControls.EditableTab
                 BackgroundImageLayout = ImageLayout.Stretch,
                 BackColor = this.BackColor,
                 FlatStyle = FlatStyle.Flat,
-                FlatAppearance = { BorderSize = 1, BorderColor = SystemColors.ActiveBorder },
-                Margin = new Padding(0, 0, 10, 0),
+                FlatAppearance = { BorderSize = 0, MouseOverBackColor = Color.Transparent, MouseDownBackColor = Color.Transparent },
+                Padding = Padding.Empty,
+                Margin = new Padding(0, 0, 5, 0),
                 TabStop = false
             };
             closeButton.Click += (sender, args) =>
@@ -185,12 +188,22 @@ namespace TiaUtilities.CustomControls.EditableTab
             firstDataInfo.Index = secondIndex;
             secondDataInfo.Index = firstIndex;
 
-            RowsData.Sort((r1, r2) => Comparer<int>.Default.Compare(r1.Info.Index, r2.Info.Index));
-
-            this.RedrawMainPanel();
+            this.SetControlsCellPosition();
         }
 
-        private void RedrawMainPanel()
+        private void SetControlsCellPosition()
+        {
+            this.mainPanel.SuspendLayout();
+
+            foreach (var rowData in RowsData.OrderBy(rowData => rowData.Info.Index))
+            {
+                this.mainPanel.SetCellPosition(rowData.Panel, new(0, rowData.Info.Index));
+            }
+
+            this.mainPanel.ResumeLayout(true);
+        }
+
+        private void DrawMainPanel()
         {
             this.mainPanel.SuspendLayout();
 

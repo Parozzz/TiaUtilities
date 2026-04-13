@@ -828,4 +828,7 @@ Usa $ seguito dal nome della colonna Excel per estrarre i valori dal foglio di c
   <data name="EDITABLE_TAB_CONTROL_CONTEXT_MENU_EDIT_NAME" xml:space="preserve">
     <value>Cambio nome</value>
   </data>
+  <data name="EDITABLE_TAB_CONTROL_CONTEXT_MENU_ADD_FIVE_TABS" xml:space="preserve">
+    <value>Aggiungi tab (x5)</value>
+  </data>
 </root>

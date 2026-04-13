@@ -828,4 +828,7 @@ Use $ followed by Excel column name for extracting values from imported spreadsh
   <data name="EDITABLE_TAB_CONTROL_CONTEXT_MENU_EDIT_NAME" xml:space="preserve">
     <value>Edit name</value>
   </data>
+  <data name="EDITABLE_TAB_CONTROL_CONTEXT_MENU_ADD_FIVE_TABS" xml:space="preserve">
+    <value>Add tabs (x5)</value>
+  </data>
 </root>

@@ -51,10 +51,11 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(799, 450);
             Controls.Add(mainPanel);
             DoubleBuffered = true;
             FormBorderStyle = FormBorderStyle.FixedToolWindow;
+            Margin = new Padding(4, 2, 4, 2);
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "EditableTabControlQuickEditForm";

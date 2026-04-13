@@ -1,11 +1,10 @@
-﻿
-using DocumentFormat.OpenXml.Drawing.Charts;
-using DocumentFormat.OpenXml.Office2010.CustomUI;
-using InfoBox;
+﻿using InfoBox;
+using System.Diagnostics;
+using System.Diagnostics.Contracts;
+using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 using TiaUtilities.Languages;
 using TiaUtilities.Resources;
-using static TiaUtilities.CustomControls.EditableTab.EditableTabControlQuickEditForm;
 
 namespace TiaUtilities.CustomControls.EditableTab
 {
@@ -39,6 +38,9 @@ namespace TiaUtilities.CustomControls.EditableTab
         private static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wp, IntPtr lp);
         private const int TCM_SETMINTABWIDTH = 0x1300 + 49;
 
+        private const int SELECTED_TAB_RECT_SIDE_PADDING = 4;
+        private const int SELECTED_TAB_RECT_HEIGHT = 2;
+
         public event EditableTabPreRemovedEventHandler TabPreRemoved = delegate { };
         public event EditableTabPreAddEventHandler TabPreAdded = delegate { };
         public event EditableTabNameChangedEventHandler TabNameUserChanged = delegate { };
@@ -59,8 +61,10 @@ namespace TiaUtilities.CustomControls.EditableTab
 
         public EditableTabControl() : base()
         {
+
             this.DrawMode = TabDrawMode.OwnerDrawFixed;
             this.Padding = new Point(12, 5);
+            this.AllowDrop = true;
 
             //This allows tab to be small 
             this.HandleCreated += (sender, args) => SendMessage(this.Handle, TCM_SETMINTABWIDTH, IntPtr.Zero, (IntPtr)16);
@@ -86,11 +90,44 @@ namespace TiaUtilities.CustomControls.EditableTab
             };
         }
 
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            //base.OnPaint(e);
+        }
+
+        protected override void OnPaintBackground(PaintEventArgs pevent)
+        {
+            //base.OnPaintBackground(pevent);
+        }
+
         protected override void OnDrawItem(DrawItemEventArgs e)
         {
             var tabPage = this.TabPages[e.Index];
             var isNewTagPage = tabPage is EditableNewTabPage;
+            var isSelected = this.SelectedTab == tabPage;
 
+            var coloredForeColor = Color.White;
+            var baseForeColor = tabPage.ForeColor; ;
+            var coloredBackColor = Color.Blue;
+            var baseBackColor = tabPage.BackColor;
+            /*
+            if (!isNewTagPage)
+            {
+                using Brush backBrush = new SolidBrush(isSelected ? coloredBackColor : baseBackColor);
+
+                var bounds = e.Bounds;
+                bounds.Offset(0, 1);
+                bounds.Inflate(0, 0);
+                e.Graphics.FillRectangle(backBrush, bounds);
+            }
+
+            using Pen displayRectPen = new(coloredBackColor, 3f);
+
+            var displayRect = this.DisplayRectangle;
+            displayRect.Offset(-1, 0);
+            displayRect.Inflate(3, 2);
+            e.Graphics.DrawRectangle(displayRectPen, displayRect);
+            */
             var tabRect = GetTabRect(e.Index);
             tabRect.Width += this.Padding.X;
             tabRect.Height = this.Padding.Y;
@@ -105,63 +142,183 @@ namespace TiaUtilities.CustomControls.EditableTab
 
             string title = tabPage.Text;
             var font = tabPage.Font;
-            if (!isNewTagPage)
+            if (isNewTagPage)
             {
-                e.Graphics.DrawString(title, font, textBrush, new PointF(textRect.X + 9, textRect.Y + textRect.Height / 2));
-
-                if (this.SelectedTab == tabPage)
-                {
-                    var ellipseRect = this.GetTabRect(e.Index);
-                    ellipseRect.Offset(2, 2);
-                    ellipseRect.Width = 7;
-                    ellipseRect.Height = 7;
-
-                    e.Graphics.FillEllipse(Brushes.DarkSeaGreen, ellipseRect);
-
-                    using var activePageEllipseBorderPen = new Pen(Brushes.Gray, 1f);
-                    e.Graphics.DrawEllipse(activePageEllipseBorderPen, ellipseRect);
-                }
+                Point textPositionPoint = new(textRect.X + this.Padding.X / 2 + 2, textRect.Y);
+                TextRenderer.DrawText(e.Graphics, title, font, textPositionPoint, baseForeColor, baseBackColor, TextFormatFlags.WordEllipsis);
             }
             else
             {
-                e.Graphics.DrawString(title, font, textBrush, new PointF(textRect.X + this.Padding.X / 2 + 2, textRect.Y));
+                int selectedTabOffset = 0;
+                if (isSelected)
+                {//Draw little green sphere to indicate selected tab
+                    var selectedRect = this.GetTabRect(e.Index);
+                    selectedRect.Offset(SELECTED_TAB_RECT_SIDE_PADDING, selectedRect.Height - (SELECTED_TAB_RECT_HEIGHT + 1));
+                    selectedRect.Width -= SELECTED_TAB_RECT_SIDE_PADDING * 2;
+                    selectedRect.Height = SELECTED_TAB_RECT_HEIGHT;
+
+                    e.Graphics.FillRectangle(Brushes.DarkGray, selectedRect);
+
+                    selectedTabOffset = SELECTED_TAB_RECT_HEIGHT;
+                }
+
+                Point textPositionPoint = new(textRect.X + 9, textRect.Y + textRect.Height / 2 - selectedTabOffset);
+                TextRenderer.DrawText(e.Graphics, title, font, textPositionPoint, baseForeColor, baseBackColor, TextFormatFlags.WordEllipsis);
+
+                /*
+                    TextRenderer.DrawText(e.Graphics, title, font, textPositionPoint, 
+                    isSelected ? coloredForeColor : baseForeColor,
+                    isSelected ? coloredBackColor : baseBackColor, 
+                    TextFormatFlags.WordEllipsis);
+                 */
+
             }
         }
 
-        protected override void OnMouseDown(MouseEventArgs e)
+        private Point? dragMouseDownPoint;
+        protected override void OnMouseDown(MouseEventArgs args)
         {
-            var index = GetLocationTabRectIndex(e.Location);
+            base.OnMouseDown(args);
+
+            var index = GetLocationTabRectIndex(args.Location);
             if (index == -1)
             {
                 return;
             }
 
             var tabPage = this.TabPages[index];
-            this.SelectedTab = tabPage;
-
             if (tabPage is EditableNewTabPage)
             {
-                AddTab();
+                this.AddTab();
+                return;
             }
 
-            if (e.Button == MouseButtons.Right)
+            if (args.Button == MouseButtons.Left)
             {
+                dragMouseDownPoint = new(args.X, args.Y);
+            }
+            else if (args.Button == MouseButtons.Right)
+            {
+                this.SelectedTab = tabPage;
                 this.HandleContextMenu(tabPage, index);
             }
         }
 
-        protected override void OnMouseDoubleClick(MouseEventArgs e)
+        protected override void OnMouseUp(MouseEventArgs args)
         {
-            var index = GetLocationTabRectIndex(e.Location);
+            base.OnMouseUp(args);
+            this.dragMouseDownPoint = null;
+        }
+
+        protected override void OnMouseDoubleClick(MouseEventArgs args)
+        {
+            base.OnMouseDoubleClick(args);
+
+            var index = GetLocationTabRectIndex(args.Location);
             if (index == -1)
             {
                 return;
             }
 
             var tabPage = this.TabPages[index];
-            this.SelectedTab = tabPage;
+            if (tabPage is EditableNewTabPage)
+            {
+                this.AddTab();
+                return;
+            }
 
+            this.SelectedTab = tabPage;
             this.HandleContextMenu(tabPage, index);
+        }
+
+        protected override void OnMouseMove(MouseEventArgs args)
+        {
+            base.OnMouseMove(args);
+
+            var index = this.GetLocationTabRectIndex(args.Location);
+            if (index == -1)
+            {
+                return;
+            }
+
+            var tabPage = this.TabPages[index];
+            if (tabPage is EditableNewTabPage)
+            {
+                return;
+            }
+
+            if (!this.dragMouseDownPoint.HasValue || Math.Abs(this.dragMouseDownPoint.Value.X - args.X) < 5)
+            {
+                return;
+            }
+
+            if (args.Button == MouseButtons.Left)
+            {
+                this.DoDragDrop(tabPage, DragDropEffects.Move, null, Point.Empty, true);
+            }
+        }
+
+        protected override void OnDragOver(DragEventArgs args)
+        {
+            base.OnDragOver(args);
+
+            var data = args.Data;
+            if (data == null || this.TabCount == 0)
+            {
+                args.Effect = DragDropEffects.None;
+                return;
+            }
+            args.Message = "Test Message?";
+            args.MessageReplacementToken = "WOW!";
+
+            var tabRectIndex = this.GetMousePointTabRectIndex(args.X, args.Y);
+            args.Effect = tabRectIndex == -1 || tabRectIndex >= this.TabCount ? DragDropEffects.None : DragDropEffects.Move;
+        }
+
+        protected override void OnDragEnter(DragEventArgs args)
+        {
+            base.OnDragEnter(args);
+        }
+
+        protected override void OnDragDrop(DragEventArgs args)
+        {
+            base.OnDragDrop(args);
+
+            var tabRectIndex = this.GetMousePointTabRectIndex(args.X, args.Y);
+            if (tabRectIndex == -1)
+            {
+                return;
+            }
+
+            var droppedTabPage = this.TabPages[tabRectIndex];
+
+            var dataObj = args.Data?.GetData(typeof(EditableNormalTabPage));
+            if (dataObj is TabPage draggedTabPage && draggedTabPage != droppedTabPage)
+            {
+                this.SuspendLayout();
+
+                int draggedIndex = this.TabPages.IndexOf(draggedTabPage);
+                int droppedIndex = this.TabPages.IndexOf(droppedTabPage);
+
+                if (draggedIndex >= 0 && draggedIndex < this.TabCount &&
+                    droppedIndex >= 0 && droppedIndex < this.TabCount &&
+                    draggedIndex != droppedIndex)
+                {
+                    var oldSelectedTab = this.SelectedTab;
+
+                    (this.TabPages[droppedIndex], this.TabPages[draggedIndex]) = (this.TabPages[draggedIndex], this.TabPages[droppedIndex]);
+
+                    this.SelectedTab = oldSelectedTab;
+                }
+
+                this.ResumeLayout(true);
+            }
+        }
+
+        private int GetMousePointTabRectIndex(int x, int y)
+        {
+            Point mousePoint = new(x, y);
+            return GetLocationTabRectIndex(this.PointToClient(mousePoint));
         }
 
         private int GetLocationTabRectIndex(Point p)
@@ -178,13 +335,85 @@ namespace TiaUtilities.CustomControls.EditableTab
             return -1;
         }
 
+        private const string IMAGE_QUICK_EDIT_KEY = "QuickEdit";
+        private const string IMAGE_ADD_KEY = "Add";
+        private const string IMAGE_EDIT_NAME_KEY = "EditName";
+        private const string IMAGE_CLOSE_KEY = "Close";
+
         private void HandleContextMenu(TabPage tabPage, int index)
         {
+            ImageList imageList = new();
+            imageList.Images.Add(IMAGE_QUICK_EDIT_KEY, ImageResources.EDIT_562275);
+            imageList.Images.Add(IMAGE_ADD_KEY, ImageResources.ADD_501366_007435);
+            imageList.Images.Add(IMAGE_EDIT_NAME_KEY, ImageResources.A_TO_Z_72773);
+            imageList.Images.Add(IMAGE_CLOSE_KEY, ImageResources.CLOSE_193002_FF001C);
+
             var contextMenu = new ContextMenuStrip()
             {
-                MinimumSize = new(300, 0)
+                MinimumSize = new(300, 0),
+                ImageList = imageList,
             };
             contextMenu.KeyDown += (sender, args) => this.CloseContextMenuOnKeyPress(contextMenu, args);
+
+            ToolStripMenuItem quickEditItem = new()
+            {
+                Text = Locale.EDITABLE_TAB_CONTROL_CONTEXT_MENU_QUICK_EDIT,
+                ImageKey = IMAGE_QUICK_EDIT_KEY,
+            };
+            quickEditItem.Click += (sender, args) =>
+            {
+                var quickEditForm = new EditableTabControlQuickEditForm(this);
+                var result = quickEditForm.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    var oldSelectedTab = this.SelectedTab;
+
+                    foreach (var rowData in quickEditForm.RowsData)
+                    {
+                        var loopTabPage = rowData.TabPage;
+                        this.RenameTab(loopTabPage, rowData.NameTextBox.Text);
+
+                        if (rowData.Info.NeedsDeletition)
+                        {
+                            rowData.Info.NeedsDeletition = this.CloseTab(loopTabPage);
+                        }
+                    }
+
+                    var pages = quickEditForm.RowsData
+                                    .OrderBy(rd => rd.Info.Index)
+                                    .Where(rd => !rd.Info.NeedsDeletition)
+                                    .Select(rd => rd.TabPage)
+                                    .ToArray();
+
+                    this.TabPages.Clear();
+                    this.TabPages.AddRange(pages);
+
+                    if (oldSelectedTab != null && oldSelectedTab.Parent != null)
+                    {
+                        this.SelectedTab = oldSelectedTab;
+                    }
+                }
+            };
+
+            ToolStripMenuItem addNewItem = new()
+            {
+                Text = Locale.EDITABLE_TAB_CONTROL_CONTEXT_MENU_ADD_FIVE_TABS,
+                ImageKey = IMAGE_ADD_KEY
+            };
+            addNewItem.Click += (sender, args) =>
+            {
+                for (int x = 0; x < 5; x++)
+                {
+                    this.AddTab();
+                }
+            };
+
+            ToolStripMenuItem closeItem = new()
+            {
+                Text = Locale.EDITABLE_TAB_CONTROL_CONTEXT_MENU_CLOSE,
+                ImageKey = IMAGE_CLOSE_KEY,
+            };
+            closeItem.Click += (sender, args) => this.CloseTab(tabPage);
 
             Label editNameLabel = new()
             {
@@ -219,64 +448,25 @@ namespace TiaUtilities.CustomControls.EditableTab
                 Padding = new(0),
             };
 
-            ToolStripMenuItem closeItem = new()
+            ToolStripControlHost editNameHost = new(panel)
             {
-                Text = Locale.EDITABLE_TAB_CONTROL_CONTEXT_MENU_CLOSE,
-                Image = ImageResources.CLOSE_193002_FF001C,
-            };
-            closeItem.Click += (sender, args) => this.CloseTab(tabPage);
-
-            ToolStripMenuItem quickEditItem = new()
-            {
-                Text = Locale.EDITABLE_TAB_CONTROL_CONTEXT_MENU_QUICK_EDIT,
-                Image = ImageResources.EDIT_562275,
-            };
-            quickEditItem.Click += (sender, args) => 
-            {
-                var quickEditForm = new EditableTabControlQuickEditForm(this);
-                var result = quickEditForm.ShowDialog(this); 
-                if(result == DialogResult.OK)
-                {
-                    var oldSelectedTab = this.SelectedTab;
-
-                    foreach(var rowData in quickEditForm.RowsData)
-                    {
-                        var loopTabPage = rowData.TabPage;
-                        this.RenameTab(loopTabPage, rowData.NameTextBox.Text);
-
-                        if (rowData.Info.NeedsDeletition)
-                        {
-                            rowData.Info.NeedsDeletition = this.CloseTab(loopTabPage);
-                        }
-                    }
-
-                    var pages = quickEditForm.RowsData
-                                    .OrderBy(rd => rd.Info.Index)
-                                    .Where(rd => !rd.Info.NeedsDeletition)
-                                    .Select(rd => rd.TabPage)
-                                    .ToArray();
-
-                    this.TabPages.Clear();
-                    this.TabPages.AddRange(pages);
-
-                    if(oldSelectedTab != null && oldSelectedTab.Parent != null)
-                    {
-                        this.SelectedTab = oldSelectedTab;
-                    }
-                }
+                BackColor = Color.Transparent,
+                ImageKey = IMAGE_EDIT_NAME_KEY, //Seems to not work :(
             };
 
-            contextMenu.Items.Add(quickEditItem);
-            contextMenu.Items.Add(new ToolStripSeparator() { Margin = new(0), Padding = new(0) });
-            contextMenu.Items.Add(new ToolStripControlHost(panel) { BackColor = Color.Transparent });
+
+            contextMenu.Items.Add(editNameHost);
             contextMenu.Items.Add(closeItem);
-
-            contextMenu.Show(Cursor.Position);
+            contextMenu.Items.Add(new ToolStripSeparator() { Margin = new(0), Padding = new(0) });
+            contextMenu.Items.Add(quickEditItem);
+            contextMenu.Items.Add(addNewItem);
 
             contextMenu.Closed += (sender, args) =>
             {
                 RenameTab(tabPage, editNameTextBox.Text);
             };
+
+            contextMenu.Show(Cursor.Position);
         }
 
         private void CloseContextMenuOnKeyPress(ContextMenuStrip contextMenu, KeyEventArgs args)
@@ -295,7 +485,7 @@ namespace TiaUtilities.CustomControls.EditableTab
 
         public void AddTab()
         {
-            var addedTabPage = new TabPage();
+            var addedTabPage = new EditableNormalTabPage();
 
             var eventArgs = new EditableTabPreAddEventArgs(addedTabPage);
             TabPreAdded(this, eventArgs);
@@ -330,7 +520,7 @@ namespace TiaUtilities.CustomControls.EditableTab
             }
 
             bool canceldHalted = true;
-            if (useGlobalConfirmBeforeClosing &&  this.RequireConfirmationBeforeClosing)
+            if (useGlobalConfirmBeforeClosing && this.RequireConfirmationBeforeClosing)
             {
                 var result = InformationBox.Show($"Are you sure you want to close {tabPage.Text}?", buttons: InformationBoxButtons.YesNo);
                 if (result == InformationBoxResult.Yes)
@@ -339,13 +529,13 @@ namespace TiaUtilities.CustomControls.EditableTab
                 }
             }
 
-            if(canceldHalted)
+            if (canceldHalted)
             {
                 return false;
             }
 
             var index = this.TabPages.IndexOf(tabPage);
-            if(index < 0)
+            if (index < 0)
             {
                 return false;
             }
@@ -362,10 +552,26 @@ namespace TiaUtilities.CustomControls.EditableTab
         }
     }
 
+    public class EditableNormalTabPage : TabPage
+    {
+        public EditableNormalTabPage()
+        {
+            this.DoubleBuffered = true;
+            this.BorderStyle = BorderStyle.None;
+
+            this.Padding = this.Margin = Padding.Empty;
+        }
+        protected override void OnPaint(PaintEventArgs e) { }
+
+        protected override void OnPaintBackground(PaintEventArgs e) { }
+    }
+
     public class EditableNewTabPage : TabPage
     {
         public EditableNewTabPage() : base()
         {
+            this.DoubleBuffered = true;
+
             this.Text = "+";
             this.Width = 5;
 
@@ -382,7 +588,22 @@ namespace TiaUtilities.CustomControls.EditableTab
     }
 }
 
+
 /*
+if (this.SelectedTab == tabPage)
+{//Draw little green sphere to indicate selected tab
+    var ellipseRect = this.GetTabRect(e.Index);
+    ellipseRect.Offset(2, 2);
+    ellipseRect.Width = 7;
+    ellipseRect.Height = 7;
+
+    e.Graphics.FillEllipse(Brushes.DarkSeaGreen, ellipseRect);
+
+    using var activePageEllipseBorderPen = new Pen(Brushes.Gray, 1f);
+    e.Graphics.DrawEllipse(activePageEllipseBorderPen, ellipseRect);
+
+
+}
 protected override void OnMouseDoubleClick(MouseEventArgs e)
 {
     var index = GetLocationTabRectIndex(e.Location);

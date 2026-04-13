@@ -108,6 +108,8 @@ namespace TiaUtilities.Generation.GridHandler
             this.DataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
             this.DataGridView.AllowUserToResizeRows = false;
 
+            this.DataGridView.BorderStyle = BorderStyle.None;
+
             this.DataGridView.ClipboardCopyMode = DataGridViewClipboardCopyMode.Disable; //Do it myself!
             this.DataGridView.SelectionMode = DataGridViewSelectionMode.CellSelect;
             this.DataGridView.MultiSelect = true;
