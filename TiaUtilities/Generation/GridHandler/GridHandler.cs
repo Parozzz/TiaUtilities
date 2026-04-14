@@ -107,6 +107,7 @@ namespace TiaUtilities.Generation.GridHandler
             this.DataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None; //Is faster?
             this.DataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
             this.DataGridView.AllowUserToResizeRows = false;
+            this.DataGridView.Margin = Padding.Empty;
 
             this.DataGridView.BorderStyle = BorderStyle.None;
 

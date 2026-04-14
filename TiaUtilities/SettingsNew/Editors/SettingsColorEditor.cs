@@ -54,7 +54,7 @@ namespace TiaUtilities.SettingsNew.Editors
                 Font = SettingsFormConstants.VALUE_CONTROL_FONT,
                 BackColor = Form.DefaultBackColor,
             };
-            Utils.SetDoubleBuffered(this.colorHexaTextBox);
+            ControlUtils.SetDoubleBuffered(this.colorHexaTextBox);
             this.colorHexaTextBox.TextChanged += ColorTextBoxTextChangedEvent;
 
             this.colorPickerButton = new Button()
@@ -68,7 +68,7 @@ namespace TiaUtilities.SettingsNew.Editors
                 Margin = new Padding(2),
                 FlatStyle = FlatStyle.Flat
             };
-            Utils.SetDoubleBuffered(this.colorPickerButton);
+            ControlUtils.SetDoubleBuffered(this.colorPickerButton);
             this.colorPickerButton.FlatAppearance.BorderColor = Color.Black;
             this.colorPickerButton.FlatAppearance.BorderSize = 1;
 
@@ -138,7 +138,7 @@ namespace TiaUtilities.SettingsNew.Editors
                     new(SizeType.AutoSize)
                 },
             };
-            Utils.SetDoubleBuffered(panel);
+            ControlUtils.SetDoubleBuffered(panel);
 
             panel.Controls.Add(this.colorHexaTextBox, 0, 0);
             //panel.Controls.Add(this.colorNameComboBox, 1, 0);

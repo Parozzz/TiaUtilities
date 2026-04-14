@@ -1141,15 +1141,6 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Add tabs (x5).
-        /// </summary>
-        internal static string EDITABLE_TAB_CONTROL_CONTEXT_MENU_ADD_FIVE_TABS {
-            get {
-                return ResourceManager.GetString("EDITABLE_TAB_CONTROL_CONTEXT_MENU_ADD_FIVE_TABS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Cerca una stringa localizzata simile a Close tab.
         /// </summary>
         internal static string EDITABLE_TAB_CONTROL_CONTEXT_MENU_CLOSE {
@@ -1168,11 +1159,29 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Insert tabs (x{c}).
+        /// </summary>
+        internal static string EDITABLE_TAB_CONTROL_CONTEXT_MENU_INSERT_TABS {
+            get {
+                return ResourceManager.GetString("EDITABLE_TAB_CONTROL_CONTEXT_MENU_INSERT_TABS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Quick edit.
         /// </summary>
         internal static string EDITABLE_TAB_CONTROL_CONTEXT_MENU_QUICK_EDIT {
             get {
                 return ResourceManager.GetString("EDITABLE_TAB_CONTROL_CONTEXT_MENU_QUICK_EDIT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Are you sure you want to close {t}?.
+        /// </summary>
+        internal static string EDITABLE_TAB_CONTROL_DELETE_CONFIRM {
+            get {
+                return ResourceManager.GetString("EDITABLE_TAB_CONTROL_DELETE_CONFIRM", resourceCulture);
             }
         }
         

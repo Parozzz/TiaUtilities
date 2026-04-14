@@ -32,11 +32,11 @@ namespace TiaUtilities.SettingsNew.Editors
                     this.textBox.TextChanged += (sender, args) => this.SaveToConfiguration();
                     break;
                 case SettingsEditorTypeEnum.INT:
-                    this.textBox.KeyPress += Utils.SignedKeyPressEventHandler;
+                    this.textBox.KeyPress += ControlUtils.SignedKeyPressEventHandler;
                     this.textBox.TextChanged += (sender, args) => this.SaveToConfiguration();
                     break;
                 case SettingsEditorTypeEnum.UINT:
-                    this.textBox.KeyPress += Utils.UnsignedKeyPressEventHandler;
+                    this.textBox.KeyPress += ControlUtils.UnsignedKeyPressEventHandler;
                     this.textBox.TextChanged += (sender, args) => this.SaveToConfiguration();
                     break;
             }

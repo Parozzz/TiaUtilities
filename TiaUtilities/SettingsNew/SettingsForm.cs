@@ -21,13 +21,13 @@ namespace TiaUtilities.Generation.SettingsNew
             InitializeComponent();
 
             this.mainPanel = new();
-            Utils.SetDoubleBuffered(this.mainPanel);
+            ControlUtils.SetDoubleBuffered(this.mainPanel);
 
             this.leftSectionListView = new();
-            Utils.SetDoubleBuffered(this.leftSectionListView);
+            ControlUtils.SetDoubleBuffered(this.leftSectionListView);
 
             this.rightSettingsPanel = new();
-            Utils.SetDoubleBuffered(this.rightSettingsPanel);
+            ControlUtils.SetDoubleBuffered(this.rightSettingsPanel);
 
             this.bindingsControlLoader = new(bindings, this);
 
@@ -121,7 +121,7 @@ namespace TiaUtilities.Generation.SettingsNew
                 AutoScrollMinSize = new Size(100, 100),
                 Controls = { rightPanel }
             };
-            Utils.SetDoubleBuffered(scrollableControl);
+            ControlUtils.SetDoubleBuffered(scrollableControl);
 
             scrollableControl.Scroll += (sender, args) => UpdateSectionVisiblePercentage(scrollableControl, args.NewValue);
             scrollableControl.MouseWheel += (sender, args) => UpdateSectionVisiblePercentage(scrollableControl);

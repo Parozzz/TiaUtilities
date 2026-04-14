@@ -12,7 +12,7 @@ namespace TiaUtilities.SettingsNew
         public class DotInfo
         {
             public required Color Color { get; init; }
-            public ToolTip ToolTip { get; init; } = Utils.CreateStandardToolTip();
+            public ToolTip ToolTip { get; init; } = ControlUtils.CreateStandardToolTip();
             public required string ToolTipText { get; init; }
 
             public Rectangle rect = Rectangle.Empty;

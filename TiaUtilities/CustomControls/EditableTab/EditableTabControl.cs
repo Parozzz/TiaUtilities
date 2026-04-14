@@ -1,8 +1,12 @@
 ﻿using InfoBox;
 using MS.WindowsAPICodePack.Internal;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using TiaUtilities.Languages;
 using TiaUtilities.Resources;
+using TiaUtilities.Styles;
+using TiaUtilities.Utility;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace TiaUtilities.CustomControls.EditableTab
 {
@@ -59,11 +63,13 @@ namespace TiaUtilities.CustomControls.EditableTab
 
         public EditableTabControl() : base()
         {
-            this.DrawMode = TabDrawMode.OwnerDrawFixed;
-            this.Padding = new Point(12, 5);
-            this.AllowDrop = true;
+            SetStyle(ControlStyles.UserPaint, true); //This is needed for the backgroundPaint event to be called!
 
-            this.BackColor = Color.Yellow;
+            this.DrawMode = TabDrawMode.OwnerDrawFixed;
+            this.DoubleBuffered = true;
+            this.Padding = new(12, 5);
+            this.Font = new Font(Font.SystemFontName, 9f, FontStyle.Italic);
+            this.AllowDrop = true;
 
             //This allows tab to be small 
             this.HandleCreated += (sender, args) => SendMessage(this.Handle, TCM_SETMINTABWIDTH, IntPtr.Zero, (IntPtr)16);
@@ -89,141 +95,103 @@ namespace TiaUtilities.CustomControls.EditableTab
             };
         }
 
-        protected override void OnHandleCreated(EventArgs e)
+        protected override void OnPaint(PaintEventArgs e) { }
+
+        protected override void OnPaintBackground(PaintEventArgs e)
         {
-            base.OnHandleCreated(e);
+            Rectangle clientRect = this.ClientRectangle;
+
+            //Painting Background
+            using Brush backBrush = new SolidBrush(SystemColors.Control);
+            e.Graphics.FillRectangle(backBrush, clientRect);
+
+            for (int i = 0; i < this.TabPages.Count; i++)
+            {
+                this.DrawCustomItem(e.Graphics, i);
+            }
         }
+
+        private void DrawCustomItem(Graphics g, int index)
+        {
+            var selectedForeColor = StyleManager.EditableTabControl.SELECTED_TAB_FORE_COLOR;
+            var selectedBackColor = StyleManager.EditableTabControl.SELECTED_TAB_BACK_COLOR;
+
+            var baseForeColor = StyleManager.EditableTabControl.TAB_FORE_COLOR;
+            var baseBackColor = StyleManager.EditableTabControl.TAB_BACK_COLOR;
+
+
+            var tabPage = this.TabPages[index];
+            var isNewTagPage = tabPage is EditableNewTabPage;
+            var isSelected = this.SelectedTab == tabPage;
+
+            var tabRect = this.GetTabRect(index);
+
+            //Draw background
+            if (!isNewTagPage)
+            {
+                using Brush backBrush = new SolidBrush(isSelected ? selectedBackColor : baseBackColor);
+                g.FillRectangle(backBrush, tabRect);
+            }
+
+            using Pen displayRectPen = new(selectedBackColor, 3f);
+
+            var borderRect = this.DisplayRectangle;
+            borderRect.Offset(-1, 0);
+            borderRect.Inflate(3, 2);
+            g.DrawRectangle(displayRectPen, borderRect);
+
+            if (isNewTagPage)
+            {
+                var textRect = tabRect;
+                textRect.Offset(0, -1);
+                TextRenderer.DrawText(g, 
+                    tabPage.Text,
+                    tabPage.Font,
+                    textRect,
+                    StyleManager.EditableTabControl.ADD_TAB_FORE_COLOR,
+                    Color.Transparent,
+                    TextFormatFlags.Top);
+            }
+            else
+            {
+                int textHeightOffset = -2;
+
+                //Draw selected tab bottom line
+                if (isSelected)
+                {
+                    var selectedRect = tabRect;
+                    selectedRect.Offset(SELECTED_TAB_RECT_SIDE_PADDING, selectedRect.Height - (SELECTED_TAB_RECT_HEIGHT + 1));
+                    selectedRect.Width -= SELECTED_TAB_RECT_SIDE_PADDING * 2;
+                    selectedRect.Height = SELECTED_TAB_RECT_HEIGHT;
+
+                    using Brush bottomRectBrush = new SolidBrush(StyleManager.EditableTabControl.SELECTED_TAB_BOTTOM_LINE_COLOR);
+                    g.FillRectangle(bottomRectBrush, selectedRect);
+
+                    textHeightOffset += SELECTED_TAB_RECT_HEIGHT;
+                }
+
+                var textRect = tabRect;
+                textRect.Offset(0, 3);
+                TextRenderer.DrawText(g,
+                    tabPage.Text,
+                    tabPage.Font,
+                    textRect,
+                    isSelected ? selectedForeColor : baseForeColor,
+                    Color.Transparent,
+                    TextFormatFlags.TextBoxControl | TextFormatFlags.WordEllipsis | TextFormatFlags.HorizontalCenter);
+            }
+        }
+
+        protected override void OnDrawItem(DrawItemEventArgs e) { }
 
         protected override void WndProc(ref Message m)
         {
             base.WndProc(ref m);
 
-            //Calling it AFTER the base.WndProc i am ovewriting the default painting!
-            if (m.Msg == 0xF) //WM_PAINT
+            var horizontalScroll = ControlUtils.WncProcHorizontalScrollWheel(m);
+            if (horizontalScroll != 0)
             {
-                using Graphics g = this.CreateGraphics();
-                //Double buffering stuff...
-                BufferedGraphicsContext currentContext;
-                BufferedGraphics myBuffer;
-                currentContext = BufferedGraphicsManager.Current;
-                myBuffer = currentContext.Allocate(g,
-                   this.ClientRectangle);
-
-                Rectangle r = ClientRectangle;
-
-                //Painting background
-                if (Enabled)
-                    myBuffer.Graphics.FillRectangle(new SolidBrush(Color.Yellow), r);
-                else
-                    myBuffer.Graphics.FillRectangle(Brushes.LightGray, r);
-
-                //Painting border
-                r.Height = this.DisplayRectangle.Height + 1; //Using display rectangle hight because it excludes the tab headers already
-                r.Y = this.DisplayRectangle.Y - 1; //Same for Y coordinate
-                r.Width -= 5;
-                r.X += 1;
-
-                if (Enabled)
-                    myBuffer.Graphics.DrawRectangle(new Pen(Color.FromArgb(255, 133, 158, 191), 1), r);
-                else
-                    myBuffer.Graphics.DrawRectangle(Pens.DarkGray, r);
-
-                myBuffer.Render();
-                myBuffer.Dispose();
-
-
-                //Actual painting of items after Background was painted
-                /*
-                foreach (int index in ItemArgs.Keys)
-                {
-                    CustomDrawItem(ItemArgs[index]);
-                }
-                */
-            }
-        }
-
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            //base.OnPaint(e);
-        }
-
-        protected override void OnPaintBackground(PaintEventArgs pevent)
-        {
-            //base.OnPaintBackground(pevent);
-        }
-
-        protected override void OnDrawItem(DrawItemEventArgs e)
-        {
-            var tabPage = this.TabPages[e.Index];
-            var isNewTagPage = tabPage is EditableNewTabPage;
-            var isSelected = this.SelectedTab == tabPage;
-
-            var coloredForeColor = Color.White;
-            var baseForeColor = tabPage.ForeColor; ;
-            var coloredBackColor = Color.Blue;
-            var baseBackColor = tabPage.BackColor;
-            /*
-            if (!isNewTagPage)
-            {
-                using Brush backBrush = new SolidBrush(isSelected ? coloredBackColor : baseBackColor);
-
-                var bounds = e.Bounds;
-                bounds.Offset(0, 1);
-                bounds.Inflate(0, 0);
-                e.Graphics.FillRectangle(backBrush, bounds);
-            }
-
-            using Pen displayRectPen = new(coloredBackColor, 3f);
-
-            var displayRect = this.DisplayRectangle;
-            displayRect.Offset(-1, 0);
-            displayRect.Inflate(3, 2);
-            e.Graphics.DrawRectangle(displayRectPen, displayRect);
-            */
-            var tabRect = GetTabRect(e.Index);
-            tabRect.Width += this.Padding.X;
-            tabRect.Height = this.Padding.Y;
-
-            var textRect = new Rectangle(tabRect.Location, tabRect.Size);
-            if (!isNewTagPage)
-            { //The cross to close is not drawn, so no need to offset!
-                textRect.Offset(4, 2);
-            }
-
-            using var textBrush = new SolidBrush(tabPage.ForeColor);
-
-            string title = tabPage.Text;
-            var font = tabPage.Font;
-            if (isNewTagPage)
-            {
-                Point textPositionPoint = new(textRect.X + this.Padding.X / 2 + 2, textRect.Y);
-                TextRenderer.DrawText(e.Graphics, title, font, textPositionPoint, baseForeColor, baseBackColor, TextFormatFlags.WordEllipsis);
-            }
-            else
-            {
-                int selectedTabOffset = 0;
-                if (isSelected)
-                {//Draw little green sphere to indicate selected tab
-                    var selectedRect = this.GetTabRect(e.Index);
-                    selectedRect.Offset(SELECTED_TAB_RECT_SIDE_PADDING, selectedRect.Height - (SELECTED_TAB_RECT_HEIGHT + 1));
-                    selectedRect.Width -= SELECTED_TAB_RECT_SIDE_PADDING * 2;
-                    selectedRect.Height = SELECTED_TAB_RECT_HEIGHT;
-
-                    e.Graphics.FillRectangle(Brushes.DarkGray, selectedRect);
-
-                    selectedTabOffset = SELECTED_TAB_RECT_HEIGHT;
-                }
-
-                Point textPositionPoint = new(textRect.X + 9, textRect.Y + textRect.Height / 2 - selectedTabOffset);
-                TextRenderer.DrawText(e.Graphics, title, font, textPositionPoint, baseForeColor, baseBackColor, TextFormatFlags.WordEllipsis);
-
-                /*
-                    TextRenderer.DrawText(e.Graphics, title, font, textPositionPoint, 
-                    isSelected ? coloredForeColor : baseForeColor,
-                    isSelected ? coloredBackColor : baseBackColor, 
-                    TextFormatFlags.WordEllipsis);
-                 */
-
+                SelectNextTab(previous: (horizontalScroll < 0));
             }
         }
 
@@ -241,7 +209,7 @@ namespace TiaUtilities.CustomControls.EditableTab
             var tabPage = this.TabPages[index];
             if (tabPage is EditableNewTabPage)
             {
-                this.AddTab();
+                this.AddTabs(count: args.Button == MouseButtons.Right ? 5 : 1);
                 return;
             }
 
@@ -252,13 +220,14 @@ namespace TiaUtilities.CustomControls.EditableTab
             else if (args.Button == MouseButtons.Right)
             {
                 this.SelectedTab = tabPage;
-                this.HandleContextMenu(tabPage, index);
+                this.HandleContextMenu(tabPage);
             }
         }
 
         protected override void OnMouseUp(MouseEventArgs args)
         {
             base.OnMouseUp(args);
+
             this.dragMouseDownPoint = null;
         }
 
@@ -275,12 +244,12 @@ namespace TiaUtilities.CustomControls.EditableTab
             var tabPage = this.TabPages[index];
             if (tabPage is EditableNewTabPage)
             {
-                this.AddTab();
+                this.AddTabs(count: args.Button == MouseButtons.Right ? 5 : 1);
                 return;
             }
 
             this.SelectedTab = tabPage;
-            this.HandleContextMenu(tabPage, index);
+            this.HandleContextMenu(tabPage);
         }
 
         protected override void OnMouseMove(MouseEventArgs args)
@@ -306,7 +275,8 @@ namespace TiaUtilities.CustomControls.EditableTab
 
             if (args.Button == MouseButtons.Left)
             {
-                this.DoDragDrop(tabPage, DragDropEffects.Move, null, Point.Empty, true);
+                EditableTabControl.DragAndDropData dragAndDrop = new(tabPage);
+                this.DoDragDrop(dragAndDrop, DragDropEffects.Move, null, Point.Empty, true);
             }
         }
 
@@ -320,16 +290,9 @@ namespace TiaUtilities.CustomControls.EditableTab
                 args.Effect = DragDropEffects.None;
                 return;
             }
-            args.Message = "Test Message?";
-            args.MessageReplacementToken = "WOW!";
 
             var tabRectIndex = this.GetMousePointTabRectIndex(args.X, args.Y);
             args.Effect = tabRectIndex == -1 || tabRectIndex >= this.TabCount ? DragDropEffects.None : DragDropEffects.Move;
-        }
-
-        protected override void OnDragEnter(DragEventArgs args)
-        {
-            base.OnDragEnter(args);
         }
 
         protected override void OnDragDrop(DragEventArgs args)
@@ -344,12 +307,12 @@ namespace TiaUtilities.CustomControls.EditableTab
 
             var droppedTabPage = this.TabPages[tabRectIndex];
 
-            var dataObj = args.Data?.GetData(typeof(EditableNormalTabPage));
-            if (dataObj is TabPage draggedTabPage && draggedTabPage != droppedTabPage)
+            var dataObj = args.Data?.GetData(typeof(EditableTabControl.DragAndDropData));
+            if (dataObj is EditableTabControl.DragAndDropData dragAndDrop && dragAndDrop.TabPage != droppedTabPage)
             {
                 this.SuspendLayout();
 
-                int draggedIndex = this.TabPages.IndexOf(draggedTabPage);
+                int draggedIndex = this.TabPages.IndexOf(dragAndDrop.TabPage);
                 int droppedIndex = this.TabPages.IndexOf(droppedTabPage);
 
                 if (draggedIndex >= 0 && draggedIndex < this.TabCount &&
@@ -387,164 +350,49 @@ namespace TiaUtilities.CustomControls.EditableTab
             return -1;
         }
 
-        private const string IMAGE_QUICK_EDIT_KEY = "QuickEdit";
-        private const string IMAGE_ADD_KEY = "Add";
-        private const string IMAGE_EDIT_NAME_KEY = "EditName";
-        private const string IMAGE_CLOSE_KEY = "Close";
-
-        private void HandleContextMenu(TabPage tabPage, int index)
+        private void HandleContextMenu(TabPage tabPage)
         {
-            ImageList imageList = new();
-            imageList.Images.Add(IMAGE_QUICK_EDIT_KEY, ImageResources.EDIT_562275);
-            imageList.Images.Add(IMAGE_ADD_KEY, ImageResources.ADD_501366_007435);
-            imageList.Images.Add(IMAGE_EDIT_NAME_KEY, ImageResources.A_TO_Z_72773);
-            imageList.Images.Add(IMAGE_CLOSE_KEY, ImageResources.CLOSE_193002_FF001C);
-
-            var contextMenu = new ContextMenuStrip()
-            {
-                MinimumSize = new(300, 0),
-                ImageList = imageList,
-            };
-            contextMenu.KeyDown += (sender, args) => this.CloseContextMenuOnKeyPress(contextMenu, args);
-
-            ToolStripMenuItem quickEditItem = new()
-            {
-                Text = Locale.EDITABLE_TAB_CONTROL_CONTEXT_MENU_QUICK_EDIT,
-                ImageKey = IMAGE_QUICK_EDIT_KEY,
-            };
-            quickEditItem.Click += (sender, args) =>
-            {
-                var quickEditForm = new EditableTabControlQuickEditForm(this);
-                var result = quickEditForm.ShowDialog(this);
-                if (result == DialogResult.OK)
-                {
-                    var oldSelectedTab = this.SelectedTab;
-
-                    foreach (var rowData in quickEditForm.RowsData)
-                    {
-                        var loopTabPage = rowData.TabPage;
-                        this.RenameTab(loopTabPage, rowData.NameTextBox.Text);
-
-                        if (rowData.Info.NeedsDeletition)
-                        {
-                            rowData.Info.NeedsDeletition = this.CloseTab(loopTabPage);
-                        }
-                    }
-
-                    var pages = quickEditForm.RowsData
-                                    .OrderBy(rd => rd.Info.Index)
-                                    .Where(rd => !rd.Info.NeedsDeletition)
-                                    .Select(rd => rd.TabPage)
-                                    .ToArray();
-
-                    this.TabPages.Clear();
-                    this.TabPages.AddRange(pages);
-
-                    if (oldSelectedTab != null && oldSelectedTab.Parent != null)
-                    {
-                        this.SelectedTab = oldSelectedTab;
-                    }
-                }
-            };
-
-            ToolStripMenuItem addNewItem = new()
-            {
-                Text = Locale.EDITABLE_TAB_CONTROL_CONTEXT_MENU_ADD_FIVE_TABS,
-                ImageKey = IMAGE_ADD_KEY
-            };
-            addNewItem.Click += (sender, args) =>
-            {
-                for (int x = 0; x < 5; x++)
-                {
-                    this.AddTab();
-                }
-            };
-
-            ToolStripMenuItem closeItem = new()
-            {
-                Text = Locale.EDITABLE_TAB_CONTROL_CONTEXT_MENU_CLOSE,
-                ImageKey = IMAGE_CLOSE_KEY,
-            };
-            closeItem.Click += (sender, args) => this.CloseTab(tabPage);
-
-            Label editNameLabel = new()
-            {
-                Text = Locale.EDITABLE_TAB_CONTROL_CONTEXT_MENU_EDIT_NAME,
-                TextAlign = ContentAlignment.MiddleCenter,
-                AutoSize = true,
-                Dock = DockStyle.Fill,
-                BackColor = Color.Transparent,
-                Padding = new(0),
-                Margin = new(0, 0, 8, 0),
-            };
-
-            TextBox editNameTextBox = new()
-            {
-                Text = tabPage.Text,
-                TextAlign = HorizontalAlignment.Left,
-                BorderStyle = BorderStyle.None,
-                Dock = DockStyle.Fill,
-                Padding = new(0),
-                Margin = new(0),
-                MinimumSize = new(200, 0)
-            };
-            editNameTextBox.KeyDown += (sender, args) => this.CloseContextMenuOnKeyPress(contextMenu, args);
-
-            FlowLayoutPanel panel = new()
-            {
-                AutoSize = true,
-                BackColor = Color.Transparent,
-                Dock = DockStyle.Fill,
-                AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                Controls = { editNameLabel, editNameTextBox },
-                Padding = new(0),
-            };
-
-            ToolStripControlHost editNameHost = new(panel)
-            {
-                BackColor = Color.Transparent,
-                ImageKey = IMAGE_EDIT_NAME_KEY, //Seems to not work :(
-            };
-
-
-            contextMenu.Items.Add(editNameHost);
-            contextMenu.Items.Add(closeItem);
-            contextMenu.Items.Add(new ToolStripSeparator() { Margin = new(0), Padding = new(0) });
-            contextMenu.Items.Add(quickEditItem);
-            contextMenu.Items.Add(addNewItem);
-
-            contextMenu.Closed += (sender, args) =>
-            {
-                RenameTab(tabPage, editNameTextBox.Text);
-            };
-
+            var contextMenu = EditableTabControlContextMenuFactory.CreateContextMenu(this, tabPage);
             contextMenu.Show(Cursor.Position);
         }
 
-        private void CloseContextMenuOnKeyPress(ContextMenuStrip contextMenu, KeyEventArgs args)
+        public void AddTabs(int count = 1)
         {
-            if (args.KeyData == Keys.Escape || args.KeyData == Keys.Enter)
+            for(int x = 0; x < count; x++)
             {
-                contextMenu.Close();
+                var tabPage = this.CreateTabPage();
+                if(tabPage != null)
+                {
+                    this.TabPages.Add(tabPage);
+                }
             }
         }
 
-
-        protected override void OnKeyDown(KeyEventArgs args)
+        public void InsertTabs(int index, int count = 1)
         {
-            base.OnKeyDown(args);
+            if(index < 0 || index >= this.TabCount)
+            {
+                return;
+            }
+
+            for (int x = 0; x < count; x++)
+            {
+                var tabPage = this.CreateTabPage();
+                if (tabPage != null)
+                {
+                    index++;
+                    this.TabPages.Insert(index, tabPage);
+                }
+            }
         }
 
-        public void AddTab()
+        private TabPage? CreateTabPage()
         {
-            var addedTabPage = new EditableNormalTabPage();
+            TabPage newTabPage = new();
 
-            var eventArgs = new EditableTabPreAddEventArgs(addedTabPage);
+            var eventArgs = new EditableTabPreAddEventArgs(newTabPage);
             TabPreAdded(this, eventArgs);
-            if (!eventArgs.Cancel)
-            {
-                this.TabPages.Add(addedTabPage);
-            }
+            return eventArgs.Cancel ? null : newTabPage;
         }
 
         public void RenameTab(TabPage tabPage, string newName)
@@ -557,7 +405,6 @@ namespace TiaUtilities.CustomControls.EditableTab
 
             EditableTabNameChangedEventArgs args = new(tabPage, newName, oldName);
             TabNameUserChanged(this, args);
-
             if (!args.Handled)
             {
                 tabPage.Text = args.NewName;
@@ -566,7 +413,8 @@ namespace TiaUtilities.CustomControls.EditableTab
 
         public bool CloseTab(TabPage tabPage, bool useGlobalConfirmBeforeClosing = true)
         {
-            if (tabPage is EditableNewTabPage)
+            var index = this.TabPages.IndexOf(tabPage);
+            if (tabPage is EditableNewTabPage || index < 0)
             {
                 return false;
             }
@@ -574,7 +422,7 @@ namespace TiaUtilities.CustomControls.EditableTab
             bool canceldHalted = true;
             if (useGlobalConfirmBeforeClosing && this.RequireConfirmationBeforeClosing)
             {
-                var result = InformationBox.Show($"Are you sure you want to close {tabPage.Text}?", buttons: InformationBoxButtons.YesNo);
+                var result = InformationBox.Show(Locale.EDITABLE_TAB_CONTROL_DELETE_CONFIRM.Replace("{t}", tabPage.Text), buttons: InformationBoxButtons.YesNo);
                 if (result == InformationBoxResult.Yes)
                 {
                     canceldHalted = false;
@@ -582,12 +430,6 @@ namespace TiaUtilities.CustomControls.EditableTab
             }
 
             if (canceldHalted)
-            {
-                return false;
-            }
-
-            var index = this.TabPages.IndexOf(tabPage);
-            if (index < 0)
             {
                 return false;
             }
@@ -602,21 +444,28 @@ namespace TiaUtilities.CustomControls.EditableTab
 
             return false;
         }
-    }
 
-    public class EditableNormalTabPage : TabPage
-    {
-        public EditableNormalTabPage()
+        public void SelectNextTab(bool previous)
         {
-            this.DoubleBuffered = true;
-            this.BorderStyle = BorderStyle.None;
+            var selectedTab = this.SelectedTab;
+            if (selectedTab == null)
+            {
+                return;
+            }
 
-            this.Padding = this.Margin = Padding.Empty;
+            var selectedIndex = this.TabPages.IndexOf(selectedTab);
+            if (previous)
+            {
+                this.SelectedIndex = Math.Max(0, selectedIndex - 1);
+            }
+            else
+            {
+                this.SelectedIndex = Math.Min(this.TabCount - 1, selectedIndex + 1);
+            }
         }
 
-        protected override void OnPaint(PaintEventArgs e) { }
+        private record DragAndDropData(TabPage TabPage);
 
-        protected override void OnPaintBackground(PaintEventArgs e) { }
     }
 
     public class EditableNewTabPage : TabPage

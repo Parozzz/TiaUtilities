@@ -80,7 +80,7 @@ namespace TiaUtilities.Generation
                     owner.Focus(); //If not focused, tooltip does not show.
                     owner.ActiveControl?.Focus();
 
-                    var tooltip = Utils.CreateQuickToolTip();
+                    var tooltip = ControlUtils.CreateQuickToolTip();
                     tooltip.ShowAlways = true;
                     tooltip.Show(Locale.GENERICS_COPIED, owner, owner.PointToClient(Cursor.Position), 1000);
                 }

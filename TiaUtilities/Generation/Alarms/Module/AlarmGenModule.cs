@@ -138,7 +138,7 @@ namespace TiaUtilities.Generation.Alarms.Module
             {
                 if (this.control.tabControl.TabCount == 0)
                 { //Check required because Load could be called before form is shown!
-                    this.control.tabControl.AddTab();
+                    this.control.tabControl.AddTabs();
                 }
             };
 

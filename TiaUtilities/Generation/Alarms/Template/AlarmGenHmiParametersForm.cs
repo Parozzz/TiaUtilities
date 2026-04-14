@@ -51,7 +51,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
 
         private void Init()
         {
-            Utils.CreateComboBoxEnumDataSource(this.displayTypeComboBox, typeof(AlarmXmlHmiParameter.DisplayTypeEnum), editable: false);
+            ControlUtils.CreateComboBoxEnumDataSource(this.displayTypeComboBox, typeof(AlarmXmlHmiParameter.DisplayTypeEnum), editable: false);
             this.displayTypeComboBox.SelectedValueChanged += (sender, args) =>
             {
                 UpdateControlEnabledFromDisplayType();
@@ -62,7 +62,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
                 }
             };
 
-            Utils.CreateComboBoxEnumDataSource(this.alignmentComboBox, typeof(AlarmXmlHmiParameter.AlignmentEnum), editable: false);
+            ControlUtils.CreateComboBoxEnumDataSource(this.alignmentComboBox, typeof(AlarmXmlHmiParameter.AlignmentEnum), editable: false);
             this.alignmentComboBox.SelectedValueChanged += (sender, args) =>
             {
                 if (!loadingControls && this.alignmentComboBox.SelectedValue is AlarmXmlHmiParameter.AlignmentEnum alignment)
@@ -87,7 +87,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
                 }
             };
 
-            this.lengthTextBox.KeyPress += Utils.UnsignedKeyPressEventHandler;
+            this.lengthTextBox.KeyPress += ControlUtils.UnsignedKeyPressEventHandler;
             this.lengthTextBox.TextChanged += (sender, args) =>
             {
                 if (!loadingControls && int.TryParse(this.lengthTextBox.Text, out var length))
@@ -96,7 +96,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
                 }
             };
 
-            this.precisionTextBox.KeyPress += Utils.UnsignedKeyPressEventHandler;
+            this.precisionTextBox.KeyPress += ControlUtils.UnsignedKeyPressEventHandler;
             this.precisionTextBox.TextChanged += (sender, args) =>
             {
                 if (!loadingControls && int.TryParse(this.precisionTextBox.Text, out var precision))
@@ -123,7 +123,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
                 if (uint.TryParse(radioButton.Text, out var number))
                 {
                     var toolTip = $"{GenPlaceholders.Alarms.HMI_PARAMETER.Replace("x", number.ToString())}";
-                    Utils.CreateStandardToolTip().SetToolTip(radioButton, toolTip);
+                    ControlUtils.CreateStandardToolTip().SetToolTip(radioButton, toolTip);
                 }
 
                 radioButton.CheckedChanged += (sender, args) =>

@@ -188,8 +188,8 @@ namespace TiaUtilities.SettingsNew.FormHelpers
                         Margin = new Padding(0, 0, 4, 0),
                         Font = SettingsFormConstants.SECTION_NAME_LABEL_FONT,
                     };
-                    Utils.SetDoubleBuffered(sectionNameLabel);
-                    Utils.CreateStandardToolTip().SetToolTip(sectionNameLabel, formSection.ToolTip);
+                    ControlUtils.SetDoubleBuffered(sectionNameLabel);
+                    ControlUtils.CreateStandardToolTip().SetToolTip(sectionNameLabel, formSection.ToolTip);
 
                     TableLayoutPanel valuesPanel = new()
                     {
@@ -201,7 +201,7 @@ namespace TiaUtilities.SettingsNew.FormHelpers
                         Padding = Padding.Empty,
                         Margin = Padding.Empty,
                     };
-                    Utils.SetDoubleBuffered(valuesPanel);
+                    ControlUtils.SetDoubleBuffered(valuesPanel);
 
                     List<ControlPosition> valuesControlPositionList = [];
 
@@ -254,7 +254,7 @@ namespace TiaUtilities.SettingsNew.FormHelpers
                                 MaximumSize = new Size(SettingsFormConstants.VALUE_DESCRIPTION_MAX_SIZE, 0), //Since last columns is to fill the all control, set a maximun size to allow wrapping of text
                                 Visible = lastOpenInformation.CommentVisibility,
                             };
-                            Utils.SetDoubleBuffered(valueDescriptionLabel);
+                            ControlUtils.SetDoubleBuffered(valueDescriptionLabel);
                             formMacroSection.ValueDescriptionLabelList.Add(valueDescriptionLabel);
 
                             valuesControlPositionList.Add(new(valueDescriptionLabel, 0, valuesRowCount));
@@ -283,7 +283,7 @@ namespace TiaUtilities.SettingsNew.FormHelpers
                         Padding = Padding.Empty,
                         Margin = new Padding(0, 6, (int)(SettingsFormConstants.SECTIONS_BORDER_COLUMN_SIZE / 2f), 6),
                     };
-                    Utils.SetDoubleBuffered(sectionBorderLabel);
+                    ControlUtils.SetDoubleBuffered(sectionBorderLabel);
 
                     this.createdControlPositionList.Add(new(sectionNameLabel, SECTION_NAME_COLUMN, rowCount));
                     this.createdControlPositionList.Add(new(sectionBorderLabel, SECTION_BORDER_COLUMN, rowCount));
@@ -357,7 +357,7 @@ namespace TiaUtilities.SettingsNew.FormHelpers
                 BackColor = Color.Transparent,
             };
             saveDefaultButton.Click += (sender, args) => formMacroSection.Binding.SaveToPresetConfiguration();
-            Utils.CreateStandardToolTip().SetToolTip(saveDefaultButton, Locale.CONFIG_LINE_SAVE_DEFAULT_TOOLTIP);
+            ControlUtils.CreateStandardToolTip().SetToolTip(saveDefaultButton, Locale.CONFIG_LINE_SAVE_DEFAULT_TOOLTIP);
 
 
             FlowLayoutPanel buttonFlowPanel = new()

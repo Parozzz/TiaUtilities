@@ -21,7 +21,7 @@ namespace TiaUtilities.Generation.Alarms.Module
         private void Translate()
         {
             this.setupButton.Text = Locale.GENERICS_SETUP;
-            Utils.CreateStandardToolTip().SetToolTip(this.setupButton, "CTRL + I");
+            ControlUtils.CreateStandardToolTip().SetToolTip(this.setupButton, "CTRL + I");
 
             this.changeTemplateButton.Text = Locale.ALARM_SETTINGS_EDIT_TEMPLATE;
         }

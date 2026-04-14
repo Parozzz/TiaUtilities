@@ -35,7 +35,7 @@ namespace TiaUtilities.SettingsNew.Editors
                     }
 
 
-                    Utils.CreateRJComboBoxEnumDataSource(this.comboBox, value.PropertyInfo.PropertyType, editable: false);
+                    ControlUtils.CreateRJComboBoxEnumDataSource(this.comboBox, value.PropertyInfo.PropertyType, editable: false);
                     this.comboBox.OnSelectedIndexChanged += (sender, args) => this.SaveToConfiguration();
 
                     break;
@@ -45,7 +45,7 @@ namespace TiaUtilities.SettingsNew.Editors
                         throw new InvalidCastException($"Using SettingsEditorTypeEnum LIST without a Tag that is not SettingsValueListTag for {value.PropertyInfo.Name}");
                     }
 
-                    Utils.CreateRJComboBoxObjectDataSource(this.comboBox, listTag.List, editable: false);
+                    ControlUtils.CreateRJComboBoxObjectDataSource(this.comboBox, listTag.List, editable: false);
                     this.comboBox.OnSelectedIndexChanged += (sender, args) => this.SaveToConfiguration();
 
                     break;
@@ -55,7 +55,7 @@ namespace TiaUtilities.SettingsNew.Editors
                         throw new InvalidCastException($"Using SettingsEditorTypeEnum UNSIGNED_LIST without a Tag that is not SettingsValueListUnsignedTag for {value.PropertyInfo.Name}");
                     }
 
-                    Utils.CreateRJComboBoxObjectDataSource(this.comboBox, unsignedTag.List, editable: false);
+                    ControlUtils.CreateRJComboBoxObjectDataSource(this.comboBox, unsignedTag.List, editable: false);
                     this.comboBox.OnSelectedIndexChanged += (sender, args) => this.SaveToConfiguration();
 
                     break;
@@ -65,7 +65,7 @@ namespace TiaUtilities.SettingsNew.Editors
                         throw new InvalidCastException($"Using SettingsEditorTypeEnum SIGNED_LIST without a Tag that is not SettingsValueListSignedTag for {value.PropertyInfo.Name}");
                     }
 
-                    Utils.CreateRJComboBoxObjectDataSource(this.comboBox, signedTag.List, editable: false);
+                    ControlUtils.CreateRJComboBoxObjectDataSource(this.comboBox, signedTag.List, editable: false);
                     this.comboBox.OnSelectedIndexChanged += (sender, args) => this.SaveToConfiguration();
 
                     break;
