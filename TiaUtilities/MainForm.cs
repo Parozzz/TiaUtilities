@@ -1,8 +1,11 @@
-﻿using InfoBox;
+﻿using DocumentFormat.OpenXml.Office2010.ExcelAc;
+using InfoBox;
 using Jint;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using SimaticML;
 using SimaticML.API;
+using SimaticML.Blocks;
+using System.Diagnostics;
 using System.Globalization;
 using System.Xml;
 using TiaUtilities.Constants;
@@ -363,6 +366,48 @@ namespace TiaUtilities
         {
             TreeViewDBVisualization dbVisualizationForm = new();
             dbVisualizationForm.Show(this);
+        }
+
+        private void exportAllMembersToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var fileDialog = new CommonOpenFileDialog
+            {
+                IsFolderPicker = false,
+                EnsurePathExists = true,
+                EnsureFileExists = true,
+                DefaultExtension = ".xml",
+                Filters = { new CommonFileDialogFilter("XML Files (*.xml)", "*.xml") }
+            };
+
+            if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                var fileName = fileDialog.FileName;
+                if (fileName == null)
+                {
+                    return;
+                }
+
+                List<string> members = [];
+
+                var xml = SimaticMLAPI.ParseFile(fileName);
+                if (xml is BlockGlobalDB globalDB)
+                {
+                    members.AddRange(globalDB.GetAllMemberAddress());
+                }
+                else if (xml is BlockInstanceDB instanceDB)
+                {
+                    members.AddRange(instanceDB.GetAllMemberAddress());
+                }
+                else if(xml is BlockUDT udt)
+                {
+                    members.AddRange(udt.GetAllMemberAddress());
+                }
+
+                string tempFilePath = System.IO.Path.GetTempPath() + "tempPaths.txt";
+                File.WriteAllText(tempFilePath, String.Join("\n", members));
+
+                Process.Start("notepad.exe", tempFilePath);
+            }
         }
     }
 }
