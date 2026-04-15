@@ -50,7 +50,7 @@
     <Compile Update="CustomControls\FlatTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Update="DBDuplicationForm.cs">
+    <Compile Update="zzzTests\DBDuplicationForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="Generation\Configuration\ConfigForm.cs">

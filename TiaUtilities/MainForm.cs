@@ -168,7 +168,7 @@ namespace TiaUtilities
         private void Translate()
         {
             this.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
-            this.Text = $"{Locale.MAIN_FORM} V{Program.VERSION}";
+            this.Text = $"{Locale.MAIN_FORM}";
 
             this.fileToolStripMenuItem.Text = Locale.GENERICS_FILE;
             this.saveMenuItem.Text = Locale.GENERICS_SAVE + " (CTRL+S)";
@@ -398,7 +398,7 @@ namespace TiaUtilities
                 {
                     members.AddRange(instanceDB.GetAllMemberAddress());
                 }
-                else if(xml is BlockUDT udt)
+                else if (xml is BlockUDT udt)
                 {
                     members.AddRange(udt.GetAllMemberAddress());
                 }
@@ -408,6 +408,11 @@ namespace TiaUtilities
 
                 Process.Start("notepad.exe", tempFilePath);
             }
+        }
+
+        private void QuestionMarkMenuItem_Click(object sender, EventArgs e)
+        {
+            new QuestionMarkForm().Show();
         }
     }
 }

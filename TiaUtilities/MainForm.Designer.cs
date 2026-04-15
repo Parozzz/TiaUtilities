@@ -49,6 +49,7 @@
             ioGenButton = new Button();
             alarmGenButton = new Button();
             duplicateDBButton = new Button();
+            questionMarkMenuItem = new ToolStripMenuItem();
             TopMenuStrip.SuspendLayout();
             MainLayoutPanel.SuspendLayout();
             bottomPanel.SuspendLayout();
@@ -57,7 +58,7 @@
             // TopMenuStrip
             // 
             TopMenuStrip.ImageScalingSize = new Size(20, 20);
-            TopMenuStrip.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, programMenuItem, testToolStripMenuItem });
+            TopMenuStrip.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, programMenuItem, testToolStripMenuItem, questionMarkMenuItem });
             TopMenuStrip.Location = new Point(0, 0);
             TopMenuStrip.Name = "TopMenuStrip";
             TopMenuStrip.Padding = new Padding(5, 2, 0, 2);
@@ -243,6 +244,14 @@
             duplicateDBButton.TextAlign = ContentAlignment.BottomCenter;
             duplicateDBButton.UseVisualStyleBackColor = false;
             // 
+            // questionMarkMenuItem
+            // 
+            questionMarkMenuItem.Font = new Font("Segoe UI", 12F);
+            questionMarkMenuItem.Name = "questionMarkMenuItem";
+            questionMarkMenuItem.Size = new Size(29, 25);
+            questionMarkMenuItem.Text = "?";
+            questionMarkMenuItem.Click += QuestionMarkMenuItem_Click;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -287,6 +296,7 @@
         private Button button1;
         private Button duplicateDBButton;
         private ToolStripMenuItem exportAllMembersToolStripMenuItem;
+        private ToolStripMenuItem questionMarkMenuItem;
     }
 }
 

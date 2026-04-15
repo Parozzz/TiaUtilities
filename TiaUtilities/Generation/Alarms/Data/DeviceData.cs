@@ -1,8 +1,9 @@
 ﻿using Newtonsoft.Json;
+using TiaUtilities.Configuration;
 using TiaUtilities.Generation.GridHandler;
-using TiaUtilities.Languages;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.Placeholders;
+using TiaUtilities.Languages;
 
 namespace TiaUtilities.Generation.Alarms.Data
 {
@@ -34,7 +35,6 @@ namespace TiaUtilities.Generation.Alarms.Data
         [JsonProperty][Locale(nameof(Locale.DEVICE_DATA_TEMPLATE), append: $" > {GenPlaceholders.Alarms.DEVICE_TEMPLATE}")] public string? Template { get; set; }
         [JsonProperty][Locale(nameof(Locale.DEVICE_DATA_PLACEHOLDERS), append: $" > {GenPlaceholders.Alarms.DEVICE_PLACEHOLDERS_GENERIC} ({GenPlaceholders.Alarms.DEVICE_PLACEHOLDERS_GENERIC_SPLITTER})")] public string? Placeholders { get; set; }
 
-        [JsonProperty] public GridSave<TemplateData>? AlarmGridSave {  get; set; }
         public object? this[int column]
         {
             get
@@ -61,12 +61,11 @@ namespace TiaUtilities.Generation.Alarms.Data
         public void Clear()
         {
             this.Name = this.Description = this.Placeholders = null;
-            this.AlarmGridSave = null;
         }
 
         public bool IsEmpty()
         {
-            return string.IsNullOrEmpty(this.Name) && string.IsNullOrEmpty(this.Description) && string.IsNullOrEmpty(this.Placeholders) && this.AlarmGridSave == null;
+            return string.IsNullOrEmpty(this.Name) && string.IsNullOrEmpty(this.Description) && string.IsNullOrEmpty(this.Placeholders);
         }
 
         public override bool Equals(object? obj)

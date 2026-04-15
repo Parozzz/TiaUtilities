@@ -1,7 +1,7 @@
 ﻿using Svg;
 using System.Drawing.Drawing2D;
 
-namespace TiaUtilities
+namespace TiaUtilities.zzzTests.SVG
 {
     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
     class DebugRenderer : ISvgRenderer
