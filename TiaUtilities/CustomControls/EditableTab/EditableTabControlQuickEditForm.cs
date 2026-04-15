@@ -2,6 +2,7 @@
 using TiaUtilities.Languages;
 using TiaUtilities.Resources;
 using TiaUtilities.Utility;
+using TiaUtilities.Utility.Extensions;
 using static TiaUtilities.SettingsNew.SettingsValueNameLabel;
 
 namespace TiaUtilities.CustomControls.EditableTab
@@ -42,7 +43,7 @@ namespace TiaUtilities.CustomControls.EditableTab
 
         private void Init()
         {
-            this.mainPanel.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
+            this.mainPanel.CellBorderStyle = TableLayoutPanelCellBorderStyle.None;
             this.mainPanel.SizeChanged += (sender, args) =>
             {
                 this.ClientSize = this.mainPanel.Size;
@@ -55,14 +56,12 @@ namespace TiaUtilities.CustomControls.EditableTab
             this.acceptButton.Margin = Padding.Empty;
             this.acceptButton.Click += (sender, args) => CloseWithResult(DialogResult.OK);
 
-            LoadTabControl();
+            LoadTabs();
             DrawMainPanel();
         }
 
-        private void LoadTabControl()
+        private void LoadTabs()
         {
-            this.RowsData.Clear();
-
             int index = 0;
             foreach (TabPage tabPage in this.tabControl.TabPages)
             {
@@ -75,6 +74,42 @@ namespace TiaUtilities.CustomControls.EditableTab
                 CreateTabEditControl(tabPage, index);
                 index++;
             }
+        }
+
+        private void DrawMainPanel()
+        {
+            this.mainPanel.RowStyles.Clear();
+            this.mainPanel.ColumnStyles.Clear();
+
+            var columnCount = (this.RowsData.Count / 30) + 1;
+            this.mainPanel.ColumnCount = columnCount;
+            for(int x = 0; x < columnCount; x++)
+            {
+                ColumnStyle columnStyle = new(SizeType.AutoSize, 50f);
+                this.mainPanel.ColumnStyles.Add(columnStyle);
+            }
+
+            var rowCount = this.RowsData.Count >= 30 ? 30 : (this.RowsData.Count % 30) + 1;
+            this.mainPanel.RowCount = rowCount;
+            for (int x = 0; x < rowCount; x++)
+            {
+                RowStyle rowStyle = new(SizeType.AutoSize);
+                this.mainPanel.RowStyles.Add(rowStyle);
+            }
+
+            foreach (var rowData in this.RowsData.OrderBy(rowData => rowData.Info.Index))
+            {
+                var index = rowData.Info.Index;
+
+                int column = index / 30;
+                int row = index % 30;
+                this.mainPanel.Controls.Add(rowData.Panel, column, row);
+            }
+            
+            this.mainPanel.RowStyles.Add(new(SizeType.AutoSize));
+            this.mainPanel.Controls.Add(this.acceptButton);
+
+            this.mainPanel.SetColumnSpan(this.acceptButton, columnCount);
         }
 
         private Control CreateTabEditControl(TabPage tabPage, int index)
@@ -137,7 +172,7 @@ namespace TiaUtilities.CustomControls.EditableTab
                 Anchor = AnchorStyles.Left | AnchorStyles.Right,
                 RowStyles = { new(SizeType.AutoSize), new(SizeType.AutoSize), new(SizeType.AutoSize) },
                 ColumnStyles = { new(SizeType.AutoSize) },
-                Padding = new(0, 5, 0, 5),
+                Padding = new(0, 1, 0, 1),
                 Margin = Padding.Empty,
                 AllowDrop = true,
             };
@@ -176,50 +211,19 @@ namespace TiaUtilities.CustomControls.EditableTab
             var dataObj = args.Data?.GetData(typeof(RowDataInfo));
             if (dataObj is RowDataInfo draggedDataInfo)
             {
-                this.SwapIndexes(dataInfo, draggedDataInfo);
+                (dataInfo.Index, draggedDataInfo.Index) = (draggedDataInfo.Index, dataInfo.Index);
+
+                this.mainPanel.SuspendLayout();
+                foreach (var rowData in RowsData.OrderBy(r => r.Info.Index))
+                {
+                    var index = rowData.Info.Index;
+                    int column = index / 30;
+                    int row = index % 30;
+
+                    this.mainPanel.SetCellPosition(rowData.Panel, new(column, row));
+                }
+                this.mainPanel.ResumeLayout(true);
             }
-        }
-
-        private void SwapIndexes(RowDataInfo firstDataInfo, RowDataInfo secondDataInfo)
-        {
-            var firstIndex = firstDataInfo.Index;
-            var secondIndex = secondDataInfo.Index;
-
-            firstDataInfo.Index = secondIndex;
-            secondDataInfo.Index = firstIndex;
-
-            this.SetControlsCellPosition();
-        }
-
-        private void SetControlsCellPosition()
-        {
-            this.mainPanel.SuspendLayout();
-
-            foreach (var rowData in RowsData.OrderBy(rowData => rowData.Info.Index))
-            {
-                this.mainPanel.SetCellPosition(rowData.Panel, new(0, rowData.Info.Index));
-            }
-
-            this.mainPanel.ResumeLayout(true);
-        }
-
-        private void DrawMainPanel()
-        {
-            this.mainPanel.SuspendLayout();
-
-            this.mainPanel.Controls.Clear();
-            this.mainPanel.RowStyles.Clear();
-
-            foreach (var rowData in RowsData.OrderBy(rowData => rowData.Info.Index))
-            {
-                this.mainPanel.RowStyles.Add(new(SizeType.AutoSize));
-                this.mainPanel.Controls.Add(rowData.Panel, 0, rowData.Info.Index);
-            }
-
-            this.mainPanel.RowStyles.Add(new(SizeType.AutoSize));
-            this.mainPanel.Controls.Add(this.acceptButton);
-
-            this.mainPanel.ResumeLayout(true);
         }
 
         private void CloseWithResult(DialogResult result = DialogResult.Cancel)

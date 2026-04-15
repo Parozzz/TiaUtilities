@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TiaUtilities.Languages;
 using TiaUtilities.Resources;
+using TiaUtilities.Utility.Extensions;
 
 namespace TiaUtilities.CustomControls.EditableTab
 {
@@ -39,28 +40,35 @@ namespace TiaUtilities.CustomControls.EditableTab
             };
             quickEditItem.Click += (sender, args) =>
             {
+                tabControl.SuspendLayout();
+
                 var quickEditForm = new EditableTabControlQuickEditForm(tabControl);
                 var result = quickEditForm.ShowDialog(tabControl);
                 if (result == DialogResult.OK)
                 {
                     var oldSelectedTab = tabControl.SelectedTab;
 
+                    Dictionary<EditableTabControlQuickEditForm.RowData, EditableTabControl.CloseRequest?> rowDataWithCloseDict = [];
                     foreach (var rowData in quickEditForm.RowsData)
                     {
-                        var loopTabPage = rowData.TabPage;
-                        tabControl.RenameTab(loopTabPage, rowData.NameTextBox.Text);
+                        tabControl.RenameTab(rowData.TabPage, rowData.NameTextBox.Text);
 
+                        EditableTabControl.CloseRequest? closeRequest = null;
                         if (rowData.Info.NeedsDeletition)
                         {
-                            rowData.Info.NeedsDeletition = tabControl.CloseTab(loopTabPage);
+                            closeRequest = new() { TabPage = rowData.TabPage };
                         }
+
+                        rowDataWithCloseDict.Add(rowData, closeRequest);
                     }
 
-                    var pages = quickEditForm.RowsData
-                                    .OrderBy(rd => rd.Info.Index)
-                                    .Where(rd => !rd.Info.NeedsDeletition)
-                                    .Select(rd => rd.TabPage)
-                                    .ToArray();
+                    var closeRequests = rowDataWithCloseDict.Values.WhereNotNull();
+                    tabControl.CloseTabs(closeRequests);
+
+                    var pages = rowDataWithCloseDict.OrderBy(p => p.Key.Info.Index)
+                                                    .Where(p => p.Value is null || !p.Value.Closed)
+                                                    .Select(p => p.Key.TabPage)
+                                                    .ToArray();
 
                     tabControl.TabPages.Clear();
                     tabControl.TabPages.AddRange(pages);
@@ -70,6 +78,8 @@ namespace TiaUtilities.CustomControls.EditableTab
                         tabControl.SelectedTab = oldSelectedTab;
                     }
                 }
+
+                tabControl.ResumeLayout(true);
             };
 
             ToolStripMenuItem addFiveTabs = new()

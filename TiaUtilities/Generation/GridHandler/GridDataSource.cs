@@ -67,7 +67,8 @@ namespace TiaUtilities.Generation.GridHandler
             this.dataList.Clear();
             for (int i = 0; i < dataAmount; i++)
             {
-                dataList.Add(dataHandler.CreateInstance());
+                var data = dataHandler.CreateInstance();
+                dataList.Add(data);
             }
 
             this.dataGridView.DataSource = new BindingSource() { DataSource = new BindingList<T>(this.dataList) };

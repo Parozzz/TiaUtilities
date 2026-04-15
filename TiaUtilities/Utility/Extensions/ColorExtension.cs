@@ -1,6 +1,6 @@
 ﻿namespace TiaUtilities.Utility.Extensions
 {
-    public static class ColorConverterExtension
+    public static class ColorExtension
     {
         // #RRGGBB
         public static string ToHexString(this Color c) => $"#{c.R:X2}{c.G:X2}{c.B:X2}";
@@ -15,5 +15,8 @@
 
         // RGBA(R, G, B, A)
         public static string ToRgbaString(this Color c) => $"RGBA({c.R}, {c.G}, {c.B}, {ToProportion(c.A):N2})";
+
+        public static bool HasTransparency(this Color color) => color.A != byte.MaxValue;
+
     }
 }

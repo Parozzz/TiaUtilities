@@ -11,7 +11,7 @@ namespace TiaUtilities.Utility.Extensions
     {
         public static void Swap<T>(this IList<T> list, int firstIndex, int secondIndex)
         {
-            if(list == null)
+            if (list == null)
             {
                 return;
             }
@@ -26,6 +26,11 @@ namespace TiaUtilities.Utility.Extensions
             T temp = list[firstIndex];
             list[firstIndex] = list[secondIndex];
             list[secondIndex] = temp;
+        }
+
+        public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> enumerable)
+        {
+            return (IEnumerable<T>) enumerable.Where(t => t is not null);
         }
 
     }

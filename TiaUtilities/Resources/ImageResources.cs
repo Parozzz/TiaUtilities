@@ -14,6 +14,9 @@ namespace TiaUtilities.Resources
         public static Image ALARM_GENERATOR { get => GetImage("AlarmGenerator.png"); }
         public static Image DUPLICATE_DB { get => GetImage("DuplicateDB.png"); }
 
+        public static Image TICK_7138168_007435 { get => GetImage("tick-7138168-007435.png"); }
+        public static Image CROSS_1364737_B8192C { get => GetImage("cross-1364737-b8192c.png"); }
+
         public static Image A_TO_Z_72773 { get => GetImage("a-to-z-72773.png"); }
         public static Image ADD_501366_007435 { get => GetImage("add-501366-007435.png"); }
         public static Image CLOSE_193002 { get => GetImage("close-193002.png"); }

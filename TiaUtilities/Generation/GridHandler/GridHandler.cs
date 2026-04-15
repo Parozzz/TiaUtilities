@@ -474,7 +474,13 @@ namespace TiaUtilities.Generation.GridHandler
 
         public DataGridViewCheckBoxColumn AddCheckBoxColumn(GridDataColumn dataColumn, int width)
         {
-            return AddColumn(new DataGridViewCheckBoxColumn(), dataColumn, width);
+            DataGridViewCheckBoxColumn checkBoxColumn = new()
+            {
+                FlatStyle = FlatStyle.Popup,
+                CellTemplate = new DataGridViewCustomCheckBoxCell()
+            };
+
+            return AddColumn(checkBoxColumn, dataColumn, width);
         }
 
         public DataGridViewEventableButtonColumn AddButtonColumn(GridDataColumn dataColumn, int width)
@@ -488,10 +494,13 @@ namespace TiaUtilities.Generation.GridHandler
 
         public DataGridViewComboBoxColumn AddComboBoxColumn(GridDataColumn dataColumn, int width, string[] items)
         {
-            var column = AddColumn(new DataGridViewComboBoxColumn(), dataColumn, width);
+            DataGridViewComboBoxColumn column = new()
+            {
+                FlatStyle = FlatStyle.Flat
+            };
             column.Items.AddRange(items);
-            column.FlatStyle = FlatStyle.Flat;
-            return column;
+
+            return AddColumn(column, dataColumn, width); ;
         }
 
         public CC AddCustomColumn<CC>(CC customColumn, GridDataColumn dataColumn, int width) where CC : DataGridViewColumn, IGridCustomColumn

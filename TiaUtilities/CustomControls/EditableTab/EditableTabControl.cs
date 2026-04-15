@@ -1,12 +1,8 @@
 ﻿using InfoBox;
-using MS.WindowsAPICodePack.Internal;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using TiaUtilities.Languages;
-using TiaUtilities.Resources;
 using TiaUtilities.Styles;
 using TiaUtilities.Utility;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace TiaUtilities.CustomControls.EditableTab
 {
@@ -144,7 +140,7 @@ namespace TiaUtilities.CustomControls.EditableTab
             {
                 var textRect = tabRect;
                 textRect.Offset(0, -1);
-                TextRenderer.DrawText(g, 
+                TextRenderer.DrawText(g,
                     tabPage.Text,
                     tabPage.Font,
                     textRect,
@@ -358,10 +354,10 @@ namespace TiaUtilities.CustomControls.EditableTab
 
         public void AddTabs(int count = 1)
         {
-            for(int x = 0; x < count; x++)
+            for (int x = 0; x < count; x++)
             {
                 var tabPage = this.CreateTabPage();
-                if(tabPage != null)
+                if (tabPage != null)
                 {
                     this.TabPages.Add(tabPage);
                 }
@@ -370,7 +366,7 @@ namespace TiaUtilities.CustomControls.EditableTab
 
         public void InsertTabs(int index, int count = 1)
         {
-            if(index < 0 || index >= this.TabCount)
+            if (index < 0 || index >= this.TabCount)
             {
                 return;
             }
@@ -380,8 +376,7 @@ namespace TiaUtilities.CustomControls.EditableTab
                 var tabPage = this.CreateTabPage();
                 if (tabPage != null)
                 {
-                    index++;
-                    this.TabPages.Insert(index, tabPage);
+                    this.TabPages.Insert(index + 1, tabPage);
                 }
             }
         }
@@ -411,38 +406,48 @@ namespace TiaUtilities.CustomControls.EditableTab
             }
         }
 
-        public bool CloseTab(TabPage tabPage, bool useGlobalConfirmBeforeClosing = true)
+        public bool CloseTab(TabPage tabPage, bool forceClosing = false)
         {
-            var index = this.TabPages.IndexOf(tabPage);
-            if (tabPage is EditableNewTabPage || index < 0)
-            {
-                return false;
-            }
+            var closeRequest = new CloseRequest() { TabPage = tabPage };
+            this.CloseTabs([closeRequest], forceClosing);
+            return closeRequest.Closed;
+        }
 
-            bool canceldHalted = true;
-            if (useGlobalConfirmBeforeClosing && this.RequireConfirmationBeforeClosing)
+        public void CloseTabs(IEnumerable<CloseRequest> closeRequests, bool forceClosing = false)
+        {
+            var validCloseRequests = closeRequests.Where(cr => cr.TabPage is not EditableNewTabPage);
+
+            if (!forceClosing && this.RequireConfirmationBeforeClosing)
             {
-                var result = InformationBox.Show(Locale.EDITABLE_TAB_CONTROL_DELETE_CONFIRM.Replace("{t}", tabPage.Text), buttons: InformationBoxButtons.YesNo);
-                if (result == InformationBoxResult.Yes)
+                var names = String.Join(", ", validCloseRequests.Select(cr => cr.TabPage.Text));
+
+                var result = InformationBox.Show(Locale.EDITABLE_TAB_CONTROL_DELETE_CONFIRM.Replace("{t}", names), buttons: InformationBoxButtons.YesNo);
+                if (result != InformationBoxResult.Yes)
                 {
-                    canceldHalted = false;
+                    return;
                 }
             }
 
-            if (canceldHalted)
+            foreach (var closeRequest in validCloseRequests)
             {
-                return false;
-            }
+                var tabPage = closeRequest.TabPage;
 
-            var args = new EditableTabPreRemoveEventArgs(tabPage, index);
-            this.TabPreRemoved(this, args);
-            if (!args.Cancel)
-            {
+                var index = this.TabPages.IndexOf(tabPage);
+                if (index < 0)
+                {
+                    continue;
+                }
+
+                var args = new EditableTabPreRemoveEventArgs(tabPage, index);
+                this.TabPreRemoved(this, args);
+                if (args.Cancel)
+                {
+                    continue;
+                }
+
                 this.TabPages.Remove(tabPage);
-                return true;
+                closeRequest.Closed = true;
             }
-
-            return false;
         }
 
         public void SelectNextTab(bool previous)
@@ -465,6 +470,18 @@ namespace TiaUtilities.CustomControls.EditableTab
         }
 
         private record DragAndDropData(TabPage TabPage);
+
+        public class CloseRequest()
+        {
+            public required TabPage TabPage { get; init; }
+            public object? Tag { get; set; }
+            public bool Closed { get; set; } = false;
+
+            public override string ToString()
+            {
+                return $"TabPage: {this.TabPage.Text}, Closed: {this.Closed}";
+            }
+        }
 
     }
 
