@@ -22,7 +22,7 @@ namespace TiaUtilities.Generation.GridHandler.Binds
         public bool IsDirty() => this.GridScriptHandler.IsDirty();
         public void Wash() => this.GridScriptHandler.Wash();
 
-        public void ChangeBind<T>(GridHandler<T>? handler) where T : IGridData
+        public void ChangeBind<T>(GridHandler<T>? handler) where T : GridData
         {
             if (this.handlerBind != null && this.handlerBind.IsSameGridHandler(handler))
             {
@@ -35,7 +35,7 @@ namespace TiaUtilities.Generation.GridHandler.Binds
             GridScriptHandler.BindToGridHandler(handlerBind);
         }
 
-        public void ShowFindForm<T>(GridHandler<T> handler) where T : IGridData
+        public void ShowFindForm<T>(GridHandler<T> handler) where T : GridData
         {
             this.ChangeBind(handler);
             ShowFindForm();
@@ -56,7 +56,7 @@ namespace TiaUtilities.Generation.GridHandler.Binds
             }
         }
 
-        public void ShowGridScript<T>(GridHandler<T> handler) where T : IGridData
+        public void ShowGridScript<T>(GridHandler<T> handler) where T : GridData
         {
             ChangeBind(handler);
             ShowGridScript();

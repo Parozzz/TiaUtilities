@@ -1,21 +1,26 @@
 ﻿using System.ComponentModel;
 using TiaUtilities.Generation.GridHandler.Data;
+using TiaUtilities.UndoRedo;
 
 namespace TiaUtilities.Generation.GridHandler
 {
-    public class GridDataSource<T> : ISaveable<Dictionary<int, T>> where T : IGridData
+    public class GridDataSource<T> : ISaveable<Dictionary<int, T>> where T : GridData
     {
         private readonly DataGridView dataGridView;
+        private readonly GridHandler<T> gridHandler;
         private readonly GridDataHandler<T> dataHandler;
+        private readonly UndoRedoHandler undoRedoHandler;
 
         private readonly List<T> dataList;
 
         public int Count { get => dataList.Count; }
 
-        public GridDataSource(DataGridView dataGridView, GridDataHandler<T> dataHandler)
+        public GridDataSource(DataGridView dataGridView, GridHandler<T> gridHandler, GridDataHandler<T> dataHandler, UndoRedoHandler undoRedoHandler)
         {
             this.dataGridView = dataGridView;
+            this.gridHandler = gridHandler;
             this.dataHandler = dataHandler;
+            this.undoRedoHandler = undoRedoHandler;
 
             this.dataList = [];
         }
@@ -64,10 +69,16 @@ namespace TiaUtilities.Generation.GridHandler
 
         public void InitializeData(uint dataAmount)
         {
+            foreach (var data in this.dataList)
+            {
+                data.ClearDataChangedDelegate();
+            }
+
             this.dataList.Clear();
             for (int i = 0; i < dataAmount; i++)
             {
                 var data = dataHandler.CreateInstance();
+                data.DataChanged += (sender, args) => this.gridHandler.HandleDataChanged(args);
                 dataList.Add(data);
             }
 

@@ -14,7 +14,7 @@ namespace TiaUtilities.Generation.IO
 {
     public static class IOGenUtils
     {
-        public static void DragPreview<T>(GridExcelDragEventArgs eventArgs, GridHandler<T> gridHandler) where T : IGridData
+        public static void DragPreview<T>(GridExcelDragEventArgs eventArgs, GridHandler<T> gridHandler) where T : GridData
         {
             var dataGridView = gridHandler.DataGridView;
 
@@ -35,7 +35,7 @@ namespace TiaUtilities.Generation.IO
             }
         }
 
-        public static void DragDone<T>(GridExcelDragEventArgs eventArgs, GridHandler<T> gridHandler) where T : IGridData
+        public static void DragDone<T>(GridExcelDragEventArgs eventArgs, GridHandler<T> gridHandler) where T : GridData
         {
             var dataGridView = gridHandler.DataGridView;
             if (eventArgs.DraggedColumn == IOData.ADDRESS)
@@ -52,7 +52,8 @@ namespace TiaUtilities.Generation.IO
                     return;
                 }
 
-                var cellChangeList = new List<GridCellChange>();
+
+                gridHandler.CacheChanges = true;
 
                 var rowIndexEnumeration = Enumerable.Range(eventArgs.TopSelectedRow, (int)eventArgs.SelectedRowCount);
                 if (!eventArgs.DraggingDown)
@@ -62,13 +63,13 @@ namespace TiaUtilities.Generation.IO
 
                 foreach (var rowIndex in rowIndexEnumeration)
                 {
-                    var cellChange = new GridCellChange(0, rowIndex) { NewValue = tagAddress.GetAddress() };
-                    cellChangeList.Add(cellChange);
-
-                    var _ = eventArgs.DraggingDown ? tagAddress.NextBit(SimaticDataType.BYTE) : tagAddress.PreviousBit(SimaticDataType.BYTE); //Increase at the end. The first value is valid!
+                    gridHandler.DataGridView.Rows[rowIndex].Cells[0].Value = tagAddress.GetAddress();
+                    var _ = eventArgs.DraggingDown ? 
+                        tagAddress.NextBit(SimaticDataType.BYTE) : 
+                        tagAddress.PreviousBit(SimaticDataType.BYTE); //Increase at the end. The first value is valid!
                 }
 
-                gridHandler.ChangeCells(cellChangeList);
+                gridHandler.CacheChanges = false;
             }
             else
             {

@@ -6,7 +6,7 @@ using System.Text.Json.Nodes;
 
 namespace TiaUtilities.Generation.Alarms.Data
 {
-    public class TemplateData : IGridData
+    public class TemplateData : GridData
     {
         private readonly static int COLUMN_COUNT = 0;
         //THESE IS THE ORDER IN WHICH THEY APPEAR!
@@ -53,42 +53,29 @@ namespace TiaUtilities.Generation.Alarms.Data
             COLUMN_LIST = columnList.AsReadOnly();
         }
 
-        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_ENABLE))] public bool Enable { get; set; }
-        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_ALM_VARIABLE))] public string? AlarmVariable { get; set; }
-        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_ALM_NEGATED))] public bool AlarmNegated { get; set; }
-        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_CUSTOM_VAR_ADDR))] public string? CustomVariableAddress { get; set; }
-        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_CUSTOM_VAR_VALUE))] public string? CustomVariableValue { get; set; }
-        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_COIL1_ADDRESS))] public string? Coil1Address { get; set; }
-        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_COIL1_TYPE))] public string? Coil1Type { get; set; }
-        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_COIL2_ADDRESS))] public string? Coil2Address { get; set; }
-        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_COIL2_TYPE))] public string? Coil2Type { get; set; }
-        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_TIMER_ADDRESS))] public string? TimerAddress { get; set; }
-        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_TIMER_TYPE))] public string? TimerType { get; set; }
-        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_TIMER_VALUE))] public string? TimerValue { get; set; }
-        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_HMI_CLASS))] public string? HmiAlarmClass { get; set; }
-        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_HMI_PARAMETERS), append: $" > {GenPlaceholders.Alarms.HMI_PARAMETER}")] public string? HmiParametersJsonString { get; set; }
-        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_HMI_TEXT), append: $" > {GenPlaceholders.Alarms.ALARM_HMI_TEXT}")] public string ? HmiAlarmText { get; set; }
-        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_DESCRIPTION), append: $" > {GenPlaceholders.Alarms.ALARM_DESCRIPTION}")] public string? Description { get; set; }
+        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_ENABLE))] public bool Enable { get => this.GetAs<bool>(); set => this.Set(value); }
+        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_ALM_VARIABLE))] public string? AlarmVariable { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_ALM_NEGATED))] public bool AlarmNegated { get => this.GetAs<bool>(); set => this.Set(value); }
+        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_CUSTOM_VAR_ADDR))] public string? CustomVariableAddress { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_CUSTOM_VAR_VALUE))] public string? CustomVariableValue { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_COIL1_ADDRESS))] public string? Coil1Address { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_COIL1_TYPE))] public string? Coil1Type { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_COIL2_ADDRESS))] public string? Coil2Address { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_COIL2_TYPE))] public string? Coil2Type { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_TIMER_ADDRESS))] public string? TimerAddress { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_TIMER_TYPE))] public string? TimerType { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_TIMER_VALUE))] public string? TimerValue { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_HMI_CLASS))] public string? HmiAlarmClass { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_HMI_PARAMETERS), append: $" > {GenPlaceholders.Alarms.HMI_PARAMETER}")] public string? HmiParametersJsonString { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_HMI_TEXT), append: $" > {GenPlaceholders.Alarms.ALARM_HMI_TEXT}")] public string ? HmiAlarmText { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_DESCRIPTION), append: $" > {GenPlaceholders.Alarms.ALARM_DESCRIPTION}")] public string? Description { get => this.GetAs<string>(); set => this.Set(value); }
 
-        public object? this[int column]
-        {
-            get
-            {
-                if (column < 0 || column >= COLUMN_LIST.Count)
-                {
-                    throw new InvalidOperationException("Invalid index for get square bracket operator in IOData");
-                }
-
-                return COLUMN_LIST[column].PropertyInfo.GetValue(this);
-            }
-        }
-
-        public IReadOnlyList<GridDataColumn> GetColumns()
+        public override IReadOnlyList<GridDataColumn> GetColumns()
         {
             return COLUMN_LIST;
         }
 
-        public GridDataColumn GetColumn(int column)
+        public override GridDataColumn GetColumn(int column)
         {
             return COLUMN_LIST[column];
         }
@@ -98,7 +85,7 @@ namespace TiaUtilities.Generation.Alarms.Data
             return !GenUtils.DATA_INVALID_CHARS.Contains(str);
         }
 
-        public void Clear()
+        public override void Clear()
         {
             this.Enable = this.AlarmNegated = false;
             this.AlarmVariable = this.CustomVariableAddress = this.CustomVariableValue = this.Coil1Address 
@@ -106,7 +93,7 @@ namespace TiaUtilities.Generation.Alarms.Data
                 = this.HmiParametersJsonString = this.HmiAlarmText = this.Description = null;
         }
 
-        public bool IsEmpty()
+        public override bool IsEmpty()
         {
             return string.IsNullOrEmpty(this.AlarmVariable) &&
                 string.IsNullOrEmpty(this.CustomVariableAddress) && string.IsNullOrEmpty(this.CustomVariableValue) &&

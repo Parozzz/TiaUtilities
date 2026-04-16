@@ -6,7 +6,7 @@ namespace TiaUtilities.Generation.GridHandler.Binds
 {
     public class GridHandlerBind
     {
-        public static GridHandlerBind CreateBind<T>(GridHandler<T> gridHandler) where T : IGridData
+        public static GridHandlerBind CreateBind<T>(GridHandler<T> gridHandler) where T : GridData
         {
             return new()
             {
@@ -29,9 +29,8 @@ namespace TiaUtilities.Generation.GridHandler.Binds
                 },
                 GetScriptVariables = gridHandler.ScriptVariableList.AsReadOnly,
 
-                AddCachedCellChange = gridHandler.AddCachedCellChange,
-                ClearCachedCellChange = gridHandler.ClearCachedCellChange,
-                ApplyCachedCellChange = () => gridHandler.ExecuteCachedCellChange(),
+                SetCacheChanges = () => gridHandler.CacheChanges = true,
+                ResetCacheChanges = () => gridHandler.CacheChanges = false,
 
                 SelectRow = gridHandler.SelectRow,
 
@@ -54,9 +53,9 @@ namespace TiaUtilities.Generation.GridHandler.Binds
         public required Func<IReadOnlyList<GridScriptVariable>> GetScriptVariables { private get; init; }
 
 
-        public required Action<GridCellChange> AddCachedCellChange { get; init; }
-        public required Action ClearCachedCellChange { get; init; }
-        public required Action ApplyCachedCellChange { get; init; }
+        public required Action SetCacheChanges { get; init; }
+        public required Action ResetCacheChanges { get; init; }
+
 
         public required Action<int> SelectRow { get; init; }
 

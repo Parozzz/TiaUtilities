@@ -127,7 +127,7 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                 }
                 engine.SetValue(ENGINE_LOG_FUNCTION, log);
 
-                this.GridHandlerBind.ClearCachedCellChange();
+                this.GridHandlerBind.SetCacheChanges();
 
                 ScriptTimeLogger timeLogger = new();
 
@@ -175,7 +175,7 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                     timeLogger.StopAndSave();
                 }
 
-                this.GridHandlerBind.ApplyCachedCellChange();
+                this.GridHandlerBind.ResetCacheChanges();
 
                 //Update JSON Context Text
                 var contextJsonJSValue = engine.Evaluate(@"JSON.stringify(this, null, 2);");

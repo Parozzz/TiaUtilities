@@ -1,13 +1,29 @@
-﻿using System.Text.RegularExpressions;
-using TiaUtilities.Generation.GridHandler.Events;
+﻿using System.Data;
+using System.Text.RegularExpressions;
 using TiaUtilities.Generation.GridHandler.Data;
+using TiaUtilities.Generation.GridHandler.Events;
 using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.GridHandler
 {
     public static class GridUtils
     {
-        public static void DragPreview<T>(GridExcelDragEventArgs eventArgs, GridHandler<T> gridHandler) where T : IGridData
+        public static void CopyGridDataValues(GridData copyFrom, GridData moveTo)
+        {
+            if (copyFrom.GetType() == moveTo.GetType())
+            {
+                var columns = copyFrom.GetColumns(); 
+                
+                foreach (var dataColumn in columns)
+                {
+                    var copeFromValue = dataColumn.GetValueFrom<object>(copyFrom);
+                    dataColumn.SetValueTo(moveTo, copeFromValue);
+                }
+            }
+
+        }
+
+        public static void DragPreview<T>(GridExcelDragEventArgs eventArgs, GridHandler<T> gridHandler) where T : GridData
         {
             var startCell = gridHandler.DataGridView.Rows[eventArgs.StartingRow]?.Cells[eventArgs.DraggedColumn];
             if (startCell is not DataGridViewTextBoxCell)
@@ -37,7 +53,7 @@ namespace TiaUtilities.Generation.GridHandler
             }
         }
 
-        public static void DragDone<T>(GridExcelDragEventArgs eventArgs, GridHandler<T> gridHandler) where T : IGridData
+        public static void DragDone<T>(GridExcelDragEventArgs eventArgs, GridHandler<T> gridHandler) where T : GridData
         {
             var startCell = gridHandler.DataGridView.Rows[eventArgs.StartingRow]?.Cells[eventArgs.DraggedColumn];
             if (startCell is not DataGridViewTextBoxCell)
@@ -51,7 +67,7 @@ namespace TiaUtilities.Generation.GridHandler
                 rowIndexEnumeration = rowIndexEnumeration.Reverse();
             }
 
-            var cellChangeList = new List<GridCellChange>();
+            gridHandler.CacheChanges = true;
 
             var startString = startCell.Value?.ToString();
             if (Utils.SplitStringFromNumberFromRight(startString, out string before, out string numString, out string after) && int.TryParse(numString, out int num))
@@ -71,20 +87,20 @@ namespace TiaUtilities.Generation.GridHandler
                         }
                     }
 
-                    var cellChange = new GridCellChange(eventArgs.DraggedColumn, rowIndex) { NewValue = (before + nextNumString + after) };
-                    cellChangeList.Add(cellChange);
+                    var newValue = (before + nextNumString + after);
+                    gridHandler.DataGridView.Rows[rowIndex].Cells[eventArgs.DraggedColumn].Value = newValue;
                 }
             }
             else
             {
                 foreach (var rowIndex in rowIndexEnumeration)
                 {
-                    var cellChange = new GridCellChange(eventArgs.DraggedColumn, rowIndex) { NewValue = startString };
-                    cellChangeList.Add(cellChange);
+                    var newValue = startString;
+                    gridHandler.DataGridView.Rows[rowIndex].Cells[eventArgs.DraggedColumn].Value = newValue;
                 }
             }
 
-            gridHandler.ChangeCells(cellChangeList);
+            gridHandler.CacheChanges = false;
         }
 
         public static void CopyAsExcel(DataGridView dataGridView)
@@ -153,25 +169,27 @@ namespace TiaUtilities.Generation.GridHandler
             }
         }
 
-        public static List<GridCellChange>? PasteAsExcel(DataGridView dataGridView)
+        public static void PasteAsExcel(DataGridView dataGridView)
         {
             try
             {
                 var cliboardObj = (DataObject?)Clipboard.GetDataObject();
                 if (cliboardObj == null || !cliboardObj.GetDataPresent(DataFormats.Text))
                 {
-                    var cellList = new List<GridCellChange>();
+                    //var cellList = new List<GridCellChange>();
                     foreach (DataGridViewCell cell in dataGridView.SelectedCells)
                     {
-                        cellList.Add(new(cell) { NewValue = null });
+                        cell.Value = null;
+                        //cellList.Add(new(cell) { NewValue = null });
                     }
-                    return cellList;
+                    return;
+                    //return cellList;
                 }
 
                 var clipboardData = cliboardObj.GetData(DataFormats.Text);
                 if (clipboardData == null)
                 {
-                    return null;
+                    return;
                 }
 
                 var pasteString = (string)clipboardData;
@@ -181,10 +199,18 @@ namespace TiaUtilities.Generation.GridHandler
                 if (returnCount == 0 || (returnCount == 1 && (pasteString.EndsWith('\t') || pasteString.EndsWith('\n'))))
                 {//If is a normal string, i will paste in ALL the selected cells!
                     var strippedPasteString = pasteString.Replace("\t", "").Replace("\r", "").Replace("\n", "");
-                    return dataGridView.SelectedCells
+
+                    foreach(DataGridViewCell cell in dataGridView.SelectedCells)
+                    {
+                        cell.Value = strippedPasteString;
+                    }
+
+                    return;
+
+                    /*return dataGridView.SelectedCells
                         .Cast<DataGridViewCell>()
                         .Select(c => new GridCellChange(c) { NewValue = strippedPasteString })
-                        .ToList();
+                        .ToList();*/
                 }
 
                 var pastedCellList = new List<GridCellChange>();
@@ -218,7 +244,8 @@ namespace TiaUtilities.Generation.GridHandler
                         var cell = dataGridView.Rows[rowIndex]?.Cells[columnIndex];
                         if (cell != null)
                         {
-                            pastedCellList.Add(new GridCellChange(cell) { NewValue = pastedValue });
+                            cell.Value = pastedValue;
+                            //pastedCellList.Add(new GridCellChange(cell) { NewValue = pastedValue });
                         }
 
                         columnCounter++;
@@ -231,14 +258,15 @@ namespace TiaUtilities.Generation.GridHandler
                     }
                 }
 
-                return pastedCellList;
+                return;
+                //return pastedCellList;
             }
             catch (Exception ex)
             {
                 Utils.ShowExceptionMessage(ex);
             }
 
-            return null;
+            //return null;
         }
     }
 }

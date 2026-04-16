@@ -46,7 +46,7 @@ namespace TiaUtilities.Generation.GridHandler.Data
         public PropertyInfo PropertyInfo { get; init; } = propertyInfo;
         public string ProgrammingFriendlyName { get; init; } = programmingFriendlyName;
 
-        public V? GetValueFrom<V>(IGridData? gridData)
+        public V? GetValueFrom<V>(GridData? gridData)
         {
             if(gridData == null || PropertyInfo.DeclaringType != gridData.GetType())
             {
@@ -62,7 +62,7 @@ namespace TiaUtilities.Generation.GridHandler.Data
             return value;
         }
 
-        public object? GetValueFrom(IGridData gridData)
+        public object? GetValueFrom(GridData gridData)
         {
             if (gridData == null || PropertyInfo.DeclaringType != gridData.GetType())
             {
@@ -72,7 +72,7 @@ namespace TiaUtilities.Generation.GridHandler.Data
             return PropertyInfo.GetValue(gridData);
         }
 
-        public void SetValueTo(IGridData gridData, object? value)
+        public void SetValueTo(GridData gridData, object? value)
         {
             if (gridData == null || PropertyInfo.DeclaringType != gridData.GetType())
             {

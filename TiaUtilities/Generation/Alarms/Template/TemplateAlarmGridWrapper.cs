@@ -67,10 +67,8 @@ namespace TiaUtilities.Generation.Alarms.Template
                     var parametersForm = new AlarmGenHmiParametersForm(gridDataString) { Location = location };
                     parametersForm.FormClosed += (sender, args) =>
                     {
-                        var oldValue = gridDataString;
-                        var newValue = parametersForm.GetJsonSerializedItems();
-
-                        this.gridHandler.ChangeCell(new(cell) { OldValue = oldValue, NewValue = newValue });
+                        var jsonString = parametersForm.GetJsonSerializedItems();
+                        cell.Value = jsonString;
                     };
                     parametersForm.Show(gridForm);
                 }

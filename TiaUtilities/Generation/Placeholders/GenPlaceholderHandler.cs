@@ -18,7 +18,7 @@ namespace TiaUtilities.Generation.Placeholders
 
         public string TabName { set => AddOrReplace(GenPlaceholders.Generation.TAB_NAME, new StringGenPlaceholderData() { Value = value }); }
 
-        public IGridData GridData
+        public GridData GridData
         {
             set
             {

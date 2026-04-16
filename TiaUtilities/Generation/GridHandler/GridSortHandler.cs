@@ -6,7 +6,7 @@ using TiaUtilities.UndoRedo;
 
 namespace TiaUtilities.Generation.GridHandler
 {
-    public class GridSortHandler<T>(GridHandler<T> gridHandler, UndoRedoHandler undoRedoHandler, IGridRowComparer<T>? comparer) : IGridCellPainter where T : IGridData
+    public class GridSortHandler<T>(GridHandler<T> gridHandler, UndoRedoHandler undoRedoHandler, IGridRowComparer<T>? comparer) : IGridCellPainter where T : GridData
     {
         private SortOrder sortOrder = SortOrder.None;
         private Dictionary<T, int>? noSortIndexSnapshot;

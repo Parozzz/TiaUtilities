@@ -1,4 +1,6 @@
-﻿namespace TiaUtilities.Generation.GridHandler.Events
+﻿using TiaUtilities.Generation.GridHandler.Data;
+
+namespace TiaUtilities.Generation.GridHandler.Events
 {
     #region SELECTED_ROW_CHANGED
     public delegate void GridSelectedRowChangedEventHandler(object? sender, GridSelectedRowChangedArgs args);
@@ -16,8 +18,8 @@
 
     public class GridCellChangeEventArgs : EventArgs
     {
-        public List<GridCellChange>? CellChangeList { get; set; }
-        public bool IsUndo { get; set; }
+        public required List<GridDataChangedEventArgs> Changes { get; init; }
+        //public bool IsUndo { get; set; }
     }
     #endregion
 

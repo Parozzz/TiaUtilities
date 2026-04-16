@@ -2,7 +2,7 @@
 
 namespace TiaUtilities.Generation.GridHandler.Data
 {
-    public class GridDataHandler<T> where T : IGridData
+    public class GridDataHandler<T> where T : GridData
     {
         private readonly DataGridView dataGridView;
         public IReadOnlyList<GridDataColumn> DataColumns { get; private set; }

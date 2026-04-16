@@ -1,19 +1,20 @@
-﻿using TiaUtilities.Generation.GridHandler.Binds;
+﻿using DocumentFormat.OpenXml.Office2010.ExcelAc;
+using System.Diagnostics;
+using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.CellPainters;
-using TiaUtilities.Generation.GridHandler.Data;
-using TiaUtilities.Generation.GridHandler.JSScript;
-using TiaUtilities.Languages;
 using TiaUtilities.Generation.GridHandler.CustomColumns;
+using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.GridHandler.Events;
+using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.Placeholders;
+using TiaUtilities.Languages;
 using TiaUtilities.UndoRedo;
 using TiaUtilities.Utility;
 using TiaUtilities.Utility.Extensions;
-using System.Diagnostics;
 
 namespace TiaUtilities.Generation.GridHandler
 {
-    public class GridHandler<T> : ICleanable, ISaveable<GridSave<T>> where T : IGridData
+    public class GridHandler<T> : ICleanable, ISaveable<GridSave<T>> where T : GridData
     {
         private class ColumnInfo(DataGridViewColumn column, GridDataColumn dataColumn, int width)
         {
@@ -47,13 +48,28 @@ namespace TiaUtilities.Generation.GridHandler
         private bool init;
         private bool dirty;
 
+        private bool _cacheChanges = false;
+        public bool CacheChanges
+        {
+            get => _cacheChanges;
+            set
+            {
+                if (value == false)
+                {
+                    this.HandleCache();
+                }
+
+                _cacheChanges = value;
+            }
+        }
+
         public uint RowCount { get; set; } = 9;
         public bool AddRowIndexToRowHeader { get; set; } = true;
         public bool EnablePasteFromExcel { get; set; } = true;
         public bool EnableRowSelectionFromRowHeaderClick { get; set; } = true;
         public bool ShowJSContextMenuTopLeft { get; set; } = true;
 
-        public GridHandler(GridSettings settings, GridBindContainer gridBindFactory, GridDataPreviewer<T> previewer, 
+        public GridHandler(GridSettings settings, GridBindContainer gridBindFactory, GridDataPreviewer<T> previewer,
             GenPlaceholderHandler placeholderHandler, IGridRowComparer<T>? comparer = null)
         {
             this.DataGridView = new MyGrid();
@@ -67,7 +83,7 @@ namespace TiaUtilities.Generation.GridHandler
             this.excelDragHandler = new(this.DataGridView, this.Events, settings);
 
             this.DataHandler = new(this.DataGridView);
-            this.DataSource = new(this.DataGridView, this.DataHandler);
+            this.DataSource = new(this.DataGridView, this, this.DataHandler, this.undoRedoHandler);
             this.sortHandler = new(this, this.undoRedoHandler, comparer);
 
             this.previewer = previewer;
@@ -241,7 +257,7 @@ namespace TiaUtilities.Generation.GridHandler
             #region EVENT - CELL FORMATTING
             this.DataGridView.CellFormatting += (sender, args) =>
             {
-                if(this.DataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex] is DataGridViewButtonCell buttonCell)
+                if (this.DataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex] is DataGridViewButtonCell buttonCell)
                 {
                     var data = this.DataSource[args.RowIndex];
                     args.Value = $"{data[args.ColumnIndex]}";
@@ -291,7 +307,11 @@ namespace TiaUtilities.Generation.GridHandler
                         break;
                     case Keys.Insert | Keys.Shift:
                     case Keys.V | Keys.Control:
-                        ChangeCells(GridUtils.PasteAsExcel(this.DataGridView));
+
+                        this.CacheChanges = true;
+                        GridUtils.PasteAsExcel(this.DataGridView);
+                        this.CacheChanges = false;
+                        //ChangeCells(GridUtils.PasteAsExcel(this.DataGridView));
                         this.Refresh(); //This is required since for some special column type (Like checkbox) is needed.
                         break;
                     case Keys.F | Keys.Control:
@@ -319,6 +339,7 @@ namespace TiaUtilities.Generation.GridHandler
             #endregion
 
             #region CELL EDIT BEGIN-END - CELL CHANGE
+            /*
             GridCellChange? editCellChange = null;
             this.DataGridView.CellBeginEdit += (sender, args) =>
             {
@@ -343,7 +364,7 @@ namespace TiaUtilities.Generation.GridHandler
                 ChangeCell(editCellChange, applyChanges: false);
 
                 editCellChange = null;
-            };
+            };*/
 
             this.DataGridView.CellContentClick += (sender, args) =>
             {
@@ -359,11 +380,11 @@ namespace TiaUtilities.Generation.GridHandler
                 {
                     var oldValue = (bool)(checkBoxCell.Value ?? false); //In this case the value is still the old one. For checkBox, been boolean value, i can predict the next!
                     var newValue = !oldValue;
-                    ChangeCell(new GridCellChange(checkBoxCell) { OldValue = oldValue, NewValue = newValue }, applyChanges: false);
+                    //ChangeCell(new GridCellChange(checkBoxCell) { OldValue = oldValue, NewValue = newValue }, applyChanges: false);
 
                     this.DataGridView.EndEdit(); //If a checkbox is clicked, it goes in edit mode. I do not want that, is confusing. This fixes it.
                 }
-                else if(cell is DataGridViewButtonCell buttonCell && cell.OwningColumn is DataGridViewEventableButtonColumn eventableButtonColumn)
+                else if (cell is DataGridViewButtonCell buttonCell && cell.OwningColumn is DataGridViewEventableButtonColumn eventableButtonColumn)
                 {
                     var data = this.DataSource[rowIndex][columnIndex];
                     eventableButtonColumn.ButtonPressedEvent(data, buttonCell);
@@ -449,10 +470,10 @@ namespace TiaUtilities.Generation.GridHandler
         {
             this.DataGridView.SuspendLayout();
             this.DataGridView.Enabled = false;
-            
+
             this.undoRedoHandler.Clear();
             this.DataSource.LoadSave(gridSave.RowData);
-            
+
             this.DataGridView.Enabled = true;
             this.DataGridView.Refresh();
             this.DataGridView.ResumeLayout();
@@ -600,7 +621,8 @@ namespace TiaUtilities.Generation.GridHandler
                     var currentCell = this.DataGridView.CurrentCell;
                     if (currentCell is DataGridViewCheckBoxCell checkBoxCell && checkBoxCell.Value is bool boolValue)
                     {
-                        this.ChangeCell(new GridCellChange(currentCell) { OldValue = boolValue, NewValue = !boolValue });
+                        checkBoxCell.Value = !boolValue;
+                        //this.ChangeCell(new GridCellChange(currentCell) { OldValue = boolValue, NewValue = !boolValue });
                         this.Refresh(); //Needed for checkbox cell
 
                         if (currentCell.RowIndex < this.DataGridView.RowCount)
@@ -617,7 +639,7 @@ namespace TiaUtilities.Generation.GridHandler
             {//This is required for some special actions! (Like arrows for Suggestions!)
                 if (column is IGridCustomColumn customColumn && customColumn.ProcessCmdKey(ref msg, keyData))
                 {
-                    return true; 
+                    return true;
                 }
             }
 
@@ -626,16 +648,170 @@ namespace TiaUtilities.Generation.GridHandler
 
         public void DeleteSelectedCells()
         {
-            var deletedCellList = new List<GridCellChange>();
+            this.CacheChanges = true;
+
+            //var deletedCellList = new List<GridCellChange>();
             foreach (DataGridViewCell selectedCell in DataGridView.SelectedCells)
             {
-                deletedCellList.Add(new GridCellChange(selectedCell) { NewValue = null }); //Set value to null so it will clear also checkboxes
+                selectedCell.Value = null;
+                //deletedCellList.Add(new GridCellChange(selectedCell) { NewValue = null }); //Set value to null so it will clear also checkboxes
             }
 
-            this.ChangeCells(deletedCellList);
+            this.CacheChanges = false;
+
+            //this.ChangeCells(deletedCellList);
         }
 
-        public void ChangeRow(int rowIndex, T data)
+        private readonly List<GridDataChangedEventArgs> cachedChanges = [];
+
+        private void HandleCache()
+        {
+            List<GridDataChangedEventArgs> changes = [.. cachedChanges];
+            this.HandleDataChanges(changes);
+
+            cachedChanges.Clear();
+        }
+
+        public void HandleDataChanged(GridDataChangedEventArgs args)
+        {
+            if(this.CacheChanges)
+            {
+                this.cachedChanges.Add(args);
+            }
+            else
+            {
+                List<GridDataChangedEventArgs> changes = [args];
+                this.HandleDataChanges(changes);
+            }
+        }
+
+        private void HandleDataChanges(List<GridDataChangedEventArgs> changes)
+        {
+            this.Events.CellChangeEvent(this, new() { Changes = changes });
+
+            this.undoRedoHandler.AddUndo(() =>
+            {
+                this.DataGridView.SuspendLayout();
+
+                this.undoRedoHandler.Lock();
+                foreach (var change in changes)
+                {
+                    change.RestoreOldValue();
+                }
+                this.undoRedoHandler.Unlock();
+
+                this.undoRedoHandler.AddRedo(() =>
+                {
+                    this.DataGridView.SuspendLayout();
+
+                    this.undoRedoHandler.Lock();
+                    foreach (var change in changes)
+                    {
+                        change.RestoreNewValue();
+                    }
+                    this.undoRedoHandler.Unlock();
+
+                    this.DataGridView.Refresh();
+                    this.DataGridView.ResumeLayout();
+
+                    this.AddUndo(changes);
+                });
+
+                this.DataGridView.Refresh();
+                this.DataGridView.ResumeLayout();
+            });
+        }
+
+
+        public void AddData(IEnumerable<T> dataEnumerable)
+        {
+            this.CacheChanges = true;
+
+            var emptyIndexList = DataSource.GetFirstEmptyRowIndexes(dataEnumerable.Count());
+
+            int i = 0;
+            foreach (var data in dataEnumerable)
+            {
+                if (i >= emptyIndexList.Count)
+                {
+                    break;
+                }
+
+                var emptyIndex = emptyIndexList[i++];
+
+                var emptyData = this.DataSource[emptyIndex];
+                GridUtils.CopyGridDataValues(data, emptyData);
+            }
+
+            this.CacheChanges = false;
+        }
+
+        public void SelectRow(int rowIndex)
+        {
+            this.DataGridView.ClearSelection();
+
+            var row = this.DataGridView.Rows[rowIndex];
+            if (row.Cells.Count > 0)
+            {
+                //I need to set the current cell, because i use the CurrentRow as a "starting row"
+                //Do not cancel current cell! It might select the first cell in the grid and mess up selection.
+                this.DataGridView.CurrentCell = row.Cells[0];
+                foreach (DataGridViewCell cell in row.Cells)
+                {
+                    cell.Selected = true;
+                }
+            }
+        }
+
+        private void SelectCell(GridCellChange cellChange)
+        {
+            this.SelectCell(cellChange.RowIndex, cellChange.ColumnIndex);
+        }
+
+        private void SelectCell(int rowIndex, int columnIndex)
+        {
+            this.SelectCell(this.DataGridView.Rows[rowIndex].Cells[columnIndex]);
+        }
+
+        private void SelectCell(DataGridViewCell? cell)
+        {
+            this.DataGridView.RefreshEdit(); //This is required to refresh checkbox otherwise, if the undo is in a selected cell, it will not update visually (DATA IS CHANGED!)
+            this.DataGridView.Refresh();
+
+            this.DataGridView.ClearSelection();
+
+            this.DataGridView.CurrentCell = cell; //Setting se current cell already center the grid to it.
+            this.DataGridView.Refresh();
+        }
+
+    }
+
+    internal class MyGrid : DataGridView
+    {
+        public MyGrid()
+        {
+            this.SetStyle(ControlStyles.SupportsTransparentBackColor, true); //this is the key
+            this.DoubleBuffered = true;
+        }
+
+        protected override void OnHandleCreated(EventArgs e)
+        {
+            // BUG => System.InvalidOperationException: 'L'operazione non può essere eseguita mentre è in corso il ridimensionamento di una colonna con riempimento automatico.'
+            // FIX = https://stackoverflow.com/questions/34344499/invalidoperationexception-this-operation-cannot-be-performed-while-an-auto-fill
+
+            // Touching the TopLeftHeaderCell here prevents
+            // System.InvalidOperationException:
+            // This operation cannot be performed while
+            // an auto-filled column is being resized.
+
+            var topLeftHeaderCell = TopLeftHeaderCell;
+            base.OnHandleCreated(e);
+        }
+    }
+}
+
+/*
+          public void ChangeRow(int rowIndex, T data)
         {
             this.ChangeCells(this.DataHandler.CreateCellChanges(rowIndex, data));
         }
@@ -777,87 +953,4 @@ namespace TiaUtilities.Generation.GridHandler
 
             undoRedoHandler.Unlock(); //And a locked undoRedo
         }
-
-        public void AddData(IEnumerable<T> dataEnumerable)
-        {
-            var dataDict = new Dictionary<int, T>();
-
-            var emptyIndexList = DataSource.GetFirstEmptyRowIndexes(dataEnumerable.Count());
-
-            int i = 0;
-            foreach (var data in dataEnumerable)
-            {
-                if (i >= emptyIndexList.Count)
-                {
-                    break;
-                }
-
-                var index = emptyIndexList[i++];
-                dataDict.AddOrReplace(index, data);
-            }
-            this.ChangeMultipleRows(dataDict);
-        }
-
-        public void SelectRow(int rowIndex)
-        {
-            this.DataGridView.ClearSelection();
-
-            var row = this.DataGridView.Rows[rowIndex];
-            if (row.Cells.Count > 0)
-            {
-                //I need to set the current cell, because i use the CurrentRow as a "starting row"
-                //Do not cancel current cell! It might select the first cell in the grid and mess up selection.
-                this.DataGridView.CurrentCell = row.Cells[0];
-                foreach (DataGridViewCell cell in row.Cells)
-                {
-                    cell.Selected = true;
-                }
-            }
-        }
-
-        private void SelectCell(GridCellChange cellChange)
-        {
-            this.SelectCell(cellChange.RowIndex, cellChange.ColumnIndex);
-        }
-
-        private void SelectCell(int rowIndex, int columnIndex)
-        {
-            this.SelectCell(this.DataGridView.Rows[rowIndex].Cells[columnIndex]);
-        }
-
-        private void SelectCell(DataGridViewCell? cell)
-        {
-            this.DataGridView.RefreshEdit(); //This is required to refresh checkbox otherwise, if the undo is in a selected cell, it will not update visually (DATA IS CHANGED!)
-            this.DataGridView.Refresh();
-
-            this.DataGridView.ClearSelection();
-
-            this.DataGridView.CurrentCell = cell; //Setting se current cell already center the grid to it.
-            this.DataGridView.Refresh();
-        }
-
-    }
-
-    internal class MyGrid : DataGridView
-    {
-        public MyGrid()
-        {
-            this.SetStyle(ControlStyles.SupportsTransparentBackColor, true); //this is the key
-            this.DoubleBuffered = true;
-        }
-
-        protected override void OnHandleCreated(EventArgs e)
-        {
-            // BUG => System.InvalidOperationException: 'L'operazione non può essere eseguita mentre è in corso il ridimensionamento di una colonna con riempimento automatico.'
-            // FIX = https://stackoverflow.com/questions/34344499/invalidoperationexception-this-operation-cannot-be-performed-while-an-auto-fill
-
-            // Touching the TopLeftHeaderCell here prevents
-            // System.InvalidOperationException:
-            // This operation cannot be performed while
-            // an auto-filled column is being resized.
-
-            var topLeftHeaderCell = TopLeftHeaderCell;
-            base.OnHandleCreated(e);
-        }
-    }
-}
+ */ 

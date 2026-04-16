@@ -180,15 +180,22 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
                     importDataList.Add(new() { Address = address, IOName = ioName, Comment = comment });
                 }
 
+                this.gridHandler.CacheChanges = true;
+
                 //Splitted this way to increase performance. Changing cell one at the time for 20-30 values takes 400ms, this way 10ms
-                var freeIndexList = this.gridHandler.DataSource.GetFirstEmptyRowIndexes(importDataList.Count);
+                var emptyIndexList = this.gridHandler.DataSource.GetFirstEmptyRowIndexes(importDataList.Count);
 
                 var dataDict = new Dictionary<int, IOGenExcelImportData>();
-                for (int i = 0; i < freeIndexList.Count; i++)
+                for (int i = 0; i < emptyIndexList.Count; i++)
                 {
-                    dataDict.Add(freeIndexList[i], importDataList[i]);
+                    var emptyIndex = emptyIndexList[i];
+                    var importData = importDataList[i];
+
+                    var emptyImportData = this.gridHandler.DataSource[emptyIndex];
+                    GridUtils.CopyGridDataValues(importData, emptyImportData);
                 }
-                this.gridHandler.ChangeMultipleRows(dataDict);
+
+                this.gridHandler.CacheChanges = false;
             }
             catch (Exception ex)
             {

@@ -127,9 +127,12 @@ namespace TiaUtilities.Generation.IO.Module
                         var dataDict = new Dictionary<int, IOData>();
                         for (int i = 0; i < firstEmptyIndexList.Count; i++)
                         {
-                            dataDict.Add(firstEmptyIndexList[i], ioDataList[i]);
+                            var emptyIndex = firstEmptyIndexList[i];
+                            var ioData = ioDataList[i];
+
+                            var emptyIoData = gridHandler.DataSource[emptyIndex];
+                            GridUtils.CopyGridDataValues(ioData, emptyIoData);
                         }
-                        gridHandler.ChangeMultipleRows(dataDict);
                     }
                 }
             };
@@ -211,11 +214,11 @@ namespace TiaUtilities.Generation.IO.Module
                     var xmlNodeConfiguration = SimaticMLAPI.ParseFile(filePath);
                     if (xmlNodeConfiguration is XMLTagTable tagTable)
                     {
+                        ioTab.GridHandler.CacheChanges = true;
+
                         var tags = tagTable.GetTags().Values;
 
                         var emptyIndexList = ioTab.GridHandler.DataSource.GetFirstEmptyRowIndexes(tags.Count);
-
-                        List<GridCellChange> cellChangeList = [];
 
                         int i = 0;
                         foreach (var tag in tagTable.GetTags().Values)
@@ -231,12 +234,13 @@ namespace TiaUtilities.Generation.IO.Module
                             var ioName = tag.TagName;
                             var comment = tag.Comment[LocaleVariables.CULTURE] ?? tag.Comment.GetDictionary().Values.FirstOrElse(() => "");
 
-                            cellChangeList.AddRange(
-                                ioTab.GridHandler.DataHandler.CreateCellChanges(index, new() { Address = address, IOName = ioName, Comment = comment })
-                            );
+                            var ioData = ioTab.GridHandler.DataSource[index];
+                            ioData.Address = address;
+                            ioData.IOName = ioName;
+                            ioData.Comment = comment;
                         }
 
-                        ioTab.GridHandler.ChangeCells(cellChangeList);
+                        ioTab.GridHandler.CacheChanges = false;
                     }
                     else
                     {

@@ -5,7 +5,7 @@ using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.GridHandler.CellPainters
 {
-    public class GridCellPreviewPainter<T>(GenPlaceholderHandler placeholderHandler, GridDataPreviewer<T> previewer, GridDataSource<T> dataSource, GridSettings settings) : IGridCellPainter where T : IGridData
+    public class GridCellPreviewPainter<T>(GenPlaceholderHandler placeholderHandler, GridDataPreviewer<T> previewer, GridDataSource<T> dataSource, GridSettings settings) : IGridCellPainter where T : GridData
     {
         public PaintRequest PaintCellRequest(DataGridViewCellPaintingEventArgs args)
         {

@@ -13,7 +13,7 @@
         }
     }
 
-    public class GridDataPreviewer<T> where T : IGridData
+    public class GridDataPreviewer<T> where T : GridData
     {
         public Func<int, T, Preview?>? Function { private get; set; }
 

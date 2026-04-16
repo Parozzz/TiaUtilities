@@ -5,21 +5,15 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
 {
     public class GridScriptVariable(string programmingName, string valueType)
     {
-        public static GridScriptVariable CreateFromGrid<H>(GridDataColumn column, GridHandler<H> gridHandler) where H : IGridData
+        public static GridScriptVariable CreateFromGrid<H>(GridDataColumn column, GridHandler<H> gridHandler) where H : GridData
         {
             GridScriptVariable scriptVariable = new(column.ProgrammingFriendlyName, column.PropertyInfo.PropertyType.Name)
             {
                 Get = row => column.GetValueFrom(gridHandler.DataSource[row]),
                 CreateCachedCellChange = (row, v) =>
                 {
-                    var actValue = column.GetValueFrom(gridHandler.DataSource[row]);
-
-                    GridCellChange cellChange = new(column, row)
-                    {
-                        OldValue = actValue,
-                        NewValue = v
-                    };
-                    gridHandler.AddCachedCellChange(cellChange);
+                    var data = gridHandler.DataSource[row];
+                    column.SetValueTo(data, v);
                 }
             };
             return scriptVariable;

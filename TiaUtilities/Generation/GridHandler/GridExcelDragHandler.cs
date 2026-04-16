@@ -5,7 +5,7 @@ using TiaUtilities.Generation.GridHandler.Data;
 
 namespace TiaUtilities.Generation.GridHandler
 {
-    public class GridExcelDragHandler<T>(DataGridView dataGridView, GridEvents<T> gridEvents, GridSettings settings) : IGridCellPainter where T : IGridData
+    public class GridExcelDragHandler<T>(DataGridView dataGridView, GridEvents<T> gridEvents, GridSettings settings) : IGridCellPainter where T : GridData
     {
         public const int TRIANGLE_SIZE = 13;
 

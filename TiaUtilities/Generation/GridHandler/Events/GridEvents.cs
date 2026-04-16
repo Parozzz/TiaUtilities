@@ -2,7 +2,7 @@
 
 namespace TiaUtilities.Generation.GridHandler.Events
 {
-    public class GridEvents<T> where T : IGridData
+    public class GridEvents<T> where T : GridData
     {
         public event GridSelectedRowChangedEventHandler RowSelectedChanged = delegate { };
         public event GridCellChangeEventHandler CellChange = delegate { };
