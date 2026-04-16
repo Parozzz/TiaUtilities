@@ -1,7 +1,10 @@
-﻿namespace TiaUtilities.Generation
+﻿using TiaUtilities.SettingsNew.Bindings;
+
+namespace TiaUtilities.Generation
 {
     public interface IGenModule : ICleanable, ISaveable<object>
     {
+        public abstract SettingsBindings SettingsBindings { get; init; }
 
         public void Init(GenModuleForm form);
 
@@ -14,5 +17,7 @@
         public string GetFormLocalizatedName();
 
         public bool ProcessCmdKey(ref Message msg, Keys keyData); //To be passed from the form!
+
+        public void OpenPlaceholderViewer(IWin32Window? window = null);
     }
 }

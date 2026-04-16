@@ -1,4 +1,6 @@
-﻿namespace TiaUtilities.Generation.GridHandler.JSScript
+﻿using TiaUtilities.CustomControls.EditableTab;
+
+namespace TiaUtilities.Generation.GridHandler.JSScript
 {
     partial class GridScriptForm
     {
@@ -40,7 +42,7 @@
             variablesPanel = new TableLayoutPanel();
             variablesLabel = new Label();
             variablesTreeView = new TreeView();
-            scriptTabControl = new CustomControls.InteractableTabControl();
+            scriptTabControl = new EditableTabControl();
             buttonPanel = new TableLayoutPanel();
             executeLineButton = new Button();
             executeAllButton = new Button();
@@ -429,7 +431,7 @@
         private TextBox logTextBox;
         private TableLayoutPanel jsonContextPanel;
         private Label jsonContextLabel;
-        private CustomControls.InteractableTabControl scriptTabControl;
+        private EditableTabControl scriptTabControl;
         private TableLayoutPanel variablesPanel;
         private Label variablesLabel;
         private TreeView variablesTreeView;

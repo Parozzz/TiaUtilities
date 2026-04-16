@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
-using TiaUtilities.Generation.Alarms;
+using TiaUtilities.Generation.Alarms.Data;
 using TiaUtilities.Generation.GridHandler.Data;
-using TiaUtilities.Generation.IO;
+using TiaUtilities.Generation.IO.Data;
 using TiaUtilities.Generation.Placeholders.Data;
 using TiaUtilities.Utility.Extensions;
 
@@ -35,9 +35,9 @@ namespace TiaUtilities.Generation.Placeholders
                     {
                         alarmPlaceholderHandler.DeviceData = deviceData;
                     }
-                    else if (value is AlarmData alarmData)
+                    else if (value is TemplateData templateData)
                     {
-                        alarmPlaceholderHandler.AlarmData = alarmData;
+                        alarmPlaceholderHandler.TemplateData = templateData;
                     }
                 }
             }
@@ -88,7 +88,7 @@ namespace TiaUtilities.Generation.Placeholders
 
         protected void AddOrReplace(string placeholder, IGenPlaceholderData placeholderData)
         {
-            placeholdersDict.Compute(placeholder, placeholderData);
+            placeholdersDict.AddOrReplace(placeholder, placeholderData);
         }
 
         public string ParseNotNull(string? str)
@@ -115,8 +115,7 @@ namespace TiaUtilities.Generation.Placeholders
                     break;
                 }
             }
-
-            //{mnemonic} {bit_address} {byte_address} {cad_address} {cad_comment1} {cad_comment2} {cad_comment3} {cad_comment4} {cad_page} {cad_panel} {cad_type}
+            
             return localStr;
         }
 

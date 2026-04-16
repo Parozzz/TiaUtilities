@@ -5,7 +5,7 @@ using System.Drawing.Drawing2D;
 namespace TiaUtilities.CustomControls
 {
     [DefaultEvent("OnSelectedIndexChanged")]
-    class RJComboBox : UserControl
+    public class RJComboBox : UserControl
     {
         [Category("RJ Code - Appearance")]
         public override Color BackColor
@@ -158,6 +158,7 @@ namespace TiaUtilities.CustomControls
             get => this.textBox.ContextMenuStrip;
             set => this.textBox.ContextMenuStrip = value;
         }
+
         #region COMBO_BOX_PROPERTIES
         [Category("RJ Code - Data")]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
@@ -243,6 +244,15 @@ namespace TiaUtilities.CustomControls
         {
             get => this.comboBox.ValueMember;
             set => this.comboBox.ValueMember = value;
+        }
+
+        [Category("RJ Code - Data")]
+        [DefaultValue(false)]
+        [Editor("System.Windows.Forms.Design.DataMemberFieldEditor, System.Design, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", typeof(UITypeEditor))]
+        public bool DroppedDrown
+        {
+            get => this.comboBox.DroppedDown;
+            set => this.comboBox.DroppedDown = value;
         }
         #endregion
 

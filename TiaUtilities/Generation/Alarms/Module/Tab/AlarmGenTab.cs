@@ -1,10 +1,12 @@
-﻿using TiaUtilities.Generation.Alarms.Module.Template;
-using TiaUtilities.Generation.GridHandler.Binds;
+﻿using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.CustomColumns;
+using TiaUtilities.Generation.Alarms.Configurations;
+using TiaUtilities.Generation.Alarms.Data;
+using TiaUtilities.Generation.Alarms.Template;
 
 namespace TiaUtilities.Generation.Alarms.Module.Tab
 {
@@ -15,13 +17,14 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
         private readonly AlarmMainConfiguration mainConfig;
         private readonly AlarmGenTemplateHandler templateHandler;
 
+        public string Name { get => this.TabPage.Text; set => this.TabPage.Text = value; }
         public TabPage TabPage { get; init; }
         public AlarmTabConfiguration TabConfig { get; init; }
 
         private readonly GridDataPreviewer<DeviceData> deviceDataPreview;
         private readonly GridHandler<DeviceData> deviceGridHandler;
 
-        public AlarmGenTabControl TabControl { get; init; }
+        public DataGridView DataGridViewControl { get => deviceGridHandler.DataGridView; }
         public List<DeviceData> DeviceDataList { get => new(deviceGridHandler.DataSource.GetNotEmptyClonedDataDict().Keys); } //Return CLONED data, otherwise operations on the xml generation will affect the table!
 
         private bool dirty = false;
@@ -39,16 +42,11 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             
             AlarmGenPlaceholdersHandler placeholdersHandler = new(mainConfig, this.TabConfig);
             this.deviceDataPreview = new();
-            this.deviceGridHandler = new(MainForm.Settings.GridSettings, this.gridBindContainer, this.deviceDataPreview, placeholdersHandler) { RowCount = 499 };
-            
-            this.TabControl = new(bindContainer.GridScriptHandler.ErrorThread, this.templateHandler, deviceGridHandler.DataGridView);
+            this.deviceGridHandler = new(MainForm.Settings.GridSettings, this.gridBindContainer, this.deviceDataPreview, placeholdersHandler) { RowCount = AlarmGenModule.DEVICE_GRID_ROW_COUNT };
         }
 
         public void Init()
         {
-            this.TabControl.Init(); //This before configHandler.
-            this.TabControl.BindConfig(this.gridBindContainer, this.mainConfig, this.TabConfig, this.module.TabConfigurations);
-
             #region DEVICE_GRID_SETUP
             this.deviceGridHandler.Events.ExcelDragPreview += (sender, args) => GridUtils.DragPreview(args, deviceGridHandler);
             this.deviceGridHandler.Events.ExcelDragDone += (sender, args) => GridUtils.DragDone(args, deviceGridHandler);
@@ -69,7 +67,6 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             #endregion
 
             this.TabPage.TextChanged += (sender, args) => this.dirty = true;
-
             this.Translate();
         }
 
@@ -80,7 +77,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
 
         private void Translate()
         {
-            TabControl.Translate();
+            //
         }
 
         public bool IsDirty() => this.dirty || this.TabConfig.IsDirty() || this.deviceGridHandler.IsDirty();
@@ -115,6 +112,21 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
         public bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             return deviceGridHandler.ProcessCmdKey(ref msg, keyData);
+        }
+
+        public void ParseTemplateRenamed(string oldName, string newName)
+        {
+            var indexes = deviceGridHandler.DataSource.GetNotEmptyIndexes();
+            foreach (var index in indexes)
+            {
+                var data = deviceGridHandler.DataSource[index];
+                if(oldName.Equals(data.Template))
+                {
+                    data.Template = newName;
+                }
+            }
+
+            this.deviceGridHandler.Refresh();
         }
     }
 }

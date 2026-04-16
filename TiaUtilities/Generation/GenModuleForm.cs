@@ -1,5 +1,8 @@
 ﻿using InfoBox;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using System.Reflection;
+using TiaUtilities.Constants;
+using TiaUtilities.Generation.SettingsNew;
 using TiaUtilities.Languages;
 using TiaUtilities.Utility;
 
@@ -50,10 +53,21 @@ namespace TiaUtilities.Generation
             };
             #endregion
 
-            #region TOP_MENU
+            #region TOP_MENU_FILE
             this.saveMenuItem.Click += (sender, args) => { this.ModuleSave(); };
             this.saveAsMenuItem.Click += (sender, args) => { this.ModuleSave(saveAs: true); };
             this.loadMenuItem.Click += (sender, args) => { this.ModuleLoad(); };
+            #endregion
+
+            #region TOP_MENU_TOOLS
+            this.toolsPlaceholderViewerMenuItem.Click += (sender, args) => this.module.OpenPlaceholderViewer(this);
+            #endregion
+
+            #region TOP_MENU_PROGRAM
+            this.programSettingsMenuItem.Click += (sender, args) => new SettingsForm(MainForm.SettingsBindings).Show(this);
+            #endregion
+
+            #region TOP_MENU_IMPORT_EXPORT
             this.exportXMLMenuItem.Click += (sender, args) =>
             {
                 try
@@ -81,7 +95,6 @@ namespace TiaUtilities.Generation
                     Utils.ShowExceptionMessage(ex);
                 }
             };
-            this.preferencesMenuItem.Click += (sender, args) => MainForm.Settings.GridSettings.ShowConfigForm(this);
             #endregion
 
             #region AUTO_SAVE
@@ -108,14 +121,20 @@ namespace TiaUtilities.Generation
             this.SetLocalizedFormText("");
 
             this.fileMenuItem.Text = Locale.GENERICS_FILE;
-            this.saveMenuItem.Text = Locale.GENERICS_SAVE;
+            this.saveMenuItem.Text = Locale.GENERICS_SAVE + " (CTRL+S)"; ;
             this.saveAsMenuItem.Text = Locale.GENERICS_SAVE_AS;
-            this.loadMenuItem.Text = Locale.GENERICS_LOAD;
+            this.loadMenuItem.Text = Locale.GENERICS_LOAD + " (CTRL+L)";
 
-            this.importExportMenuItem.Text = Locale.IO_GEN_FORM_IMPEXP;
-            this.exportXMLMenuItem.Text = Locale.IO_GEN_FORM_IMPEXP_EXPORT_XML;
+            this.programMenuItem.Text = Locale.GENERICS_PROGRAM;
+            this.programSettingsMenuItem.Text = Locale.GENERICS_SETTINGS + " (CTRL+P)";
 
-            this.preferencesMenuItem.Text = Locale.GRID_PREFERENCES;
+            this.toolsMenuItem.Text = Locale.GEN_FORM_TOOLS;
+            this.toolsPlaceholderViewerMenuItem.Text = Locale.GEN_FORM_TOOLS_PLACEHOLDER_VIEWER + " (CTRL+Q)";
+
+            this.importExportMenuItem.Text = Locale.GEN_FORM_IMPORT_EXPORT;
+            this.exportXMLMenuItem.Text = Locale.GEN_FORM_IMPORT_EXPORT_EXPORT_XML;
+
+
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -124,12 +143,21 @@ namespace TiaUtilities.Generation
             {
                 switch (keyData)
                 {
+                    case Keys.P | Keys.Control:
+                        this.programSettingsMenuItem.PerformClick();
+                        return true;
                     case Keys.S | Keys.Control:
                         this.ModuleSave(force: true);
                         return true; //Return required otherwise will write the letter.
                     case Keys.L | Keys.Control:
                         this.ModuleLoad();
                         return true; //Return required otherwise will write the letter.
+                    case Keys.I | Keys.Control:
+                        new SettingsForm(this.module.SettingsBindings).Show(this);
+                        return true;
+                    case Keys.Q | Keys.Control:
+                        this.module.OpenPlaceholderViewer(this);
+                        return true;
                 }
 
                 if (this.module.ProcessCmdKey(ref msg, keyData))
@@ -160,8 +188,14 @@ namespace TiaUtilities.Generation
             }
 
             var projectSave = this.module.CreateSave();
+            if (projectSave == null)
+            {
+                return;
+            }
 
-            var saveOK = SavesLoader.Save(projectSave, ref lastFilePath, Constants.SAVE_FILE_EXTENSION, saveAs || !File.Exists(lastFilePath));
+            var version = GetProjectSaveVersion(projectSave);
+
+            var saveOK = SavesLoader.Save(projectSave, version, ref lastFilePath, ProgramConstants.SAVE_FILE_EXTENSION, saveAs || !File.Exists(lastFilePath));
             if (!saveOK)
             {
                 return;
@@ -176,7 +210,7 @@ namespace TiaUtilities.Generation
         {
             projectLoading = true;
 
-            saveObject ??= SavesLoader.LoadWithDialog(ref lastFilePath, Constants.SAVE_FILE_EXTENSION);
+            saveObject ??= SavesLoader.LoadWithDialog(ref lastFilePath, ProgramConstants.SAVE_FILE_EXTENSION);
             if (saveObject != null)
             {
                 this.module.LoadSave(saveObject);
@@ -196,6 +230,22 @@ namespace TiaUtilities.Generation
         public void SetLastFilePath(string? filePath)
         {
             this.lastFilePath = filePath;
+        }
+
+        private int GetProjectSaveVersion(Object obj)
+        {
+            const int LEGACY_VERSION = 1;
+
+            var type = obj.GetType();
+
+            var versionPropertyType = type.GetProperty("VERSION", BindingFlags.Static);
+            if (versionPropertyType == null)
+            {
+                return LEGACY_VERSION; //If no version is found, i consider it a legacy V1.
+            }
+
+            var version = versionPropertyType.GetValue(null);
+            return version is int intVersion ? intVersion : LEGACY_VERSION;
         }
     }
 }

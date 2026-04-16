@@ -1,35 +1,66 @@
-﻿using InfoBox;
+﻿using DocumentFormat.OpenXml.Office2010.ExcelAc;
+using InfoBox;
 using Jint;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using SimaticML;
 using SimaticML.API;
+using SimaticML.Blocks;
+using System.Diagnostics;
 using System.Globalization;
 using System.Xml;
-using TiaUtilities.Generation.Alarms.Module;
-using TiaUtilities.Generation.Configuration.Utility;
-using TiaUtilities.Generation.IO.Module;
-using TiaUtilities.Languages;
-using Timer = System.Windows.Forms.Timer;
+using TiaUtilities.Constants;
 using TiaUtilities.DbVisualization;
 using TiaUtilities.Editors.ErrorReporting;
 using TiaUtilities.Generation;
+using TiaUtilities.Generation.Alarms;
+using TiaUtilities.Generation.Alarms.Module;
 using TiaUtilities.Generation.Configuration;
+using TiaUtilities.Generation.Configuration.Utility;
+using TiaUtilities.Generation.GridHandler;
+using TiaUtilities.Generation.IO;
+using TiaUtilities.Generation.IO.Module;
+using TiaUtilities.Generation.SettingsNew;
+using TiaUtilities.Languages;
+using TiaUtilities.Resources;
+using TiaUtilities.SettingsNew.Bindings;
 using TiaUtilities.Utility;
+using Timer = System.Windows.Forms.Timer;
 
 namespace TiaUtilities
 {
     public partial class MainForm : Form
     {
-        public static ProgramSettings Settings { get; private set; } = new();
+        public static ProgramSettingsV1 Settings { get; private set; } = new();
+        public static SettingsBindings SettingsBindings { get; private set; } = new();
+
+        private static void LoadLanguage()
+        {
+            try
+            {
+                var culture = CultureInfo.GetCultureInfo(MainForm.Settings.IetfLanguage);
+                LocaleVariables.LANG = culture.IetfLanguageTag;
+            }
+            catch (CultureNotFoundException ex)
+            {
+                Utils.ShowExceptionMessage(ex);
+            }
+        }
+
+        private static void LoadTIAVersion()
+        {
+            SimaticMLAPI.TIA_VERSION = MainForm.Settings.TIAVersion;
+        }
 
         private readonly TimedSaveHandler autoSaveHandler;
         private readonly ErrorReportThread errorThread;
+
+        public static readonly ErrorReportThread JavascriptErrorThread = new();
 
         public MainForm()
         {
             InitializeComponent();
 
-            Settings = SavesLoader.LoadWithoutDialog(ProgramSettings.GetFilePath(), "json") is ProgramSettings loadedSave ? loadedSave : new();
+            Settings = SavesLoader.LoadWithoutDialog(ProgramSettingsV1.GetFilePath(), "json") is ProgramSettingsV1 loadedSave ? loadedSave : new();
             Settings.Save(); //To create file if not exist!
 
             this.autoSaveHandler = new TimedSaveHandler();
@@ -40,81 +71,74 @@ namespace TiaUtilities
 
         private void Init()
         {
+            this.saveMenuItem.Click += (sender, args) => MainForm.Settings.Save();
+            this.programSettingsMenuItem.Click += (sender, args) => new SettingsForm(MainForm.SettingsBindings).ShowDialog(this);
+
             this.sampleXMLMenuItem.Click += (sender, args) =>
             {
                 SimaticMLExamples.CreateFCExample();
                 SimaticMLExamples.CreateGlobalDBExample();
             };
 
-            var ignoreSettingsAtStartup = true;
-
             LogHandler.INSTANCE.Init();
             LogHandler.INSTANCE.Start();
+
+            JavascriptErrorThread.Init();
+            JavascriptErrorThread.Start();
 
             this.errorThread.Init();
             this.errorThread.Start();
 
-            this.tiaVersionComboBox.SelectedIndexChanged += (sender, args) =>
-            {
-                if (uint.TryParse(tiaVersionComboBox.Text, out var version))
-                {
-                    SimaticMLAPI.TIA_VERSION = version;
+            MainForm.LoadLanguage();
+            MainForm.LoadTIAVersion();
+            this.autoSaveHandler.Start(MainForm.Settings.AutoSaveTime * 1000);
 
-                    if (!ignoreSettingsAtStartup)
-                    {
-                        Settings.TIAVersion = version;
-                        Settings.Save();
-                    }
+            MainForm.SettingsBindings
+                .MacroSection(() => Locale.GENERICS_PROGRAM, () => true, () => MainForm.Settings)
+
+                .Section(Locale.PROGRAM_SETTINGS_AUTO_SAVE)
+                .AddInt(nameof(ProgramSettingsV1.AutoSaveTime))
+
+                .Section(Locale.PROGRAM_SETTINGS_LANGUAGE)
+                .AddStringList(nameof(ProgramSettingsV1.IetfLanguage), ["it-IT", "en-US"])
+
+                .Section(Locale.PROGRAM_SETTINGS_TIA_VERSION)
+                .AddUnsignedNumberList(nameof(ProgramSettingsV1.TIAVersion), [16, 17, 18, 19])
+
+                .MacroSection(() => Locale.PROGRAM_SETTINGS_GRID_PREFERENCES, () => true, () => MainForm.Settings.GridSettings)
+
+                .Section(Locale.PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS)
+                .AddColor(nameof(GridSettings.SingleSelectedCellBorderColor), Locale.PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_SELECTED_CELL_BORDER)
+                .AddColor(nameof(GridSettings.DragSelectedCellBorderColor), Locale.PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_SELECTED_CELL_BORDER)
+                .AddColor(nameof(GridSettings.SelectedCellTriangleColor), Locale.PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_DRAGGED_CELL_BACK)
+                .AddColor(nameof(GridSettings.PreviewColor), Locale.PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_PREVIEW_FORE);
+
+            MainForm.Settings.PropertyChanged += (sender, args) =>
+            {
+                if (args.PropertyName == nameof(ProgramSettingsV1.AutoSaveTime))
+                {
+                    this.autoSaveHandler.Start(MainForm.Settings.AutoSaveTime * 1000);
                 }
-            };
-            this.tiaVersionComboBox.Text = "" + Settings.TIAVersion; //After the event so is applied!
-
-            this.languageComboBox.Items.AddRange(["it-IT", "en-US"]);
-            this.languageComboBox.TextChanged += (sender, args) =>
-            {
-                try
+                else if (args.PropertyName == nameof(ProgramSettingsV1.TIAVersion))
                 {
-                    var culture = CultureInfo.GetCultureInfo(this.languageComboBox.Text);
-                    LocaleVariables.LANG = culture.IetfLanguageTag;
-
-                    if (ignoreSettingsAtStartup)
-                    {
-                        return;
-                    }
-
-                    //Without save, after restart it would restore the old (Meaning it would be useless)
-                    Settings.IetfLanguage = culture.IetfLanguageTag;
-                    Settings.Save();
-
+                    MainForm.LoadTIAVersion();
+                }
+                else if (args.PropertyName == nameof(ProgramSettingsV1.IetfLanguage))
+                {
                     //This should stay always in english. In case someone set an unkown language, this will be neautral.
                     var result = InformationBox.Show("Do you want to restart application?", "Restart to change language", buttons: InformationBoxButtons.YesNo);
                     if (result == InformationBoxResult.Yes)
                     {
+                        MainForm.Settings.Save();
+
                         Application.Restart();
                         Environment.Exit(0);
+                        return;
                     }
                 }
-                catch (CultureNotFoundException ex)
-                {
-                    this.languageComboBox.SelectedItem = this.languageComboBox.Items[0];
-                    Utils.ShowExceptionMessage(ex);
-                }
-            };
-            this.languageComboBox.Text = Settings.IetfLanguage; //Call this after so the text changed event changes the system lang.
 
-            this.autoSaveTimeTextBox.TextChanged += (sender, args) =>
-            {
-                if (int.TryParse(autoSaveTimeTextBox.Text, out int time))
-                {
-                    this.autoSaveHandler.Start(time * 1000);
-                    if (!ignoreSettingsAtStartup)
-                    {
-                        Settings.AutoSaveTime = time;
-                        Settings.Save(); //To create file if not exist!
-                    }
-                }
+                MainForm.Settings.Save();
             };
-            this.autoSaveTimeTextBox.Text = "" + Settings.AutoSaveTime; //Call this after so it start auto save
 
             Timer settingsDirtyTimer = new() { Interval = 1000 };
             settingsDirtyTimer.Tick += (sender, args) =>
@@ -126,33 +150,51 @@ namespace TiaUtilities
             };
             settingsDirtyTimer.Start();
 
-            Translate();
+            this.ioGenButton.BackgroundImage = ImageResources.ALIAS_GENERATOR;
+            this.ioGenButton.BackgroundImageLayout = ImageLayout.Zoom;
+            this.ioGenButton.Click += (sender, args) => OpenIOGenModuleForm();
 
-            ignoreSettingsAtStartup = false;
+            this.alarmGenButton.BackgroundImage = ImageResources.ALARM_GENERATOR;
+            this.alarmGenButton.BackgroundImageLayout = ImageLayout.Zoom;
+            this.alarmGenButton.Click += (sender, args) => OpenAlarmGenModuleForm();
+
+            this.duplicateDBButton.BackgroundImage = ImageResources.DUPLICATE_DB;
+            this.duplicateDBButton.BackgroundImageLayout = ImageLayout.Zoom;
+            this.duplicateDBButton.Click += (sender, args) => new DBDuplicationForm(Settings) { ShowInTaskbar = false }.ShowDialog();
+
+            Translate();
         }
 
         private void Translate()
         {
             this.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
-            this.Text = $"{Locale.MAIN_FORM} V{Program.VERSION}";
+            this.Text = $"{Locale.MAIN_FORM}";
 
             this.fileToolStripMenuItem.Text = Locale.GENERICS_FILE;
-            this.loadToolStripMenuItem.Text = Locale.GENERICS_LOAD;
-            this.autoSaveMenuItem.Text = Locale.MAIN_FORM_TOP_FILE_AUTO_SAVE;
+            this.saveMenuItem.Text = Locale.GENERICS_SAVE + " (CTRL+S)";
+            this.loadToolStripMenuItem.Text = Locale.GENERICS_LOAD + " (CTRL+L)";
 
-            this.dbDuplicationMenuItem.Text = Locale.MAIN_FORM_TOP_DB_DUPLICATION;
-            this.generateIOMenuItem.Text = Locale.MAIN_FORM_TOP_IO_GENERATION;
-            this.generateAlarmsMenuItem.Text = Locale.MAIN_FORM_TOP_ALARM_GENERATOR;
+            this.programMenuItem.Text = Locale.GENERICS_PROGRAM;
+            this.programSettingsMenuItem.Text = Locale.GENERICS_SETTINGS + " (CTRL+P)";
 
-            this.tiaVersionLabel.Text = Locale.MAIN_FORM_TIA_VERSION;
-            this.languageLabel.Text = Locale.MAIN_FORM_LANGUAGE;
+
+            this.ioGenButton.Text = Locale.MAIN_FORM_TOP_IO_GENERATION;
+            this.alarmGenButton.Text = Locale.MAIN_FORM_TOP_ALARM_GENERATOR;
+            this.duplicateDBButton.Text = Locale.MAIN_FORM_TOP_DB_DUPLICATION;
         }
+
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             try
             {
                 switch (keyData)
                 {
+                    case Keys.P | Keys.Control:
+                        new SettingsForm(MainForm.SettingsBindings).ShowDialog(this);
+                        return true;
+                    case Keys.S | Keys.Control:
+                        MainForm.Settings.Save();
+                        return true;
                     case Keys.L | Keys.Control:
                         this.loadToolStripMenuItem.PerformClick();
                         return true; //Return required otherwise will write the letter.
@@ -171,14 +213,14 @@ namespace TiaUtilities
         {
             var filePath = "";
 
-            var saveObject = SavesLoader.LoadWithDialog(ref filePath, Constants.SAVE_FILE_EXTENSION);
+            var saveObject = SavesLoader.LoadWithDialog(ref filePath, ProgramConstants.SAVE_FILE_EXTENSION);
 
             GenModuleForm genForm;
-            if (saveObject is IOGenSave)
+            if (saveObject is IOGenSaveV1)
             {
                 genForm = OpenIOGenModuleForm();
             }
-            else if (saveObject is AlarmGenSave)
+            else if (saveObject is AlarmGenSaveV1)
             {
                 genForm = OpenAlarmGenModuleForm();
             }
@@ -187,15 +229,10 @@ namespace TiaUtilities
                 return;
             }
 
+
             genForm.SetLastFilePath(filePath);
             genForm.ModuleLoad(saveObject);
         }
-
-        private void DbDuplicationMenuItem_Click(object sender, EventArgs e) => new DBDuplicationForm(Settings) { ShowInTaskbar = false }.ShowDialog();
-
-        private void GenerateIOMenuItem_Click(object sender, EventArgs e) => OpenIOGenModuleForm();
-
-        private void GenerateAlarmsToolStripMenuItem_Click(object sender, EventArgs e) => OpenAlarmGenModuleForm();
 
         private GenModuleForm OpenIOGenModuleForm()
         {
@@ -330,113 +367,52 @@ namespace TiaUtilities
             TreeViewDBVisualization dbVisualizationForm = new();
             dbVisualizationForm.Show(this);
         }
-    }
-}
 
-/*
- 
-
-
-        private void generateButton_Click(object sender, EventArgs e)
+        private void exportAllMembersToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            GlobalIDGenerator.ResetID();
-
-            var fc = new BlockFC();
-            fc.Init();
-
-            //BLOCK ATTRIBUTES
-            var inputSection = fc.GetBlockAttributes().ComputeSection(SectionTypeEnum.INPUT);
-
-            var variableInput = inputSection.AddMember("VariableInput", "Int");
-            //BLOCK ATTRIBUTES
-
-            //COMPILE UNITS
-            var compileUnit = fc.AddCompileUnit();
-            compileUnit.Init();
-
-            var contactPart = compileUnit.AddPart(Part.Type.CONTACT).SetNegated();
-            var coilPart = compileUnit.AddPart(Part.Type.COIL);
-
-            compileUnit.AddPowerrail(new Dictionary<Part, string> {
-                    { contactPart, "in" }
-            });
-            compileUnit.AddIdentWire(Access.Type.GLOBAL_VARIABLE, "IO.IN_01", contactPart, "operand");
-            compileUnit.AddIdentWire(Access.Type.GLOBAL_VARIABLE, "IO.IN_02", coilPart, "operand");
-            compileUnit.AddBoolANDWire(contactPart, "out", coilPart, "in");
-
-            //COMPILE UNITS
-
-            var xmlDocument = SiemensMLParser.CreateDocument();
-            xmlDocument.DocumentElement.AppendChild(fc.Generate(xmlDocument));
-            if (!string.IsNullOrEmpty(xmlPathTextBlock.Text))
+            var fileDialog = new CommonOpenFileDialog
             {
-                xmlDocument.Save(xmlPathTextBlock.Text);
-            }
-        }
+                IsFolderPicker = false,
+                EnsurePathExists = true,
+                EnsureFileExists = true,
+                DefaultExtension = ".xml",
+                Filters = { new CommonFileDialogFilter("XML Files (*.xml)", "*.xml") }
+            };
 
-        private void generateTagTableButton_Click(object sender, EventArgs e)
-        {
-            var tagTable = SiemensMLParser.CreateEmptyTagTable();
-
-            var tag = tagTable.AddTag();
-            tag.SetLogicalAddress("%M40.0");
-            tag.SetTagName("TagName?!");
-            tag.SetDataTypeName("bool");
-
-            var xmlDocument = SiemensMLParser.CreateDocument();
-            xmlDocument.DocumentElement.AppendChild(tagTable.Generate(xmlDocument));
-            xmlDocument.Save(excelPathTextBox.Text);
-        }
-        
-
-        private void GenerateXMLExportFiles_MouseClick(object sender, MouseEventArgs e)
-        {
-            try
+            if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                //Allow opening file while having excel open. TIMESAVER!
-                using (var stream = new FileStream(configExcelPathTextBox.Text,
-                                 FileMode.Open,
-                                 FileAccess.Read,
-                                 FileShare.ReadWrite))
+                var fileName = fileDialog.FileName;
+                if (fileName == null)
                 {
-
-                    using (var configWorkbook = new XLWorkbook(stream))
-                    {
-                        var configWorksheet = configWorkbook.Worksheets.Worksheet(1);
-
-                        var configTypeValue = configWorksheet.Cell("A2").Value;
-                        if (!configTypeValue.IsText || string.IsNullOrEmpty(configTypeValue.GetText()))
-                        {
-                            throw new ApplicationException("Configuration excel file invalid");
-                        }
-
-                        switch (configTypeValue.GetText().ToLower())
-                        {
-                            case "type1":
-                                var alarmExcelImporter = new AlarmExcelImporter();
-                                alarmExcelImporter.ImportExcelConfig(configWorksheet);
-
-                                var alarmXmlGenerator = new AlarmXmlGenerator(alarmExcelImporter.GetConfiguration(), alarmExcelImporter.GetAlarmDataList(), alarmExcelImporter.GetDeviceDataList());
-                                alarmXmlGenerator.GenerateBlocks();
-                                alarmXmlGenerator.ExportXML(exportPathTextBlock.Text);
-                                break;
-                            case "type3":
-                                var ioExcelImporter = new IOExcelImporter();
-                                ioExcelImporter.ImportExcelConfig(configWorksheet);
-
-                                var ioXmlGenerator = new IOXmlGenerator(ioExcelImporter.GetConfiguration(), ioExcelImporter.GetDataList());
-                                ioXmlGenerator.GenerateBlocks();
-                                ioXmlGenerator.ExportXML(exportPathTextBlock.Text);
-                                break;
-                        }
-                    }
+                    return;
                 }
 
-            }
-            catch (Exception ex)
-            {
-                Utils.ShowExceptionMessage(ex);
+                List<string> members = [];
+
+                var xml = SimaticMLAPI.ParseFile(fileName);
+                if (xml is BlockGlobalDB globalDB)
+                {
+                    members.AddRange(globalDB.GetAllMemberAddress());
+                }
+                else if (xml is BlockInstanceDB instanceDB)
+                {
+                    members.AddRange(instanceDB.GetAllMemberAddress());
+                }
+                else if (xml is BlockUDT udt)
+                {
+                    members.AddRange(udt.GetAllMemberAddress());
+                }
+
+                string tempFilePath = System.IO.Path.GetTempPath() + "tempPaths.txt";
+                File.WriteAllText(tempFilePath, String.Join("\n", members));
+
+                Process.Start("notepad.exe", tempFilePath);
             }
         }
-        
-*/
+
+        private void QuestionMarkMenuItem_Click(object sender, EventArgs e)
+        {
+            new QuestionMarkForm().Show();
+        }
+    }
+}

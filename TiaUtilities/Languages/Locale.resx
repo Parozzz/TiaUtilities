@@ -117,32 +117,26 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ALARM_CONFIG_COIL2_TYPE" xml:space="preserve">
-    <value>Coil 2 Type</value>
-  </data>
-  <data name="ALARM_CONFIG_COIL_TYPE_COIL" xml:space="preserve">
+  <data name="ALARM_SETTINGS_COIL_TYPE_COIL" xml:space="preserve">
     <value>Coil</value>
   </data>
-  <data name="ALARM_CONFIG_COIL_TYPE_NONE" xml:space="preserve">
+  <data name="ALARM_SETTINGS_COIL_TYPE_NONE" xml:space="preserve">
     <value>Ignore</value>
   </data>
-  <data name="ALARM_CONFIG_COIL_TYPE_RESET" xml:space="preserve">
+  <data name="ALARM_SETTINGS_COIL_TYPE_RESET" xml:space="preserve">
     <value>Reset</value>
   </data>
-  <data name="ALARM_CONFIG_COIL_TYPE_SET" xml:space="preserve">
+  <data name="ALARM_SETTINGS_COIL_TYPE_SET" xml:space="preserve">
     <value>Set</value>
   </data>
-  <data name="ALARM_CONFIG_DEFAULTS" xml:space="preserve">
-    <value>Field default Values</value>
+  <data name="ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS" xml:space="preserve">
+    <value>Templates default</value>
   </data>
-  <data name="ALARM_CONFIG_DEFAULTS_COIL1" xml:space="preserve">
-    <value>Coil 1</value>
+  <data name="ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_COIL1" xml:space="preserve">
+    <value>Coil 1 Defaults</value>
   </data>
-  <data name="ALARM_CONFIG_DEFAULTS_COIL2" xml:space="preserve">
-    <value>Coil 2</value>
-  </data>
-  <data name="ALARM_CONFIG_DEFAULTS_TIMER" xml:space="preserve">
-    <value>Timer</value>
+  <data name="ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_COIL2" xml:space="preserve">
+    <value>Coil 2 Defaults</value>
   </data>
   <data name="GENERICS_ADDRESS" xml:space="preserve">
     <value>Address</value>
@@ -186,158 +180,143 @@
   <data name="GENERICS_CLEAR" xml:space="preserve">
     <value>Clear</value>
   </data>
-  <data name="IO_GEN_EXCELIMPORT_IO_NAME" xml:space="preserve">
+  <data name="IO_SETTINGS_EXCELIMPORT_IO_NAME" xml:space="preserve">
     <value>IO Name</value>
   </data>
-  <data name="IO_GEN_EXCELIMPORT_STARTING_ROW" xml:space="preserve">
+  <data name="IO_SETTINGS_EXCELIMPORT_STARTING_ROW" xml:space="preserve">
     <value>Starting row</value>
   </data>
-  <data name="IO_GEN_EXCELIMPORT_EXPRESSION" xml:space="preserve">
+  <data name="IO_SETTINGS_EXCELIMPORT_EXPRESSION" xml:space="preserve">
     <value>JS Expressione
 for row validation</value>
   </data>
   <data name="IO_GEN_EXCELIMPORT_IMPORT" xml:space="preserve">
     <value>Import Excel</value>
   </data>
-  <data name="ALARM_CONFIG_FC" xml:space="preserve">
+  <data name="ALARM_SETTINGS_FC" xml:space="preserve">
     <value>FC</value>
   </data>
-  <data name="ALARM_CONFIG_GENERATION" xml:space="preserve">
-    <value>Generation</value>
+  <data name="ALARM_SETTINGS_TAB_ALARM_NUMS" xml:space="preserve">
+    <value>Alarm numbers</value>
   </data>
-  <data name="ALARM_CONFIG_GENERATION_ANTI_SLIP" xml:space="preserve">
+  <data name="ALARM_SETTINGS_TAB_SPARE_ANTI_SLIP" xml:space="preserve">
     <value>Anti-Slip</value>
   </data>
-  <data name="ALARM_CONFIG_GENERATION_ANTI_SLIP_AMOUNT" xml:space="preserve">
+  <data name="ALARM_SETTINGS__GENERATION_ANTI_SLIP_AMOUNT" xml:space="preserve">
     <value>Group Size</value>
   </data>
-  <data name="ALARM_CONFIG_GENERATION_ANTI_SLIP_GEN_EMPTY" xml:space="preserve">
-    <value>Generate Empty</value>
+  <data name="ALARM_SETTINGS_TAB_SPARE_ANTI_SLIP_GEN_EMPTY" xml:space="preserve">
+    <value>Generate Empty for Anti-Slip</value>
   </data>
-  <data name="ALARM_CONFIG_GENERATION_EMPTY" xml:space="preserve">
-    <value>Generation Empty</value>
-  </data>
-  <data name="ALARM_CONFIG_GENERATION_EMPTY_ALARM_ADDRESS" xml:space="preserve">
+  <data name="ALARM_SETTINGS_TAB_SPARE_ADDRESS" xml:space="preserve">
     <value>Alarm Address</value>
   </data>
-  <data name="ALARM_CONFIG_GENERATION_EMPTY_ANTI_SLIP" xml:space="preserve">
-    <value>Generate in anti-slip</value>
-  </data>
-  <data name="ALARM_CONFIG_GENERATION_EMPTY_NUM" xml:space="preserve">
+  <data name="ALARM_SETTINGS_TAB_SPARE_EMPTY_NUM_AT_END" xml:space="preserve">
     <value>Num. at end</value>
   </data>
-  <data name="ALARM_CONFIG_GENERATION_EMPTY_TIMER" xml:space="preserve">
-    <value>Timer</value>
+  <data name="ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_TIMER" xml:space="preserve">
+    <value>Timer Defaults</value>
   </data>
-  <data name="ALARM_CONFIG_GENERATION_EMPTY_TIMER_ADDRESS" xml:space="preserve">
-    <value>Address</value>
+  <data name="ALARM_SETTINGS_ALARM_NUM_PLACEHOLDER_FORMAT" xml:space="preserve">
+    <value>Alarm number format</value>
   </data>
-  <data name="ALARM_CONFIG_GENERATION_EMPTY_TIMER_TYPE" xml:space="preserve">
-    <value>Type</value>
+  <data name="ALARM_SETTINGS_TAB_SPARE_GROUP_SKIP" xml:space="preserve">
+    <value>Quantity after each group</value>
   </data>
-  <data name="ALARM_CONFIG_GENERATION_EMPTY_TIMER_VALUE" xml:space="preserve">
-    <value>Time</value>
+  <data name="ALARM_SETTINGS_TAB_ALARM_NUMS_START" xml:space="preserve">
+    <value>Starting at</value>
   </data>
-  <data name="ALARM_CONFIG_FORMATTING_FORMAT" xml:space="preserve">
-    <value>Format</value>
-  </data>
-  <data name="ALARM_CONFIG_GENERATION_SKIP" xml:space="preserve">
-    <value>Skip after each group</value>
-  </data>
-  <data name="ALARM_CONFIG_GENERATION_START_NUM" xml:space="preserve">
-    <value>Starting alarm num.</value>
-  </data>
-  <data name="ALARM_CONFIG_GROUPING_TYPE" xml:space="preserve">
+  <data name="ALARM_SETTINGS_GROUPING_TYPE" xml:space="preserve">
     <value>Grouping type</value>
   </data>
-  <data name="ALARM_CONFIG_GROUPING_TYPE_GROUP" xml:space="preserve">
-    <value>GroupPerSegment</value>
-  </data>
-  <data name="ALARM_CONFIG_GROUPING_TYPE_ONE" xml:space="preserve">
-    <value>OnePerSegment</value>
-  </data>
-  <data name="ALARM_CONFIG_PARTITION_TYPE" xml:space="preserve">
-    <value>Partition type</value>
-  </data>
-  <data name="ALARM_CONFIG_PARTITION_TYPE_ALARM_TYPE" xml:space="preserve">
-    <value>AlarmType</value>
-  </data>
-  <data name="ALARM_CONFIG_PARTITION_TYPE_DEVICE" xml:space="preserve">
-    <value>Device</value>
-  </data>
-  <data name="ALARM_CONFIG_PREFIX" xml:space="preserve">
-    <value>Field Prefixes</value>
-  </data>
-  <data name="ALARM_CONFIG_PREFIX_ALARM" xml:space="preserve">
-    <value>Alarm Address</value>
-  </data>
-  <data name="ALARM_CONFIG_PREFIX_COIL1" xml:space="preserve">
-    <value>Coil 1 Address</value>
-  </data>
-  <data name="ALARM_CONFIG_PREFIX_COIL2" xml:space="preserve">
-    <value>Coil 2 Address</value>
-  </data>
-  <data name="ALARM_CONFIG_PREFIX_TIMER" xml:space="preserve">
-    <value>Timer Address</value>
-  </data>
-  <data name="ALARM_CONFIG_SEGMENT_NAME" xml:space="preserve">
-    <value>Segment Names</value>
-  </data>
-  <data name="ALARM_CONFIG_SEGMENT_NAME_GROUP_EACH" xml:space="preserve">
+  <data name="ALARM_SETTINGS_GROUPING_TYPE_GROUP" xml:space="preserve">
     <value>Groupped</value>
   </data>
-  <data name="ALARM_CONFIG_SEGMENT_NAME_GROUP_EACH_EMPTY" xml:space="preserve">
-    <value>Groupped(Empty)</value>
+  <data name="ALARM_SETTINGS_GROUPING_TYPE_ONE" xml:space="preserve">
+    <value>Single</value>
   </data>
-  <data name="ALARM_CONFIG_SEGMENT_NAME_ONE_EACH" xml:space="preserve">
-    <value>One each</value>
+  <data name="ALARM_SETTINGS_PARTITION_TYPE" xml:space="preserve">
+    <value>Partition type</value>
   </data>
-  <data name="ALARM_CONFIG_SEGMENT_NAME_ONE_EACH_EMPTY" xml:space="preserve">
-    <value>One each(Empty)</value>
+  <data name="ALARM_SETTINGS_PARTITION_TYPE_ALARM_TYPE" xml:space="preserve">
+    <value>AlarmType</value>
   </data>
-  <data name="ALARM_CONFIG_TEXT_LIST" xml:space="preserve">
-    <value>Alarm Text List</value>
+  <data name="ALARM_SETTINGS_PARTITION_TYPE_DEVICE" xml:space="preserve">
+    <value>Device</value>
   </data>
-  <data name="ALARM_CONFIG_TEXT_LIST_EMPTY" xml:space="preserve">
-    <value>Empty</value>
+  <data name="ALARM_SETTINGS_PREFIX" xml:space="preserve">
+    <value>Field Prefixes</value>
   </data>
-  <data name="ALARM_CONFIG_TEXT_LIST_FULL" xml:space="preserve">
-    <value>Full</value>
+  <data name="ALARM_SETTINGS_PREFIX_ALARM" xml:space="preserve">
+    <value>Alarm Address</value>
   </data>
-  <data name="ALARM_DATA_ALM_VARIABLE" xml:space="preserve">
-    <value>Alarm Variable</value>
+  <data name="ALARM_SETTINGS_PREFIX_COIL1" xml:space="preserve">
+    <value>Coil 1 Address</value>
   </data>
-  <data name="ALARM_DATA_CUSTOM_VAR_ADDR" xml:space="preserve">
-    <value>Custom Variable</value>
+  <data name="ALARM_SETTINGS_PREFIX_COIL2" xml:space="preserve">
+    <value>Coil 2 Address</value>
   </data>
-  <data name="ALARM_DATA_CUSTOM_VAR_VALUE" xml:space="preserve">
-    <value>Value</value>
-  </data>
-  <data name="ALARM_DATA_COIL1_ADDRESS" xml:space="preserve">
-    <value>Coil1 Address</value>
-  </data>
-  <data name="ALARM_DATA_COIL1_TYPE" xml:space="preserve">
-    <value>Type</value>
-  </data>
-  <data name="ALARM_DATA_COIL2_TYPE" xml:space="preserve">
-    <value>Type</value>
-  </data>
-  <data name="ALARM_DATA_COIL2_ADDRESS" xml:space="preserve">
-    <value>Coil2 Address</value>
-  </data>
-  <data name="ALARM_DATA_DESCRIPTION" xml:space="preserve">
-    <value>Description</value>
-  </data>
-  <data name="ALARM_DATA_ENABLE" xml:space="preserve">
-    <value>Enable</value>
-  </data>
-  <data name="ALARM_DATA_TIMER_ADDRESS" xml:space="preserve">
+  <data name="ALARM_SETTINGS_PREFIX_TIMER" xml:space="preserve">
     <value>Timer Address</value>
   </data>
-  <data name="ALARM_DATA_TIMER_TYPE" xml:space="preserve">
+  <data name="ALARM_SETTINGS_TAB_SEGMENT_NAME" xml:space="preserve">
+    <value>Segment Names</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_SEGMENT_NAME_GROUP_EACH" xml:space="preserve">
+    <value>Groupped</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_SEGMENT_NAME_GROUP_EACH_SPARE" xml:space="preserve">
+    <value>Groupped (Spare)</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_SEGMENT_NAME_ONE_EACH" xml:space="preserve">
+    <value>One each</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_SEGMENT_NAME_ONE_EACH_SPARE" xml:space="preserve">
+    <value>One each (Spare)</value>
+  </data>
+  <data name="ALARM_SETTINGS_TEXT_LIST" xml:space="preserve">
+    <value>Alarm Text List</value>
+  </data>
+  <data name="ALARM_SETTINGS_TEXT_LIST_EMPTY" xml:space="preserve">
+    <value>Empty</value>
+  </data>
+  <data name="ALARM_SETTINGS_TEXT_LIST_FULL" xml:space="preserve">
+    <value>Full</value>
+  </data>
+  <data name="ALARM_TEMPLATE_DATA_ALM_VARIABLE" xml:space="preserve">
+    <value>Alarm Variable</value>
+  </data>
+  <data name="ALARM_TEMPLATE_DATA_CUSTOM_VAR_ADDR" xml:space="preserve">
+    <value>Custom Variable</value>
+  </data>
+  <data name="ALARM_TEMPLATE_DATA_CUSTOM_VAR_VALUE" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="ALARM_TEMPLATE_DATA_COIL1_ADDRESS" xml:space="preserve">
+    <value>Coil1 Address</value>
+  </data>
+  <data name="ALARM_TEMPLATE_DATA_COIL1_TYPE" xml:space="preserve">
     <value>Type</value>
   </data>
-  <data name="ALARM_DATA_TIMER_VALUE" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_COIL2_TYPE" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="ALARM_TEMPLATE_DATA_COIL2_ADDRESS" xml:space="preserve">
+    <value>Coil2 Address</value>
+  </data>
+  <data name="ALARM_TEMPLATE_DATA_DESCRIPTION" xml:space="preserve">
+    <value>Alarm Text</value>
+  </data>
+  <data name="ALARM_TEMPLATE_DATA_ENABLE" xml:space="preserve">
+    <value>Enable</value>
+  </data>
+  <data name="ALARM_TEMPLATE_DATA_TIMER_ADDRESS" xml:space="preserve">
+    <value>Timer Address</value>
+  </data>
+  <data name="ALARM_TEMPLATE_DATA_TIMER_TYPE" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="ALARM_TEMPLATE_DATA_TIMER_VALUE" xml:space="preserve">
     <value>Time</value>
   </data>
   <data name="ALARM_GEN_FORM" xml:space="preserve">
@@ -349,22 +328,19 @@ for row validation</value>
   <data name="DEVICE_DATA_NAME" xml:space="preserve">
     <value>Name</value>
   </data>
-  <data name="ALARM_CONFIG_COIL1_TYPE" xml:space="preserve">
-    <value>Coil 1 Type</value>
-  </data>
-  <data name="GRID_PREFERENCES" xml:space="preserve">
+  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES" xml:space="preserve">
     <value>Grid Preferences</value>
   </data>
-  <data name="GRID_PREFERENCES_DRAGGED_CELL_BACK" xml:space="preserve">
+  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_DRAGGED_CELL_BACK" xml:space="preserve">
     <value>Dragged cell background</value>
   </data>
-  <data name="GRID_PREFERENCES_DRAG_TRIANGLE_COLOR" xml:space="preserve">
+  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_DRAG_TRIANGLE_COLOR" xml:space="preserve">
     <value>Drag triangle</value>
   </data>
-  <data name="GRID_PREFERENCES_PREVIEW_FORE" xml:space="preserve">
+  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_PREVIEW_FORE" xml:space="preserve">
     <value>Preview</value>
   </data>
-  <data name="GRID_PREFERENCES_SELECTED_CELL_BORDER" xml:space="preserve">
+  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_SELECTED_CELL_BORDER" xml:space="preserve">
     <value>Selected cell border</value>
   </data>
   <data name="GRID_SCRIPT_JS_EXPRESSION" xml:space="preserve">
@@ -409,22 +385,22 @@ for row validation</value>
   <data name="GRID_FIND_FORM_NAME" xml:space="preserve">
     <value>Grid - Find and Replace</value>
   </data>
-  <data name="IO_CONFIG_GROUPING_TYPE" xml:space="preserve">
+  <data name="IO_SETTINGS_GROUPING_TYPE" xml:space="preserve">
     <value>Grouping Type</value>
   </data>
-  <data name="IO_CONFIG_GROUPING_TYPE_BIT" xml:space="preserve">
-    <value>GroupEachBit</value>
+  <data name="IO_GROUPING_TYPE_BIT" xml:space="preserve">
+    <value>Bit</value>
   </data>
-  <data name="IO_CONFIG_GROUPING_TYPE_BYTE" xml:space="preserve">
-    <value>GroupEachByte</value>
+  <data name="IO_GROUPING_TYPE_BYTE" xml:space="preserve">
+    <value>Byte</value>
   </data>
-  <data name="IO_CONFIG_MEMORY_TYPE" xml:space="preserve">
+  <data name="IO_SETTINGS_MEMORY_TYPE" xml:space="preserve">
     <value>Memory Type</value>
   </data>
-  <data name="IO_CONFIG_MEMORY_TYPE_DB" xml:space="preserve">
+  <data name="IO_MEMORY_TYPE_DB" xml:space="preserve">
     <value>DB</value>
   </data>
-  <data name="IO_CONFIG_MEMORY_TYPE_MERKER" xml:space="preserve">
+  <data name="IO_MEMORY_TYPE_MERKER" xml:space="preserve">
     <value>Merker</value>
   </data>
   <data name="IO_DATA_ADDRESS" xml:space="preserve">
@@ -448,31 +424,22 @@ for row validation</value>
   <data name="IO_GEN_CONFIG_ALIAS_DB" xml:space="preserve">
     <value>Alias DB</value>
   </data>
-  <data name="IO_GEN_CONFIG_ALIAS_DB_GENERATED_DEFINED_VARIABLES" xml:space="preserve">
-    <value>Genera Defined variables</value>
+  <data name="IO_SETTINGS_ALIAS_DB_INPUT_DEFAULT" xml:space="preserve">
+    <value>Input: Default address</value>
   </data>
-  <data name="IO_GEN_CONFIG_ALIAS_DB_IN_DEFAULT" xml:space="preserve">
-    <value>Default Input value</value>
-  </data>
-  <data name="IO_GEN_CONFIG_ALIAS_DB_OUT_DEFAULT" xml:space="preserve">
-    <value>Default Output value</value>
+  <data name="IO_SETTINGS_ALIAS_DB_OUTPUT_DEFAULT" xml:space="preserve">
+    <value>Output: Default address</value>
   </data>
   <data name="IO_GEN_CONFIG_ALIAS_TABLE" xml:space="preserve">
     <value>Alias Table</value>
   </data>
-  <data name="IO_GEN_CONFIG_ALIAS_TABLE_INPUT_VARIABLE" xml:space="preserve">
-    <value>Input Variable</value>
-  </data>
-  <data name="IO_GEN_CONFIG_ALIAS_TABLE_NEW_EVERY" xml:space="preserve">
+  <data name="IO_SETTINGS_ALIAS_TABLE_SPLIT_EVERY" xml:space="preserve">
     <value>New every n° bit</value>
   </data>
-  <data name="IO_GEN_CONFIG_ALIAS_TABLE_OUTPUT_VARIABLE" xml:space="preserve">
-    <value>Output Variable</value>
-  </data>
-  <data name="IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_DEFAULT" xml:space="preserve">
+  <data name="IO_SETTINGS_ALIAS_TABLE_INOUT_DEFAULT" xml:space="preserve">
     <value>Default Value</value>
   </data>
-  <data name="IO_GEN_CONFIG_ALIAS_TABLE_VARIABLE_START_ADDRESS" xml:space="preserve">
+  <data name="IO_SETTINGS_ALIAS_TABLE_INOUT_START_ADDRESS" xml:space="preserve">
     <value>Start Address</value>
   </data>
   <data name="IO_GEN_CONFIG_FC" xml:space="preserve">
@@ -481,28 +448,28 @@ for row validation</value>
   <data name="IO_GEN_CONFIG_IO_TABLE" xml:space="preserve">
     <value>IN/OUT Table</value>
   </data>
-  <data name="IO_GEN_CONFIG_IO_TABLE_DEFAULT_NAME" xml:space="preserve">
-    <value>Default tag name</value>
+  <data name="IO_SETTINGS_IO_TABLE_DEFAULT_NAME" xml:space="preserve">
+    <value>Default Tag name preset</value>
   </data>
-  <data name="IO_GEN_CONFIG_IO_TABLE_NEW_EVERY" xml:space="preserve">
+  <data name="IO_SETTINGS_IO_TABLE_SPLIT_EVERY" xml:space="preserve">
     <value>New every n° bit</value>
   </data>
   <data name="IO_GEN_CONFIG_SEGMENT" xml:space="preserve">
     <value>Segment Name</value>
   </data>
-  <data name="IO_GEN_CONFIG_SEGMENT_BIT_DIVISION" xml:space="preserve">
-    <value>Division per bit</value>
+  <data name="IO_SETTINGS_SEGMENT_BIT_GROUPING" xml:space="preserve">
+    <value>Bit grouping</value>
   </data>
-  <data name="IO_GEN_CONFIG_SEGMENT_BYTE_DIVISION" xml:space="preserve">
-    <value>Division per byte</value>
+  <data name="IO_SETTINGS_SEGMENT_BYTE_GROUPING" xml:space="preserve">
+    <value>Byte grouping</value>
   </data>
   <data name="IO_GEN_FORM_NAME" xml:space="preserve">
     <value>Input/Output alias generator. Project file: {file_path}</value>
   </data>
-  <data name="IO_GEN_FORM_IMPEXP" xml:space="preserve">
+  <data name="GEN_FORM_IMPORT_EXPORT" xml:space="preserve">
     <value>Import/Export</value>
   </data>
-  <data name="IO_GEN_FORM_IMPEXP_EXPORT_XML" xml:space="preserve">
+  <data name="GEN_FORM_IMPORT_EXPORT_EXPORT_XML" xml:space="preserve">
     <value>Export XML</value>
   </data>
   <data name="IO_GEN_FORM_IMPEXP_IMPORT_EXCEL" xml:space="preserve">
@@ -520,10 +487,10 @@ for row validation</value>
   <data name="MAIN_FORM" xml:space="preserve">
     <value>Tia Utilities</value>
   </data>
-  <data name="MAIN_FORM_LANGUAGE" xml:space="preserve">
+  <data name="PROGRAM_SETTINGS_LANGUAGE" xml:space="preserve">
     <value>Language</value>
   </data>
-  <data name="MAIN_FORM_TIA_VERSION" xml:space="preserve">
+  <data name="PROGRAM_SETTINGS_TIA_VERSION" xml:space="preserve">
     <value>TIA Portal Version</value>
   </data>
   <data name="MAIN_FORM_TOP_ALARM_GENERATOR" xml:space="preserve">
@@ -532,23 +499,23 @@ for row validation</value>
   <data name="MAIN_FORM_TOP_DB_DUPLICATION" xml:space="preserve">
     <value>DB Duplication</value>
   </data>
-  <data name="MAIN_FORM_TOP_FILE_AUTO_SAVE" xml:space="preserve">
-    <value>AutoSave (s)</value>
+  <data name="PROGRAM_SETTINGS_AUTO_SAVE" xml:space="preserve">
+    <value>Auto-Save (s)</value>
   </data>
   <data name="MAIN_FORM_TOP_IO_GENERATION" xml:space="preserve">
     <value>Alias Generator</value>
   </data>
-  <data name="ALARM_CONFIG_COIL_TYPE_NCOIL" xml:space="preserve">
+  <data name="ALARM_SETTINGS_COIL_TYPE_NCOIL" xml:space="preserve">
     <value>N-Coil</value>
   </data>
-  <data name="ALARM_CONFIG_DEFAULTS_CUSTOM_VAR" xml:space="preserve">
+  <data name="ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_CUSTOM_VAR" xml:space="preserve">
+    <value>Custom variable Defaults</value>
+  </data>
+  <data name="ALARM_SETTINGS_ENABLE_CUSTOM_VAR" xml:space="preserve">
     <value>Custom variable</value>
   </data>
-  <data name="ALARM_CONFIG_ENABLE_CUSTOM_VAR" xml:space="preserve">
-    <value>Enable custom variable</value>
-  </data>
-  <data name="ALARM_CONFIG_ENABLE_TIMER" xml:space="preserve">
-    <value>Enable timer</value>
+  <data name="ALARM_SETTINGS_ENABLE_TIMER" xml:space="preserve">
+    <value>Timer</value>
   </data>
   <data name="DEVICE_DATA_TEMPLATE" xml:space="preserve">
     <value>Template</value>
@@ -559,7 +526,7 @@ for row validation</value>
   <data name="ALARM_TEMPLATE_SELECT_TEMPLATE" xml:space="preserve">
     <value>Select Template</value>
   </data>
-  <data name="ALARM_CONFIG_EDIT_TEMPLATE" xml:space="preserve">
+  <data name="ALARM_SETTINGS_EDIT_TEMPLATE" xml:space="preserve">
     <value>Edit Template</value>
   </data>
   <data name="CONFIRM_DELETE_DIALOG_CAPTION" xml:space="preserve">
@@ -568,58 +535,303 @@ for row validation</value>
   <data name="CONFIRM_DELETE_DIALOG_TEXT" xml:space="preserve">
     <value>Are you sure you want to delete {delete_item}?</value>
   </data>
-  <data name="CONFIG_LINE_TRANSFER_TO_OTHERS" xml:space="preserve">
+  <data name="SETTINGS_FORM_CONTEXT_MENU_SET_TO_OTHERS" xml:space="preserve">
     <value>Transfer values to all others configurations</value>
   </data>
   <data name="CONFIG_LINE_SAVE_DEFAULT_TOOLTIP" xml:space="preserve">
     <value>Save actual configuration as default</value>
   </data>
-  <data name="ALARM_CONFIG_GENERATION_TOTAL_NUM" xml:space="preserve">
-    <value>Total num. of alarms</value>
+  <data name="ALARM_SETTINGS_TAB_ALARM_NUMS_TOTAL" xml:space="preserve">
+    <value>Total</value>
   </data>
-  <data name="ALARM_CONFIG_FORMATTING_NAME_TEMPLATE" xml:space="preserve">
-    <value>Name</value>
+  <data name="ALARM_SETTINGS_UDT_ALARM_VARIABLE_NAME" xml:space="preserve">
+    <value>Alarm name</value>
   </data>
-  <data name="ALARM_CONFIG_FORMATTING_COMMENT_TEMPLATE" xml:space="preserve">
-    <value>Comment</value>
+  <data name="ALARM_SETTINGS_UDT_ALARM_VARIABLE_COMMENT" xml:space="preserve">
+    <value>Alarm comment</value>
   </data>
-  <data name="ALARM_CONFIG_FORMATTING_COMMENT_TEMPLATE_SPARE" xml:space="preserve">
-    <value>Spare comment</value>
+  <data name="ALARM_SETTINGS_UDT_ALARM_VARIABLE_SPARE_COMMENT" xml:space="preserve">
+    <value>SPARE alarm comment</value>
   </data>
-  <data name="ALARM_CONFIG_FORMATTING_UDT_NAME" xml:space="preserve">
-    <value>UDT Name</value>
+  <data name="ALARM_SETTINGS_UDT" xml:space="preserve">
+    <value>UDT</value>
   </data>
-  <data name="ALARM_CONFIG_FORMATTING" xml:space="preserve">
-    <value>Formatting / UDT</value>
-  </data>
-  <data name="ALARM_CONFIG_GENERATION_HMI_START_ID" xml:space="preserve">
+  <data name="ALARM_SETTINGS_TAB_HMI_START_ID" xml:space="preserve">
     <value>Start ID</value>
   </data>
-  <data name="ALARM_CONFIG_FORMATTING_HMI_TRIGGER_TAG_TEMPLATE" xml:space="preserve">
-    <value>Trigger tag template</value>
+  <data name="ALARM_SETTINGS_HMI_TRIGGER_TAG" xml:space="preserve">
+    <value>Trigger tag</value>
   </data>
-  <data name="ALARM_CONFIG_FORMATTING_HMI_USE_WORD_ARRAY" xml:space="preserve">
-    <value>Word array as trigger</value>
+  <data name="ALARM_SETTINGS_HMI_USE_WORD_ARRAY" xml:space="preserve">
+    <value>Word array as trigger (Unified)</value>
   </data>
-  <data name="ALARM_CONFIG_FORMATTING_HMI_NAME" xml:space="preserve">
+  <data name="ALARM_SETTINGS_HMI_NAME" xml:space="preserve">
     <value>Name</value>
   </data>
-  <data name="ALARM_DATA_ALM_NEGATED" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_ALM_NEGATED" xml:space="preserve">
     <value>Negated</value>
   </data>
   <data name="GENERICS_HMI" xml:space="preserve">
     <value>HMI</value>
   </data>
-  <data name="ALARM_CONFIG_GENERATION_HMI_DEFAULT_ALARM_CLASS" xml:space="preserve">
+  <data name="ALARM_SETTINGS_TAB_HMI_DEFAULT_ALARM_CLASS" xml:space="preserve">
     <value>Default Alarm Class</value>
   </data>
-  <data name="ALARM_DATA_HMI_CLASS" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_HMI_CLASS" xml:space="preserve">
     <value>Hmi Class</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_PLACEHOLDERS" xml:space="preserve">
+    <value>Placeholders</value>
+  </data>
+  <data name="ALARM_SETTINGS_HMI_ITEM_TEXT" xml:space="preserve">
+    <value>Alarm text</value>
+  </data>
+  <data name="ALARM_SETTINGS_HMI_ITEM_NAME" xml:space="preserve">
+    <value>Alarm name</value>
+  </data>
+  <data name="ALARM_SETTINGS_UDT_ALARM_VARIABLE" xml:space="preserve">
+    <value>UDT Alarm variable</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_GROUPING_TYPE" xml:space="preserve">
+    <value>Grouping type</value>
+  </data>
+  <data name="GENERICS_QUANTITY" xml:space="preserve">
+    <value>Quantity</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_SPARE" xml:space="preserve">
+    <value>Spare alarms</value>
+  </data>
+  <data name="GENERICS_VARIABLE" xml:space="preserve">
+    <value>Variable</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_GROUPING_TYPE_DESCR" xml:space="preserve">
+    <value>Define if every fc segment contains a complete template or an individual alarm</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_SPARE_ANTI_SLIP_DESCR" xml:space="preserve">
+    <value>Defines the quantity of alarms for each template to avoid slipping. If the alarm quantity inside a template is lower than this, it will skip alarms (Or generate spare if enabled). Set 0 to disable.</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_SEGMENT_NAME_GROUP_EACH_DESCR" xml:space="preserve">
+    <value>Segment name inside the FC block for the GroupingType groupped.</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_SEGMENT_NAME_ONE_EACH_DESCR" xml:space="preserve">
+    <value>Segment name inside the FC block for the GroupingType single.</value>
+  </data>
+  <data name="ALARM_SETTINGS_UDT_DESCR" xml:space="preserve">
+    <value>Generated UDT given name</value>
+  </data>
+  <data name="ALARM_SETTINGS_ALARM_NUM_PLACEHOLDER_FORMAT_DESCR" xml:space="preserve">
+    <value>String format for all alarm number placeholders. Please follow String.Format C# guide.</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_ALARM_NUMS_TOTAL_DESCR" xml:space="preserve">
+    <value>Total number of alarms to be generated inside UDT. Generated quantity inside FC block depends on templates and other settings.</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_ALARM_NUMS_START_DESCR" xml:space="preserve">
+    <value>Alarm number offset to be start at when generating alarms. Valid both for UDT and FC.</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_SPARE_EMPTY_NUM_AT_END_DESCR" xml:space="preserve">
+    <value>Quantity of spare alarm to generate at the end of FC block.</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_SPARE_GROUP_SKIP_DESCR" xml:space="preserve">
+    <value>Quantity of spare alarm to generate at the end of each template.</value>
+  </data>
+  <data name="GENERICS_DESCR_SET_SLASH_TO_DISABLE" xml:space="preserve">
+    <value>Set / to disable.</value>
+  </data>
+  <data name="ALARM_SETTINGS_ENABLE" xml:space="preserve">
+    <value>Enablings</value>
+  </data>
+  <data name="ALARM_SETTINGS_ENABLE_CUSTOM_VAR_DESCR" xml:space="preserve">
+    <value>Enable custom variable inside templates.</value>
+  </data>
+  <data name="ALARM_SETTINGS_ENABLE_TIMER_DESCR" xml:space="preserve">
+    <value>Enable timer inside templates.</value>
+  </data>
+  <data name="ALARM_SETTINGS_HMI_ITEM_NAME_DESCR" xml:space="preserve">
+    <value>Value to be used inside siemens WinCC "Name" column.</value>
+  </data>
+  <data name="ALARM_SETTINGS_HMI_ITEM_TEXT_DESCR" xml:space="preserve">
+    <value>Value to be used inside siemens WinCC "Alarm Text" column.</value>
+  </data>
+  <data name="ALARM_SETTINGS_HMI_TRIGGER_TAG_DESCR" xml:space="preserve">
+    <value>Value to be used inside siemens WinCC "Trigger Tag" column.</value>
+  </data>
+  <data name="ALARM_SETTINGS_HMI_USE_WORD_ARRAY_DESCR" xml:space="preserve">
+    <value>Define if the "Trigger Tag" should use single element of the Array[*] of word inside WinCC (e.g. HmiAlm[0], increasing "Trigger Bit" up to 15) instead of the full tag (Increasing "Trigger Bit" indefinately). Used for WinCC Unified panels.</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_HMI_START_ID_DESCR" xml:space="preserve">
+    <value>Defines start number for column "ID" in WinCC.</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_HMI_DEFAULT_ALARM_CLASS_DESCR" xml:space="preserve">
+    <value>Define default value for column "Class" in WinCC inside templates.</value>
+  </data>
+  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS" xml:space="preserve">
+    <value>Colors</value>
+  </data>
+  <data name="GENERICS_SETTINGS" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="GENERICS_PROGRAM" xml:space="preserve">
+    <value>Program</value>
+  </data>
+  <data name="GENERICS_SETUP" xml:space="preserve">
+    <value>Setup</value>
+  </data>
+  <data name="ALARM_SETTINGS_TEMPLATE_STANDALONE_ALARMS" xml:space="preserve">
+    <value>Standalone Alarms</value>
+  </data>
+  <data name="ALARM_SETTINGS_TEMPLATE_STANDALONE_ALARMS_DESC" xml:space="preserve">
+    <value>Allows to ignore all the default values from the alarm setup. Useful for generating standalone alarms that are not linked to a device.</value>
+  </data>
+  <data name="SETTINGS_FORM_CONTEXT_MENU_OPEN_OTHER_CONF_FAST_EDIT" xml:space="preserve">
+    <value>Open other configuration fast edit</value>
+  </data>
+  <data name="ALARM_SETTINGS_TAB_PLACEHOLDERS_DESC" xml:space="preserve">
+    <value>Allows to add custom placeholders to use during .xml file generation. Create a simple JSON Object and each value will be treated as placeholder. {YOUR_PLACEHOLDER_NAME_HERE}</value>
   </data>
   <data name="DEVICE_DATA_PLACEHOLDERS" xml:space="preserve">
     <value>Placeholders</value>
   </data>
-  <data name="ALARM_CONFIG_FORMATTING_HMI_TEXT" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_DATA_HMI_PARAMETERS" xml:space="preserve">
+    <value>Hmi Parameters</value>
+  </data>
+  <data name="ALARM_TEMPLATE_DATA_HMI_TEXT" xml:space="preserve">
+    <value>HMI Alarm Text</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE" xml:space="preserve">
+    <value>Display type</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_TAG" xml:space="preserve">
+    <value>Tag</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_TEXT_LIST" xml:space="preserve">
+    <value>Text list</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_LENGTH" xml:space="preserve">
+    <value>Length</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_PRECISION" xml:space="preserve">
+    <value>Decimals</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_ALIGNMENT" xml:space="preserve">
+    <value>Alignment</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_ZERO_PADDING" xml:space="preserve">
+    <value>Zero Padding</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_TEXT_LIST" xml:space="preserve">
+    <value>Text List</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_TEXT" xml:space="preserve">
     <value>Text</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_BINARY" xml:space="preserve">
+    <value>Binary</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_DECIMAL" xml:space="preserve">
+    <value>Decimal</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_FLOATING_POINT" xml:space="preserve">
+    <value>Float</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_HEX" xml:space="preserve">
+    <value>Hexadecimal</value>
+  </data>
+  <data name="ALARM_TEMPLATE_HMI_PARAM_DISPLAY_TYPE_OCTAL" xml:space="preserve">
+    <value>Octal</value>
+  </data>
+  <data name="GENERICS_LEFT" xml:space="preserve">
+    <value>Left</value>
+  </data>
+  <data name="GENERICS_RIGHT" xml:space="preserve">
+    <value>Right</value>
+  </data>
+  <data name="IO_SETTINGS_EXCELIMPORT" xml:space="preserve">
+    <value>Excel Importer</value>
+  </data>
+  <data name="IO_SETTINGS_ALIAS_DB_NUMBER_DESC" xml:space="preserve">
+    <value>Number to give to the generated DB. Set to -1 to use auto numeration.
+Placeholder: &lt;placeholder&gt;</value>
+  </data>
+  <data name="IO_SETTINGS_ALIAS_DB_NAME_DESC" xml:space="preserve">
+    <value>Name to give to the generated DB.
+Placeholder: &lt;placeholder&gt;.</value>
+  </data>
+  <data name="IO_SETTINGS_IO_TABLE_SPLIT_EVERY_DESC" xml:space="preserve">
+    <value>Generate a new xml file after the set number of bits. Big tables takes a lot more time to import.</value>
+  </data>
+  <data name="IO_SETTINGS_GROUPING_TYPE_DESC" xml:space="preserve">
+    <value>Decides how alarms are groupped inside a segments are generated.
+Bit=Single IO for each segment.
+Byte=Group the whole byte for each segnemt.</value>
+  </data>
+  <data name="IO_SETTINGS_MEMORY_TYPE_DESC" xml:space="preserve">
+    <value>Dicides the type of memory wherealias are generated.</value>
+  </data>
+  <data name="IO_SETTINGS_ALIAS_TABLE_INPUT_START_NUMBER" xml:space="preserve">
+    <value>Input Merker: Start number</value>
+  </data>
+  <data name="IO_SETTINGS_ALIAS_TABLE_INPUT_DEFAULT_NAME" xml:space="preserve">
+    <value>Input Merker: Default name</value>
+  </data>
+  <data name="IO_SETTINGS_ALIAS_TABLE_OUTPUT_START_NUMBER" xml:space="preserve">
+    <value>Output Merker: Start number</value>
+  </data>
+  <data name="IO_SETTINGS_ALIAS_TABLE_OUTPUT_DEFAULT_NAME" xml:space="preserve">
+    <value>Output Merker: Default name</value>
+  </data>
+  <data name="IO_SETTINGS_IO_TABLE_NAME_DESC" xml:space="preserve">
+    <value>Name to give to the table hosting IO tags (%I / %Q)</value>
+  </data>
+  <data name="IO_SETTINGS_IO_TABLE_DEFAULT_NAME_DESC" xml:space="preserve">
+    <value>Default name to give to the generated tag.</value>
+  </data>
+  <data name="IO_SETTINGS_ALIAS_TABLE_NAME_DESC" xml:space="preserve">
+    <value>Name to give to the table hosting Merker tags (%M)</value>
+  </data>
+  <data name="IO_SETTINGS_EXCELIMPORT_ADDRESS_DESC" xml:space="preserve">
+    <value>Template to use to fill address column.
+Use $ followed by Excel column name for extracting values from imported spreadsheet file (Supported by all values here).</value>
+  </data>
+  <data name="IO_SETTINGS_EXCELIMPORT_IO_NAME_DESC" xml:space="preserve">
+    <value>Template to use to fill io name column.</value>
+  </data>
+  <data name="IO_SETTINGS_EXCELIMPORT_COMMENT_DESC" xml:space="preserve">
+    <value>Template to use to fill comment column.</value>
+  </data>
+  <data name="IO_SETTINGS_EXCELIMPORT_STARTING_ROW_DESC" xml:space="preserve">
+    <value>Decideds at which spreadsheet row to start parsing data.</value>
+  </data>
+  <data name="IO_SETTINGS_EXCELIMPORT_EXPRESSION_DESC" xml:space="preserve">
+    <value>Javascript boolean expression to decide if the spreadsheet row is valid to be parsed.</value>
+  </data>
+  <data name="SETTINGS_FORM_SECTION_HAS_PLACEHOLDER_TOOLTIP" xml:space="preserve">
+    <value>Support placeholders.</value>
+  </data>
+  <data name="GEN_FORM_TOOLS" xml:space="preserve">
+    <value>Tools</value>
+  </data>
+  <data name="GEN_FORM_TOOLS_PLACEHOLDER_VIEWER" xml:space="preserve">
+    <value>Placeholder viewer</value>
+  </data>
+  <data name="GEN_PLACEHOLDER_VIEWER_FORM" xml:space="preserve">
+    <value>Placeholder Viewer</value>
+  </data>
+  <data name="GENERICS_COPIED" xml:space="preserve">
+    <value>Copied</value>
+  </data>
+  <data name="EDITABLE_TAB_CONTROL_CONTEXT_MENU_QUICK_EDIT" xml:space="preserve">
+    <value>Quick edit</value>
+  </data>
+  <data name="EDITABLE_TAB_CONTROL_CONTEXT_MENU_CLOSE" xml:space="preserve">
+    <value>Close tab</value>
+  </data>
+  <data name="EDITABLE_TAB_CONTROL_CONTEXT_MENU_EDIT_NAME" xml:space="preserve">
+    <value>Edit name</value>
+  </data>
+  <data name="EDITABLE_TAB_CONTROL_CONTEXT_MENU_INSERT_TABS" xml:space="preserve">
+    <value>Insert tabs (x{c})</value>
+  </data>
+  <data name="EDITABLE_TAB_CONTROL_DELETE_CONFIRM" xml:space="preserve">
+    <value>Are you sure you want to close {t}?</value>
   </data>
 </root>

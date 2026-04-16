@@ -131,7 +131,7 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                     return;
                 }
 
-                record.Script.Name = args.NewName;
+                record.Script.Name = args.TabPage.Text;
             };
 
             this.autoFormatButton.Click += (sender, args) => this.GetCurrentTabPageRecord()?.Editor.GetTextBox().DoAutoIndent();

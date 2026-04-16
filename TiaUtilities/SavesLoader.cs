@@ -2,8 +2,8 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
-using TiaUtilities.Generation.Alarms.Module;
-using TiaUtilities.Generation.IO.Module;
+using TiaUtilities.Generation.Alarms;
+using TiaUtilities.Generation.IO;
 using TiaUtilities.Utility;
 
 namespace TiaUtilities
@@ -13,6 +13,7 @@ namespace TiaUtilities
         private class SaveFile
         {
             [JsonProperty] public string? Type { get; set; }
+            [JsonProperty] public int? Version { get; set; }
             [JsonProperty] public object? @Object { get; set; }
         }
 
@@ -31,9 +32,9 @@ namespace TiaUtilities
 
         static SavesLoader()
         {
-            SavesLoader.RegisterType(typeof(ProgramSettings), "ProgramSettings");
-            SavesLoader.RegisterType(typeof(AlarmGenSave), "AlarmGeneration");
-            SavesLoader.RegisterType(typeof(IOGenSave), "IOGeneration");
+            SavesLoader.RegisterType(typeof(ProgramSettingsV1), "ProgramSettings");
+            SavesLoader.RegisterType(typeof(AlarmGenSaveV1), "AlarmGeneration");
+            SavesLoader.RegisterType(typeof(IOGenSaveV1), "IOGeneration");
         }
 
         public static CommonOpenFileDialog CreateFileDialog(bool ensureFileExists, string? filePath, string extension)
@@ -67,7 +68,7 @@ namespace TiaUtilities
             }
         }
 
-        public static bool CreateFileAndSave(object obj, string filePath, string extension)
+        public static bool CreateFileAndSave(object obj, int version, string filePath, string extension)
         {
             if (!CreateFileWithDirectory(filePath))
             {
@@ -75,10 +76,10 @@ namespace TiaUtilities
             }
 
             var localFilePath = filePath;
-            return Save(obj, ref localFilePath, extension);
+            return Save(obj, version, ref localFilePath, extension);
         }
 
-        public static bool Save(object obj, ref string? filePath, string extension, bool showFileDialog = false)
+        public static bool Save(object obj, int version, ref string? filePath, string extension, bool showFileDialog = false)
         {
             try
             {
@@ -115,7 +116,7 @@ namespace TiaUtilities
                     return false;
                 }
 
-                SaveFile saveFile = new() { Type = typeID, Object = obj, };
+                SaveFile saveFile = new() { Type = typeID, Version = version, Object = obj, };
 
                 var jObject = JObject.FromObject(saveFile, SavesLoader.CreateJSONSerializer());
                 File.WriteAllText(filePath, jObject.ToString());

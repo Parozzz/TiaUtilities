@@ -53,6 +53,9 @@
     <Optimize>false</Optimize>
     <DefineConstants>#define TIA_V19</DefineConstants>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'V21|AnyCPU'">
+    <OutputPath>bin\V21\</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Siemens.Engineering.AddIn">
       <HintPath>..\SiemensAPI\V19\Siemens.Engineering.AddIn.dll</HintPath>

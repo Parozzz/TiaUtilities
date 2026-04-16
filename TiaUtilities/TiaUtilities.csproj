@@ -9,7 +9,8 @@
     <StartupObject>TiaUtilities.Program</StartupObject>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <BaseOutputPath></BaseOutputPath>
-    <ApplicationIcon>icon.ico</ApplicationIcon>
+    <ApplicationIcon>TiaUtilities_Icon.ico</ApplicationIcon>
+    <Configurations>Debug;Release;V21</Configurations>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -22,13 +23,13 @@
 
   <ItemGroup>
     <Content Include="!!TO-DO!!.txt" />
-    <Content Include="icon.ico" />
+    <Content Include="TiaUtilities_Icon.ico" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.104.2" />
     <PackageReference Include="FastColoredTextBox.Net6" Version="1.0.0" />
-    <PackageReference Include="InformationBox" Version="1.3.0.162" />
+    <PackageReference Include="InformationBox" Version="1.4.0.220" />
     <PackageReference Include="Jint" Version="4.2.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Svg" Version="3.4.7" />
@@ -49,16 +50,15 @@
     <Compile Update="CustomControls\FlatTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Update="DBDuplicationForm.cs">
+    <Compile Update="zzzTests\DBDuplicationForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="Generation\Configuration\ConfigForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Generation\IO\Module\ExcelImporter\IOGenExcelImportForm.cs">
+    <Compile Update="Generation\IO\IOGenExcelImportForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Generation\IO\Module\Tab\IOGenTabControl.cs" />
     <Compile Update="Languages\Locale.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -85,13 +85,58 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
     <None Update="Mentions.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Images\a-to-z-72773.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Images\add-501366-007435.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Images\AlarmGenerator.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Images\AliasGenerator.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Images\arrow-left.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Images\close-193002-FF001C.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Images\close-193002.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Images\cross-1364737-b8192c.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Images\double-arrow-down-3134107.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Images\double-arrow-up-3134107.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Images\drag-8187494.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Images\DuplicateDB.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Images\edit-5260657.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Images\edit-562275.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Images\favorite-8250509.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Images\noun-clone-5410291.png">
@@ -106,10 +151,22 @@
     <None Update="Resources\Images\noun-rename-4926118.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\Images\noun-save-2433498.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\Images\noun-text-to-text-transfer-6855194.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Images\noun-transfer-7710063.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Images\subtitle-8187463.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Images\TiaUtilities_Icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Images\tick-7138168-007435.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

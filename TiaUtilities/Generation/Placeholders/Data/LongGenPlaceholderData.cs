@@ -2,17 +2,12 @@
 {
     public class LongGenPlaceholderData : IGenPlaceholderData
     {
-        public long Value { get; set; }
-        public Func<long, string> Function { get; set; }
-
-        public LongGenPlaceholderData()
-        {
-
-        }
+        public required long Value { get; set; }
+        public Func<long, string>? Function { get; set; }
 
         public string GetSubstitution()
         {
-            return Function.Invoke(Value);
+            return this.Function == null ? this.Value.ToString() : this.Function.Invoke(Value);
         }
     }
 

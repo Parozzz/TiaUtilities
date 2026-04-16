@@ -46,6 +46,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'V19|AnyCPU'">
     <OutputPath>bin\V19\</OutputPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'V21|AnyCPU'">
+    <OutputPath>bin\V21\</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Siemens.Engineering.AddIn, Version=17.0.0.0, Culture=neutral, PublicKeyToken=65b871d8372d6a8f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

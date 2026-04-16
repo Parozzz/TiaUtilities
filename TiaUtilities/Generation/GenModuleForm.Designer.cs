@@ -30,12 +30,15 @@
         {
             topMenuStrip = new MenuStrip();
             fileMenuItem = new ToolStripMenuItem();
+            loadMenuItem = new ToolStripMenuItem();
             saveMenuItem = new ToolStripMenuItem();
             saveAsMenuItem = new ToolStripMenuItem();
-            loadMenuItem = new ToolStripMenuItem();
+            programMenuItem = new ToolStripMenuItem();
+            programSettingsMenuItem = new ToolStripMenuItem();
+            toolsMenuItem = new ToolStripMenuItem();
+            toolsPlaceholderViewerMenuItem = new ToolStripMenuItem();
             importExportMenuItem = new ToolStripMenuItem();
             exportXMLMenuItem = new ToolStripMenuItem();
-            preferencesMenuItem = new ToolStripMenuItem();
             formTableLayout = new TableLayoutPanel();
             topMenuStrip.SuspendLayout();
             formTableLayout.SuspendLayout();
@@ -43,7 +46,7 @@
             // 
             // topMenuStrip
             // 
-            topMenuStrip.Items.AddRange(new ToolStripItem[] { fileMenuItem, importExportMenuItem, preferencesMenuItem });
+            topMenuStrip.Items.AddRange(new ToolStripItem[] { fileMenuItem, programMenuItem, toolsMenuItem, importExportMenuItem });
             topMenuStrip.Location = new Point(0, 0);
             topMenuStrip.Name = "topMenuStrip";
             topMenuStrip.Size = new Size(800, 24);
@@ -52,10 +55,16 @@
             // 
             // fileMenuItem
             // 
-            fileMenuItem.DropDownItems.AddRange(new ToolStripItem[] { saveMenuItem, saveAsMenuItem, loadMenuItem });
+            fileMenuItem.DropDownItems.AddRange(new ToolStripItem[] { loadMenuItem, saveMenuItem, saveAsMenuItem });
             fileMenuItem.Name = "fileMenuItem";
             fileMenuItem.Size = new Size(37, 20);
             fileMenuItem.Text = "File";
+            // 
+            // loadMenuItem
+            // 
+            loadMenuItem.Name = "loadMenuItem";
+            loadMenuItem.Size = new Size(111, 22);
+            loadMenuItem.Text = "Load";
             // 
             // saveMenuItem
             // 
@@ -69,30 +78,45 @@
             saveAsMenuItem.Size = new Size(111, 22);
             saveAsMenuItem.Text = "SaveAs";
             // 
-            // loadMenuItem
+            // programMenuItem
             // 
-            loadMenuItem.Name = "loadMenuItem";
-            loadMenuItem.Size = new Size(111, 22);
-            loadMenuItem.Text = "Load";
+            programMenuItem.DropDownItems.AddRange(new ToolStripItem[] { programSettingsMenuItem });
+            programMenuItem.Font = new Font("Segoe UI", 9F);
+            programMenuItem.Name = "programMenuItem";
+            programMenuItem.Size = new Size(65, 20);
+            programMenuItem.Text = "Program";
+            // 
+            // programSettingsMenuItem
+            // 
+            programSettingsMenuItem.Name = "programSettingsMenuItem";
+            programSettingsMenuItem.Size = new Size(116, 22);
+            programSettingsMenuItem.Text = "Settings";
+            // 
+            // toolsMenuItem
+            // 
+            toolsMenuItem.DropDownItems.AddRange(new ToolStripItem[] { toolsPlaceholderViewerMenuItem });
+            toolsMenuItem.Name = "toolsMenuItem";
+            toolsMenuItem.Size = new Size(47, 20);
+            toolsMenuItem.Text = "Tools";
+            // 
+            // toolsPlaceholderViewerMenuItem
+            // 
+            toolsPlaceholderViewerMenuItem.Name = "toolsPlaceholderViewerMenuItem";
+            toolsPlaceholderViewerMenuItem.Size = new Size(173, 22);
+            toolsPlaceholderViewerMenuItem.Text = "Placeholder viewer";
             // 
             // importExportMenuItem
             // 
             importExportMenuItem.DropDownItems.AddRange(new ToolStripItem[] { exportXMLMenuItem });
             importExportMenuItem.Name = "importExportMenuItem";
-            importExportMenuItem.Size = new Size(94, 20);
+            importExportMenuItem.Size = new Size(93, 20);
             importExportMenuItem.Text = "Import/Export";
             // 
             // exportXMLMenuItem
             // 
             exportXMLMenuItem.Name = "exportXMLMenuItem";
-            exportXMLMenuItem.Size = new Size(135, 22);
+            exportXMLMenuItem.Size = new Size(134, 22);
             exportXMLMenuItem.Text = "Export XML";
-            // 
-            // preferencesMenuItem
-            // 
-            preferencesMenuItem.Name = "preferencesMenuItem";
-            preferencesMenuItem.Size = new Size(80, 20);
-            preferencesMenuItem.Text = "Preferences";
             // 
             // formTableLayout
             // 
@@ -114,6 +138,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
             Controls.Add(formTableLayout);
+            DoubleBuffered = true;
             Name = "GenModuleForm";
             Text = "GenerationProjectForm";
             topMenuStrip.ResumeLayout(false);
@@ -131,8 +156,11 @@
         private ToolStripMenuItem saveAsMenuItem;
         private ToolStripMenuItem loadMenuItem;
         private ToolStripMenuItem exportXMLMenuItem;
-        private ToolStripMenuItem preferencesMenuItem;
         private TableLayoutPanel formTableLayout;
         public ToolStripMenuItem importExportMenuItem;
+        private ToolStripMenuItem programMenuItem;
+        private ToolStripMenuItem programSettingsMenuItem;
+        private ToolStripMenuItem toolsMenuItem;
+        private ToolStripMenuItem toolsPlaceholderViewerMenuItem;
     }
 }

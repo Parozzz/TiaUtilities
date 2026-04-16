@@ -17,14 +17,10 @@ namespace SpinAddIn
     {
         public readonly GROUP group;
         public readonly FileInfo fileInfo;
-        public readonly ImportOptions importOptions;
-        public readonly SWImportOptions swImportOptions;
-        public ImportData(GROUP group, FileInfo fileInfo, ImportOptions importOptions, SWImportOptions swImportOptions)
+        public ImportData(GROUP group, FileInfo fileInfo)
         {
             this.group = group;
             this.fileInfo = fileInfo;
-            this.importOptions = importOptions;
-            this.swImportOptions = swImportOptions;
         }
     }
 
@@ -476,18 +472,10 @@ namespace SpinAddIn
                 {
 #if TIA_V19 || TIA_V20 || TIA_V21
                     var importData = new ImportData<GROUP>(group,
-                        new FileInfo(fileName),
-                        ImportOptions.Override | ImportOptions.ActivateInactiveCultures,
-                        SWImportOptions.IgnoreMissingReferencedObjects |
-                        SWImportOptions.IgnoreStructuralChanges |
-                        SWImportOptions.IgnoreUnitAttributes);
+                        new FileInfo(fileName));
 #else
                     var importData = new ImportData<GROUP>(group,
-                        new FileInfo(fileName),
-                        ImportOptions.Override,
-                        SWImportOptions.IgnoreMissingReferencedObjects |
-                        SWImportOptions.IgnoreStructuralChanges |
-                        SWImportOptions.IgnoreUnitAttributes);
+                        new FileInfo(fileName));
 #endif
 
                     return importPredicate(importData);

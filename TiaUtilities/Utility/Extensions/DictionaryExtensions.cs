@@ -2,7 +2,7 @@
 {
     public static class DictionaryExtensions
     {
-        public static void Compute<K, V>(this Dictionary<K, V> dictionary, K key, V value)
+        public static void AddOrReplace<K, V>(this Dictionary<K, V> dictionary, K key, V value)
         {
             if (dictionary.ContainsKey(key))
             {
@@ -21,6 +21,18 @@
             }
 
             return default;
+        }
+
+        public static V GetOrAdd<K, V>(this Dictionary<K, V> dictionary, K key, Func<V> valueFunc)
+        {
+            if (dictionary.ContainsKey(key))
+            {
+                return dictionary[key];
+            }
+
+            var value = valueFunc.Invoke();
+            dictionary.Add(key, value);
+            return value;
         }
     }
 }

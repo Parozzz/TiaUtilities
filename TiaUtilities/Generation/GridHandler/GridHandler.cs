@@ -9,6 +9,7 @@ using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.UndoRedo;
 using TiaUtilities.Utility;
 using TiaUtilities.Utility.Extensions;
+using System.Diagnostics;
 
 namespace TiaUtilities.Generation.GridHandler
 {
@@ -106,6 +107,9 @@ namespace TiaUtilities.Generation.GridHandler
             this.DataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None; //Is faster?
             this.DataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
             this.DataGridView.AllowUserToResizeRows = false;
+            this.DataGridView.Margin = Padding.Empty;
+
+            this.DataGridView.BorderStyle = BorderStyle.None;
 
             this.DataGridView.ClipboardCopyMode = DataGridViewClipboardCopyMode.Disable; //Do it myself!
             this.DataGridView.SelectionMode = DataGridViewSelectionMode.CellSelect;
@@ -225,7 +229,7 @@ namespace TiaUtilities.Generation.GridHandler
 
             #endregion
 
-            #region Cell Paiting
+            #region CELL PAINTING
             var paintHandler = new GridCellPaintHandler(this.DataGridView);
             paintHandler.AddPainter(this.sortHandler); //ORDER IS IMPORTANT!
             paintHandler.AddPainter(this.excelDragHandler);
@@ -234,7 +238,18 @@ namespace TiaUtilities.Generation.GridHandler
             paintHandler.Init();
             #endregion
 
-            #region RowHeaderNumber
+            #region EVENT - CELL FORMATTING
+            this.DataGridView.CellFormatting += (sender, args) =>
+            {
+                if(this.DataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex] is DataGridViewButtonCell buttonCell)
+                {
+                    var data = this.DataSource[args.RowIndex];
+                    args.Value = $"{data[args.ColumnIndex]}";
+                }
+            };
+            #endregion
+
+            #region ROW HEADER NUMBER
             if (AddRowIndexToRowHeader)
             {
                 this.DataGridView.RowPostPaint += (sender, args) =>
@@ -259,7 +274,7 @@ namespace TiaUtilities.Generation.GridHandler
             }
             #endregion
 
-            #region KeyDown - Paste/Delete/Undo/Redo/Find
+            #region EVENT - KEYDOWN - Paste/Delete/Undo/Redo/Find
             this.DataGridView.KeyDown += (sender, args) =>
             {
                 var handled = true;
@@ -303,9 +318,9 @@ namespace TiaUtilities.Generation.GridHandler
             };
             #endregion
 
-            #region CellEdit Begin-End - ChangeCell
+            #region CELL EDIT BEGIN-END - CELL CHANGE
             GridCellChange? editCellChange = null;
-            DataGridView.CellBeginEdit += (sender, args) =>
+            this.DataGridView.CellBeginEdit += (sender, args) =>
             {
                 editCellChange = null;
 
@@ -316,7 +331,7 @@ namespace TiaUtilities.Generation.GridHandler
                 }
             };
 
-            DataGridView.CellEndEdit += (sender, args) =>
+            this.DataGridView.CellEndEdit += (sender, args) =>
             {
                 if (editCellChange == null || editCellChange.ColumnIndex != args.ColumnIndex || editCellChange.RowIndex != args.RowIndex)
                 {
@@ -330,7 +345,7 @@ namespace TiaUtilities.Generation.GridHandler
                 editCellChange = null;
             };
 
-            DataGridView.CellContentClick += (sender, args) =>
+            this.DataGridView.CellContentClick += (sender, args) =>
             {
                 var rowIndex = args.RowIndex;
                 var columnIndex = args.ColumnIndex;
@@ -346,7 +361,29 @@ namespace TiaUtilities.Generation.GridHandler
                     var newValue = !oldValue;
                     ChangeCell(new GridCellChange(checkBoxCell) { OldValue = oldValue, NewValue = newValue }, applyChanges: false);
 
-                    DataGridView.EndEdit(); //If a checkbox is clicked, it goes in edit mode. I do not want that, is confusing. This fixes it.
+                    this.DataGridView.EndEdit(); //If a checkbox is clicked, it goes in edit mode. I do not want that, is confusing. This fixes it.
+                }
+                else if(cell is DataGridViewButtonCell buttonCell && cell.OwningColumn is DataGridViewEventableButtonColumn eventableButtonColumn)
+                {
+                    var data = this.DataSource[rowIndex][columnIndex];
+                    eventableButtonColumn.ButtonPressedEvent(data, buttonCell);
+                }
+            };
+
+            this.DataGridView.CellContentDoubleClick += (sender, args) =>
+            {
+                var rowIndex = args.RowIndex;
+                var columnIndex = args.ColumnIndex;
+                if (rowIndex < 0 || rowIndex >= this.DataGridView.RowCount || columnIndex < 0 || columnIndex >= this.DataGridView.ColumnCount)
+                {
+                    return;
+                }
+
+                var cell = this.DataGridView.Rows[rowIndex].Cells[columnIndex];
+                if (cell is DataGridViewButtonCell buttonCell && cell.OwningColumn is DataGridViewEventableButtonColumn eventableButtonColumn)
+                {
+                    var data = this.DataSource[rowIndex][columnIndex];
+                    eventableButtonColumn.ButtonDoublePressedEvent(data, buttonCell);
                 }
             };
             #endregion
@@ -437,15 +474,33 @@ namespace TiaUtilities.Generation.GridHandler
 
         public DataGridViewCheckBoxColumn AddCheckBoxColumn(GridDataColumn dataColumn, int width)
         {
-            return AddColumn(new DataGridViewCheckBoxColumn(), dataColumn, width);
+            DataGridViewCheckBoxColumn checkBoxColumn = new()
+            {
+                FlatStyle = FlatStyle.Popup,
+                CellTemplate = new DataGridViewCustomCheckBoxCell()
+            };
+
+            return AddColumn(checkBoxColumn, dataColumn, width);
+        }
+
+        public DataGridViewEventableButtonColumn AddButtonColumn(GridDataColumn dataColumn, int width)
+        {
+            DataGridViewEventableButtonColumn column = new()
+            {
+                UseColumnTextForButtonValue = false,
+            };
+            return AddColumn(column, dataColumn, width);
         }
 
         public DataGridViewComboBoxColumn AddComboBoxColumn(GridDataColumn dataColumn, int width, string[] items)
         {
-            var column = AddColumn(new DataGridViewComboBoxColumn(), dataColumn, width);
+            DataGridViewComboBoxColumn column = new()
+            {
+                FlatStyle = FlatStyle.Flat
+            };
             column.Items.AddRange(items);
-            column.FlatStyle = FlatStyle.Flat;
-            return column;
+
+            return AddColumn(column, dataColumn, width); ;
         }
 
         public CC AddCustomColumn<CC>(CC customColumn, GridDataColumn dataColumn, int width) where CC : DataGridViewColumn, IGridCustomColumn
@@ -738,10 +793,11 @@ namespace TiaUtilities.Generation.GridHandler
                 }
 
                 var index = emptyIndexList[i++];
-                dataDict.Compute(index, data);
+                dataDict.AddOrReplace(index, data);
             }
             this.ChangeMultipleRows(dataDict);
         }
+
         public void SelectRow(int rowIndex)
         {
             this.DataGridView.ClearSelection();

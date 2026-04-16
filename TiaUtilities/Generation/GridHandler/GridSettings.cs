@@ -23,6 +23,7 @@ namespace TiaUtilities.Generation.GridHandler
             this.GridFont = SystemFonts.DefaultFont;
         }
 
+        /*
         public void ShowConfigForm(IWin32Window owner)
         {
             var configForm = new ConfigForm(Locale.GRID_PREFERENCES) { ControlWidth = 300 };
@@ -37,6 +38,6 @@ namespace TiaUtilities.Generation.GridHandler
             configForm.StartShowingAtLocation(Cursor.Position);
             configForm.Init();
             configForm.Show(owner);
-        }
+        }*/
     }
 }

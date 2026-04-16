@@ -1,0 +1,48 @@
+﻿using TiaUtilities.Configuration;
+using TiaUtilities.Generation;
+
+namespace TiaUtilities.SettingsNew.Bindings
+{
+    public class SettingsMacroSectionBinding<T>(Func<string> getNameFunc, Func<bool> isVisibleFunc,
+        Type configurationType,
+        Func<T?> getConfigurationFunc, T? presetConfigurationObject, Func<Dictionary<string, T>>? getOtherConfigurationsFunc)
+        where T : ObservableConfiguration
+    {
+        public Guid Guid { get; init; } = Guid.NewGuid();
+
+        public string Name { get => getNameFunc(); }
+        public bool Visible { get => isVisibleFunc(); }
+        public T? PresetConfigurationObject { get; init; } = presetConfigurationObject;
+        public Dictionary<string, T>? OtherConfigurationDict { get => this.getOtherConfigurationsFunc?.Invoke(); }
+
+        public List<SettingsSectionBinding> SectionsList { get; init; } = [];
+
+        private readonly Func<string> getNameFunc = getNameFunc;
+        private readonly Func<bool> isVisibleFunc = isVisibleFunc;
+        private readonly Type configurationType = configurationType;
+        private readonly Func<T?> getConfigurationObject = getConfigurationFunc;
+        private readonly Func<Dictionary<string, T>>? getOtherConfigurationsFunc = getOtherConfigurationsFunc;
+
+        public T? GetConfigurationObject()
+        {
+            return getConfigurationObject.Invoke();
+        }
+
+        public Type GetConfigurationType()
+        {
+            return configurationType;
+        }
+
+        public void SaveToPresetConfiguration()
+        {
+            var configurationObject = this.getConfigurationObject();
+            if (configurationObject != null && this.PresetConfigurationObject != null)
+            {
+                GenUtils.CopySamePublicFieldsAndProperties(configurationObject, this.PresetConfigurationObject);
+            }
+        }
+
+        public override string ToString() => $"{Guid};{Name};{Visible}";
+    }
+
+}

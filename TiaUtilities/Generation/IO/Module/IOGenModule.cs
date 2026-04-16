@@ -3,13 +3,21 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using SimaticML.API;
 using SimaticML.Blocks;
 using SimaticML.TagTable;
+using TiaUtilities.Configuration;
+using TiaUtilities.Editors.ErrorReporting;
 using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.Data;
+using TiaUtilities.Generation.IO.Configurations;
+using TiaUtilities.Generation.IO.Data;
 using TiaUtilities.Generation.IO.Module.ExcelImporter;
 using TiaUtilities.Generation.IO.Module.Tab;
+using TiaUtilities.Generation.IO.Xml;
+using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Languages;
-using TiaUtilities.Editors.ErrorReporting;
+using TiaUtilities.SettingsNew;
+using TiaUtilities.SettingsNew.Bindings;
+using TiaUtilities.Utility;
 using TiaUtilities.Utility.Extensions;
 
 namespace TiaUtilities.Generation.IO.Module
@@ -59,7 +67,10 @@ namespace TiaUtilities.Generation.IO.Module
 
         private readonly IOGenControl control;
 
-        private readonly List<IOGenTab> genTabList;
+        private readonly List<IOGenTab> ioTabList;
+
+        public SettingsBindings SettingsBindings { get; init; }
+        private readonly SettingsFormCache settingsFromCache;
 
         public IOGenModule(ErrorReportThread errorThread)
         {
@@ -76,11 +87,16 @@ namespace TiaUtilities.Generation.IO.Module
 
             this.control = new(suggestionGridHandler.DataGridView);
 
-            this.genTabList = [];
+            this.ioTabList = [];
+            this.SettingsBindings = new();
         }
 
         public void Init(GenModuleForm form)
         {
+            #region TOP_BUTTONS_STRIP
+            this.control.setupButton.Click += (sender, args) => this.settingsFromCache.Show(this.control);
+            #endregion
+
             #region IMPORT_EXPORT_MENU_ITEMS
             ToolStripMenuItem importExcelMenuItem = new(Locale.IO_GEN_FORM_IMPEXP_IMPORT_EXCEL);
             importExcelMenuItem.Click += (sender, args) =>
@@ -101,7 +117,7 @@ namespace TiaUtilities.Generation.IO.Module
                         });
                     }
 
-                    var selectedTab = this.control.gridsTabControl.SelectedTab;
+                    var selectedTab = this.control.tabControl.SelectedTab;
                     if (selectedTab != null && selectedTab.Tag is IOGenTab genTab)
                     {
                         var gridHandler = genTab.GridHandler;
@@ -170,7 +186,7 @@ namespace TiaUtilities.Generation.IO.Module
             ToolStripMenuItem importAddressMenuItem = new(Locale.IO_GEN_FORM_IMPEXP_IMPORT_IO);
             importAddressMenuItem.Click += (sender, args) =>
             {
-                if (this.control.gridsTabControl.SelectedTab?.Tag is not IOGenTab ioTab)
+                if (this.control.tabControl.SelectedTab?.Tag is not IOGenTab ioTab)
                 {
                     return;
                 }
@@ -243,9 +259,7 @@ namespace TiaUtilities.Generation.IO.Module
             #endregion
 
             this.gridBindContainer.Init(form);
-
             this.suggestionGridHandler.Init();
-            this.control.BindConfig(mainConfig);
 
             #region SUGGESTION_GRIDS_EVENTS
             this.suggestionGridHandler.DataGridView.CellToolTipTextNeeded += (sender, args) =>
@@ -259,7 +273,7 @@ namespace TiaUtilities.Generation.IO.Module
 
                 args.ToolTipText = "";
 
-                foreach (var genTab in genTabList)
+                foreach (var genTab in ioTabList)
                 {
                     var dict = genTab.GridHandler.DataSource.GetNotEmptyDataDict();
                     foreach (var entry in dict)
@@ -286,63 +300,102 @@ namespace TiaUtilities.Generation.IO.Module
             this.suggestionPreviewer.Function = (column, ioData) => null;
             #endregion
 
-            this.control.gridsTabControl.TabPreAdded += (sender, args) => TabCreation(args.TabPage);
-            this.control.gridsTabControl.TabPreRemoved += (sender, args) =>
+            #region TAB CONTROL
+            this.control.tabControl.TabPreAdded += (sender, args) => TabCreation(args.TabPage);
+            this.control.tabControl.TabPreRemoved += (sender, args) =>
             {
                 if (args.TabPage.Tag is IOGenTab ioGenTab)
                 {
-                    genTabList.Remove(ioGenTab);
+                    ioTabList.Remove(ioGenTab);
                 }
             };
-            this.control.gridsTabControl.Selected += (sender, args) =>
+
+            this.control.tabControl.TabNameUserChanged += (sender, args) =>
+            {
+                var newName = args.NewName;
+                foreach (var loopTab in this.ioTabList)
+                {
+                    if (newName == loopTab.Name)
+                    {
+                        var tabNames = this.ioTabList
+                                            .Where(tab => tab.TabPage != args.TabPage)
+                                            .Select(tab => tab.Name);
+
+                        var fixedNewName = Utils.CheckEqualityAndAddNumberAtEnd(newName, tabNames);
+                        args.NewName = fixedNewName;
+                    }
+                }
+
+                this.SettingsBindings.Update();
+            };
+
+            this.control.tabControl.Selected += (sender, args) =>
             {
                 if (args.TabPage?.Tag is IOGenTab tab)
                 {
                     tab.Selected();
+                    this.SettingsBindings.Update();
                 }
             };
+            #endregion
+
+            #region SETTINGS_BINDINGS
+            void placeholderRequestEvent(object? sender, PlaceholderViewRequestEventArgs args) => this.OpenPlaceholderViewer(args.Form);
+            this.SettingsBindings.PlaceholderViewerRequestEvent += placeholderRequestEvent;
+
+            form.FormClosed += (sender, args) =>
+            {
+                this.SettingsBindings.PlaceholderViewerRequestEvent -= placeholderRequestEvent;
+            };
+            #endregion
 
             form.Shown += (sender, args) =>
             {
                 suggestionGridHandler.DataGridView.AutoResizeColumnHeadersHeight();
-                if (this.control.gridsTabControl.TabCount == 0)
+                if (this.control.tabControl.TabCount == 0)
                 { //Check required because Load could be called before form is shown!
-                    TabPage tabPage = new();
-                    TabCreation(tabPage);
-                    this.control.gridsTabControl.TabPages.Add(tabPage);
+                    this.control.tabControl.AddTabs();
                 }
             };
+
+            this.AddConfigurationBindings(this.SettingsBindings);
         }
 
         private void TabCreation(TabPage tabPage, IOGenTabSave? save = null)
         {
-            tabPage.Text = save?.Name ?? "IOGen";
-
             IOGenTab ioGenTab = new(MainForm.Settings.GridSettings, this.gridBindContainer, this, tabPage, this.mainConfig);
-            genTabList.Add(ioGenTab);
-
             ioGenTab.Init();
+            
+            if (save == null)
+            {
+                ioGenTab.Name = Utils.CheckEqualityAndAddNumberAtEnd("IoTab", this.ioTabList.Select(tab => tab.Name));
+            }
             if (save != null)
             {
                 ioGenTab.LoadSave(save);
+                ioGenTab.Name = Utils.CheckEqualityAndAddNumberAtEnd(ioGenTab.Name, this.ioTabList.Select(tab => tab.Name)); //In case the loaded file has a duplicated name!
             }
-            tabPage.Tag = ioGenTab;
 
-            tabPage.Controls.Add(ioGenTab.TabControl);
+            tabPage.Tag = ioGenTab;
+            tabPage.Controls.Add(ioGenTab.GridHandler.DataGridView);
+
+            ioTabList.Add(ioGenTab);
         }
 
         public void Clear()
         {
-            this.genTabList.Clear();
-            this.control.gridsTabControl.TabPages.Clear();
+            this.SettingsBindings.Clear();
+
+            this.ioTabList.Clear();
+            this.control.tabControl.TabPages.Clear();
         }
 
-        public bool IsDirty() => mainConfig.IsDirty() || suggestionGridHandler.IsDirty() || genTabList.Any(x => x.IsDirty()) || this.gridBindContainer.IsDirty();
+        public bool IsDirty() => mainConfig.IsDirty() || suggestionGridHandler.IsDirty() || ioTabList.Any(x => x.IsDirty()) || this.gridBindContainer.IsDirty();
         public void Wash()
         {
             this.mainConfig.Wash();
             this.suggestionGridHandler.Wash();
-            foreach (var tab in genTabList)
+            foreach (var tab in ioTabList)
             {
                 tab.Wash();
             }
@@ -354,12 +407,24 @@ namespace TiaUtilities.Generation.IO.Module
             return this.control;
         }
 
+        public void OpenPlaceholderViewer(IWin32Window? window = null)
+        {
+            var form = window ?? this.control.FindForm();
+            if (form == null)
+            {
+                return;
+            }
+
+            var placeholderForm = new PlaceholderViewerForm(GenPlaceholders.IO.PLACEHOLDER_LIST);
+            placeholderForm.Show(form);
+        }
+
         public void ExportXML(string folderPath)
         {
             var ioXmlGenerator = new IOXmlGenerator(mainConfig);
             ioXmlGenerator.Init();
 
-            foreach (var tab in genTabList)
+            foreach (var tab in ioTabList)
             {
                 var ioDataList = new List<IOData>(tab.GridHandler.DataSource.GetNotEmptyClonedDataDict().Keys); //Return CLONED data, otherwise operations on the xml generation will affect the table!
                 ioXmlGenerator.GenerateAlias(tab.TabPage.Text, tab.Previewer, tab.TabConfig, ioDataList);
@@ -370,7 +435,7 @@ namespace TiaUtilities.Generation.IO.Module
 
         public object CreateSave()
         {
-            IOGenSave save = new()
+            IOGenSaveV1 save = new()
             {
                 SuggestionGrid = this.suggestionGridHandler.CreateSave(),
                 ScriptSave = this.gridBindContainer.GridScriptHandler.CreateSave()
@@ -379,7 +444,7 @@ namespace TiaUtilities.Generation.IO.Module
             GenUtils.CopyJsonFieldsAndProperties(mainConfig, save.MainConfig);
             GenUtils.CopyJsonFieldsAndProperties(excelImportConfig, save.ExcelImportConfiguration);
 
-            foreach (var tab in genTabList)
+            foreach (var tab in ioTabList)
             {
                 var tabSave = tab.CreateSave();
                 save.TabSaves.Add(tabSave);
@@ -390,7 +455,7 @@ namespace TiaUtilities.Generation.IO.Module
 
         public void LoadSave(object saveObject)
         {
-            if (saveObject is not IOGenSave loadedSave)
+            if (saveObject is not IOGenSaveV1 loadedSave)
             {
                 return;
             }
@@ -407,15 +472,22 @@ namespace TiaUtilities.Generation.IO.Module
             {
                 TabPage tabPage = new();
                 TabCreation(tabPage, tabSave);
-                this.control.gridsTabControl.TabPages.Add(tabPage);
+                this.control.tabControl.TabPages.Add(tabPage);
             }
 
-            UpdateSuggestionColors();
+            this.UpdateSuggestionColors();
+
+            this.AddConfigurationBindings(this.SettingsBindings);
+            //Seems that the Selected event is not called in this case. Doing it manually.
+            if (this.control.tabControl.SelectedTab?.Tag is IOGenTab tab)
+            {
+                tab.Selected();
+            }
         }
 
         public bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            var selectedTab = this.control.gridsTabControl.SelectedTab;
+            var selectedTab = this.control.tabControl.SelectedTab;
             if (selectedTab != null && selectedTab.Tag is IOGenTab ioGenTab)
             {
                 return ioGenTab.ProcessCmdKey(ref msg, keyData);
@@ -434,7 +506,7 @@ namespace TiaUtilities.Generation.IO.Module
             IEnumerable<string> suggestions = suggestionGridHandler.DataSource.GetNotEmptyDataDict().Keys.Select(k => k.Value ?? "");
             if (filterAlreadyUsed)
             {
-                foreach (var ioTab in this.genTabList)
+                foreach (var ioTab in this.ioTabList)
                 {
                     var tabVariables = ioTab.GridHandler.DataSource.GetNotEmptyData().Select(i => i.Variable?.ToLowerInvariant())
                                                                                      .Where(i => i != null);
@@ -457,7 +529,7 @@ namespace TiaUtilities.Generation.IO.Module
 
             List<GenTabRowRecord> rows = [];
 
-            foreach (var genTab in genTabList)
+            foreach (var genTab in ioTabList)
             {
                 var dict = genTab.GridHandler.DataSource.GetNotEmptyDataDict();
                 foreach (var entry in dict)
@@ -481,6 +553,45 @@ namespace TiaUtilities.Generation.IO.Module
             }
 
             suggestionGridHandler.DataGridView.ResumeLayout();
+        }
+
+        private void AddConfigurationBindings(SettingsBindings settingsBindings)
+        {
+            IOGenUtils.AddMainConfigBindings(settingsBindings, this.mainConfig);
+            IOGenUtils.AddTabConfigSettings(settingsBindings, 
+                this.GetCurrentTabName,
+                this.IsAnyTabSelected,
+                this.GetCurrentTabConfiguration, 
+                this.GetTabConfigurationDict);
+        }
+
+        private string GetCurrentTabName()
+        {
+            var tabPage = this.control.tabControl.SelectedTab;
+            return tabPage == null ? "" : tabPage.Text;
+        }
+
+        private bool IsAnyTabSelected()
+        {
+            return this.control.tabControl.SelectedTab != null;
+        }
+
+        private IOTabConfiguration? GetCurrentTabConfiguration()
+        {
+            return this.control.tabControl.SelectedTab?.Tag is IOGenTab genTab ? genTab.TabConfig : null;
+        }
+
+        private Dictionary<string, ObservableConfiguration> GetTabConfigurationDict()
+        {
+            Dictionary<string, ObservableConfiguration> dict = [];
+            foreach (var tab in this.ioTabList)
+            {
+                if(!dict.TryAdd(tab.Name, tab.TabConfig))
+                {
+                    dict.Add(tab.Name + "*", tab.TabConfig);
+                }
+            }
+            return dict;
         }
     }
 }

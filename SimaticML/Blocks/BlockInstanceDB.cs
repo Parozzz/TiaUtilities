@@ -20,7 +20,7 @@ namespace SimaticML.Blocks
 
             //Generate static section
             var _ = this.AttributeList.STATIC;
-
+            
             this.AttributeList.ProgrammingLanguage = SimaticProgrammingLanguage.DB;
             this.AttributeList.HeaderAuthor = SimaticMLAPI.HEADER_AUTHOR;
             this.AttributeList.HeaderFamily = SimaticMLAPI.HEADER_FAMILY;

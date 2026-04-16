@@ -18,6 +18,26 @@ namespace TiaUtilities.CustomControls
             this.InputText = inputText;
         }
 
+        public FloatingTextBox UseSignedKeyPressEventHandler()
+        {
+            this.textBox.KeyPress += (sender, args) =>
+            {
+                var isKeyValid = char.IsLetter(args.KeyChar) && args.KeyChar != '+' && args.KeyChar != '-';
+                args.Handled = isKeyValid;
+            };
+            return this;
+        }
+
+        public FloatingTextBox UseUnsignedKeyPressEventHandler()
+        {
+            this.textBox.KeyPress += (sender, args) =>
+            {
+                var isKeyValid = char.IsLetter(args.KeyChar);
+                args.Handled = isKeyValid;
+            };
+            return this;
+        }
+
         private bool formReadyToClose = false;
         protected override void WndProc(ref Message m)
         {
@@ -63,6 +83,14 @@ namespace TiaUtilities.CustomControls
             this.Location = Cursor.Position;
 
             return this.ShowDialog(owner);
+        }
+
+        public DialogResult ShowDialogAtPosition(int x, int y)
+        {
+            this.StartPosition = FormStartPosition.Manual;
+            this.Location = new Point(x, y);
+
+            return this.ShowDialog();
         }
     }
 }
