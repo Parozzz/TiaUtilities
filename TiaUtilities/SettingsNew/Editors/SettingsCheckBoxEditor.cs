@@ -7,7 +7,7 @@ namespace TiaUtilities.SettingsNew.Editors
     {
 
         private readonly RJToggleButton toggleButton;
-        public SettingsCheckBoxEditor(SettingsFormValueImpl value) : base(value)
+        public SettingsCheckBoxEditor(SettingsFormValueImpl value, bool useContextMenu) : base(value, useContextMenu)
         {
             this.toggleButton = new RJToggleButton
             {
@@ -22,7 +22,10 @@ namespace TiaUtilities.SettingsNew.Editors
             };
             toggleButton.CheckedChanged += (sender, args) => this.SaveToConfiguration();
 
-            var _ = SettingsFormUtils.AddContextualMenu(this.toggleButton, value);
+            if(useContextMenu)
+            {
+                var _ = SettingsFormUtils.AddContextualMenu(this.toggleButton, value);
+            }
         }
 
         public override Control GetControl()

@@ -8,8 +8,8 @@ using TiaUtilities.Generation.Alarms.Xml;
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.Placeholders;
-using TiaUtilities.Generation.SettingsNew;
 using TiaUtilities.Languages;
+using TiaUtilities.SettingsNew;
 using TiaUtilities.SettingsNew.Bindings;
 using TiaUtilities.Utility;
 
@@ -31,6 +31,7 @@ namespace TiaUtilities.Generation.Alarms.Module
         public IEnumerable<AlarmTabConfiguration> TabConfigurations { get => this.alarmTabList.Select(tab => tab.TabConfig); }
 
         public SettingsBindings SettingsBindings { get; init; }
+        private readonly SettingsFormCache settingsFromCache;
 
         private AlarmGenTemplateForm? shownTemplateForm = null;
 
@@ -45,12 +46,13 @@ namespace TiaUtilities.Generation.Alarms.Module
 
             this.alarmTabList = [];
             this.SettingsBindings = new();
+            this.settingsFromCache = new(this.SettingsBindings);
         }
 
         public void Init(GenModuleForm form)
         {
             #region TOP_BUTTONS_STRIP
-            this.control.setupButton.Click += (sender, args) => new SettingsForm(this.SettingsBindings).Show(this.control);
+            this.control.setupButton.Click += (sender, args) => settingsFromCache.Show(this.control);
             this.control.changeTemplateButton.Click += (sender, args) =>
             {
                 var currentTabConfig = GetCurrentTabConfiguration();

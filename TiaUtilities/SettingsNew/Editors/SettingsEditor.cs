@@ -5,7 +5,7 @@ namespace TiaUtilities.SettingsNew.Editors
 {
     public abstract class SettingsEditor
     {
-        public static SettingsEditor? ObtainFromValue(SettingsFormValueImpl formValue)
+        public static SettingsEditor? ObtainFromValue(SettingsFormValueImpl formValue, bool useContextMenu)
         {
             SettingsEditor editor;
             switch (formValue.Binding.EditorType)
@@ -16,25 +16,25 @@ namespace TiaUtilities.SettingsNew.Editors
                 case SettingsEditorTypeEnum.STRING:
                 case SettingsEditorTypeEnum.UINT:
                 case SettingsEditorTypeEnum.INT:
-                    editor = new SettingsTextBoxEditor(formValue);
+                    editor = new SettingsTextBoxEditor(formValue, useContextMenu);
                     break;
                 case SettingsEditorTypeEnum.BOOLEAN:
-                    editor = new SettingsCheckBoxEditor(formValue);
+                    editor = new SettingsCheckBoxEditor(formValue, useContextMenu);
                     break;
                 case SettingsEditorTypeEnum.COLOR:
-                    editor = new SettingsColorEditor(formValue);
+                    editor = new SettingsColorEditor(formValue, useContextMenu);
                     break;
                 case SettingsEditorTypeEnum.JSON:
-                    editor = new SettingsJSONEditor(formValue);
+                    editor = new SettingsJSONEditor(formValue, useContextMenu);
                     break;
                 case SettingsEditorTypeEnum.JAVASCRIPT:
-                    editor = new SettingsJavascriptEditor(formValue);
+                    editor = new SettingsJavascriptEditor(formValue, useContextMenu);
                     break;
                 case SettingsEditorTypeEnum.ENUM:
                 case SettingsEditorTypeEnum.STRING_LIST:
                 case SettingsEditorTypeEnum.UNSIGNED_LIST:
                 case SettingsEditorTypeEnum.SIGNED_LIST:
-                    editor = new SettingsComboBoxEditor(formValue);
+                    editor = new SettingsComboBoxEditor(formValue, useContextMenu);
                     break;
             }
 
@@ -48,7 +48,7 @@ namespace TiaUtilities.SettingsNew.Editors
         private readonly PropertyChangedEventHandler propertyChangedEventHandler;
         private readonly EventHandler disposedEventHandler;
 
-        public SettingsEditor(SettingsFormValueImpl value)
+        public SettingsEditor(SettingsFormValueImpl value, bool useContextMenu)
         {
             this.Value = value;
             this.propertyChangedEventHandler = this.PropertyChanged;

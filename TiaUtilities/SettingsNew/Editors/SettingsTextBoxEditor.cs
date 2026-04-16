@@ -9,7 +9,7 @@ namespace TiaUtilities.SettingsNew.Editors
 
         private readonly TextBox textBox;
 
-        public SettingsTextBoxEditor(SettingsFormValueImpl value) : base(value)
+        public SettingsTextBoxEditor(SettingsFormValueImpl value, bool useContextMenu) : base(value, useContextMenu)
         {
             var size = TextRenderer.MeasureText("AaGg", SettingsFormConstants.VALUE_CONTROL_FONT, Size.Empty, TextFormatFlags.TextBoxControl);
             this.textBox = new()
@@ -41,7 +41,10 @@ namespace TiaUtilities.SettingsNew.Editors
                     break;
             }
 
-            var _ = SettingsFormUtils.AddContextualMenu(this.textBox, value);
+            if (useContextMenu)
+            {
+                var _ = SettingsFormUtils.AddContextualMenu(this.textBox, value);
+            }
         }
 
         public override Control GetControl()

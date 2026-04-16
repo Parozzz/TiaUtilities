@@ -107,7 +107,7 @@ namespace TiaUtilities.SettingsNew
                 var name = pair.Key;
                 var otherConf = pair.Value;
 
-                var otherFormValue = formValue.Clone();
+                var otherFormValue = formValue.Clone(useContextMenu: false);
                 otherFormValue.UpdateConfigurationObject(otherConf);
 
                 var editor = otherFormValue.Editor;

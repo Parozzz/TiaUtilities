@@ -9,7 +9,7 @@ namespace TiaUtilities.SettingsNew.Editors
         private readonly JsonEditor editor;
         private FastColoredTextBox Control { get => editor.GetTextBox(); }
 
-        public SettingsJSONEditor(SettingsFormValueImpl value) : base(value)
+        public SettingsJSONEditor(SettingsFormValueImpl value, bool useContextMenu) : base(value, useContextMenu)
         {
             this.editor = new JsonEditor();
             this.editor.InitControl();
@@ -19,7 +19,10 @@ namespace TiaUtilities.SettingsNew.Editors
             this.Control.Font = SettingsFormConstants.VALUE_CONTROL_FONT;
             this.Control.TextChanged += (sender, args) => this.SaveToConfiguration();
 
-            var _ = SettingsFormUtils.AddContextualMenu(this.Control, value);
+            if (useContextMenu)
+            {
+                var _ = SettingsFormUtils.AddContextualMenu(this.Control, value);
+            }
         }
 
         public override Control GetControl()

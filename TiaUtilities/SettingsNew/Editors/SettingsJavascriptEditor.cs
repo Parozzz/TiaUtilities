@@ -11,7 +11,7 @@ namespace TiaUtilities.SettingsNew.Editors
         private readonly JavascriptEditor editor;
         private FastColoredTextBox Control { get => editor.GetTextBox(); }
 
-        public SettingsJavascriptEditor(SettingsFormValueImpl value) : base(value)
+        public SettingsJavascriptEditor(SettingsFormValueImpl value, bool useContextMenu) : base(value, useContextMenu)
         {
             this.editor = new JavascriptEditor();
             this.editor.InitControl();
@@ -21,7 +21,10 @@ namespace TiaUtilities.SettingsNew.Editors
             this.Control.Font = SettingsFormConstants.VALUE_CONTROL_FONT;
             this.Control.TextChanged += (sender, args) => this.SaveToConfiguration();
 
-            var _ = SettingsFormUtils.AddContextualMenu(this.Control, value);
+            if (useContextMenu)
+            {
+                var _ = SettingsFormUtils.AddContextualMenu(this.Control, value);
+            }
         }
 
         public override Control GetControl()

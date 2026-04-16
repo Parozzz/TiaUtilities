@@ -14,8 +14,8 @@ using TiaUtilities.Generation.IO.Module.ExcelImporter;
 using TiaUtilities.Generation.IO.Module.Tab;
 using TiaUtilities.Generation.IO.Xml;
 using TiaUtilities.Generation.Placeholders;
-using TiaUtilities.Generation.SettingsNew;
 using TiaUtilities.Languages;
+using TiaUtilities.SettingsNew;
 using TiaUtilities.SettingsNew.Bindings;
 using TiaUtilities.Utility;
 using TiaUtilities.Utility.Extensions;
@@ -70,6 +70,7 @@ namespace TiaUtilities.Generation.IO.Module
         private readonly List<IOGenTab> ioTabList;
 
         public SettingsBindings SettingsBindings { get; init; }
+        private readonly SettingsFormCache settingsFromCache;
 
         public IOGenModule(ErrorReportThread errorThread)
         {
@@ -93,7 +94,7 @@ namespace TiaUtilities.Generation.IO.Module
         public void Init(GenModuleForm form)
         {
             #region TOP_BUTTONS_STRIP
-            this.control.setupButton.Click += (sender, args) => new SettingsForm(this.SettingsBindings).Show(this.control);
+            this.control.setupButton.Click += (sender, args) => this.settingsFromCache.Show(this.control);
             #endregion
 
             #region IMPORT_EXPORT_MENU_ITEMS

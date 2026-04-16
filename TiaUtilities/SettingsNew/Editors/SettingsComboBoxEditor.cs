@@ -10,7 +10,7 @@ namespace TiaUtilities.SettingsNew.Editors
     public class SettingsComboBoxEditor : SettingsEditor
     {
         private readonly RJComboBox comboBox;
-        public SettingsComboBoxEditor(SettingsFormValueImpl value) : base(value)
+        public SettingsComboBoxEditor(SettingsFormValueImpl value, bool useContextMenu) : base(value, useContextMenu)
         {
             this.comboBox = new RJComboBox()
             {
@@ -82,7 +82,10 @@ namespace TiaUtilities.SettingsNew.Editors
                     break;
             }
 
-            var _ = SettingsFormUtils.AddContextualMenu(this.comboBox, value);
+            if (useContextMenu)
+            {
+                var _ = SettingsFormUtils.AddContextualMenu(this.comboBox, value);
+            }
         }
 
         private void StringTextChangedEventHandler(object? sender, EventArgs args)

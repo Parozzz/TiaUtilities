@@ -20,7 +20,7 @@ namespace TiaUtilities.SettingsNew.FormHelpers
                 throw new InvalidOperationException($"No valid PropertyInfo has been found named \"{binding.PropertyName}\" for Object: {configurationObject.GetType().FullName}");
             }
 
-            SettingsFormValueImpl valueImpl = new(binding, configurationObject, propertyInfo);
+            SettingsFormValueImpl valueImpl = new(binding, configurationObject, propertyInfo, useContextMenu: true);
             valueImpl.Editor?.AddFormCallbacks(form);
             return valueImpl;
         }
@@ -66,7 +66,7 @@ namespace TiaUtilities.SettingsNew.FormHelpers
 
         public object? GetConfigurationValue() => this.GetConfigurationValue(this.ConfigurationObject);
 
-        public abstract SettingsFormValue Clone();
+        public abstract SettingsFormValue Clone(bool useContextMenu);
 
         public override string ToString() => $"{Name};{Binding.EditorType};{Binding.SectionBinding.Name}";
     }
@@ -80,7 +80,7 @@ namespace TiaUtilities.SettingsNew.FormHelpers
 
         public override void SetConfigurationValue(ObservableConfiguration configuration, object setValue) { }
 
-        public override SettingsFormValue Clone() => new EmptySettingsFormValueImpl(base.Binding, base.ConfigurationObject);
+        public override SettingsFormValue Clone(bool useContextMenu) => new EmptySettingsFormValueImpl(base.Binding, base.ConfigurationObject);
     }
 
     public class SettingsFormValueImpl : SettingsFormValue
@@ -90,10 +90,10 @@ namespace TiaUtilities.SettingsNew.FormHelpers
 
         public bool SetInProgress { get; private set; } = false;
 
-        public SettingsFormValueImpl(SettingsValueBinding binding, ObservableConfiguration configurationObject, PropertyInfo propertyInfo) : base(binding, configurationObject)
+        public SettingsFormValueImpl(SettingsValueBinding binding, ObservableConfiguration configurationObject, PropertyInfo propertyInfo, bool useContextMenu) : base(binding, configurationObject)
         {
             this.PropertyInfo = propertyInfo;
-            this.Editor = SettingsEditor.ObtainFromValue(this);
+            this.Editor = SettingsEditor.ObtainFromValue(this, useContextMenu);
         }
 
         public override void SetConfigurationValue(ObservableConfiguration configuration, object setValue)
@@ -189,6 +189,6 @@ namespace TiaUtilities.SettingsNew.FormHelpers
             return true;
         }
 
-        public override SettingsFormValue Clone() => new SettingsFormValueImpl(base.Binding, base.ConfigurationObject, this.PropertyInfo);
+        public override SettingsFormValue Clone(bool useContextMenu) => new SettingsFormValueImpl(base.Binding, base.ConfigurationObject, this.PropertyInfo, useContextMenu);
     }
 }

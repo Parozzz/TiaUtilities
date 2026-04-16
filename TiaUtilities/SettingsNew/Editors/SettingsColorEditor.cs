@@ -39,7 +39,7 @@ namespace TiaUtilities.SettingsNew.Editors
 
         private bool loading = false;
 
-        public SettingsColorEditor(SettingsFormValueImpl value) : base(value)
+        public SettingsColorEditor(SettingsFormValueImpl value, bool useContextMenu) : base(value, useContextMenu)
         {
             this.colorHexaTextBox = new()
             {
@@ -74,13 +74,16 @@ namespace TiaUtilities.SettingsNew.Editors
 
             this.colorPickerButton.Click += ColorPickerButtonClickEvent;
 
-            var _ = SettingsFormUtils.AddContextualMenu(this.colorHexaTextBox, value);
-            _ = SettingsFormUtils.AddContextualMenu(this.colorPickerButton, value);
+            if (useContextMenu)
+            {
+                var _ = SettingsFormUtils.AddContextualMenu(this.colorHexaTextBox, value);
+                _ = SettingsFormUtils.AddContextualMenu(this.colorPickerButton, value);
+            }
         }
 
         private void ColorTextBoxTextChangedEvent(object? sender, EventArgs e)
         {
-            if(loading)
+            if (loading)
             {
                 return;
             }
