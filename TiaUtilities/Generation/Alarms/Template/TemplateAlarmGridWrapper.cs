@@ -156,30 +156,36 @@ namespace TiaUtilities.Generation.Alarms.Template
             #endregion
 
             #region ENABLE_CHECKBOX_IF_FILLED
-            this.gridHandler.Events.CellChange += (sender, args) =>
+            this.gridHandler.Events.CellDataChanged += (sender, args) =>
             {
-                if (args.CellChangeList == null)
+                foreach (var changedCellData in args.ChangedCellDataList)
                 {
-                    return;
-                }
-
-                foreach (var cellChange in args.CellChangeList)
-                {
-                    if (TemplateData.ALARM_VARIABLE == cellChange.ColumnIndex)
+                    if (TemplateData.ALARM_VARIABLE == changedCellData.ColumnIndex)
                     {//If an alarm variable is filled (Before empty and now full) i will automatically set the enable to be true. The opposite removes the enable. QOL
-                        if (cellChange.IsOldValueEmptyString() && cellChange.IsNewValueFullString())
+                        if (IsObjectStringEmpty(changedCellData.OldValue) && IsObjectStringFull(changedCellData.NewValue))
                         {
-                            gridHandler.DataSource[cellChange.RowIndex].Enable = true;
+                            gridHandler.DataSource[changedCellData.RowIndex].Enable = true;
                         }
-                        else if (cellChange.IsOldValueFullString() && cellChange.IsNewValueEmptyString())
+                        else if (IsObjectStringFull(changedCellData.OldValue) && IsObjectStringEmpty(changedCellData.NewValue))
                         {
-                            gridHandler.DataSource[cellChange.RowIndex].Enable = false;
+                            gridHandler.DataSource[changedCellData.RowIndex].Enable = false;
                         }
                     }
                 }
             };
             #endregion
         }
+
+        private static bool IsObjectStringEmpty(object? obj)
+        {
+            return obj == null || (obj is string str && string.IsNullOrWhiteSpace(str));
+        }
+
+        private static bool IsObjectStringFull(object? obj)
+        {
+            return obj != null && obj is string str && !string.IsNullOrWhiteSpace(str);
+        }
+
         public void Refresh()
         {
             this.gridHandler.Refresh();

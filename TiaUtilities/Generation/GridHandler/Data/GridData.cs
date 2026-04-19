@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using DocumentFormat.OpenXml.Vml.Office;
+using System.Runtime.CompilerServices;
 using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.GridHandler.Data
@@ -6,35 +7,71 @@ namespace TiaUtilities.Generation.GridHandler.Data
     public abstract class GridData
     { //CLASS THAT IMPLEMENT THIS MUST HAVE AN EMPTY CONSTRUCTOR!
 
+        private class StoredData
+        {
+            public required object? Value { get; set; }
+            public required GridDataColumn Column { get; init; }
+        }
+
         public event GridDataChangedEvent DataChanged = delegate { };
-        private readonly Dictionary<string, object?> objectDict = [];
+        private readonly Dictionary<string, StoredData> objectDict = [];
 
         public void ClearDataChangedDelegate()
         {
             this.DataChanged = delegate { };
         }
 
-        public void Set(object? value, [CallerMemberName] string propertyName = "")
+        public void Set(object? newValue, [CallerMemberName] string propertyName = "")
         {
-            var added = objectDict.TryAdd(propertyName, value);
-            if(added)
+            var getDone = objectDict.TryGetValue(propertyName, out var storedData);
+            if (getDone)
             {
-                DataChanged.Invoke(this, new(this, propertyName, oldValue: null, value));
+                if (storedData != null && Utils.AreDifferentObject(storedData.Value, newValue))
+                {
+                    DataChanged.Invoke(this, new(this, propertyName, storedData.Column, storedData.Value, newValue));
+                    storedData.Value = newValue;
+                }
             }
             else
             {
-                var oldValue = objectDict[propertyName];
-                if (Utils.AreDifferentObject(oldValue, value))
+                var column = this.GetColumnFromPropertyName(propertyName);
+
+                try
                 {
-                    DataChanged.Invoke(this, new(this, propertyName, oldValue, value));
-                    objectDict[propertyName] = value;
+
+                    GridDataChangedEventArgs args = new(this, propertyName, column, OldValue: null, newValue);
+                    DataChanged.Invoke(this, args);
+                }
+                catch (Exception ex)
+                {
+                    Utils.ShowExceptionMessage(ex);
+                }
+
+                objectDict.Add(propertyName, new()
+                {
+                    Column = column,
+                    Value = newValue
+                });
+            }
+        }
+
+        private GridDataColumn GetColumnFromPropertyName(string propertyName)
+        {
+            var columns = this.GetColumns();
+            foreach (var column in columns)
+            {
+                if (column.PropertyInfoName == propertyName)
+                {
+                    return column;
                 }
             }
+            //It must exists! 
+            throw new ArgumentException($"{propertyName} DataGridColumn does not exists in {this.GetType().FullName}");
         }
 
         public object? Get([CallerMemberName] string key = "")
         {
-            return objectDict.TryGetValue(key, out var value) ? value : null;
+            return objectDict.TryGetValue(key, out var storedData) ? storedData.Value : null;
         }
 
         public T? GetAs<T>([CallerMemberName] string key = "")
@@ -64,34 +101,10 @@ namespace TiaUtilities.Generation.GridHandler.Data
         public abstract IReadOnlyList<GridDataColumn> GetColumns();
 
         public abstract GridDataColumn GetColumn(int column);
-        
+
     }
 
     public delegate void GridDataChangedEvent(object? Sender, GridDataChangedEventArgs args);
-    public class GridDataChangedEventArgs(GridData data, string propertyName, object? oldValue, object? newValue)
-    {
-        public GridData Data { get; init; } = data;
-        public string PropertyName { get; init; } = propertyName;
-        public object? OldValue { get; init; } = oldValue;
-        public object? NewValue { get; init; } = newValue;
+    public record GridDataChangedEventArgs(GridData Data, string PropertyName, GridDataColumn Column, object? OldValue, object? NewValue);
 
-        public void RestoreOldValue()
-        {
-            var property = this.Data.GetType().GetProperty(this.PropertyName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
-            if(property != null && property.CanWrite)
-            {
-                property.SetValue(this.Data, this.OldValue);
-            }
-        }
-
-        public void RestoreNewValue()
-        {
-            var property = this.Data.GetType().GetProperty(this.PropertyName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
-            if (property != null && property.CanWrite)
-            {
-                property.SetValue(this.Data, this.NewValue);
-            }
-        }
-    }
-    
 }

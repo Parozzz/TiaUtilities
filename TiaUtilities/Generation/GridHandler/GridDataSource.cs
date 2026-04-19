@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Reflection;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.UndoRedo;
 
@@ -8,21 +9,42 @@ namespace TiaUtilities.Generation.GridHandler
     {
         private readonly DataGridView dataGridView;
         private readonly GridHandler<T> gridHandler;
-        private readonly GridDataHandler<T> dataHandler;
-        private readonly UndoRedoHandler undoRedoHandler;
-
         private readonly List<T> dataList;
 
         public int Count { get => dataList.Count; }
+        public IReadOnlyList<GridDataColumn> DataColumns { get; init; }
 
-        public GridDataSource(DataGridView dataGridView, GridHandler<T> gridHandler, GridDataHandler<T> dataHandler, UndoRedoHandler undoRedoHandler)
+        public GridDataSource(DataGridView dataGridView, GridHandler<T> gridHandler)
         {
             this.dataGridView = dataGridView;
             this.gridHandler = gridHandler;
-            this.dataHandler = dataHandler;
-            this.undoRedoHandler = undoRedoHandler;
 
             this.dataList = [];
+
+            this.DataColumns = ValidateColumnList();
+        }
+
+        private static IReadOnlyList<GridDataColumn> ValidateColumnList()
+        {
+            var type = typeof(T);
+            var fieldInfo = type.GetField("COLUMN_LIST", BindingFlags.Static | BindingFlags.Public);
+            if (fieldInfo == null)
+            {
+                throw new MissingFieldException($"IGridData must have a public static IReadOnlyList<GridDataColumn> COLUMN_LIST field for {type.Name}");
+            }
+
+            if (fieldInfo.FieldType != typeof(IReadOnlyList<GridDataColumn>))
+            {
+                throw new MissingFieldException($"IGridData must have a public static IReadOnlyList<GridDataColumn> COLUMN_LIST field for {type.Name}");
+            }
+
+            return (IReadOnlyList<GridDataColumn>)fieldInfo.GetValue(null);
+        }
+
+        public T CreateInstance()
+        {
+            var type = typeof(T);
+            return (T)type.Assembly.CreateInstance(type.FullName);
         }
 
         public Dictionary<int, T> CreateSave()
@@ -40,23 +62,39 @@ namespace TiaUtilities.Generation.GridHandler
             //Here DO NOT CLEAR the data. Seems like the system binds to the loaded data and changes are directly applied.
             //Only clearing it, it will not unbind from previous loaded data and will corrupt it.
             //this.Clear();
-            this.InitializeData((uint) this.Count);
-            
+            this.InitializeData((uint)this.Count);
+
             foreach (var entry in saveDict)
             {
                 var rowIndex = entry.Key;
                 var data = entry.Value;
                 if (rowIndex >= 0 && rowIndex <= this.Count)
                 {
-                    this.dataHandler.CopyValues(data, this[rowIndex]);
+                    GridUtils.CopyGridDataValues(data, this[rowIndex]);
                 }
             }
         }
 
         public T this[int i]
         {
-            get { return dataList[i]; }
-            set { dataList[i] = value; }
+            get
+            {
+                if (i < 0 || i >= this.Count)
+                {
+                    throw new InvalidEnumArgumentException($"Index {i} out of range for {this.dataList.GetType().FullName}.");
+                }
+
+                return dataList[i];
+            }
+            set 
+            {
+                if (i < 0 || i >= this.Count)
+                {
+                    throw new InvalidEnumArgumentException($"Index {i} out of range for {this.dataList.GetType().FullName}.");
+                }
+
+                dataList[i] = value; 
+            }
         }
 
         public void Clear()
@@ -75,11 +113,13 @@ namespace TiaUtilities.Generation.GridHandler
             }
 
             this.dataList.Clear();
-            for (int i = 0; i < dataAmount; i++)
+            for (int row = 0; row < dataAmount; row++)
             {
-                var data = dataHandler.CreateInstance();
-                data.DataChanged += (sender, args) => this.gridHandler.HandleDataChanged(args);
+                var data = this.CreateInstance();
                 dataList.Add(data);
+
+                int savedRow = row; //If i don't do this, it will keep the ram value of row (So dataAmount - 1)
+                data.DataChanged += (sender, args) => this.gridHandler.HandleDataChangedEvent(args, savedRow);
             }
 
             this.dataGridView.DataSource = new BindingSource() { DataSource = new BindingList<T>(this.dataList) };
@@ -170,7 +210,7 @@ namespace TiaUtilities.Generation.GridHandler
         public Dictionary<T, int> GetNotEmptyDataDict(int startRow = 0)
         {
             Dictionary<T, int> dict = [];
-            if(startRow >= dataList.Count)
+            if (startRow >= dataList.Count)
             {
                 return dict;
             }
@@ -205,8 +245,8 @@ namespace TiaUtilities.Generation.GridHandler
                 var data = dataList[x];
                 if (!data.IsEmpty())
                 {
-                    var dataClone = dataHandler.CreateInstance();
-                    dataHandler.CopyValues(data, dataClone);
+                    var dataClone = this.CreateInstance();
+                    GridUtils.CopyGridDataValues(data, dataClone);
                     notEmptyDict.Add(dataClone, x);
                 }
             }

@@ -1,4 +1,5 @@
-﻿using TiaUtilities.Generation.GridHandler.Data;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using TiaUtilities.Generation.GridHandler.Data;
 
 namespace TiaUtilities.Generation.GridHandler.Events
 {
@@ -14,11 +15,47 @@ namespace TiaUtilities.Generation.GridHandler.Events
     #endregion
 
     #region CELL_CHANGE
-    public delegate void GridCellChangeEventHandler(object? sender, GridCellChangeEventArgs args);
+    public delegate void GridCellDataChangedEventHandler(object? sender, GridCellDataChangedEventArgs args);
 
-    public class GridCellChangeEventArgs : EventArgs
+    public class GridCellChangedData(GridData data, string propertyName, GridDataColumn column, int row, object? oldValue, object? newValue)
     {
-        public required List<GridDataChangedEventArgs> Changes { get; init; }
+        public GridData Data { get; init; } = data;
+        public string PropertyName { get; init; } = propertyName;
+        public GridDataColumn Column { get; init; } = column;
+        public int ColumnIndex { get => this.Column.ColumnIndex; }
+        public int RowIndex { get; init; } = row;
+        public object? OldValue { get; init; } = oldValue;
+        public object? NewValue { get; init; } = newValue;
+
+        public GridCellChangedData(GridDataChangedEventArgs args, int row) : this(args.Data, args.PropertyName, args.Column, row, args.OldValue, args.NewValue) { }
+
+        public void RestoreOldValue()
+        {
+            var property = this.Data.GetType().GetProperty(this.PropertyName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+            if (property != null && property.CanWrite)
+            {
+                property.SetValue(this.Data, this.OldValue);
+            }
+        }
+
+        public void RestoreNewValue()
+        {
+            var property = this.Data.GetType().GetProperty(this.PropertyName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+            if (property != null && property.CanWrite)
+            {
+                property.SetValue(this.Data, this.NewValue);
+            }
+        }
+
+        public override string ToString()
+        {
+            return $"Property: {PropertyName}, Column: {ColumnIndex}, Row: {RowIndex}, Old: {OldValue}, New: {NewValue}";
+        }
+    }
+
+    public class GridCellDataChangedEventArgs : EventArgs
+    {
+        public List<GridCellChangedData> ChangedCellDataList { get; init; } = [];
         //public bool IsUndo { get; set; }
     }
     #endregion

@@ -53,7 +53,7 @@ namespace TiaUtilities.Generation.IO
                 }
 
 
-                gridHandler.CacheChanges = true;
+                var request = gridHandler.DataChangedHandler.Join();
 
                 var rowIndexEnumeration = Enumerable.Range(eventArgs.TopSelectedRow, (int)eventArgs.SelectedRowCount);
                 if (!eventArgs.DraggingDown)
@@ -69,7 +69,7 @@ namespace TiaUtilities.Generation.IO
                         tagAddress.PreviousBit(SimaticDataType.BYTE); //Increase at the end. The first value is valid!
                 }
 
-                gridHandler.CacheChanges = false;
+                gridHandler.DataChangedHandler.End(request);
             }
             else
             {

@@ -127,7 +127,8 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                 }
                 engine.SetValue(ENGINE_LOG_FUNCTION, log);
 
-                this.GridHandlerBind.SetCacheChanges();
+                this.GridHandlerBind.DataGridView.SuspendLayout();
+                var request = this.GridHandlerBind.Join();
 
                 ScriptTimeLogger timeLogger = new();
 
@@ -175,7 +176,9 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                     timeLogger.StopAndSave();
                 }
 
-                this.GridHandlerBind.ResetCacheChanges();
+                this.GridHandlerBind.DataGridView.Refresh();
+                this.GridHandlerBind.DataGridView.ResumeLayout(true);
+                this.GridHandlerBind.StopJoin(request);
 
                 //Update JSON Context Text
                 var contextJsonJSValue = engine.Evaluate(@"JSON.stringify(this, null, 2);");

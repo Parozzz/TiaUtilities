@@ -67,7 +67,7 @@ namespace TiaUtilities.Generation.GridHandler
                 rowIndexEnumeration = rowIndexEnumeration.Reverse();
             }
 
-            gridHandler.CacheChanges = true;
+            var request = gridHandler.DataChangedHandler.Join();
 
             var startString = startCell.Value?.ToString();
             if (Utils.SplitStringFromNumberFromRight(startString, out string before, out string numString, out string after) && int.TryParse(numString, out int num))
@@ -100,7 +100,7 @@ namespace TiaUtilities.Generation.GridHandler
                 }
             }
 
-            gridHandler.CacheChanges = false;
+            gridHandler.DataChangedHandler.End(request);
         }
 
         public static void CopyAsExcel(DataGridView dataGridView)
@@ -176,14 +176,11 @@ namespace TiaUtilities.Generation.GridHandler
                 var cliboardObj = (DataObject?)Clipboard.GetDataObject();
                 if (cliboardObj == null || !cliboardObj.GetDataPresent(DataFormats.Text))
                 {
-                    //var cellList = new List<GridCellChange>();
                     foreach (DataGridViewCell cell in dataGridView.SelectedCells)
                     {
                         cell.Value = null;
-                        //cellList.Add(new(cell) { NewValue = null });
                     }
                     return;
-                    //return cellList;
                 }
 
                 var clipboardData = cliboardObj.GetData(DataFormats.Text);
@@ -206,14 +203,7 @@ namespace TiaUtilities.Generation.GridHandler
                     }
 
                     return;
-
-                    /*return dataGridView.SelectedCells
-                        .Cast<DataGridViewCell>()
-                        .Select(c => new GridCellChange(c) { NewValue = strippedPasteString })
-                        .ToList();*/
                 }
-
-                var pastedCellList = new List<GridCellChange>();
 
                 //If contains new lines or tab it needs to handled like an excel file. New line => next row. Tab => next column.
                 int startRowIndex = dataGridView.CurrentCell.RowIndex; //The currentCell row index needs to be taken BEFORE adding cells otherwise it will be moved!
@@ -245,7 +235,6 @@ namespace TiaUtilities.Generation.GridHandler
                         if (cell != null)
                         {
                             cell.Value = pastedValue;
-                            //pastedCellList.Add(new GridCellChange(cell) { NewValue = pastedValue });
                         }
 
                         columnCounter++;
@@ -259,14 +248,11 @@ namespace TiaUtilities.Generation.GridHandler
                 }
 
                 return;
-                //return pastedCellList;
             }
             catch (Exception ex)
             {
                 Utils.ShowExceptionMessage(ex);
             }
-
-            //return null;
         }
     }
 }

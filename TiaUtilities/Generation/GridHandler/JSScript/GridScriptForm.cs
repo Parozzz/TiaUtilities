@@ -1,6 +1,7 @@
 ﻿using FastColoredTextBoxNS;
-using TiaUtilities.Languages;
 using TiaUtilities.Editors;
+using TiaUtilities.Languages;
+using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.GridHandler.JSScript
 {
@@ -94,6 +95,13 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
 
                 ScriptInfo script = new();
                 AddJavascriptControl(tabPage, script);
+
+                var tabNames = this.GetTabNames(toIgnore: tabPage);
+
+                var fixedNewName = Utils.CheckEqualityAndAddNumberAtEnd(script.Name, tabNames);
+                script.Name = fixedNewName;
+                tabPage.Text = fixedNewName;
+
                 this.scriptHandler.Scripts.Add(script);
             };
 
@@ -131,7 +139,11 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                     return;
                 }
 
-                record.Script.Name = args.TabPage.Text;
+                var tabNames = this.GetTabNames(toIgnore: tabPage);
+
+                var fixedNewName = Utils.CheckEqualityAndAddNumberAtEnd(args.NewName, tabNames);
+                args.NewName = fixedNewName;
+                record.Script.Name = fixedNewName;
             };
 
             this.autoFormatButton.Click += (sender, args) => this.GetCurrentTabPageRecord()?.Editor.GetTextBox().DoAutoIndent();
@@ -152,6 +164,19 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
             };
 
             this.Translate();
+        }
+
+        private List<string> GetTabNames(TabPage toIgnore)
+        {
+            List<string> tabNames = [];
+            foreach (TabPage tab in this.scriptTabControl.TabPages)
+            {
+                if (tab != toIgnore)
+                {
+                    tabNames.Add(tab.Text);
+                }
+            }
+            return tabNames;
         }
 
         private void Translate()

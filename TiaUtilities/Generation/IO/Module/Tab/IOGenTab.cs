@@ -72,19 +72,14 @@ namespace TiaUtilities.Generation.IO.Module.Tab
             this.GridHandler.Init();
 
             #region SUGGESTION_GRIDS_EVENTS
-            this.GridHandler.Events.CellChange += (sender, args) =>
+            this.GridHandler.Events.CellDataChanged += (sender, args) =>
             {
-                if (args.CellChangeList == null)
-                {
-                    return;
-                }
-
-                if (args.CellChangeList.Where(c => c.ColumnIndex == IOData.VARIABLE).Any())
+                if (args.ChangedCellDataList.Any(c => c.ColumnIndex == IOData.VARIABLE))
                 {
                     module.UpdateSuggestionColors();
                 }
-
-                if (args.CellChangeList.Where(c => c.ColumnIndex == IOData.ADDRESS || c.ColumnIndex == IOData.IO_NAME).Any())
+                
+                if (args.ChangedCellDataList.Any(c => c.ColumnIndex == IOData.ADDRESS || c.ColumnIndex == IOData.IO_NAME))
                 {
                     UpdateDuplicatedIOValues();
                 }

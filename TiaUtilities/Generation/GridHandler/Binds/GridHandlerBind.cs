@@ -12,7 +12,7 @@ namespace TiaUtilities.Generation.GridHandler.Binds
             {
                 DataTypeName = typeof(T).Name,
                 DataGridView = gridHandler.DataGridView,
-                DataColumns = gridHandler.DataHandler.DataColumns,
+                DataColumns = gridHandler.DataSource.DataColumns,
 
                 GetNotEmptyRowIndexesStartingAt = gridHandler.DataSource.GetNotEmptyIndexes,
                 GetFirstFullIndexStartingAt = gridHandler.DataSource.GetFirstNotEmptyIndexStartingFrom,
@@ -29,8 +29,8 @@ namespace TiaUtilities.Generation.GridHandler.Binds
                 },
                 GetScriptVariables = gridHandler.ScriptVariableList.AsReadOnly,
 
-                SetCacheChanges = () => gridHandler.CacheChanges = true,
-                ResetCacheChanges = () => gridHandler.CacheChanges = false,
+                Join = () => gridHandler.DataChangedHandler.Join(),
+                StopJoin = gridHandler.DataChangedHandler.End,
 
                 SelectRow = gridHandler.SelectRow,
 
@@ -53,8 +53,8 @@ namespace TiaUtilities.Generation.GridHandler.Binds
         public required Func<IReadOnlyList<GridScriptVariable>> GetScriptVariables { private get; init; }
 
 
-        public required Action SetCacheChanges { get; init; }
-        public required Action ResetCacheChanges { get; init; }
+        public required Func<GridDataChangedOperationRequest> Join { get; init; }
+        public required Action<GridDataChangedOperationRequest> StopJoin { get; init; }
 
 
         public required Action<int> SelectRow { get; init; }

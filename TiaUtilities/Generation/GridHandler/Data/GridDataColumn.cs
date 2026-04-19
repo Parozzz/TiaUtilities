@@ -4,14 +4,13 @@ using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.GridHandler.Data
 {
-    public class GridDataColumn(string name, string dataPropertyName, int columnIndex, PropertyInfo propertyInfo, string programmingFriendlyName)
+    public class GridDataColumn(string name, int columnIndex, PropertyInfo propertyInfo, string programmingFriendlyName)
     {
         public static GridDataColumn GetFromReflection(Type type, int columnIndex, string propertyName, string? programmingFriendlyName = null)
         {
             var propertyInfo = type.GetProperty(propertyName) ?? throw new Exception("Invalid property name while creating GridDataColumn from reflection from type " + type.FullName);
             var dataColumn = new GridDataColumn(
                 name: propertyInfo.GetTranslation(),
-                dataPropertyName: propertyInfo.Name,
                 columnIndex: columnIndex,
                 propertyInfo: propertyInfo,
                 programmingFriendlyName: programmingFriendlyName ?? propertyInfo.Name.ToLower()
@@ -41,9 +40,10 @@ namespace TiaUtilities.Generation.GridHandler.Data
         }
 
         public string Name { get; init; } = name;
-        public string DataPropertyName { get; init; } = dataPropertyName;
+        
         public int ColumnIndex { get; init; } = columnIndex;
         public PropertyInfo PropertyInfo { get; init; } = propertyInfo;
+        public string PropertyInfoName { get => this.PropertyInfo.Name; }
         public string ProgrammingFriendlyName { get; init; } = programmingFriendlyName;
 
         public V? GetValueFrom<V>(GridData? gridData)
@@ -96,14 +96,14 @@ namespace TiaUtilities.Generation.GridHandler.Data
         {
             return obj is GridDataColumn column &&
                    Name == column.Name &&
-                   DataPropertyName == column.DataPropertyName &&
+                   PropertyInfoName == column.PropertyInfoName &&
                    ColumnIndex == column.ColumnIndex &&
                    EqualityComparer<PropertyInfo>.Default.Equals(PropertyInfo, column.PropertyInfo);
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Name, DataPropertyName, ColumnIndex, PropertyInfo);
+            return HashCode.Combine(Name, PropertyInfoName, ColumnIndex, PropertyInfo);
         }
 
         #region OPERATORS GridDataColumn - int

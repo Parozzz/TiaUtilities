@@ -34,9 +34,9 @@ namespace TiaUtilities.Generation.GridHandler
                     return;
                 }
 
-                this.handlerBind.SetCacheChanges();
+                var request = this.handlerBind.Join();
                 var addOK = this.AddSearchReplaceCellChange(findData);
-                this.handlerBind.ResetCacheChanges();
+                this.handlerBind.StopJoin(request);
 
                 if (addOK)
                 {
@@ -51,7 +51,7 @@ namespace TiaUtilities.Generation.GridHandler
                 }
 
                 this.handlerBind.DataGridView.SuspendLayout();
-                this.handlerBind.SetCacheChanges();
+                var request = this.handlerBind.Join();
 
                 int count = 0;
 
@@ -68,7 +68,8 @@ namespace TiaUtilities.Generation.GridHandler
                     count++;
                 }
 
-                this.handlerBind.ResetCacheChanges();
+                this.handlerBind.StopJoin(request);
+                this.handlerBind.DataGridView.Refresh();
                 this.handlerBind.DataGridView.ResumeLayout(performLayout: true);
 
                 var title = Locale.GRID_FIND_FORM_NAME;

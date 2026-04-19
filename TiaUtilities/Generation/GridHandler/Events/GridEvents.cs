@@ -5,7 +5,7 @@ namespace TiaUtilities.Generation.GridHandler.Events
     public class GridEvents<T> where T : GridData
     {
         public event GridSelectedRowChangedEventHandler RowSelectedChanged = delegate { };
-        public event GridCellChangeEventHandler CellChange = delegate { };
+        public event GridCellDataChangedEventHandler CellDataChanged = delegate { };
 
         public event GridPreSortEventHandler PreSort = delegate { };
         public event GridPostSortEventHandler PostSort = delegate { };
@@ -18,9 +18,9 @@ namespace TiaUtilities.Generation.GridHandler.Events
             RowSelectedChanged(sender, args);
         }
 
-        public void CellChangeEvent(object? sender, GridCellChangeEventArgs args)
+        public void CellDataChangedEvent(object? sender, GridCellDataChangedEventArgs args)
         {
-            CellChange(sender, args);
+            CellDataChanged(sender, args);
         }
 
         public void PreSortEvent(object? sender, GridPreSortEventArgs args)

@@ -1,4 +1,6 @@
-﻿namespace TiaUtilities
+﻿using System.Runtime.CompilerServices;
+
+namespace TiaUtilities
 {
     public interface ICleanable
     {

@@ -94,7 +94,7 @@ namespace TiaUtilities.Generation.Alarms.Module
             {
                 if (args.TabPage.Tag is AlarmGenTab tab)
                 {
-                    alarmTabList.Remove(tab);
+                    this.alarmTabList.Remove(tab);
                 }
             };
 

@@ -70,7 +70,7 @@ namespace TiaUtilities.Generation.IO.Module
         private readonly List<IOGenTab> ioTabList;
 
         public SettingsBindings SettingsBindings { get; init; }
-        private readonly SettingsFormCache settingsFromCache;
+        private readonly SettingsFormCache settingsFormCache;
 
         public IOGenModule(ErrorReportThread errorThread)
         {
@@ -89,12 +89,13 @@ namespace TiaUtilities.Generation.IO.Module
 
             this.ioTabList = [];
             this.SettingsBindings = new();
+            this.settingsFormCache = new(this.SettingsBindings);
         }
 
         public void Init(GenModuleForm form)
         {
             #region TOP_BUTTONS_STRIP
-            this.control.setupButton.Click += (sender, args) => this.settingsFromCache.Show(this.control);
+            this.control.setupButton.Click += (sender, args) => this.settingsFormCache.Show(this.control);
             #endregion
 
             #region IMPORT_EXPORT_MENU_ITEMS
@@ -214,7 +215,7 @@ namespace TiaUtilities.Generation.IO.Module
                     var xmlNodeConfiguration = SimaticMLAPI.ParseFile(filePath);
                     if (xmlNodeConfiguration is XMLTagTable tagTable)
                     {
-                        ioTab.GridHandler.CacheChanges = true;
+                        var request = ioTab.GridHandler.DataChangedHandler.Join();
 
                         var tags = tagTable.GetTags().Values;
 
@@ -240,7 +241,7 @@ namespace TiaUtilities.Generation.IO.Module
                             ioData.Comment = comment;
                         }
 
-                        ioTab.GridHandler.CacheChanges = false;
+                        ioTab.GridHandler.DataChangedHandler.End(request);
                     }
                     else
                     {
@@ -297,7 +298,7 @@ namespace TiaUtilities.Generation.IO.Module
                 }
             };
 
-            suggestionGridHandler.Events.CellChange += (sender, args) => UpdateSuggestionColors();
+            suggestionGridHandler.Events.CellDataChanged += (sender, args) => UpdateSuggestionColors();
             #endregion
 
             #region PREVIEW

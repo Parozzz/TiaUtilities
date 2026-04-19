@@ -26,7 +26,6 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
         private readonly GridHandler<IOGenExcelImportData> gridHandler;
 
         private readonly SettingsBindings settingsBindings;
-
         public IEnumerable<IOGenExcelImportData> ImportDataEnumerable { get => gridHandler.DataSource.GetNotEmptyDataDict().Keys; }
 
         public IOGenerationExcelImportForm(GridSettings gridSettings, GridBindContainer gridBindContainer, IOExcelImportConfiguration configuration)
@@ -180,7 +179,7 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
                     importDataList.Add(new() { Address = address, IOName = ioName, Comment = comment });
                 }
 
-                this.gridHandler.CacheChanges = true;
+                var request = this.gridHandler.DataChangedHandler.Join();
 
                 //Splitted this way to increase performance. Changing cell one at the time for 20-30 values takes 400ms, this way 10ms
                 var emptyIndexList = this.gridHandler.DataSource.GetFirstEmptyRowIndexes(importDataList.Count);
@@ -195,7 +194,7 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
                     GridUtils.CopyGridDataValues(importData, emptyImportData);
                 }
 
-                this.gridHandler.CacheChanges = false;
+                this.gridHandler.DataChangedHandler.End(request);
             }
             catch (Exception ex)
             {
