@@ -11,6 +11,7 @@ namespace TiaUtilities.Generation.GridHandler
         private readonly GridHandler<T> gridHandler;
         private readonly List<T> dataList;
 
+        public bool BindingComplete { get; private set;  }
         public int Count { get => dataList.Count; }
         public IReadOnlyList<GridDataColumn> DataColumns { get; init; }
 
@@ -22,6 +23,8 @@ namespace TiaUtilities.Generation.GridHandler
             this.dataList = [];
 
             this.DataColumns = ValidateColumnList();
+
+            this.dataGridView.HandleCreated += (sender, args) => this.BindingComplete = true;
         }
 
         private static IReadOnlyList<GridDataColumn> ValidateColumnList()
@@ -107,6 +110,8 @@ namespace TiaUtilities.Generation.GridHandler
 
         public void InitializeData(uint dataAmount)
         {
+            this.BindingComplete = false;
+
             foreach (var data in this.dataList)
             {
                 data.ClearDataChangedDelegate();
@@ -122,6 +127,7 @@ namespace TiaUtilities.Generation.GridHandler
                 data.DataChanged += (sender, args) => this.gridHandler.HandleDataChangedEvent(args, savedRow);
             }
 
+            this.dataGridView.DataSource = null; //This SHOULD update the datagrid
             this.dataGridView.DataSource = new BindingSource() { DataSource = new BindingList<T>(this.dataList) };
         }
 

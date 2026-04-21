@@ -1919,7 +1919,7 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Template to use to fill io name column..
+        ///   Cerca una stringa localizzata simile a Expression to use to fill io name column. It must return a STRING which can contain an excel column variable..
         /// </summary>
         internal static string IO_SETTINGS_EXCELIMPORT_IO_NAME_DESC {
             get {

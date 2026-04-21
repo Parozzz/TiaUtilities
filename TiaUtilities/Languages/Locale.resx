@@ -793,7 +793,7 @@ Byte=Group the whole byte for each segnemt.</value>
 Use $ followed by Excel column name for extracting values from imported spreadsheet file (Supported by all values here).</value>
   </data>
   <data name="IO_SETTINGS_EXCELIMPORT_IO_NAME_DESC" xml:space="preserve">
-    <value>Template to use to fill io name column.</value>
+    <value>Expression to use to fill io name column. It must return a STRING which can contain an excel column variable.</value>
   </data>
   <data name="IO_SETTINGS_EXCELIMPORT_COMMENT_DESC" xml:space="preserve">
     <value>Template to use to fill comment column.</value>

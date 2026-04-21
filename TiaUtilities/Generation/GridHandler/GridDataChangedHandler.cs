@@ -63,11 +63,18 @@ namespace TiaUtilities.Generation.GridHandler
                 this.joinRequest = null;
 
                 this.HandleCache();
+
+                this.gridHandler.DataGridView.Refresh(); //This is to maintain compatability with old system.
             }
         }
 
         internal void HandleCellChangeEvent(GridDataChangedEventArgs args, int row)
         {
+            if(this.gridHandler.DataGridView.RowCount <= 0 || this.gridHandler.DataGridView.ColumnCount <= 0)
+            {
+                return;
+            }
+            
             GridDataChangedCache cachedChange = new(args, row);
             if(this.joinRequest != null)
             {

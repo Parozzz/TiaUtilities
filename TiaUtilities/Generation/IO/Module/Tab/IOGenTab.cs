@@ -55,7 +55,7 @@ namespace TiaUtilities.Generation.IO.Module.Tab
 
             //Column initialization before gridHandler.Init()
             #region COLUMNS
-            var addressColumn = GridHandler.AddTextBoxColumn(IOData.ADDRESS, 65);
+            var addressColumn = this.GridHandler.AddTextBoxColumn(IOData.ADDRESS, 65);
             this.GridHandler.AddCheckBoxColumn(IOData.NEGATED, 50);
             this.GridHandler.AddTextBoxColumn(IOData.IO_NAME, 110);
             var variableAddressColumn = this.GridHandler.AddCustomColumn(new SuggestionTextBoxColumn(), IOData.VARIABLE, 200);
@@ -71,20 +71,25 @@ namespace TiaUtilities.Generation.IO.Module.Tab
 
             this.GridHandler.Init();
 
-            #region SUGGESTION_GRIDS_EVENTS
+            #region GRID EVENTS - DUPLKICATED IO VALUES
             this.GridHandler.Events.CellDataChanged += (sender, args) =>
             {
                 if (args.ChangedCellDataList.Any(c => c.ColumnIndex == IOData.VARIABLE))
                 {
                     module.UpdateSuggestionColors();
                 }
-                
+
                 if (args.ChangedCellDataList.Any(c => c.ColumnIndex == IOData.ADDRESS || c.ColumnIndex == IOData.IO_NAME))
                 {
                     UpdateDuplicatedIOValues();
                 }
             };
             this.GridHandler.Events.PostSort += (sender, args) =>
+            {
+                module.UpdateSuggestionColors();
+                UpdateDuplicatedIOValues();
+            };
+            this.GridHandler.DataGridView.VisibleChanged += (sender, args) =>
             {
                 module.UpdateSuggestionColors();
                 UpdateDuplicatedIOValues();
@@ -189,10 +194,8 @@ namespace TiaUtilities.Generation.IO.Module.Tab
         {
             TabPage.Text = save.Name;
 
-            GridHandler.LoadSave(save.IOGrid);
+            this.GridHandler.LoadSave(save.IOGrid);
             GenUtils.CopyJsonFieldsAndProperties(save.TabConfig, TabConfig);
-
-            UpdateDuplicatedIOValues();
         }
 
         public bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -202,9 +205,9 @@ namespace TiaUtilities.Generation.IO.Module.Tab
 
         private void UpdateDuplicatedIOValues()
         {
-            GridHandler.DataGridView.SuspendLayout();
+            this.GridHandler.DataGridView.SuspendLayout();
 
-            foreach (DataGridViewRow row in GridHandler.DataGridView.Rows)
+            foreach (DataGridViewRow row in this.GridHandler.DataGridView.Rows)
             {
                 var addressCell = row.Cells[IOData.ADDRESS.ColumnIndex];
                 addressCell.ToolTipText = string.Empty;
@@ -217,9 +220,12 @@ namespace TiaUtilities.Generation.IO.Module.Tab
                 ioNameCell.Style.SelectionBackColor = Color.LightGray;
             }
 
-            var dataDict = GridHandler.DataSource.GetNotEmptyDataDict();
+            var dataDict = this.GridHandler.DataSource.GetNotEmptyDataDict();
 
-            var multipleIONameGroupingList = dataDict.Where(x => !string.IsNullOrEmpty(x.Key.IOName)).GroupBy(x => x.Key.IOName).Where(g => g.Count() > 1).ToList();
+            var multipleIONameGroupingList = dataDict.Where(x => !string.IsNullOrEmpty(x.Key.IOName))
+                                                        .GroupBy(x => x.Key.IOName)
+                                                        .Where(g => g.Count() > 1)
+                                                        .ToList();
             foreach (var grouping in multipleIONameGroupingList)
             {
                 //+1 to row because rows index start from 0.
@@ -231,7 +237,7 @@ namespace TiaUtilities.Generation.IO.Module.Tab
                 {
                     var rowIndex = entry.Value;
 
-                    var ioNameCell = GridHandler.DataGridView.Rows[rowIndex].Cells[IOData.IO_NAME.ColumnIndex];
+                    var ioNameCell = this.GridHandler.DataGridView.Rows[rowIndex].Cells[IOData.IO_NAME.ColumnIndex];
                     ioNameCell.ToolTipText = tooltipText;
                     ioNameCell.Style.BackColor = ControlPaint.LightLight(Color.Orange);
                 }
@@ -249,13 +255,14 @@ namespace TiaUtilities.Generation.IO.Module.Tab
                 {
                     var rowIndex = entry.Value;
 
-                    var addressCell = GridHandler.DataGridView.Rows[rowIndex].Cells[IOData.ADDRESS.ColumnIndex];
+                    var addressCell = this.GridHandler.DataGridView.Rows[rowIndex].Cells[IOData.ADDRESS.ColumnIndex];
                     addressCell.ToolTipText = tooltipText;
                     addressCell.Style.BackColor = ControlPaint.LightLight(Color.Orange);
                 }
             }
 
-            GridHandler.DataGridView.ResumeLayout();
+            this.GridHandler.DataGridView.Refresh();
+            this.GridHandler.DataGridView.ResumeLayout(true);
         }
     }
 }

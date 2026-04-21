@@ -125,9 +125,8 @@ namespace TiaUtilities.Generation.GridHandler
 
             this.DataGridView.DataError += DataErrorEventHandler;
 
-            this.DataSource.InitializeData(this.RowCount);
-
             InitColumns();
+            this.DataSource.InitializeData(this.RowCount);
 
             #region QOL - Quality of life
 
@@ -529,40 +528,33 @@ namespace TiaUtilities.Generation.GridHandler
 
             this.DataGridView.Columns.Clear();
 
-            columnInfoList.Sort((one, two) => one.DataColumn.ColumnIndex.CompareTo(two.DataColumn.ColumnIndex));
-            foreach (var columnInfo in columnInfoList)
+            this.columnInfoList.Sort((one, two) => one.DataColumn.ColumnIndex.CompareTo(two.DataColumn.ColumnIndex));
+            foreach (var columnInfo in this.columnInfoList)
             {
                 var column = columnInfo.Column;
-                if (columnInfo.Visible)
+                if (column is IGridCustomColumn customColumn)
                 {
-                    if (column is IGridCustomColumn customColumn)
-                    {
-                        customColumn.RegisterEvents(this.DataGridView);
-                    }
-
-                    column.Visible = true;
-
-                    column.Name = columnInfo.DataColumn.Name;
-                    column.DisplayIndex = columnInfo.DataColumn.ColumnIndex;
-                    column.DataPropertyName = columnInfo.DataColumn.PropertyInfoName;
-                    column.AutoSizeMode = columnInfo.Width <= 0 ? DataGridViewAutoSizeColumnMode.Fill : DataGridViewAutoSizeColumnMode.None;
-                    column.Width = columnInfo.Width;
-                    column.MinimumWidth = 15;
-                    column.SortMode = DataGridViewColumnSortMode.Programmatic;
-
-                    column.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
-                    column.HeaderCell.Style.Padding = new Padding(0);
-                    column.HeaderCell.Style.WrapMode = DataGridViewTriState.True;
-
-                    column.DefaultCellStyle.SelectionBackColor = Color.LightGray;
-                    column.DefaultCellStyle.BackColor = SystemColors.ControlLightLight;
-                    column.DefaultCellStyle.SelectionForeColor = Color.Black;
-                    column.DefaultCellStyle.ForeColor = Color.Black;
+                    customColumn.RegisterEvents(this.DataGridView);
                 }
-                else
-                {
-                    column.Visible = false;
-                }
+
+                column.Name = columnInfo.DataColumn.Name;
+                column.DisplayIndex = columnInfo.DataColumn.ColumnIndex;
+                column.DataPropertyName = columnInfo.DataColumn.PropertyInfoName;
+                column.AutoSizeMode = columnInfo.Width <= 0 ? DataGridViewAutoSizeColumnMode.Fill : DataGridViewAutoSizeColumnMode.None;
+                column.Width = columnInfo.Width;
+                column.MinimumWidth = 15;
+                column.SortMode = DataGridViewColumnSortMode.Programmatic;
+
+                column.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                column.HeaderCell.Style.Padding = new Padding(0);
+                column.HeaderCell.Style.WrapMode = DataGridViewTriState.True;
+
+                column.DefaultCellStyle.SelectionBackColor = Color.LightGray;
+                column.DefaultCellStyle.BackColor = SystemColors.ControlLightLight;
+                column.DefaultCellStyle.SelectionForeColor = Color.Black;
+                column.DefaultCellStyle.ForeColor = Color.Black;
+
+                column.Visible = columnInfo.Visible;
 
                 this.DataGridView.Columns.Add(column);
             }

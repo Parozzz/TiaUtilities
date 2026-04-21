@@ -14,7 +14,6 @@ namespace TiaUtilities.Generation.IO.Configurations
         public IOExcelImportConfiguration()
         {
             this.AddressCellConfig = "$A";
-            this.IONameCellConfig = "$A";
             this.CommentCellConfig = "$E $F $G $H (P$K - $O)";
             this.StartingRow = 2;
             this.IgnoreRowExpressionConfig = "$A != \"\"";

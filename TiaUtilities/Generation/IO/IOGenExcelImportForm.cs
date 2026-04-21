@@ -161,13 +161,18 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
                         allEmpty &= string.IsNullOrEmpty(cellValue);
                     }
 
-                    if (allEmpty || !EvaluteRowExpression(engine, excelCellValueDict, out bool expressionResult) || !expressionResult)
+                    if (allEmpty || !this.EvaluateRowExpression(engine, excelCellValueDict, out bool expressionResult) || !expressionResult)
+                    {
+                        continue;
+                    }
+
+                    var ioNameEvaluateOk = EvaluateIONameExpression(engine, excelCellValueDict, out string ioName);
+                    if(!ioNameEvaluateOk)
                     {
                         continue;
                     }
 
                     var address = excelImportConfig.AddressCellConfig;
-                    var ioName = excelImportConfig.IONameCellConfig;
                     var comment = excelImportConfig.CommentCellConfig;
                     foreach (var entry in excelCellValueDict)
                     {
@@ -203,7 +208,7 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
 
         }
 
-        private bool EvaluteRowExpression(Engine engine, Dictionary<string, string> dict, out bool result)
+        private bool EvaluateRowExpression(Engine engine, Dictionary<string, string> dict, out bool result)
         {
             result = false;
             try
@@ -228,6 +233,26 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
                 Utils.ShowExceptionMessage(ex);
                 return false;
             }
+        }
+
+        private bool EvaluateIONameExpression(Engine engine, Dictionary<string, string> dict, out string result)
+        {
+            result = "";
+
+            foreach (var entry in dict)
+            {
+                engine.SetValue(entry.Key, entry.Value);
+            }
+
+            var eval = engine.Evaluate(excelImportConfig.IONameCellConfig);
+            if (!eval.IsString())
+            {
+                InformationBox.Show("Return must be boolean.", "Invalid ignore row operation", icon: InformationBoxIcon.Exclamation);
+                return false;
+            }
+
+            result = eval.AsString();
+            return true;
         }
 
         [GeneratedRegex(@"[$]+\w")]

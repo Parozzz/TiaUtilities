@@ -28,30 +28,32 @@ namespace TiaUtilities.Generation.GridHandler.Data
             {
                 if (storedData != null && Utils.AreDifferentObject(storedData.Value, newValue))
                 {
-                    DataChanged.Invoke(this, new(this, propertyName, storedData.Column, storedData.Value, newValue));
+                    var oldData = storedData.Value;
                     storedData.Value = newValue;
+                    //Maybe the data changes is better to be called AFTER data is changed?
+                    DataChanged.Invoke(this, new(this, propertyName, storedData.Column, oldData, newValue));
                 }
             }
             else
             {
-                var column = this.GetColumnFromPropertyName(propertyName);
-
                 try
                 {
+                    var column = this.GetColumnFromPropertyName(propertyName);
+                    objectDict.Add(propertyName, new()
+                    {
+                        Column = column,
+                        Value = newValue
+                    });
 
-                    GridDataChangedEventArgs args = new(this, propertyName, column, OldValue: null, newValue);
-                    DataChanged.Invoke(this, args);
+                    //Maybe the data changes is better to be called AFTER data is changed?
+                    DataChanged.Invoke(this, new(this, propertyName, column, OldValue: null, newValue));
                 }
                 catch (Exception ex)
                 {
                     Utils.ShowExceptionMessage(ex);
                 }
 
-                objectDict.Add(propertyName, new()
-                {
-                    Column = column,
-                    Value = newValue
-                });
+
             }
         }
 

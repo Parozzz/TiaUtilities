@@ -266,7 +266,7 @@ namespace TiaUtilities.Generation.IO.Module
             this.gridBindContainer.Init(form);
             this.suggestionGridHandler.Init();
 
-            #region SUGGESTION_GRIDS_EVENTS
+            #region SUGGESTIONS GRID - EVENTS - TOOL TIP / CELL CHANGE
             this.suggestionGridHandler.DataGridView.CellToolTipTextNeeded += (sender, args) =>
             {
                 if (args.RowIndex < 0 || args.RowIndex > suggestionGridHandler.RowCount)

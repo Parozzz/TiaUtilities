@@ -793,7 +793,7 @@ Byte=Raggruppa il byte dentro al segmento.</value>
 Usa $ seguito dal nome della colonna Excel per estrarre i valori dal foglio di calcolo importato (Supportato da tutti i valori).</value>
   </data>
   <data name="IO_SETTINGS_EXCELIMPORT_IO_NAME_DESC" xml:space="preserve">
-    <value>Template per riempire la colonna nome io.</value>
+    <value>Espressione per riempire la colonna nome io. Deve ritornare una STRINGA che può contenere variabili di colonne excel.</value>
   </data>
   <data name="IO_SETTINGS_EXCELIMPORT_COMMENT_DESC" xml:space="preserve">
     <value>Template per riempire la colonna commento.</value>

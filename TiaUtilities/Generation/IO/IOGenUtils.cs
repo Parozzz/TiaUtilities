@@ -144,7 +144,7 @@ namespace TiaUtilities.Generation.IO
                 .AddString(nameof(IOExcelImportConfiguration.AddressCellConfig), description: Locale.IO_SETTINGS_EXCELIMPORT_ADDRESS_DESC)
 
                 .Section(Locale.IO_SETTINGS_EXCELIMPORT_IO_NAME)
-                .AddString(nameof(IOExcelImportConfiguration.IONameCellConfig), description: Locale.IO_SETTINGS_EXCELIMPORT_IO_NAME_DESC)
+                .AddJavascript(nameof(IOExcelImportConfiguration.IONameCellConfig), description: Locale.IO_SETTINGS_EXCELIMPORT_IO_NAME_DESC)
 
                 .Section(Locale.GENERICS_COMMENT)
                 .AddString(nameof(IOExcelImportConfiguration.CommentCellConfig), description: Locale.IO_SETTINGS_EXCELIMPORT_COMMENT_DESC)
