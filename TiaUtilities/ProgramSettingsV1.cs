@@ -37,6 +37,8 @@ namespace TiaUtilities
         [JsonProperty] public AlarmTabConfiguration PresetAlarmTabConfiguration { get => this.GetAs<AlarmTabConfiguration>(); set => this.Set(value); }
         [JsonProperty] public AlarmTemplateConfiguration PresetTemplateConfiguration { get => this.GetAs<AlarmTemplateConfiguration>(); set => this.Set(value); }
 
+        [JsonProperty] public Dictionary<Guid, string> SaveFileDialogPath { get => this.GetAs<Dictionary<Guid, string>>(); set => this.Set(value); }
+
         public ProgramSettingsV1()
         {
             this.LastDBDuplicationFileName = "";
@@ -62,6 +64,27 @@ namespace TiaUtilities
             this.PresetAlarmMainConfiguration = new();
             this.PresetAlarmTabConfiguration = new();
             this.PresetTemplateConfiguration = new();
+
+            this.SaveFileDialogPath = [];
+        }
+
+        public string? GetSavedFileDialogPath(Guid guid)
+        {
+            return this.SaveFileDialogPath.TryGetValue(guid, out var path) ? path : null;
+        }
+
+        public void SetSavedFileDialogPath(Guid guid, string? filePath)
+        {
+            if (filePath == null)
+            {
+                this.SaveFileDialogPath.Remove(guid);
+            }
+            else if (!this.SaveFileDialogPath.TryAdd(guid, filePath))
+            {
+                this.SaveFileDialogPath[guid] = filePath;
+            }
+
+            this.Save();
         }
 
         public static string GetFilePath()

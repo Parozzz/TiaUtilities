@@ -1,24 +1,28 @@
 ﻿using DocumentFormat.OpenXml.Vml.Office;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.GridHandler.Data
 {
-    public abstract class GridData
+    public abstract class GridData : INotifyPropertyChanged
     { //CLASS THAT IMPLEMENT THIS MUST HAVE AN EMPTY CONSTRUCTOR!
 
         private class StoredData
         {
-            public required object? Value { get; set; }
             public required GridDataColumn Column { get; init; }
+            public required object? Value { get; set; }
         }
 
-        public event GridDataChangedEvent DataChanged = delegate { };
+        public event PropertyChangedEventHandler? PropertyChanged = delegate { };
+        public event GridDataPropertyChangedEvent DataPropertyChanged = delegate { };
+
         private readonly Dictionary<string, StoredData> objectDict = [];
 
         public void ClearDataChangedDelegate()
         {
-            this.DataChanged = delegate { };
+            this.PropertyChanged = delegate { };
+            this.DataPropertyChanged = delegate { };
         }
 
         public void Set(object? newValue, [CallerMemberName] string propertyName = "")
@@ -28,10 +32,11 @@ namespace TiaUtilities.Generation.GridHandler.Data
             {
                 if (storedData != null && Utils.AreDifferentObject(storedData.Value, newValue))
                 {
-                    var oldData = storedData.Value;
+                    var oldValue = storedData.Value;
                     storedData.Value = newValue;
+
                     //Maybe the data changes is better to be called AFTER data is changed?
-                    DataChanged.Invoke(this, new(this, propertyName, storedData.Column, oldData, newValue));
+                    this.CallDataChangedEvent(propertyName, storedData.Column,  oldValue, newValue);
                 }
             }
             else
@@ -39,22 +44,23 @@ namespace TiaUtilities.Generation.GridHandler.Data
                 try
                 {
                     var column = this.GetColumnFromPropertyName(propertyName);
-                    objectDict.Add(propertyName, new()
-                    {
-                        Column = column,
-                        Value = newValue
-                    });
+                    objectDict.Add(propertyName, new() { Column = column, Value = newValue });
 
                     //Maybe the data changes is better to be called AFTER data is changed?
-                    DataChanged.Invoke(this, new(this, propertyName, column, OldValue: null, newValue));
+                    this.CallDataChangedEvent(propertyName, column, oldValue: null, newValue);
                 }
                 catch (Exception ex)
                 {
                     Utils.ShowExceptionMessage(ex);
                 }
-
-
             }
+        }
+
+        private void CallDataChangedEvent(string propertyName, GridDataColumn column, object? oldValue, object? newValue)
+        {
+            //Maybe the data changes is better to be called AFTER data is changed?
+            this.DataPropertyChanged.Invoke(this, new(this, propertyName, column, oldValue, newValue));
+            this.PropertyChanged?.Invoke(this, new(propertyName));
         }
 
         private GridDataColumn GetColumnFromPropertyName(string propertyName)
@@ -82,17 +88,41 @@ namespace TiaUtilities.Generation.GridHandler.Data
             return obj is T t ? t : default;
         }
 
-        public object? this[int column]
+        private IReadOnlyList<GridDataColumn> ValidateColumns(int column)
+        {
+            var columns = this.GetColumns();
+            if (column < 0 || column >= columns.Count)
+            {
+                throw new InvalidOperationException($"Invalid index for GridData{column}");
+            }
+            return columns;
+        }
+
+        public object? this[GridDataColumn c]
+        {
+            get => this[c.ColumnIndex];
+            set => this[c.ColumnIndex] = value;
+        }
+
+        public object? this[int c]
         {
             get
             {
-                var columns = this.GetColumns();
-                if (column < 0 || column >= columns.Count)
+                var columns = ValidateColumns(c);
+                return columns[c].PropertyInfo.GetValue(this);
+            }
+
+            set
+            {
+                var columns = ValidateColumns(c);
+
+                var propertyInfo = columns[c].PropertyInfo;
+                if(value != null && !propertyInfo.PropertyType.IsAssignableFrom(value.GetType()))
                 {
-                    throw new InvalidOperationException("Invalid index for get square bracket operator in IOData");
+                    throw new InvalidOperationException($"Invalid value type for SET GridData[{c}]. Found: {value?.GetType().FullName}, Expected: {propertyInfo.PropertyType.FullName}");
                 }
 
-                return columns[column].PropertyInfo.GetValue(this);
+                propertyInfo.SetValue(this, value);
             }
         }
 
@@ -106,7 +136,7 @@ namespace TiaUtilities.Generation.GridHandler.Data
 
     }
 
-    public delegate void GridDataChangedEvent(object? Sender, GridDataChangedEventArgs args);
-    public record GridDataChangedEventArgs(GridData Data, string PropertyName, GridDataColumn Column, object? OldValue, object? NewValue);
+    public delegate void GridDataPropertyChangedEvent(object? Sender, GridDataPropertyChangedEventArgs args);
+    public record GridDataPropertyChangedEventArgs(GridData Data, string PropertyName, GridDataColumn Column, object? OldValue, object? NewValue);
 
 }

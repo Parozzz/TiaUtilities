@@ -33,7 +33,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
         {
             this.templateDataGridWrapper.Init(this.mainConfig, this.tabConfig, () => this.SelectedTemplate?.TemplateConfig ?? new());
 
-            this.mainPanel.Controls.Add(this.templateDataGridWrapper.GetDataGridView());
+            this.mainPanel.Controls.Add(this.templateDataGridWrapper.GetGridControl());
 
             this.templateHandler.SelectedTemplateChanged += (sender, args) => this.HandleTemplateChanged(args.OldTemplate);
 

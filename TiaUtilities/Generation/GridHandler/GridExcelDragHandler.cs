@@ -1,13 +1,15 @@
 ﻿using TiaUtilities.Generation.GridHandler.CellPainters;
-using TiaUtilities.Generation.GridHandler.Events;
 using static TiaUtilities.Generation.GridHandler.CellPainters.GridCellPaintHandler;
 using TiaUtilities.Generation.GridHandler.Data;
 
 namespace TiaUtilities.Generation.GridHandler
 {
-    public class GridExcelDragHandler<T>(DataGridView dataGridView, GridEvents<T> gridEvents, GridSettings settings) : IGridCellPainter where T : GridData
+    public class GridExcelDragHandler<T>(GridHandler<T> gridHandler, GridSettings settings) : IGridCellPainter where T : GridData
     {
         public const int TRIANGLE_SIZE = 13;
+
+        private readonly GridHandler<T> gridHandler = gridHandler;
+        private DataGridView DataGridView { get => this.gridHandler.InternalDataGridView; }
 
         private bool started = false;
         private int rowIndexStart = -1;
@@ -28,30 +30,30 @@ namespace TiaUtilities.Generation.GridHandler
 
         public void Init()
         {
-            dataGridView.MouseMove += (sender, args) =>
+            this.DataGridView.MouseMove += (sender, args) =>
             {
                 if (started)
                 {
                     return;
                 }
 
-                dataGridView.Cursor = Cursors.Default;
+                this.DataGridView.Cursor = Cursors.Default;
 
-                if (IsInsideTriangle(args.X, args.Y, dataGridView.CurrentCell))
+                if (IsInsideTriangle(args.X, args.Y, this.DataGridView.CurrentCell))
                 {
-                    dataGridView.Cursor = Cursors.Cross;
+                    this.DataGridView.Cursor = Cursors.Cross;
                 }
             };
 
-            dataGridView.LostFocus += (sender, args) => this.Clear();
+            this.DataGridView.LostFocus += (sender, args) => this.Clear();
 
-            dataGridView.MouseDown += (sender, args) =>
+            this.DataGridView.MouseDown += (sender, args) =>
             {
-                var hitTest = dataGridView.HitTest(args.X, args.Y);
+                var hitTest = this.DataGridView.HitTest(args.X, args.Y);
                 if (hitTest.Type == DataGridViewHitTestType.Cell && args.Button == MouseButtons.Left)
                 {
-                    var hitCell = dataGridView.Rows[hitTest.RowIndex].Cells[hitTest.ColumnIndex];
-                    if (hitCell == dataGridView.CurrentCell && IsInsideTriangle(args.X, args.Y, hitCell))
+                    var hitCell = this.DataGridView.Rows[hitTest.RowIndex].Cells[hitTest.ColumnIndex];
+                    if (hitCell == this.DataGridView.CurrentCell && IsInsideTriangle(args.X, args.Y, hitCell))
                     {
                         started = true;
                         bottomSelectionRowIndex = topSelectionRowIndex = rowIndexStart = hitTest.RowIndex;
@@ -60,20 +62,20 @@ namespace TiaUtilities.Generation.GridHandler
                 }
             };
 
-            dataGridView.MouseUp += (sender, args) =>
+            this.DataGridView.MouseUp += (sender, args) =>
             {
                 if (started)
                 {
                     started = false;
 
                     var eventArgs = this.CreateDragEventArgs();
-                    gridEvents.ExcelDragDoneEvent(dataGridView, eventArgs);
+                    this.gridHandler.CallExcelDragDoneEvent(eventArgs);
 
                     this.Clear();
                 }
             };
 
-            dataGridView.SelectionChanged += (sender, args) =>
+            this.DataGridView.SelectionChanged += (sender, args) =>
             {
                 if (!started)
                 {
@@ -84,7 +86,7 @@ namespace TiaUtilities.Generation.GridHandler
                 var lowestRowIndex = int.MaxValue;
 
                 //When dragging, only allow cell on the column to be selected! I don't care about other ways and want it simple.
-                foreach (DataGridViewCell selectedCell in dataGridView.SelectedCells)
+                foreach (DataGridViewCell selectedCell in this.DataGridView.SelectedCells)
                 {
                     bool sameColumn = selectedCell.ColumnIndex == draggedColumnIndex;
                     if (!sameColumn)
@@ -109,8 +111,9 @@ namespace TiaUtilities.Generation.GridHandler
                 };
 
                 var eventArgs = this.CreateDragEventArgs();
-                gridEvents.ExcelDragPreviewEvent(dataGridView, eventArgs);
-                if (!string.IsNullOrEmpty(eventArgs.TooltipString) && dataGridView.FindForm() is Form form)
+                this.gridHandler.CallExcelDragPreviewEvent(eventArgs);
+
+                if (!string.IsNullOrEmpty(eventArgs.TooltipString) && this.DataGridView.FindForm() is Form form)
                 {
                     dragToolTip.Show(eventArgs.TooltipString, form, form.PointToClient(Cursor.Position));
                 }
@@ -145,8 +148,8 @@ namespace TiaUtilities.Generation.GridHandler
                     return paintRequest.Background();
                 }
 
-                var currentCell = dataGridView.CurrentCell;
-                if (currentCell != null && currentCell.RowIndex == rowIndex && currentCell.ColumnIndex == columnIndex && dataGridView.SelectedCells.Count == 1)
+                var currentCell = this.DataGridView.CurrentCell;
+                if (currentCell != null && currentCell.RowIndex == rowIndex && currentCell.ColumnIndex == columnIndex && this.DataGridView.SelectedCells.Count == 1)
                 {
                     return paintRequest.Background();
                 }
@@ -187,8 +190,8 @@ namespace TiaUtilities.Generation.GridHandler
                 return;
             }
 
-            var currentCell = dataGridView.CurrentCell;
-            if (currentCell != null && currentCell.RowIndex == rowIndex && currentCell.ColumnIndex == columnIndex && dataGridView.SelectedCells.Count == 1)
+            var currentCell = this.DataGridView.CurrentCell;
+            if (currentCell != null && currentCell.RowIndex == rowIndex && currentCell.ColumnIndex == columnIndex && this.DataGridView.SelectedCells.Count == 1)
             {//I only want to apply the effect when the only selected cell is the current cell.
                 args.PaintBackground(bounds, true);
 
@@ -224,7 +227,7 @@ namespace TiaUtilities.Generation.GridHandler
                 return false;
             }
 
-            var bounds = dataGridView.GetCellDisplayRectangle(cell.ColumnIndex, cell.RowIndex, false);
+            var bounds = this.DataGridView.GetCellDisplayRectangle(cell.ColumnIndex, cell.RowIndex, false);
             return x >= bounds.Right - TRIANGLE_SIZE && x <= bounds.Right + 2 //Go outside a bit of the cell to avoid misclick that sometime happend
                 && y >= bounds.Bottom - TRIANGLE_SIZE && y <= bounds.Bottom + 2;
         }

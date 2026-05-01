@@ -24,39 +24,39 @@ namespace TiaUtilities.Generation.Alarms.Template
         public TemplateAlarmGridWrapper(GenPlaceholderHandler placeholderHandler, GridBindContainer bindContainer)
         {
             this.previewer = new();
-            this.gridHandler = new(MainForm.Settings.GridSettings, bindContainer, previewer, placeholderHandler) { RowCount = AlarmGenModule.TEMPLATE_GRID_ROW_COUNT };
+            this.gridHandler = new(MainForm.Settings.GridSettings, bindContainer, previewer, placeholderHandler) { InitializeRowCount = AlarmGenModule.TEMPLATE_GRID_ROW_COUNT };
         }
 
         public void Init(AlarmMainConfiguration mainConfig, AlarmTabConfiguration tabConfig, Func<AlarmTemplateConfiguration> getTemplateConfig)
         {
             #region DRAG
-            this.gridHandler.Events.ExcelDragPreview += (sender, args) => GridUtils.DragPreview(args, gridHandler);
-            this.gridHandler.Events.ExcelDragDone += (sender, args) => GridUtils.DragDone(args, gridHandler);
+            this.gridHandler.ExcelDragPreview += (sender, args) => GridUtils.DragPreview(args, gridHandler);
+            this.gridHandler.ExcelDragDone += (sender, args) => GridUtils.DragDone(args, gridHandler);
             #endregion
 
             #region COLUMNS
-            this.gridHandler.AddCheckBoxColumn(TemplateData.ENABLE, 40);
-            this.gridHandler.AddTextBoxColumn(TemplateData.ALARM_VARIABLE, 200);
-            this.gridHandler.AddCheckBoxColumn(TemplateData.ALARM_NEGATED, 55);
-            this.gridHandler.AddTextBoxColumn(TemplateData.CUSTOM_VARIABLE_ADDRESS, 145);
-            this.gridHandler.AddTextBoxColumn(TemplateData.CUSTOM_VARIABLE_VALUE, 50);
-            this.gridHandler.AddTextBoxColumn(TemplateData.COIL1_ADDRESS, 145);
-            this.gridHandler.AddComboBoxColumn(TemplateData.COIL1_TYPE, 65, ALARM_COIL_TYPE_ITEMS);
-            this.gridHandler.AddTextBoxColumn(TemplateData.COIL2_ADDRESS, 145);
-            this.gridHandler.AddComboBoxColumn(TemplateData.COIL2_TYPE, 65, ALARM_COIL_TYPE_ITEMS);
-            this.gridHandler.AddTextBoxColumn(TemplateData.TIMER_ADDRESS, 95);
-            this.gridHandler.AddComboBoxColumn(TemplateData.TIMER_TYPE, 55, TIMERS_TYPES_ITEMS);
-            this.gridHandler.AddTextBoxColumn(TemplateData.TIMER_VALUE, 50);
-            this.gridHandler.AddTextBoxColumn(TemplateData.HMI_ALARM_CLASS, 150);
+            this.gridHandler.Columns.AddCheckBox(TemplateData.ENABLE, 40);
+            this.gridHandler.Columns.AddTextBox(TemplateData.ALARM_VARIABLE, 200);
+            this.gridHandler.Columns.AddCheckBox(TemplateData.ALARM_NEGATED, 55);
+            this.gridHandler.Columns.AddTextBox(TemplateData.CUSTOM_VARIABLE_ADDRESS, 145);
+            this.gridHandler.Columns.AddTextBox(TemplateData.CUSTOM_VARIABLE_VALUE, 50);
+            this.gridHandler.Columns.AddTextBox(TemplateData.COIL1_ADDRESS, 145);
+            this.gridHandler.Columns.AddComboBox(TemplateData.COIL1_TYPE, 65, ALARM_COIL_TYPE_ITEMS);
+            this.gridHandler.Columns.AddTextBox(TemplateData.COIL2_ADDRESS, 145);
+            this.gridHandler.Columns.AddComboBox(TemplateData.COIL2_TYPE, 65, ALARM_COIL_TYPE_ITEMS);
+            this.gridHandler.Columns.AddTextBox(TemplateData.TIMER_ADDRESS, 95);
+            this.gridHandler.Columns.AddComboBox(TemplateData.TIMER_TYPE, 55, TIMERS_TYPES_ITEMS);
+            this.gridHandler.Columns.AddTextBox(TemplateData.TIMER_VALUE, 50);
+            this.gridHandler.Columns.AddTextBox(TemplateData.HMI_ALARM_CLASS, 150);
 
-            var hmiParametersColumn = this.gridHandler.AddButtonColumn(TemplateData.HMI_PARAMETERS, 150);
+            var hmiParametersColumn = this.gridHandler.Columns.AddButton(TemplateData.HMI_PARAMETERS, 150);
             hmiParametersColumn.ButtonDoublePressed += (sender, args) =>
             {
                 var cell = args.Cell;
                 var rowIndex = args.Cell.RowIndex;
                 var columnIndex = args.Cell.ColumnIndex;
 
-                var gridForm = this.gridHandler.DataGridView.FindForm();
+                var gridForm = this.gridHandler.FindForm();
                 if(gridForm != null)
                 {
                     var location = Cursor.Position;
@@ -74,8 +74,8 @@ namespace TiaUtilities.Generation.Alarms.Template
                 }
             };
 
-            this.gridHandler.AddTextBoxColumn(TemplateData.HMI_ALARM_TEXT, 250);
-            this.gridHandler.AddTextBoxColumn(TemplateData.DESCRIPTION, 0);
+            this.gridHandler.Columns.AddTextBox(TemplateData.HMI_ALARM_TEXT, 250);
+            this.gridHandler.Columns.AddTextBox(TemplateData.DESCRIPTION, 0);
             #endregion
 
             this.gridHandler.Init();
@@ -156,7 +156,7 @@ namespace TiaUtilities.Generation.Alarms.Template
             #endregion
 
             #region ENABLE_CHECKBOX_IF_FILLED
-            this.gridHandler.Events.CellDataChanged += (sender, args) =>
+            this.gridHandler.DataChanged += (sender, args) =>
             {
                 foreach (var changedCellData in args.ChangedCellDataList)
                 {
@@ -191,10 +191,7 @@ namespace TiaUtilities.Generation.Alarms.Template
             this.gridHandler.Refresh();
         }
 
-        public DataGridView GetDataGridView()
-        {
-            return gridHandler.DataGridView;
-        }
+        public Control GetGridControl() => this.gridHandler.GetControl();
 
         public void AddScriptVariable(GridScriptVariable scriptVariable)
         {
@@ -208,34 +205,34 @@ namespace TiaUtilities.Generation.Alarms.Template
         {
             if (!show)
             {
-                gridHandler.HideColumn(TemplateData.CUSTOM_VARIABLE_ADDRESS);
-                gridHandler.HideColumn(TemplateData.CUSTOM_VARIABLE_VALUE);
+                gridHandler.Columns.Hide(TemplateData.CUSTOM_VARIABLE_ADDRESS);
+                gridHandler.Columns.Hide(TemplateData.CUSTOM_VARIABLE_VALUE);
             }
             else
             {
-                gridHandler.ShowColumn(TemplateData.CUSTOM_VARIABLE_ADDRESS);
-                gridHandler.ShowColumn(TemplateData.CUSTOM_VARIABLE_VALUE);
+                gridHandler.Columns.Show(TemplateData.CUSTOM_VARIABLE_ADDRESS);
+                gridHandler.Columns.Show(TemplateData.CUSTOM_VARIABLE_VALUE);
             }
 
-            gridHandler.InitColumns();
+            gridHandler.Columns.Init();
         }
 
         public void ShowTimer(bool show)
         {
             if (!show)
             {
-                gridHandler.HideColumn(TemplateData.TIMER_ADDRESS);
-                gridHandler.HideColumn(TemplateData.TIMER_TYPE);
-                gridHandler.HideColumn(TemplateData.TIMER_VALUE);
+                gridHandler.Columns.Hide(TemplateData.TIMER_ADDRESS);
+                gridHandler.Columns.Hide(TemplateData.TIMER_TYPE);
+                gridHandler.Columns.Hide(TemplateData.TIMER_VALUE);
             }
             else
             {
-                gridHandler.ShowColumn(TemplateData.TIMER_ADDRESS);
-                gridHandler.ShowColumn(TemplateData.TIMER_TYPE);
-                gridHandler.ShowColumn(TemplateData.TIMER_VALUE);
+                gridHandler.Columns.Show(TemplateData.TIMER_ADDRESS);
+                gridHandler.Columns.Show(TemplateData.TIMER_TYPE);
+                gridHandler.Columns.Show(TemplateData.TIMER_VALUE);
             }
 
-            gridHandler.InitColumns();
+            gridHandler.Columns.Init();
         }
 
         public bool IsDirty() => gridHandler.IsDirty();

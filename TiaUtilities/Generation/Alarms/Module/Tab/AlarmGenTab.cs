@@ -24,7 +24,6 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
         private readonly GridDataPreviewer<DeviceData> deviceDataPreview;
         private readonly GridHandler<DeviceData> deviceGridHandler;
 
-        public DataGridView DataGridViewControl { get => deviceGridHandler.DataGridView; }
         public List<DeviceData> DeviceDataList { get => new(deviceGridHandler.DataSource.GetNotEmptyClonedDataDict().Keys); } //Return CLONED data, otherwise operations on the xml generation will affect the table!
 
         private bool dirty = false;
@@ -42,23 +41,23 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             
             AlarmGenPlaceholdersHandler placeholdersHandler = new(mainConfig, this.TabConfig);
             this.deviceDataPreview = new();
-            this.deviceGridHandler = new(MainForm.Settings.GridSettings, this.gridBindContainer, this.deviceDataPreview, placeholdersHandler) { RowCount = AlarmGenModule.DEVICE_GRID_ROW_COUNT };
+            this.deviceGridHandler = new(MainForm.Settings.GridSettings, this.gridBindContainer, this.deviceDataPreview, placeholdersHandler) { InitializeRowCount = AlarmGenModule.DEVICE_GRID_ROW_COUNT };
         }
 
         public void Init()
         {
             #region DEVICE_GRID_SETUP
-            this.deviceGridHandler.Events.ExcelDragPreview += (sender, args) => GridUtils.DragPreview(args, deviceGridHandler);
-            this.deviceGridHandler.Events.ExcelDragDone += (sender, args) => GridUtils.DragDone(args, deviceGridHandler);
+            this.deviceGridHandler.ExcelDragPreview += (sender, args) => GridUtils.DragPreview(args, deviceGridHandler);
+            this.deviceGridHandler.ExcelDragDone += (sender, args) => GridUtils.DragDone(args, deviceGridHandler);
 
             //Columns before GridHandler.Init()
             SuggestionTextBoxColumn templateSuggestionColumn = new();
             templateSuggestionColumn.SetGetItemsFunc(templateHandler.GetAllNames);
             //COLUMNS
-            this.deviceGridHandler.AddTextBoxColumn(DeviceData.NAME, 125);
-            this.deviceGridHandler.AddCustomColumn(templateSuggestionColumn, DeviceData.TEMPLATE, 200);
-            this.deviceGridHandler.AddTextBoxColumn(DeviceData.PLACEHOLDERS, 300);
-            this.deviceGridHandler.AddTextBoxColumn(DeviceData.DESCRIPTION, 0);
+            this.deviceGridHandler.Columns.AddTextBox(DeviceData.NAME, 125);
+            this.deviceGridHandler.Columns.Add(templateSuggestionColumn, DeviceData.TEMPLATE, 200);
+            this.deviceGridHandler.Columns.AddTextBox(DeviceData.PLACEHOLDERS, 300);
+            this.deviceGridHandler.Columns.AddTextBox(DeviceData.DESCRIPTION, 0);
 
             this.deviceGridHandler.Init();
             this.deviceDataPreview.Function = (column, deviceData) => null;
@@ -128,5 +127,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
 
             this.deviceGridHandler.Refresh();
         }
+
+        public Control GetGridControl() => this.deviceGridHandler.GetControl();
     }
 }

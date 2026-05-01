@@ -127,7 +127,7 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                 }
                 engine.SetValue(ENGINE_LOG_FUNCTION, log);
 
-                this.GridHandlerBind.DataGridView.SuspendLayout();
+                this.GridHandlerBind.SuspendLayout();
                 var request = this.GridHandlerBind.Join();
 
                 ScriptTimeLogger timeLogger = new();
@@ -135,8 +135,8 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                 List<int> rowIndexes = [];
                 if (singleExecution)
                 {
-                    int rowIndex = this.GridHandlerBind.DataGridView.CurrentCell?.RowIndex ?? 0;
-                    if (rowIndex >= 0 && rowIndex <= this.GridHandlerBind.DataGridView.RowCount)
+                    int rowIndex = this.GridHandlerBind.GetCurrentCell()?.RowIndex ?? 0;
+                    if (rowIndex >= 0 && rowIndex <= this.GridHandlerBind.RowCount)
                     {
                         if (!this.GridHandlerBind.IsGridDataEmpty(rowIndex))
                         {
@@ -176,9 +176,8 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                     timeLogger.StopAndSave();
                 }
 
-                this.GridHandlerBind.DataGridView.Refresh();
-                this.GridHandlerBind.DataGridView.ResumeLayout(true);
-                this.GridHandlerBind.StopJoin(request);
+                this.GridHandlerBind.ResumeLayout(refresh: true);
+                this.GridHandlerBind.End(request);
 
                 //Update JSON Context Text
                 var contextJsonJSValue = engine.Evaluate(@"JSON.stringify(this, null, 2);");

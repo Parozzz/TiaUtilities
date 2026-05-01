@@ -15,6 +15,7 @@ using TiaUtilities.Generation.IO.Module.Tab;
 using TiaUtilities.Generation.IO.Xml;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Languages;
+using TiaUtilities.Resources;
 using TiaUtilities.SettingsNew;
 using TiaUtilities.SettingsNew.Bindings;
 using TiaUtilities.Utility;
@@ -83,9 +84,9 @@ namespace TiaUtilities.Generation.IO.Module
             GenUtils.CopyJsonFieldsAndProperties(MainForm.Settings.PresetIOExcelImportConfiguration, this.excelImportConfig);
 
             this.suggestionPreviewer = new();
-            this.suggestionGridHandler = new(MainForm.Settings.GridSettings, this.gridBindContainer, suggestionPreviewer, new(), new IOSuggesttionRowComparare()) { RowCount = 9999 };
+            this.suggestionGridHandler = new(MainForm.Settings.GridSettings, this.gridBindContainer, suggestionPreviewer, new(), new IOSuggesttionRowComparare()) { InitializeRowCount = 9999 };
 
-            this.control = new(suggestionGridHandler.DataGridView);
+            this.control = new(suggestionGridHandler.GetControl());
 
             this.ioTabList = [];
             this.SettingsBindings = new();
@@ -142,6 +143,8 @@ namespace TiaUtilities.Generation.IO.Module
             ToolStripMenuItem importSuggestionsMenuItem = new(Locale.IO_GEN_FORM_IMPEXP_IMPORT_SUGGESTION);
             importSuggestionsMenuItem.Click += (sender, args) =>
             {
+                var savedFilePath = MainForm.Settings.GetSavedFileDialogPath(FileDialogResources.GENERATION_IO_IMPORT_SUGGESTIONS);
+
                 var fileDialog = new CommonOpenFileDialog
                 {
                     IsFolderPicker = false,
@@ -149,12 +152,13 @@ namespace TiaUtilities.Generation.IO.Module
                     EnsureValidNames = true,
                     Multiselect = true,
                     DefaultExtension = ".xml",
-                    Filters = { new CommonFileDialogFilter("XML Files", "*.xml") }
+                    Filters = { new CommonFileDialogFilter("XML Files", "*.xml") },
+                    InitialDirectory = savedFilePath,
                 };
 
                 if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
                 {
-                    suggestionGridHandler.DataSource.InitializeData(suggestionGridHandler.RowCount);
+                    suggestionGridHandler.DataSource.InitializeData(suggestionGridHandler.InitializeRowCount);
 
                     foreach (var filePath in fileDialog.FileNames)
                     {
@@ -162,19 +166,19 @@ namespace TiaUtilities.Generation.IO.Module
                         if (xmlNodeConfiguration is BlockGlobalDB globalDB)
                         {
                             var suggestionEnumerable = globalDB.GetAllMemberAddress().Select(v => new IOSuggestionData() { Value = v });
-                            suggestionGridHandler.AddData(suggestionEnumerable);
+                            suggestionGridHandler.AppendData(suggestionEnumerable);
 
                         }
                         else if (xmlNodeConfiguration is BlockInstanceDB instanceDB)
                         {
                             var suggestionEnumerable = instanceDB.GetAllMemberAddress().Select(v => new IOSuggestionData() { Value = v });
-                            suggestionGridHandler.AddData(suggestionEnumerable);
+                            suggestionGridHandler.AppendData(suggestionEnumerable);
                         }
                         else if (xmlNodeConfiguration is XMLTagTable tagTable)
                         {
                             var suggestionEnumerable = tagTable.GetTags().Values.Select(t => t.TagName)
                                                                                 .Select(n => new IOSuggestionData() { Value = n });
-                            suggestionGridHandler.AddData(suggestionEnumerable);
+                            suggestionGridHandler.AppendData(suggestionEnumerable);
                         }
                         else
                         {
@@ -183,6 +187,12 @@ namespace TiaUtilities.Generation.IO.Module
                     }
 
                     this.UpdateSuggestionColors();
+
+                    var fileName = fileDialog.FileName;
+                    if(fileName != null)
+                    {
+                        MainForm.Settings.SetSavedFileDialogPath(FileDialogResources.GENERATION_IO_IMPORT_SUGGESTIONS, Path.GetDirectoryName(fileName));
+                    }
                 }
             };
             form.importExportMenuItem.DropDownItems.Add(importSuggestionsMenuItem);
@@ -195,6 +205,8 @@ namespace TiaUtilities.Generation.IO.Module
                     return;
                 }
 
+                var savedFilePath = MainForm.Settings.GetSavedFileDialogPath(FileDialogResources.GENERATION_IO_IMPORT_FROM_TABLE);
+
                 var fileDialog = new CommonOpenFileDialog
                 {
                     IsFolderPicker = false,
@@ -202,7 +214,8 @@ namespace TiaUtilities.Generation.IO.Module
                     EnsureValidNames = true,
                     Multiselect = true,
                     DefaultExtension = ".xml",
-                    Filters = { new CommonFileDialogFilter("XML Files", "*.xml") }
+                    Filters = { new CommonFileDialogFilter("XML Files", "*.xml") },
+                    InitialDirectory = savedFilePath,
                 };
 
                 if (fileDialog.ShowDialog() != CommonFileDialogResult.Ok)
@@ -215,7 +228,7 @@ namespace TiaUtilities.Generation.IO.Module
                     var xmlNodeConfiguration = SimaticMLAPI.ParseFile(filePath);
                     if (xmlNodeConfiguration is XMLTagTable tagTable)
                     {
-                        var request = ioTab.GridHandler.DataChangedHandler.Join();
+                        var req = ioTab.GridHandler.DataChangedHandler.Join();
 
                         var tags = tagTable.GetTags().Values;
 
@@ -241,7 +254,7 @@ namespace TiaUtilities.Generation.IO.Module
                             ioData.Comment = comment;
                         }
 
-                        ioTab.GridHandler.DataChangedHandler.End(request);
+                        ioTab.GridHandler.DataChangedHandler.End(req);
                     }
                     else
                     {
@@ -250,26 +263,32 @@ namespace TiaUtilities.Generation.IO.Module
                 }
 
                 this.UpdateSuggestionColors();
+
+                var fileName = fileDialog.FileName;
+                if (fileName != null)
+                {
+                    MainForm.Settings.SetSavedFileDialogPath(FileDialogResources.GENERATION_IO_IMPORT_FROM_TABLE, Path.GetDirectoryName(fileName));
+                }
             };
             form.importExportMenuItem.DropDownItems.Add(importAddressMenuItem);
             #endregion
 
             #region DRAG
-            suggestionGridHandler.Events.ExcelDragPreview += (sender, args) => GridUtils.DragPreview(args, suggestionGridHandler);
-            suggestionGridHandler.Events.ExcelDragDone += (sender, args) => GridUtils.DragDone(args, suggestionGridHandler);
+            suggestionGridHandler.ExcelDragPreview += (sender, args) => GridUtils.DragPreview(args, suggestionGridHandler);
+            suggestionGridHandler.ExcelDragDone += (sender, args) => GridUtils.DragDone(args, suggestionGridHandler);
             #endregion
             //Column initialization before gridHandler.Init()
             #region COLUMNS
-            suggestionGridHandler.AddTextBoxColumn(IOSuggestionData.VALUE, 0);
+            suggestionGridHandler.Columns.AddTextBox(IOSuggestionData.VALUE, 0);
             #endregion
 
             this.gridBindContainer.Init(form);
             this.suggestionGridHandler.Init();
 
             #region SUGGESTIONS GRID - EVENTS - TOOL TIP / CELL CHANGE
-            this.suggestionGridHandler.DataGridView.CellToolTipTextNeeded += (sender, args) =>
+            this.suggestionGridHandler.CellToolTipTextNeeded += (sender, args) =>
             {
-                if (args.RowIndex < 0 || args.RowIndex > suggestionGridHandler.RowCount)
+                if (args.RowIndex < 0 || args.RowIndex > suggestionGridHandler.InitializeRowCount)
                 {
                     return;
                 }
@@ -298,7 +317,7 @@ namespace TiaUtilities.Generation.IO.Module
                 }
             };
 
-            suggestionGridHandler.Events.CellDataChanged += (sender, args) => UpdateSuggestionColors();
+            suggestionGridHandler.DataChanged += (sender, args) => UpdateSuggestionColors();
             #endregion
 
             #region PREVIEW
@@ -356,7 +375,7 @@ namespace TiaUtilities.Generation.IO.Module
 
             form.Shown += (sender, args) =>
             {
-                suggestionGridHandler.DataGridView.AutoResizeColumnHeadersHeight();
+                this.suggestionGridHandler.AutoResizeColumnHeadersHeight();
                 if (this.control.tabControl.TabCount == 0)
                 { //Check required because Load could be called before form is shown!
                     this.control.tabControl.AddTabs();
@@ -382,7 +401,7 @@ namespace TiaUtilities.Generation.IO.Module
             }
 
             tabPage.Tag = ioGenTab;
-            tabPage.Controls.Add(ioGenTab.GridHandler.DataGridView);
+            tabPage.Controls.Add(ioGenTab.GridHandler.GetControl());
 
             ioTabList.Add(ioGenTab);
         }
@@ -523,13 +542,16 @@ namespace TiaUtilities.Generation.IO.Module
 
         public void UpdateSuggestionColors()
         {
-            suggestionGridHandler.DataGridView.SuspendLayout();
+            suggestionGridHandler.SuspendLayout();
 
-            foreach (DataGridViewRow row in suggestionGridHandler.DataGridView.Rows)
+            foreach (var rowIndex in suggestionGridHandler.DataSource.GetNotEmptyIndexes())
             {
-                var cell = row.Cells[IOSuggestionData.VALUE.ColumnIndex];
-                cell.Style.BackColor = SystemColors.ControlLightLight;
-                cell.Style.SelectionBackColor = Color.LightGray;
+                var cell = suggestionGridHandler.GetCell(rowIndex, IOSuggestionData.VALUE);
+                if(cell != null)
+                {
+                    cell.Style.BackColor = SystemColors.ControlLightLight;
+                    cell.Style.SelectionBackColor = Color.LightGray;
+                }
             }
 
             List<GenTabRowRecord> rows = [];
@@ -552,12 +574,15 @@ namespace TiaUtilities.Generation.IO.Module
                 var foundData = rows.Where(d => d.IOData.Variable == suggestion.Value);
                 if (foundData.Any())
                 {
-                    var cell = suggestionGridHandler.DataGridView.Rows[row].Cells[IOSuggestionData.VALUE.ColumnIndex];
-                    cell.Style.BackColor = cell.Style.SelectionBackColor = Color.LightGreen;
+                    var cell = suggestionGridHandler.GetCell(row, IOSuggestionData.VALUE);
+                    if(cell != null)
+                    {
+                        cell.Style.BackColor = cell.Style.SelectionBackColor = Color.LightGreen;
+                    }
                 }
             }
 
-            suggestionGridHandler.DataGridView.ResumeLayout();
+            suggestionGridHandler.ResumeLayout(refresh: true);
         }
 
         private void AddConfigurationBindings(SettingsBindings settingsBindings)

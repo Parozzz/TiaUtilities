@@ -7,24 +7,18 @@ namespace TiaUtilities.Generation.GridHandler
 {
     public class GridDataSource<T> : ISaveable<Dictionary<int, T>> where T : GridData
     {
-        private readonly DataGridView dataGridView;
         private readonly GridHandler<T> gridHandler;
         private readonly List<T> dataList;
 
-        public bool BindingComplete { get; private set;  }
         public int Count { get => dataList.Count; }
         public IReadOnlyList<GridDataColumn> DataColumns { get; init; }
 
-        public GridDataSource(DataGridView dataGridView, GridHandler<T> gridHandler)
+        public GridDataSource(GridHandler<T> gridHandler)
         {
-            this.dataGridView = dataGridView;
             this.gridHandler = gridHandler;
-
             this.dataList = [];
 
             this.DataColumns = ValidateColumnList();
-
-            this.dataGridView.HandleCreated += (sender, args) => this.BindingComplete = true;
         }
 
         private static IReadOnlyList<GridDataColumn> ValidateColumnList()
@@ -78,24 +72,24 @@ namespace TiaUtilities.Generation.GridHandler
             }
         }
 
+        private void ValidateRowIndex(int index)
+        {
+            if (index < 0 || index >= this.Count)
+            {
+                throw new InvalidEnumArgumentException($"Index {index} out of range for {this.dataList.GetType().FullName}.");
+            }
+        }
+
         public T this[int i]
         {
             get
             {
-                if (i < 0 || i >= this.Count)
-                {
-                    throw new InvalidEnumArgumentException($"Index {i} out of range for {this.dataList.GetType().FullName}.");
-                }
-
+                ValidateRowIndex(i);
                 return dataList[i];
             }
-            set 
+            set
             {
-                if (i < 0 || i >= this.Count)
-                {
-                    throw new InvalidEnumArgumentException($"Index {i} out of range for {this.dataList.GetType().FullName}.");
-                }
-
+                ValidateRowIndex(i);
                 dataList[i] = value; 
             }
         }
@@ -110,8 +104,6 @@ namespace TiaUtilities.Generation.GridHandler
 
         public void InitializeData(uint dataAmount)
         {
-            this.BindingComplete = false;
-
             foreach (var data in this.dataList)
             {
                 data.ClearDataChangedDelegate();
@@ -121,14 +113,17 @@ namespace TiaUtilities.Generation.GridHandler
             for (int row = 0; row < dataAmount; row++)
             {
                 var data = this.CreateInstance();
-                dataList.Add(data);
 
                 int savedRow = row; //If i don't do this, it will keep the ram value of row (So dataAmount - 1)
-                data.DataChanged += (sender, args) => this.gridHandler.HandleDataChangedEvent(args, savedRow);
+                data.DataPropertyChanged += (sender, args) => this.gridHandler.HandleDataChangedEvent(args, savedRow);
+
+                dataList.Add(data);
             }
 
-            this.dataGridView.DataSource = null; //This SHOULD update the datagrid
-            this.dataGridView.DataSource = new BindingSource() { DataSource = new BindingList<T>(this.dataList) };
+            BindingList<T> bindingList = new(this.dataList);
+            BindingSource bindingSource = new() { DataSource = bindingList };
+
+            this.gridHandler.SetDataSource(bindingSource);
         }
 
         public List<int> GetFirstEmptyRowIndexes(int num)
@@ -166,7 +161,7 @@ namespace TiaUtilities.Generation.GridHandler
                     dataList.Reverse();
                 }
 
-                dataGridView.Refresh();
+                this.gridHandler.Refresh();
             }
         }
 
@@ -191,7 +186,8 @@ namespace TiaUtilities.Generation.GridHandler
 
                 return xValue.CompareTo(yValue);
             });
-            dataGridView.Refresh();
+
+            this.gridHandler.Refresh();
         }
 
         public int GetFirstNotEmptyIndexStartingFrom(int indexStart)

@@ -163,7 +163,7 @@ namespace TiaUtilities.Generation.Alarms.Module
             }
 
             tabPage.Tag = alarmTab;
-            tabPage.Controls.Add(alarmTab.DataGridViewControl);
+            tabPage.Controls.Add(alarmTab.GetGridControl());
 
             alarmTabList.Add(alarmTab); //Do this AFTER. Otherwise the Selected event is called with Tag null.
         }

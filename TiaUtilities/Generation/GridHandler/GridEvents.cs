@@ -1,7 +1,7 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
 using TiaUtilities.Generation.GridHandler.Data;
 
-namespace TiaUtilities.Generation.GridHandler.Events
+namespace TiaUtilities.Generation.GridHandler
 {
     #region SELECTED_ROW_CHANGED
     public delegate void GridSelectedRowChangedEventHandler(object? sender, GridSelectedRowChangedArgs args);
@@ -14,12 +14,16 @@ namespace TiaUtilities.Generation.GridHandler.Events
 
     #endregion
 
-    #region CELL_CHANGE
-    public delegate void GridCellDataChangedEventHandler(object? sender, GridCellDataChangedEventArgs args);
+    #region DATA_LOADED
+    public delegate void GridDataLoadedEvent(object? sender, EventArgs eventArgs);
+    #endregion
 
-    public class GridCellChangedData(GridData data, string propertyName, GridDataColumn column, int row, object? oldValue, object? newValue)
+    #region DATA_CHANGED
+    public delegate void GridDataChangedEventHandler(object? sender, GridDataChangedEventArgs args);
+
+    public class GridChangedData(GridData gridData, string propertyName, GridDataColumn column, int row, object? oldValue, object? newValue)
     {
-        public GridData Data { get; init; } = data;
+        public GridData GridData { get; init; } = gridData;
         public string PropertyName { get; init; } = propertyName;
         public GridDataColumn Column { get; init; } = column;
         public int ColumnIndex { get => this.Column.ColumnIndex; }
@@ -27,23 +31,23 @@ namespace TiaUtilities.Generation.GridHandler.Events
         public object? OldValue { get; init; } = oldValue;
         public object? NewValue { get; init; } = newValue;
 
-        public GridCellChangedData(GridDataChangedEventArgs args, int row) : this(args.Data, args.PropertyName, args.Column, row, args.OldValue, args.NewValue) { }
+        public GridChangedData(GridDataPropertyChangedEventArgs args, int row) : this(args.Data, args.PropertyName, args.Column, row, args.OldValue, args.NewValue) { }
 
         public void RestoreOldValue()
         {
-            var property = this.Data.GetType().GetProperty(this.PropertyName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+            var property = this.GridData.GetType().GetProperty(this.PropertyName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
             if (property != null && property.CanWrite)
             {
-                property.SetValue(this.Data, this.OldValue);
+                property.SetValue(this.GridData, this.OldValue);
             }
         }
 
         public void RestoreNewValue()
         {
-            var property = this.Data.GetType().GetProperty(this.PropertyName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+            var property = this.GridData.GetType().GetProperty(this.PropertyName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
             if (property != null && property.CanWrite)
             {
-                property.SetValue(this.Data, this.NewValue);
+                property.SetValue(this.GridData, this.NewValue);
             }
         }
 
@@ -53,9 +57,9 @@ namespace TiaUtilities.Generation.GridHandler.Events
         }
     }
 
-    public class GridCellDataChangedEventArgs : EventArgs
+    public class GridDataChangedEventArgs : EventArgs
     {
-        public List<GridCellChangedData> ChangedCellDataList { get; init; } = [];
+        public List<GridChangedData> ChangedCellDataList { get; init; } = [];
         //public bool IsUndo { get; set; }
     }
     #endregion

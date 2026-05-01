@@ -3,17 +3,18 @@ using InfoBox;
 using Jint;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Text.RegularExpressions;
+using TiaUtilities.Editors.ErrorReporting;
+using TiaUtilities.Generation.Configuration;
 using TiaUtilities.Generation.Configuration.Utility;
 using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.Binds;
-using TiaUtilities.Languages;
-using TiaUtilities.Editors.ErrorReporting;
-using TiaUtilities.Generation.Configuration;
-using TiaUtilities.Utility;
 using TiaUtilities.Generation.IO.Configurations;
 using TiaUtilities.Generation.IO.Data;
-using TiaUtilities.SettingsNew.Bindings;
 using TiaUtilities.Generation.SettingsNew;
+using TiaUtilities.Languages;
+using TiaUtilities.Resources;
+using TiaUtilities.SettingsNew.Bindings;
+using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.IO.Module.ExcelImporter
 {
@@ -34,7 +35,7 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
 
             this.errorThread = gridBindContainer.GridScriptHandler.ErrorThread;
             this.excelImportConfig = configuration;
-            this.gridHandler = new(gridSettings, gridBindContainer, new(), new()) { RowCount = 1999 };
+            this.gridHandler = new(gridSettings, gridBindContainer, new(), new()) { InitializeRowCount = 1999 };
 
             this.settingsBindings = new();
 
@@ -55,7 +56,7 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
 
         private void Init()
         {
-            this.MainTableLayoutPanel.Controls.Add(this.gridHandler.DataGridView);
+            this.MainTableLayoutPanel.Controls.Add(this.gridHandler.GetControl());
 
             #region FORM
             this.acceptButton.Click += (object sender, EventArgs args) =>
@@ -71,14 +72,14 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
             #endregion
 
             #region DRAG
-            this.gridHandler.Events.ExcelDragPreview += (sender, args) => IOGenUtils.DragPreview(args, this.gridHandler);
-            this.gridHandler.Events.ExcelDragDone += (sender, args) => IOGenUtils.DragDone(args, this.gridHandler);
+            this.gridHandler.ExcelDragPreview += (sender, args) => IOGenUtils.DragPreview(args, this.gridHandler);
+            this.gridHandler.ExcelDragDone += (sender, args) => IOGenUtils.DragDone(args, this.gridHandler);
             #endregion
 
             #region COLUMNS
-            this.gridHandler.AddTextBoxColumn(IOGenExcelImportData.ADDRESS, 80);
-            this.gridHandler.AddTextBoxColumn(IOGenExcelImportData.IO_NAME, 110);
-            this.gridHandler.AddTextBoxColumn(IOGenExcelImportData.COMMENT, 0);
+            this.gridHandler.Columns.AddTextBox(IOGenExcelImportData.ADDRESS, 80);
+            this.gridHandler.Columns.AddTextBox(IOGenExcelImportData.IO_NAME, 110);
+            this.gridHandler.Columns.AddTextBox(IOGenExcelImportData.COMMENT, 0);
             #endregion
 
             gridHandler.Init();
@@ -88,11 +89,14 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
 
             this.importExcelButton.Click += (sender, args) =>
             {
+                var savedFilePath = MainForm.Settings.GetSavedFileDialogPath(FileDialogResources.GENERATION_IO_IMPORT_EXCEL);
+
                 var fileDialog = new CommonOpenFileDialog
                 {
                     EnsurePathExists = true,
                     EnsureFileExists = true,
-                    Filters = { new CommonFileDialogFilter("Excel Files", "*.xlsx,*.xls") }
+                    Filters = { new CommonFileDialogFilter("Excel Files", "*.xlsx,*.xls") },
+                    InitialDirectory = savedFilePath,
                 };
 
                 if (fileDialog.ShowDialog(ownerWindowHandle: this.Handle) == CommonFileDialogResult.Ok)
@@ -101,6 +105,8 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
                     if (fileName != null)
                     {
                         this.ImportExcel(fileName);
+
+                        MainForm.Settings.SetSavedFileDialogPath(FileDialogResources.GENERATION_IO_IMPORT_EXCEL, Path.GetDirectoryName(fileName));
                     }
                 }
             };
@@ -184,7 +190,7 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
                     importDataList.Add(new() { Address = address, IOName = ioName, Comment = comment });
                 }
 
-                var request = this.gridHandler.DataChangedHandler.Join();
+                var req = this.gridHandler.DataChangedHandler.Join();
 
                 //Splitted this way to increase performance. Changing cell one at the time for 20-30 values takes 400ms, this way 10ms
                 var emptyIndexList = this.gridHandler.DataSource.GetFirstEmptyRowIndexes(importDataList.Count);
@@ -199,7 +205,7 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
                     GridUtils.CopyGridDataValues(importData, emptyImportData);
                 }
 
-                this.gridHandler.DataChangedHandler.End(request);
+                this.gridHandler.DataChangedHandler.End(req);
             }
             catch (Exception ex)
             {

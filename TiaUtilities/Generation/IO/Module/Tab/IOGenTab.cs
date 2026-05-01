@@ -43,27 +43,29 @@ namespace TiaUtilities.Generation.IO.Module.Tab
             this.Previewer = new();
 
             IOGenPlaceholderHandler placeholdersHandler = new(this.Previewer, this.mainConfig, TabConfig);
-            this.GridHandler = new(gridSettings, gridBindFactory, this.Previewer, placeholdersHandler, new IOGenComparer()) { RowCount = 2999 };
+            this.GridHandler = new(gridSettings, gridBindFactory, this.Previewer, placeholdersHandler, new IOGenComparer()) { InitializeRowCount = 2999 };
         }
 
         public void Init()
         {
             #region DRAG
-            GridHandler.Events.ExcelDragPreview += (sender, args) => IOGenUtils.DragPreview(args, GridHandler);
-            GridHandler.Events.ExcelDragDone += (sender, args) => IOGenUtils.DragDone(args, GridHandler);
+            GridHandler.ExcelDragPreview += (sender, args) => IOGenUtils.DragPreview(args, GridHandler);
+            GridHandler.ExcelDragDone += (sender, args) => IOGenUtils.DragDone(args, GridHandler);
             #endregion
 
             //Column initialization before gridHandler.Init()
             #region COLUMNS
-            var addressColumn = this.GridHandler.AddTextBoxColumn(IOData.ADDRESS, 65);
-            this.GridHandler.AddCheckBoxColumn(IOData.NEGATED, 50);
-            this.GridHandler.AddTextBoxColumn(IOData.IO_NAME, 110);
-            var variableAddressColumn = this.GridHandler.AddCustomColumn(new SuggestionTextBoxColumn(), IOData.VARIABLE, 200);
-            this.GridHandler.AddTextBoxColumn(IOData.MERKER_ADDRESS, MERKER_ADDRESS_COLUMN_SIZE);
-            this.GridHandler.AddTextBoxColumn(IOData.COMMENT, 0);
-
+            var addressColumn = this.GridHandler.Columns.AddTextBox(IOData.ADDRESS, 65);
             addressColumn.MaxInputLength = 10;
+
+            this.GridHandler.Columns.AddCheckBox(IOData.NEGATED, 50);
+            this.GridHandler.Columns.AddTextBox(IOData.IO_NAME, 110);
+
+            var variableAddressColumn = this.GridHandler.Columns.Add(new SuggestionTextBoxColumn(), IOData.VARIABLE, 200);
             variableAddressColumn.SetGetItemsFunc(() => module.GetSuggestions(filterAlreadyUsed: true));
+
+            this.GridHandler.Columns.AddTextBox(IOData.MERKER_ADDRESS, MERKER_ADDRESS_COLUMN_SIZE);
+            this.GridHandler.Columns.AddTextBox(IOData.COMMENT, 0);
 
             mainConfig.Subscribe(() => mainConfig.MemoryType, UpdateMerkerColumn);
             UpdateMerkerColumn(mainConfig.MemoryType);
@@ -72,7 +74,7 @@ namespace TiaUtilities.Generation.IO.Module.Tab
             this.GridHandler.Init();
 
             #region GRID EVENTS - DUPLKICATED IO VALUES
-            this.GridHandler.Events.CellDataChanged += (sender, args) =>
+            this.GridHandler.DataChanged += (sender, args) =>
             {
                 if (args.ChangedCellDataList.Any(c => c.ColumnIndex == IOData.VARIABLE))
                 {
@@ -84,12 +86,12 @@ namespace TiaUtilities.Generation.IO.Module.Tab
                     UpdateDuplicatedIOValues();
                 }
             };
-            this.GridHandler.Events.PostSort += (sender, args) =>
+            this.GridHandler.PostSort += (sender, args) =>
             {
                 module.UpdateSuggestionColors();
                 UpdateDuplicatedIOValues();
             };
-            this.GridHandler.DataGridView.VisibleChanged += (sender, args) =>
+            this.GridHandler.DataLoaded += (sender, args) =>
             {
                 module.UpdateSuggestionColors();
                 UpdateDuplicatedIOValues();
@@ -175,7 +177,7 @@ namespace TiaUtilities.Generation.IO.Module.Tab
 
         private void UpdateMerkerColumn(IOMemoryTypeEnum memoryType)
         {
-            this.GridHandler.ChangeColumnVisibility(IOData.MERKER_ADDRESS, visible: memoryType == IOMemoryTypeEnum.MERKER, init: true);
+            this.GridHandler.Columns.ChangeVisibility(IOData.MERKER_ADDRESS, visible: memoryType == IOMemoryTypeEnum.MERKER, init: true);
         }
 
         public IOGenTabSave CreateSave()
@@ -205,19 +207,26 @@ namespace TiaUtilities.Generation.IO.Module.Tab
 
         private void UpdateDuplicatedIOValues()
         {
-            this.GridHandler.DataGridView.SuspendLayout();
+            this.GridHandler.SuspendLayout();
 
-            foreach (DataGridViewRow row in this.GridHandler.DataGridView.Rows)
+            
+            foreach (var rowIndex in this.GridHandler.DataSource.GetNotEmptyIndexes())
             {
-                var addressCell = row.Cells[IOData.ADDRESS.ColumnIndex];
-                addressCell.ToolTipText = string.Empty;
-                addressCell.Style.BackColor = SystemColors.ControlLightLight;
-                addressCell.Style.SelectionBackColor = Color.LightGray;
+                var addressCell = this.GridHandler.GetCell(rowIndex, IOData.ADDRESS);
+                if(addressCell != null)
+                {
+                    addressCell.ToolTipText = string.Empty;
+                    addressCell.Style.BackColor = SystemColors.ControlLightLight;
+                    addressCell.Style.SelectionBackColor = Color.LightGray;
+                }
 
-                var ioNameCell = row.Cells[IOData.IO_NAME.ColumnIndex];
-                ioNameCell.ToolTipText = string.Empty;
-                ioNameCell.Style.BackColor = SystemColors.ControlLightLight;
-                ioNameCell.Style.SelectionBackColor = Color.LightGray;
+                var ioNameCell = this.GridHandler.GetCell(rowIndex, IOData.IO_NAME);
+                if(ioNameCell != null)
+                {
+                    ioNameCell.ToolTipText = string.Empty;
+                    ioNameCell.Style.BackColor = SystemColors.ControlLightLight;
+                    ioNameCell.Style.SelectionBackColor = Color.LightGray;
+                }
             }
 
             var dataDict = this.GridHandler.DataSource.GetNotEmptyDataDict();
@@ -237,9 +246,12 @@ namespace TiaUtilities.Generation.IO.Module.Tab
                 {
                     var rowIndex = entry.Value;
 
-                    var ioNameCell = this.GridHandler.DataGridView.Rows[rowIndex].Cells[IOData.IO_NAME.ColumnIndex];
-                    ioNameCell.ToolTipText = tooltipText;
-                    ioNameCell.Style.BackColor = ControlPaint.LightLight(Color.Orange);
+                    var ioNameCell = this.GridHandler.GetCell(rowIndex, IOData.IO_NAME);
+                    if(ioNameCell != null)
+                    {
+                        ioNameCell.ToolTipText = tooltipText;
+                        ioNameCell.Style.BackColor = ControlPaint.LightLight(Color.Orange);
+                    }
                 }
             }
 
@@ -255,14 +267,16 @@ namespace TiaUtilities.Generation.IO.Module.Tab
                 {
                     var rowIndex = entry.Value;
 
-                    var addressCell = this.GridHandler.DataGridView.Rows[rowIndex].Cells[IOData.ADDRESS.ColumnIndex];
-                    addressCell.ToolTipText = tooltipText;
-                    addressCell.Style.BackColor = ControlPaint.LightLight(Color.Orange);
+                    var addressCell = this.GridHandler.GetCell(rowIndex, IOData.ADDRESS);
+                    if(addressCell != null)
+                    {
+                        addressCell.ToolTipText = tooltipText;
+                        addressCell.Style.BackColor = ControlPaint.LightLight(Color.Orange);
+                    }
                 }
             }
 
-            this.GridHandler.DataGridView.Refresh();
-            this.GridHandler.DataGridView.ResumeLayout(true);
+            this.GridHandler.ResumeLayout(refresh: true);
         }
     }
 }

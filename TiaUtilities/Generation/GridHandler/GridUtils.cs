@@ -1,7 +1,6 @@
 ﻿using System.Data;
 using System.Text.RegularExpressions;
 using TiaUtilities.Generation.GridHandler.Data;
-using TiaUtilities.Generation.GridHandler.Events;
 using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.GridHandler
@@ -25,13 +24,13 @@ namespace TiaUtilities.Generation.GridHandler
 
         public static void DragPreview<T>(GridExcelDragEventArgs eventArgs, GridHandler<T> gridHandler) where T : GridData
         {
-            var startCell = gridHandler.DataGridView.Rows[eventArgs.StartingRow]?.Cells[eventArgs.DraggedColumn];
-            if (startCell is not DataGridViewTextBoxCell)
+            var gridColumn = gridHandler.DataSource[eventArgs.StartingRow].GetColumn(eventArgs.DraggedColumn);
+            if (gridColumn.PropertyInfo.PropertyType != typeof(string))
             {
                 return;
             }
 
-            var startString = startCell.Value?.ToString();
+            var startString = "" + gridHandler.DataSource[eventArgs.StartingRow][eventArgs.DraggedColumn];
             if (Utils.SplitStringFromNumberFromRight(startString, out string before, out string numString, out string after) && int.TryParse(numString, out int num))
             {
                 var nextNum = num + (eventArgs.SelectedRowCount - 1) * (eventArgs.DraggingDown ? 1 : -1);
@@ -55,8 +54,8 @@ namespace TiaUtilities.Generation.GridHandler
 
         public static void DragDone<T>(GridExcelDragEventArgs eventArgs, GridHandler<T> gridHandler) where T : GridData
         {
-            var startCell = gridHandler.DataGridView.Rows[eventArgs.StartingRow]?.Cells[eventArgs.DraggedColumn];
-            if (startCell is not DataGridViewTextBoxCell)
+            var gridColumn = gridHandler.DataSource[eventArgs.StartingRow].GetColumn(eventArgs.DraggedColumn);
+            if(gridColumn.PropertyInfo.PropertyType != typeof(string))
             {
                 return;
             }
@@ -67,9 +66,9 @@ namespace TiaUtilities.Generation.GridHandler
                 rowIndexEnumeration = rowIndexEnumeration.Reverse();
             }
 
-            var request = gridHandler.DataChangedHandler.Join();
+            var req = gridHandler.DataChangedHandler.Join();
 
-            var startString = startCell.Value?.ToString();
+            var startString = "" + gridHandler.DataSource[eventArgs.StartingRow][eventArgs.DraggedColumn];
             if (Utils.SplitStringFromNumberFromRight(startString, out string before, out string numString, out string after) && int.TryParse(numString, out int num))
             {
                 var x = 0;
@@ -88,7 +87,7 @@ namespace TiaUtilities.Generation.GridHandler
                     }
 
                     var newValue = (before + nextNumString + after);
-                    gridHandler.DataGridView.Rows[rowIndex].Cells[eventArgs.DraggedColumn].Value = newValue;
+                    gridHandler.DataSource[rowIndex][eventArgs.DraggedColumn] = newValue;
                 }
             }
             else
@@ -96,11 +95,11 @@ namespace TiaUtilities.Generation.GridHandler
                 foreach (var rowIndex in rowIndexEnumeration)
                 {
                     var newValue = startString;
-                    gridHandler.DataGridView.Rows[rowIndex].Cells[eventArgs.DraggedColumn].Value = newValue;
+                    gridHandler.DataSource[rowIndex][eventArgs.DraggedColumn] = newValue;
                 }
             }
 
-            gridHandler.DataChangedHandler.End(request);
+            gridHandler.DataChangedHandler.End(req);
         }
 
         public static void CopyAsExcel(DataGridView dataGridView)

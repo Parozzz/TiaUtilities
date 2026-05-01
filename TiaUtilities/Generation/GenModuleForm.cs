@@ -4,6 +4,7 @@ using System.Reflection;
 using TiaUtilities.Constants;
 using TiaUtilities.Generation.SettingsNew;
 using TiaUtilities.Languages;
+using TiaUtilities.Resources;
 using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation
@@ -14,7 +15,8 @@ namespace TiaUtilities.Generation
         private readonly TimedSaveHandler autoSaveHandler;
 
         private bool projectLoading = false;
-        private string? lastFilePath;
+
+        protected string? openProjectFilePath;
 
         public GenModuleForm(IGenModule generationProject, TimedSaveHandler autoSaveHandler)
         {
@@ -32,7 +34,7 @@ namespace TiaUtilities.Generation
             this.FormClosing += (sender, args) =>
             {
                 InformationBoxResult result = InformationBoxResult.None;
-                if (string.IsNullOrEmpty(lastFilePath))
+                if (string.IsNullOrEmpty(this.openProjectFilePath))
                 {
                     result = InformationBox.Show("Do you want to save this project?", title: "Project not saved", buttons: InformationBoxButtons.YesNoCancel);
                 }
@@ -72,11 +74,14 @@ namespace TiaUtilities.Generation
             {
                 try
                 {
+                    var filePath = MainForm.Settings.GetSavedFileDialogPath(FileDialogResources.GENERATION_EXPORT_XML);
+
                     var folderDialog = new CommonOpenFileDialog
                     {
                         IsFolderPicker = true,
                         EnsurePathExists = true,
-                        EnsureValidNames = true
+                        EnsureValidNames = true,
+                        InitialDirectory = filePath
                     };
 
                     if (folderDialog.ShowDialog() == CommonFileDialogResult.Ok)
@@ -88,6 +93,8 @@ namespace TiaUtilities.Generation
                         }
 
                         this.module.ExportXML(folderName);
+
+                        MainForm.Settings.SetSavedFileDialogPath(FileDialogResources.GENERATION_EXPORT_XML, folderName);
                     }
                 }
                 catch (Exception ex)
@@ -100,7 +107,7 @@ namespace TiaUtilities.Generation
             #region AUTO_SAVE
             void eventHandler(object? sender, EventArgs args)
             {
-                if (File.Exists(this.lastFilePath))
+                if (File.Exists(this.openProjectFilePath))
                 {
                     this.ModuleSave();
                 }
@@ -195,29 +202,50 @@ namespace TiaUtilities.Generation
 
             var version = GetProjectSaveVersion(projectSave);
 
-            var saveOK = SavesLoader.Save(projectSave, version, ref lastFilePath, ProgramConstants.SAVE_FILE_EXTENSION, saveAs || !File.Exists(lastFilePath));
-            if (!saveOK)
+
+
+            var filePath = this.openProjectFilePath;
+            if(string.IsNullOrEmpty(filePath))
             {
-                return;
+                filePath = MainForm.Settings.GetSavedFileDialogPath(FileDialogResources.GENERATION_SAVE);
             }
 
-            this.module.Wash();
+            var requireFileDialog = string.IsNullOrEmpty(this.openProjectFilePath) || saveAs || !File.Exists(filePath);
 
-            this.SetLocalizedFormText(lastFilePath ?? "");
+            var saveOK = SavesLoader.Save(projectSave, version, ref filePath, ProgramConstants.SAVE_FILE_EXTENSION, requireFileDialog);
+            if (saveOK)
+            {
+                this.openProjectFilePath = filePath;
+
+                this.module.Wash();
+                this.SetLocalizedFormText(filePath ?? "");
+            }
+
+            MainForm.Settings.SetSavedFileDialogPath(FileDialogResources.GENERATION_SAVE, filePath);
         }
 
         public void ModuleLoad(object? saveObject = null)
         {
             projectLoading = true;
 
-            saveObject ??= SavesLoader.LoadWithDialog(ref lastFilePath, ProgramConstants.SAVE_FILE_EXTENSION);
+            var filePath = this.openProjectFilePath;
+            if(string.IsNullOrEmpty(filePath))
+            {
+                filePath = MainForm.Settings.GetSavedFileDialogPath(FileDialogResources.GENERATION_LOAD);
+            }
+
+            saveObject ??= SavesLoader.LoadWithDialog(ref filePath, ProgramConstants.SAVE_FILE_EXTENSION);
             if (saveObject != null)
             {
+                this.openProjectFilePath = filePath;
+                this.SetLocalizedFormText(filePath ?? "");
+
                 this.module.LoadSave(saveObject);
                 this.module.Wash();
 
-                this.SetLocalizedFormText(lastFilePath ?? "");
             }
+
+            MainForm.Settings.SetSavedFileDialogPath(FileDialogResources.GENERATION_LOAD, filePath);
 
             projectLoading = false;
         }
@@ -227,9 +255,9 @@ namespace TiaUtilities.Generation
             this.Text = this.module.GetFormLocalizatedName().Replace("{file_path}", filePath);
         }
 
-        public void SetLastFilePath(string? filePath)
+        public void SetOpenProjectFilePath(string? filePath)
         {
-            this.lastFilePath = filePath;
+            this.openProjectFilePath = filePath;
         }
 
         private int GetProjectSaveVersion(Object obj)

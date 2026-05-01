@@ -36,7 +36,7 @@ namespace TiaUtilities.Generation.GridHandler
 
                 var request = this.handlerBind.Join();
                 var addOK = this.AddSearchReplaceCellChange(findData);
-                this.handlerBind.StopJoin(request);
+                this.handlerBind.End(request);
 
                 if (addOK)
                 {
@@ -50,7 +50,7 @@ namespace TiaUtilities.Generation.GridHandler
                     return;
                 }
 
-                this.handlerBind.DataGridView.SuspendLayout();
+                this.handlerBind.SuspendLayout();
                 var request = this.handlerBind.Join();
 
                 int count = 0;
@@ -68,9 +68,8 @@ namespace TiaUtilities.Generation.GridHandler
                     count++;
                 }
 
-                this.handlerBind.StopJoin(request);
-                this.handlerBind.DataGridView.Refresh();
-                this.handlerBind.DataGridView.ResumeLayout(performLayout: true);
+                this.handlerBind.End(request);
+                this.handlerBind.ResumeLayout(refresh: true);
 
                 var title = Locale.GRID_FIND_FORM_NAME;
                 var searchCompletedText = Locale.GRID_FIND_REPLACE_ALL_COMPLETED.Replace("{count}", count.ToString());
@@ -112,7 +111,9 @@ namespace TiaUtilities.Generation.GridHandler
 
             var replaceText = this.ReplaceTextBox.Text ?? "";
             var newText = findData.Text.Replace(searchText, replaceText, StringComparison.OrdinalIgnoreCase);
-            this.handlerBind.DataGridView.Rows[findData.Row].Cells[findData.Column.ColumnIndex].Value = newText;
+            this.handlerBind[findData.Row][findData.Column.ColumnIndex] = newText;
+            
+            //this.handlerBind.DataGridView.Rows[findData.Row].Cells[findData.Column.ColumnIndex].Value = newText;
 
             return true;
         }
@@ -131,7 +132,7 @@ namespace TiaUtilities.Generation.GridHandler
                 return null;
             }
 
-            var currentCell = this.handlerBind.DataGridView.CurrentCell;
+            var currentCell = this.handlerBind.GetCurrentCell();
 
             var startRow = currentCell?.RowIndex ?? 0;
             var startColumn = (currentCell?.ColumnIndex ?? 0); 
@@ -139,7 +140,7 @@ namespace TiaUtilities.Generation.GridHandler
             if(startFromNextCell)
             {
                 startColumn++;
-                if (startColumn >= this.handlerBind.DataGridView.ColumnCount)
+                if (startColumn >= this.handlerBind.ColumnCount)
                 {
                     startRow++;
                     startColumn = 0;
@@ -177,7 +178,8 @@ namespace TiaUtilities.Generation.GridHandler
                 if (findData != null)
                 {
                     //I directly edit the CurrentCell to avoid calling unwanted refresh!
-                    this.handlerBind.DataGridView.CurrentCell = this.handlerBind.DataGridView.Rows[findData.Row].Cells[findData.Column.ColumnIndex];
+                    this.handlerBind.ChangeCurrentCell(findData.Row, findData.Column.ColumnIndex);
+                    //this.handlerBind.DataGridView.CurrentCell = this.handlerBind.DataGridView.Rows[findData.Row].Cells[findData.Column.ColumnIndex];
                     break;
                 }
             }

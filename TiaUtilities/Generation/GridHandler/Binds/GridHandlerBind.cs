@@ -1,6 +1,7 @@
 ﻿using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Utility;
+using System.Runtime.CompilerServices;
 
 namespace TiaUtilities.Generation.GridHandler.Binds
 {
@@ -8,10 +9,27 @@ namespace TiaUtilities.Generation.GridHandler.Binds
     {
         public static GridHandlerBind CreateBind<T>(GridHandler<T> gridHandler) where T : GridData
         {
-            return new()
+            GirdHadlerBindActions actions = new()
+            {
+                SuspendLayoutAction = gridHandler.SuspendLayout,
+                ResumeLayoutAction = refresh => gridHandler.ResumeLayout(refresh),
+
+                GetData = (row) => gridHandler.DataSource[row],
+
+                GetRowCount = () => gridHandler.RowCount,
+                GetColumnCount = () => gridHandler.ColumnCount,
+
+                SelectRow = gridHandler.SelectRow,
+
+                Join = () => gridHandler.DataChangedHandler.Join(),
+                End = gridHandler.DataChangedHandler.End,
+
+                GetCurrentCell = gridHandler.GetCurrentCell,
+                ChangeCurrentCell = gridHandler.ChangeCurrentCell,
+            };
+            return new(actions)
             {
                 DataTypeName = typeof(T).Name,
-                DataGridView = gridHandler.DataGridView,
                 DataColumns = gridHandler.DataSource.DataColumns,
 
                 GetNotEmptyRowIndexesStartingAt = gridHandler.DataSource.GetNotEmptyIndexes,
@@ -29,19 +47,38 @@ namespace TiaUtilities.Generation.GridHandler.Binds
                 },
                 GetScriptVariables = gridHandler.ScriptVariableList.AsReadOnly,
 
-                Join = () => gridHandler.DataChangedHandler.Join(),
-                StopJoin = gridHandler.DataChangedHandler.End,
 
-                SelectRow = gridHandler.SelectRow,
 
                 IsGridDataEmpty = rowIndex => gridHandler.DataSource[rowIndex].IsEmpty(),
                 IsSameGridHandler = x => Utils.AreEqualsObject(x, gridHandler),
             };
         }
 
+        private class GirdHadlerBindActions()
+        {
+            public required Action SuspendLayoutAction { get; init; }
+            public required Action<bool> ResumeLayoutAction { get; init; }
+
+            public required Func<int, GridData> GetData { get; init; }
+
+            public required Func<int> GetRowCount { get; init; }
+            public required Func<int> GetColumnCount { get; init; }
+
+            public required Action<int> SelectRow { get; init; }
+
+            public required Func<GridDataChangedOperationRequest> Join { get; init; }
+            public required Action<GridDataChangedOperationRequest> End { get; init; }
+
+
+            public required Func<DataGridViewCell?> GetCurrentCell {  get; init; }
+            public required Action<int, int> ChangeCurrentCell { get; init; }
+        }
+
         public required string DataTypeName { get; init; }
-        public required DataGridView DataGridView { get; init; }
         public required IReadOnlyList<GridDataColumn> DataColumns { get; init; }
+
+        public int RowCount { get => this.actions.GetRowCount(); }
+        public int ColumnCount { get => this.actions.GetColumnCount(); }
 
         public required Func<int, ICollection<int>> GetNotEmptyRowIndexesStartingAt { get; init; }
         public required Func<int, int> GetFirstFullIndexStartingAt { get; init; }
@@ -52,19 +89,33 @@ namespace TiaUtilities.Generation.GridHandler.Binds
         public IReadOnlyList<GridScriptVariable> ScriptVariables { get => this.GetScriptVariables(); }
         public required Func<IReadOnlyList<GridScriptVariable>> GetScriptVariables { private get; init; }
 
-
-        public required Func<GridDataChangedOperationRequest> Join { get; init; }
-        public required Action<GridDataChangedOperationRequest> StopJoin { get; init; }
-
-
-        public required Action<int> SelectRow { get; init; }
-
         public required Predicate<int> IsGridDataEmpty { get; init; }
         public required Predicate<object?> IsSameGridHandler { get; init; }
 
-        private GridHandlerBind()
-        {
+        private readonly GirdHadlerBindActions actions;
 
+        private GridHandlerBind(GirdHadlerBindActions actions)
+        {
+            this.actions = actions;
+        }
+
+        public void SuspendLayout() => this.actions.SuspendLayoutAction();
+
+        public void ResumeLayout(bool refresh = false) => this.actions.ResumeLayoutAction(refresh);
+
+        public void SelectRow(int row) => this.actions.SelectRow(row);
+
+        public DataGridViewCell? GetCurrentCell() => this.actions.GetCurrentCell();
+
+        public void ChangeCurrentCell(int row, int column) => this.actions.ChangeCurrentCell(row, column);
+
+        public GridDataChangedOperationRequest Join() => this.actions.Join();
+
+        public void End(GridDataChangedOperationRequest request) => this.actions.End(request);
+
+        public GridData this[int i]
+        {
+            get => this.actions.GetData(i);
         }
     }
 }

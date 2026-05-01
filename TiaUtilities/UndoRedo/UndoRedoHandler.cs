@@ -2,15 +2,9 @@
 {
     public class UndoRedoHandler
     {
-        private readonly List<Action> undoActionList;
-        private readonly List<Action> redoActionList;
+        private readonly List<Action> undoActionList = [];
+        private readonly List<Action> redoActionList = [];
         private bool locked;
-
-        public UndoRedoHandler()
-        {
-            undoActionList = new List<Action>();
-            redoActionList = new List<Action>();
-        }
 
         public UndoRedoHandler Lock()
         {
@@ -35,7 +29,7 @@
             var func = undoActionList[index];
             undoActionList.RemoveAt(index);
 
-            func.Invoke();
+            func();
         }
 
         public void AddUndo(Action action)
@@ -59,7 +53,7 @@
             var func = redoActionList[index];
             redoActionList.RemoveAt(index);
 
-            func.Invoke();
+            func();
         }
 
         public void AddRedo(Action action)
@@ -76,21 +70,6 @@
         {
             this.undoActionList.Clear();
             this.redoActionList.Clear();
-        }
-    }
-
-    public class UndoRedoAction
-    {
-        private readonly Func<bool> function;
-
-        public UndoRedoAction(Func<bool> function)
-        {
-            this.function = function;
-        }
-
-        public bool Execute()
-        {
-            return function.Invoke();
         }
     }
 }

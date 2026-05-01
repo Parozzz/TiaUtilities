@@ -1,5 +1,4 @@
 ﻿using TiaUtilities.Generation.GridHandler.CellPainters;
-using TiaUtilities.Generation.GridHandler.Events;
 using static TiaUtilities.Generation.GridHandler.CellPainters.GridCellPaintHandler;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.UndoRedo;
@@ -11,7 +10,7 @@ namespace TiaUtilities.Generation.GridHandler
         private SortOrder sortOrder = SortOrder.None;
         private Dictionary<T, int>? noSortIndexSnapshot;
 
-        private DataGridView DataGridView { get => gridHandler.DataGridView; }
+        private DataGridView DataGridView { get => gridHandler.InternalDataGridView; }
         private GridDataSource<T> DataSource { get => gridHandler.DataSource; }
 
         public Color SortIconColor { get; set; } = Color.Green;
@@ -54,7 +53,7 @@ namespace TiaUtilities.Generation.GridHandler
         private void ColumnSort(SortOrder oldSortOrder, int columnIndex)
         {
             var preSortEventArgs = new GridPreSortEventArgs(oldSortOrder, this.sortOrder, columnIndex);
-            gridHandler.Events.PreSortEvent(gridHandler.DataGridView, preSortEventArgs);
+            gridHandler.CallPreSortEvent(preSortEventArgs);
 
             if (preSortEventArgs.Handled)
             {
@@ -98,7 +97,7 @@ namespace TiaUtilities.Generation.GridHandler
             });
 
             var postSortEventArgs = new GridPostSortEventArgs(oldSortOrder, this.sortOrder, columnIndex);
-            gridHandler.Events.PostSortEvent(gridHandler.DataGridView, postSortEventArgs);
+            gridHandler.CallPostSortEvent(postSortEventArgs);
         }
 
         private void ClearAllSortGlyphDirection()

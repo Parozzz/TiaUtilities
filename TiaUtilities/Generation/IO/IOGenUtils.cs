@@ -3,7 +3,6 @@ using SimaticML.Enums;
 using TiaUtilities.Configuration;
 using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.Data;
-using TiaUtilities.Generation.GridHandler.Events;
 using TiaUtilities.Generation.IO.Configurations;
 using TiaUtilities.Generation.IO.Data;
 using TiaUtilities.Generation.Placeholders;
@@ -16,9 +15,7 @@ namespace TiaUtilities.Generation.IO
     {
         public static void DragPreview<T>(GridExcelDragEventArgs eventArgs, GridHandler<T> gridHandler) where T : GridData
         {
-            var dataGridView = gridHandler.DataGridView;
-
-            var startingCellValue = dataGridView.Rows[eventArgs.StartingRow]?.Cells[eventArgs.DraggedColumn].Value;
+            var startingCellValue = gridHandler.DataSource[eventArgs.StartingRow][eventArgs.DraggedColumn];
             if (eventArgs.DraggedColumn == IOData.ADDRESS)
             {
                 var tagAddress = SimaticTagAddress.FromAddress(startingCellValue?.ToString());
@@ -37,10 +34,9 @@ namespace TiaUtilities.Generation.IO
 
         public static void DragDone<T>(GridExcelDragEventArgs eventArgs, GridHandler<T> gridHandler) where T : GridData
         {
-            var dataGridView = gridHandler.DataGridView;
             if (eventArgs.DraggedColumn == IOData.ADDRESS)
             {
-                var startString = dataGridView.Rows[eventArgs.StartingRow]?.Cells[eventArgs.DraggedColumn].Value?.ToString();
+                var startString = "" + gridHandler.DataSource[eventArgs.StartingRow][eventArgs.DraggedColumn];
                 if (string.IsNullOrEmpty(startString))
                 {
                     return;
@@ -53,7 +49,7 @@ namespace TiaUtilities.Generation.IO
                 }
 
 
-                var request = gridHandler.DataChangedHandler.Join();
+                var req = gridHandler.DataChangedHandler.Join();
 
                 var rowIndexEnumeration = Enumerable.Range(eventArgs.TopSelectedRow, (int)eventArgs.SelectedRowCount);
                 if (!eventArgs.DraggingDown)
@@ -63,13 +59,13 @@ namespace TiaUtilities.Generation.IO
 
                 foreach (var rowIndex in rowIndexEnumeration)
                 {
-                    gridHandler.DataGridView.Rows[rowIndex].Cells[0].Value = tagAddress.GetAddress();
+                    gridHandler.DataSource[rowIndex][IOData.ADDRESS] = tagAddress.GetAddress();
                     var _ = eventArgs.DraggingDown ? 
                         tagAddress.NextBit(SimaticDataType.BYTE) : 
                         tagAddress.PreviousBit(SimaticDataType.BYTE); //Increase at the end. The first value is valid!
                 }
 
-                gridHandler.DataChangedHandler.End(request);
+                gridHandler.DataChangedHandler.End(req);
             }
             else
             {

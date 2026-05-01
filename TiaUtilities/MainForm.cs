@@ -230,7 +230,7 @@ namespace TiaUtilities
             }
 
 
-            genForm.SetLastFilePath(filePath);
+            genForm.SetOpenProjectFilePath(filePath);
             genForm.ModuleLoad(saveObject);
         }
 
