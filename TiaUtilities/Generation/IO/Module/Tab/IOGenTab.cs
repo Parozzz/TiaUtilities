@@ -73,7 +73,7 @@ namespace TiaUtilities.Generation.IO.Module.Tab
 
             this.GridHandler.Init();
 
-            #region GRID EVENTS - DUPLKICATED IO VALUES
+            #region GRID EVENTS - DUPLICATED IO VALUES
             this.GridHandler.DataChanged += (sender, args) =>
             {
                 if (args.ChangedCellDataList.Any(c => c.ColumnIndex == IOData.VARIABLE))
@@ -209,11 +209,10 @@ namespace TiaUtilities.Generation.IO.Module.Tab
         {
             this.GridHandler.SuspendLayout();
 
-            
-            foreach (var rowIndex in this.GridHandler.DataSource.GetNotEmptyIndexes())
+            for(int rowIndex = 0; rowIndex < this.GridHandler.DataSource.Count; rowIndex++)
             {
                 var addressCell = this.GridHandler.GetCell(rowIndex, IOData.ADDRESS);
-                if(addressCell != null)
+                if (addressCell != null)
                 {
                     addressCell.ToolTipText = string.Empty;
                     addressCell.Style.BackColor = SystemColors.ControlLightLight;
@@ -221,7 +220,7 @@ namespace TiaUtilities.Generation.IO.Module.Tab
                 }
 
                 var ioNameCell = this.GridHandler.GetCell(rowIndex, IOData.IO_NAME);
-                if(ioNameCell != null)
+                if (ioNameCell != null)
                 {
                     ioNameCell.ToolTipText = string.Empty;
                     ioNameCell.Style.BackColor = SystemColors.ControlLightLight;

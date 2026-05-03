@@ -1,6 +1,6 @@
 ﻿namespace TiaUtilities.Generation.GridHandler.Data
 {
-    public class Preview
+    public class GridDataPreview
     {
         public string? Prefix { get; set; }
         public string? DefaultValue { get; set; }
@@ -15,14 +15,14 @@
 
     public class GridDataPreviewer<T> where T : GridData
     {
-        public Func<int, T, Preview?>? Function { private get; set; }
+        public Func<int, T, GridDataPreview?>? Function { private get; set; }
 
-        public Preview? RequestPreview(GridDataColumn column, T gridData)
+        public GridDataPreview? RequestPreview(GridDataColumn column, T gridData)
         {
             return this.RequestPreview(column.ColumnIndex, gridData);
         }
 
-        public Preview? RequestPreview(int column, T gridData)
+        public GridDataPreview? RequestPreview(int column, T gridData)
         {
             return Function?.Invoke(column, gridData);
         }

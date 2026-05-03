@@ -5,7 +5,7 @@ using TiaUtilities.UndoRedo;
 
 namespace TiaUtilities.Generation.GridHandler
 {
-    public class GridSortHandler<T>(GridHandler<T> gridHandler, UndoRedoHandler undoRedoHandler, IGridRowComparer<T>? comparer) : IGridCellPainter where T : GridData
+    public class GridSortHandler<T>(GridHandler<T> gridHandler, UndoRedoHandler undoRedoHandler, IGridRowComparer<T>? comparer) where T : GridData
     {
         private SortOrder sortOrder = SortOrder.None;
         private Dictionary<T, int>? noSortIndexSnapshot;
@@ -108,23 +108,49 @@ namespace TiaUtilities.Generation.GridHandler
             }
         }
 
-        public PaintRequest PaintCellRequest(DataGridViewCellPaintingEventArgs args)
+        public bool ShouldCellContentPaint(DataGridViewCellPaintingEventArgs args)
         {
-            var paintResult = new PaintRequest();
             if (comparer == null)
             {
-                return paintResult;
+                return false;
             }
 
             var columnIndex = args.ColumnIndex;
             if (columnIndex < 0 || columnIndex >= this.DataGridView.ColumnCount) //To avoid 0xffffffff (Top left square corner!)
             {
-                return paintResult;
+                return false;
             }
 
-            return args.RowIndex == -1 ? paintResult.Content().Background() : paintResult;
+            return args.RowIndex == -1;
         }
 
+        public bool CellContentPaint(DataGridViewCellPaintingEventArgs args)
+        {
+            var bounds = args.CellBounds;
+            var graphics = args.Graphics;
+            var style = args.CellStyle;
+
+            var rowIndex = args.RowIndex;
+            var columnIndex = args.ColumnIndex;
+
+            if (rowIndex != -1 || columnIndex < 0 || columnIndex >= this.DataGridView.ColumnCount || graphics == null || style == null)
+            {
+                return false;
+            }
+
+            TextRenderer.DrawText(graphics, string.Format("{0}", args.FormattedValue), style.Font, bounds, style.ForeColor, TextFormatFlags.VerticalCenter | TextFormatFlags.Left);
+
+            var column = this.DataGridView.Columns[columnIndex];
+            if (column.HeaderCell.SortGlyphDirection != SortOrder.None)
+            {
+                var sortIcon = column.HeaderCell.SortGlyphDirection == SortOrder.Ascending ? "▲" : "▼";
+                TextRenderer.DrawText(graphics, sortIcon, style.Font, bounds, SortIconColor, TextFormatFlags.VerticalCenter | TextFormatFlags.Right);
+            }
+
+            return true;
+        }
+
+        /*
         public void PaintCell(DataGridViewCellPaintingEventArgs args, PaintRequest request, bool backgroundRequested)
         {
             var bounds = args.CellBounds;
@@ -153,5 +179,34 @@ namespace TiaUtilities.Generation.GridHandler
             }
         }
 
+        public bool PaintContent(DataGridViewCellPaintingEventArgs args, bool backgroundPainter)
+        {
+            var bounds = args.CellBounds;
+            var graphics = args.Graphics;
+            var style = args.CellStyle;
+
+            var rowIndex = args.RowIndex;
+            var columnIndex = args.ColumnIndex;
+
+            if (rowIndex != -1 || columnIndex < 0 || columnIndex >= this.DataGridView.ColumnCount || graphics == null)
+            {
+                return false;
+            }
+
+            TextRenderer.DrawText(graphics, string.Format("{0}", args.FormattedValue), style.Font, bounds, style.ForeColor, TextFormatFlags.VerticalCenter | TextFormatFlags.Left);
+            
+            var column = this.DataGridView.Columns[columnIndex];
+            if (column.HeaderCell.SortGlyphDirection != SortOrder.None)
+            {
+                var sortIcon = column.HeaderCell.SortGlyphDirection == SortOrder.Ascending ? "▲" : "▼";
+                TextRenderer.DrawText(graphics, sortIcon, style.Font, bounds, SortIconColor, TextFormatFlags.VerticalCenter | TextFormatFlags.Right);
+            }
+
+            return true;
+        }
+
+        public bool PaintBackground(DataGridViewCellPaintingEventArgs args, bool backgroundPainter) => false;
+
+        public bool PaintBorder(DataGridViewCellPaintingEventArgs args, bool backgroundPainter) => false;*/
     }
 }

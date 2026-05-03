@@ -3,16 +3,10 @@ using static TiaUtilities.Generation.GridHandler.CellPainters.GridCellPaintHandl
 
 namespace TiaUtilities.Generation.GridHandler.CellPainters
 {
-    public class GridCellPaintHandler
+    public class GridCellPaintHandler(DataGridView dataGridView)
     {
-        private readonly DataGridView dataGridView;
-        private readonly List<IGridCellPainter> painterList;
-
-        public GridCellPaintHandler(DataGridView dataGridView)
-        {
-            this.dataGridView = dataGridView;
-            painterList = new List<IGridCellPainter>();
-        }
+        private readonly DataGridView dataGridView = dataGridView;
+        private readonly List<IGridCellPainter> painterList = [];
 
         public void AddPainter(IGridCellPainter painter)
         {
@@ -34,16 +28,33 @@ namespace TiaUtilities.Generation.GridHandler.CellPainters
 
                 bool backgroundDone = false, contentDone = false;
 
+                args.PaintBackground(args.CellBounds, true);
+                //args.PaintContent(args.CellBounds);
+
                 var resultDict = new Dictionary<IGridCellPainter, PaintRequest>();
                 foreach (var painter in painterList)
                 {
-                    var request = painter.PaintCellRequest(args);
-                    if (!request.HasNone())
-                    {
-                        resultDict.Add(painter, request);
-                    }
+                    backgroundDone |= painter.PaintBackground(args, backgroundDone);
                 }
 
+                foreach (var painter in painterList)
+                {
+                    contentDone |= painter.PaintContent(args, backgroundDone);
+                }
+
+                if(!contentDone)
+                {
+                    args.PaintContent(args.CellBounds);
+                }
+
+                foreach (var painter in painterList)
+                {
+                    contentDone |= painter.PaintBorder(args, backgroundDone);
+                }
+
+                args.Handled = true;
+
+                /*
                 foreach (var entry in resultDict)
                 {
                     var painter = entry.Key;
@@ -63,7 +74,7 @@ namespace TiaUtilities.Generation.GridHandler.CellPainters
                     var painter = entry.Key;
                     var request = entry.Value;
 
-                    if (!request.IsExecuted())
+                    if (!request.IsExecuted() && !request.HasBorder())
                     {
                         backgroundDone |= request.HasBackground();
                         contentDone |= request.HasContent();
@@ -72,15 +83,28 @@ namespace TiaUtilities.Generation.GridHandler.CellPainters
                     }
                 }
 
-                if (backgroundDone || contentDone)
+                if (!backgroundDone)
                 {
-                    args.Handled = true;
-
-                    if (!contentDone)
-                    {
-                        args.PaintContent(args.ClipBounds);
-                    }
+                    args.PaintBackground(args.ClipBounds, true);
                 }
+
+                if (!contentDone)
+                {
+                    args.PaintContent(args.ClipBounds);
+                }
+
+                args.Handled = true;
+
+                foreach (var entry in resultDict)
+                {
+                    var painter = entry.Key;
+                    var request = entry.Value;
+
+                    if (!request.IsExecuted() && request.HasBorder())
+                    {
+                        painter.PaintCell(args, request.Executed(), !backgroundDone);
+                    }
+                }*/
             };
         }
 
@@ -88,9 +112,10 @@ namespace TiaUtilities.Generation.GridHandler.CellPainters
         {
             private bool background;
             private bool content;
+            private bool border;
             private bool executed;
             public object data;
-            public Preview dataPreview;
+            public GridDataPreview dataPreview;
 
             public PaintRequest Background()
             {
@@ -104,6 +129,12 @@ namespace TiaUtilities.Generation.GridHandler.CellPainters
                 return this;
             }
 
+            public PaintRequest Border()
+            {
+                border = true;
+                return this;
+            }
+
             public PaintRequest Executed()
             {
                 executed = true;
@@ -114,7 +145,9 @@ namespace TiaUtilities.Generation.GridHandler.CellPainters
 
             public bool HasContent() => content;
 
-            public bool HasNone() => !background && !content;
+            public bool HasBorder() => border;
+
+            public bool HasNone() => !background && !content && !border;
 
             public bool IsExecuted() => executed;
 
@@ -123,8 +156,8 @@ namespace TiaUtilities.Generation.GridHandler.CellPainters
 
     public interface IGridCellPainter
     {
-        PaintRequest PaintCellRequest(DataGridViewCellPaintingEventArgs args);
-
-        void PaintCell(DataGridViewCellPaintingEventArgs args, PaintRequest paintResult, bool backgroundRequested);
+        bool PaintContent(DataGridViewCellPaintingEventArgs args, bool backgroundPainter);
+        bool PaintBackground(DataGridViewCellPaintingEventArgs args, bool backgroundPainter);
+        bool PaintBorder(DataGridViewCellPaintingEventArgs args, bool backgroundPainter);
     }
 }

@@ -1,4 +1,8 @@
-﻿using TiaUtilities.Generation.GridHandler.Binds;
+﻿using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using DocumentFormat.OpenXml.Wordprocessing;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.CellPainters;
 using TiaUtilities.Generation.GridHandler.CustomColumns;
 using TiaUtilities.Generation.GridHandler.Data;
@@ -6,11 +10,26 @@ using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Languages;
 using TiaUtilities.UndoRedo;
+using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.GridHandler
 {
     public class GridHandler<T> : ICleanable, ISaveable<GridSave<T>> where T : GridData
     {
+        //Mouse actions
+        private const int MOUSEEVENTF_LEFTDOWN = 0x02;
+        private const int MOUSEEVENTF_LEFTUP = 0x04;
+        private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
+        private const int MOUSEEVENTF_RIGHTUP = 0x10;
+
+        internal class CellTag
+        {
+            public bool HasBorder { get; set; }
+
+            public float BordersWidth { get; set; }
+            public RectangleF[] Borders { get; set; } = [];
+        }
+
         private readonly GridSettings settings;
         private readonly GridBindContainer gridBindFactory;
 
@@ -26,9 +45,6 @@ namespace TiaUtilities.Generation.GridHandler
         public GridDataSource<T> DataSource { get; init; }
         public GridDataChangedHandler<T> DataChangedHandler { get; init; }
         public GridColumnHandler<T> Columns { get; init; }
-
-        private readonly List<IGridCellPainter> cellPainterList;
-
         public List<GridScriptVariable> ScriptVariableList { get; init; }
 
 
@@ -73,7 +89,6 @@ namespace TiaUtilities.Generation.GridHandler
             this.previewer = previewer;
             this.placeholderHandler = placeholderHandler;
 
-            this.cellPainterList = [];
             this.ScriptVariableList = [];
 
             this.DataGridView = new MyGrid();
@@ -132,11 +147,6 @@ namespace TiaUtilities.Generation.GridHandler
             this.DataLoaded(this.DataGridView, new());
         }
 
-        public void AddCellPainter(IGridCellPainter cellPainter)
-        {
-            cellPainterList.Add(cellPainter);
-        }
-
         internal void SetDataSource(object dataSource)
         {
             this.DataGridView.DataSource = dataSource;
@@ -191,7 +201,22 @@ namespace TiaUtilities.Generation.GridHandler
             this.DataGridView.Font = settings.GridFont;
             this.DataGridView.AllowUserToAddRows = false;
 
+            this.DataGridView.AllowDrop = true;
             this.DataGridView.DataError += DataErrorEventHandler;
+
+            this.DataGridView.DefaultCellStyle.SelectionBackColor = Color.LightGray;
+            this.DataGridView.DefaultCellStyle.BackColor = SystemColors.ControlLightLight;
+            this.DataGridView.DefaultCellStyle.SelectionForeColor = Color.Black;
+            this.DataGridView.DefaultCellStyle.ForeColor = Color.Black;
+            this.DataGridView.DefaultCellStyle.Padding = new Padding(2);
+            this.DataGridView.DefaultCellStyle.Tag = new CellTag();
+
+            this.DataGridView.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            this.DataGridView.ColumnHeadersDefaultCellStyle.Padding = new Padding(0);
+            this.DataGridView.ColumnHeadersDefaultCellStyle.WrapMode = DataGridViewTriState.True;
+
+            this.DataGridView.CellBorderStyle = DataGridViewCellBorderStyle.Single;
+            this.DataGridView.AdvancedCellBorderStyle.All = DataGridViewAdvancedCellBorderStyle.Single;
 
             this.Columns.Init();
             this.DataSource.InitializeData(this.InitializeRowCount);
@@ -300,13 +325,232 @@ namespace TiaUtilities.Generation.GridHandler
 
             #endregion
 
-            #region CELL PAINTING
-            var paintHandler = new GridCellPaintHandler(this.DataGridView);
-            paintHandler.AddPainter(this.sortHandler); //ORDER IS IMPORTANT!
-            paintHandler.AddPainter(this.excelDragHandler);
-            paintHandler.AddPainter(new GridCellPreviewPainter<T>(this.placeholderHandler, this.previewer, this.DataSource, this.settings));
-            paintHandler.AddPainterRange(cellPainterList);
-            paintHandler.Init();
+            #region EVENT - CELL PAINTING
+
+            var previewPainter = new GridCellPreviewPainter<T>(this.placeholderHandler, this.previewer, this.DataSource, this.settings);
+            this.DataGridView.CellPainting += (sender, args) =>
+            {
+                if (sortHandler.ShouldCellContentPaint(args))
+                {
+                    args.PaintBackground(args.ClipBounds, true);
+                    sortHandler.CellContentPaint(args); //This paints the top columns cell
+                    return;
+                }
+
+                this.excelDragHandler.CellPaiting(args);
+
+                args.Handled = true;
+                args.PaintBackground(args.ClipBounds, true);
+
+                var paintData = previewPainter.ShouldCellContentPaint(args);
+                if (paintData != null)
+                {
+                    previewPainter.CellContentPaint(args, paintData);
+                }
+                else
+                {
+                    args.PaintContent(args.ClipBounds);
+                }
+            };
+
+            DataGridViewCell[]? selectedCellArray = null;
+            this.DataGridView.Paint += (sender, args) =>
+            {
+                try
+                {
+
+                    if (selectedCellArray != null)
+                    {
+                        var same = selectedCellArray.All(c => this.DataGridView.SelectedCells.Contains(c)) && selectedCellArray.Length == this.DataGridView.SelectedCells.Count;
+                        if (!same)
+                        {
+                            foreach (var cell in selectedCellArray)
+                            {
+                                var cellTag = this.GetCellTag(cell);
+                                cellTag.HasBorder = false;
+                                cellTag.Borders = [RectangleF.Empty, RectangleF.Empty, RectangleF.Empty, RectangleF.Empty];
+
+                                this.DataGridView.InvalidateCell(cell);
+                            }
+                        }
+
+                    }
+
+                    selectedCellArray = new DataGridViewCell[this.DataGridView.SelectedCells.Count];
+                    this.DataGridView.SelectedCells.CopyTo(selectedCellArray, 0);
+
+                    var continous = GridUtils.AreSelectedCellsPlanar(this.DataGridView);
+                    if (continous)
+                    {
+                        var borders = GridUtils.GetSelectedCellsBorderCoordinates(this.DataGridView);
+                        foreach (DataGridViewCell cell in this.DataGridView.SelectedCells)
+                        {
+                            GridUtils.PaintCellBorder(this, args.Graphics, borders, cell, this.settings.SingleSelectedCellBorderColor, width: 2f);
+                        }
+                    }
+
+                    this.excelDragHandler.PaintTriangle(args.Graphics);
+                }
+                catch (Exception ex)
+                {
+                    Utils.ShowExceptionMessage(ex);
+                }
+            };
+            #endregion
+
+            #region DRAG&DROP + CURSOR
+
+            bool cursorInsideBorder = false;
+            this.DataGridView.CellMouseMove += (sender, args) =>
+            {
+                this.DataGridView.Cursor = Cursors.Default;
+                cursorInsideBorder = false;
+
+                if (excelDragHandler.IsStarted())
+                {
+                    return;
+                }
+
+                var rowIndex = args.RowIndex;
+                var columnIndex = args.ColumnIndex;
+
+                var currentCell = this.DataGridView.CurrentCell;
+                if (rowIndex == currentCell.RowIndex && columnIndex == currentCell.ColumnIndex && excelDragHandler.CellMouseMoveShouldDisplayCursor(args))
+                {
+                    this.DataGridView.Cursor = Cursors.Cross;
+                    return;
+                }
+
+                if (rowIndex < 0 || columnIndex < 0)
+                {
+                    return;
+                }
+
+                var cell = this.DataGridView.Rows[rowIndex].Cells[columnIndex];
+                if (cell != null)
+                {
+                    var tag = this.GetCellTag(cell);
+                    if (tag.HasBorder)
+                    {
+                        const int EXTRA_PX_BORDER_MOUSE_SELECTION = 3;
+
+                        var cursorPosition = this.DataGridView.PointToClient(Cursor.Position);
+                        if (tag.Borders.Any(r =>
+                        {
+                            var rect = r;
+                            //rect.Offset(-EXTRA_PX_BORDER_MOUSE_SELECTION, -EXTRA_PX_BORDER_MOUSE_SELECTION);
+                            rect.Inflate(EXTRA_PX_BORDER_MOUSE_SELECTION, EXTRA_PX_BORDER_MOUSE_SELECTION);
+                            return rect.Contains(cursorPosition);
+                        }))
+                        {
+                            this.DataGridView.Cursor = Cursors.SizeAll;
+                            cursorInsideBorder = true;
+                        }
+                    }
+                }
+            };
+
+            this.DataGridView.MouseLeave += (sender, args) => cursorInsideBorder = false;
+
+            this.DataGridView.MouseDown += (sender, args) =>
+            {
+                if (!this.excelDragHandler.IsStarted() && cursorInsideBorder && args.Button == MouseButtons.Left)
+                {
+                    var text = GridUtils.GetCopyAsExcelText(this.DataGridView);
+                    if (text != null)
+                    {
+                        this.DataGridView.DoDragDrop(text, DragDropEffects.Move, null, Point.Empty, true);
+                        cursorInsideBorder = false;
+                    }
+                }
+            };
+
+            this.DataGridView.DragOver += (sender, args) =>
+            {
+                var data = args.Data;
+                args.Effect = data?.GetData(typeof(string)) is string text && string.IsNullOrEmpty(text) ? DragDropEffects.None : DragDropEffects.Move;
+            };
+
+            this.DataGridView.DragDrop += (sender, args) =>
+            {
+                try
+                {
+                    var dataObj = args.Data?.GetData(typeof(string));
+                    if (dataObj is string excelText)
+                    {
+                        var gridPoint = this.DataGridView.PointToClient(new(args.X, args.Y));
+
+                        var hitTest = this.DataGridView.HitTest(gridPoint.X, gridPoint.Y);
+                        if (hitTest.Type == DataGridViewHitTestType.Cell)
+                        {
+                            var rowIndex = hitTest.RowIndex;
+                            var columnIndex = hitTest.ColumnIndex;
+
+                            var selectionRowOffset = rowIndex - this.DataGridView.SelectedCells.Cast<DataGridViewCell>().Min(c => c.RowIndex);
+                            var selectionColumnOffset = columnIndex - this.DataGridView.SelectedCells.Cast<DataGridViewCell>().Min(c => c.ColumnIndex);
+
+                            this.SuspendLayout();
+
+                            List<Point> cellsToSelect = [];
+
+                            var req = this.DataChangedHandler.Join();
+                            foreach (DataGridViewCell selectedCell in this.DataGridView.SelectedCells)
+                            {
+                                selectedCell.Value = null;
+                                //Needs to create MAP for considering invisible columns and rows.
+                                /*
+                                var mappaCols = dgv.Columns.Cast<DataGridViewColumn>()
+                                    .Where(c => c.Visible)
+                                    .OrderBy(c => c.DisplayIndex)
+                                    .ToList();
+
+                                var mappaRows = dgv.Rows.Cast<DataGridViewRow>()
+                                    .Where(r => r.Visible)
+                                    .OrderBy(r => r.Index)
+                                    .ToList();*/
+                                cellsToSelect.Add(new() { X = selectedCell.RowIndex + selectionRowOffset, Y = selectedCell.ColumnIndex + selectionColumnOffset });
+                            }
+
+                            GridUtils.PasteAsExcel(this.DataGridView, excelText, rowIndex, columnIndex, ignoreSingleLineMultiplePasting: true);
+                            this.DataChangedHandler.End(req);
+
+                            this.ResumeLayout(refresh: false);
+
+                            this.FindForm()?.BeginInvoke(() =>
+                            {//This fixes the mouse down stuck after dropping.
+                                var cursorPos = Cursor.Position;
+                                DllImports.mouse_event(DllImports.MOUSEEVENTF_LEFTUP, cursorPos.X, cursorPos.Y, 0, 0);
+
+                                this.DataGridView.ClearSelection();
+                                this.DataGridView.CurrentCell = this.DataGridView.Rows[rowIndex].Cells[columnIndex];
+
+                                foreach (var point in cellsToSelect)
+                                {
+                                    var rowIndex = point.X;
+                                    var columnIndex = point.Y;
+                                    if (this.AreCellCoordinatesValid(rowIndex, columnIndex))
+                                    {
+                                        var cell = this.DataGridView.Rows[rowIndex].Cells[columnIndex];
+                                        cell.Selected = true;
+
+                                        this.DataGridView.InvalidateCell(cell);
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Utils.ShowExceptionMessage(ex);
+                }
+                finally
+                {
+                    cursorInsideBorder = false;
+                }
+
+            };
+
             #endregion
 
             #region ROW HEADER NUMBER
@@ -334,7 +578,7 @@ namespace TiaUtilities.Generation.GridHandler
             }
             #endregion
 
-            #region EVENT - KEYDOWN - Paste/Delete/Undo/Redo/Find
+            #region EVENT - KEYDOWN - CopyAsExcel/PasteAsExcel/Delete/Undo/Redo/Find
             this.DataGridView.KeyDown += (sender, args) =>
             {
                 var handled = true;
@@ -347,13 +591,13 @@ namespace TiaUtilities.Generation.GridHandler
                         undoRedoHandler.Redo();
                         break;
                     case Keys.C | Keys.Control:
-                        GridUtils.CopyAsExcel(this.DataGridView);
+                        GridUtils.CopyAsExcelToClipboard(this.DataGridView);
                         break;
                     case Keys.Insert | Keys.Shift:
                     case Keys.V | Keys.Control:
 
                         var req = this.DataChangedHandler.Join();
-                        GridUtils.PasteAsExcel(this.DataGridView);
+                        GridUtils.PasteAsExcelFromClipboard(this.DataGridView);
                         this.DataChangedHandler.End(req);
 
                         this.Refresh(); //This is required since for some special column type (Like checkbox) is needed.
@@ -472,6 +716,16 @@ namespace TiaUtilities.Generation.GridHandler
             this.DataGridView.ResumeLayout();
 
             init = true;
+        }
+
+        internal CellTag GetCellTag(DataGridViewCell cell)
+        {
+            if (cell.Tag is not CellTag)
+            {
+                cell.Tag = new CellTag();
+            }
+
+            return (CellTag)cell.Tag;
         }
 
         public bool IsDirty() => this.dirty;
@@ -684,6 +938,91 @@ namespace TiaUtilities.Generation.GridHandler
         }
     }
 }
+
+/*
+            bool VerificaColonneConsecutive(DataGridView dgv)
+            {//Can you see this is vibe-coded?
+                if (dgv.SelectedCells.Count == 0)
+                {
+                    return false;
+                }
+
+                // 1. Otteniamo l'elenco delle colonne coinvolte nella selezione (senza duplicati)
+                var colonneSelezionate = dgv.SelectedCells
+                    .Cast<DataGridViewCell>()
+                    .Select(c => c.OwningColumn)
+                    .Distinct()
+                    .ToList();
+
+                // 2. Creiamo la sequenza REALE delle colonne visibili a schermo
+                // Usiamo DisplayIndex solo per l'ordinamento iniziale, poi ce ne dimentichiamo.
+                var mappaVisiva = dgv.Columns
+                    .Cast<DataGridViewColumn>()
+                    .Where(c => c.Visible)
+                    .OrderBy(c => c.DisplayIndex)
+                    .ToList();
+
+                // 3. Troviamo la posizione (indice) nella nostra mappa per ogni colonna selezionata
+                var posizioni = colonneSelezionate
+                    .Select(col => mappaVisiva.IndexOf(col))
+                    .Where(idx => idx >= 0) // Esclude eventuali colonne selezionate ma diventate invisibili
+                    .OrderBy(idx => idx)
+                    .ToList();
+
+                if (posizioni.Count <= 1)
+                {
+                    return true;
+                }
+
+                // 4. Controllo di continuità: la differenza tra l'ultimo e il primo indice 
+                // deve essere uguale al numero di colonne selezionate - 1.
+                // Esempio: Indici [3, 4, 5] -> 5 - 3 = 2. (3 colonne, 3-1=2). OK!
+                // Esempio: Indici [3, 4, 6] -> 6 - 3 = 3. (3 colonne, 3-1=2). NO!
+                int min = posizioni.First();
+                int max = posizioni.Last();
+
+                return (max - min) == (posizioni.Count - 1);
+            }
+
+            bool VerificaRigheConsecutive(DataGridView dgv)
+            {//Can you see this is vibe-coded?
+                if (dgv.SelectedCells.Count == 0) return false;
+
+                // 1. Otteniamo l'elenco delle righe coinvolte nella selezione (senza duplicati)
+                var righeSelezionate = dgv.SelectedCells
+                    .Cast<DataGridViewCell>()
+                    .Select(c => c.OwningRow)
+                    .Distinct()
+                    .Where(r => r.Visible) // Consideriamo solo righe effettivamente visibili
+                    .ToList();
+
+                if (righeSelezionate.Count <= 1)
+                {
+                    return true;
+                }
+
+                // 2. Creiamo la mappa delle righe visibili nell'ordine corrente della UI
+                // Usiamo l'indice della collezione Rows che riflette l'ordine di visualizzazione/ordinamento
+                var mappaVisiva = dgv.Rows
+                    .Cast<DataGridViewRow>()
+                    .Where(r => r.Visible)
+                    .OrderBy(r => r.Index)
+                    .ToList();
+
+                // 3. Troviamo la posizione relativa nella nostra mappa "filtrata"
+                var posizioni = righeSelezionate
+                    .Select(r => mappaVisiva.IndexOf(r))
+                    .OrderBy(idx => idx)
+                    .ToList();
+
+                // 4. Verifica di continuità
+                int min = posizioni.First();
+                int max = posizioni.Last();
+
+                return (max - min) == (posizioni.Count - 1);
+            }
+ 
+*/
 
 /*
           public void ChangeRow(int rowIndex, T data)

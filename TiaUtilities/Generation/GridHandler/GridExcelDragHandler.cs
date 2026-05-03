@@ -1,10 +1,10 @@
-﻿using TiaUtilities.Generation.GridHandler.CellPainters;
-using static TiaUtilities.Generation.GridHandler.CellPainters.GridCellPaintHandler;
+﻿using System.Diagnostics;
 using TiaUtilities.Generation.GridHandler.Data;
+using static TiaUtilities.Generation.GridHandler.CellPainters.GridCellPaintHandler;
 
 namespace TiaUtilities.Generation.GridHandler
 {
-    public class GridExcelDragHandler<T>(GridHandler<T> gridHandler, GridSettings settings) : IGridCellPainter where T : GridData
+    public class GridExcelDragHandler<T>(GridHandler<T> gridHandler, GridSettings settings) where T : GridData
     {
         public const int TRIANGLE_SIZE = 13;
 
@@ -28,23 +28,13 @@ namespace TiaUtilities.Generation.GridHandler
             return started;
         }
 
+        public bool CellMouseMoveShouldDisplayCursor(MouseEventArgs args)
+        {
+            return !started && IsInsideTriangle(args.X, args.Y, this.DataGridView.CurrentCell, xyCellCoordinates: true);
+        }
+
         public void Init()
         {
-            this.DataGridView.MouseMove += (sender, args) =>
-            {
-                if (started)
-                {
-                    return;
-                }
-
-                this.DataGridView.Cursor = Cursors.Default;
-
-                if (IsInsideTriangle(args.X, args.Y, this.DataGridView.CurrentCell))
-                {
-                    this.DataGridView.Cursor = Cursors.Cross;
-                }
-            };
-
             this.DataGridView.LostFocus += (sender, args) => this.Clear();
 
             this.DataGridView.MouseDown += (sender, args) =>
@@ -53,7 +43,7 @@ namespace TiaUtilities.Generation.GridHandler
                 if (hitTest.Type == DataGridViewHitTestType.Cell && args.Button == MouseButtons.Left)
                 {
                     var hitCell = this.DataGridView.Rows[hitTest.RowIndex].Cells[hitTest.ColumnIndex];
-                    if (hitCell == this.DataGridView.CurrentCell && IsInsideTriangle(args.X, args.Y, hitCell))
+                    if (hitCell == this.DataGridView.CurrentCell && IsInsideTriangle(args.X, args.Y, hitCell, xyCellCoordinates: false))
                     {
                         started = true;
                         bottomSelectionRowIndex = topSelectionRowIndex = rowIndexStart = hitTest.RowIndex;
@@ -133,7 +123,7 @@ namespace TiaUtilities.Generation.GridHandler
                 TooltipString = ""
             };
         }
-
+        /*
         public PaintRequest PaintCellRequest(DataGridViewCellPaintingEventArgs args)
         {
             var paintRequest = new PaintRequest();
@@ -157,14 +147,10 @@ namespace TiaUtilities.Generation.GridHandler
 
             return paintRequest;
         }
+        */
 
-        public void PaintCell(DataGridViewCellPaintingEventArgs args, PaintRequest paintRequest, bool backgroundRequested)
+        public void CellPaiting(DataGridViewCellPaintingEventArgs args)
         {
-            if (args.Handled)
-            {
-                return;
-            }
-
             var bounds = args.CellBounds;
             var graphics = args.Graphics;
 
@@ -173,54 +159,39 @@ namespace TiaUtilities.Generation.GridHandler
 
             var style = args.CellStyle;
 
-            if (graphics == null || style == null)
+            if (rowIndex < 0 || columnIndex < 0 || graphics == null || style == null)
             {
                 return;
             }
 
-            if (rowIndex < 0 || columnIndex < 0)
-            {
-                return;
-            }
-            else if (started)
+            if (started)
             {
                 style.SelectionBackColor = settings.DragSelectedCellBorderColor;
-
-                args.PaintBackground(bounds, true);
-                return;
-            }
-
-            var currentCell = this.DataGridView.CurrentCell;
-            if (currentCell != null && currentCell.RowIndex == rowIndex && currentCell.ColumnIndex == columnIndex && this.DataGridView.SelectedCells.Count == 1)
-            {//I only want to apply the effect when the only selected cell is the current cell.
-                args.PaintBackground(bounds, true);
-
-                //args.Paint(bounds, DataGridViewPaintParts.All & ~DataGridViewPaintParts.Border);
-                using var borderPen = new Pen(settings.SingleSelectedCellBorderColor, 2);
-
-                //Border
-                Rectangle rect = args.CellBounds;
-                rect.Width -= 1;
-                rect.Height -= 1;
-                graphics.DrawRectangle(borderPen, rect);
-
-
-                if (currentCell is DataGridViewTextBoxCell)
-                {
-                    using var triangleBrush = new SolidBrush(settings.SelectedCellTriangleColor);
-
-                    //Little triangle in the lower part only for current cell
-                    var point1 = new Point(bounds.Right - 1, bounds.Bottom - TRIANGLE_SIZE);
-                    var point2 = new Point(bounds.Right - 1, bounds.Bottom - 1);
-                    var point3 = new Point(bounds.Right - TRIANGLE_SIZE, bounds.Bottom - 1);
-
-                    Point[] pt = [point1, point2, point3];
-                    graphics.FillPolygon(triangleBrush, pt);
-                }
             }
         }
 
-        public bool IsInsideTriangle(int x, int y, DataGridViewCell cell)
+        public void PaintTriangle(Graphics graphics)
+        {
+            var currentCell = this.DataGridView.CurrentCell;
+            if (currentCell is DataGridViewTextBoxCell && this.DataGridView.SelectedCells.Count == 1)
+            {//I only want to apply the effect when the only selected cell is the current cell.
+
+                var bounds = this.DataGridView.GetCellDisplayRectangle(currentCell.ColumnIndex, currentCell.RowIndex, false);
+
+                using var triangleBrush = new SolidBrush(settings.SelectedCellTriangleColor);
+
+                //Little triangle in the lower part only for current cell
+                var point1 = new Point(bounds.Right - 1, bounds.Bottom - TRIANGLE_SIZE);
+                var point2 = new Point(bounds.Right - 1, bounds.Bottom - 1);
+                var point3 = new Point(bounds.Right - TRIANGLE_SIZE, bounds.Bottom - 1);
+
+                Point[] pt = [point1, point2, point3];
+                graphics.FillPolygon(triangleBrush, pt);
+            }
+
+        }
+
+        public bool IsInsideTriangle(int x, int y, DataGridViewCell cell, bool xyCellCoordinates)
         {
             if (cell is not DataGridViewTextBoxCell)
             {
@@ -228,8 +199,22 @@ namespace TiaUtilities.Generation.GridHandler
             }
 
             var bounds = this.DataGridView.GetCellDisplayRectangle(cell.ColumnIndex, cell.RowIndex, false);
-            return x >= bounds.Right - TRIANGLE_SIZE && x <= bounds.Right + 2 //Go outside a bit of the cell to avoid misclick that sometime happend
-                && y >= bounds.Bottom - TRIANGLE_SIZE && y <= bounds.Bottom + 2;
+
+            var xMin = bounds.Right - TRIANGLE_SIZE;
+            var xMax = bounds.Right + 2;
+            var yMin = bounds.Bottom - TRIANGLE_SIZE;
+            var yMax = bounds.Bottom + 2;
+
+            if(xyCellCoordinates)
+            {
+                x += bounds.X;
+                y += bounds.Y;
+            }
+
+            //Debug.WriteLine($"Pos: {x},{y}. X: [{xMin},{xMax}], Y: [{yMin},{yMax}]");
+
+            //Go outside a bit of the cell to avoid misclick that sometime happend
+            return x >= xMin && x <= xMax && y >= yMin && y <= yMax;
         }
 
         private void Clear()

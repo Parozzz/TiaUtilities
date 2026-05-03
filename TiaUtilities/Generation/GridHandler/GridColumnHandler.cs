@@ -89,27 +89,13 @@ namespace TiaUtilities.Generation.GridHandler
         }
 
         public void Init()
-        {/*
-            foreach (var column in this.columnInfoList.Select(i => i.Column))
-            {
-                if (column is IGridCustomColumn customColumn)
-                {
-                    customColumn.UnregisterEvents(this.DataGridView);
-                }
-            }
-            */
-
+        {
             this.gridHandler.ClearColumns();
 
             this.columnInfoList.Sort((one, two) => one.DataColumn.ColumnIndex.CompareTo(two.DataColumn.ColumnIndex));
             foreach (var columnInfo in this.columnInfoList)
             {
                 var column = columnInfo.Column;
-                /*
-                if (column is IGridCustomColumn customColumn)
-                {
-                    customColumn.RegisterEvents(this.DataGridView);
-                }*/
 
                 column.Name = columnInfo.DataColumn.Name;
                 column.DisplayIndex = columnInfo.DataColumn.ColumnIndex;
@@ -118,15 +104,6 @@ namespace TiaUtilities.Generation.GridHandler
                 column.Width = columnInfo.Width;
                 column.MinimumWidth = 15;
                 column.SortMode = DataGridViewColumnSortMode.Programmatic;
-
-                column.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
-                column.HeaderCell.Style.Padding = new Padding(0);
-                column.HeaderCell.Style.WrapMode = DataGridViewTriState.True;
-
-                column.DefaultCellStyle.SelectionBackColor = Color.LightGray;
-                column.DefaultCellStyle.BackColor = SystemColors.ControlLightLight;
-                column.DefaultCellStyle.SelectionForeColor = Color.Black;
-                column.DefaultCellStyle.ForeColor = Color.Black;
 
                 column.Visible = columnInfo.Visible;
 

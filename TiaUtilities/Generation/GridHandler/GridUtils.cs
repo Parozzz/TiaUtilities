@@ -1,4 +1,6 @@
-﻿using System.Data;
+﻿using InfoBox;
+using System.Data;
+using System.Text;
 using System.Text.RegularExpressions;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Utility;
@@ -11,8 +13,8 @@ namespace TiaUtilities.Generation.GridHandler
         {
             if (copyFrom.GetType() == moveTo.GetType())
             {
-                var columns = copyFrom.GetColumns(); 
-                
+                var columns = copyFrom.GetColumns();
+
                 foreach (var dataColumn in columns)
                 {
                     var copeFromValue = dataColumn.GetValueFrom<object>(copyFrom);
@@ -55,7 +57,7 @@ namespace TiaUtilities.Generation.GridHandler
         public static void DragDone<T>(GridExcelDragEventArgs eventArgs, GridHandler<T> gridHandler) where T : GridData
         {
             var gridColumn = gridHandler.DataSource[eventArgs.StartingRow].GetColumn(eventArgs.DraggedColumn);
-            if(gridColumn.PropertyInfo.PropertyType != typeof(string))
+            if (gridColumn.PropertyInfo.PropertyType != typeof(string))
             {
                 return;
             }
@@ -102,7 +104,7 @@ namespace TiaUtilities.Generation.GridHandler
             gridHandler.DataChangedHandler.End(req);
         }
 
-        public static void CopyAsExcel(DataGridView dataGridView)
+        public static string? GetCopyAsExcelText(DataGridView dataGridView)
         {
             try
             {
@@ -141,8 +143,8 @@ namespace TiaUtilities.Generation.GridHandler
                     var stringValue = cell.Value == null ? "" : cell.Value.ToString();
                     clipboardText += stringValue;
                 }
-                
-                if(visibleSelectedCells.Count() > 1)
+
+                if (visibleSelectedCells.Count() > 1)
                 {
                     if (clipboardText.Contains('\t')) //If is a multiple column copy, there needs to be a tab at the end required by some software
                     {
@@ -151,6 +153,22 @@ namespace TiaUtilities.Generation.GridHandler
 
                     clipboardText += "\r\n"; //Add since some software requires it for multiple rows.
                 }
+
+                return clipboardText;
+            }
+            catch (Exception ex)
+            {
+                Utils.ShowExceptionMessage(ex);
+            }
+
+            return null;
+        }
+
+        public static void CopyAsExcelToClipboard(DataGridView dataGridView)
+        {
+            try
+            {
+                var clipboardText = GridUtils.GetCopyAsExcelText(dataGridView);
 
                 //The clipboard cannot have an empty string as text
                 if (string.IsNullOrEmpty(clipboardText))
@@ -166,47 +184,33 @@ namespace TiaUtilities.Generation.GridHandler
             {
                 Utils.ShowExceptionMessage(ex);
             }
+
         }
 
-        public static void PasteAsExcel(DataGridView dataGridView)
+        public static void PasteAsExcel(DataGridView dataGridView, string pasteString, int row, int column, bool ignoreSingleLineMultiplePasting = false)
         {
             try
             {
-                var cliboardObj = (DataObject?)Clipboard.GetDataObject();
-                if (cliboardObj == null || !cliboardObj.GetDataPresent(DataFormats.Text))
+                if (!ignoreSingleLineMultiplePasting)
                 {
-                    foreach (DataGridViewCell cell in dataGridView.SelectedCells)
-                    {
-                        cell.Value = null;
+                    var returnCount = pasteString.Count(c => c == '\t' || c == '\n');
+                    //If the text has only one return or tab AND it does not end with a special char, i will treat it as a single line/column
+                    if (returnCount == 0 || (returnCount == 1 && (pasteString.EndsWith('\t') || pasteString.EndsWith('\n'))))
+                    {//If is a normal string, i will paste in ALL the selected cells!
+                        var strippedPasteString = pasteString.Replace("\t", "").Replace("\r", "").Replace("\n", "");
+
+                        foreach (DataGridViewCell cell in dataGridView.SelectedCells)
+                        {
+                            cell.Value = strippedPasteString;
+                        }
+
+                        return;
                     }
-                    return;
-                }
-
-                var clipboardData = cliboardObj.GetData(DataFormats.Text);
-                if (clipboardData == null)
-                {
-                    return;
-                }
-
-                var pasteString = (string)clipboardData;
-
-                var returnCount = pasteString.Count(c => c == '\t' || c == '\n');
-                //If the text has only one return or tab AND it does not end with a special char, i will treat it as a single line/column
-                if (returnCount == 0 || (returnCount == 1 && (pasteString.EndsWith('\t') || pasteString.EndsWith('\n'))))
-                {//If is a normal string, i will paste in ALL the selected cells!
-                    var strippedPasteString = pasteString.Replace("\t", "").Replace("\r", "").Replace("\n", "");
-
-                    foreach(DataGridViewCell cell in dataGridView.SelectedCells)
-                    {
-                        cell.Value = strippedPasteString;
-                    }
-
-                    return;
                 }
 
                 //If contains new lines or tab it needs to handled like an excel file. New line => next row. Tab => next column.
-                int startRowIndex = dataGridView.CurrentCell.RowIndex; //The currentCell row index needs to be taken BEFORE adding cells otherwise it will be moved!
-                int startColumnIndex = dataGridView.CurrentCell.ColumnIndex;
+                int startRowIndex = row; //The currentCell row index needs to be taken BEFORE adding cells otherwise it will be moved!
+                int startColumnIndex = column;
 
                 var validColumnIndexes = dataGridView.Columns.Cast<DataGridViewColumn>()
                     .Where(x => x.Visible)
@@ -245,13 +249,176 @@ namespace TiaUtilities.Generation.GridHandler
                         break;
                     }
                 }
-
-                return;
             }
             catch (Exception ex)
             {
                 Utils.ShowExceptionMessage(ex);
             }
+        }
+
+        public static void PasteAsExcelFromClipboard(DataGridView dataGridView)
+        {
+            try
+            {
+                if (Clipboard.ContainsText())
+                {
+                    var clipboardText = Clipboard.GetText();
+
+                    var currentCell = dataGridView.CurrentCell;
+                    GridUtils.PasteAsExcel(dataGridView, clipboardText, currentCell.RowIndex, currentCell.ColumnIndex);
+                }
+                else
+                {
+                    foreach (DataGridViewCell cell in dataGridView.SelectedCells)
+                    {
+                        cell.Value = null;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Utils.ShowExceptionMessage(ex);
+            }
+        }
+
+        public static bool AreSelectedCellsPlanar(DataGridView dgv)
+        {//Can you see this is vibe-coded?
+         // 1. Prendi solo le celle effettivamente visibili (evita ghost selection su righe/colonne nascoste)
+            var selectedCellsList = dgv.SelectedCells.Cast<DataGridViewCell>()
+                .Where(c => c.Visible && c.OwningColumn.Visible && c.OwningRow.Visible)
+                .ToList();
+
+            if (!selectedCellsList.Any())
+            {
+                return false;
+            }
+
+            // 2. Identifica colonne e righe uniche coinvolte
+            var distinctColumnsList = selectedCellsList.Select(c => c.OwningColumn).Distinct().ToList();
+            var distinctRowsList = selectedCellsList.Select(c => c.OwningRow).Distinct().ToList();
+
+            // --- CONTROLLO COLONNE CONSECUTIVE ---
+            var columnsMapList = dgv.Columns.Cast<DataGridViewColumn>()
+                .Where(c => c.Visible)
+                .OrderBy(c => c.DisplayIndex)
+                .ToList();
+
+            var columnsIndexList = distinctColumnsList
+                .Select(c => columnsMapList.IndexOf(c))
+                .OrderBy(i => i)
+                .ToList();
+
+            bool columnsOK = (columnsIndexList.Last() - columnsIndexList.First()) == (distinctColumnsList.Count - 1);
+
+            if (!columnsOK)
+            {
+                return false;
+            }
+
+            // --- CONTROLLO RIGHE CONSECUTIVE ---
+            var rowsMapList = dgv.Rows.Cast<DataGridViewRow>()
+                .Where(r => r.Visible)
+                .OrderBy(r => r.Index)
+                .ToList();
+
+            var rowsIndexList = distinctRowsList
+                .Select(r => rowsMapList.IndexOf(r))
+                .OrderBy(i => i)
+                .ToList();
+
+            bool rowsOK = (rowsIndexList.Last() - rowsIndexList.First()) == (distinctRowsList.Count - 1);
+            if (!rowsOK)
+            {
+                return false;
+            }
+
+            // --- CONTROLLO AREA (Il "Rettangolo Pieno") ---
+            // Se è un rettangolo senza buchi, il numero di celle selezionate 
+            // deve corrispondere esattamente all'area (Base x Altezza)
+            int gridCalculatedArea = distinctColumnsList.Count * distinctRowsList.Count;
+            return selectedCellsList.Count == gridCalculatedArea;
+        }
+
+        public class SelectedCellsBorderCoordinates
+        {
+            public required int Top { get; init; } //Lowest Row Index
+            public required int Bottom { get; init; } //Highest Row Index
+            public required int Left { get; init; } //Lowest Column Index
+            public required int Right { get; init; } //Highest Column Index
+
+            public bool IsTop(DataGridViewCell cell) => cell.RowIndex == this.Top;
+            public bool IsBottom(DataGridViewCell cell) => cell.RowIndex == this.Bottom;
+            public bool IsLeft(DataGridViewCell cell) => cell.ColumnIndex == this.Left;
+            public bool IsRight(DataGridViewCell cell) => cell.ColumnIndex == this.Right;
+        }
+
+        public static SelectedCellsBorderCoordinates GetSelectedCellsBorderCoordinates(DataGridView dataGridView)
+        {
+            int lowestRowIndex = -1;
+            int highestRowIndex = -1;
+
+            int lowestColumnIndex = -1;
+            int highestColumnIndex = -1;
+
+            foreach (DataGridViewCell cell in dataGridView.SelectedCells)
+            {
+                lowestRowIndex = (lowestRowIndex == -1 || cell.RowIndex < lowestRowIndex) ? cell.RowIndex : lowestRowIndex;
+                highestRowIndex = (highestRowIndex == -1 || cell.RowIndex > highestRowIndex) ? cell.RowIndex : highestRowIndex;
+
+                lowestColumnIndex = (lowestColumnIndex == -1 || cell.ColumnIndex < lowestColumnIndex) ? cell.ColumnIndex : lowestColumnIndex;
+                highestColumnIndex = (highestColumnIndex == -1 || cell.ColumnIndex > highestColumnIndex) ? cell.ColumnIndex : highestColumnIndex;
+            }
+
+            return new() { Top = lowestRowIndex, Bottom = highestRowIndex, Left = lowestColumnIndex, Right = highestColumnIndex };
+            //return [lowestRowIndex, highestRowIndex, lowestColumnIndex, highestColumnIndex]; //top, bottom, left, right
+        }
+
+        public static void PaintCellBorder<T>(GridHandler<T> gridHandler, Graphics graphics, SelectedCellsBorderCoordinates borders, DataGridViewCell cell, Color color, float width) where T : GridData
+        {
+            var cellBounds = gridHandler.InternalDataGridView.GetCellDisplayRectangle(cell.ColumnIndex, cell.RowIndex, false);
+
+            var cellTag = gridHandler.GetCellTag(cell);
+
+            RectangleF topBorderRect = RectangleF.Empty;
+            RectangleF bottomBorderRect = RectangleF.Empty;
+            RectangleF leftBorderRect = RectangleF.Empty;
+            RectangleF rightBorderRect = RectangleF.Empty;
+
+            using var brush = new SolidBrush(color);
+
+            var top = borders.IsTop(cell);
+            var bottom = borders.IsBottom(cell);
+            var left = borders.IsLeft(cell);
+            var right = borders.IsRight(cell);
+
+            cellTag.HasBorder = top | bottom | left | right;
+
+            if (top)
+            {
+                topBorderRect = new(cellBounds.Left - 1, cellBounds.Top, cellBounds.Right - cellBounds.Left - 1, width);
+                graphics.FillRectangle(brush, topBorderRect);
+            }
+
+            if (bottom)
+            {
+                bottomBorderRect = new(cellBounds.Left - 1, cellBounds.Bottom - width - 1, cellBounds.Right - cellBounds.Left - 1, width);
+                graphics.FillRectangle(brush, bottomBorderRect);
+            }
+
+            if (left)
+            {
+                leftBorderRect = new(cellBounds.Left, cellBounds.Top + 1, width, cellBounds.Bottom - cellBounds.Top - 1);
+                graphics.FillRectangle(brush, leftBorderRect);
+            }
+
+            if (right)
+            {
+                rightBorderRect = new(cellBounds.Right - width - 1, cellBounds.Top - 1, width, cellBounds.Bottom - cellBounds.Top - 1);
+                graphics.FillRectangle(brush, rightBorderRect);
+            }
+
+            cellTag.BordersWidth = width;
+            cellTag.Borders = [topBorderRect, bottomBorderRect, leftBorderRect, rightBorderRect];
         }
     }
 }
