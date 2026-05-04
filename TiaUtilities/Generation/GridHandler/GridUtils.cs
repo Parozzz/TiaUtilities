@@ -373,7 +373,7 @@ namespace TiaUtilities.Generation.GridHandler
             //return [lowestRowIndex, highestRowIndex, lowestColumnIndex, highestColumnIndex]; //top, bottom, left, right
         }
 
-        public static void PaintCellBorder<T>(GridHandler<T> gridHandler, Graphics graphics, SelectedCellsBorderCoordinates borders, DataGridViewCell cell, Color color, float width) where T : GridData
+        public static void CreateCellBorders<T>(GridHandler<T> gridHandler, SelectedCellsBorderCoordinates cellBorderCoordinates, DataGridViewCell cell, float width) where T : GridData
         {
             var cellBounds = gridHandler.InternalDataGridView.GetCellDisplayRectangle(cell.ColumnIndex, cell.RowIndex, false);
 
@@ -384,41 +384,75 @@ namespace TiaUtilities.Generation.GridHandler
             RectangleF leftBorderRect = RectangleF.Empty;
             RectangleF rightBorderRect = RectangleF.Empty;
 
-            using var brush = new SolidBrush(color);
-
-            var top = borders.IsTop(cell);
-            var bottom = borders.IsBottom(cell);
-            var left = borders.IsLeft(cell);
-            var right = borders.IsRight(cell);
+            var top = cellBorderCoordinates.IsTop(cell);
+            var bottom = cellBorderCoordinates.IsBottom(cell);
+            var left = cellBorderCoordinates.IsLeft(cell);
+            var right = cellBorderCoordinates.IsRight(cell);
 
             cellTag.HasBorder = top | bottom | left | right;
 
             if (top)
             {
                 topBorderRect = new(cellBounds.Left - 1, cellBounds.Top, cellBounds.Right - cellBounds.Left - 1, width);
-                graphics.FillRectangle(brush, topBorderRect);
             }
 
             if (bottom)
             {
                 bottomBorderRect = new(cellBounds.Left - 1, cellBounds.Bottom - width - 1, cellBounds.Right - cellBounds.Left - 1, width);
-                graphics.FillRectangle(brush, bottomBorderRect);
             }
 
             if (left)
             {
                 leftBorderRect = new(cellBounds.Left, cellBounds.Top + 1, width, cellBounds.Bottom - cellBounds.Top - 1);
-                graphics.FillRectangle(brush, leftBorderRect);
             }
 
             if (right)
             {
                 rightBorderRect = new(cellBounds.Right - width - 1, cellBounds.Top - 1, width, cellBounds.Bottom - cellBounds.Top - 1);
-                graphics.FillRectangle(brush, rightBorderRect);
             }
 
             cellTag.BordersWidth = width;
             cellTag.Borders = [topBorderRect, bottomBorderRect, leftBorderRect, rightBorderRect];
+            cellTag.CellsBorderCoordinates = cellBorderCoordinates;
+        }
+
+        public static void PaintCellBorder<T>(GridHandler<T> gridHandler, Graphics graphics, DataGridViewCell cell, Color color, float width) where T : GridData
+        {
+            //var cellBounds = gridHandler.InternalDataGridView.GetCellDisplayRectangle(cell.ColumnIndex, cell.RowIndex, false);
+
+            var cellTag = gridHandler.GetCellTag(cell);
+
+            var cellBorderCoordinates = cellTag.CellsBorderCoordinates;
+            if(cellBorderCoordinates == null || cellTag.Borders.Length != 4 || !cellTag.HasBorder)
+            {
+                return;
+            }
+
+            using var brush = new SolidBrush(color);
+
+            var topRect = cellTag.Borders[0];
+            if (topRect != RectangleF.Empty)
+            {
+                graphics.FillRectangle(brush, topRect);
+            }
+
+            var bottomRect = cellTag.Borders[1];
+            if (bottomRect != RectangleF.Empty)
+            {
+                graphics.FillRectangle(brush, bottomRect);
+            }
+
+            var leftRect = cellTag.Borders[2];
+            if (leftRect != RectangleF.Empty)
+            {
+                graphics.FillRectangle(brush, leftRect);
+            }
+
+            var rightRect = cellTag.Borders[3];
+            if (rightRect != RectangleF.Empty)
+            {
+                graphics.FillRectangle(brush, rightRect);
+            }
         }
     }
 }

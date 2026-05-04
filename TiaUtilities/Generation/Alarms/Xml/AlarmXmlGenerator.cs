@@ -236,9 +236,16 @@ namespace TiaUtilities.Generation.Alarms.Xml
 
             var alarmVariableName = placeholdersHandler.ParseNotNull(mainConfig.AlarmNameTemplate);
             var alarmVariableComment = placeholdersHandler.ParseNotNull(commentTemplate);
-
+            
             var hmiAlarmName = placeholdersHandler.ParseNotNull(mainConfig.HmiNameTemplate);
-            var hmiAlarmText = hmiEmpty ? "" : placeholdersHandler.ParseNotNull(mainConfig.HmiTextTemplate);
+
+            var hmiTextTemplate = mainConfig.HmiTextTemplate;
+            if(!string.IsNullOrEmpty(templateData?.HmiAlarmText))
+            {//Since ALARM_HMI_TEXT) placeholder needs to substitute the default alarm description, i will replace the placeholder so the formatting is still valid
+                hmiTextTemplate = hmiTextTemplate.Replace(GenPlaceholders.Alarms.ALARM_DESCRIPTION, GenPlaceholders.Alarms.ALARM_HMI_TEXT);
+            }
+
+            string hmiAlarmText = hmiEmpty ? "" : placeholdersHandler.ParseNotNull(hmiTextTemplate);
             var hmiTriggerTag = placeholdersHandler.ParseNotNull(mainConfig.HmiTriggerTagTemplate);
             var hmiAlarmClass = placeholdersHandler.ParseNotNull(string.IsNullOrEmpty(templateData?.HmiAlarmClass) ? tabConfig.DefaultHmiAlarmClass : templateData?.HmiAlarmClass);
 
