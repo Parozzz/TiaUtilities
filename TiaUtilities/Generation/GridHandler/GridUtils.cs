@@ -288,7 +288,7 @@ namespace TiaUtilities.Generation.GridHandler
                 .Where(c => c.Visible && c.OwningColumn.Visible && c.OwningRow.Visible)
                 .ToList();
 
-            if (!selectedCellsList.Any())
+            if (selectedCellsList.Count == 0)
             {
                 return false;
             }

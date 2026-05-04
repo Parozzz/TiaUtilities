@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.UndoRedo;
+using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.GridHandler
 {
@@ -84,12 +85,15 @@ namespace TiaUtilities.Generation.GridHandler
 
             GridDataChangedOperationRequest newJoinRequest = new() { FilePath = filePath, MemberName = memberName, SourceLineNumber = sourceLineNumber };
             this.joinRequest = newJoinRequest;
-            Task.Delay(1000).ContinueWith(t =>
+            Task.Delay(120000).ContinueWith(t =>
             {
                 if (this.joinRequest != null && this.joinRequest.Guid == newJoinRequest.Guid)
                 {
                     this.joinRequest = null;
-                    throw new InvalidOperationException($"Cached join request timeout for {filePath}. Member: {memberName}, Line: {sourceLineNumber}");
+
+                    var ex = new InvalidOperationException($"Cached join request timeout for {filePath}. Member: {memberName}, Line: {sourceLineNumber}");
+                    Utils.ShowExceptionMessage(ex);
+                    throw ex;
                 }
             });
             return newJoinRequest;
