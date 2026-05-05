@@ -661,27 +661,7 @@ namespace TiaUtilities.Generation.GridHandler
                 switch (args.KeyData)
                 {
                     case Keys.A | Keys.Control:
-                        this.SuspendLayout();
-
-                        this.DataGridView.ClearSelection();
-
-                        bool currentCellSet = false;
-                        foreach(var cell in this.DataGridView.Rows.Cast<DataGridViewRow>().SelectMany(r => r.Cells.Cast<DataGridViewCell>()))
-                        {
-                            if(cell.Value != default && cell.ValueType != typeof(bool)) //Selected checkbox are bleah
-                            {
-                                if(!currentCellSet)
-                                {
-                                    currentCellSet = true;
-                                    this.DataGridView.CurrentCell = cell;
-                                }
-
-                                cell.Selected = true;
-                            }
-                        }
-
-                        this.ResumeLayout(refresh: true);
-
+                        this.DataGridView.SelectAll(); //KISS
                         break;
                     case Keys.Z | Keys.Control:
                         undoRedoHandler.Undo();
