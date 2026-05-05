@@ -104,8 +104,10 @@ namespace TiaUtilities.Generation.GridHandler
             gridHandler.DataChangedHandler.End(req);
         }
 
-        public static string? GetCopyAsExcelText(DataGridView dataGridView)
+        public static string? GetCopyAsExcelText(DataGridView dataGridView, out List<DataGridViewCell> copiedCellList)
         {
+            copiedCellList = [];
+
             try
             {
                 var selectedCellList = dataGridView.SelectedCells.Cast<DataGridViewCell>().ToList();
@@ -142,15 +144,12 @@ namespace TiaUtilities.Generation.GridHandler
 
                     var stringValue = cell.Value == null ? "" : cell.Value.ToString();
                     clipboardText += stringValue;
+
+                    copiedCellList.Add(cell);
                 }
 
                 if (visibleSelectedCells.Count() > 1)
                 {
-                    if (clipboardText.Contains('\t')) //If is a multiple column copy, there needs to be a tab at the end required by some software
-                    {
-                        clipboardText += '\t';
-                    }
-
                     clipboardText += "\r\n"; //Add since some software requires it for multiple rows.
                 }
 
@@ -164,31 +163,25 @@ namespace TiaUtilities.Generation.GridHandler
             return null;
         }
 
-        public static void CopyAsExcelToClipboard(DataGridView dataGridView)
+        public static void CopyAsExcelToClipboard(DataGridView dataGridView, out List<DataGridViewCell> pastedCells)
         {
-            try
-            {
-                var clipboardText = GridUtils.GetCopyAsExcelText(dataGridView);
+            var clipboardText = GridUtils.GetCopyAsExcelText(dataGridView, out pastedCells);
 
-                //The clipboard cannot have an empty string as text
-                if (string.IsNullOrEmpty(clipboardText))
-                {
-                    Clipboard.Clear();
-                }
-                else
-                {
-                    Clipboard.SetText(clipboardText, TextDataFormat.UnicodeText);
-                }
-            }
-            catch (Exception ex)
+            //The clipboard cannot have an empty string as text
+            if (string.IsNullOrEmpty(clipboardText))
             {
-                Utils.ShowExceptionMessage(ex);
+                Clipboard.Clear();
             }
-
+            else
+            {
+                Clipboard.SetText(clipboardText, TextDataFormat.UnicodeText);
+            }
         }
 
-        public static void PasteAsExcel(DataGridView dataGridView, string pasteString, int row, int column, bool ignoreSingleLineMultiplePasting = false)
+        public static void PasteAsExcel(DataGridView dataGridView, string pasteString, int row, int column, out List<DataGridViewCell> pastedCellList, bool ignoreSingleLineMultiplePasting = false)
         {
+            pastedCellList = [];
+
             try
             {
                 if (!ignoreSingleLineMultiplePasting)
@@ -202,6 +195,7 @@ namespace TiaUtilities.Generation.GridHandler
                         foreach (DataGridViewCell cell in dataGridView.SelectedCells)
                         {
                             cell.Value = strippedPasteString;
+                            pastedCellList.Add(cell);
                         }
 
                         return;
@@ -223,6 +217,8 @@ namespace TiaUtilities.Generation.GridHandler
 
                 string[] pastedRowArray = Regex.Split(pasteString.TrimEnd("\r\n".ToCharArray()), "\r\n");
 
+                List<DataGridViewCell> pastedCells = [];
+
                 var rowIndex = startRowIndex;
                 foreach (var pastedRow in pastedRowArray)
                 {
@@ -238,6 +234,7 @@ namespace TiaUtilities.Generation.GridHandler
                         if (cell != null)
                         {
                             cell.Value = pastedValue;
+                            pastedCells.Add(cell);
                         }
 
                         columnCounter++;
@@ -256,28 +253,24 @@ namespace TiaUtilities.Generation.GridHandler
             }
         }
 
-        public static void PasteAsExcelFromClipboard(DataGridView dataGridView)
+        public static void PasteAsExcelFromClipboard(DataGridView dataGridView, out List<DataGridViewCell> pastedCellsList)
         {
-            try
-            {
-                if (Clipboard.ContainsText())
-                {
-                    var clipboardText = Clipboard.GetText();
+            pastedCellsList = [];
 
-                    var currentCell = dataGridView.CurrentCell;
-                    GridUtils.PasteAsExcel(dataGridView, clipboardText, currentCell.RowIndex, currentCell.ColumnIndex);
-                }
-                else
-                {
-                    foreach (DataGridViewCell cell in dataGridView.SelectedCells)
-                    {
-                        cell.Value = null;
-                    }
-                }
-            }
-            catch (Exception ex)
+            if (Clipboard.ContainsText())
             {
-                Utils.ShowExceptionMessage(ex);
+                var clipboardText = Clipboard.GetText();
+
+                var currentCell = dataGridView.CurrentCell;
+                GridUtils.PasteAsExcel(dataGridView, clipboardText, currentCell.RowIndex, currentCell.ColumnIndex, out pastedCellsList);
+            }
+            else
+            {
+                foreach (DataGridViewCell cell in dataGridView.SelectedCells)
+                {
+                    cell.Value = null;
+                    pastedCellsList.Add(cell);
+                }
             }
         }
 
@@ -423,7 +416,7 @@ namespace TiaUtilities.Generation.GridHandler
             var cellTag = gridHandler.GetCellTag(cell);
 
             var cellBorderCoordinates = cellTag.CellsBorderCoordinates;
-            if(cellBorderCoordinates == null || cellTag.Borders.Length != 4 || !cellTag.HasBorder)
+            if (cellBorderCoordinates == null || cellTag.Borders.Length != 4 || !cellTag.HasBorder)
             {
                 return;
             }

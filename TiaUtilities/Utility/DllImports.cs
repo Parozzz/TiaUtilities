@@ -21,5 +21,10 @@ namespace TiaUtilities.Utility
         public const int MOUSEEVENTF_LEFTDOWN = 0x02;
         public const int MOUSEEVENTF_LEFTUP = 0x04;
 
+        public static void RaiseLeftMouse(Point position)
+        {
+            DllImports.mouse_event(DllImports.MOUSEEVENTF_LEFTUP, position.X, position.Y, 0, 0);
+        }
+
     }
 }
