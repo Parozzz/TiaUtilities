@@ -834,4 +834,7 @@ Usa $ seguito dal nome della colonna Excel per estrarre i valori dal foglio di c
   <data name="EDITABLE_TAB_CONTROL_DELETE_CONFIRM" xml:space="preserve">
     <value>Sei sicuro di voler chiudere {t}?</value>
   </data>
+  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_DRAG_DROP_START_CELL" xml:space="preserve">
+    <value>Cella di partenza Drag&amp;Drop</value>
+  </data>
 </root>

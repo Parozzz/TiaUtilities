@@ -109,6 +109,7 @@ namespace TiaUtilities
 
                 .Section(Locale.PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS)
                 .AddColor(nameof(GridSettings.SingleSelectedCellBorderColor), Locale.PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_SELECTED_CELL_BORDER)
+                .AddColor(nameof(GridSettings.DragDropStartCellSelectedBackColor), Locale.PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_DRAG_DROP_START_CELL)
                 .AddColor(nameof(GridSettings.DragSelectedCellBorderColor), Locale.PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_SELECTED_CELL_BORDER)
                 .AddColor(nameof(GridSettings.SelectedCellTriangleColor), Locale.PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_DRAGGED_CELL_BACK)
                 .AddColor(nameof(GridSettings.PreviewColor), Locale.PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_PREVIEW_FORE);

@@ -834,4 +834,7 @@ Use $ followed by Excel column name for extracting values from imported spreadsh
   <data name="EDITABLE_TAB_CONTROL_DELETE_CONFIRM" xml:space="preserve">
     <value>Are you sure you want to close {t}?</value>
   </data>
+  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_DRAG_DROP_START_CELL" xml:space="preserve">
+    <value>Drag&amp;Drop starting cell</value>
+  </data>
 </root>
