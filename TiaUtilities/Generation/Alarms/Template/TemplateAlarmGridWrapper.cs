@@ -57,7 +57,7 @@ namespace TiaUtilities.Generation.Alarms.Template
                 var columnIndex = args.Cell.ColumnIndex;
 
                 var gridForm = this.gridHandler.FindForm();
-                if(gridForm != null)
+                if (gridForm != null)
                 {
                     var location = Cursor.Position;
                     location.Offset(+5, +5);
@@ -160,7 +160,7 @@ namespace TiaUtilities.Generation.Alarms.Template
             {
                 foreach (var changedCellData in args.ChangedCellDataList)
                 {
-                    if (TemplateData.ALARM_VARIABLE == changedCellData.ColumnIndex)
+                    if (changedCellData.Column == TemplateData.ALARM_VARIABLE)
                     {//If an alarm variable is filled (Before empty and now full) i will automatically set the enable to be true. The opposite removes the enable. QOL
                         if (IsObjectStringEmpty(changedCellData.OldValue) && IsObjectStringFull(changedCellData.NewValue))
                         {
@@ -170,6 +170,12 @@ namespace TiaUtilities.Generation.Alarms.Template
                         {
                             gridHandler.DataSource[changedCellData.RowIndex].Enable = false;
                         }
+
+                        this.gridHandler.RefreshRow(changedCellData.RowIndex);
+                    }
+                    else if (changedCellData.Column == TemplateData.DESCRIPTION)
+                    {
+                        this.gridHandler.RefreshRow(changedCellData.RowIndex);
                     }
                 }
             };

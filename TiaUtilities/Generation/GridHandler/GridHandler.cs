@@ -1,5 +1,5 @@
-﻿using TiaUtilities.Generation.GridHandler.Binds;
-using TiaUtilities.Generation.GridHandler.CellPainters;
+﻿using System.Diagnostics;
+using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.CustomColumns;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.GridHandler.JSScript;
@@ -7,7 +7,6 @@ using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Languages;
 using TiaUtilities.UndoRedo;
 using TiaUtilities.Utility;
-using static TiaUtilities.Generation.GridHandler.GridUtils;
 
 namespace TiaUtilities.Generation.GridHandler
 {
@@ -15,23 +14,18 @@ namespace TiaUtilities.Generation.GridHandler
     {
         internal class CellTag
         {
-            public bool HasBorder { get; set; }
 
-            public SelectedCellsBorderCoordinates? CellsBorderCoordinates { get; set; }
-
-            public float BordersWidth { get; set; }
-            public RectangleF[] Borders { get; set; } = [];
         }
 
-        private readonly GridSettings settings;
         private readonly GridBindContainer gridBindFactory;
 
         private readonly UndoRedoHandler undoRedoHandler;
         private readonly GridExcelDragHandler<T> excelDragHandler;
         private readonly GridSortHandler<T> sortHandler;
-        private readonly GridDataPreviewer<T> previewer;
         private readonly GenPlaceholderHandler placeholderHandler;
 
+        internal GridSettings GridSettings { get; init; }
+        internal GridDataPreviewer<T> DataPreviewer { get; init; }
         private DataGridView DataGridView { get; init; }
         internal DataGridView InternalDataGridView { get => this.DataGridView; }
 
@@ -86,9 +80,9 @@ namespace TiaUtilities.Generation.GridHandler
             GenPlaceholderHandler placeholderHandler,
             IGridRowComparer<T>? comparer = null)
         {
-            this.settings = settings;
+            this.GridSettings = settings;
             this.gridBindFactory = gridBindFactory;
-            this.previewer = previewer;
+            this.DataPreviewer = previewer;
             this.placeholderHandler = placeholderHandler;
 
             this.ScriptVariableList = [];
@@ -105,10 +99,7 @@ namespace TiaUtilities.Generation.GridHandler
             this.Columns = new(this);
         }
 
-        internal void CallPreSortEvent(GridPreSortEventArgs args)
-        {
-            this.PreSort(this.DataGridView, args);
-        }
+        internal void CallPreSortEvent(GridPreSortEventArgs args) => this.PreSort(this.DataGridView, args);
 
         internal void CallPostSortEvent(GridPostSortEventArgs args)
         {
@@ -116,20 +107,18 @@ namespace TiaUtilities.Generation.GridHandler
             this.PostSort(this.DataGridView, args);
         }
 
-        internal void CallExcelDragPreviewEvent(GridExcelDragEventArgs args)
-        {
-            this.ExcelDragPreview(this.DataGridView, args);
-        }
+        internal void CallExcelDragPreviewEvent(GridExcelDragEventArgs args) => this.ExcelDragPreview(this.DataGridView, args);
 
-        internal void CallExcelDragDoneEvent(GridExcelDragEventArgs args)
-        {
-            this.ExcelDragDone(this.DataGridView, args);
-        }
+
+        internal void CallExcelDragDoneEvent(GridExcelDragEventArgs args) => this.ExcelDragDone(this.DataGridView, args);
+
 
         internal void CallDataChangedEvent(List<GridDataChangedCache> cachedChanges)
         {
             if (cachedChanges.Count > 0)
             {
+                this.dirty = true;
+
                 GridDataChangedEventArgs args = new();
                 args.ChangedCellDataList.AddRange(
                     cachedChanges.Select(c => new GridChangedData(c.Args, c.Row))
@@ -139,20 +128,28 @@ namespace TiaUtilities.Generation.GridHandler
             }
         }
 
-        private void CallRowSelectedChangedEvent(GridSelectedRowChangedArgs args)
+        private void CallRowSelectedChangedEvent(GridSelectedRowChangedArgs args) => this.RowSelectedChanged(this.DataGridView, args);
+
+        private void CallLoadDataEvent() => this.DataLoaded(this.DataGridView, new());
+
+
+        internal void SetDataSource(object dataSource) => this.DataGridView.DataSource = dataSource;
+
+        public void RefreshRow(int rowIndex)
         {
-            this.RowSelectedChanged(this.DataGridView, args);
+            if (this.IsCellRowValid(rowIndex))
+            {
+                var row = this.DataGridView.Rows[rowIndex];
+                foreach (DataGridViewCell cell in row.Cells)
+                {
+                    this.RefreshCell(cell);
+                }
+            }
         }
 
-        private void CallLoadDataEvent()
-        {
-            this.DataLoaded(this.DataGridView, new());
-        }
+        public void RefreshCell(DataGridViewCell cell) => this.DataGridView.InvalidateCell(cell);
 
-        internal void SetDataSource(object dataSource)
-        {
-            this.DataGridView.DataSource = dataSource;
-        }
+        public void RefreshCell(int columnIndex, int rowIndex) => this.DataGridView.InvalidateCell(columnIndex, rowIndex);
 
         public void Refresh()
         {
@@ -160,10 +157,7 @@ namespace TiaUtilities.Generation.GridHandler
             this.DataGridView.Refresh();
         }
 
-        public void SuspendLayout()
-        {
-            this.DataGridView.SuspendLayout();
-        }
+        public void SuspendLayout() => this.DataGridView.SuspendLayout();
 
         public void ResumeLayout(bool refresh = false, bool performLayout = true)
         {
@@ -200,7 +194,7 @@ namespace TiaUtilities.Generation.GridHandler
             this.DataGridView.MultiSelect = true;
 
             this.DataGridView.EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2;
-            this.DataGridView.Font = settings.GridFont;
+            this.DataGridView.Font = GridSettings.GridFont;
             this.DataGridView.AllowUserToAddRows = false;
 
             this.DataGridView.AllowDrop = true;
@@ -329,7 +323,6 @@ namespace TiaUtilities.Generation.GridHandler
 
             #region EVENTS(CellPainting/SelectionChanged/Paint) - Paint stuff on cells / Draw borders on cells
 
-            var previewPainter = new GridCellPreviewPainter<T>(this.placeholderHandler, this.previewer, this.DataSource, this.settings);
             this.DataGridView.CellPainting += (sender, args) =>
             {
                 if (sortHandler.ShouldCellContentPaint(args))
@@ -344,10 +337,40 @@ namespace TiaUtilities.Generation.GridHandler
                 args.Handled = true;
                 args.PaintBackground(args.ClipBounds, true);
 
-                var paintData = previewPainter.ShouldCellContentPaint(args);
-                if (paintData != null)
+                var previewData = GridUtils.CellValuePreviewRequestData(this, args.ColumnIndex, args.RowIndex);
+                if (previewData != null)
                 {
-                    previewPainter.CellContentPaint(args, paintData);
+                    /* protected virtual void Paint(Graphics graphics,
+                           Rectangle clipBounds,
+                           Rectangle cellBounds,
+                           int rowIndex,
+                           DataGridViewElementStates cellState,
+                           object value,
+                           object formattedValue,
+                           string errorText,
+                           DataGridViewCellStyle cellStyle,
+                           DataGridViewAdvancedBorderStyle advancedBorderStyle,
+                           DataGridViewPaintParts paintParts) */
+                    var method = typeof(DataGridViewCell).GetMethod("Paint", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+
+                    //This methods is inside DataGridViewCell.
+                    //This allows to draw stuff, like drop down arrow on combo boxes
+                    var cell = this.DataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex];
+                    method?.Invoke(cell,
+                        [args.Graphics,
+                        args.ClipBounds,
+                        args.CellBounds,
+                        args.RowIndex,
+                        args.State,
+                        args.Value,
+                        args.FormattedValue,
+                        args.ErrorText,
+                        args.CellStyle,
+                        args.AdvancedBorderStyle,
+                        DataGridViewPaintParts.ContentBackground | DataGridViewPaintParts.ErrorIcon ]);
+
+                    GridUtils.CellValuePreviewContentPaint(this, previewData, this.placeholderHandler, args);
+                    Debug.WriteLine($"Preview: Row[{args.RowIndex}], Column[{args.ColumnIndex}]");
                 }
                 else
                 {
@@ -404,8 +427,8 @@ namespace TiaUtilities.Generation.GridHandler
                         if (topLeft != null && topRight != null && bottomLeft != null && bottomRight != null)
                         {
                             var borderSize = 2f;
-                            using Pen borderPen = new(this.settings.SingleSelectedCellBorderColor, borderSize);
-                            using Brush borderBrush = new SolidBrush(this.settings.SingleSelectedCellBorderColor);
+                            using Pen borderPen = new(this.GridSettings.SingleSelectedCellBorderColor, borderSize);
+                            using Brush borderBrush = new SolidBrush(this.GridSettings.SingleSelectedCellBorderColor);
 
                             Rectangle topLeftBounds;
                             Rectangle topRightBounds;
@@ -497,21 +520,15 @@ namespace TiaUtilities.Generation.GridHandler
 
                 var rowIndex = args.RowIndex;
                 var columnIndex = args.ColumnIndex;
+                if (!this.AreCellCoordinatesValid(rowIndex, columnIndex))
+                {
+                    return;
+                }
 
                 var currentCell = this.DataGridView.CurrentCell;
-                if (currentCell == null)
-                {
-                    return;
-                }
-
-                if (rowIndex == currentCell.RowIndex && columnIndex == currentCell.ColumnIndex && excelDragHandler.CellMouseMoveShouldDisplayCursor(args))
+                if (currentCell != null && rowIndex == currentCell.RowIndex && columnIndex == currentCell.ColumnIndex && excelDragHandler.MouseShouldDisplayCursor(args))
                 {
                     this.DataGridView.Cursor = Cursors.Cross;
-                    return;
-                }
-
-                if (rowIndex < 0 || columnIndex < 0)
-                {
                     return;
                 }
 
@@ -563,6 +580,7 @@ namespace TiaUtilities.Generation.GridHandler
                         cursorInsideBorder = false;
                     }
                 }
+
             };
 
             this.DataGridView.DragOver += (sender, args) =>
@@ -675,7 +693,7 @@ namespace TiaUtilities.Generation.GridHandler
                         GridUtils.CopyAsExcelToClipboard(this.DataGridView, out var copiedCellsList);
 
                         var ctrlXReq = this.DataChangedHandler.Join();
-                        foreach(var cell in copiedCellsList)
+                        foreach (var cell in copiedCellsList)
                         {
                             cell.Value = default;
                         }
@@ -705,7 +723,13 @@ namespace TiaUtilities.Generation.GridHandler
                         this.DeleteSelectedCells();
                         break;
                     case Keys.Escape:
-                        this.SelectCell(cell: null);
+                        this.DataGridView.RefreshEdit(); //This is required to refresh checkbox otherwise, if the undo is in a selected cell, it will not update visually (DATA IS CHANGED!)
+                        this.DataGridView.Refresh();
+
+                        this.DataGridView.ClearSelection();
+                        this.DataGridView.CurrentCell = null; //Setting se current cell already center the grid to it.
+
+                        this.DataGridView.Refresh();
                         break;
                     case Keys.F5:
                         this.DataGridView.Refresh();
@@ -722,7 +746,7 @@ namespace TiaUtilities.Generation.GridHandler
             #region EVENTS(MouseWheel) - Allow scroll while selecting
             this.DataGridView.MouseWheel += (sender, args) =>
             {
-                if((Control.MouseButtons & MouseButtons.Left) != 0)
+                if ((Control.MouseButtons & MouseButtons.Left) != 0)
                 {
                     var rowCount = this.DataGridView.RowCount;
                     var firstDisplayedRowIndex = this.DataGridView.FirstDisplayedScrollingRowIndex;
@@ -819,7 +843,7 @@ namespace TiaUtilities.Generation.GridHandler
             };
             #endregion
 
-            this.settings.PropertyChanged += (sender, args) => this.DataGridView.Refresh();
+            this.GridSettings.PropertyChanged += (sender, args) => this.DataGridView.Refresh();
             this.DataGridView.VisibleChanged += (sender, argz) => this.DataGridView.AutoResizeColumnHeadersHeight();
 
             this.excelDragHandler.Init();
@@ -841,6 +865,7 @@ namespace TiaUtilities.Generation.GridHandler
         }
 
         public bool IsDirty() => this.dirty;
+
         public void Wash() => this.dirty = false;
 
         public GridSave<T> CreateSave()
@@ -879,16 +904,17 @@ namespace TiaUtilities.Generation.GridHandler
             }
         }
 
-        public Form? FindForm()
-        {
-            return this.DataGridView.FindForm();
-        }
+        public Form? FindForm() => this.DataGridView.FindForm();
 
         public void AutoResizeColumns() => this.DataGridView.AutoResizeColumns();
 
         public void AutoResizeColumnHeadersHeight() => this.DataGridView.AutoResizeColumnHeadersHeight();
 
-        private bool AreCellCoordinatesValid(int row, int column) => row >= 0 && column >= 0 && row < this.RowCount && column < this.ColumnCount;
+        private bool IsCellRowValid(int row) => row >= 0 && row < this.RowCount;
+
+        private bool IsCellColumnValid(int column) => column >= 0 && column < this.ColumnCount;
+
+        private bool AreCellCoordinatesValid(int row, int column) => this.IsCellRowValid(row) && this.IsCellColumnValid(column);
 
         public DataGridViewCell? GetCurrentCell() => this.DataGridView.CurrentCell;
 
@@ -909,15 +935,9 @@ namespace TiaUtilities.Generation.GridHandler
 
         public DataGridViewColumn GetColumn(int columnIndex) => this.DataGridView.Columns[columnIndex];
 
-        internal void AddColumn(DataGridViewColumn column)
-        {
-            this.DataGridView.Columns.Add(column);
-        }
+        internal void AddColumn(DataGridViewColumn column) => this.DataGridView.Columns.Add(column);
 
-        internal void ClearColumns()
-        {
-            this.DataGridView.Columns.Clear();
-        }
+        internal void ClearColumns() => this.DataGridView.Columns.Clear();
 
         public bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
@@ -1012,17 +1032,6 @@ namespace TiaUtilities.Generation.GridHandler
             }
         }
 
-        private void SelectCell(DataGridViewCell? cell)
-        {
-            this.DataGridView.RefreshEdit(); //This is required to refresh checkbox otherwise, if the undo is in a selected cell, it will not update visually (DATA IS CHANGED!)
-            this.DataGridView.Refresh();
-
-            this.DataGridView.ClearSelection();
-
-            this.DataGridView.CurrentCell = cell; //Setting se current cell already center the grid to it.
-            this.DataGridView.Refresh();
-        }
-
         public Control GetControl() => this.DataGridView;
 
     }
@@ -1050,233 +1059,3 @@ namespace TiaUtilities.Generation.GridHandler
         }
     }
 }
-
-/*
-            bool VerificaColonneConsecutive(DataGridView dgv)
-            {//Can you see this is vibe-coded?
-                if (dgv.SelectedCells.Count == 0)
-                {
-                    return false;
-                }
-
-                // 1. Otteniamo l'elenco delle colonne coinvolte nella selezione (senza duplicati)
-                var colonneSelezionate = dgv.SelectedCells
-                    .Cast<DataGridViewCell>()
-                    .Select(c => c.OwningColumn)
-                    .Distinct()
-                    .ToList();
-
-                // 2. Creiamo la sequenza REALE delle colonne visibili a schermo
-                // Usiamo DisplayIndex solo per l'ordinamento iniziale, poi ce ne dimentichiamo.
-                var mappaVisiva = dgv.Columns
-                    .Cast<DataGridViewColumn>()
-                    .Where(c => c.Visible)
-                    .OrderBy(c => c.DisplayIndex)
-                    .ToList();
-
-                // 3. Troviamo la posizione (indice) nella nostra mappa per ogni colonna selezionata
-                var posizioni = colonneSelezionate
-                    .Select(col => mappaVisiva.IndexOf(col))
-                    .Where(idx => idx >= 0) // Esclude eventuali colonne selezionate ma diventate invisibili
-                    .OrderBy(idx => idx)
-                    .ToList();
-
-                if (posizioni.Count <= 1)
-                {
-                    return true;
-                }
-
-                // 4. Controllo di continuità: la differenza tra l'ultimo e il primo indice 
-                // deve essere uguale al numero di colonne selezionate - 1.
-                // Esempio: Indici [3, 4, 5] -> 5 - 3 = 2. (3 colonne, 3-1=2). OK!
-                // Esempio: Indici [3, 4, 6] -> 6 - 3 = 3. (3 colonne, 3-1=2). NO!
-                int min = posizioni.First();
-                int max = posizioni.Last();
-
-                return (max - min) == (posizioni.Count - 1);
-            }
-
-            bool VerificaRigheConsecutive(DataGridView dgv)
-            {//Can you see this is vibe-coded?
-                if (dgv.SelectedCells.Count == 0) return false;
-
-                // 1. Otteniamo l'elenco delle righe coinvolte nella selezione (senza duplicati)
-                var righeSelezionate = dgv.SelectedCells
-                    .Cast<DataGridViewCell>()
-                    .Select(c => c.OwningRow)
-                    .Distinct()
-                    .Where(r => r.Visible) // Consideriamo solo righe effettivamente visibili
-                    .ToList();
-
-                if (righeSelezionate.Count <= 1)
-                {
-                    return true;
-                }
-
-                // 2. Creiamo la mappa delle righe visibili nell'ordine corrente della UI
-                // Usiamo l'indice della collezione Rows che riflette l'ordine di visualizzazione/ordinamento
-                var mappaVisiva = dgv.Rows
-                    .Cast<DataGridViewRow>()
-                    .Where(r => r.Visible)
-                    .OrderBy(r => r.Index)
-                    .ToList();
-
-                // 3. Troviamo la posizione relativa nella nostra mappa "filtrata"
-                var posizioni = righeSelezionate
-                    .Select(r => mappaVisiva.IndexOf(r))
-                    .OrderBy(idx => idx)
-                    .ToList();
-
-                // 4. Verifica di continuità
-                int min = posizioni.First();
-                int max = posizioni.Last();
-
-                return (max - min) == (posizioni.Count - 1);
-            }
- 
-*/
-
-/*
-          public void ChangeRow(int rowIndex, T data)
-        {
-            this.ChangeCells(this.DataHandler.CreateCellChanges(rowIndex, data));
-        }
-
-        public void ChangeMultipleRows(Dictionary<int, T> dataDict)
-        {
-            this.ChangeCells(this.DataHandler.CreateCellChanges(dataDict));
-        }
-
-        public void AddCachedCellChange(GridCellChange cellChange)
-        {
-            this.cachedCellChangeList.Add(cellChange);
-        }
-
-        public void ExecuteCachedCellChange(bool applyChanges = true)
-        {
-            this.ChangeCells(this.cachedCellChangeList, applyChanges: applyChanges);
-            this.ClearCachedCellChange();
-        }
-
-        public void ClearCachedCellChange()
-        {
-            this.cachedCellChangeList.Clear();
-        }
-
-        public void ChangeCell(GridCellChange cellChange, bool applyChanges = true)
-        {
-            ChangeCells(Utils.SingletonList(cellChange), applyChanges);
-        }
-
-        public void ChangeCells(List<GridCellChange>? cellChangeList, bool applyChanges = true)
-        {
-            if (cellChangeList == null || cellChangeList.Count == 0)
-            {
-                return;
-            }
-
-            //This is to avoid having a list that is reused passed here and would cause problems with undo / redo
-            var localCellChangeList = new List<GridCellChange>(cellChangeList);
-
-            if (applyChanges)
-            {
-                this.DataGridView.SuspendLayout();
-            }
-
-            try
-            {
-                if (applyChanges)
-                {
-                    this.undoRedoHandler.Lock();
-                    foreach (var cellChange in localCellChangeList) //Accessing DataSource instead of changing value of cell is WAAAAY faster (From 3s to 22ms)
-                    {
-                        var data = this.DataSource[cellChange.RowIndex];
-                        if (data == null)
-                        {
-                            continue;
-                        }
-
-                        var dataColumn = data.GetColumn(cellChange.ColumnIndex);
-
-                        var oldValue = dataColumn.GetValueFrom<object>(data);
-                        cellChange.OldValue = oldValue;
-
-                        //For CheckBox is needed since passing "True" as string does not count as a valid object!
-                        var newValue = cellChange.NewValue;
-                        if (newValue is string newValueStr)
-                        {
-                            var columnType = dataColumn.PropertyInfo.PropertyType;
-                            if (columnType == typeof(bool) && bool.TryParse(newValueStr, out bool result))
-                            {
-                                newValue = result;
-                            }
-                        }
-                        dataColumn.SetValueTo(data, newValue);
-                    }
-                    this.undoRedoHandler.Unlock();
-                }
-
-                this.Events.CellChangeEvent(this.DataGridView, new() { CellChangeList = localCellChangeList });
-                undoRedoHandler.AddUndo(() => UndoChangeCells(localCellChangeList));
-            }
-            catch (Exception ex)
-            {
-                Utils.ShowExceptionMessage(ex);
-            }
-            finally
-            { //This is just in case something goes wrong and i won't leave a lock undoRedo
-                undoRedoHandler.Unlock();
-            }
-
-            if (applyChanges)
-            {
-                this.DataGridView.Refresh();
-                this.DataGridView.ResumeLayout();
-            }
-        }
-
-        private void UndoChangeCells(List<GridCellChange> cellChangeList)
-        {
-            this.DataGridView.SuspendLayout();
-
-
-            try
-            {
-                this.undoRedoHandler.Lock();
-
-                List<GridCellChange> invertedCellChangeList = [];
-
-                foreach (var cellChange in cellChangeList) //Accessing DataSource instead of changing value of cell is WAAAAY faster (From 3s to 22ms)
-                {
-                    var data = this.DataSource[cellChange.RowIndex];
-                    var column = data.GetColumn(cellChange.ColumnIndex);
-
-                    var actualValue = column.GetValueFrom<object>(data);
-                    var restoreValue = cellChange.OldValue;
-
-                    column.SetValueTo(data, cellChange.OldValue);
-
-                    invertedCellChangeList.Add(new(cellChange.ColumnIndex, cellChange.RowIndex) { OldValue = actualValue, NewValue = restoreValue });
-                }
-                this.undoRedoHandler.Unlock();
-
-                SelectCell(cellChangeList[^1]);  //Setting se current cell already center the grid to it.
-                this.Events.CellChangeEvent(this.DataGridView, new() { CellChangeList = invertedCellChangeList, IsUndo = true });
-
-                undoRedoHandler.AddRedo(() =>
-                {
-                    ChangeCells(cellChangeList);
-                    SelectCell(cellChangeList[0]);  //Setting se current cell already center the grid to it.
-                });
-            }
-            catch (Exception ex)
-            {
-                Utils.ShowExceptionMessage(ex);
-            }
-
-            this.DataGridView.Refresh();
-            this.DataGridView.ResumeLayout();
-
-            undoRedoHandler.Unlock(); //And a locked undoRedo
-        }
- */ 

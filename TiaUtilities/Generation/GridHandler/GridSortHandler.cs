@@ -1,6 +1,4 @@
-﻿using TiaUtilities.Generation.GridHandler.CellPainters;
-using static TiaUtilities.Generation.GridHandler.CellPainters.GridCellPaintHandler;
-using TiaUtilities.Generation.GridHandler.Data;
+﻿using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.UndoRedo;
 
 namespace TiaUtilities.Generation.GridHandler

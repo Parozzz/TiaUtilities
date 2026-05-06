@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using TiaUtilities.Generation.GridHandler.Data;
-using static TiaUtilities.Generation.GridHandler.CellPainters.GridCellPaintHandler;
+﻿using TiaUtilities.Generation.GridHandler.Data;
 
 namespace TiaUtilities.Generation.GridHandler
 {
@@ -28,7 +26,7 @@ namespace TiaUtilities.Generation.GridHandler
             return started;
         }
 
-        public bool CellMouseMoveShouldDisplayCursor(MouseEventArgs args)
+        public bool MouseShouldDisplayCursor(MouseEventArgs args)
         {
             return !started && IsInsideTriangle(args.X, args.Y, this.DataGridView.CurrentCell, xyCellCoordinates: true);
         }

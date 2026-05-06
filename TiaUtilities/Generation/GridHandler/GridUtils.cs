@@ -1,8 +1,7 @@
-﻿using InfoBox;
-using System.Data;
-using System.Text;
+﻿using System.Data;
 using System.Text.RegularExpressions;
 using TiaUtilities.Generation.GridHandler.Data;
+using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.GridHandler
@@ -24,6 +23,7 @@ namespace TiaUtilities.Generation.GridHandler
 
         }
 
+        #region DRAG_DOWN
         public static void DragPreview<T>(GridExcelDragEventArgs eventArgs, GridHandler<T> gridHandler) where T : GridData
         {
             var gridColumn = gridHandler.DataSource[eventArgs.StartingRow].GetColumn(eventArgs.DraggedColumn);
@@ -103,7 +103,9 @@ namespace TiaUtilities.Generation.GridHandler
 
             gridHandler.DataChangedHandler.End(req);
         }
+        #endregion
 
+        #region COPY/PASTE AS EXCEL
         public static string? GetCopyAsExcelText(DataGridView dataGridView, out List<DataGridViewCell> copiedCellList)
         {
             copiedCellList = [];
@@ -217,8 +219,6 @@ namespace TiaUtilities.Generation.GridHandler
 
                 string[] pastedRowArray = Regex.Split(pasteString.TrimEnd("\r\n".ToCharArray()), "\r\n");
 
-                List<DataGridViewCell> pastedCells = [];
-
                 var rowIndex = startRowIndex;
                 foreach (var pastedRow in pastedRowArray)
                 {
@@ -234,7 +234,7 @@ namespace TiaUtilities.Generation.GridHandler
                         if (cell != null)
                         {
                             cell.Value = pastedValue;
-                            pastedCells.Add(cell);
+                            pastedCellList.Add(cell);
                         }
 
                         columnCounter++;
@@ -273,6 +273,84 @@ namespace TiaUtilities.Generation.GridHandler
                 }
             }
         }
+        #endregion
+
+        #region CELL VALUES PREVIEW PAINT
+        public class GridCellValuePreviewData<T> where T : GridData
+        {
+            public required GridDataPreview Preview { get; init; }
+            public required T GridData { get; init; }
+        }
+
+        public static GridCellValuePreviewData<T>? CellValuePreviewRequestData<T>(GridHandler<T> gridHandler, int columnIndex, int rowIndex) where T : GridData
+        {
+            try
+            {
+                if (rowIndex < 0 || rowIndex >= gridHandler.DataSource.Count)
+                {
+                    return null;
+                }
+
+                var gridData = gridHandler.DataSource[rowIndex];
+
+                var preview = gridHandler.DataPreviewer.RequestPreview(columnIndex, gridData);
+                if (preview == null)
+                {
+                    return null;
+                }
+
+                return new() { Preview = preview, GridData = gridData };
+            }
+            catch (Exception ex)
+            {
+                Utils.ShowExceptionMessage(ex);
+            }
+
+            return null;
+        }
+
+        public static void CellValuePreviewContentPaint<T>(GridHandler<T> gridHandler, GridCellValuePreviewData<T> paintData, GenPlaceholderHandler placeholderHandler, DataGridViewCellPaintingEventArgs args) where T : GridData
+        {
+            var bounds = args.CellBounds;
+            var graphics = args.Graphics;
+            var style = args.CellStyle;
+
+            try
+            {
+                placeholderHandler.GridData = paintData.GridData;
+
+                var previewData = paintData.Preview;
+
+                var isValueDefault = string.IsNullOrEmpty(previewData.Value);
+                var value = placeholderHandler.Parse(isValueDefault ? previewData.DefaultValue : previewData.Value);
+
+                RectangleF rec = new();
+
+                var hasPrefix = !string.IsNullOrEmpty(previewData.Prefix);
+                if (hasPrefix)
+                {
+                    var parsedPrefix = placeholderHandler.Parse(previewData.Prefix);
+                    var prefixMeasuredText = TextRenderer.MeasureText(parsedPrefix, style.Font);
+
+                    rec = new RectangleF(bounds.Location, new Size(prefixMeasuredText.Width, bounds.Height));
+                    TextRenderer.DrawText(graphics, parsedPrefix, style.Font, Rectangle.Round(rec), gridHandler.GridSettings.PreviewColor, TextFormatFlags.VerticalCenter | TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPadding | TextFormatFlags.TextBoxControl);
+                }
+
+                var valueMeasuredText = TextRenderer.MeasureText(value, style.Font);
+                rec = hasPrefix
+                    ? new RectangleF(new PointF(rec.Location.X + rec.Width - 7, rec.Location.Y), new SizeF(valueMeasuredText.Width, bounds.Height))
+                    : new RectangleF(bounds.Location, new Size(valueMeasuredText.Width, bounds.Height));
+
+                var color = isValueDefault ? gridHandler.GridSettings.PreviewColor : style.ForeColor;
+                TextRenderer.DrawText(graphics, value, style.Font, Rectangle.Round(rec), color, TextFormatFlags.VerticalCenter | TextFormatFlags.Right);
+            }
+            catch (Exception ex)
+            {
+                Utils.ShowExceptionMessage(ex);
+            }
+
+        }
+        #endregion
 
         public static bool AreSelectedCellsPlanar(DataGridView dgv)
         {//Can you see this is vibe-coded?
@@ -364,88 +442,6 @@ namespace TiaUtilities.Generation.GridHandler
 
             return new() { Top = lowestRowIndex, Bottom = highestRowIndex, Left = lowestColumnIndex, Right = highestColumnIndex };
             //return [lowestRowIndex, highestRowIndex, lowestColumnIndex, highestColumnIndex]; //top, bottom, left, right
-        }
-
-        public static void CreateCellBorders<T>(GridHandler<T> gridHandler, SelectedCellsBorderCoordinates cellBorderCoordinates, DataGridViewCell cell, float width) where T : GridData
-        {
-            var cellBounds = gridHandler.InternalDataGridView.GetCellDisplayRectangle(cell.ColumnIndex, cell.RowIndex, false);
-
-            var cellTag = gridHandler.GetCellTag(cell);
-
-            RectangleF topBorderRect = RectangleF.Empty;
-            RectangleF bottomBorderRect = RectangleF.Empty;
-            RectangleF leftBorderRect = RectangleF.Empty;
-            RectangleF rightBorderRect = RectangleF.Empty;
-
-            var top = cellBorderCoordinates.IsTop(cell);
-            var bottom = cellBorderCoordinates.IsBottom(cell);
-            var left = cellBorderCoordinates.IsLeft(cell);
-            var right = cellBorderCoordinates.IsRight(cell);
-
-            cellTag.HasBorder = top | bottom | left | right;
-
-            if (top)
-            {
-                topBorderRect = new(cellBounds.Left - 1, cellBounds.Top, cellBounds.Right - cellBounds.Left - 1, width);
-            }
-
-            if (bottom)
-            {
-                bottomBorderRect = new(cellBounds.Left - 1, cellBounds.Bottom - width - 1, cellBounds.Right - cellBounds.Left - 1, width);
-            }
-
-            if (left)
-            {
-                leftBorderRect = new(cellBounds.Left, cellBounds.Top + 1, width, cellBounds.Bottom - cellBounds.Top - 1);
-            }
-
-            if (right)
-            {
-                rightBorderRect = new(cellBounds.Right - width - 1, cellBounds.Top - 1, width, cellBounds.Bottom - cellBounds.Top - 1);
-            }
-
-            cellTag.BordersWidth = width;
-            cellTag.Borders = [topBorderRect, bottomBorderRect, leftBorderRect, rightBorderRect];
-            cellTag.CellsBorderCoordinates = cellBorderCoordinates;
-        }
-
-        public static void PaintCellBorder<T>(GridHandler<T> gridHandler, Graphics graphics, DataGridViewCell cell, Color color, float width) where T : GridData
-        {
-            //var cellBounds = gridHandler.InternalDataGridView.GetCellDisplayRectangle(cell.ColumnIndex, cell.RowIndex, false);
-
-            var cellTag = gridHandler.GetCellTag(cell);
-
-            var cellBorderCoordinates = cellTag.CellsBorderCoordinates;
-            if (cellBorderCoordinates == null || cellTag.Borders.Length != 4 || !cellTag.HasBorder)
-            {
-                return;
-            }
-
-            using var brush = new SolidBrush(color);
-
-            var topRect = cellTag.Borders[0];
-            if (topRect != RectangleF.Empty)
-            {
-                graphics.FillRectangle(brush, topRect);
-            }
-
-            var bottomRect = cellTag.Borders[1];
-            if (bottomRect != RectangleF.Empty)
-            {
-                graphics.FillRectangle(brush, bottomRect);
-            }
-
-            var leftRect = cellTag.Borders[2];
-            if (leftRect != RectangleF.Empty)
-            {
-                graphics.FillRectangle(brush, leftRect);
-            }
-
-            var rightRect = cellTag.Borders[3];
-            if (rightRect != RectangleF.Empty)
-            {
-                graphics.FillRectangle(brush, rightRect);
-            }
         }
     }
 }
