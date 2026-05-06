@@ -297,7 +297,7 @@ namespace TiaUtilities.Generation.GridHandler
 
             this.DataGridView.CellMouseDoubleClick += (sender, args) =>
             {
-                if (Control.ModifierKeys == Keys.Shift || Control.ModifierKeys == Keys.Control || args.RowIndex < 0 || args.ColumnIndex < 0)
+                if (Control.ModifierKeys == Keys.Shift || Control.ModifierKeys == Keys.Control || args.Button != MouseButtons.Left || args.RowIndex < 0 || args.ColumnIndex < 0)
                 {
                     return;
                 }
@@ -370,7 +370,6 @@ namespace TiaUtilities.Generation.GridHandler
                         DataGridViewPaintParts.ContentBackground | DataGridViewPaintParts.ErrorIcon ]);
 
                     GridUtils.CellValuePreviewContentPaint(this, previewData, this.placeholderHandler, args);
-                    Debug.WriteLine($"Preview: Row[{args.RowIndex}], Column[{args.ColumnIndex}]");
                 }
                 else
                 {
