@@ -217,9 +217,7 @@ namespace TiaUtilities.Generation.GridHandler
             this.Columns.Init();
             this.DataSource.InitializeData(this.InitializeRowCount);
 
-            #region EVENTS(MouseDown/CellClick/CellMouseDoubleClick) QOL - Quality of life
-
-            #region Full Row Selection
+            #region EVENTS(MouseDown) - QOL Full Row Selection
             if (EnableRowSelectionFromRowHeaderClick)
             {
                 this.DataGridView.MouseDown += (sender, args) =>
@@ -268,7 +266,7 @@ namespace TiaUtilities.Generation.GridHandler
             }
             #endregion
 
-            #region Better Editing Control Show
+            #region EVENTS(CellClick / CellMouseDoubleClick) QOL - Better Editing Control Show
             this.DataGridView.CellClick += (sender, args) =>
             {
                 if (Control.ModifierKeys == Keys.Shift || Control.ModifierKeys == Keys.Control || args.RowIndex < 0 || args.ColumnIndex < 0)
@@ -319,9 +317,7 @@ namespace TiaUtilities.Generation.GridHandler
             };
             #endregion
 
-            #endregion
-
-            #region EVENTS(CellPainting/SelectionChanged/Paint) - Paint stuff on cells / Draw borders on cells
+            #region EVENTS(CellPainting / SelectionChanged / Paint) - Paint stuff on cells / Draw borders on cells
 
             this.DataGridView.CellPainting += (sender, args) =>
             {
@@ -504,7 +500,7 @@ namespace TiaUtilities.Generation.GridHandler
             };
             #endregion
 
-            #region EVENTS(CellMouseMove/MouseLeave/MouseDown/DragOver/DragDrop) - Drag&Drop / Custom cursor on cell mouse
+            #region EVENTS(CellMouseMove / MouseLeave / MouseDown / DragOver / DragDrop) - Drag&Drop / Custom cursor on cell mouse
 
             bool cursorInsideBorder = false;
             this.DataGridView.CellMouseMove += (sender, args) =>
@@ -773,7 +769,7 @@ namespace TiaUtilities.Generation.GridHandler
             };
             #endregion
 
-            #region EVENTS(CellContentClick/CellContentDoubleClick) - Logics for DataGridViewCheckBoxCell / DataGridViewEventableButtonColumn
+            #region EVENTS(CellContentClick / CellContentDoubleClick) - Logics for DataGridViewCheckBoxCell / DataGridViewEventableButtonColumn
             this.DataGridView.CellContentClick += (sender, args) =>
             {
                 var rowIndex = args.RowIndex;
@@ -843,12 +839,12 @@ namespace TiaUtilities.Generation.GridHandler
             #endregion
 
             this.GridSettings.PropertyChanged += (sender, args) => this.DataGridView.Refresh();
-            this.DataGridView.VisibleChanged += (sender, argz) => this.DataGridView.AutoResizeColumnHeadersHeight();
+            this.DataGridView.VisibleChanged += (sender, args) => this.DataGridView.AutoResizeColumnHeadersHeight();
 
             this.excelDragHandler.Init();
             this.sortHandler.Init();
 
-            this.DataGridView.ResumeLayout();
+            this.DataGridView.ResumeLayout(true);
 
             init = true;
         }
