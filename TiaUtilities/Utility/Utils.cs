@@ -132,7 +132,13 @@ namespace TiaUtilities.Utility
                 return !enumerableOne.SequenceEqual(enumerableTwo);
             }
 
-            return valueOne != null && !valueOne.Equals(valueTwo);
+            if(valueOne == null)
+            {
+                return false;
+            }
+
+            var equals = valueOne.Equals(valueTwo);
+            return !equals;
         }
 
         public static bool ArePublicFieldDifferent<T>(T obj1, T obj2)
