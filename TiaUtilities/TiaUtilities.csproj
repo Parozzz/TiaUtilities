@@ -28,6 +28,7 @@
 
   <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.104.2" />
+    <PackageReference Include="Cyotek.Windows.Forms.ColorPicker" Version="1.7.2" />
     <PackageReference Include="FastColoredTextBox.Net6" Version="1.0.0" />
     <PackageReference Include="InformationBox" Version="1.4.0.220" />
     <PackageReference Include="Jint" Version="4.2.2" />

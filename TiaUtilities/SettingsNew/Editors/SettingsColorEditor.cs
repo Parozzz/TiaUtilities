@@ -1,6 +1,7 @@
 ﻿using TiaUtilities.SettingsNew.FormHelpers;
 using TiaUtilities.Utility;
 using TiaUtilities.Utility.Extensions;
+using Cyotek.Windows.Forms;
 
 namespace TiaUtilities.SettingsNew.Editors
 {
@@ -104,7 +105,7 @@ namespace TiaUtilities.SettingsNew.Editors
         {
             try
             {
-                var colorDialog = new ColorDialog() { Color = lastColorChange.Color };
+                var colorDialog = new ColorPickerDialog() { Color = lastColorChange.Color, ShowAlphaChannel = false }; 
                 if (colorDialog.ShowDialog() == DialogResult.OK)
                 {
                     this.lastColorChange = new(colorDialog.Color, LastColorChangeCauseEnum.COLOR_PICKER);

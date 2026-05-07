@@ -328,20 +328,20 @@ for row validation</value>
   <data name="DEVICE_DATA_NAME" xml:space="preserve">
     <value>Name</value>
   </data>
-  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES" xml:space="preserve">
+  <data name="GRID_SETTINGS" xml:space="preserve">
     <value>Grid Preferences</value>
   </data>
-  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_DRAGGED_CELL_BACK" xml:space="preserve">
-    <value>Dragged cell background</value>
+  <data name="GRID_SETTINGS_DRAG_DOWN_CELL_BACK" xml:space="preserve">
+    <value>Cell background</value>
   </data>
-  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_DRAG_TRIANGLE_COLOR" xml:space="preserve">
-    <value>Drag triangle</value>
+  <data name="GRID_SETTINGS_DRAG_DOWN_TRIANGLE_COLOR" xml:space="preserve">
+    <value>Triangle</value>
   </data>
-  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_PREVIEW_FORE" xml:space="preserve">
+  <data name="GRID_SETTINGS_PREVIEW" xml:space="preserve">
     <value>Preview</value>
   </data>
-  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_SELECTED_CELL_BORDER" xml:space="preserve">
-    <value>Selected cell border</value>
+  <data name="GRID_SETTINGS_BORDERS_SELECTED_CELL_COLOR" xml:space="preserve">
+    <value>Selection</value>
   </data>
   <data name="GRID_SCRIPT_JS_EXPRESSION" xml:space="preserve">
     <value>Javascript Expression</value>
@@ -664,9 +664,6 @@ for row validation</value>
   <data name="ALARM_SETTINGS_TAB_HMI_DEFAULT_ALARM_CLASS_DESCR" xml:space="preserve">
     <value>Define default value for column "Class" in WinCC inside templates.</value>
   </data>
-  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS" xml:space="preserve">
-    <value>Colors</value>
-  </data>
   <data name="GENERICS_SETTINGS" xml:space="preserve">
     <value>Settings</value>
   </data>
@@ -834,7 +831,28 @@ Use $ followed by Excel column name for extracting values from imported spreadsh
   <data name="EDITABLE_TAB_CONTROL_DELETE_CONFIRM" xml:space="preserve">
     <value>Are you sure you want to close {t}?</value>
   </data>
-  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_DRAG_DROP_START_CELL" xml:space="preserve">
+  <data name="GRID_SETTINGS_DRAG_DROP_CELL_BACK" xml:space="preserve">
     <value>Drag&amp;Drop starting cell</value>
+  </data>
+  <data name="GRID_SETTINGS_SELECTED_CELL" xml:space="preserve">
+    <value>Selected Cell</value>
+  </data>
+  <data name="GRID_SETTINGS_SELECTED_CELL_BACK_COLOR" xml:space="preserve">
+    <value>Back Color</value>
+  </data>
+  <data name="GRID_SETTINGS_SELECTED_CELL_FORE_COLOR" xml:space="preserve">
+    <value>Fore Color</value>
+  </data>
+  <data name="GRID_SETTINGS_BORDERS" xml:space="preserve">
+    <value>Borders</value>
+  </data>
+  <data name="GRID_SETTINGS_BORDERS_WEIGHT" xml:space="preserve">
+    <value>Weight</value>
+  </data>
+  <data name="GRID_SETTINGS_DRAG_DOWN" xml:space="preserve">
+    <value>Dragging Down</value>
+  </data>
+  <data name="GRID_SETTINGS_PREVIEW_FORE_COLOR" xml:space="preserve">
+    <value>Text Color</value>
   </data>
 </root>

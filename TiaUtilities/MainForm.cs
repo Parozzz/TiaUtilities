@@ -105,14 +105,23 @@ namespace TiaUtilities
                 .Section(Locale.PROGRAM_SETTINGS_TIA_VERSION)
                 .AddUnsignedNumberList(nameof(ProgramSettingsV1.TIAVersion), [16, 17, 18, 19])
 
-                .MacroSection(() => Locale.PROGRAM_SETTINGS_GRID_PREFERENCES, () => true, () => MainForm.Settings.GridSettings)
+                .MacroSection(() => Locale.GRID_SETTINGS, () => true, () => MainForm.Settings.GridSettings)
 
-                .Section(Locale.PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS)
-                .AddColor(nameof(GridSettings.SingleSelectedCellBorderColor), Locale.PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_SELECTED_CELL_BORDER)
-                .AddColor(nameof(GridSettings.DragDropStartCellSelectedBackColor), Locale.PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_DRAG_DROP_START_CELL)
-                .AddColor(nameof(GridSettings.DragSelectedCellBorderColor), Locale.PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_SELECTED_CELL_BORDER)
-                .AddColor(nameof(GridSettings.SelectedCellTriangleColor), Locale.PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_DRAGGED_CELL_BACK)
-                .AddColor(nameof(GridSettings.PreviewColor), Locale.PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_PREVIEW_FORE);
+                .Section(Locale.GRID_SETTINGS_SELECTED_CELL)
+                .AddColor(nameof(GridSettings.SelectedCellBackColor), Locale.GRID_SETTINGS_SELECTED_CELL_BACK_COLOR)
+                .AddColor(nameof(GridSettings.SelectedCellForeColor), Locale.GRID_SETTINGS_SELECTED_CELL_FORE_COLOR)
+
+                .Section(Locale.GRID_SETTINGS_BORDERS)
+                .AddInt(nameof(GridSettings.BorderWeight), Locale.GRID_SETTINGS_BORDERS_WEIGHT)
+                .AddColor(nameof(GridSettings.SingleSelectedCellBorderColor), Locale.GRID_SETTINGS_BORDERS_SELECTED_CELL_COLOR)
+                .AddColor(nameof(GridSettings.DragDropStartCellSelectedBackColor), Locale.GRID_SETTINGS_DRAG_DROP_CELL_BACK)
+
+                .Section(Locale.GRID_SETTINGS_DRAG_DOWN)
+                .AddColor(nameof(GridSettings.SelectedCellTriangleColor), Locale.GRID_SETTINGS_DRAG_DOWN_TRIANGLE_COLOR)
+                .AddColor(nameof(GridSettings.DragSelectedCellBorderColor), Locale.GRID_SETTINGS_DRAG_DOWN_CELL_BACK)
+
+                .Section(Locale.GRID_SETTINGS_PREVIEW)
+                .AddColor(nameof(GridSettings.PreviewColor), Locale.GRID_SETTINGS_PREVIEW_FORE_COLOR);
 
             MainForm.Settings.PropertyChanged += (sender, args) =>
             {

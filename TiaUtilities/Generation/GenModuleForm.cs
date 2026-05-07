@@ -67,6 +67,7 @@ namespace TiaUtilities.Generation
 
             #region TOP_MENU_PROGRAM
             this.programSettingsMenuItem.Click += (sender, args) => new SettingsForm(MainForm.SettingsBindings).Show(this);
+            this.programModuleSetupMenuItem.Click += (sender, args) => this.module.ToggleSettingsFormVisibility();
             #endregion
 
             #region TOP_MENU_IMPORT_EXPORT
@@ -134,6 +135,7 @@ namespace TiaUtilities.Generation
 
             this.programMenuItem.Text = Locale.GENERICS_PROGRAM;
             this.programSettingsMenuItem.Text = Locale.GENERICS_SETTINGS + " (CTRL+P)";
+            this.programModuleSetupMenuItem.Text = Locale.GENERICS_SETUP + " (CTRL+W)";
 
             this.toolsMenuItem.Text = Locale.GEN_FORM_TOOLS;
             this.toolsPlaceholderViewerMenuItem.Text = Locale.GEN_FORM_TOOLS_PLACEHOLDER_VIEWER + " (CTRL+Q)";
@@ -152,6 +154,9 @@ namespace TiaUtilities.Generation
                 {
                     case Keys.P | Keys.Control:
                         this.programSettingsMenuItem.PerformClick();
+                        return true;
+                    case Keys.W | Keys.Control:
+                        this.programModuleSetupMenuItem.PerformClick();
                         return true;
                     case Keys.S | Keys.Control:
                         this.ModuleSave(force: true);

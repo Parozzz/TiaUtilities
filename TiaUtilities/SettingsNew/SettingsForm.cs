@@ -211,6 +211,9 @@ namespace TiaUtilities.Generation.SettingsNew
                     case Keys.Q | Keys.Control:
                         this.bindingsControlLoader.Bindings.PlaceholderViewerRequest(this);
                         return true;
+                    case Keys.W | Keys.Control:
+                        this.ToggleVisibility();
+                        return true;
                 }
             }
             catch (Exception ex)
@@ -220,6 +223,21 @@ namespace TiaUtilities.Generation.SettingsNew
 
             // Call the base class
             return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        public void ToggleVisibility(bool forceOpen = false, bool forceClosed = false)
+        {
+            var windowState = this.WindowState;
+            if((this.WindowState == FormWindowState.Minimized || forceOpen) && !forceClosed)
+            {
+                this.WindowState = FormWindowState.Normal;
+                this.ShowInTaskbar = true;
+            }
+            else
+            {
+                this.WindowState = FormWindowState.Minimized;
+                this.ShowInTaskbar = false;
+            }
         }
 
     }

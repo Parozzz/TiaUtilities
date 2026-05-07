@@ -3,21 +3,21 @@ using TiaUtilities.SettingsNew.Bindings;
 
 namespace TiaUtilities.SettingsNew
 {
-    public class SettingsFormCache(SettingsBindings settingsBindings)
+    public class SettingsFormCache(SettingsBindings settingsBindings, IWin32Window window)
     {
         private readonly SettingsBindings settingsBindings = settingsBindings;
+        private readonly IWin32Window window = window;
         private SettingsForm? settingsForm;
 
-        public void Show(IWin32Window? window)
+        public void Show()
         {
             if (this.settingsForm != null)
             {
-                if (window is Control control)
+                if (this.window is Control control)
                 {
                     this.settingsForm.Owner = control.FindForm();
                 }
-                this.settingsForm.ShowInTaskbar = true;
-                this.settingsForm.WindowState = FormWindowState.Normal;
+                this.settingsForm.ToggleVisibility(forceOpen: true);
             }
             else
             {
@@ -26,14 +26,23 @@ namespace TiaUtilities.SettingsNew
                 {
                     if(args.CloseReason == CloseReason.UserClosing)
                     {
-                        this.settingsForm.WindowState = FormWindowState.Minimized;
-                        this.settingsForm.ShowInTaskbar = false;
-
+                        this.settingsForm.ToggleVisibility(forceClosed: true);
                         args.Cancel = true;
                     }
                 };
-                this.settingsForm.Show(window);
+                this.settingsForm.Show(this.window);
             }
+        }
+
+        public void ToggleVisibility()
+        {
+            if(settingsForm == null)
+            {
+                this.Show();
+                return;
+            }
+
+            this.settingsForm.ToggleVisibility();
         }
 
     }

@@ -328,20 +328,20 @@ validità riga</value>
   <data name="DEVICE_DATA_NAME" xml:space="preserve">
     <value>Nome</value>
   </data>
-  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES" xml:space="preserve">
+  <data name="GRID_SETTINGS" xml:space="preserve">
     <value>Preferenze Griglia</value>
   </data>
-  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_DRAGGED_CELL_BACK" xml:space="preserve">
-    <value>Sfondo cella trascinamento</value>
+  <data name="GRID_SETTINGS_DRAG_DOWN_CELL_BACK" xml:space="preserve">
+    <value>Sfondo cella</value>
   </data>
-  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_DRAG_TRIANGLE_COLOR" xml:space="preserve">
-    <value>Triangolo trascinamento</value>
+  <data name="GRID_SETTINGS_DRAG_DOWN_TRIANGLE_COLOR" xml:space="preserve">
+    <value>Triangolo</value>
   </data>
-  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_PREVIEW_FORE" xml:space="preserve">
+  <data name="GRID_SETTINGS_PREVIEW" xml:space="preserve">
     <value>Anteprima</value>
   </data>
-  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_SELECTED_CELL_BORDER" xml:space="preserve">
-    <value>Bordo cella selezionata</value>
+  <data name="GRID_SETTINGS_BORDERS_SELECTED_CELL_COLOR" xml:space="preserve">
+    <value>Selezione</value>
   </data>
   <data name="GRID_SCRIPT_JS_EXPRESSION" xml:space="preserve">
     <value>Espressione Javascript</value>
@@ -664,9 +664,6 @@ validità riga</value>
   <data name="ALARM_SETTINGS_TAB_HMI_DEFAULT_ALARM_CLASS_DESCR" xml:space="preserve">
     <value>Definisce valore di default per colonna "Classe" in WinCC dentro ai template.</value>
   </data>
-  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS" xml:space="preserve">
-    <value>Colori</value>
-  </data>
   <data name="GENERICS_SETTINGS" xml:space="preserve">
     <value>Impostazioni</value>
   </data>
@@ -834,7 +831,28 @@ Usa $ seguito dal nome della colonna Excel per estrarre i valori dal foglio di c
   <data name="EDITABLE_TAB_CONTROL_DELETE_CONFIRM" xml:space="preserve">
     <value>Sei sicuro di voler chiudere {t}?</value>
   </data>
-  <data name="PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_DRAG_DROP_START_CELL" xml:space="preserve">
+  <data name="GRID_SETTINGS_DRAG_DROP_CELL_BACK" xml:space="preserve">
     <value>Cella di partenza Drag&amp;Drop</value>
+  </data>
+  <data name="GRID_SETTINGS_SELECTED_CELL" xml:space="preserve">
+    <value>Cella Selezionata</value>
+  </data>
+  <data name="GRID_SETTINGS_SELECTED_CELL_FORE_COLOR" xml:space="preserve">
+    <value>Colore Testo</value>
+  </data>
+  <data name="GRID_SETTINGS_SELECTED_CELL_BACK_COLOR" xml:space="preserve">
+    <value>Colore Sfondo</value>
+  </data>
+  <data name="GRID_SETTINGS_BORDERS" xml:space="preserve">
+    <value>Bordi</value>
+  </data>
+  <data name="GRID_SETTINGS_BORDERS_WEIGHT" xml:space="preserve">
+    <value>Spessore</value>
+  </data>
+  <data name="GRID_SETTINGS_DRAG_DOWN" xml:space="preserve">
+    <value>Trascimento</value>
+  </data>
+  <data name="GRID_SETTINGS_PREVIEW_FORE_COLOR" xml:space="preserve">
+    <value>Colore Testo</value>
   </data>
 </root>

@@ -35,6 +35,7 @@
             saveAsMenuItem = new ToolStripMenuItem();
             programMenuItem = new ToolStripMenuItem();
             programSettingsMenuItem = new ToolStripMenuItem();
+            programModuleSetupMenuItem = new ToolStripMenuItem();
             toolsMenuItem = new ToolStripMenuItem();
             toolsPlaceholderViewerMenuItem = new ToolStripMenuItem();
             importExportMenuItem = new ToolStripMenuItem();
@@ -80,7 +81,7 @@
             // 
             // programMenuItem
             // 
-            programMenuItem.DropDownItems.AddRange(new ToolStripItem[] { programSettingsMenuItem });
+            programMenuItem.DropDownItems.AddRange(new ToolStripItem[] { programSettingsMenuItem, programModuleSetupMenuItem });
             programMenuItem.Font = new Font("Segoe UI", 9F);
             programMenuItem.Name = "programMenuItem";
             programMenuItem.Size = new Size(65, 20);
@@ -89,8 +90,14 @@
             // programSettingsMenuItem
             // 
             programSettingsMenuItem.Name = "programSettingsMenuItem";
-            programSettingsMenuItem.Size = new Size(116, 22);
+            programSettingsMenuItem.Size = new Size(180, 22);
             programSettingsMenuItem.Text = "Settings";
+            // 
+            // programModuleSetupMenuItem
+            // 
+            programModuleSetupMenuItem.Name = "programModuleSetupMenuItem";
+            programModuleSetupMenuItem.Size = new Size(180, 22);
+            programModuleSetupMenuItem.Text = "ModuleSetup";
             // 
             // toolsMenuItem
             // 
@@ -162,5 +169,6 @@
         private ToolStripMenuItem programSettingsMenuItem;
         private ToolStripMenuItem toolsMenuItem;
         private ToolStripMenuItem toolsPlaceholderViewerMenuItem;
+        public ToolStripMenuItem programModuleSetupMenuItem;
     }
 }

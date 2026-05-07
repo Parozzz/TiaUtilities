@@ -1573,6 +1573,123 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Grid Preferences.
+        /// </summary>
+        internal static string GRID_SETTINGS {
+            get {
+                return ResourceManager.GetString("GRID_SETTINGS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Borders.
+        /// </summary>
+        internal static string GRID_SETTINGS_BORDERS {
+            get {
+                return ResourceManager.GetString("GRID_SETTINGS_BORDERS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Selection.
+        /// </summary>
+        internal static string GRID_SETTINGS_BORDERS_SELECTED_CELL_COLOR {
+            get {
+                return ResourceManager.GetString("GRID_SETTINGS_BORDERS_SELECTED_CELL_COLOR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Weight.
+        /// </summary>
+        internal static string GRID_SETTINGS_BORDERS_WEIGHT {
+            get {
+                return ResourceManager.GetString("GRID_SETTINGS_BORDERS_WEIGHT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Dragging Down.
+        /// </summary>
+        internal static string GRID_SETTINGS_DRAG_DOWN {
+            get {
+                return ResourceManager.GetString("GRID_SETTINGS_DRAG_DOWN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Cell background.
+        /// </summary>
+        internal static string GRID_SETTINGS_DRAG_DOWN_CELL_BACK {
+            get {
+                return ResourceManager.GetString("GRID_SETTINGS_DRAG_DOWN_CELL_BACK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Triangle.
+        /// </summary>
+        internal static string GRID_SETTINGS_DRAG_DOWN_TRIANGLE_COLOR {
+            get {
+                return ResourceManager.GetString("GRID_SETTINGS_DRAG_DOWN_TRIANGLE_COLOR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Drag&amp;Drop starting cell.
+        /// </summary>
+        internal static string GRID_SETTINGS_DRAG_DROP_CELL_BACK {
+            get {
+                return ResourceManager.GetString("GRID_SETTINGS_DRAG_DROP_CELL_BACK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Preview.
+        /// </summary>
+        internal static string GRID_SETTINGS_PREVIEW {
+            get {
+                return ResourceManager.GetString("GRID_SETTINGS_PREVIEW", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Text Color.
+        /// </summary>
+        internal static string GRID_SETTINGS_PREVIEW_FORE_COLOR {
+            get {
+                return ResourceManager.GetString("GRID_SETTINGS_PREVIEW_FORE_COLOR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Selected Cell.
+        /// </summary>
+        internal static string GRID_SETTINGS_SELECTED_CELL {
+            get {
+                return ResourceManager.GetString("GRID_SETTINGS_SELECTED_CELL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Back Color.
+        /// </summary>
+        internal static string GRID_SETTINGS_SELECTED_CELL_BACK_COLOR {
+            get {
+                return ResourceManager.GetString("GRID_SETTINGS_SELECTED_CELL_BACK_COLOR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Fore Color.
+        /// </summary>
+        internal static string GRID_SETTINGS_SELECTED_CELL_FORE_COLOR {
+            get {
+                return ResourceManager.GetString("GRID_SETTINGS_SELECTED_CELL_FORE_COLOR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Address.
         /// </summary>
         internal static string IO_DATA_ADDRESS {
@@ -2097,69 +2214,6 @@ namespace TiaUtilities.Languages {
         internal static string PROGRAM_SETTINGS_AUTO_SAVE {
             get {
                 return ResourceManager.GetString("PROGRAM_SETTINGS_AUTO_SAVE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Grid Preferences.
-        /// </summary>
-        internal static string PROGRAM_SETTINGS_GRID_PREFERENCES {
-            get {
-                return ResourceManager.GetString("PROGRAM_SETTINGS_GRID_PREFERENCES", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Colors.
-        /// </summary>
-        internal static string PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS {
-            get {
-                return ResourceManager.GetString("PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Drag&amp;Drop starting cell.
-        /// </summary>
-        internal static string PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_DRAG_DROP_START_CELL {
-            get {
-                return ResourceManager.GetString("PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_DRAG_DROP_START_CELL", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Drag triangle.
-        /// </summary>
-        internal static string PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_DRAG_TRIANGLE_COLOR {
-            get {
-                return ResourceManager.GetString("PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_DRAG_TRIANGLE_COLOR", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Dragged cell background.
-        /// </summary>
-        internal static string PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_DRAGGED_CELL_BACK {
-            get {
-                return ResourceManager.GetString("PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_DRAGGED_CELL_BACK", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Preview.
-        /// </summary>
-        internal static string PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_PREVIEW_FORE {
-            get {
-                return ResourceManager.GetString("PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_PREVIEW_FORE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Selected cell border.
-        /// </summary>
-        internal static string PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_SELECTED_CELL_BORDER {
-            get {
-                return ResourceManager.GetString("PROGRAM_SETTINGS_GRID_PREFERENCES_COLORS_SELECTED_CELL_BORDER", resourceCulture);
             }
         }
         

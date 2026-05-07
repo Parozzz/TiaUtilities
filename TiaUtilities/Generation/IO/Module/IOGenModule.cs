@@ -90,13 +90,13 @@ namespace TiaUtilities.Generation.IO.Module
 
             this.ioTabList = [];
             this.SettingsBindings = new();
-            this.settingsFormCache = new(this.SettingsBindings);
+            this.settingsFormCache = new(this.SettingsBindings, this.control);
         }
 
         public void Init(GenModuleForm form)
         {
             #region TOP_BUTTONS_STRIP
-            this.control.setupButton.Click += (sender, args) => this.settingsFormCache.Show(this.control);
+            this.control.setupButton.Click += (sender, args) => this.ToggleSettingsFormVisibility();
             #endregion
 
             #region IMPORT_EXPORT_MENU_ITEMS
@@ -384,6 +384,8 @@ namespace TiaUtilities.Generation.IO.Module
 
             this.AddConfigurationBindings(this.SettingsBindings);
         }
+
+        public void ToggleSettingsFormVisibility() => this.settingsFormCache.ToggleVisibility();
 
         private void TabCreation(TabPage tabPage, IOGenTabSave? save = null)
         {
