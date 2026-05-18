@@ -53,22 +53,16 @@ namespace TiaUtilities.Generation.IO.Data
             return COLUMN_LIST[column];
         }
 
-        public void LoadDefaults(GridDataPreviewer<IOData> previewer, IOMainConfiguration config, out bool ioNameDefault, out bool variableDefault, out bool merkerAddressDefault)
+        public void LoadDefaults(GridDataPreviewer<IOData> previewer, IOMainConfiguration config)
         {
-            ioNameDefault = variableDefault = merkerAddressDefault = false;
-
             if (string.IsNullOrEmpty(IOName))
             {
-                ioNameDefault = true;
-
                 var preview = previewer.RequestPreview(IOData.IO_NAME, this);
                 IOName = preview?.ComposeDefaultValue();
             }
 
             if (string.IsNullOrEmpty(Variable))
             {
-                variableDefault = true;
-
                 var preview = previewer.RequestPreview(IOData.VARIABLE, this);
                 Variable = preview?.ComposeDefaultValue();
             }
@@ -79,8 +73,6 @@ namespace TiaUtilities.Generation.IO.Data
                 var addressTag = SimaticTagAddress.FromAddress(this.Address);
                 if (addressTag != null)
                 {
-                    merkerAddressDefault = true;
-
                     addressTag.MemoryArea = SimaticMemoryArea.MERKER;
                     addressTag.ByteOffset += addressTag.MemoryArea == SimaticMemoryArea.INPUT ? config.VariableTableInputStartAddress : config.VariableTableOutputStartAddress;
                     this.MerkerAddress = addressTag.ToString();

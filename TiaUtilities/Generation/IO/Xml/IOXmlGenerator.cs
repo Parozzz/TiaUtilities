@@ -18,11 +18,9 @@ namespace TiaUtilities.Generation.IO.Xml
         private readonly IOMainConfiguration mainConfig = mainConfig;
 
         private readonly Dictionary<string, BlockFC> fcDict = [];
-        private BlockGlobalDB? db;
-
         private readonly Dictionary<string, List<XMLTagTable>> ioTagTableDict = [];
 
-        private XMLTagTable? variableTagTable;
+        private readonly BlockGlobalDB globalDB = new();
         private readonly List<XMLTagTable> variableTagTableList = [];
 
         public void Init()
@@ -36,9 +34,16 @@ namespace TiaUtilities.Generation.IO.Xml
                 TabName = tabName
             };
 
+            this.globalDB.Init();
+            this.globalDB.AttributeList.BlockName = placeholderHandler.ParseNotNull(mainConfig.DBName);
+            this.globalDB.AttributeList.BlockNumber = mainConfig.DBNumber;
+            this.globalDB.AttributeList.AutoNumber = (mainConfig.DBNumber > 0);
+
+            XMLTagTable? variableTagTable = null;
+
             BlockFC fc = new();
             fc.Init();
-            fc.AttributeList.BlockName = placeholderHandler.Parse(tabConfig.FCBlockName) ?? "INVALID_NAME";
+            fc.AttributeList.BlockName = placeholderHandler.ParseNotNull(tabConfig.FCBlockName);
             fc.AttributeList.BlockNumber = tabConfig.FCBlockNumber;
             fc.AttributeList.AutoNumber = (tabConfig.FCBlockNumber > 0);
 
@@ -51,7 +56,7 @@ namespace TiaUtilities.Generation.IO.Xml
             var ioAddressDict = new Dictionary<string, uint>();
             var duplicatedAddressDict = new Dictionary<string, uint>();
 
-            List<XMLTagTable> ioTagTableList = new();
+            List<XMLTagTable> ioTagTableList = [];
             ioTagTableDict.Add(tabName, ioTagTableList);
 
             XMLTagTable ioTagTable = new() { TableName = $"{placeholderHandler.Parse(mainConfig.IOTableName)}_{tagCounter}" };
@@ -68,7 +73,7 @@ namespace TiaUtilities.Generation.IO.Xml
                     continue;
                 }
 
-                ioData.LoadDefaults(previewer, mainConfig, out bool ioNameDefault, out bool variableDefault, out bool merkerAddressDefault);
+                ioData.LoadDefaults(previewer, mainConfig);
 
                 placeholderHandler.Clear();
                 placeholderHandler.TabName = tabName;
@@ -84,50 +89,48 @@ namespace TiaUtilities.Generation.IO.Xml
                 tagCounter++;
 
                 //Set it with default tag name. In case it has a specific one, it will be overwritten below.
-                var ioTag = ioTagTable.AddTag()
-                    .SetBoolean(ioData.GetAddressMemoryArea(), ioData.GetAddressByte(), ioData.GetAddressBit());
+                var ioTag = ioTagTable.AddTag();
                 ioTag.TagName = FixDuplicateAddress(ioData.IOName, ioAddressDict);
                 ioTag.Comment[LocaleVariables.CULTURE] = ioData.Comment;
+                ioTag.SetBoolean(ioData.GetAddressMemoryArea(), ioData.GetAddressByte(), ioData.GetAddressBit());
 
                 string? inOutAddress = null;
-                if (!variableDefault)
+                switch (mainConfig.MemoryType)
                 {
-                    var member = AddMemberToDB(placeholderHandler, duplicatedAddressDict, ioData.Variable, ioData.Comment);
-                    inOutAddress = $"{ioData.Variable}";
-                }
-                else
-                {
-                    switch (mainConfig.MemoryType)
-                    {
-                        case IOMemoryTypeEnum.MERKER:
-                            if (variableTagTable == null || (mainConfig.VariableTableSplitEvery > 0 && merkerCounter % mainConfig.VariableTableSplitEvery == 0))
-                            {
-                                variableTagTable = new() { TableName = mainConfig.VariableTableName + "_" + merkerCounter };
-                                variableTagTableList.Add(variableTagTable);
-                            }
-                            merkerCounter++;
+                    case IOMemoryTypeEnum.MERKER:
+                        if (variableTagTable == null || (mainConfig.VariableTableSplitEvery > 0 && merkerCounter % mainConfig.VariableTableSplitEvery == 0))
+                        {
+                            variableTagTable = new() 
+                            { 
+                                TableName = placeholderHandler.ParseNotNull($"{mainConfig.VariableTableName}_{merkerCounter}")
+                            };
+                            variableTagTableList.Add(variableTagTable);
+                        }
+                        merkerCounter++;
 
-                            var merkerVariableAddress = FixDuplicateAddress(ioData.Variable, duplicatedAddressDict);
+                        var merkerVariableAddress = FixDuplicateAddress(ioData.Variable, duplicatedAddressDict);
 
-                            var merkerVariableTag = SimaticTagAddress.FromAddress(ioData.MerkerAddress);
-                            if (merkerVariableAddress == null || merkerVariableTag == null)
-                            {
-                                throw new Exception("Cannot parse Merker VariableAddress for " + ioData.MerkerAddress);
-                            }
+                        var merkerVariableTag = SimaticTagAddress.FromAddress(ioData.MerkerAddress);
+                        if (merkerVariableAddress == null || merkerVariableTag == null)
+                        {
+                            throw new Exception("Cannot parse Merker VariableAddress for " + ioData.MerkerAddress);
+                        }
 
-                            var tag = variableTagTable.AddTag();
-                            tag.TagName = merkerVariableAddress;
-                            tag.Comment[LocaleVariables.CULTURE] = ioData.Comment;
-                            tag.SetBoolean(SimaticMemoryArea.MERKER, merkerVariableTag.ByteOffset, merkerVariableTag.BitOffset);
+                        var tag = variableTagTable.AddTag();
+                        tag.TagName = merkerVariableAddress;
+                        tag.Comment[LocaleVariables.CULTURE] = ioData.Comment;
+                        tag.SetBoolean(SimaticMemoryArea.MERKER, merkerVariableTag.ByteOffset, merkerVariableTag.BitOffset);
 
-                            inOutAddress = $"\"{merkerVariableAddress}\""; //Add double quote to avoid this address to be parsed as a DB call (eg. to avoid I0.0 to be parsed as "I0"."0" instead "I0.0")
-                            break;
-                        case IOMemoryTypeEnum.DB:
-                            var member = AddMemberToDB(placeholderHandler, duplicatedAddressDict, ioData.Variable, ioData.Comment);
-                            inOutAddress = member.GetCompleteSymbol();
+                        inOutAddress = $"\"{merkerVariableAddress}\""; //Add double quote to avoid this address to be parsed as a DB call (eg. to avoid I0.0 to be parsed as "I0"."0" instead "I0.0")
+                        break;
+                    case IOMemoryTypeEnum.DB:
+                        var dbMemberAddress = FixDuplicateAddress(ioData.Variable, duplicatedAddressDict);
 
-                            break;
-                    }
+                        var member = globalDB.AttributeList.STATIC.AddMembersFromAddress(dbMemberAddress, SimaticDataType.BOOLEAN) ?? throw new InvalidDataException();
+                        member.Comment[LocaleVariables.CULTURE] = ioData.Comment;
+
+                        inOutAddress = member.GetCompleteSymbol();
+                        break;
                 }
 
                 if (mainConfig.GroupingType == IOGroupingTypeEnum.PER_BIT)
@@ -176,24 +179,6 @@ namespace TiaUtilities.Generation.IO.Xml
             return ((int)iOData.GetAddressMemoryArea()) * Math.Pow(10, 9) + iOData.GetAddressByte() * Math.Pow(10, 3) + iOData.GetAddressBit();
         }
 
-        private Member AddMemberToDB(IOGenPlaceholderHandler placeholderHandler, Dictionary<string, uint> duplicatedAddressDict, string variable, string comment)
-        {
-            if (db == null)
-            {
-                db = new BlockGlobalDB();
-                db.Init();
-                db.AttributeList.BlockName = placeholderHandler.ParseNotNull(mainConfig.DBName);
-                db.AttributeList.BlockNumber = mainConfig.DBNumber;
-                db.AttributeList.AutoNumber = (mainConfig.DBNumber > 0);
-            }
-
-            var dbMemberAddress = FixDuplicateAddress(variable, duplicatedAddressDict);
-
-            var member = db.AttributeList.STATIC.AddMembersFromAddress(dbMemberAddress, SimaticDataType.BOOLEAN) ?? throw new InvalidDataException();
-            member.Comment[LocaleVariables.CULTURE] = comment;
-            return member;
-        }
-
         private static string FixDuplicateAddress(string? address, Dictionary<string, uint> dict)
         {
             address = address ?? SimaticMLAPI.DEFAULT_EMPTY_MEMBER_NAME;
@@ -216,7 +201,7 @@ namespace TiaUtilities.Generation.IO.Xml
 
         public void ExportXML(string exportPath)
         {
-            if (string.IsNullOrEmpty(exportPath) || fcDict.Count == 0 || (this.db == null && this.ioTagTableDict.Count == 0))
+            if (string.IsNullOrEmpty(exportPath) || fcDict.Count == 0 || (this.globalDB == null && this.ioTagTableDict.Count == 0))
             {
                 return;
             }
@@ -227,7 +212,7 @@ namespace TiaUtilities.Generation.IO.Xml
                 var fc = entry.Value;
 
                 var xmlDocument = SimaticMLAPI.CreateDocument(fc);
-                xmlDocument.Save(exportPath + $"/[FC]{name}_{fc.AttributeList.BlockName}.xml");
+                xmlDocument.Save(exportPath + $"/[FC]-{fc.AttributeList.BlockName}.xml");
             }
 
             foreach (var entry in ioTagTableDict)
@@ -238,20 +223,20 @@ namespace TiaUtilities.Generation.IO.Xml
                 foreach (var ioTagTable in ioTagTableList)
                 {
                     var xmlDocument = SimaticMLAPI.CreateDocument(ioTagTable);
-                    xmlDocument.Save(exportPath + $"/[TagTable]{name}_{ioTagTable.TableName}.xml");
+                    xmlDocument.Save(exportPath + $"/[TagTable_IO]-{ioTagTable.TableName}.xml");
                 }
             }
 
             foreach (var variableTagTable in variableTagTableList)
             {
                 var xmlDocument = SimaticMLAPI.CreateDocument(variableTagTable);
-                xmlDocument.Save(exportPath + $"/[TagTable]Alias_{variableTagTable.TableName}.xml");
+                xmlDocument.Save(exportPath + $"/[TagTable_Alias]-{variableTagTable.TableName}.xml");
             }
 
-            if (db != null)
+            if (globalDB != null)
             {
-                var xmlDocument = SimaticMLAPI.CreateDocument(db);
-                xmlDocument.Save(exportPath + $"/[DB]Alias_{db.AttributeList.BlockName}.xml");
+                var xmlDocument = SimaticMLAPI.CreateDocument(globalDB);
+                xmlDocument.Save(exportPath + $"/[DB_Alias]-{globalDB.AttributeList.BlockName}.xml");
             }
         }
     }
