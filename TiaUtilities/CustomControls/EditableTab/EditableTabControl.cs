@@ -1,4 +1,6 @@
-﻿using InfoBox;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Office2010.ExcelAc;
+using InfoBox;
 using System.Runtime.InteropServices;
 using TiaUtilities.Languages;
 using TiaUtilities.Styles;
@@ -308,16 +310,18 @@ namespace TiaUtilities.CustomControls.EditableTab
             {
                 this.SuspendLayout();
 
-                int draggedIndex = this.TabPages.IndexOf(dragAndDrop.TabPage);
-                int droppedIndex = this.TabPages.IndexOf(droppedTabPage);
+                int dragStartIndex = this.TabPages.IndexOf(dragAndDrop.TabPage);
+                int dragEndIndex = this.TabPages.IndexOf(droppedTabPage);
 
-                if (draggedIndex >= 0 && draggedIndex < this.TabCount &&
-                    droppedIndex >= 0 && droppedIndex < this.TabCount &&
-                    draggedIndex != droppedIndex)
+                if (dragStartIndex >= 0 && dragStartIndex < this.TabCount &&
+                    dragEndIndex >= 0 && dragEndIndex < this.TabCount &&
+                    dragStartIndex != dragEndIndex)
                 {
                     var oldSelectedTab = this.SelectedTab;
 
-                    (this.TabPages[droppedIndex], this.TabPages[draggedIndex]) = (this.TabPages[draggedIndex], this.TabPages[droppedIndex]);
+                    var item = this.TabPages[dragStartIndex];
+                    this.TabPages.RemoveAt(dragStartIndex);
+                    this.TabPages.Insert(dragEndIndex, item);
 
                     this.SelectedTab = oldSelectedTab;
                 }

@@ -144,9 +144,10 @@ namespace TiaUtilities.CustomControls.EditableTab
                 AllowDrop = true,
                 TabStop = false
             };
-            dragButton.DragEnter += (sender, args) => HandleDragEnter(args);
-            dragButton.DragDrop += (sender, args) => HandleDragDrop(currentDataInfo, args);
-            dragButton.MouseDown += (sender, args) => dragButton.DoDragDrop(currentDataInfo, DragDropEffects.Move, null, Point.Empty, true);
+            //This needs to be changed
+            //dragButton.DragEnter += (sender, args) => HandleDragEnter(args);
+            //dragButton.DragDrop += (sender, args) => HandleDragDrop(currentDataInfo, args);
+            //dragButton.MouseDown += (sender, args) => dragButton.DoDragDrop(currentDataInfo, DragDropEffects.Move, null, Point.Empty, true);
 
             Button closeButton = new()
             {
