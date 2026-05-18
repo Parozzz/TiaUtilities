@@ -415,6 +415,11 @@ namespace TiaUtilities.CustomControls.EditableTab
 
         public void CloseTabs(IEnumerable<CloseRequest> closeRequests, bool forceClosing = false)
         {
+            if(!closeRequests.Any())
+            {
+                return;
+            }
+
             var validCloseRequests = closeRequests.Where(cr => cr.TabPage is not EditableNewTabPage);
 
             if (!forceClosing && this.RequireConfirmationBeforeClosing)

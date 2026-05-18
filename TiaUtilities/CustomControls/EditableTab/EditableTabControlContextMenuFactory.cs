@@ -43,8 +43,7 @@ namespace TiaUtilities.CustomControls.EditableTab
                 tabControl.SuspendLayout();
 
                 var quickEditForm = new EditableTabControlQuickEditForm(tabControl);
-                var result = quickEditForm.ShowDialog(tabControl);
-                if (result == DialogResult.OK)
+                if (quickEditForm.ShowDialog(tabControl) == DialogResult.OK)
                 {
                     var oldSelectedTab = tabControl.SelectedTab;
 
@@ -63,7 +62,10 @@ namespace TiaUtilities.CustomControls.EditableTab
                     }
 
                     var closeRequests = rowDataWithCloseDict.Values.WhereNotNull();
-                    tabControl.CloseTabs(closeRequests);
+                    if(closeRequests.Any())
+                    {
+                        tabControl.CloseTabs(closeRequests);
+                    }
 
                     var pages = rowDataWithCloseDict.OrderBy(p => p.Key.Info.Index)
                                                     .Where(p => p.Value is null || !p.Value.Closed)
