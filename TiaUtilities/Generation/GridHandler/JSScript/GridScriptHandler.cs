@@ -67,7 +67,7 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
             this.GridHandlerBind = handlerBind;
 
             this.gridVariables.Clear();
-            if(handlerBind != null)
+            if (handlerBind != null)
             {
                 this.gridVariables.AddRange(handlerBind.ScriptVariables);
             }
@@ -75,7 +75,7 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
 
         public void ShowForm(IWin32Window? window = null)
         {
-            if(form == null)
+            if (form == null)
             {
                 this.log.Value = "";
                 this.jsonContext.Value = "";
@@ -127,53 +127,60 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                 }
                 engine.SetValue(ENGINE_LOG_FUNCTION, log);
 
+                ScriptTimeLogger timeLogger = new();
+
                 this.GridHandlerBind.SuspendLayout();
                 var request = this.GridHandlerBind.Join();
 
-                ScriptTimeLogger timeLogger = new();
-
-                List<int> rowIndexes = [];
-                if (singleExecution)
+                try
                 {
-                    int rowIndex = this.GridHandlerBind.GetCurrentCell()?.RowIndex ?? 0;
-                    if (rowIndex >= 0 && rowIndex <= this.GridHandlerBind.RowCount)
+                    List<int> rowIndexes = [];
+                    if (singleExecution)
                     {
-                        if (!this.GridHandlerBind.IsGridDataEmpty(rowIndex))
+                        int rowIndex = this.GridHandlerBind.GetCurrentCell()?.RowIndex ?? 0;
+                        if (rowIndex >= 0 && rowIndex <= this.GridHandlerBind.RowCount)
                         {
-                            rowIndexes.Add(rowIndex);
-                        }
+                            if (!this.GridHandlerBind.IsGridDataEmpty(rowIndex))
+                            {
+                                rowIndexes.Add(rowIndex);
+                            }
 
-                        var nextRow = this.GridHandlerBind.GetFirstFullIndexStartingAt(rowIndex + 1);
-                        //If there is no next row, start from top (and now we are here).
-                        nextRow = nextRow < 0 ? this.GridHandlerBind.GetFirstFullIndexStartingAt(0) : nextRow;
-                        if (nextRow >= 0)
-                        {
-                            this.GridHandlerBind.SelectRow(nextRow);
+                            var nextRow = this.GridHandlerBind.GetFirstFullIndexStartingAt(rowIndex + 1);
+                            //If there is no next row, start from top (and now we are here).
+                            nextRow = nextRow < 0 ? this.GridHandlerBind.GetFirstFullIndexStartingAt(0) : nextRow;
+                            if (nextRow >= 0)
+                            {
+                                this.GridHandlerBind.SelectRow(nextRow);
+                            }
                         }
                     }
-                }
-                else
-                {
-                    rowIndexes.AddRange(this.GridHandlerBind.GetNotEmptyRowIndexesStartingAt(0));
-                }
-
-                var variables = this.JoinAllVariables();
-                foreach (var rowIndex in rowIndexes)
-                {
-                    Dictionary<string, GridJSVariable> variablesDict = [];
-
-                    engine.SetValue(ENGINE_ROW_VARIABLE, rowIndex);
-                    foreach (var variable in variables)
+                    else
                     {
-                        var value = variable.Get?.Invoke(rowIndex);
-                        engine.SetValue(variable.Name, value);
-
-                        variablesDict.Add(variable.Name, new(variable) { OldValue = value });
+                        rowIndexes.AddRange(this.GridHandlerBind.GetNotEmptyRowIndexesStartingAt(0));
                     }
 
-                    timeLogger.Restart();
-                    ExecuteJS(engine, preparedScript, variablesDict, rowIndex);
-                    timeLogger.StopAndSave();
+                    var variables = this.JoinAllVariables();
+                    foreach (var rowIndex in rowIndexes)
+                    {
+                        Dictionary<string, GridJSVariable> variablesDict = [];
+
+                        engine.SetValue(ENGINE_ROW_VARIABLE, rowIndex);
+                        foreach (var variable in variables)
+                        {
+                            var value = variable.Get?.Invoke(rowIndex);
+                            engine.SetValue(variable.Name, value);
+
+                            variablesDict.Add(variable.Name, new(variable) { OldValue = value });
+                        }
+
+                        timeLogger.Restart();
+                        ExecuteJS(engine, preparedScript, variablesDict, rowIndex);
+                        timeLogger.StopAndSave();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Utils.ShowExceptionMessage(ex);
                 }
 
                 this.GridHandlerBind.ResumeLayout(refresh: true);

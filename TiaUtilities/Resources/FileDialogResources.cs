@@ -10,5 +10,7 @@
         public static readonly Guid GENERATION_IO_IMPORT_SUGGESTIONS = new("bdc92f8e-2907-44bc-a151-ea3abc2f4d8e");
         public static readonly Guid GENERATION_IO_IMPORT_EXCEL = new("204e39f4-99cb-486d-86e7-ece204d6c08d");
         public static readonly Guid GENERATION_IO_IMPORT_FROM_TABLE = new("59a71e14-e4cc-4edc-b113-c8d120949976");
+
+        public static readonly Guid GENERATION_ALARM_IMPORT_TEMPLATES_FROM_FB = new("ad54c7c1-adcf-4aff-bd53-9c00a3d9cb5b");
     }
 }

@@ -63,7 +63,7 @@ namespace SimaticML.Blocks
             var membersAddressList = new List<string>();
             foreach (var member in blockAttributeList.STATIC.GetItems())
             {
-                var memberChildAddressList = this.GetAddressOfChildMembers(member);
+                var memberChildAddressList = BlockDB.GetAddressOfChildMembers(member);
 
                 var memberName = SimaticMLUtil.WrapAddressComponentIfRequired(member.MemberName);
                 membersAddressList.AddRange(memberChildAddressList.Select(s => this.blockAttributeList.BlockName + "." + memberName + "." + s));
@@ -72,7 +72,7 @@ namespace SimaticML.Blocks
             return membersAddressList;
         }
 
-        private List<string> GetAddressOfChildMembers(Member member)
+        public static List<string> GetAddressOfChildMembers(Member member)
         {
             var childAddressList = new List<string>();
 
@@ -95,7 +95,7 @@ namespace SimaticML.Blocks
                     }
                     else
                     {
-                        var subChildAddressList = this.GetAddressOfChildMembers(childMember);
+                        var subChildAddressList = BlockDB.GetAddressOfChildMembers(childMember);
                         childAddressList.AddRange(subChildAddressList.Select(s => childName + "." + s));
                     }
                 }

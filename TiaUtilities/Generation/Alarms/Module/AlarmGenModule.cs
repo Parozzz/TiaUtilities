@@ -1,14 +1,23 @@
-﻿using TiaUtilities.Configuration;
+﻿using InfoBox;
+using Microsoft.WindowsAPICodePack.Dialogs;
+using SimaticML.API;
+using SimaticML.Blocks;
+using SimaticML.TagTable;
+using System.Globalization;
+using TiaUtilities.Configuration;
 using TiaUtilities.Editors.ErrorReporting;
 using TiaUtilities.Generation.Alarms.Configurations;
+using TiaUtilities.Generation.Alarms.Data;
 using TiaUtilities.Generation.Alarms.Module.Tab;
 using TiaUtilities.Generation.Alarms.Module.Template;
 using TiaUtilities.Generation.Alarms.Template;
 using TiaUtilities.Generation.Alarms.Xml;
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.JSScript;
+using TiaUtilities.Generation.IO.Module;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Languages;
+using TiaUtilities.Resources;
 using TiaUtilities.SettingsNew;
 using TiaUtilities.SettingsNew.Bindings;
 using TiaUtilities.Utility;
@@ -70,6 +79,58 @@ namespace TiaUtilities.Generation.Alarms.Module
                     this.SettingsBindings.Reload();
                 }
             };
+
+            ToolStripMenuItem importTemplatesFromFb = new("Import templates from FB");
+            importTemplatesFromFb.Click += (sender, args) =>
+            {
+                var savedFilePath = MainForm.Settings.GetSavedFileDialogPath(FileDialogResources.GENERATION_ALARM_IMPORT_TEMPLATES_FROM_FB);
+
+                var fileDialog = new CommonOpenFileDialog
+                {
+                    IsFolderPicker = false,
+                    EnsurePathExists = true,
+                    EnsureValidNames = true,
+                    Multiselect = true,
+                    DefaultExtension = ".xml",
+                    Filters = { new CommonFileDialogFilter("XML Files", "*.xml") },
+                    InitialDirectory = savedFilePath,
+                };
+
+                if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
+                {
+                    foreach (var filePath in fileDialog.FileNames)
+                    {
+                        var xmlNodeConfiguration = SimaticMLAPI.ParseFile(filePath);
+                        if (xmlNodeConfiguration is BlockFB blockFB)
+                        {
+                            foreach(var member in blockFB.AttributeList.STATIC.GetItems())
+                            {
+                                if(member.MemberName.ToLower().Equals("allarmi"))
+                                {
+                                    var template = templateHandler.AddNewTemplate();
+                                    template.Name = blockFB.AttributeList.BlockName;
+
+                                    var nextGridIndex = template.AlarmGridSave.RowData.Count == 0 ? 0 : (template.AlarmGridSave.RowData.Keys.Max() + 1);
+                                    foreach(var subMember in member.GetItems())
+                                    {
+                                        TemplateData newTemplateData = new() { AlarmVariable = subMember.MemberName, Description = subMember.Comment[CultureInfo.CurrentCulture] };
+
+                                        template.AlarmGridSave.RowData.Add(nextGridIndex, newTemplateData);
+                                        nextGridIndex++;
+                                    }
+
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            InformationBox.Show("The selected block is NOT a BlockFB or file is invalid.", "Invalid imported xml", icon: InformationBoxIcon.Exclamation);
+                        }
+                    }
+                }
+            };
+            form.importExportMenuItem.DropDownItems.Add(importTemplatesFromFb);
             #endregion
 
             this.gridBindContainer.Init(form);

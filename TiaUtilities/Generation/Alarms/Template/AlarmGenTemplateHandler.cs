@@ -88,7 +88,7 @@ namespace TiaUtilities.Generation.Alarms.Template
             return null;
         }
 
-        public void AddNewTemplate()
+        public AlarmGenTemplate AddNewTemplate()
         {
             AlarmGenTemplate newTemplate = new($"New template [{templateList.Count}]");
             this.templateList.Add(newTemplate);
@@ -97,6 +97,8 @@ namespace TiaUtilities.Generation.Alarms.Template
             this.SelectedTemplate = newTemplate;
 
             this.dirty = true;
+
+            return newTemplate;
         }
 
         public void RemoveSelectedTemplate()

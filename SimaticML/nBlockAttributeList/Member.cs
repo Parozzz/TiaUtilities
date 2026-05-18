@@ -60,7 +60,7 @@ namespace SimaticML.nBlockAttributeList
 
             subElement = this.AddNode("Subelement");
             subElementPath = subElement.AddAttribute("Path", required: true);
-            subElementStartValue = subElement.AddNode("StartValue", required: true);
+            subElementStartValue = subElement.AddNode("StartValue");
 
             sections = this.AddNodeList("Sections", xmlNode => new Section());
 
@@ -114,6 +114,21 @@ namespace SimaticML.nBlockAttributeList
         public string GetCompleteSymbol()
         {
             return this.GetParentSymbol(this);
+        }
+
+        public List<string> GetAllMemberAddress(bool includeItself = true)
+        {
+            var membersAddressList = new List<string>();
+            
+            foreach (var member in this.GetItems())
+            {
+                var memberChildAddressList = BlockDB.GetAddressOfChildMembers(member);
+
+                var memberName = includeItself ? (SimaticMLUtil.WrapAddressComponentIfRequired(member.MemberName) + ".") : "";
+                membersAddressList.AddRange(memberChildAddressList.Select(s => memberName + s));
+            }
+
+            return membersAddressList;
         }
 
         private string GetParentSymbol(XmlNodeConfiguration parentConfiguration)

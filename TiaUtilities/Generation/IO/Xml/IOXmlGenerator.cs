@@ -29,10 +29,12 @@ namespace TiaUtilities.Generation.IO.Xml
         {
         }
 
-        public void GenerateAlias(string name, GridDataPreviewer<IOData> previewer, IOTabConfiguration tabConfig, List<IOData> ioDataList)
+        public void GenerateAlias(string tabName, GridDataPreviewer<IOData> previewer, IOTabConfiguration tabConfig, List<IOData> ioDataList)
         {
-            IOGenPlaceholderHandler placeholderHandler = new(previewer, this.mainConfig, tabConfig);
-            placeholderHandler.TabName = name;
+            IOGenPlaceholderHandler placeholderHandler = new(previewer, this.mainConfig, tabConfig)
+            {
+                TabName = tabName
+            };
 
             BlockFC fc = new();
             fc.Init();
@@ -50,7 +52,7 @@ namespace TiaUtilities.Generation.IO.Xml
             var duplicatedAddressDict = new Dictionary<string, uint>();
 
             List<XMLTagTable> ioTagTableList = new();
-            ioTagTableDict.Add(name, ioTagTableList);
+            ioTagTableDict.Add(tabName, ioTagTableList);
 
             XMLTagTable ioTagTable = new() { TableName = $"{placeholderHandler.Parse(mainConfig.IOTableName)}_{tagCounter}" };
             ioTagTableList.Add(ioTagTable);
@@ -58,7 +60,7 @@ namespace TiaUtilities.Generation.IO.Xml
             SimaticLADSegment? segment = null;
 
             //Order list by ADRESS TYPE - BYTE - BIT 
-            foreach (var ioData in ioDataList.OrderBy(x => ((int)x.GetAddressMemoryArea()) * Math.Pow(10, 9) + x.GetAddressByte() * Math.Pow(10, 3) + x.GetAddressBit()).ToList())
+            foreach (var ioData in ioDataList.OrderBy(IOXmlGenerator.OrderByAddress))
             {
                 //If name of variable is \ i will ignore everything and skip to the next
                 if (GenUtils.DATA_INVALID_CHARS.Contains(ioData.Variable) || GenUtils.DATA_INVALID_CHARS.Contains(ioData.IOName))
@@ -69,7 +71,7 @@ namespace TiaUtilities.Generation.IO.Xml
                 ioData.LoadDefaults(previewer, mainConfig, out bool ioNameDefault, out bool variableDefault, out bool merkerAddressDefault);
 
                 placeholderHandler.Clear();
-                placeholderHandler.TabName = name;
+                placeholderHandler.TabName = tabName;
                 placeholderHandler.IOData = ioData;
 
                 ioData.ParsePlaceholders(placeholderHandler);
@@ -90,7 +92,7 @@ namespace TiaUtilities.Generation.IO.Xml
                 string? inOutAddress = null;
                 if (!variableDefault)
                 {
-                    var member = AddMemberToDB(duplicatedAddressDict, ioData.Variable, ioData.Comment);
+                    var member = AddMemberToDB(placeholderHandler, duplicatedAddressDict, ioData.Variable, ioData.Comment);
                     inOutAddress = $"{ioData.Variable}";
                 }
                 else
@@ -121,7 +123,7 @@ namespace TiaUtilities.Generation.IO.Xml
                             inOutAddress = $"\"{merkerVariableAddress}\""; //Add double quote to avoid this address to be parsed as a DB call (eg. to avoid I0.0 to be parsed as "I0"."0" instead "I0.0")
                             break;
                         case IOMemoryTypeEnum.DB:
-                            var member = AddMemberToDB(duplicatedAddressDict, ioData.Variable, ioData.Comment);
+                            var member = AddMemberToDB(placeholderHandler, duplicatedAddressDict, ioData.Variable, ioData.Comment);
                             inOutAddress = member.GetCompleteSymbol();
 
                             break;
@@ -166,16 +168,21 @@ namespace TiaUtilities.Generation.IO.Xml
 
             segment?.Create(fc); //The last segment would not be generated otherwise (Since they are created during a group change!)
 
-            this.fcDict.Add(name, fc);
+            this.fcDict.Add(tabName, fc);
         }
 
-        private Member AddMemberToDB(Dictionary<string, uint> duplicatedAddressDict, string variable, string comment)
+        private static double OrderByAddress(IOData iOData)
+        {
+            return ((int)iOData.GetAddressMemoryArea()) * Math.Pow(10, 9) + iOData.GetAddressByte() * Math.Pow(10, 3) + iOData.GetAddressBit();
+        }
+
+        private Member AddMemberToDB(IOGenPlaceholderHandler placeholderHandler, Dictionary<string, uint> duplicatedAddressDict, string variable, string comment)
         {
             if (db == null)
             {
                 db = new BlockGlobalDB();
                 db.Init();
-                db.AttributeList.BlockName = mainConfig.DBName;
+                db.AttributeList.BlockName = placeholderHandler.ParseNotNull(mainConfig.DBName);
                 db.AttributeList.BlockNumber = mainConfig.DBNumber;
                 db.AttributeList.AutoNumber = (mainConfig.DBNumber > 0);
             }
