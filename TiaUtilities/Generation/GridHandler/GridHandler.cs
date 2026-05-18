@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using TiaUtilities.Generation.GridHandler.Binds;
+﻿using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.CustomColumns;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.GridHandler.JSScript;
@@ -42,7 +41,6 @@ namespace TiaUtilities.Generation.GridHandler
 
         public bool AddRowIndexToRowHeader { get; set; } = true;
         public bool EnablePasteFromExcel { get; set; } = true;
-        public bool EnableRowSelectionFromRowHeaderClick { get; set; } = true;
         public bool ShowJSContextMenuTopLeft { get; set; } = true;
 
         public event GridDataChangedEventHandler DataChanged = delegate { };
@@ -225,53 +223,35 @@ namespace TiaUtilities.Generation.GridHandler
             this.Columns.Init();
             this.DataSource.InitializeData(this.InitializeRowCount);
 
-            #region EVENTS(MouseDown) - QOL Full Row Selection
-            if (EnableRowSelectionFromRowHeaderClick)
+            #region EVENTS(CellMouseDown) - QOL Full Row Selection
+            this.DataGridView.CellMouseDown += (sender, args) =>
             {
-                this.DataGridView.MouseDown += (sender, args) =>
+                if (args.ColumnIndex == -1 && args.RowIndex >= 0)
                 {
-                    var hitTest = this.DataGridView.HitTest(args.X, args.Y);
-                    switch (hitTest.Type)
+                    var currentRow = this.DataGridView.CurrentRow;
+                    if (Control.ModifierKeys == Keys.Shift && currentRow != null)
                     {
-                        case DataGridViewHitTestType.None: //I want that to clear the selection, you do a simple click in an empty area!
-                            this.DataGridView.ClearSelection();
-                            this.DataGridView.CurrentCell = null; //This avoid the situation where if you click the old cell again, it start editing immediately! 
-                            break;
-                        case DataGridViewHitTestType.RowHeader: //If i click a row head, i want the whole row to be selected!
-                            var currentRow = this.DataGridView.CurrentRow;
-                            if (Control.ModifierKeys == Keys.Shift && currentRow != null)
+                        var startRowIndex = currentRow.Index;
+                        var endRowIndex = args.RowIndex;
+
+                        this.DataGridView.ClearSelection();
+
+                        var biggestIndex = Math.Max(startRowIndex, endRowIndex);
+                        var lowestIndex = Math.Min(startRowIndex, endRowIndex);
+                        for (int x = lowestIndex; x < biggestIndex + 1; x++)
+                        {
+                            foreach (DataGridViewCell cell in this.DataGridView.Rows[x].Cells)
                             {
-                                if (hitTest.RowIndex < 0)
-                                {
-                                    break;
-                                }
-
-                                var startRowIndex = currentRow.Index;
-                                var endRowIndex = hitTest.RowIndex;
-
-                                this.DataGridView.ClearSelection();
-
-                                var biggestIndex = Math.Max(startRowIndex, endRowIndex);
-                                var lowestIndex = Math.Min(startRowIndex, endRowIndex);
-                                for (int x = lowestIndex; x < biggestIndex + 1; x++)
-                                {
-                                    foreach (DataGridViewCell cell in this.DataGridView.Rows[x].Cells)
-                                    {
-                                        cell.Selected = true;
-                                    }
-                                }
+                                cell.Selected = true;
                             }
-                            else
-                            {
-                                SelectRow(hitTest.RowIndex);
-                            }
-
-                            break;
-                        case DataGridViewHitTestType.Cell:
-                            break;
+                        }
                     }
-                };
-            }
+                    else
+                    {
+                        SelectRow(args.RowIndex);
+                    }
+                }
+            };
             #endregion
 
             #region EVENTS(CellClick / CellMouseDoubleClick) QOL - Better Editing Control Show
