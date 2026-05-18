@@ -8,6 +8,7 @@ using TiaUtilities.Generation.IO.Data;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Languages;
 using TiaUtilities.SettingsNew.Bindings;
+using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.IO
 {
@@ -34,6 +35,11 @@ namespace TiaUtilities.Generation.IO
 
         public static void DragDone<T>(GridExcelDragEventArgs eventArgs, GridHandler<T> gridHandler) where T : GridData
         {
+            if (eventArgs.SelectedRowCount <= 0 || eventArgs.TopSelectedRow < 0)
+            {
+                return;
+            }
+
             if (eventArgs.DraggedColumn == IOData.ADDRESS)
             {
                 var startString = "" + gridHandler.DataSource[eventArgs.StartingRow][eventArgs.DraggedColumn];
@@ -51,18 +57,25 @@ namespace TiaUtilities.Generation.IO
 
                 var req = gridHandler.DataChangedHandler.Join();
 
-                var rowIndexEnumeration = Enumerable.Range(eventArgs.TopSelectedRow, (int)eventArgs.SelectedRowCount);
-                if (!eventArgs.DraggingDown)
+                try
                 {
-                    rowIndexEnumeration = rowIndexEnumeration.Reverse();
-                }
+                    var rowIndexEnumeration = Enumerable.Range(eventArgs.TopSelectedRow, (int)eventArgs.SelectedRowCount);
+                    if (!eventArgs.DraggingDown)
+                    {
+                        rowIndexEnumeration = rowIndexEnumeration.Reverse();
+                    }
 
-                foreach (var rowIndex in rowIndexEnumeration)
+                    foreach (var rowIndex in rowIndexEnumeration)
+                    {
+                        gridHandler.DataSource[rowIndex][IOData.ADDRESS] = tagAddress.GetAddress();
+                        var _ = eventArgs.DraggingDown ?
+                            tagAddress.NextBit(SimaticDataType.BYTE) :
+                            tagAddress.PreviousBit(SimaticDataType.BYTE); //Increase at the end. The first value is valid!
+                    }
+                }
+                catch (Exception ex)
                 {
-                    gridHandler.DataSource[rowIndex][IOData.ADDRESS] = tagAddress.GetAddress();
-                    var _ = eventArgs.DraggingDown ? 
-                        tagAddress.NextBit(SimaticDataType.BYTE) : 
-                        tagAddress.PreviousBit(SimaticDataType.BYTE); //Increase at the end. The first value is valid!
+                    Utils.ShowExceptionMessage(ex);
                 }
 
                 gridHandler.DataChangedHandler.End(req);
@@ -112,8 +125,8 @@ namespace TiaUtilities.Generation.IO
                 .SetHasPlaceholderSupportDotMark();
         }
 
-        public static void AddTabConfigSettings(SettingsBindings settingsBindings, 
-            Func<string> nameFunc, Func<bool> isVisibileFunc, 
+        public static void AddTabConfigSettings(SettingsBindings settingsBindings,
+            Func<string> nameFunc, Func<bool> isVisibileFunc,
             Func<IOTabConfiguration?> tabConfigFunc, Func<Dictionary<string, ObservableConfiguration>> tabDictFunc)
         {
             settingsBindings
