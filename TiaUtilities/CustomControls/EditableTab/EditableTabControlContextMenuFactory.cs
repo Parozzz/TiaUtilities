@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TiaUtilities.Languages;
+﻿using TiaUtilities.Languages;
 using TiaUtilities.Resources;
 using TiaUtilities.Utility.Extensions;
 
@@ -15,6 +10,11 @@ namespace TiaUtilities.CustomControls.EditableTab
         private const string IMAGE_ADD_KEY = "Add";
         private const string IMAGE_EDIT_NAME_KEY = "EditName";
         private const string IMAGE_CLOSE_KEY = "Close";
+
+        private class ContextMenuTag()
+        {
+            public bool IgnoreChangesOnClose { get; set; } = false;
+        }
 
         public static ContextMenuStrip CreateContextMenu(EditableTabControl tabControl, TabPage tabPage)
         {
@@ -30,8 +30,9 @@ namespace TiaUtilities.CustomControls.EditableTab
             {
                 MinimumSize = new(300, 0),
                 ImageList = imageList,
+                Tag = new ContextMenuTag(),
             };
-            contextMenu.KeyDown += (sender, args) => EditableTabControlContextMenuFactory.CloseOnKeyPress(contextMenu, args);
+            contextMenu.PreviewKeyDown += (sender, args) => EditableTabControlContextMenuFactory.CloseOnPreviewKeyDown(contextMenu, args);
 
             ToolStripMenuItem quickEditItem = new()
             {
@@ -62,7 +63,7 @@ namespace TiaUtilities.CustomControls.EditableTab
                     }
 
                     var closeRequests = rowDataWithCloseDict.Values.WhereNotNull();
-                    if(closeRequests.Any())
+                    if (closeRequests.Any())
                     {
                         tabControl.CloseTabs(closeRequests);
                     }
@@ -126,7 +127,7 @@ namespace TiaUtilities.CustomControls.EditableTab
                 Margin = new(0),
                 MinimumSize = new(200, 0)
             };
-            editNameTextBox.KeyDown += (sender, args) => EditableTabControlContextMenuFactory.CloseOnKeyPress(contextMenu, args);
+            editNameTextBox.PreviewKeyDown += (sender, args) => EditableTabControlContextMenuFactory.CloseOnPreviewKeyDown(contextMenu, args);
 
             FlowLayoutPanel panel = new()
             {
@@ -137,12 +138,7 @@ namespace TiaUtilities.CustomControls.EditableTab
                 Controls = { editNameLabel, editNameTextBox },
                 Padding = new(0),
             };
-
-            ToolStripControlHost editNameHost = new(panel)
-            {
-                BackColor = Color.Transparent,
-                ImageKey = IMAGE_EDIT_NAME_KEY, //Seems to not work :(
-            };
+            ToolStripControlHost editNameHost = new(panel) { BackColor = Color.Transparent };
 
 
             contextMenu.Items.Add(editNameHost);
@@ -152,17 +148,34 @@ namespace TiaUtilities.CustomControls.EditableTab
             contextMenu.Items.Add(addOneTab);
             contextMenu.Items.Add(addFiveTabs);
 
+            contextMenu.Opened += (sender, args) =>
+            {
+                editNameTextBox.Focus();
+                editNameTextBox.SelectAll();
+            };
+
             contextMenu.Closed += (sender, args) =>
             {
+                if (contextMenu.Tag is ContextMenuTag tag && tag.IgnoreChangesOnClose)
+                {
+                    return;
+                }
+
                 tabControl.RenameTab(tabPage, editNameTextBox.Text);
             };
 
             return contextMenu;
         }
 
-        private static void CloseOnKeyPress(ContextMenuStrip contextMenu, KeyEventArgs args)
+        private static void CloseOnPreviewKeyDown(ContextMenuStrip contextMenu, PreviewKeyDownEventArgs args)
         {
-            if (args.KeyData == Keys.Escape || args.KeyData == Keys.Enter)
+            var escape = args.KeyData == Keys.Escape;
+            if (escape && contextMenu.Tag is ContextMenuTag tag)
+            {
+                tag.IgnoreChangesOnClose = true;
+            }
+
+            if (escape || args.KeyData == Keys.Enter)
             {
                 contextMenu.Close();
             }

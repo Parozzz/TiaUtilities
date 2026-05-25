@@ -1,8 +1,9 @@
-﻿using TiaUtilities.SettingsNew.Bindings;
+﻿using TiaUtilities.Generation.TextsEditor;
+using TiaUtilities.SettingsNew.Bindings;
 
 namespace TiaUtilities.Generation
 {
-    public interface IGenModule : ICleanable, ISaveable<object>
+    public interface IGenModule : ICleanable, ISaveable<object>, ITextsEditorExporter
     {
         public abstract SettingsBindings SettingsBindings { get; init; }
 
@@ -21,5 +22,6 @@ namespace TiaUtilities.Generation
         public void OpenPlaceholderViewer(IWin32Window? window = null);
 
         public void ToggleSettingsFormVisibility();
+
     }
 }

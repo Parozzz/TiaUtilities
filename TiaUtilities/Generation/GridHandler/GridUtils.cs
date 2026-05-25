@@ -196,6 +196,11 @@ namespace TiaUtilities.Generation.GridHandler
 
                         foreach (DataGridViewCell cell in dataGridView.SelectedCells)
                         {
+                            if(cell.ReadOnly)
+                            {
+                                continue;
+                            }
+
                             cell.Value = strippedPasteString;
                             pastedCellList.Add(cell);
                         }
@@ -231,7 +236,7 @@ namespace TiaUtilities.Generation.GridHandler
                         var columnIndex = validColumnIndexes[columnCounter];
 
                         var cell = dataGridView.Rows[rowIndex]?.Cells[columnIndex];
-                        if (cell != null)
+                        if (cell != null && !cell.ReadOnly)
                         {
                             cell.Value = pastedValue;
                             pastedCellList.Add(cell);

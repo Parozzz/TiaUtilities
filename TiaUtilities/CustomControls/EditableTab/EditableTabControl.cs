@@ -193,6 +193,17 @@ namespace TiaUtilities.CustomControls.EditableTab
             }
         }
 
+        protected override void OnPreviewKeyDown(PreviewKeyDownEventArgs e)
+        {
+            base.OnPreviewKeyDown(e);
+
+            if(e.KeyData == (Keys.Enter | Keys.Control))
+            {
+                this.HandleContextMenuOnKeyboard();
+            }
+        }
+
+
         private Point? dragMouseDownPoint;
         protected override void OnMouseDown(MouseEventArgs args)
         {
@@ -218,7 +229,7 @@ namespace TiaUtilities.CustomControls.EditableTab
             else if (args.Button == MouseButtons.Right)
             {
                 this.SelectedTab = tabPage;
-                this.HandleContextMenu(tabPage);
+                this.HandleContextMenuOnMouse(tabPage);
             }
         }
 
@@ -247,7 +258,7 @@ namespace TiaUtilities.CustomControls.EditableTab
             }
 
             this.SelectedTab = tabPage;
-            this.HandleContextMenu(tabPage);
+            this.HandleContextMenuOnMouse(tabPage);
         }
 
         protected override void OnMouseMove(MouseEventArgs args)
@@ -350,10 +361,23 @@ namespace TiaUtilities.CustomControls.EditableTab
             return -1;
         }
 
-        private void HandleContextMenu(TabPage tabPage)
+        private void HandleContextMenuOnMouse(TabPage tabPage)
         {
             var contextMenu = EditableTabControlContextMenuFactory.CreateContextMenu(this, tabPage);
             contextMenu.Show(Cursor.Position);
+        }
+
+        private void HandleContextMenuOnKeyboard()
+        {
+            if(this.SelectedTab == null)
+            {
+                return;
+            }
+
+            var contextMenu = EditableTabControlContextMenuFactory.CreateContextMenu(this, this.SelectedTab);
+            
+            Point point = new(this.SelectedTab.Left, this.SelectedTab.Top);
+            contextMenu.Show(this.SelectedTab.PointToScreen(point));
         }
 
         public void AddTabs(int count = 1)

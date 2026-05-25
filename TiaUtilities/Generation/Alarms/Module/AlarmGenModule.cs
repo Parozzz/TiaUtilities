@@ -1,8 +1,8 @@
-﻿using InfoBox;
+﻿using ClosedXML.Excel;
+using InfoBox;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using SimaticML.API;
 using SimaticML.Blocks;
-using SimaticML.TagTable;
 using System.Globalization;
 using TiaUtilities.Configuration;
 using TiaUtilities.Editors.ErrorReporting;
@@ -13,9 +13,10 @@ using TiaUtilities.Generation.Alarms.Module.Template;
 using TiaUtilities.Generation.Alarms.Template;
 using TiaUtilities.Generation.Alarms.Xml;
 using TiaUtilities.Generation.GridHandler.Binds;
+using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.GridHandler.JSScript;
-using TiaUtilities.Generation.IO.Module;
 using TiaUtilities.Generation.Placeholders;
+using TiaUtilities.Generation.TextsEditor;
 using TiaUtilities.Languages;
 using TiaUtilities.Resources;
 using TiaUtilities.SettingsNew;
@@ -103,15 +104,15 @@ namespace TiaUtilities.Generation.Alarms.Module
                         var xmlNodeConfiguration = SimaticMLAPI.ParseFile(filePath);
                         if (xmlNodeConfiguration is BlockFB blockFB)
                         {
-                            foreach(var member in blockFB.AttributeList.STATIC.GetItems())
+                            foreach (var member in blockFB.AttributeList.STATIC.GetItems())
                             {
-                                if(member.MemberName.ToLower().Equals("allarmi"))
+                                if (member.MemberName.ToLower().Equals("allarmi"))
                                 {
                                     var template = templateHandler.AddNewTemplate();
                                     template.Name = blockFB.AttributeList.BlockName;
 
                                     var nextGridIndex = template.AlarmGridSave.RowData.Count == 0 ? 0 : (template.AlarmGridSave.RowData.Keys.Max() + 1);
-                                    foreach(var subMember in member.GetItems())
+                                    foreach (var subMember in member.GetItems())
                                     {
                                         TemplateData newTemplateData = new() { AlarmVariable = subMember.MemberName, Description = subMember.Comment[CultureInfo.CurrentCulture] };
 
@@ -162,9 +163,9 @@ namespace TiaUtilities.Generation.Alarms.Module
             this.control.tabControl.TabNameUserChanged += (sender, args) =>
             {
                 var newName = args.NewName;
-                foreach(var loopTab in this.alarmTabList)
+                foreach (var loopTab in this.alarmTabList)
                 {
-                    if(newName == loopTab.Name)
+                    if (newName == loopTab.Name)
                     {
                         var tabNames = this.alarmTabList
                                             .Where(tab => tab.TabPage != args.TabPage)
@@ -215,7 +216,7 @@ namespace TiaUtilities.Generation.Alarms.Module
             AlarmGenTab alarmTab = new(this.gridBindContainer, this, this.mainConfig, this.templateHandler, tabPage);
             alarmTab.Init();
 
-            if(save == null)
+            if (save == null)
             {
                 alarmTab.Name = Utils.CheckEqualityAndAddNumberAtEnd("AlarmTab", this.alarmTabList.Select(tab => tab.Name));
             }
@@ -346,10 +347,10 @@ namespace TiaUtilities.Generation.Alarms.Module
         {
             AlarmGenUtils.AddMainConfigBindings(settingsBindings, this.mainConfig);
 
-            AlarmGenUtils.AddTabConfigSettings(settingsBindings, 
-                this.GetCurrentTabName, 
-                this.IsAnyTabSelected, 
-                this.GetCurrentTabConfiguration, 
+            AlarmGenUtils.AddTabConfigSettings(settingsBindings,
+                this.GetCurrentTabName,
+                this.IsAnyTabSelected,
+                this.GetCurrentTabConfiguration,
                 this.GetTabConfigurationDict);
 
             AlarmGenUtils.AddTemplateConfigSettings(settingsBindings,
@@ -407,14 +408,177 @@ namespace TiaUtilities.Generation.Alarms.Module
         private Dictionary<string, ObservableConfiguration> GetTemplateConfigurationDict()
         {
             Dictionary<string, ObservableConfiguration> dict = [];
-            foreach(var template in this.templateHandler.BindingList)
+            foreach (var template in this.templateHandler.BindingList)
             {
-                if(!dict.TryAdd(template.Name, template.TemplateConfig))
+                if (!dict.TryAdd(template.Name, template.TemplateConfig))
                 {
                     dict.Add(template.Name + "*", template.TemplateConfig);
                 }
             }
             return dict;
         }
+
+        public List<GenModuleEditableTextReference> GetTextsReferences()
+        {
+            var splitter = GenModuleTextsEditorForm.REFERENCE_EDITOR_SPLITTER;
+
+            List<GenModuleEditableTextReference> textReferencesList = [];
+            foreach (var tab in this.alarmTabList)
+            {
+                var moduleId = $"TAB{splitter}{tab.Name}";
+                AddDataFieldTextReferences(textReferencesList, tab.DeviceDataList, moduleId, d => d.Name ?? "INVALID", nameof(DeviceData.Description));
+
+                foreach (var template in this.templateHandler.BindingList)
+                {
+                    moduleId = $"TEMPLATE{splitter}{template.Name}";
+
+                    var templateDataEnumerable = template.AlarmGridSave.RowData.Values;
+                    AddDataFieldTextReferences(textReferencesList, templateDataEnumerable, moduleId, t => t.AlarmVariable ?? "INVALID", nameof(TemplateData.HmiAlarmText));
+                    AddDataFieldTextReferences(textReferencesList, templateDataEnumerable, moduleId, t => t.AlarmVariable ?? "INVALID", nameof(TemplateData.Description));
+                }
+            }
+
+            return textReferencesList;
+        }
+
+        public void SetTextsReferences(List<GenModuleEditableTextReference> textReferences)
+        {
+            var splitter = GenModuleTextsEditorForm.REFERENCE_EDITOR_SPLITTER;
+
+
+            foreach (var tab in this.alarmTabList)
+            {
+                var tabTextReferences = textReferences.Where(r => this.CheckTextReferenceID1(r, "TAB", tab.Name));
+                this.SetTextReferencesToDataField(tabTextReferences, tab.DeviceDataList, d => d.Name);
+            }
+
+            foreach (var template in this.templateHandler.BindingList)
+            {
+                var templateTextReferenced = textReferences.Where(r => this.CheckTextReferenceID1(r, "TEMPLATE", template.Name));
+                this.SetTextReferencesToDataField(templateTextReferenced, template.AlarmGridSave.RowData.Values, d => d.AlarmVariable);
+            }
+            /*
+            foreach (var textReference in textReferences)
+            {
+                if (textReference.ID1.StartsWith("TAB"))
+                {
+                    var tabName = textReference.ID1.Split(splitter)[1];
+                    var deviceName = textReference.ID2;
+                    var dataName = textReference.ID3;
+
+                    var text = textReference.Text;
+
+                    var tab = this.alarmTabList.FirstOrDefault(t => t.Name == tabName);
+                    if (tab == null)
+                    {
+                        continue;
+                    }
+
+
+                    var dataList = tab.DeviceDataList.Where(d => d.Name == deviceName);
+                    foreach (var data in dataList)
+                    {
+                        if (dataName == nameof(data.Description))
+                        {
+                            data.Description = text;
+                        }
+                    }
+                }
+                else if (textReference.ID1.StartsWith("TEMPLATE"))
+                {
+                    var templateName = textReference.ID1.Split(splitter)[1];
+                    var variable = textReference.ID2;
+                    var dataName = textReference.ID3;
+
+                    var text = textReference.Text;
+
+
+                    var template = this.templateHandler.BindingList.FirstOrDefault(t => t.Name == templateName);
+                    if (template == null)
+                    {
+                        continue;
+                    }
+
+                    var dataPairEnumerable = template.AlarmGridSave.RowData.Where(p => p.Value.AlarmVariable == variable);
+                    foreach (var (rowIndex, templateData) in dataPairEnumerable)
+                    {
+                        if (dataName == nameof(templateData.Description))
+                        {
+                            templateData.Description = text;
+                        }
+                        else if (dataName == nameof(templateData.HmiAlarmText))
+                        {
+                            templateData.HmiAlarmText = text;
+                        }
+                    }
+                }
+            }*/
+        }
+
+        private bool CheckTextReferenceID1(GenModuleEditableTextReference textReference, params string[] param)
+        {
+            var id1SplitArray = textReference.ID1.Split(GenModuleTextsEditorForm.REFERENCE_EDITOR_SPLITTER);
+            return id1SplitArray.Length > 0 && id1SplitArray.Length == param.Length && Enumerable.SequenceEqual(id1SplitArray, param);
+        }
+
+        private void AddDataFieldTextReferences<T>(List<GenModuleEditableTextReference> textReferenceList,
+            IEnumerable<T> dataEnumerable,
+            string moduleId, string id2, string propertyName) where T : GridData
+        {
+            AddDataFieldTextReferences<T>(textReferenceList, dataEnumerable, moduleId, t => id2, propertyName);
+        }
+
+        private void AddDataFieldTextReferences<T>(List<GenModuleEditableTextReference> textReferenceList,
+            IEnumerable<T> dataEnumerable,
+            string moduleId, Func<T, string?> id2Getter, string propertyName) where T : GridData
+        {
+            foreach (var data in dataEnumerable)
+            {
+                try
+                {
+                    var propertyInfo = data.GetType().GetProperty(propertyName, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                    if (propertyInfo == null || !propertyInfo.CanRead || propertyInfo.PropertyType != typeof(string))
+                    {
+                        continue;
+                    }
+
+                    var text = (string)propertyInfo.GetValue(data);
+
+                    var textReference = this.CreateEditableTextReference(moduleId, id2Getter(data), propertyName, text);
+                    textReferenceList.Add(textReference);
+                }
+                catch (Exception ex)
+                {
+                    Utils.ShowExceptionMessage(ex);
+                }
+            }
+        }
+
+        private void SetTextReferencesToDataField<T>(IEnumerable<GenModuleEditableTextReference> textReferenceList,
+            IEnumerable<T> dataEnumerable,
+            Func<T, string?> id2Getter) where T : GridData
+        {
+            foreach (var textReference in textReferenceList)
+            {
+                foreach (var data in dataEnumerable)
+                {
+                    var id2 = id2Getter(data);
+                    if (id2 != textReference.ID2)
+                    {
+                        continue;
+                    }
+
+                    var propertyInfo = data.GetType().GetProperty(textReference.ID3, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                    if (propertyInfo == null || !propertyInfo.CanRead || propertyInfo.PropertyType != typeof(string))
+                    {
+                        continue;
+                    }
+
+                    propertyInfo.SetValue(data, textReference.Text);
+                }
+            }
+        }
+
+        private GenModuleEditableTextReference CreateEditableTextReference(string moduleId, string? id, string fieldName, string? fieldText) => new(ID1: moduleId, ID2: id, ID3: fieldName, Text: fieldText);
     }
 }

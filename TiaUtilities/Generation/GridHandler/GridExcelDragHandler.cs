@@ -41,6 +41,11 @@ namespace TiaUtilities.Generation.GridHandler
                 if (hitTest.Type == DataGridViewHitTestType.Cell && args.Button == MouseButtons.Left)
                 {
                     var hitCell = this.DataGridView.Rows[hitTest.RowIndex].Cells[hitTest.ColumnIndex];
+                    if(hitCell.ReadOnly)
+                    {
+                        return;
+                    }
+
                     if (hitCell == this.DataGridView.CurrentCell && IsInsideTriangle(args.X, args.Y, hitCell, xyCellCoordinates: false))
                     {
                         started = true;
@@ -121,31 +126,6 @@ namespace TiaUtilities.Generation.GridHandler
                 TooltipString = ""
             };
         }
-        /*
-        public PaintRequest PaintCellRequest(DataGridViewCellPaintingEventArgs args)
-        {
-            var paintRequest = new PaintRequest();
-
-            var columnIndex = args.ColumnIndex;
-            var rowIndex = args.RowIndex;
-
-            if (columnIndex >= 0 && rowIndex >= 0)
-            {
-                if (started && this.draggedColumnIndex == columnIndex)
-                {
-                    return paintRequest.Background();
-                }
-
-                var currentCell = this.DataGridView.CurrentCell;
-                if (currentCell != null && currentCell.RowIndex == rowIndex && currentCell.ColumnIndex == columnIndex && this.DataGridView.SelectedCells.Count == 1)
-                {
-                    return paintRequest.Background();
-                }
-            }
-
-            return paintRequest;
-        }
-        */
 
         public void CellPaiting(DataGridViewCellPaintingEventArgs args)
         {
@@ -171,7 +151,7 @@ namespace TiaUtilities.Generation.GridHandler
         public void PaintTriangle(Graphics graphics)
         {
             var currentCell = this.DataGridView.CurrentCell;
-            if (currentCell is DataGridViewTextBoxCell && this.DataGridView.SelectedCells.Count == 1)
+            if (currentCell is DataGridViewTextBoxCell && !currentCell.ReadOnly && this.DataGridView.SelectedCells.Count == 1)
             {//I only want to apply the effect when the only selected cell is the current cell.
 
                 var bounds = this.DataGridView.GetCellDisplayRectangle(currentCell.ColumnIndex, currentCell.RowIndex, false);

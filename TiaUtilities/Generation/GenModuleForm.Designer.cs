@@ -41,6 +41,7 @@
             importExportMenuItem = new ToolStripMenuItem();
             exportXMLMenuItem = new ToolStripMenuItem();
             formTableLayout = new TableLayoutPanel();
+            toolsTextsEditorMenuItem = new ToolStripMenuItem();
             topMenuStrip.SuspendLayout();
             formTableLayout.SuspendLayout();
             SuspendLayout();
@@ -90,18 +91,18 @@
             // programSettingsMenuItem
             // 
             programSettingsMenuItem.Name = "programSettingsMenuItem";
-            programSettingsMenuItem.Size = new Size(180, 22);
+            programSettingsMenuItem.Size = new Size(145, 22);
             programSettingsMenuItem.Text = "Settings";
             // 
             // programModuleSetupMenuItem
             // 
             programModuleSetupMenuItem.Name = "programModuleSetupMenuItem";
-            programModuleSetupMenuItem.Size = new Size(180, 22);
+            programModuleSetupMenuItem.Size = new Size(145, 22);
             programModuleSetupMenuItem.Text = "ModuleSetup";
             // 
             // toolsMenuItem
             // 
-            toolsMenuItem.DropDownItems.AddRange(new ToolStripItem[] { toolsPlaceholderViewerMenuItem });
+            toolsMenuItem.DropDownItems.AddRange(new ToolStripItem[] { toolsPlaceholderViewerMenuItem, toolsTextsEditorMenuItem });
             toolsMenuItem.Name = "toolsMenuItem";
             toolsMenuItem.Size = new Size(47, 20);
             toolsMenuItem.Text = "Tools";
@@ -109,7 +110,7 @@
             // toolsPlaceholderViewerMenuItem
             // 
             toolsPlaceholderViewerMenuItem.Name = "toolsPlaceholderViewerMenuItem";
-            toolsPlaceholderViewerMenuItem.Size = new Size(173, 22);
+            toolsPlaceholderViewerMenuItem.Size = new Size(180, 22);
             toolsPlaceholderViewerMenuItem.Text = "Placeholder viewer";
             // 
             // importExportMenuItem
@@ -138,6 +139,12 @@
             formTableLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             formTableLayout.Size = new Size(800, 450);
             formTableLayout.TabIndex = 0;
+            // 
+            // toolsTextsEditorMenuItem
+            // 
+            toolsTextsEditorMenuItem.Name = "toolsTextsEditorMenuItem";
+            toolsTextsEditorMenuItem.Size = new Size(180, 22);
+            toolsTextsEditorMenuItem.Text = "Texts Editor";
             // 
             // GenModuleForm
             // 
@@ -170,5 +177,6 @@
         private ToolStripMenuItem toolsMenuItem;
         private ToolStripMenuItem toolsPlaceholderViewerMenuItem;
         public ToolStripMenuItem programModuleSetupMenuItem;
+        private ToolStripMenuItem toolsTextsEditorMenuItem;
     }
 }

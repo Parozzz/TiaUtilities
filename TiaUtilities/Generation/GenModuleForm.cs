@@ -3,6 +3,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Reflection;
 using TiaUtilities.Constants;
 using TiaUtilities.Generation.SettingsNew;
+using TiaUtilities.Generation.TextsEditor;
 using TiaUtilities.Languages;
 using TiaUtilities.Resources;
 using TiaUtilities.Utility;
@@ -63,6 +64,11 @@ namespace TiaUtilities.Generation
 
             #region TOP_MENU_TOOLS
             this.toolsPlaceholderViewerMenuItem.Click += (sender, args) => this.module.OpenPlaceholderViewer(this);
+            this.toolsTextsEditorMenuItem.Click += (sender, args) =>
+            {
+                GenModuleTextsEditorForm textsEditorForm = new(this.module);
+                textsEditorForm.ShowDialog(this);
+            };
             #endregion
 
             #region TOP_MENU_PROGRAM

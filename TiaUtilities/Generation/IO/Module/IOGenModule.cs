@@ -14,6 +14,7 @@ using TiaUtilities.Generation.IO.Module.ExcelImporter;
 using TiaUtilities.Generation.IO.Module.Tab;
 using TiaUtilities.Generation.IO.Xml;
 using TiaUtilities.Generation.Placeholders;
+using TiaUtilities.Generation.TextsEditor;
 using TiaUtilities.Languages;
 using TiaUtilities.Resources;
 using TiaUtilities.SettingsNew;
@@ -624,6 +625,16 @@ namespace TiaUtilities.Generation.IO.Module
                 }
             }
             return dict;
+        }
+
+        public List<GenModuleEditableTextReference> GetTextsReferences()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetTextsReferences(List<GenModuleEditableTextReference> textReferences)
+        {
+            throw new NotImplementedException();
         }
     }
 }

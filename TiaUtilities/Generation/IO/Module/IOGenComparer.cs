@@ -67,7 +67,7 @@ namespace TiaUtilities.Generation.IO.Module
 
                 var xIsString = xValue is string;
                 var yIsString = yValue is string;
-
+                
                 if (!xIsString && !yIsString)
                 {
                     return 0;
