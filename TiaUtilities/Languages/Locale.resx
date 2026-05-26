@@ -855,4 +855,19 @@ Use $ followed by Excel column name for extracting values from imported spreadsh
   <data name="GRID_SETTINGS_PREVIEW_FORE_COLOR" xml:space="preserve">
     <value>Text Color</value>
   </data>
+  <data name="ALARM_SETTINGS_PREFIXES" xml:space="preserve">
+    <value>Variables prefixes</value>
+  </data>
+  <data name="ALARM_SETTINGS_PREFIXES_ALARM" xml:space="preserve">
+    <value>Alarm</value>
+  </data>
+  <data name="ALARM_SETTINGS_PREFIXES_COIL1" xml:space="preserve">
+    <value>Coil 1</value>
+  </data>
+  <data name="ALARM_SETTINGS_PREFIXES_COIL2" xml:space="preserve">
+    <value>Coil 2</value>
+  </data>
+  <data name="ALARM_SETTINGS_PREFIXES_TIMER" xml:space="preserve">
+    <value>Timer</value>
+  </data>
 </root>

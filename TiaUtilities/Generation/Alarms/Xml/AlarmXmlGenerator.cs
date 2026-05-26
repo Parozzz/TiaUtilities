@@ -47,7 +47,7 @@ namespace TiaUtilities.Generation.Alarms.Xml
             fc.Init();
             fc.AttributeList.BlockName = placeholdersHandler.ParseNotNull(mainConfig.FCBlockName);
             fc.AttributeList.BlockNumber = mainConfig.FCBlockNumber;
-            fc.AttributeList.AutoNumber = (mainConfig.FCBlockNumber > 0);
+            fc.AttributeList.AutoNumber = (mainConfig.FCBlockNumber <= 0);
 
             List<AlarmXmlItem> items = [];
             var fullAlarmList = "\'";
@@ -79,6 +79,7 @@ namespace TiaUtilities.Generation.Alarms.Xml
                 placeholdersHandler.Clear();
                 placeholdersHandler.LoadJSONObject(tabConfig.CustomPlaceholdersJSON);
                 placeholdersHandler.TabName = tabName;
+                placeholdersHandler.DeviceData = deviceData;
 
                 if (deviceData.Placeholders != null)
                 {
@@ -109,8 +110,6 @@ namespace TiaUtilities.Generation.Alarms.Xml
                     nextAlarmNum++;
 
                     var parsedTemplateData = ReplaceTemplateDataWithDefaultAndPrefix(tabConfig, template.TemplateConfig, templateData);
-
-                    placeholdersHandler.DeviceData = deviceData;
                     placeholdersHandler.TemplateData = parsedTemplateData;
                     placeholdersHandler.SetAlarmNum(alarmNum, mainConfig.AlarmNumFormat);
 

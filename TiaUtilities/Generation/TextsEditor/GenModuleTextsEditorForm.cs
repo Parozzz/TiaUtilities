@@ -1,25 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using TiaUtilities.Editors.ErrorReporting;
-using TiaUtilities.Generation.GridHandler;
+﻿using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.Data;
-using TiaUtilities.Generation.GridHandler.JSScript;
-using TiaUtilities.Generation.IO.Data;
 using TiaUtilities.Generation.Placeholders;
 
 namespace TiaUtilities.Generation.TextsEditor
 {
     public partial class GenModuleTextsEditorForm : Form
     {
-        public const string REFERENCE_EDITOR_SPLITTER = "*/";
+        public const string REFERENCE_EDITOR_SPLITTER = "//";
 
         private readonly ITextsEditorExporter exporter;
 

@@ -3,6 +3,7 @@ using InfoBox;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using SimaticML.API;
 using SimaticML.Blocks;
+using System.Diagnostics;
 using System.Globalization;
 using TiaUtilities.Configuration;
 using TiaUtilities.Editors.ErrorReporting;
@@ -427,15 +428,15 @@ namespace TiaUtilities.Generation.Alarms.Module
             {
                 var moduleId = $"TAB{splitter}{tab.Name}";
                 AddDataFieldTextReferences(textReferencesList, tab.DeviceDataList, moduleId, d => d.Name ?? "INVALID", nameof(DeviceData.Description));
+            }
 
-                foreach (var template in this.templateHandler.BindingList)
-                {
-                    moduleId = $"TEMPLATE{splitter}{template.Name}";
+            foreach (var template in this.templateHandler.BindingList)
+            {
+                var moduleId = $"TEMPLATE{splitter}{template.Name}";
 
-                    var templateDataEnumerable = template.AlarmGridSave.RowData.Values;
-                    AddDataFieldTextReferences(textReferencesList, templateDataEnumerable, moduleId, t => t.AlarmVariable ?? "INVALID", nameof(TemplateData.HmiAlarmText));
-                    AddDataFieldTextReferences(textReferencesList, templateDataEnumerable, moduleId, t => t.AlarmVariable ?? "INVALID", nameof(TemplateData.Description));
-                }
+                var templateDataEnumerable = template.AlarmGridSave.RowData.Values;
+                AddDataFieldTextReferences(textReferencesList, templateDataEnumerable, moduleId, t => t.AlarmVariable ?? "INVALID", nameof(TemplateData.HmiAlarmText));
+                AddDataFieldTextReferences(textReferencesList, templateDataEnumerable, moduleId, t => t.AlarmVariable ?? "INVALID", nameof(TemplateData.Description));
             }
 
             return textReferencesList;
@@ -445,18 +446,27 @@ namespace TiaUtilities.Generation.Alarms.Module
         {
             var splitter = GenModuleTextsEditorForm.REFERENCE_EDITOR_SPLITTER;
 
-
+            var startMillis = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            var endMillis = startMillis;
             foreach (var tab in this.alarmTabList)
             {
                 var tabTextReferences = textReferences.Where(r => this.CheckTextReferenceID1(r, "TAB", tab.Name));
                 this.SetTextReferencesToDataField(tabTextReferences, tab.DeviceDataList, d => d.Name);
             }
 
+            endMillis = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            Debug.WriteLine("Tab: " + (endMillis - startMillis));
+            startMillis = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+
             foreach (var template in this.templateHandler.BindingList)
             {
                 var templateTextReferenced = textReferences.Where(r => this.CheckTextReferenceID1(r, "TEMPLATE", template.Name));
                 this.SetTextReferencesToDataField(templateTextReferenced, template.AlarmGridSave.RowData.Values, d => d.AlarmVariable);
             }
+
+            endMillis = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            Debug.WriteLine("Template: " + (endMillis - startMillis));
+            startMillis = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             /*
             foreach (var textReference in textReferences)
             {

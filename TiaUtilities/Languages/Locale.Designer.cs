@@ -385,6 +385,51 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Variables prefixes.
+        /// </summary>
+        internal static string ALARM_SETTINGS_PREFIXES {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_PREFIXES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Alarm.
+        /// </summary>
+        internal static string ALARM_SETTINGS_PREFIXES_ALARM {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_PREFIXES_ALARM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Coil 1.
+        /// </summary>
+        internal static string ALARM_SETTINGS_PREFIXES_COIL1 {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_PREFIXES_COIL1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Coil 2.
+        /// </summary>
+        internal static string ALARM_SETTINGS_PREFIXES_COIL2 {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_PREFIXES_COIL2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Timer.
+        /// </summary>
+        internal static string ALARM_SETTINGS_PREFIXES_TIMER {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_PREFIXES_TIMER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Alarm numbers.
         /// </summary>
         internal static string ALARM_SETTINGS_TAB_ALARM_NUMS {

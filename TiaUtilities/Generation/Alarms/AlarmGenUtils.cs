@@ -65,6 +65,12 @@ namespace TiaUtilities.Generation.Alarms
             settingsBindings
                 .MacroSection(nameFunc, isVisibileFunc, tabConfigFunc, MainForm.Settings.PresetAlarmTabConfiguration, tabDictFunc)
 
+                .Section(Locale.ALARM_SETTINGS_PREFIXES)
+                .AddString(nameof(AlarmTabConfiguration.AlarmAddressPrefix), description: Locale.ALARM_SETTINGS_PREFIXES_ALARM)
+                .AddString(nameof(AlarmTabConfiguration.Coil1AddressPrefix), description: Locale.ALARM_SETTINGS_PREFIXES_COIL1)
+                .AddString(nameof(AlarmTabConfiguration.Coil2AddressPrefix), description: Locale.ALARM_SETTINGS_PREFIXES_COIL2)
+                .AddString(nameof(AlarmTabConfiguration.TimerAddressPrefix), description: Locale.ALARM_SETTINGS_PREFIXES_TIMER)
+
                 .Section(Locale.ALARM_SETTINGS_TAB_GROUPING_TYPE)
                 .AddEnum(nameof(AlarmTabConfiguration.GroupingType), description: Locale.ALARM_SETTINGS_TAB_GROUPING_TYPE_DESCR)
 

@@ -855,4 +855,19 @@ Usa $ seguito dal nome della colonna Excel per estrarre i valori dal foglio di c
   <data name="GRID_SETTINGS_PREVIEW_FORE_COLOR" xml:space="preserve">
     <value>Colore Testo</value>
   </data>
+  <data name="ALARM_SETTINGS_PREFIXES" xml:space="preserve">
+    <value>Prefissi variabili</value>
+  </data>
+  <data name="ALARM_SETTINGS_PREFIXES_ALARM" xml:space="preserve">
+    <value>Allarme</value>
+  </data>
+  <data name="ALARM_SETTINGS_PREFIXES_COIL1" xml:space="preserve">
+    <value>Bobina 1</value>
+  </data>
+  <data name="ALARM_SETTINGS_PREFIXES_COIL2" xml:space="preserve">
+    <value>Bobina 2</value>
+  </data>
+  <data name="ALARM_SETTINGS_PREFIXES_TIMER" xml:space="preserve">
+    <value>Timer</value>
+  </data>
 </root>
