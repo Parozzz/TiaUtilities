@@ -2,48 +2,33 @@
 
 namespace SimaticML.XMLClasses
 {
-    public class XmlNodeConfiguration : XmlConfiguration
+    public class XmlNodeConfiguration(string name, bool required = false, string namespaceURI = "", string defaultInnerText = "")
+        : XmlConfiguration(name, required)
     {
-        public string NamespaceURI { get; init; }
+        public string NamespaceURI { get; init; } = namespaceURI;
         public bool Parsed { get; private set; }
-        protected override string XmlValue { get => this.innerText; set => this.innerText = value; }
+        public override XmlValue Value { get; init; } = new(defaultInnerText); //Inner Text
         public Func<bool>? CanBeGeneratedFunc { get; init; }
 
         protected XmlElement? xmlElement;
 
-        protected readonly Dictionary<string, XmlAttributeConfiguration> attributeDict;
-        protected readonly Dictionary<string, XmlNodeConfiguration> childrenDict;
+        protected readonly Dictionary<string, XmlAttributeConfiguration> staticDefinedAttributes = [];
+        protected readonly Dictionary<string, XmlNodeConfiguration> staticDefinedNodes = [];
 
-        protected readonly List<XmlNodeConfiguration> unkownChilds;
-        protected readonly List<XmlAttributeConfiguration> unknownAttributes;
+        protected readonly List<XmlNodeConfiguration> children = [];
 
-        protected readonly List<XmlNode> parseUnkownChilds;
-        protected readonly List<XmlAttribute> parseUnkownAttributes;
+        protected readonly List<XmlNodeConfiguration> unkownChilds = [];
+        protected readonly List<XmlAttributeConfiguration> unknownAttributes = [];
 
-        private string innerText;
-
-
-        public XmlNodeConfiguration(string name, bool required = false, string namespaceURI = "", string defaultInnerText = "") : base(name, required)
-        {
-            this.NamespaceURI = namespaceURI;
-            this.innerText = defaultInnerText;
-
-            this.attributeDict = [];
-            this.childrenDict = [];
-
-            this.unkownChilds = [];
-            this.unknownAttributes = [];
-
-            this.parseUnkownChilds = [];
-            this.parseUnkownAttributes = [];
-        }
+        protected readonly List<XmlNode> parseUnkownChilds = [];
+        protected readonly List<XmlAttribute> parseUnkownAttributes = [];
 
         public T AddAttribute<T>(T attributeConfig) where T : XmlAttributeConfiguration
         {
             attributeConfig.SetParentConfiguration(this);
 
             var attributeName = attributeConfig.ConfigurationName;
-            attributeDict.TryAdd(attributeName, attributeConfig);
+            staticDefinedAttributes.TryAdd(attributeName, attributeConfig);
             return attributeConfig;
         }
 
@@ -57,7 +42,7 @@ namespace SimaticML.XMLClasses
             childNodeConfig.SetParentConfiguration(this);
 
             var childNodeName = childNodeConfig.ConfigurationName;
-            childrenDict.TryAdd(childNodeName, childNodeConfig);
+            staticDefinedNodes.TryAdd(childNodeName, childNodeConfig);
             return childNodeConfig;
         }
 
@@ -87,7 +72,7 @@ namespace SimaticML.XMLClasses
             this.xmlElement = (XmlElement)xmlNode;
             foreach (XmlAttribute attribute in this.xmlElement.Attributes)
             {
-                var attributeConfig = attributeDict.GetValueOrDefault(attribute.Name);
+                var attributeConfig = staticDefinedAttributes.GetValueOrDefault(attribute.Name);
                 if (attributeConfig == null)
                 {
                     this.parseUnkownAttributes.Add(attribute);
@@ -101,25 +86,35 @@ namespace SimaticML.XMLClasses
             {
                 if (child.NodeType == XmlNodeType.Text) //The text inside childs IS the inner text!
                 {
-                    this.innerText = child.Value ?? "";
+                    this.Value.AsString = child.Value ?? defaultInnerText;
                     continue;
                 }
                 else if (child.NodeType == XmlNodeType.Element)
                 {
-                    var childConfig = childrenDict.GetValueOrDefault(child.Name);
+                    XmlNodeConfiguration? childConfig = staticDefinedNodes.GetValueOrDefault(child.Name);
                     if (childConfig == null)
                     {
-                        this.parseUnkownChilds.Add(child);
-                        continue;
+                        var generateOk = XmlNodeGenerator.TryGenerateFromNode(child, this, out childConfig);
+                        if (!generateOk)
+                        {
+                            this.parseUnkownChilds.Add(child);
+                            continue;
+                        }
                     }
 
-                    childConfig.Load(child);
+                    if (childConfig != null)
+                    {
+                        childConfig.SetParentConfiguration(this);
+                        childConfig.Load(child);
+
+                        children.Add(childConfig);
+                    }
                 }
             }
 
             this.Parsed = true;
 
-            foreach (var attributeConfig in attributeDict.Values)
+            foreach (var attributeConfig in staticDefinedAttributes.Values)
             {
                 if (attributeConfig.Required && !attributeConfig.Parsed)
                 {
@@ -127,7 +122,7 @@ namespace SimaticML.XMLClasses
                 }
             }
 
-            foreach (var childNodeConfig in childrenDict.Values)
+            foreach (var childNodeConfig in staticDefinedNodes.Values)
             {
                 if (childNodeConfig.Required && !childNodeConfig.Parsed)
                 {
@@ -171,7 +166,7 @@ namespace SimaticML.XMLClasses
         {
             if (this is IGlobalObject globalObject)
             {
-                globalObject.GetGlobalObjectData().AsString = globalIDGeneration.GetNextHex();
+                globalObject.GetGlobalObjectData().Value.AsString = globalIDGeneration.GetNextHex();
             }
 
             if (this is ILocalObjectMaster localObjectMaster)
@@ -179,7 +174,7 @@ namespace SimaticML.XMLClasses
                 localObjectMaster.UpdateLocalObjects();
             }
 
-            foreach (var nodeConfig in this.childrenDict.Values)
+            foreach (var nodeConfig in this.staticDefinedNodes.Values)
             {
                 nodeConfig.UpdateID_UId(globalIDGeneration);
             }
@@ -187,9 +182,9 @@ namespace SimaticML.XMLClasses
 
         public override bool IsEmpty()
         {
-            return string.IsNullOrEmpty(this.innerText)
-                        && childrenDict.Values.All(c => c.IsEmpty())
-                        && attributeDict.Values.All(c => c.IsEmpty())
+            return string.IsNullOrEmpty(this.Value.AsString)
+                        && staticDefinedNodes.Values.All(c => c.IsEmpty())
+                        && staticDefinedAttributes.Values.All(c => c.IsEmpty())
                         && unknownAttributes.Count == 0
                         && unkownChilds.Count == 0;
         }
@@ -204,13 +199,13 @@ namespace SimaticML.XMLClasses
             //If i don't recall the first NamespaceURI all the nodes that are inside a node with a namespace will show xmlns=""
             var namespaceURI = FindFirstNamespaceURI(this);
             xmlElement = string.IsNullOrEmpty(namespaceURI) ? document.CreateElement(ConfigurationName) : document.CreateElement(ConfigurationName, namespaceURI);
-            if (!string.IsNullOrEmpty(this.innerText))
+            if (!string.IsNullOrEmpty(this.Value.AsString))
             {
-                xmlElement.InnerText = this.innerText;
+                xmlElement.InnerText = this.Value.AsString;
             }
 
             var attributeConfigList = new List<XmlAttributeConfiguration>();
-            attributeConfigList.AddRange(attributeDict.Values);
+            attributeConfigList.AddRange(staticDefinedAttributes.Values);
             attributeConfigList.AddRange(unknownAttributes);    //UNKNOWN ATTRIBUTES
             foreach (var attributeConfig in attributeConfigList)
             {
@@ -221,7 +216,7 @@ namespace SimaticML.XMLClasses
             }
 
             var childConfigList = new List<XmlNodeConfiguration>();
-            childConfigList.AddRange(childrenDict.Values);
+            childConfigList.AddRange(staticDefinedNodes.Values);
             childConfigList.AddRange(unkownChilds); //UNKNOWN CHILDS
             foreach (var childConfig in childConfigList)
             {
@@ -259,6 +254,6 @@ namespace SimaticML.XMLClasses
             return this.ParentConfiguration is T t ? t : this.ParentConfiguration.FindParent<T>();
         }
 
-        public override string ToString() => $"Node - {base.ToString()}, Parsed: {Parsed}, Child: {this.childrenDict.Count + this.parseUnkownChilds.Count}, Attributes: {this.attributeDict.Count + this.unknownAttributes.Count}";
+        public override string ToString() => $"Node - {base.ToString()}, Parsed: {Parsed}, Child: {this.staticDefinedNodes.Count + this.parseUnkownChilds.Count}, Attributes: {this.staticDefinedAttributes.Count + this.unknownAttributes.Count}";
     }
 }

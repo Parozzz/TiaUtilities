@@ -59,8 +59,8 @@ namespace SimaticML.LanguageText
             return node.Name == MultiLanguageText.NODE_NAME ? new MultiLanguageText() : null;
         }
 
-        public CultureInfo Lang { get => this.lang.AsCulture; set => this.lang.AsCulture = value; }
-        public string LangText { get => this.AsString; set => this.AsString = value; }
+        public CultureInfo Lang { get => this.lang.Value.AsCulture; set => this.lang.Value.AsCulture = value; }
+        public string LangText { get => this.Value.AsString; set => this.Value.AsString = value; }
 
         private readonly XmlAttributeConfiguration lang;
 

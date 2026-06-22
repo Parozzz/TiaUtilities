@@ -16,8 +16,13 @@ namespace SimaticML.Blocks.FlagNet
     public class Wire : XmlNodeListConfiguration<Con>, ILocalObject
     {
         public const string NODE_NAME = "Wire";
-        public static Wire? CreateWire(CompileUnit compileUnit, XmlNode node)
+        public static Wire? CreateWire(XmlNode node, XmlNodeConfiguration parentConfiguration)
         {
+            if(parentConfiguration is not CompileUnit compileUnit)
+            {
+                return null;
+            }
+
             return node.Name == Wire.NODE_NAME ? new Wire(compileUnit) : null;
         }
 
@@ -56,12 +61,12 @@ namespace SimaticML.Blocks.FlagNet
 
         public void SetUId(uint uid)
         {
-            this.uid.AsUInt = uid;
+            this.uid.Value.AsUInt = uid;
         }
 
         public uint GetUId()
         {
-            return this.uid.AsUInt;
+            return this.uid.Value.AsUInt;
         }
 
         public PowerrailCon? GetPowerrail()
@@ -218,7 +223,7 @@ namespace SimaticML.Blocks.FlagNet
         {
             if (this.localObject != null)
             {
-                this.uid.AsUInt = localObject.GetUId();
+                this.uid.Value.AsUInt = localObject.GetUId();
             }
         }
 
@@ -229,7 +234,7 @@ namespace SimaticML.Blocks.FlagNet
 
         public uint GetLocalObjectUId()
         {
-            return localObject == null ? this.uid.AsUInt : localObject.GetUId();
+            return localObject == null ? this.uid.Value.AsUInt : localObject.GetUId();
         }
     }
 
@@ -244,12 +249,12 @@ namespace SimaticML.Blocks.FlagNet
 
         public void SetUId(uint uid)
         {
-            this.uid.AsUInt = uid;
+            this.uid.Value.AsUInt = uid;
         }
 
         public uint GetUId()
         {
-            return this.uid.AsUInt;
+            return this.uid.Value.AsUInt;
         }
 
     }
@@ -263,7 +268,7 @@ namespace SimaticML.Blocks.FlagNet
     {
         public const string NODE_NAME = "NameCon";
 
-        public string ConName { get => this.connectionName.AsString; set => this.connectionName.AsString = value; }
+        public string ConName { get => this.connectionName.Value.AsString; set => this.connectionName.Value.AsString = value; }
 
         private readonly XmlAttributeConfiguration connectionName;
         private ILocalObject? localObject;
@@ -279,7 +284,7 @@ namespace SimaticML.Blocks.FlagNet
         {
             if (this.localObject != null)
             {
-                this.uid.AsUInt = localObject.GetUId();
+                this.uid.Value.AsUInt = localObject.GetUId();
             }
         }
 
@@ -290,7 +295,7 @@ namespace SimaticML.Blocks.FlagNet
 
         public uint GetLocalObjectUId()
         {
-            return localObject == null ? this.uid.AsUInt : localObject.GetUId();
+            return localObject == null ? this.uid.Value.AsUInt : localObject.GetUId();
         }
     }
 }

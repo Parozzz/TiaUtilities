@@ -77,9 +77,9 @@ namespace TiaUtilities.Generation.Alarms.Xml
                 }
 
                 placeholdersHandler.Clear();
-                placeholdersHandler.LoadJSONObject(tabConfig.CustomPlaceholdersJSON);
                 placeholdersHandler.TabName = tabName;
                 placeholdersHandler.DeviceData = deviceData;
+                placeholdersHandler.LoadJSONObject(tabConfig.CustomPlaceholdersJSON);
 
                 if (deviceData.Placeholders != null)
                 {

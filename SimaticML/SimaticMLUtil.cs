@@ -1,5 +1,7 @@
-﻿using SimaticML.Enums;
+﻿using SimaticML.Blocks;
+using SimaticML.Enums;
 using SimaticML.Enums.Utility;
+using SimaticML.nBlockAttributeList;
 
 namespace SimaticML
 {
@@ -383,6 +385,38 @@ namespace SimaticML
             }
 
             return arrayIndexesList;
+        }
+
+        public static List<string> GetAddressesOfChildren(Member member)
+        {
+            var childAddressList = new List<string>();
+
+            var memberChildren = member.Members;
+            if (memberChildren.Any())
+            {
+                foreach (var child in memberChildren)
+                { //TO-DO Add arrays into list!
+                    var childName = SimaticMLUtil.WrapAddressComponentIfRequired(child.MemberName);
+
+                    var childChildren = child.Members;
+                    if (childChildren.Any())
+                    {
+                        var subChildAddressList = BlockDB.GetAddressOfChildMembers(child);
+                        childAddressList.AddRange(subChildAddressList.Select(s => childName + "." + s));
+                    }
+                    else
+                    {
+                        childAddressList.Add(childName);
+                    }
+                }
+            }
+            else
+            {
+                var memberName = SimaticMLUtil.WrapAddressComponentIfRequired(member.MemberName);
+                childAddressList.Add(memberName);
+            }
+
+            return childAddressList;
         }
 
         private class LoopComponent

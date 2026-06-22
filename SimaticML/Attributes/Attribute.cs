@@ -20,9 +20,9 @@ namespace SimaticML.Attributes
 
     public abstract class IAttribute<V> : XmlNodeConfiguration
     {
-        public string AttributeName { get => this.attributeName.AsString; }
+        public string AttributeName { get => this.attributeName.Value.AsString; }
         public abstract V AttributeValue { get; set; }
-        public bool SystemDefined { get => this.systemDefined.AsBool; }
+        public bool SystemDefined { get => this.systemDefined.Value.AsBool; }
 
         private readonly XmlAttributeConfiguration attributeName;
         private readonly XmlAttributeConfiguration informative;
@@ -41,20 +41,20 @@ namespace SimaticML.Attributes
     {
         public const string NODE_NAME = "BooleanAttribute";
 
-        public override bool AttributeValue { get => this.AsBool; set => this.AsBool = value; }
+        public override bool AttributeValue { get => this.Value.AsBool; set => this.Value.AsBool = value; }
     }
 
     public class StringAttribute() : IAttribute<string>(StringAttribute.NODE_NAME, defaultInnerText: "")
     {
         public const string NODE_NAME = "StringAttribute";
 
-        public override string AttributeValue { get => this.AsString; set => this.AsString = value; }
+        public override string AttributeValue { get => this.Value.AsString; set => this.Value.AsString = value; }
     }
 
     public class IntegerAttribute() : IAttribute<uint>(IntegerAttribute.NODE_NAME, defaultInnerText: "")
     {
         public const string NODE_NAME = "IntegerAttribute";
 
-        public override uint AttributeValue { get => this.AsUInt; set => this.AsUInt = value; }
+        public override uint AttributeValue { get => this.Value.AsUInt; set => this.Value.AsUInt = value; }
     }
 }

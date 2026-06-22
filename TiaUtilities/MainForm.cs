@@ -1,10 +1,11 @@
-﻿using DocumentFormat.OpenXml.Office2010.ExcelAc;
+﻿using ClosedXML.Excel;
 using InfoBox;
 using Jint;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using SimaticML;
 using SimaticML.API;
 using SimaticML.Blocks;
+using SimaticML.nBlockAttributeList;
 using System.Diagnostics;
 using System.Globalization;
 using System.Xml;
@@ -13,6 +14,7 @@ using TiaUtilities.DbVisualization;
 using TiaUtilities.Editors.ErrorReporting;
 using TiaUtilities.Generation;
 using TiaUtilities.Generation.Alarms;
+using TiaUtilities.Generation.Alarms.Data;
 using TiaUtilities.Generation.Alarms.Module;
 using TiaUtilities.Generation.Configuration;
 using TiaUtilities.Generation.Configuration.Utility;
@@ -423,6 +425,122 @@ namespace TiaUtilities
         private void QuestionMarkMenuItem_Click(object sender, EventArgs e)
         {
             new QuestionMarkForm().Show();
+        }
+
+        private void CreateTextListsExcelToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CreateParametersExcel();
+        }
+
+        private void CreateParametersExcel()
+        {
+            const int COLUMN_IDS = 1;
+            const int COLUMN_TEXTS = 2;
+
+            const int START_TIMES = 0;
+            const int START_VAR = 100;
+            const int START_FILTERS = 200;
+            const int START_BOOLS = 0;
+
+            var fileDialog = new CommonOpenFileDialog
+            {
+                IsFolderPicker = false,
+                EnsurePathExists = true,
+                EnsureValidNames = true,
+                Multiselect = true,
+                DefaultExtension = ".xml",
+                Filters = { new CommonFileDialogFilter("XML Files", "*.xml") }
+            };
+
+            if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                Dictionary<string, Pair<int, string>> paramDict = [];
+
+                var workbook = new XLWorkbook();
+                var worksheet = workbook.Worksheets.Add("DiscreteAlarms");
+
+                int row = 1;
+
+                var directory = "";
+                foreach (var filePath in fileDialog.FileNames)
+                {
+                    if(directory == "")
+                    {
+                        directory = Path.GetDirectoryName(filePath);
+                    }
+
+                    var xmlNodeConfiguration = SimaticMLAPI.ParseFile(filePath);
+                    if (xmlNodeConfiguration is BlockFB blockFB)
+                    {
+                        worksheet.Cell(row, COLUMN_IDS).Value = "TEXT_LIST";
+                        worksheet.Cell(row, COLUMN_TEXTS).Value = blockFB.AttributeList.BlockName;
+                        row++;
+
+                        worksheet.Cell(row, COLUMN_IDS).Value = -1;
+                        worksheet.Cell(row, COLUMN_TEXTS).Value = "M{module_name}";
+                        row++;
+
+                        var parameterMember = blockFB.AttributeList.INOUT.GetItems().FirstOrDefault(m => m.MemberName.ToLower().Equals("parametri"));
+                        if (parameterMember == null)
+                        {
+                            return;
+                        }
+
+
+                        void parseMember(Member? member, int startId)
+                        {
+                            if (member == null)
+                            {
+                                return;
+                            }
+
+                            foreach (var subElement in member.SubElements)
+                            {
+                                if(int.TryParse(subElement.Path, out int path))
+                                {
+                                    string text = ""; 
+                                    
+                                    var comment = subElement.Comment;
+                                    if (comment != null && comment.GetItems().Count > 0)
+                                    {
+                                        text = comment.GetItems()[0].LangText;
+                                    }
+
+                                    worksheet.Cell(row, COLUMN_IDS).Value = path + startId;
+                                    worksheet.Cell(row, COLUMN_TEXTS).Value = text;
+
+                                    row++;
+                                }
+                            }
+                        }
+
+                        var subSection = parameterMember.SubSection;
+                        if(subSection != null)
+                        {
+                            var subSectionMembers = subSection.GetItems();
+                            if(subSectionMembers != null)
+                            {
+                                var tempiMember = subSectionMembers.FirstOrDefault(m => m.MemberName.ToLower().Equals("tempi"));
+                                var varMember = subSectionMembers.FirstOrDefault(m => m.MemberName.ToLower().Equals("variabili"));
+                                var filtersMember = subSectionMembers.FirstOrDefault(m => m.MemberName.ToLower().Equals("filtrisensori"));
+                                var boolMember = subSectionMembers.FirstOrDefault(m => m.MemberName.ToLower().Equals("bool"));
+
+                                parseMember(tempiMember, START_TIMES);
+                                parseMember(varMember, START_VAR);
+                                parseMember(filtersMember, START_FILTERS);
+                                parseMember(boolMember, START_BOOLS);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        InformationBox.Show("The selected block is NOT a BlockFB or file is invalid.", "Invalid imported xml", icon: InformationBoxIcon.Exclamation);
+                    }
+                }
+
+
+                workbook.SaveAs($"{directory}/textsExcel.xlsx");
+            }
         }
     }
 }

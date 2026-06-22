@@ -1,4 +1,5 @@
 ﻿using SimaticML.API;
+using SimaticML.Blocks;
 using SimaticML.Enums;
 using SimaticML.XMLClasses;
 using System.Xml;
@@ -7,6 +8,12 @@ namespace SimaticML.nBlockAttributeList
 {
     public class BlockAttributeList : XmlNodeConfiguration
     {
+
+        public static string NODE_NAME = SimaticMLAPI.ATTRIBUTE_LIST_KEY;
+        public static BlockAttributeList? CreateBlockAttributeList(XmlNode node, XmlNodeConfiguration parent)
+        {
+            return node.Name == NODE_NAME ? new BlockAttributeList(isUDT: parent is BlockUDT) : null;
+        }
 
         public Section INPUT { get => this.ComputeSection(SectionTypeEnum.INPUT); }
         public Section OUTPUT { get => this.ComputeSection(SectionTypeEnum.OUTPUT); }
@@ -17,31 +24,31 @@ namespace SimaticML.nBlockAttributeList
         public Section RETURN { get => this.ComputeSection(SectionTypeEnum.RETURN); }
         public Section NONE { get => this.ComputeSection(SectionTypeEnum.NONE); }
 
-        public string HeaderAuthor { get => this.headerAuthor.AsString; set => this.headerAuthor.AsString = value; }
-        public string HeaderFamily { get => this.headerFamily.AsString; set => this.headerFamily.AsString = value; }
-        public string HeaderName { get => this.headerName.AsString; set => this.headerName.AsString = value; }
+        public string HeaderAuthor { get => this.headerAuthor.Value.AsString; set => this.headerAuthor.Value.AsString = value; }
+        public string HeaderFamily { get => this.headerFamily.Value.AsString; set => this.headerFamily.Value.AsString = value; }
+        public string HeaderName { get => this.headerName.Value.AsString; set => this.headerName.Value.AsString = value; }
 
-        public string MemoryLayout { get => this.memoryLayout.AsString; set => this.memoryLayout.AsString = value; }
-        public uint MemoryReserve { get => this.memoryReserve.AsUInt; set => this.memoryReserve.AsUInt = value; }
-        public bool AutoNumber { get => this.autoNumber.AsBool; set => this.autoNumber.AsBool = value; } //HE WANTS LOWERCASE!
-        public string BlockName { get => this.blockName.AsString; set => this.blockName.AsString = value; }
-        public uint BlockNumber { get => this.blockNumber.AsUInt; set => this.blockNumber.AsUInt = value; }
-        public bool SetENOAutomatically { get => this.setENOAutomatically.AsBool; set => this.setENOAutomatically.AsBool = value; }
-        public SimaticProgrammingLanguage ProgrammingLanguage { get => this.programmingLanguage.AsEnum<SimaticProgrammingLanguage>(); set => this.programmingLanguage.AsEnum(value); }
+        public string MemoryLayout { get => this.memoryLayout.Value.AsString; set => this.memoryLayout.Value.AsString = value; }
+        public uint MemoryReserve { get => this.memoryReserve.Value.AsUInt; set => this.memoryReserve.Value.AsUInt = value; }
+        public bool AutoNumber { get => this.autoNumber.Value.AsBool; set => this.autoNumber.Value.AsBool = value; } //HE WANTS LOWERCASE!
+        public string BlockName { get => this.blockName.Value.AsString; set => this.blockName.Value.AsString = value; }
+        public uint BlockNumber { get => this.blockNumber.Value.AsUInt; set => this.blockNumber.Value.AsUInt = value; }
+        public bool SetENOAutomatically { get => this.setENOAutomatically.Value.AsBool; set => this.setENOAutomatically.Value.AsBool = value; }
+        public SimaticProgrammingLanguage ProgrammingLanguage { get => this.programmingLanguage.Value.AsEnum<SimaticProgrammingLanguage>(); set => this.programmingLanguage.Value.AsEnum(value); }
 
         public string UDABlockProperties
         {
-            get => this.udaBlockProperties.AsString;
+            get => this.udaBlockProperties.Value.AsString;
             set
             {
                 this.UDAEnableTagReadback = true;
-                this.udaBlockProperties.AsString = value;
+                this.udaBlockProperties.Value.AsString = value;
             }
         }
-        public bool UDAEnableTagReadback { get => this.udaEnableTagReadback.AsBool; private set => this.udaEnableTagReadback.AsBool = value; }
+        public bool UDAEnableTagReadback { get => this.udaEnableTagReadback.Value.AsBool; private set => this.udaEnableTagReadback.Value.AsBool = value; }
 
-        public string InstanceOfName { get => this.instanceOfName.AsString; set => this.instanceOfName.AsString = value; }
-        public string InstanceOfType { get => this.instanceOfType.AsString; set => this.instanceOfType.AsString = value; }
+        public string InstanceOfName { get => this.instanceOfName.Value.AsString; set => this.instanceOfName.Value.AsString = value; }
+        public string InstanceOfType { get => this.instanceOfType.Value.AsString; set => this.instanceOfType.Value.AsString = value; }
 
 
 

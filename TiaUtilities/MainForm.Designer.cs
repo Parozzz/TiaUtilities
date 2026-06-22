@@ -43,13 +43,14 @@
             svgToolStripMenuItem = new ToolStripMenuItem();
             dbVisualizationMenuItem = new ToolStripMenuItem();
             exportAllMembersToolStripMenuItem = new ToolStripMenuItem();
+            questionMarkMenuItem = new ToolStripMenuItem();
             LogWorker = new System.ComponentModel.BackgroundWorker();
             MainLayoutPanel = new TableLayoutPanel();
             bottomPanel = new FlowLayoutPanel();
             ioGenButton = new Button();
             alarmGenButton = new Button();
             duplicateDBButton = new Button();
-            questionMarkMenuItem = new ToolStripMenuItem();
+            createTextListsExcelToolStripMenuItem = new ToolStripMenuItem();
             TopMenuStrip.SuspendLayout();
             MainLayoutPanel.SuspendLayout();
             bottomPanel.SuspendLayout();
@@ -108,7 +109,7 @@
             // 
             // testToolStripMenuItem
             // 
-            testToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { importXMLToolStripMenuItem, jSToolStripMenuItem, sampleXMLMenuItem, testProjectMenuItem, svgToolStripMenuItem, dbVisualizationMenuItem, exportAllMembersToolStripMenuItem });
+            testToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { importXMLToolStripMenuItem, jSToolStripMenuItem, sampleXMLMenuItem, testProjectMenuItem, svgToolStripMenuItem, dbVisualizationMenuItem, exportAllMembersToolStripMenuItem, createTextListsExcelToolStripMenuItem });
             testToolStripMenuItem.Font = new Font("Segoe UI", 12F);
             testToolStripMenuItem.Name = "testToolStripMenuItem";
             testToolStripMenuItem.Size = new Size(48, 25);
@@ -117,49 +118,57 @@
             // importXMLToolStripMenuItem
             // 
             importXMLToolStripMenuItem.Name = "importXMLToolStripMenuItem";
-            importXMLToolStripMenuItem.Size = new Size(208, 26);
+            importXMLToolStripMenuItem.Size = new Size(216, 26);
             importXMLToolStripMenuItem.Text = "Import XML";
             importXMLToolStripMenuItem.Click += ImportXMLToolStripMenuItem_Click;
             // 
             // jSToolStripMenuItem
             // 
             jSToolStripMenuItem.Name = "jSToolStripMenuItem";
-            jSToolStripMenuItem.Size = new Size(208, 26);
+            jSToolStripMenuItem.Size = new Size(216, 26);
             jSToolStripMenuItem.Text = "JS";
             jSToolStripMenuItem.Click += JSToolStripMenuItem_Click;
             // 
             // sampleXMLMenuItem
             // 
             sampleXMLMenuItem.Name = "sampleXMLMenuItem";
-            sampleXMLMenuItem.Size = new Size(208, 26);
+            sampleXMLMenuItem.Size = new Size(216, 26);
             sampleXMLMenuItem.Text = "Sample XML";
             // 
             // testProjectMenuItem
             // 
             testProjectMenuItem.Name = "testProjectMenuItem";
-            testProjectMenuItem.Size = new Size(208, 26);
+            testProjectMenuItem.Size = new Size(216, 26);
             testProjectMenuItem.Text = "Project";
             // 
             // svgToolStripMenuItem
             // 
             svgToolStripMenuItem.Name = "svgToolStripMenuItem";
-            svgToolStripMenuItem.Size = new Size(208, 26);
+            svgToolStripMenuItem.Size = new Size(216, 26);
             svgToolStripMenuItem.Text = "Svg";
             svgToolStripMenuItem.Click += SvgToolStripMenuItem_Click;
             // 
             // dbVisualizationMenuItem
             // 
             dbVisualizationMenuItem.Name = "dbVisualizationMenuItem";
-            dbVisualizationMenuItem.Size = new Size(208, 26);
+            dbVisualizationMenuItem.Size = new Size(216, 26);
             dbVisualizationMenuItem.Text = "DbVisualization";
             dbVisualizationMenuItem.Click += dbVisualizationMenuItem_Click;
             // 
             // exportAllMembersToolStripMenuItem
             // 
             exportAllMembersToolStripMenuItem.Name = "exportAllMembersToolStripMenuItem";
-            exportAllMembersToolStripMenuItem.Size = new Size(208, 26);
+            exportAllMembersToolStripMenuItem.Size = new Size(216, 26);
             exportAllMembersToolStripMenuItem.Text = "ExportAllMembers";
             exportAllMembersToolStripMenuItem.Click += exportAllMembersToolStripMenuItem_Click;
+            // 
+            // questionMarkMenuItem
+            // 
+            questionMarkMenuItem.Font = new Font("Segoe UI", 12F);
+            questionMarkMenuItem.Name = "questionMarkMenuItem";
+            questionMarkMenuItem.Size = new Size(29, 25);
+            questionMarkMenuItem.Text = "?";
+            questionMarkMenuItem.Click += QuestionMarkMenuItem_Click;
             // 
             // MainLayoutPanel
             // 
@@ -244,13 +253,12 @@
             duplicateDBButton.TextAlign = ContentAlignment.BottomCenter;
             duplicateDBButton.UseVisualStyleBackColor = false;
             // 
-            // questionMarkMenuItem
+            // createTextListsExcelToolStripMenuItem
             // 
-            questionMarkMenuItem.Font = new Font("Segoe UI", 12F);
-            questionMarkMenuItem.Name = "questionMarkMenuItem";
-            questionMarkMenuItem.Size = new Size(29, 25);
-            questionMarkMenuItem.Text = "?";
-            questionMarkMenuItem.Click += QuestionMarkMenuItem_Click;
+            createTextListsExcelToolStripMenuItem.Name = "createTextListsExcelToolStripMenuItem";
+            createTextListsExcelToolStripMenuItem.Size = new Size(216, 26);
+            createTextListsExcelToolStripMenuItem.Text = "CreateTextListsExcel";
+            createTextListsExcelToolStripMenuItem.Click += CreateTextListsExcelToolStripMenuItem_Click;
             // 
             // MainForm
             // 
@@ -297,6 +305,7 @@
         private Button duplicateDBButton;
         private ToolStripMenuItem exportAllMembersToolStripMenuItem;
         private ToolStripMenuItem questionMarkMenuItem;
+        private ToolStripMenuItem createTextListsExcelToolStripMenuItem;
     }
 }
 

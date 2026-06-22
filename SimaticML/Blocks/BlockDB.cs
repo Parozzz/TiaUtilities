@@ -27,6 +27,7 @@ namespace SimaticML.Blocks
         private readonly BlockAttributeList blockAttributeList;
         private readonly XmlNodeListConfiguration<XmlNodeConfiguration> objectList;
 
+
         public BlockDB(string nodeName) : base(nodeName)
         {
             //==== INIT CONFIGURATION ====
@@ -72,36 +73,6 @@ namespace SimaticML.Blocks
             return membersAddressList;
         }
 
-        public static List<string> GetAddressOfChildMembers(Member member)
-        {
-            var childAddressList = new List<string>();
-
-            var items = member.GetItems();
-            if (items.Count == 0)
-            {
-                var memberName = SimaticMLUtil.WrapAddressComponentIfRequired(member.MemberName);
-                childAddressList.Add(memberName);
-            }
-            else
-            {
-                foreach (var childMember in items)
-                { //TO-DO Add arrays into list!
-                    var childName = SimaticMLUtil.WrapAddressComponentIfRequired(childMember.MemberName);
-
-                    var childItems = childMember.GetItems();
-                    if (childItems.Count == 0)
-                    {
-                        childAddressList.Add(childName);
-                    }
-                    else
-                    {
-                        var subChildAddressList = BlockDB.GetAddressOfChildMembers(childMember);
-                        childAddressList.AddRange(subChildAddressList.Select(s => childName + "." + s));
-                    }
-                }
-            }
-
-            return childAddressList;
-        }
+        public static List<string> GetAddressOfChildMembers(Member member) => SimaticMLUtil.GetAddressesOfChildren(member);
     }
 }

@@ -103,8 +103,8 @@ namespace SimaticML.LanguageText
             return node.Name == MultilingualTextItem.NODE_KEY ? new MultilingualTextItem() : null;
         }
 
-        public CultureInfo Culture { get => CultureInfo.GetCultureInfo(culture.AsString); }
-        public string Text { get => text.AsString; set => text.AsString = value; }
+        public CultureInfo Culture { get => CultureInfo.GetCultureInfo(culture.Value.AsString); }
+        public string Text { get => text.Value.AsString; set => text.Value.AsString = value; }
 
         private readonly GlobalObjectData globalObjectData;
 

@@ -19,10 +19,11 @@ namespace SimaticML.Blocks.FlagNet.nCall
             uid = this.AddAttribute("UId");
 
             parameterName = this.AddAttribute("Name", required: true);
-            section = this.AddAttribute("Section", required: true);
-            type = this.AddAttribute("Type", required: true);
+            section = this.AddAttribute("Section");
+            type = this.AddAttribute("Type");
             templateReference = this.AddAttribute("TemplateReference");
             informative = this.AddAttribute("Informative");
+            
             //==== INIT CONFIGURATION ====
         }
     }

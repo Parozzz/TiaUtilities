@@ -10,7 +10,7 @@ using System.Xml;
 namespace SimaticML.nBlockAttributeList
 {
     //Members can have other members inside (In case of structs)
-    public class Member : XmlNodeListConfiguration<Member>, ISimaticVariableDataHolder
+    public class Member : XmlNodeConfiguration, ISimaticVariableDataHolder
     {
         public const string NODE_NAME = "Member";
         public static Member? CreateMember(XmlNode node)
@@ -18,12 +18,18 @@ namespace SimaticML.nBlockAttributeList
             return node.Name == Member.NODE_NAME ? new Member() : null;
         }
 
-        public string MemberName { get => this.memberName.AsString; set => this.memberName.AsString = (string.IsNullOrEmpty(value) ? SimaticMLAPI.DEFAULT_EMPTY_MEMBER_NAME : value); }
-        public string MemberDataType { get => this.dataType.AsString; set => this.dataType.AsString = value; }
+        public string MemberName { get => this.memberName.Value.AsString; set => this.memberName.Value.AsString = (string.IsNullOrEmpty(value) ? SimaticMLAPI.DEFAULT_EMPTY_MEMBER_NAME : value); }
+        public string MemberDataType { get => this.dataType.Value.AsString; set => this.dataType.Value.AsString = value; }
         public SimaticDataType SimaticDataType { get => SimaticDataType.FromSimaticMLString(this.MemberDataType); }
-        public string StartValue { get => this.startValue.AsString; set => this.startValue.AsString = value; }
-        public string Version { get => this.version.AsString; set => this.version.AsString = value; }
-        public uint Offset { get => this.GetAttribute<uint>("Offset")?.AsUInt ?? 0; } //If not found, returns 0
+
+        public IEnumerable<Member> Members { get => this.children.Where(c => c.ConfigurationName == Member.NODE_NAME).Cast<Member>(); }
+
+        public Section? SubSection { get => this.sections.GetItems().FirstOrDefault(s => s.SectionType == SectionTypeEnum.NONE); }
+        public IEnumerable<SubElement> SubElements { get => this.children.Where(c => c.ConfigurationName == SubElement.NODE_NAME).Cast<SubElement>(); }
+
+        public string StartValue { get => this.startValue.Value.AsString; set => this.startValue.Value.AsString = value; }
+        public string Version { get => this.version.Value.AsString; set => this.version.Value.AsString = value; }
+        public uint Offset { get => this.GetAttribute<uint>("Offset")?.Value.AsUInt ?? 0; } //If not found, returns 0
 
         public Comment Comment { get => this.comment; }
 
@@ -36,17 +42,13 @@ namespace SimaticML.nBlockAttributeList
 
         private readonly XmlNodeListConfiguration<XmlNodeConfiguration> attributeList;
 
-        private readonly XmlNodeConfiguration subElement;           //Not implemented yet
-        private readonly XmlAttributeConfiguration subElementPath;  //Not implemented yet
-        private readonly XmlNodeConfiguration subElementStartValue; //Not implemented yet
-
         private readonly XmlNodeListConfiguration<Section> sections;//Not implemented yet. Used to define start value in case of an array of UDT.                     
 
         private readonly XmlNodeConfiguration startValue;
 
         private readonly Comment comment;
 
-        public Member() : base(Member.NODE_NAME, Member.CreateMember, namespaceURI: SimaticMLAPI.GET_SECTIONS_NAMESPACE())
+        public Member() : base(Member.NODE_NAME, namespaceURI: SimaticMLAPI.GET_SECTIONS_NAMESPACE())
         {
             //==== INIT CONFIGURATION ====
             memberName = this.AddAttribute("Name", required: true, value: "DefaultName");
@@ -58,45 +60,28 @@ namespace SimaticML.nBlockAttributeList
 
             attributeList = this.AddNode(new XmlNodeListConfiguration<XmlNodeConfiguration>(SimaticMLAPI.ATTRIBUTE_LIST_KEY, AttributeUtil.CreateAttribute));
 
-            subElement = this.AddNode("Subelement");
-            subElementPath = subElement.AddAttribute("Path", required: true);
-            subElementStartValue = subElement.AddNode("StartValue");
-
             sections = this.AddNodeList("Sections", xmlNode => new Section());
 
             startValue = this.AddNode("StartValue");
 
             comment = this.AddNode(new Comment());
             //==== INIT CONFIGURATION ====
-
-            GetItems().CollectionChanged += Member_CollectionChanged;
-        }
-
-        private void Member_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            if (e.NewItems != null)
-            {
-                foreach (Member newItem in e.NewItems)
-                {
-                    newItem.ParentConfiguration = this;
-                }
-            }
         }
 
         public string GetRemanence()
         {
-            return this.remanence.AsString;
+            return this.remanence.Value.AsString;
         }
 
         public Member SetRemanenceRetain()
         {
-            this.remanence.AsString = "Retain";
+            this.remanence.Value.AsString = "Retain";
             return this;
         }
 
         public Member SeRemancenceSetInIDB()
         {
-            this.remanence.AsString = "SetInIDB";
+            this.remanence.Value.AsString = "SetInIDB";
             return this;
         }
 
@@ -107,7 +92,8 @@ namespace SimaticML.nBlockAttributeList
                 MemberName = name,
                 MemberDataType = dataType.SimaticMLString,
             };
-            this.GetItems().Add(member);
+            member.SetParentConfiguration(this);
+            base.children.Add(member);
             return member;
         }
 
@@ -120,7 +106,7 @@ namespace SimaticML.nBlockAttributeList
         {
             var membersAddressList = new List<string>();
             
-            foreach (var member in this.GetItems())
+            foreach (var member in this.Members)
             {
                 var memberChildAddressList = BlockDB.GetAddressOfChildMembers(member);
 
@@ -192,12 +178,12 @@ namespace SimaticML.nBlockAttributeList
             var dict = new Dictionary<CultureInfo, string>();
             foreach (var item in comment.GetItems())
             {
-                dict.Add(item.Lang, item.AsString);
+                dict.Add(item.Lang, item.Value.AsString);
             }
             return dict;
         }
 
-        public override string ToString() => $@"Member: {memberName.AsString}, Type: {dataType.AsString}";
+        public override string ToString() => $@"Member: {memberName.Value.AsString}, Type: {dataType.Value.AsString}";
 
         public string GetName()
         {

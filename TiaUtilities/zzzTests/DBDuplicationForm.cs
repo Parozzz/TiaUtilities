@@ -82,7 +82,7 @@ namespace TiaUtilities
             }
 
             memberWordDict[memberName] += 1;
-            foreach (var subMember in member.GetItems())
+            foreach (var subMember in member.Members)
             {
                 this.AnalyzeMemberNames(subMember);
             }
@@ -147,7 +147,7 @@ namespace TiaUtilities
                 member.MemberName = replacement;
             }
 
-            foreach (var subMember in member.GetItems())
+            foreach (var subMember in member.Members)
             {
                 this.ReplaceMemberNames(subMember, toReplace, replacement);
             }

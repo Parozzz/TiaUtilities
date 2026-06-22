@@ -24,7 +24,7 @@ namespace SimaticML.Blocks
             };
         }
 
-        public SimaticProgrammingLanguage ProgrammingLanguage { get => this.programmingLanguage.AsEnum<SimaticProgrammingLanguage>(); set => this.programmingLanguage.AsEnum(value); }
+        public SimaticProgrammingLanguage ProgrammingLanguage { get => this.programmingLanguage.Value.AsEnum<SimaticProgrammingLanguage>(); set => this.programmingLanguage.Value.AsEnum(value); }
         public MultilingualText Title { get => this.ComputeMultilingualText(MultilingualTextType.TITLE); }
         public MultilingualText Comment { get => this.ComputeMultilingualText(MultilingualTextType.COMMENT); }
         public PowerrailWire Powerrail { get => new(this.ComputePowerrail()); }
@@ -57,7 +57,7 @@ namespace SimaticML.Blocks
             flgNet = networkSource.AddNode("FlgNet", namespaceURI: SimaticMLAPI.GET_FLAG_NET_NAMESPACE());
             labels = flgNet.AddNodeList("Labels", LabelDeclaration.CreateLabelDeclaration); //FIRST! It will not work otherwise.
             parts = flgNet.AddNodeList("Parts", CompileUnit.CreatePart);
-            wires = flgNet.AddNodeList("Wires", xmlNode => Wire.CreateWire(this, xmlNode));
+            wires = flgNet.AddNodeList("Wires", xmlNode => Wire.CreateWire(xmlNode, this));
 
             objectList = this.AddNodeList(SimaticMLAPI.OBJECT_LIST_KEY, MultilingualText.CreateMultilingualText, required: true);
 
@@ -112,7 +112,7 @@ namespace SimaticML.Blocks
             this.LocalIDGenerator.Reset();
 
             var objectList = new List<object>();
-            objectList.AddRange(base.childrenDict.Values);
+            objectList.AddRange(base.staticDefinedNodes.Values);
             objectList.AddRange(this.labels.GetItems());
             objectList.AddRange(this.parts.GetItems());
             objectList.AddRange(this.wires.GetItems()); //UPDATE WIRES AFTER PARTS! OTHERWISE PART LOCAL UID ARE NOT UPDATED AND IT WON'T WORK!

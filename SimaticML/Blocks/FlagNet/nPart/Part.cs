@@ -23,20 +23,20 @@ namespace SimaticML.Blocks.FlagNet.nPart
     {
         public const string NODE_NAME = "Part";
 
-        public PartType PartType { get => this.partName.AsEnum<PartType>(); set => this.partName.AsEnum(value); }
-        public string Negated { get => this.negatedName.AsString; set => this.negatedName.AsString = value; }
-        public bool DisabledENO { get => this.disabledENO.AsBool; set => this.disabledENO.AsBool = value; }
+        public PartType PartType { get => this.partName.Value.AsEnum<PartType>(); set => this.partName.Value.AsEnum(value); }
+        public string Negated { get => this.negatedName.Value.AsString; set => this.negatedName.Value.AsString = value; }
+        public bool DisabledENO { get => this.disabledENO.Value.AsBool; set => this.disabledENO.Value.AsBool = value; }
 
-        public bool AutomaticTyped { get => this.automaticTyped.AsBool; set => this.automaticTyped.AsBool = value; }
-        public string AutomaticTypedName { get => this.automaticTypedName.AsString; set => this.automaticTypedName.AsString = value; }
+        public bool AutomaticTyped { get => this.automaticTyped.Value.AsBool; set => this.automaticTyped.Value.AsBool = value; }
+        public string AutomaticTypedName { get => this.automaticTypedName.Value.AsString; set => this.automaticTypedName.Value.AsString = value; }
 
-        public string TemplateValue { get => this.templateValue.AsString; set => this.templateValue.AsString = value; }
-        public string TemplateValueName { get => this.templateValueName.AsString; set => this.templateValueName.AsString = value; }
-        public string TemplateValueType { get => this.templateValueType.AsString; set => this.templateValueType.AsString = value; }
+        public string TemplateValue { get => this.templateValue.Value.AsString; set => this.templateValue.Value.AsString = value; }
+        public string TemplateValueName { get => this.templateValueName.Value.AsString; set => this.templateValueName.Value.AsString = value; }
+        public string TemplateValueType { get => this.templateValueType.Value.AsString; set => this.templateValueType.Value.AsString = value; }
 
-        public string Version { get => this.version.AsString; set => this.version.AsString = value; }
+        public string Version { get => this.version.Value.AsString; set => this.version.Value.AsString = value; }
 
-        public Instance Instance { get => this.instance; }
+        public CallInstance Instance { get => this.instance; }
         public Comment Comment { get => this.comment; }
 
 
@@ -55,7 +55,7 @@ namespace SimaticML.Blocks.FlagNet.nPart
         private readonly XmlNodeConfiguration automaticTyped;
         private readonly XmlAttributeConfiguration automaticTypedName;
 
-        private readonly Instance instance;
+        private readonly CallInstance instance;
 
         private readonly Comment comment;
 
@@ -74,7 +74,7 @@ namespace SimaticML.Blocks.FlagNet.nPart
             automaticTypedName = automaticTyped.AddAttribute("Name", required: true);
 
             //L'ORDINE TRA INSTANCE E TEMPLATE VALUE è IMPORTANTE! NON MUOVERE.
-            instance = this.AddNode(new Instance());
+            instance = this.AddNode(new CallInstance());
 
             comment = this.AddNode(new Comment()); //A part can have a comment in the little resizable square.
 
@@ -97,12 +97,12 @@ namespace SimaticML.Blocks.FlagNet.nPart
 
         public void SetUId(uint uid)
         {
-            this.uid.AsUInt = uid;
+            this.uid.Value.AsUInt = uid;
         }
 
         public uint GetUId()
         {
-            return this.uid.AsUInt;
+            return this.uid.Value.AsUInt;
         }
 
         /*

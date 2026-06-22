@@ -2,49 +2,37 @@
 
 namespace SimaticML.XMLClasses
 {
-    public class XmlAttributeConfiguration : XmlConfiguration
+    public class XmlAttributeConfiguration(string name, bool required = false, string requiredValue = "", string value = "") : XmlConfiguration(name, required)
     {
         public bool Parsed { get; private set; } = false;
-        protected override string XmlValue { get => this.value; set => this.value = value; }
+        public override XmlValue Value { get; init; } = new(value);
 
-        private readonly string requiredValue;
+        private readonly string requiredValue = requiredValue;
         protected XmlAttribute? xmlAttribute;
-        private string value;
-
-        public XmlAttributeConfiguration(string name, bool required = false, string requiredValue = "", string value = "") : base(name, required)
-        {
-            this.requiredValue = requiredValue;
-            this.value = value;
-        }
 
         public bool IsNullOrEmpty()
         {
-            return string.IsNullOrEmpty(this.value);
-        }
-
-        public bool GetUIntValue(out uint value)
-        {
-            return uint.TryParse(this.value, out value);
+            return string.IsNullOrEmpty(this.Value.AsString);
         }
 
         public override void Load(XmlNode xmlNode, bool parseUnknown = true)
         {
             if (xmlNode is XmlAttribute xmlAttribute)
             {
-                this.value = xmlAttribute.Value;
-                this.Parsed = !this.Required || requiredValue == "" || requiredValue == this.value;
+                this.Value.AsString = xmlAttribute.Value;
+                this.Parsed = !this.Required || requiredValue == "" || requiredValue == this.Value.AsString;
             }
         }
 
         public override bool IsEmpty()
         {
-            return string.IsNullOrEmpty(this.value) && string.IsNullOrEmpty(this.requiredValue);
+            return string.IsNullOrEmpty(this.Value.AsString) && string.IsNullOrEmpty(this.requiredValue);
         }
 
         public virtual void Set(XmlDocument document, XmlNode xmlNode)
         {
             xmlAttribute = document.CreateAttribute(ConfigurationName);
-            xmlAttribute.Value = string.IsNullOrEmpty(this.value) ? this.requiredValue : this.value;
+            xmlAttribute.Value = string.IsNullOrEmpty(this.Value.AsString) ? this.requiredValue : this.Value.AsString;
             xmlNode.Attributes?.Append(xmlAttribute);
         }
 

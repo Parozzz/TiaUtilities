@@ -58,12 +58,12 @@ namespace SimaticML
 
         public string GetHexId()
         {
-            return base.AsString;
+            return base.Value.AsString;
         }
 
         public uint GetId()
         {
-            return uint.Parse(base.AsString, NumberStyles.HexNumber);
+            return uint.Parse(base.Value.AsString, NumberStyles.HexNumber);
         }
     }
 

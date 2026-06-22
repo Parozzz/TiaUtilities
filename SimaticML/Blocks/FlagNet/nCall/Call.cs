@@ -37,12 +37,12 @@ namespace SimaticML.Blocks.FlagNet.nCall
 
         public void SetUId(uint uid)
         {
-            this.uid.AsUInt = uid;
+            this.uid.Value.AsUInt = uid;
         }
 
         public uint GetUId()
         {
-            return this.uid.AsUInt;
+            return this.uid.Value.AsUInt;
         }
     }
 }

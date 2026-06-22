@@ -12,15 +12,15 @@ namespace SimaticML.Blocks.FlagNet.nCall
             return node.Name == CallParameter.NODE_NAME ? new CallParameter() : null;
         }
 
-        public string CallName { get => this.callName.AsString; set => this.callName.AsString = value; }
-        public SimaticBlockType BlockType { get => this.blockType.AsEnum<SimaticBlockType>(); set => this.blockType.AsEnum(value); }
-        public Instance Instance { get => this.instance; }
+        public string CallName { get => this.callName.Value.AsString; set => this.callName.Value.AsString = value; }
+        public SimaticBlockType BlockType { get => this.blockType.Value.AsEnum<SimaticBlockType>(); set => this.blockType.Value.AsEnum(value); }
+        public CallInstance Instance { get => this.instance; }
 
 
         private readonly XmlAttributeConfiguration uid; //Only for SCL
         private readonly XmlAttributeConfiguration callName;
         private readonly XmlAttributeConfiguration blockType;
-        private readonly Instance instance;
+        private readonly CallInstance instance;
 
         public CallInfo() : base(CallInfo.NODE_NAME, CallInfo.CreateParameter)
         {
@@ -29,7 +29,7 @@ namespace SimaticML.Blocks.FlagNet.nCall
 
             callName = this.AddAttribute("Name", required: true);
             blockType = this.AddAttribute("BlockType", required: true);
-            instance = this.AddNode(new Instance());
+            instance = this.AddNode(new CallInstance());
             //==== INIT CONFIGURATION ====
         }
     }

@@ -11,7 +11,7 @@ namespace SimaticML.Blocks.FlagNet
             return node.Name == LabelDeclaration.NODE_NAME ? new LabelDeclaration() : null;
         }
 
-        public string LabelName { get => this.labelName.AsString; set => this.labelName.AsString = value; }
+        public string LabelName { get => this.labelName.Value.AsString; set => this.labelName.Value.AsString = value; }
 
         private readonly XmlAttributeConfiguration uid;
 
@@ -35,12 +35,12 @@ namespace SimaticML.Blocks.FlagNet
 
         public void SetUId(uint uid)
         {
-            this.uid.AsUInt = uid;
+            this.uid.Value.AsUInt = uid;
         }
 
         public uint GetUId()
         {
-            return this.uid.AsUInt;
+            return this.uid.Value.AsUInt;
         }
     }
 }

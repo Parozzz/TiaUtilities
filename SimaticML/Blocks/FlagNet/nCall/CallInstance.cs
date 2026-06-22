@@ -6,7 +6,7 @@ using System.Xml;
 
 namespace SimaticML.Blocks.FlagNet.nCall
 {
-    public class Instance : XmlNodeListConfiguration<Component>, ILocalObject
+    public class CallInstance : XmlNodeListConfiguration<Component>, ILocalObject
     {
         public const string NODE_NAME = "Instance";
         private static Component? CreateComponent(XmlNode xmlNode)
@@ -14,12 +14,12 @@ namespace SimaticML.Blocks.FlagNet.nCall
             return xmlNode.Name == Component.NODE_NAME ? new Component() : null;
         }
 
-        public SimaticVariableScope VariableScope { get => this.scope.AsEnum<SimaticVariableScope>(); set => this.scope.AsEnum(value); }
+        public SimaticVariableScope VariableScope { get => this.scope.Value.AsEnum<SimaticVariableScope>(); set => this.scope.Value.AsEnum(value); }
 
         private readonly XmlAttributeConfiguration scope;
         private readonly XmlAttributeConfiguration uid;
 
-        public Instance() : base(Instance.NODE_NAME, Instance.CreateComponent)
+        public CallInstance() : base(CallInstance.NODE_NAME, CallInstance.CreateComponent)
         {
             //==== INIT CONFIGURATION ====
             scope = this.AddAttribute("Scope", required: true);
@@ -34,12 +34,12 @@ namespace SimaticML.Blocks.FlagNet.nCall
 
         public void SetUId(uint uid)
         {
-            this.uid.AsUInt = uid;
+            this.uid.Value.AsUInt = uid;
         }
 
         public uint GetUId()
         {
-            return this.uid.AsUInt;
+            return this.uid.Value.AsUInt;
         }
 
         public string GetAddress()
@@ -50,7 +50,7 @@ namespace SimaticML.Blocks.FlagNet.nCall
             return SimaticMLUtil.JoinComponentsIntoAddress(componentList);
         }
 
-        public Instance SetAddress(string address)
+        public CallInstance SetAddress(string address)
         {
             this.GetItems().Clear();
 

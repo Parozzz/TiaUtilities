@@ -25,7 +25,7 @@ namespace SimaticML.nBlockAttributeList
     {
         public const string NODE_NAME = "Section";
 
-        public SectionTypeEnum SectionType { get => SimaticEnumUtils.FindByString<SectionTypeEnum>(this.sectionName.AsString); }
+        public SectionTypeEnum SectionType { get => SimaticEnumUtils.FindByString<SectionTypeEnum>(this.sectionName.Value.AsString); }
         public ObservableCollection<Member> Members { get => this.GetItems(); }
 
         private readonly XmlAttributeConfiguration sectionName;
@@ -39,7 +39,7 @@ namespace SimaticML.nBlockAttributeList
 
         public Section(SectionTypeEnum type) : this()
         {
-            this.sectionName.AsString = type.GetSimaticMLString();
+            this.sectionName.Value.AsString = type.GetSimaticMLString();
         }
 
         //Override base IsEmpty. A section is empty if there is no items inside. Don't care about other stuff.
@@ -139,7 +139,7 @@ namespace SimaticML.nBlockAttributeList
                 }
 
                 lastMember = existingMember;
-                lastMembersList = existingMember.GetItems();
+                lastMembersList = existingMember.Members;
             }
 
             return lastMember;

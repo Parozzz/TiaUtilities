@@ -113,7 +113,7 @@ namespace TiaUtilities.Generation.Alarms.Module
                                     template.Name = blockFB.AttributeList.BlockName;
 
                                     var nextGridIndex = template.AlarmGridSave.RowData.Count == 0 ? 0 : (template.AlarmGridSave.RowData.Keys.Max() + 1);
-                                    foreach (var subMember in member.GetItems())
+                                    foreach (var subMember in member.Members)
                                     {
                                         TemplateData newTemplateData = new() { AlarmVariable = subMember.MemberName, Description = subMember.Comment[CultureInfo.CurrentCulture] };
 

@@ -9,11 +9,11 @@ namespace SimaticML.Blocks.FlagNet.nAccess
     {
         public const string NODE_NAME = "Access";
 
-        public SimaticVariableScope VariableScope { get => SimaticEnumUtils.FindByString<SimaticVariableScope>(scope.AsString); set => scope.AsString = value.GetSimaticMLString(); }
+        public SimaticVariableScope VariableScope { get => SimaticEnumUtils.FindByString<SimaticVariableScope>(scope.Value.AsString); set => scope.Value.AsString = value.GetSimaticMLString(); }
 
-        public string ConstantName { get => this.constantName.AsString; set => this.constantName.AsString = value; }
-        public string ConstantValue { get => this.constantValue.AsString; set => this.constantValue.AsString = value; }
-        public SimaticDataType ConstantType { get => SimaticDataType.FromSimaticMLString(this.constantType.AsString); set => this.constantType.AsString = value.SimaticMLString; }
+        public string ConstantName { get => this.constantName.Value.AsString; set => this.constantName.Value.AsString = value; }
+        public string ConstantValue { get => this.constantValue.Value.AsString; set => this.constantValue.Value.AsString = value; }
+        public SimaticDataType ConstantType { get => SimaticDataType.FromSimaticMLString(this.constantType.Value.AsString); set => this.constantType.Value.AsString = value.SimaticMLString; }
 
 
         private readonly XmlAttributeConfiguration uid;
@@ -54,12 +54,12 @@ namespace SimaticML.Blocks.FlagNet.nAccess
 
         public void SetUId(uint uid)
         {
-            this.uid.AsUInt = uid;
+            this.uid.Value.AsUInt = uid;
         }
 
         public uint GetUId()
         {
-            return this.uid.AsUInt;
+            return this.uid.Value.AsUInt;
         }
 
         public string GetAddress()
@@ -157,45 +157,45 @@ namespace SimaticML.Blocks.FlagNet.nAccess
 
         public string GetComponentName()
         {
-            return componentName.AsString;
+            return componentName.Value.AsString;
         }
 
         public Component SetComponentName(string name)
         {
-            this.componentName.AsString = name;
+            this.componentName.Value.AsString = name;
             return this;
         }
 
         public string GetSliceAccessModifier()
         {
-            return sliceAccessModifier.AsString;
+            return sliceAccessModifier.Value.AsString;
         }
 
         public Component SetSliceAccessModifier(string sliceAccessModifier)
         {
-            this.sliceAccessModifier.AsString = sliceAccessModifier;
+            this.sliceAccessModifier.Value.AsString = sliceAccessModifier;
             return this;
         }
 
         public string GetSimpleAccessModifier()
         {
-            return simpleAccessModifier.AsString;
+            return simpleAccessModifier.Value.AsString;
         }
 
         public Component SetSimpleAccessModifier(string simpleAccessModifier)
         {
-            this.simpleAccessModifier.AsString = simpleAccessModifier;
+            this.simpleAccessModifier.Value.AsString = simpleAccessModifier;
             return this;
         }
 
         public string GetAccessModifier()
         {
-            return accessModifier.AsString;
+            return accessModifier.Value.AsString;
         }
 
         public Component SetAccessModifier(string accessModifier)
         {
-            this.accessModifier.AsString = accessModifier;
+            this.accessModifier.Value.AsString = accessModifier;
             return this;
         }
     }

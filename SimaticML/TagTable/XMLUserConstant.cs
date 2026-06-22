@@ -11,9 +11,9 @@ namespace SimaticML.TagTable
         public const string NODE_NAME = "SW.Tags.PlcUserConstant";
 
         public MultilingualText Comment { get => comment; }
-        public string ConstantName { get => constantName.AsString; set => constantName.AsString = value; }
-        public string ConstantValue { get => constantValue.AsString; set => constantValue.AsString = value; }
-        public SimaticDataType DataType { get => SimaticDataType.FromSimaticMLString(dataTypeName.AsString); set => dataTypeName.AsString = value.SimaticMLString; }
+        public string ConstantName { get => constantName.Value.AsString; set => constantName.Value.AsString = value; }
+        public string ConstantValue { get => constantValue.Value.AsString; set => constantValue.Value.AsString = value; }
+        public SimaticDataType DataType { get => SimaticDataType.FromSimaticMLString(dataTypeName.Value.AsString); set => dataTypeName.Value.AsString = value.SimaticMLString; }
 
 
         private readonly GlobalObjectData globalObjectData;

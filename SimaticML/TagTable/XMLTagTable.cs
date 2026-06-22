@@ -19,7 +19,7 @@ namespace SimaticML.TagTable
             };
         }
 
-        public string TableName { get => this.tagTableName.AsString; set => this.tagTableName.AsString = value; }
+        public string TableName { get => this.tagTableName.Value.AsString; set => this.tagTableName.Value.AsString = value; }
 
         private readonly GlobalObjectData globalObjectData;
 

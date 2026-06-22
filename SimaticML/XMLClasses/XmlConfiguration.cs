@@ -9,34 +9,13 @@ namespace SimaticML.XMLClasses
     {
         public string ConfigurationName { get; init; }
         public bool Required { get; init; }
-        protected abstract string XmlValue { get; set; }
-
-        public bool AsBool { get => bool.TryParse(this.XmlValue, out bool result) && result; set => this.XmlValue = value.ToString().ToLower(); } //HE WANTS LOWERCASE!
-        public string AsString { get => this.XmlValue; set => this.XmlValue = value; }
-        public uint AsUInt { get => uint.TryParse(this.XmlValue, out uint result) ? result : 0; set => this.XmlValue = value.ToString(); }
-        public CultureInfo AsCulture { get => CultureInfo.GetCultureInfo(this.XmlValue); set => this.XmlValue = value.IetfLanguageTag; }
+        public abstract XmlValue Value { get; init; }
 
         protected XmlNodeConfiguration? ParentConfiguration { get; set; }
         public XmlConfiguration(string name, bool required = false)
         {
             this.ConfigurationName = name;
             this.Required = required;
-        }
-
-        public T? AsEnum<T>() where T : Enum
-        {
-            return SimaticEnumUtils.FindByString<T>(this.XmlValue);
-        }
-
-        public T AsEnum<T>(T value) where T : Enum
-        {
-            this.XmlValue = value.GetSimaticMLString();
-            return value;
-        }
-
-        public T AsCustom<T>(Func<string, T> func)
-        {
-            return func.Invoke(this.XmlValue);
         }
 
         public XmlNodeConfiguration? GetParentConfiguration()
@@ -59,7 +38,7 @@ namespace SimaticML.XMLClasses
 
         public override string ToString()
         {
-            var str = $"Name: {this.ConfigurationName}, Required: {Required}, XmlValue: \"{this.XmlValue}\"";
+            var str = $"Name: {this.ConfigurationName}, Required: {Required}, XmlValue: \"{this.Value}\"";
             if (this is ILocalObject localObject)
             {
                 str = $"UId={localObject.GetUId()}, {str}";

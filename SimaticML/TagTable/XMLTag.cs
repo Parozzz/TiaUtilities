@@ -11,8 +11,8 @@ namespace SimaticML.TagTable
         public const string NODE_NAME = "SW.Tags.PlcTag";
 
         public MultilingualText Comment { get => comment; }
-        public string TagName { get => tagName.AsString; set => tagName.AsString = value; }
-        public SimaticDataType DataType { get => SimaticDataType.FromSimaticMLString(dataTypeName.AsString); set => dataTypeName.AsString = value.SimaticMLString; }
+        public string TagName { get => tagName.Value.AsString; set => tagName.Value.AsString = value; }
+        public SimaticDataType DataType { get => SimaticDataType.FromSimaticMLString(dataTypeName.Value.AsString); set => dataTypeName.Value.AsString = value.SimaticMLString; }
 
 
         private readonly GlobalObjectData globalObjectData;
@@ -53,26 +53,26 @@ namespace SimaticML.TagTable
 
         public string GetLogicalAddress()
         {
-            return logicalAddress.AsString;
+            return logicalAddress.Value.AsString;
         }
 
         public XMLTag SetLogicalAddress(SimaticMemoryArea memoryArea, uint memoryByte, uint memoryBit)
         {
-            logicalAddress.AsString = "%" + memoryArea.GetSimaticMLString() + memoryByte + "." + memoryBit;
+            logicalAddress.Value.AsString = "%" + memoryArea.GetSimaticMLString() + memoryByte + "." + memoryBit;
             return this;
         }
 
         public XMLTag SetBoolean(SimaticMemoryArea memoryArea, uint memoryByte, uint memoryBit)
         {
             this.DataType = SimaticDataType.BOOLEAN;
-            logicalAddress.AsString = "%" + memoryArea.GetSimaticMLString() + memoryByte + "." + memoryBit;
+            logicalAddress.Value.AsString = "%" + memoryArea.GetSimaticMLString() + memoryByte + "." + memoryBit;
             return this;
         }
 
         public XMLTag SetComplex(SimaticMemoryArea memoryArea, SimaticDataType dataType, uint memoryByte)
         {
             this.DataType = dataType;
-            logicalAddress.AsString = "%" + memoryArea.GetSimaticMLString() + dataType.GetSimaticLengthIdentifier() + memoryByte;
+            logicalAddress.Value.AsString = "%" + memoryArea.GetSimaticMLString() + dataType.GetSimaticLengthIdentifier() + memoryByte;
             return this;
         }
 
