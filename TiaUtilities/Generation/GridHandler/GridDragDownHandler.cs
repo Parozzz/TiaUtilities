@@ -2,7 +2,7 @@
 
 namespace TiaUtilities.Generation.GridHandler
 {
-    public class GridExcelDragHandler<T>(GridHandler<T> gridHandler, GridSettings settings) where T : GridData
+    public class GridDragDownHandler<T>(GridHandler<T> gridHandler, GridSettings settings) where T : GridData
     {
         public const int TRIANGLE_SIZE = 13;
 
@@ -28,89 +28,95 @@ namespace TiaUtilities.Generation.GridHandler
 
         public bool MouseShouldDisplayCursor(MouseEventArgs args)
         {
-            return !started && IsInsideTriangle(args.X, args.Y, this.DataGridView.CurrentCell, xyCellCoordinates: true);
+            return !started && this.DataGridView.GetCellCount(DataGridViewElementStates.Selected) == 1 && IsInsideTriangle(args.X, args.Y, this.DataGridView.CurrentCell, xyCellCoordinates: true);
         }
 
-        public void Init()
+        public void EventSelectionChanged()
         {
-            this.DataGridView.LostFocus += (sender, args) => this.Clear();
-
-            this.DataGridView.MouseDown += (sender, args) =>
+            if (!started)
             {
-                var hitTest = this.DataGridView.HitTest(args.X, args.Y);
-                if (hitTest.Type == DataGridViewHitTestType.Cell && args.Button == MouseButtons.Left)
-                {
-                    var hitCell = this.DataGridView.Rows[hitTest.RowIndex].Cells[hitTest.ColumnIndex];
-                    if(hitCell.ReadOnly)
-                    {
-                        return;
-                    }
+                return;
+            }
 
-                    if (hitCell == this.DataGridView.CurrentCell && IsInsideTriangle(args.X, args.Y, hitCell, xyCellCoordinates: false))
-                    {
-                        started = true;
-                        bottomSelectionRowIndex = topSelectionRowIndex = rowIndexStart = hitTest.RowIndex;
-                        draggedColumnIndex = hitTest.ColumnIndex;
-                    }
+            var highestRowIndex = int.MinValue;
+            var lowestRowIndex = int.MaxValue;
+
+            //When dragging, only allow cell on the column to be selected! I don't care about other ways and want it simple.
+            foreach (DataGridViewCell selectedCell in this.DataGridView.SelectedCells)
+            {
+                bool sameColumn = selectedCell.ColumnIndex == draggedColumnIndex;
+                if (!sameColumn)
+                {
+                    selectedCell.Selected = false; //Only keep the ones on the same columns of the selected!
+                    continue;
                 }
+
+                highestRowIndex = Math.Max(highestRowIndex, selectedCell.RowIndex);
+                lowestRowIndex = Math.Min(lowestRowIndex, selectedCell.RowIndex);
+            }
+
+            topSelectionRowIndex = lowestRowIndex;
+            bottomSelectionRowIndex = highestRowIndex;
+
+            dragToolTip ??= new ToolTip
+            {
+                Active = true,
+                BackColor = Color.DarkGray,
+                ForeColor = Color.Black,
+                ShowAlways = true,
             };
 
-            this.DataGridView.MouseUp += (sender, args) =>
+            var eventArgs = this.CreateDragEventArgs();
+            this.gridHandler.CallExcelDragPreviewEvent(eventArgs);
+
+            if (!string.IsNullOrEmpty(eventArgs.TooltipString) && this.DataGridView.FindForm() is Form form)
             {
-                if (started)
-                {
-                    started = false;
+                dragToolTip.Show(eventArgs.TooltipString, form, form.PointToClient(Cursor.Position));
+            }
+        }
 
-                    var eventArgs = this.CreateDragEventArgs();
-                    this.gridHandler.CallExcelDragDoneEvent(eventArgs);
-
-                    this.Clear();
-                }
-            };
-
-            this.DataGridView.SelectionChanged += (sender, args) =>
+        public void EventMouseDown(int x, int y, MouseButtons button)
+        {
+            if(this.DataGridView.GetCellCount(DataGridViewElementStates.Selected) != 1)
             {
-                if (!started)
+                return;
+            }
+
+            var hitTest = this.DataGridView.HitTest(x, y);
+            if (hitTest.Type == DataGridViewHitTestType.Cell && button == MouseButtons.Left)
+            {
+                var hitCell = this.DataGridView.Rows[hitTest.RowIndex].Cells[hitTest.ColumnIndex];
+                if (hitCell.ReadOnly)
                 {
                     return;
                 }
 
-                var highestRowIndex = int.MinValue;
-                var lowestRowIndex = int.MaxValue;
-
-                //When dragging, only allow cell on the column to be selected! I don't care about other ways and want it simple.
-                foreach (DataGridViewCell selectedCell in this.DataGridView.SelectedCells)
+                if (hitCell == this.DataGridView.CurrentCell && IsInsideTriangle(x, y, hitCell, xyCellCoordinates: false))
                 {
-                    bool sameColumn = selectedCell.ColumnIndex == draggedColumnIndex;
-                    if (!sameColumn)
-                    {
-                        selectedCell.Selected = false; //Only keep the ones on the same columns of the selected!
-                        continue;
-                    }
+                    started = true;
 
-                    highestRowIndex = Math.Max(highestRowIndex, selectedCell.RowIndex);
-                    lowestRowIndex = Math.Min(lowestRowIndex, selectedCell.RowIndex);
+                    bottomSelectionRowIndex = topSelectionRowIndex = rowIndexStart = hitTest.RowIndex;
+                    draggedColumnIndex = hitTest.ColumnIndex;
                 }
+            }
+        }
 
-                topSelectionRowIndex = lowestRowIndex;
-                bottomSelectionRowIndex = highestRowIndex;
-
-                dragToolTip ??= new ToolTip
-                {
-                    Active = true,
-                    BackColor = Color.DarkGray,
-                    ForeColor = Color.Black,
-                    ShowAlways = true,
-                };
+        public void EventMouseUp()
+        {
+            if (started)
+            {
+                started = false;
 
                 var eventArgs = this.CreateDragEventArgs();
-                this.gridHandler.CallExcelDragPreviewEvent(eventArgs);
+                this.gridHandler.CallExcelDragDoneEvent(eventArgs);
 
-                if (!string.IsNullOrEmpty(eventArgs.TooltipString) && this.DataGridView.FindForm() is Form form)
-                {
-                    dragToolTip.Show(eventArgs.TooltipString, form, form.PointToClient(Cursor.Position));
-                }
-            };
+                this.Clear();
+            }
+        }
+
+        public void EventLostFocus()
+        {
+            this.Clear();
         }
 
         private GridExcelDragEventArgs CreateDragEventArgs()
@@ -127,7 +133,7 @@ namespace TiaUtilities.Generation.GridHandler
             };
         }
 
-        public void CellPaiting(DataGridViewCellPaintingEventArgs args)
+        public void EventCellPainting(DataGridViewCellPaintingEventArgs args)
         {
             var bounds = args.CellBounds;
             var graphics = args.Graphics;
@@ -183,7 +189,7 @@ namespace TiaUtilities.Generation.GridHandler
             var yMin = bounds.Bottom - TRIANGLE_SIZE;
             var yMax = bounds.Bottom + 2;
 
-            if(xyCellCoordinates)
+            if (xyCellCoordinates)
             {
                 x += bounds.X;
                 y += bounds.Y;

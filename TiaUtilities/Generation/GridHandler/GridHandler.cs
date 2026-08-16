@@ -1,4 +1,5 @@
-﻿using TiaUtilities.Generation.GridHandler.Binds;
+﻿using System.Diagnostics;
+using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.CustomColumns;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.GridHandler.JSScript;
@@ -11,15 +12,11 @@ namespace TiaUtilities.Generation.GridHandler
 {
     public class GridHandler<T> : ICleanable, ISaveable<GridSave<T>> where T : GridData
     {
-        internal class CellTag
-        {
-
-        }
 
         private readonly GridBindContainer gridBindFactory;
 
         private readonly UndoRedoHandler undoRedoHandler;
-        private readonly GridExcelDragHandler<T> excelDragHandler;
+        private readonly GridDragDownHandler<T> dragDownHandler;
         private readonly GridSortHandler<T> sortHandler;
         private readonly GenPlaceholderHandler placeholderHandler;
 
@@ -32,7 +29,7 @@ namespace TiaUtilities.Generation.GridHandler
         public GridDataChangedHandler<T> DataChangedHandler { get; init; }
         public GridColumnHandler<T> Columns { get; init; }
         public List<GridScriptVariable> ScriptVariableList { get; init; }
-
+        public GridSelectionBorder SelectionBorder { get; init; }
 
         public required uint InitializeRowCount { get; set; } = 9;
 
@@ -65,13 +62,6 @@ namespace TiaUtilities.Generation.GridHandler
         private bool dragDropBusy;
         private Point dragDropMouseDownLocation;
 
-        private RectangleF topBorderRect = RectangleF.Empty;
-        private RectangleF bottomBorderRect = RectangleF.Empty;
-        private RectangleF leftBorderRect = RectangleF.Empty;
-        private RectangleF rightBorderRect = RectangleF.Empty;
-
-        private readonly List<DataGridViewCell> oldSelectedCellsList = [];
-        private bool selectedCellsArePlanar = false;
 
         public GridHandler(GridSettings settings,
             GridBindContainer gridBindFactory,
@@ -90,12 +80,14 @@ namespace TiaUtilities.Generation.GridHandler
             this.DataSource = new(this);
 
             this.undoRedoHandler = new();
-            this.excelDragHandler = new(this, settings);
+            this.dragDownHandler = new(this, settings);
 
             this.sortHandler = new(this, this.undoRedoHandler, comparer);
 
             this.DataChangedHandler = new(this, this.undoRedoHandler);
             this.Columns = new(this);
+
+            this.SelectionBorder = new(this.InternalDataGridView, this.GridSettings);
         }
 
         internal void CallPreSortEvent(GridPreSortEventArgs args) => this.PreSort(this.DataGridView, args);
@@ -197,7 +189,14 @@ namespace TiaUtilities.Generation.GridHandler
             this.DataGridView.AllowUserToAddRows = false;
 
             this.DataGridView.AllowDrop = true;
-            this.DataGridView.DataError += DataErrorEventHandler;
+            this.DataGridView.DataError += (obj, args) =>
+            {
+                var cell = this.DataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex];
+                if (cell is DataGridViewComboBoxCell comboBoxCell)
+                {
+                    comboBoxCell.Value = "";
+                }
+            };
 
             void LoadDefaultCellStyle()
             {
@@ -223,7 +222,7 @@ namespace TiaUtilities.Generation.GridHandler
             this.Columns.Init();
             this.DataSource.InitializeData(this.InitializeRowCount);
 
-            #region EVENTS(CellMouseDown) - QOL Full Row Selection
+            #region EVENTS(CellMouseDown) QOL - Full Row Selection
             this.DataGridView.CellMouseDown += (sender, args) =>
             {
                 if (args.ColumnIndex == -1 && args.RowIndex >= 0)
@@ -306,44 +305,24 @@ namespace TiaUtilities.Generation.GridHandler
             #endregion
 
             #region EVENTS(SelectionChanged / CellPainting / Paint) - Paint stuff on cells / Draw borders on cells
-
-            this.DataGridView.SelectionChanged += (sender, args) =>
+            this.DataGridView.SelectionChanged += (sender, args) => 
             {
-                var selectedCells = this.DataGridView.SelectedCells;
-                if (selectedCells == null || selectedCells.Count == 0)
-                {
-                    this.oldSelectedCellsList.Clear();
-                    return;
-                }
-
-                this.selectedCellsArePlanar = GridUtils.AreSelectedCellsPlanar(this.DataGridView);
-
-                if (this.oldSelectedCellsList.Count > 0)
-                {
-                    foreach (var cell in selectedCells.Cast<DataGridViewCell>().Intersect(oldSelectedCellsList))
-                    {
-                        if (cell.DataGridView == this.DataGridView)
-                        {//It could happen
-                            this.DataGridView.InvalidateCell(cell);
-                        }
-                    }
-
-                    this.oldSelectedCellsList.Clear();
-                }
-
-                this.oldSelectedCellsList.AddRange(this.DataGridView.SelectedCells.Cast<DataGridViewCell>());
+                this.dragDownHandler.EventSelectionChanged();
+                this.SelectionBorder.EventSelectionChanged(); 
             };
+
 
             this.DataGridView.CellPainting += (sender, args) =>
             {
-                if (sortHandler.ShouldCellContentPaint(args))
+                if (sortHandler.IsTopRow(args.ColumnIndex, args.RowIndex))
                 {
                     args.PaintBackground(args.ClipBounds, true);
-                    sortHandler.CellContentPaint(args); //This paints the top columns cell
+
+                    sortHandler.EventCellPainting_DrawText(args.CellBounds, args.Graphics, args.CellStyle, args.RowIndex, args.ColumnIndex, args.FormattedValue); //This paints the top columns cell
                     return;
                 }
 
-                this.excelDragHandler.CellPaiting(args);
+                this.dragDownHandler.EventCellPainting(args);
 
                 if (this.dragDropMouseDownLocation != Point.Empty && args.CellBounds.Contains(this.dragDropMouseDownLocation))
                 {
@@ -402,90 +381,10 @@ namespace TiaUtilities.Generation.GridHandler
 
                 try
                 {
-                    topBorderRect = bottomBorderRect = leftBorderRect = rightBorderRect = RectangleF.Empty;
-                    if (!this.DataGridView.AreAllCellsSelected(false) && selectedCellsArePlanar && this.DataGridView.SelectedCells.Cast<DataGridViewCell>().Any(c => c.Displayed))
-                    {
-                        var borders = GridUtils.GetSelectedCellsBorderCoordinates(this.DataGridView);
+                    this.SelectionBorder.CalculateSelectionBorders();
+                    this.SelectionBorder.EventPaint(args.Graphics);
 
-                        var topLeft = this.oldSelectedCellsList.FirstOrDefault(c => c.ColumnIndex == borders.Left && c.RowIndex == borders.Top);
-                        var topRight = this.oldSelectedCellsList.FirstOrDefault(c => c.ColumnIndex == borders.Right && c.RowIndex == borders.Top);
-                        var bottomLeft = this.oldSelectedCellsList.FirstOrDefault(c => c.ColumnIndex == borders.Left && c.RowIndex == borders.Bottom);
-                        var bottomRight = this.oldSelectedCellsList.FirstOrDefault(c => c.ColumnIndex == borders.Right && c.RowIndex == borders.Bottom);
-
-                        if (topLeft != null && topRight != null && bottomLeft != null && bottomRight != null)
-                        {
-                            var borderSize = this.GridSettings.BorderWeight;
-
-                            using Pen borderPen = new(this.GridSettings.SingleSelectedCellBorderColor, borderSize);
-                            using Brush borderBrush = new SolidBrush(this.GridSettings.SingleSelectedCellBorderColor);
-
-                            Rectangle topLeftBounds;
-                            Rectangle topRightBounds;
-                            if (topLeft.Displayed && topRight.Displayed)
-                            {
-                                topLeftBounds = this.DataGridView.GetCellDisplayRectangle(topLeft.ColumnIndex, topLeft.RowIndex, true);
-                                topRightBounds = this.DataGridView.GetCellDisplayRectangle(topRight.ColumnIndex, topRight.RowIndex, true);
-
-                                topBorderRect = new()
-                                {
-                                    X = topLeftBounds.X,
-                                    Y = topLeftBounds.Y,
-                                    Width = (topRightBounds.X + topRightBounds.Width) - (topLeftBounds.X + 1),
-                                    Height = borderSize
-                                };
-                                args.Graphics.FillRectangle(borderBrush, topBorderRect);
-                            }
-                            else
-                            {
-                                var topDisplayRow = this.DataGridView.FirstDisplayedScrollingRowIndex;
-                                topLeftBounds = this.DataGridView.GetCellDisplayRectangle(topLeft.ColumnIndex, topDisplayRow, true);
-                                topRightBounds = this.DataGridView.GetCellDisplayRectangle(topRight.ColumnIndex, topDisplayRow, true);
-                            }
-
-                            var rowHeight = this.DataGridView.RowTemplate.Height;
-
-                            Rectangle bottomLeftBounds = this.DataGridView.GetCellDisplayRectangle(bottomLeft.ColumnIndex, bottomLeft.RowIndex, true);
-                            Rectangle bottomRightBounds = this.DataGridView.GetCellDisplayRectangle(bottomRight.ColumnIndex, bottomRight.RowIndex, true);
-                            if (bottomLeft.Displayed && bottomLeftBounds.Height == rowHeight && bottomRight.Displayed && bottomRightBounds.Height == rowHeight)
-                            {
-                                bottomBorderRect = new()
-                                {
-                                    X = bottomLeftBounds.X,
-                                    Y = bottomLeftBounds.Y + bottomLeftBounds.Height - 1 - borderSize,
-                                    Width = (bottomRightBounds.X + bottomRightBounds.Width) - (bottomLeftBounds.X + 1),
-                                    Height = borderSize
-                                };
-                                args.Graphics.FillRectangle(borderBrush, bottomBorderRect);
-                            }
-                            else
-                            {
-                                var lastDisplayedRow = this.DataGridView.FirstDisplayedScrollingRowIndex + this.DataGridView.Rows.GetRowCount(DataGridViewElementStates.Displayed | DataGridViewElementStates.Visible) - 1;
-
-                                bottomLeftBounds = this.DataGridView.GetCellDisplayRectangle(bottomLeft.ColumnIndex, lastDisplayedRow, true);
-                                bottomRightBounds = this.DataGridView.GetCellDisplayRectangle(bottomRight.ColumnIndex, lastDisplayedRow, true);
-                            }
-
-                            leftBorderRect = new()
-                            {
-                                X = topLeftBounds.X,
-                                Y = topLeftBounds.Y,
-                                Width = borderSize,
-                                Height = (bottomLeftBounds.Y + bottomLeftBounds.Height) - topLeftBounds.Y
-                            };
-                            args.Graphics.FillRectangle(borderBrush, leftBorderRect);
-
-                            rightBorderRect = new()
-                            {
-                                X = topRightBounds.X + topRightBounds.Width - borderSize - 1,
-                                Y = topRightBounds.Y,
-                                Width = borderSize,
-                                Height = (bottomRightBounds.Y + bottomRightBounds.Height) - topRightBounds.Y
-                            };
-                            args.Graphics.FillRectangle(borderBrush, rightBorderRect);
-                        }
-                    }
-
-                    this.excelDragHandler.PaintTriangle(args.Graphics);
+                    this.dragDownHandler.PaintTriangle(args.Graphics);
                 }
                 catch (Exception ex)
                 {
@@ -495,17 +394,9 @@ namespace TiaUtilities.Generation.GridHandler
             #endregion
 
             #region EVENTS(CellMouseMove / MouseLeave / MouseDown / DragOver / DragDrop) - DragDrop / Custom cursor on cell mouse
-
-            bool cursorInsideBorder = false;
             this.DataGridView.CellMouseMove += (sender, args) =>
             {
                 this.DataGridView.Cursor = Cursors.Default;
-                cursorInsideBorder = false;
-
-                if (excelDragHandler.IsStarted())
-                {
-                    return;
-                }
 
                 var rowIndex = args.RowIndex;
                 var columnIndex = args.ColumnIndex;
@@ -514,58 +405,42 @@ namespace TiaUtilities.Generation.GridHandler
                     return;
                 }
 
+                this.SelectionBorder.EventCellMouseMove(columnIndex, rowIndex);
+
+                if (this.dragDownHandler.IsStarted())
+                {
+                    return;
+                }
+
                 var currentCell = this.DataGridView.CurrentCell;
-                if (currentCell != null && rowIndex == currentCell.RowIndex && columnIndex == currentCell.ColumnIndex && excelDragHandler.MouseShouldDisplayCursor(args))
+                if (currentCell != null && rowIndex == currentCell.RowIndex && columnIndex == currentCell.ColumnIndex && this.dragDownHandler.MouseShouldDisplayCursor(args))
                 {
                     this.DataGridView.Cursor = Cursors.Cross;
                     return;
                 }
 
-                var cell = this.DataGridView.Rows[rowIndex].Cells[columnIndex];
-                if (cell.Selected)
-                {
-                    const int EXTRA_PX_BORDER_MOUSE_SELECTION = 3;
-
-                    var topBorder = topBorderRect;
-                    if (topBorder != RectangleF.Empty)
-                    {
-                        topBorder.Inflate(EXTRA_PX_BORDER_MOUSE_SELECTION, EXTRA_PX_BORDER_MOUSE_SELECTION);
-                    }
-                    var bottomBorder = bottomBorderRect;
-                    if (bottomBorder != RectangleF.Empty)
-                    {
-                        bottomBorder.Inflate(EXTRA_PX_BORDER_MOUSE_SELECTION, EXTRA_PX_BORDER_MOUSE_SELECTION);
-                    }
-                    var leftBorder = leftBorderRect;
-                    if (leftBorder != RectangleF.Empty)
-                    {
-                        leftBorder.Inflate(EXTRA_PX_BORDER_MOUSE_SELECTION, EXTRA_PX_BORDER_MOUSE_SELECTION);
-                    }
-                    var rightBorder = rightBorderRect;
-                    if (rightBorder != RectangleF.Empty)
-                    {
-                        rightBorder.Inflate(EXTRA_PX_BORDER_MOUSE_SELECTION, EXTRA_PX_BORDER_MOUSE_SELECTION);
-                    }
-
-                    var cursorPosition = this.DataGridView.PointToClient(Cursor.Position);
-                    if (topBorder.Contains(cursorPosition) || bottomBorder.Contains(cursorPosition) || leftBorder.Contains(cursorPosition) || rightBorder.Contains(cursorPosition))
-                    {
-                        this.DataGridView.Cursor = Cursors.SizeAll;
-                        cursorInsideBorder = true;
-                    }
+                if (this.SelectionBorder.CursorInsideBorder)
+                {//Display cursor for drag&drop
+                    this.DataGridView.Cursor = Cursors.SizeAll;
                 }
             };
 
-            this.DataGridView.MouseLeave += (sender, args) => cursorInsideBorder = false; //This seems to be called just after the DoDragDrop method.
+            this.DataGridView.MouseLeave += (sender, args) =>
+            {//This seems to be called just after the DoDragDrop method.
+                this.SelectionBorder.EventMouseLeave();
+            };
 
             this.DataGridView.MouseDown += (sender, args) =>
             {
-                if (!this.excelDragHandler.IsStarted() && cursorInsideBorder && args.Button == MouseButtons.Left)
+                this.dragDownHandler.EventMouseDown(args.X, args.Y, args.Button);
+
+                if (!this.dragDownHandler.IsStarted() && this.SelectionBorder.CursorInsideBorder && args.Button == MouseButtons.Left)
                 {
                     var text = GridUtils.GetCopyAsExcelText(this.DataGridView, out var _);
                     if (text != null)
                     {
-                        cursorInsideBorder = false;
+                        this.SelectionBorder.ClearCursor();
+
                         this.dragDropMouseDownLocation = args.Location;
 
                         var mouseDownHitTest = this.DataGridView.HitTest(this.dragDropMouseDownLocation.X, this.dragDropMouseDownLocation.Y);
@@ -576,8 +451,8 @@ namespace TiaUtilities.Generation.GridHandler
 
                         dragDropBusy = true;
                         try
-                        {
-                            this.DataGridView.DoDragDrop(text, DragDropEffects.Move, null, Point.Empty, true); //Sembra che questa tenga bloccata l'esecuzione della grid! Quindi fare le cose prima
+                        {//DoDragDrop seems to block operations in the grid. Everything else must be done b4 the method.
+                            this.DataGridView.DoDragDrop(text, DragDropEffects.Move, null, Point.Empty, true);
                         }
                         catch (Exception ex)
                         {
@@ -588,7 +463,31 @@ namespace TiaUtilities.Generation.GridHandler
                         this.dragDropMouseDownLocation = Point.Empty;
                     }
                 }
+            };
 
+            this.DataGridView.MouseUp += (sender, args) =>
+            {
+                this.dragDownHandler.EventMouseUp();
+            };
+
+            this.DataGridView.LostFocus += (sender, args) =>
+            {
+                this.dragDownHandler.EventLostFocus();
+            };
+
+            this.DataGridView.QueryContinueDrag += (sender, args) =>
+            {
+                /*
+                var dataGridCursorPosition = this.DataGridView.PointToClient(Cursor.Position);
+                
+                var hitTest = this.DataGridView.HitTest(dataGridCursorPosition.X, dataGridCursorPosition.Y);
+                Debug.WriteLine("Query continue drag. HitTest: " + (hitTest.Type == DataGridViewHitTestType.Cell));
+
+                if(hitTest.Type == DataGridViewHitTestType.Cell)
+                {
+                    var cell = this.DataGridView.Rows[hitTest.RowIndex].Cells[hitTest.ColumnIndex];
+                    cell.Style.BackColor = SystemColors.ActiveCaptionText;
+                }*/
             };
 
             this.DataGridView.DragOver += (sender, args) =>
@@ -658,7 +557,7 @@ namespace TiaUtilities.Generation.GridHandler
                 }
                 finally
                 {
-                    cursorInsideBorder = false;
+                    this.SelectionBorder.ClearCursor();
                     this.dragDropMouseDownLocation = Point.Empty;
                 }
 
@@ -864,22 +763,11 @@ namespace TiaUtilities.Generation.GridHandler
             this.GridSettings.PropertyChanged += (sender, args) => this.DataGridView.Refresh();
             this.DataGridView.VisibleChanged += (sender, args) => this.DataGridView.AutoResizeColumnHeadersHeight();
 
-            this.excelDragHandler.Init();
             this.sortHandler.Init();
 
             this.DataGridView.ResumeLayout(true);
 
             init = true;
-        }
-
-        internal CellTag GetCellTag(DataGridViewCell cell)
-        {
-            if (cell.Tag is not CellTag)
-            {
-                cell.Tag = new CellTag();
-            }
-
-            return (CellTag)cell.Tag;
         }
 
         public bool IsDirty() => this.dirty;
@@ -911,15 +799,6 @@ namespace TiaUtilities.Generation.GridHandler
             this.DataChangedHandler.End(req);
 
             this.CallLoadDataEvent();
-        }
-
-        private void DataErrorEventHandler(object? sender, DataGridViewDataErrorEventArgs args)
-        {
-            var cell = this.DataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex];
-            if (cell is DataGridViewComboBoxCell comboBoxCell)
-            {
-                comboBoxCell.Value = "";
-            }
         }
 
         public Form? FindForm() => this.DataGridView.FindForm();

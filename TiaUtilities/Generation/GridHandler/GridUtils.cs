@@ -357,10 +357,13 @@ namespace TiaUtilities.Generation.GridHandler
         }
         #endregion
 
-        public static bool AreSelectedCellsPlanar(DataGridView dgv)
+        public static bool AreSelectedCellsPlanar(
+            DataGridViewSelectedCellCollection selectedCells, 
+            DataGridViewColumnCollection columns, 
+            DataGridViewRowCollection rows)
         {//Can you see this is vibe-coded?
          // 1. Prendi solo le celle effettivamente visibili (evita ghost selection su righe/colonne nascoste)
-            var selectedCellsList = dgv.SelectedCells.Cast<DataGridViewCell>()
+            var selectedCellsList = selectedCells.Cast<DataGridViewCell>()
                 .Where(c => c.Visible && c.OwningColumn.Visible && c.OwningRow.Visible)
                 .ToList();
 
@@ -374,7 +377,7 @@ namespace TiaUtilities.Generation.GridHandler
             var distinctRowsList = selectedCellsList.Select(c => c.OwningRow).Distinct().ToList();
 
             // --- CONTROLLO COLONNE CONSECUTIVE ---
-            var columnsMapList = dgv.Columns.Cast<DataGridViewColumn>()
+            var columnsMapList = columns.Cast<DataGridViewColumn>()
                 .Where(c => c.Visible)
                 .OrderBy(c => c.DisplayIndex)
                 .ToList();
@@ -392,7 +395,7 @@ namespace TiaUtilities.Generation.GridHandler
             }
 
             // --- CONTROLLO RIGHE CONSECUTIVE ---
-            var rowsMapList = dgv.Rows.Cast<DataGridViewRow>()
+            var rowsMapList = rows.Cast<DataGridViewRow>()
                 .Where(r => r.Visible)
                 .OrderBy(r => r.Index)
                 .ToList();

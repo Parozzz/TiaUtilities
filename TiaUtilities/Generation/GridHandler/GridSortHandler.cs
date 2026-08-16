@@ -106,43 +106,26 @@ namespace TiaUtilities.Generation.GridHandler
             }
         }
 
-        public bool ShouldCellContentPaint(DataGridViewCellPaintingEventArgs args)
+        public bool IsTopRow(int columnIndex, int rowIndex)
         {
-            if (comparer == null)
-            {
-                return false;
-            }
-
-            var columnIndex = args.ColumnIndex;
-            if (columnIndex < 0 || columnIndex >= this.DataGridView.ColumnCount) //To avoid 0xffffffff (Top left square corner!)
-            {
-                return false;
-            }
-
-            return args.RowIndex == -1;
+            //Check column index to avoid 0xffffffff (Top left square corner!)
+            return comparer != null && (columnIndex >= 0 && columnIndex < this.DataGridView.ColumnCount) && rowIndex == -1;
         }
 
-        public bool CellContentPaint(DataGridViewCellPaintingEventArgs args)
+        public bool EventCellPainting_DrawText(Rectangle cellBounds, Graphics? graphics, DataGridViewCellStyle? cellStyle, int rowIndex, int columnIndex, object? formattedValue)
         {
-            var bounds = args.CellBounds;
-            var graphics = args.Graphics;
-            var style = args.CellStyle;
-
-            var rowIndex = args.RowIndex;
-            var columnIndex = args.ColumnIndex;
-
-            if (rowIndex != -1 || columnIndex < 0 || columnIndex >= this.DataGridView.ColumnCount || graphics == null || style == null)
+            if (rowIndex != -1 || columnIndex < 0 || columnIndex >= this.DataGridView.ColumnCount || graphics == null || cellStyle == null)
             {
                 return false;
             }
 
-            TextRenderer.DrawText(graphics, string.Format("{0}", args.FormattedValue), style.Font, bounds, style.ForeColor, TextFormatFlags.VerticalCenter | TextFormatFlags.Left);
+            TextRenderer.DrawText(graphics, string.Format("{0}", formattedValue), cellStyle.Font, cellBounds, cellStyle.ForeColor, TextFormatFlags.VerticalCenter | TextFormatFlags.Left);
 
             var column = this.DataGridView.Columns[columnIndex];
             if (column.HeaderCell.SortGlyphDirection != SortOrder.None)
             {
                 var sortIcon = column.HeaderCell.SortGlyphDirection == SortOrder.Ascending ? "▲" : "▼";
-                TextRenderer.DrawText(graphics, sortIcon, style.Font, bounds, SortIconColor, TextFormatFlags.VerticalCenter | TextFormatFlags.Right);
+                TextRenderer.DrawText(graphics, sortIcon, cellStyle.Font, cellBounds, SortIconColor, TextFormatFlags.VerticalCenter | TextFormatFlags.Right);
             }
 
             return true;
