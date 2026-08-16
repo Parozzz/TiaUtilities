@@ -26,9 +26,11 @@ namespace TiaUtilities.Generation.GridHandler
             return started;
         }
 
-        public bool MouseShouldDisplayCursor(MouseEventArgs args)
+        public bool MouseShouldDisplayCursor(int x, int y)
         {
-            return !started && this.DataGridView.GetCellCount(DataGridViewElementStates.Selected) == 1 && IsInsideTriangle(args.X, args.Y, this.DataGridView.CurrentCell, xyCellCoordinates: true);
+            return !started && 
+                this.DataGridView.GetCellCount(DataGridViewElementStates.Selected) == 1 && 
+                this.IsInsideTriangle(x, y, this.DataGridView.CurrentCell, xyCellCoordinates: true);
         }
 
         public void EventSelectionChanged()
@@ -157,7 +159,7 @@ namespace TiaUtilities.Generation.GridHandler
         public void PaintTriangle(Graphics graphics)
         {
             var currentCell = this.DataGridView.CurrentCell;
-            if (currentCell is DataGridViewTextBoxCell && !currentCell.ReadOnly && this.DataGridView.SelectedCells.Count == 1)
+            if (currentCell is DataGridViewTextBoxCell textBoxCell && !textBoxCell.IsInEditMode && !currentCell.ReadOnly && this.DataGridView.SelectedCells.Count == 1)
             {//I only want to apply the effect when the only selected cell is the current cell.
 
                 var bounds = this.DataGridView.GetCellDisplayRectangle(currentCell.ColumnIndex, currentCell.RowIndex, false);
@@ -177,7 +179,7 @@ namespace TiaUtilities.Generation.GridHandler
 
         public bool IsInsideTriangle(int x, int y, DataGridViewCell cell, bool xyCellCoordinates)
         {
-            if (cell is not DataGridViewTextBoxCell)
+            if (cell is not DataGridViewTextBoxCell textBoxCell || textBoxCell.IsInEditMode)
             {
                 return false;
             }
@@ -194,8 +196,6 @@ namespace TiaUtilities.Generation.GridHandler
                 x += bounds.X;
                 y += bounds.Y;
             }
-
-            //Debug.WriteLine($"Pos: {x},{y}. X: [{xMin},{xMax}], Y: [{yMin},{yMax}]");
 
             //Go outside a bit of the cell to avoid misclick that sometime happend
             return x >= xMin && x <= xMax && y >= yMin && y <= yMax;

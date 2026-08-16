@@ -19,6 +19,7 @@ namespace TiaUtilities.Generation.GridHandler
         private readonly GridDragDownHandler<T> dragDownHandler;
         private readonly GridSortHandler<T> sortHandler;
         private readonly GenPlaceholderHandler placeholderHandler;
+        private readonly GridQOL qol;
 
         internal GridSettings GridSettings { get; init; }
         internal GridDataPreviewer<T> DataPreviewer { get; init; }
@@ -86,6 +87,8 @@ namespace TiaUtilities.Generation.GridHandler
 
             this.DataChangedHandler = new(this, this.undoRedoHandler);
             this.Columns = new(this);
+
+            this.qol = new(this.DataGridView);
 
             this.SelectionBorder = new(this.InternalDataGridView, this.GridSettings);
         }
@@ -222,93 +225,36 @@ namespace TiaUtilities.Generation.GridHandler
             this.Columns.Init();
             this.DataSource.InitializeData(this.InitializeRowCount);
 
-            #region EVENTS(CellMouseDown) QOL - Full Row Selection
+            #region EVENTS(CellMouseDown / CellClick / CellMouseDoubleClick / RowPostPaint) QOL
             this.DataGridView.CellMouseDown += (sender, args) =>
             {
-                if (args.ColumnIndex == -1 && args.RowIndex >= 0)
-                {
-                    var currentRow = this.DataGridView.CurrentRow;
-                    if (Control.ModifierKeys == Keys.Shift && currentRow != null)
-                    {
-                        var startRowIndex = currentRow.Index;
-                        var endRowIndex = args.RowIndex;
-
-                        this.DataGridView.ClearSelection();
-
-                        var biggestIndex = Math.Max(startRowIndex, endRowIndex);
-                        var lowestIndex = Math.Min(startRowIndex, endRowIndex);
-                        for (int x = lowestIndex; x < biggestIndex + 1; x++)
-                        {
-                            foreach (DataGridViewCell cell in this.DataGridView.Rows[x].Cells)
-                            {
-                                cell.Selected = true;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        SelectRow(args.RowIndex);
-                    }
-                }
+                this.qol.EventCellMouseDown_FullRowSelection(args.RowIndex, args.ColumnIndex);
             };
-            #endregion
 
-            #region EVENTS(CellClick / CellMouseDoubleClick) QOL - Better Editing Control Show
             this.DataGridView.CellClick += (sender, args) =>
             {
-                if (Control.ModifierKeys == Keys.Shift || Control.ModifierKeys == Keys.Control || args.RowIndex < 0 || args.ColumnIndex < 0)
-                {
-                    return;
-                }
-
-                var cell = this.DataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex];
-                if (cell == null)
-                {
-                    return;
-                }
-
-                //This is to have a better user experience while dealing with combobox. When finishing the edit, it will revert back to a simple selected cell instead of selected text!
-                if (cell is DataGridViewComboBoxCell comboBoxCell)
-                {
-                    this.DataGridView.CurrentCell = cell;
-                    this.DataGridView.BeginEdit(false);
-                    if (this.DataGridView.EditingControl is DataGridViewComboBoxEditingControl comboBoxEditingControl)
-                    {
-                        comboBoxEditingControl.DroppedDown = true;
-                        comboBoxEditingControl.DropDownClosed += (sender, args) => this.DataGridView.EndEdit();
-                    }
-                }
+                this.qol.EventCellClick_ImproveComboBox(args.RowIndex, args.ColumnIndex);
             };
 
             this.DataGridView.CellMouseDoubleClick += (sender, args) =>
             {
-                if (Control.ModifierKeys == Keys.Shift || Control.ModifierKeys == Keys.Control || args.Button != MouseButtons.Left || args.RowIndex < 0 || args.ColumnIndex < 0)
-                {
-                    return;
-                }
-
-                var cell = this.DataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex];
-                if (cell == null)
-                {
-                    return;
-                }
-
-                if (cell is DataGridViewTextBoxCell textBoxCell)
-                {
-                    this.DataGridView.BeginEdit(true);
-                }
-                else if (cell is DataGridViewCheckBoxCell checkboxCell)
-                {
-                    checkboxCell.Value = (bool)(checkboxCell.Value ?? false) == false;
-                }
+                this.qol.EventCellDoubleClick(args.RowIndex, args.ColumnIndex, args.Button);
             };
+
+            if (AddRowIndexToRowHeader)
+            {
+                this.DataGridView.RowPostPaint += (sender, args) =>
+                {
+                    this.qol.EventRowPostPaint_AddNumbers(args.RowBounds, args.InheritedRowStyle, args.Graphics, args.RowIndex);
+                };
+            }
             #endregion
 
             #region EVENTS(SelectionChanged / CellPainting / Paint) - Paint stuff on cells / Draw borders on cells
-            this.DataGridView.SelectionChanged += (sender, args) => 
+            this.DataGridView.SelectionChanged += (sender, args) =>
             {
                 this.dragDownHandler.EventSelectionChanged();
-                this.SelectionBorder.EventSelectionChanged(); 
+                this.SelectionBorder.EventSelectionChanged();
             };
 
 
@@ -382,7 +328,7 @@ namespace TiaUtilities.Generation.GridHandler
                 try
                 {
                     this.SelectionBorder.CalculateSelectionBorders();
-                    this.SelectionBorder.EventPaint(args.Graphics);
+                    this.SelectionBorder.EventPaint(this.DataGridView.CreateGraphics());
 
                     this.dragDownHandler.PaintTriangle(args.Graphics);
                 }
@@ -413,7 +359,10 @@ namespace TiaUtilities.Generation.GridHandler
                 }
 
                 var currentCell = this.DataGridView.CurrentCell;
-                if (currentCell != null && rowIndex == currentCell.RowIndex && columnIndex == currentCell.ColumnIndex && this.dragDownHandler.MouseShouldDisplayCursor(args))
+                if (currentCell != null &&
+                    rowIndex == currentCell.RowIndex &&
+                    columnIndex == currentCell.ColumnIndex &&
+                    this.dragDownHandler.MouseShouldDisplayCursor(args.X, args.Y))
                 {
                     this.DataGridView.Cursor = Cursors.Cross;
                     return;
@@ -562,31 +511,6 @@ namespace TiaUtilities.Generation.GridHandler
                 }
 
             };
-            #endregion
-
-            #region EVENTS(RowPostPaint) - Add row header numbers
-            if (AddRowIndexToRowHeader)
-            {
-                this.DataGridView.RowPostPaint += (sender, args) =>
-                {
-                    var style = args.InheritedRowStyle;
-
-                    var rowIdx = (args.RowIndex + 1).ToString();
-
-                    var centerFormat = new StringFormat()
-                    {
-                        // right alignment might actually make more sense for numbers
-                        Alignment = StringAlignment.Far,
-                        LineAlignment = StringAlignment.Far
-                    };
-
-                    var textSize = TextRenderer.MeasureText(rowIdx, style.Font); //get the size of the string
-                    DataGridView.RowHeadersWidth = Math.Max(DataGridView.RowHeadersWidth, textSize.Width + 15); //if header width lower then string width then resize
-
-                    var headerBounds = new Rectangle(args.RowBounds.Left, args.RowBounds.Top, DataGridView.RowHeadersWidth, args.RowBounds.Height);
-                    args.Graphics.DrawString(rowIdx, style.Font, SystemBrushes.ControlText, headerBounds, centerFormat);
-                };
-            }
             #endregion
 
             #region EVENTS(KeyDown) - SelectAll/Cut/Copy/Paste/Delete/Undo/Redo/Find
@@ -912,22 +836,7 @@ namespace TiaUtilities.Generation.GridHandler
             this.DataChangedHandler.End(req);
         }
 
-        public void SelectRow(int rowIndex)
-        {
-            this.DataGridView.ClearSelection();
-
-            var row = this.DataGridView.Rows[rowIndex];
-            if (row.Cells.Count > 0)
-            {
-                //I need to set the current cell, because i use the CurrentRow as a "starting row"
-                //Do not cancel current cell! It might select the first cell in the grid and mess up selection.
-                this.DataGridView.CurrentCell = row.Cells[0];
-                foreach (DataGridViewCell cell in row.Cells)
-                {
-                    cell.Selected = true;
-                }
-            }
-        }
+        public void SelectRow(int rowIndex) => this.qol.SelectRow(rowIndex);
 
         public Control GetControl() => this.DataGridView;
 
