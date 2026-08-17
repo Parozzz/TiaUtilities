@@ -6,10 +6,13 @@ namespace TiaUtilities.Generation.GridHandler
     {
         public const int TRIANGLE_SIZE = 13;
 
+        public bool Started { get; private set; } = false;
+        public bool DraggingDown { get => topSelectionRowIndex == rowIndexStart; }
+
+
         private readonly GridHandler<T> gridHandler = gridHandler;
         private DataGridView DataGridView { get => this.gridHandler.InternalDataGridView; }
 
-        private bool started = false;
         private int rowIndexStart = -1;
         private int draggedColumnIndex = -1;
 
@@ -19,23 +22,32 @@ namespace TiaUtilities.Generation.GridHandler
 
         private ToolTip? dragToolTip;
 
-        public bool DraggingDown { get => topSelectionRowIndex == rowIndexStart; }
 
-        public bool IsStarted()
+        public bool RequiresCursorCross(int x, int y, int columnIndex, int rowIndex)
         {
-            return started;
-        }
+            if (this.Started)
+            {
+                return false;
+            }
 
-        public bool MouseShouldDisplayCursor(int x, int y)
-        {
-            return !started && 
-                this.DataGridView.GetCellCount(DataGridViewElementStates.Selected) == 1 && 
-                this.IsInsideTriangle(x, y, this.DataGridView.CurrentCell, xyCellCoordinates: true);
+            var currentCellAddress = this.DataGridView.CurrentCellAddress;
+            if (columnIndex != currentCellAddress.X || rowIndex != currentCellAddress.Y)
+            {
+                return false;
+            }
+
+            var selectedCellCount = this.DataGridView.GetCellCount(DataGridViewElementStates.Selected);
+            if (selectedCellCount != 1)
+            {
+                return false;
+            }
+
+            return this.IsInsideTriangle(x, y, this.DataGridView.CurrentCell);
         }
 
         public void EventSelectionChanged()
         {
-            if (!started)
+            if (!Started)
             {
                 return;
             }
@@ -77,37 +89,33 @@ namespace TiaUtilities.Generation.GridHandler
             }
         }
 
-        public void EventMouseDown(int x, int y, MouseButtons button)
+        public void EventMouseDown(Point location, int columnIndex, int rowIndex)
         {
-            if(this.DataGridView.GetCellCount(DataGridViewElementStates.Selected) != 1)
+            if (this.DataGridView.GetCellCount(DataGridViewElementStates.Selected) != 1)
             {
                 return;
             }
 
-            var hitTest = this.DataGridView.HitTest(x, y);
-            if (hitTest.Type == DataGridViewHitTestType.Cell && button == MouseButtons.Left)
+            var cell = this.DataGridView.Rows[rowIndex].Cells[columnIndex];
+            if (cell.ReadOnly)
             {
-                var hitCell = this.DataGridView.Rows[hitTest.RowIndex].Cells[hitTest.ColumnIndex];
-                if (hitCell.ReadOnly)
-                {
-                    return;
-                }
+                return;
+            }
 
-                if (hitCell == this.DataGridView.CurrentCell && IsInsideTriangle(x, y, hitCell, xyCellCoordinates: false))
-                {
-                    started = true;
+            if (cell == this.DataGridView.CurrentCell && this.IsInsideTriangle(location, cell))
+            {
+                Started = true;
 
-                    bottomSelectionRowIndex = topSelectionRowIndex = rowIndexStart = hitTest.RowIndex;
-                    draggedColumnIndex = hitTest.ColumnIndex;
-                }
+                bottomSelectionRowIndex = topSelectionRowIndex = rowIndexStart = rowIndex;
+                draggedColumnIndex = columnIndex;
             }
         }
 
         public void EventMouseUp()
         {
-            if (started)
+            if (Started)
             {
-                started = false;
+                Started = false;
 
                 var eventArgs = this.CreateDragEventArgs();
                 this.gridHandler.CallExcelDragDoneEvent(eventArgs);
@@ -150,7 +158,7 @@ namespace TiaUtilities.Generation.GridHandler
                 return;
             }
 
-            if (started)
+            if (Started)
             {
                 style.SelectionBackColor = settings.DragSelectedCellBorderColor;
             }
@@ -177,7 +185,9 @@ namespace TiaUtilities.Generation.GridHandler
 
         }
 
-        public bool IsInsideTriangle(int x, int y, DataGridViewCell cell, bool xyCellCoordinates)
+        public bool IsInsideTriangle(Point p, DataGridViewCell cell, bool xyCellCoordinates = false) => IsInsideTriangle(p.X, p.Y, cell, xyCellCoordinates);
+
+        public bool IsInsideTriangle(int x, int y, DataGridViewCell cell, bool xyCellCoordinates = false)
         {
             if (cell is not DataGridViewTextBoxCell textBoxCell || textBoxCell.IsInEditMode)
             {
@@ -203,7 +213,7 @@ namespace TiaUtilities.Generation.GridHandler
 
         private void Clear()
         {
-            started = false;
+            Started = false;
             rowIndexStart = draggedColumnIndex = topSelectionRowIndex = bottomSelectionRowIndex = -1;
 
             if (dragToolTip != null)

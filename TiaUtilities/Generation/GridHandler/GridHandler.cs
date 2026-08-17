@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.CustomColumns;
+using TiaUtilities.Generation.GridHandler.CustomColumns.ButtonColumn;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.Placeholders;
@@ -20,6 +21,7 @@ namespace TiaUtilities.Generation.GridHandler
         private readonly GridSortHandler<T> sortHandler;
         private readonly GenPlaceholderHandler placeholderHandler;
         private readonly GridQOL qol;
+        private readonly GridDoDragDropHandler<T> doDragDropHandler;
 
         internal GridSettings GridSettings { get; init; }
         internal GridDataPreviewer<T> DataPreviewer { get; init; }
@@ -60,9 +62,6 @@ namespace TiaUtilities.Generation.GridHandler
 
         private bool init;
         private bool dirty;
-        private bool dragDropBusy;
-        private Point dragDropMouseDownLocation;
-
 
         public GridHandler(GridSettings settings,
             GridBindContainer gridBindFactory,
@@ -88,7 +87,8 @@ namespace TiaUtilities.Generation.GridHandler
             this.DataChangedHandler = new(this, this.undoRedoHandler);
             this.Columns = new(this);
 
-            this.qol = new(this.DataGridView);
+            this.qol = new(this.InternalDataGridView);
+            this.doDragDropHandler = new(this.InternalDataGridView, this.DataChangedHandler, this.GridSettings);
 
             this.SelectionBorder = new(this.InternalDataGridView, this.GridSettings);
         }
@@ -131,7 +131,7 @@ namespace TiaUtilities.Generation.GridHandler
 
         public void RefreshRow(int rowIndex)
         {
-            if (this.IsCellRowValid(rowIndex))
+            if (GridUtils.IsRowValid(this.DataGridView, rowIndex))
             {
                 var row = this.DataGridView.Rows[rowIndex];
                 foreach (DataGridViewCell cell in row.Cells)
@@ -203,8 +203,9 @@ namespace TiaUtilities.Generation.GridHandler
 
             void LoadDefaultCellStyle()
             {
-                this.DataGridView.DefaultCellStyle.SelectionBackColor = this.GridSettings.SelectedCellBackColor;
-                this.DataGridView.DefaultCellStyle.SelectionForeColor = this.GridSettings.SelectedCellForeColor;
+                //The real selection colors is applied in CellPainting
+                this.DataGridView.DefaultCellStyle.SelectionBackColor = SystemColors.ControlLightLight;
+                this.DataGridView.DefaultCellStyle.SelectionForeColor = Color.Black;
                 this.DataGridView.DefaultCellStyle.BackColor = SystemColors.ControlLightLight;
                 this.DataGridView.DefaultCellStyle.ForeColor = Color.Black;
                 this.DataGridView.DefaultCellStyle.Padding = new Padding(2);
@@ -225,21 +226,12 @@ namespace TiaUtilities.Generation.GridHandler
             this.Columns.Init();
             this.DataSource.InitializeData(this.InitializeRowCount);
 
-            #region EVENTS(CellMouseDown / CellClick / CellMouseDoubleClick / RowPostPaint) QOL
-            this.DataGridView.CellMouseDown += (sender, args) =>
-            {
-                this.qol.EventCellMouseDown_FullRowSelection(args.RowIndex, args.ColumnIndex);
-            };
+            #region EVENTS(CellMouseDown / CellClick / CellMouseDoubleClick / MouseWheel / RowPostPaint) QOL
+            this.DataGridView.CellMouseDown += (sender, args) => this.qol.EventCellMouseDown_FullRowSelection(args.RowIndex, args.ColumnIndex);
+            this.DataGridView.CellClick += (sender, args) => this.qol.EventCellClick_ImproveComboBox(args.RowIndex, args.ColumnIndex);
+            this.DataGridView.CellMouseDoubleClick += (sender, args) => this.qol.EventCellDoubleClick(args.RowIndex, args.ColumnIndex, args.Button);
 
-            this.DataGridView.CellClick += (sender, args) =>
-            {
-                this.qol.EventCellClick_ImproveComboBox(args.RowIndex, args.ColumnIndex);
-            };
-
-            this.DataGridView.CellMouseDoubleClick += (sender, args) =>
-            {
-                this.qol.EventCellDoubleClick(args.RowIndex, args.ColumnIndex, args.Button);
-            };
+            this.DataGridView.MouseWheel += (sender, args) => this.qol.EventMouseWheel_UseWheelDuringSelection(args.Delta);
 
             if (AddRowIndexToRowHeader)
             {
@@ -257,9 +249,10 @@ namespace TiaUtilities.Generation.GridHandler
                 this.SelectionBorder.EventSelectionChanged();
             };
 
-
             this.DataGridView.CellPainting += (sender, args) =>
             {
+                args.Handled = true;
+
                 if (sortHandler.IsTopRow(args.ColumnIndex, args.RowIndex))
                 {
                     args.PaintBackground(args.ClipBounds, true);
@@ -268,19 +261,32 @@ namespace TiaUtilities.Generation.GridHandler
                     return;
                 }
 
-                this.dragDownHandler.EventCellPainting(args);
-
-                if (this.dragDropMouseDownLocation != Point.Empty && args.CellBounds.Contains(this.dragDropMouseDownLocation))
+                var cellStyle = args.CellStyle;
+                if (cellStyle != null)
                 {
-                    args.CellStyle.SelectionBackColor = this.GridSettings.DragDropStartCellSelectedBackColor;
+                    var currentCellAddress = this.DataGridView.CurrentCellAddress;
+                    if (args.ColumnIndex == currentCellAddress.X && args.RowIndex == currentCellAddress.Y)
+                    {
+                        cellStyle.SelectionBackColor = cellStyle.BackColor;
+                        cellStyle.SelectionForeColor = cellStyle.ForeColor;
+                    }
+                    else if (args.State.HasFlag(DataGridViewElementStates.Selected))
+                    {
+                        cellStyle.SelectionBackColor = this.GridSettings.SelectedCellBackColor;
+                        cellStyle.SelectionForeColor = this.GridSettings.SelectedCellForeColor;
+                    }
                 }
 
-                args.Handled = true;
+                this.dragDownHandler.EventCellPainting(args);
+                this.doDragDropHandler.EventCellPainting(args.CellBounds, args.CellStyle, args.ColumnIndex, args.RowIndex); //Change cell style background for DoDragDrop start cell.
+
                 args.PaintBackground(args.ClipBounds, true);
 
                 var previewData = GridUtils.CellValuePreviewRequestData(this, args.ColumnIndex, args.RowIndex);
                 if (previewData != null)
                 {
+                    var method = typeof(DataGridViewCell).GetMethod("Paint", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+
                     /* protected virtual void Paint(Graphics graphics,
                            Rectangle clipBounds,
                            Rectangle cellBounds,
@@ -292,7 +298,6 @@ namespace TiaUtilities.Generation.GridHandler
                            DataGridViewCellStyle cellStyle,
                            DataGridViewAdvancedBorderStyle advancedBorderStyle,
                            DataGridViewPaintParts paintParts) */
-                    var method = typeof(DataGridViewCell).GetMethod("Paint", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
 
                     //This methods is inside DataGridViewCell.
                     //This allows to draw stuff, like drop down arrow on combo boxes
@@ -318,19 +323,30 @@ namespace TiaUtilities.Generation.GridHandler
                 }
             };
 
+            RectangleF[] oldBorders = [];
             this.DataGridView.Paint += (sender, args) =>
             {
-                if (dragDropBusy)
-                {
-                    return;
-                }
-
                 try
                 {
-                    this.SelectionBorder.CalculateSelectionBorders();
-                    this.SelectionBorder.EventPaint(this.DataGridView.CreateGraphics());
+                    this.SelectionBorder.EventPaint(args.Graphics);
 
                     this.dragDownHandler.PaintTriangle(args.Graphics);
+                    if (this.doDragDropHandler.Busy)
+                    {
+                        if (oldBorders.Length == 4)
+                        {
+                            this.SelectionBorder.DrawBorders(args.Graphics, oldBorders, Color.Transparent);
+                            oldBorders = [];
+                        }
+
+                        var offset = this.doDragDropHandler.GetDifferenceFromMouseDown(Cursor.Position, useDisplayIndex: true);
+                        Debug.WriteLine($"Paint. Offset: [{offset.X}, {offset.Y}]");
+                        var bordersWithOffset = this.SelectionBorder.CalculateBorders(this.GridSettings.BorderWeight + 3, offset.Y, offset.X);
+                        this.SelectionBorder.DrawBorders(args.Graphics, bordersWithOffset, this.GridSettings.SingleSelectedCellBorderColor);
+
+                        oldBorders = bordersWithOffset;
+
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -339,177 +355,111 @@ namespace TiaUtilities.Generation.GridHandler
             };
             #endregion
 
-            #region EVENTS(CellMouseMove / MouseLeave / MouseDown / DragOver / DragDrop) - DragDrop / Custom cursor on cell mouse
-            this.DataGridView.CellMouseMove += (sender, args) =>
+            #region EVENTS(MouseMove) - Change cursor
+            this.DataGridView.MouseMove += (sender, args) =>
             {
+                this.SelectionBorder.EventMouseMove_CursorInsideBorder(args.X, args.Y);
+
                 this.DataGridView.Cursor = Cursors.Default;
 
-                var rowIndex = args.RowIndex;
-                var columnIndex = args.ColumnIndex;
-                if (!this.AreCellCoordinatesValid(rowIndex, columnIndex))
+                var hitTest = this.DataGridView.HitTest(args.X, args.Y);
+                if (hitTest.Type == DataGridViewHitTestType.Cell)
                 {
-                    return;
-                }
+                    var rowIndex = hitTest.RowIndex;
+                    var columnIndex = hitTest.ColumnIndex;
 
-                this.SelectionBorder.EventCellMouseMove(columnIndex, rowIndex);
-
-                if (this.dragDownHandler.IsStarted())
-                {
-                    return;
-                }
-
-                var currentCell = this.DataGridView.CurrentCell;
-                if (currentCell != null &&
-                    rowIndex == currentCell.RowIndex &&
-                    columnIndex == currentCell.ColumnIndex &&
-                    this.dragDownHandler.MouseShouldDisplayCursor(args.X, args.Y))
-                {
-                    this.DataGridView.Cursor = Cursors.Cross;
-                    return;
-                }
-
-                if (this.SelectionBorder.CursorInsideBorder)
-                {//Display cursor for drag&drop
-                    this.DataGridView.Cursor = Cursors.SizeAll;
-                }
-            };
-
-            this.DataGridView.MouseLeave += (sender, args) =>
-            {//This seems to be called just after the DoDragDrop method.
-                this.SelectionBorder.EventMouseLeave();
-            };
-
-            this.DataGridView.MouseDown += (sender, args) =>
-            {
-                this.dragDownHandler.EventMouseDown(args.X, args.Y, args.Button);
-
-                if (!this.dragDownHandler.IsStarted() && this.SelectionBorder.CursorInsideBorder && args.Button == MouseButtons.Left)
-                {
-                    var text = GridUtils.GetCopyAsExcelText(this.DataGridView, out var _);
-                    if (text != null)
+                    if (this.dragDownHandler.Started)
                     {
-                        this.SelectionBorder.ClearCursor();
+                        this.DataGridView.Cursor = Cursors.Cross;
+                        return;
+                    }
 
-                        this.dragDropMouseDownLocation = args.Location;
+                    if (this.dragDownHandler.RequiresCursorCross(args.X, args.Y, columnIndex, rowIndex))
+                    {
+                        this.DataGridView.Cursor = Cursors.Cross;
+                        return;
+                    }
 
-                        var mouseDownHitTest = this.DataGridView.HitTest(this.dragDropMouseDownLocation.X, this.dragDropMouseDownLocation.Y);
-                        if (mouseDownHitTest.Type == DataGridViewHitTestType.Cell)
-                        {//This allows the cell to show different back color
-                            this.DataGridView.InvalidateCell(mouseDownHitTest.ColumnIndex, mouseDownHitTest.RowIndex);
-                        }
-
-                        dragDropBusy = true;
-                        try
-                        {//DoDragDrop seems to block operations in the grid. Everything else must be done b4 the method.
-                            this.DataGridView.DoDragDrop(text, DragDropEffects.Move, null, Point.Empty, true);
-                        }
-                        catch (Exception ex)
-                        {
-                            Utils.ShowExceptionMessage(ex);
-                        }
-                        dragDropBusy = false;
-
-                        this.dragDropMouseDownLocation = Point.Empty;
+                    if (this.SelectionBorder.CursorInsideBorder)
+                    {//Display cursor for do drag&drop
+                        this.DataGridView.Cursor = Cursors.SizeAll;
                     }
                 }
             };
+            #endregion
 
-            this.DataGridView.MouseUp += (sender, args) =>
+            #region EVENTS(MouseLeave / MouseDown / LostFocus / DragOver / DragDrop / QueryContinueDrag) - DragDown / DoDragDrop
+            this.DataGridView.MouseDown += (sender, args) =>
             {
-                this.dragDownHandler.EventMouseUp();
+                if (args.Button != MouseButtons.Left)
+                {
+                    return;
+                }
+
+                var hitTest = this.DataGridView.HitTest(args.Location.X, args.Location.Y);
+                if (hitTest.Type != DataGridViewHitTestType.Cell)
+                {
+                    return;
+                }
+
+                var columnIndex = hitTest.ColumnIndex;
+                var rowIndex = hitTest.RowIndex;
+
+                this.dragDownHandler.EventMouseDown(args.Location, columnIndex, rowIndex);
+
+                if (!this.dragDownHandler.Started && this.SelectionBorder.CursorInsideBorder)
+                {
+                    this.SelectionBorder.ClearCursor();
+                    this.doDragDropHandler.EventMouseDown(args.Location, columnIndex, rowIndex);
+                }
             };
 
-            this.DataGridView.LostFocus += (sender, args) =>
-            {
-                this.dragDownHandler.EventLostFocus();
-            };
+            this.DataGridView.MouseUp += (sender, args) => this.dragDownHandler.EventMouseUp();
+            this.DataGridView.MouseLeave += (sender, args) => this.SelectionBorder.EventMouseLeave();
+            this.DataGridView.LostFocus += (sender, args) => this.dragDownHandler.EventLostFocus();
 
             this.DataGridView.QueryContinueDrag += (sender, args) =>
             {
-                /*
-                var dataGridCursorPosition = this.DataGridView.PointToClient(Cursor.Position);
-                
-                var hitTest = this.DataGridView.HitTest(dataGridCursorPosition.X, dataGridCursorPosition.Y);
-                Debug.WriteLine("Query continue drag. HitTest: " + (hitTest.Type == DataGridViewHitTestType.Cell));
+                var gridPoint = this.DataGridView.PointToClient(Cursor.Position);
 
-                if(hitTest.Type == DataGridViewHitTestType.Cell)
+                var hitTest = this.DataGridView.HitTest(gridPoint.X, gridPoint.Y);
+                if (hitTest.Type == DataGridViewHitTestType.Cell)
                 {
-                    var cell = this.DataGridView.Rows[hitTest.RowIndex].Cells[hitTest.ColumnIndex];
-                    cell.Style.BackColor = SystemColors.ActiveCaptionText;
-                }*/
+                    var columnIndex = hitTest.ColumnIndex;
+                    var rowIndex = hitTest.RowIndex;
+
+                    var displayedRowCount = this.DataGridView.DisplayedRowCount(includePartialRow: false);
+
+                    if(rowIndex < this.DataGridView.FirstDisplayedScrollingRowIndex + 4)
+                    {
+                        this.qol.Scroll(-1);
+                    }
+                    if (rowIndex < this.DataGridView.FirstDisplayedScrollingRowIndex + 2)
+                    {
+                        this.qol.Scroll(-2);
+                    }
+                    else if (rowIndex > this.DataGridView.FirstDisplayedScrollingRowIndex + displayedRowCount - 2)
+                    {
+                        this.qol.Scroll(2);
+                    }
+                    else if (rowIndex > this.DataGridView.FirstDisplayedScrollingRowIndex + displayedRowCount - 4)
+                    {
+                        this.qol.Scroll(1);
+                    }
+                }
+
+                this.Refresh(); //Force refresh also during DoDragDrop!
             };
 
             this.DataGridView.DragOver += (sender, args) =>
             {
-                var data = args.Data?.GetData(typeof(string));
-                args.Effect = data is not string ? DragDropEffects.None : DragDropEffects.Move;
+                args.Effect = this.doDragDropHandler.EventDragOver(args.Data);
             };
 
             this.DataGridView.DragDrop += (sender, args) =>
             {
-                try
-                {
-                    var dataObj = args.Data?.GetData(typeof(string));
-                    if (dataObj is string excelText)
-                    {
-                        var gridPoint = this.DataGridView.PointToClient(new(args.X, args.Y));
-
-                        var mouseDownHitTest = this.DataGridView.HitTest(this.dragDropMouseDownLocation.X, this.dragDropMouseDownLocation.Y);
-                        var dropHitTest = this.DataGridView.HitTest(gridPoint.X, gridPoint.Y);
-
-                        var bothAreCells = mouseDownHitTest.Type == DataGridViewHitTestType.Cell && dropHitTest.Type == DataGridViewHitTestType.Cell;
-                        var sameCells = mouseDownHitTest.RowIndex == dropHitTest.RowIndex && mouseDownHitTest.ColumnIndex == dropHitTest.ColumnIndex;
-                        if (bothAreCells && !sameCells)
-                        {
-                            //var rowIndex = dropHitTest.RowIndex;
-                            //var columnIndex = dropHitTest.ColumnIndex;
-
-                            var minRowIndex = this.DataGridView.SelectedCells.Cast<DataGridViewCell>().Min(c => c.RowIndex);
-                            var minColumnIndex = this.DataGridView.SelectedCells.Cast<DataGridViewCell>().Min(c => c.ColumnIndex);
-
-                            var pasteRowIndex = minRowIndex + (dropHitTest.RowIndex - mouseDownHitTest.RowIndex);
-                            var pasteColumnIndex = minColumnIndex + (dropHitTest.ColumnIndex - mouseDownHitTest.ColumnIndex);
-
-                            this.SuspendLayout();
-
-                            var req = this.DataChangedHandler.Join();
-                            GridUtils.PasteAsExcel(this.DataGridView, excelText, pasteRowIndex, pasteColumnIndex, out var pastedCellsList, ignoreSingleLineMultiplePasting: true);
-
-                            var cellsToDelete = this.DataGridView.SelectedCells.Cast<DataGridViewCell>().Except(pastedCellsList);
-                            foreach (var cell in cellsToDelete)
-                            {
-                                cell.Value = null;
-                            }
-
-                            this.DataChangedHandler.End(req);
-
-                            this.FindForm()?.BeginInvoke(() =>
-                            {
-                                DllImports.RaiseLeftMouse(Cursor.Position); //This fixes the mouse down stuck after dropping.
-
-                                this.DataGridView.ClearSelection();
-                                this.DataGridView.CurrentCell = this.DataGridView.Rows[pasteRowIndex].Cells[pasteColumnIndex];
-
-                                foreach (var cell in pastedCellsList)
-                                {
-                                    cell.Selected = true;
-                                }
-
-                                this.ResumeLayout(refresh: false);
-                            });
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Utils.ShowExceptionMessage(ex);
-                }
-                finally
-                {
-                    this.SelectionBorder.ClearCursor();
-                    this.dragDropMouseDownLocation = Point.Empty;
-                }
-
+                this.doDragDropHandler.EventDragDrop(args.Data, args.X, args.Y);
+                this.SelectionBorder.ClearCursor();
             };
             #endregion
 
@@ -549,7 +499,7 @@ namespace TiaUtilities.Generation.GridHandler
                     case Keys.V | Keys.Control:
 
                         var ctrlVReq = this.DataChangedHandler.Join();
-                        GridUtils.PasteAsExcelFromClipboard(this.DataGridView, out var _);
+                        GridUtils.PasteAsExcelFromClipboard(this.DataGridView);
                         this.DataChangedHandler.End(ctrlVReq);
 
                         this.Refresh(); //This is required since for some special column type (Like checkbox) is needed.
@@ -584,43 +534,32 @@ namespace TiaUtilities.Generation.GridHandler
             };
             #endregion
 
-            #region EVENTS(MouseWheel) - Allow scroll while selecting
-            this.DataGridView.MouseWheel += (sender, args) =>
-            {
-                if ((Control.MouseButtons & MouseButtons.Left) != 0)
-                {
-                    var rowCount = this.DataGridView.RowCount;
-                    var firstDisplayedRowIndex = this.DataGridView.FirstDisplayedScrollingRowIndex;
-
-                    var rowToShow = firstDisplayedRowIndex - args.Delta / 40;
-
-                    var displayedRowCount = this.DataGridView.DisplayedRowCount(false);
-                    rowToShow = Math.Max(rowToShow, 0);
-                    rowToShow = Math.Min(rowToShow, rowCount - displayedRowCount);
-
-                    this.DataGridView.FirstDisplayedScrollingRowIndex = rowToShow;
-
-                }
-            };
-            #endregion
-
             #region EVENTS(CellFormatting) - Custom formatting for DataGridViewButtonCell
             this.DataGridView.CellFormatting += (sender, args) =>
             {
-                if (this.DataGridView.Rows[args.RowIndex].Cells[args.ColumnIndex] is DataGridViewButtonCell buttonCell)
+                int columnIndex = args.ColumnIndex;
+                int rowIndex = args.RowIndex;
+
+                if (!GridUtils.AreCoordinatesValid(this.DataGridView, rowIndex, columnIndex))
                 {
-                    var data = this.DataSource[args.RowIndex];
-                    args.Value = $"{data[args.ColumnIndex]}";
+                    return;
+                }
+
+                var cell = this.DataGridView.Rows[rowIndex].Cells[columnIndex];
+                if (cell is DataGridViewButtonCell buttonCell)
+                {
+                    var data = this.DataSource[rowIndex][columnIndex];
+                    args.Value = $"{data}";
                 }
             };
             #endregion
 
-            #region EVENTS(CellContentClick / CellContentDoubleClick) - Logics for DataGridViewCheckBoxCell / DataGridViewEventableButtonColumn
+            #region EVENTS(CellContentClick) - Fix for edit mode for DataGridViewCheckBoxCell
             this.DataGridView.CellContentClick += (sender, args) =>
             {
                 var rowIndex = args.RowIndex;
                 var columnIndex = args.ColumnIndex;
-                if (rowIndex < 0 || rowIndex >= this.DataGridView.RowCount || columnIndex < 0 || columnIndex >= this.DataGridView.ColumnCount)
+                if (!GridUtils.AreCoordinatesValid(this.DataGridView, rowIndex, columnIndex))
                 {
                     return;
                 }
@@ -629,28 +568,6 @@ namespace TiaUtilities.Generation.GridHandler
                 if (cell is DataGridViewCheckBoxCell checkBoxCell)
                 {
                     this.DataGridView.EndEdit(); //If a checkbox is clicked, it goes in edit mode. I do not want that, is confusing. This fixes it.
-                }
-                else if (cell is DataGridViewButtonCell buttonCell && cell.OwningColumn is DataGridViewEventableButtonColumn eventableButtonColumn)
-                {
-                    var data = this.DataSource[rowIndex][columnIndex];
-                    eventableButtonColumn.ButtonPressedEvent(data, buttonCell);
-                }
-            };
-
-            this.DataGridView.CellContentDoubleClick += (sender, args) =>
-            {
-                var rowIndex = args.RowIndex;
-                var columnIndex = args.ColumnIndex;
-                if (rowIndex < 0 || rowIndex >= this.DataGridView.RowCount || columnIndex < 0 || columnIndex >= this.DataGridView.ColumnCount)
-                {
-                    return;
-                }
-
-                var cell = this.DataGridView.Rows[rowIndex].Cells[columnIndex];
-                if (cell is DataGridViewButtonCell buttonCell && cell.OwningColumn is DataGridViewEventableButtonColumn eventableButtonColumn)
-                {
-                    var data = this.DataSource[rowIndex][columnIndex];
-                    eventableButtonColumn.ButtonDoublePressedEvent(data, buttonCell);
                 }
             };
             #endregion
@@ -731,17 +648,11 @@ namespace TiaUtilities.Generation.GridHandler
 
         public void AutoResizeColumnHeadersHeight() => this.DataGridView.AutoResizeColumnHeadersHeight();
 
-        private bool IsCellRowValid(int row) => row >= 0 && row < this.RowCount;
-
-        private bool IsCellColumnValid(int column) => column >= 0 && column < this.ColumnCount;
-
-        private bool AreCellCoordinatesValid(int row, int column) => this.IsCellRowValid(row) && this.IsCellColumnValid(column);
-
         public DataGridViewCell? GetCurrentCell() => this.DataGridView.CurrentCell;
 
         public void ChangeCurrentCell(int rowIndex, int columnIndex)
         {
-            if (AreCellCoordinatesValid(rowIndex, columnIndex))
+            if (GridUtils.AreCoordinatesValid(this.DataGridView, rowIndex, columnIndex))
             {
                 this.DataGridView.CurrentCell = this.DataGridView.Rows[rowIndex].Cells[columnIndex];
             }
@@ -751,7 +662,7 @@ namespace TiaUtilities.Generation.GridHandler
 
         public DataGridViewCell? GetCell(int rowIndex, int columnIndex)
         {
-            return AreCellCoordinatesValid(rowIndex, columnIndex) ? this.DataGridView.Rows[rowIndex].Cells[columnIndex] : null;
+            return GridUtils.AreCoordinatesValid(this.DataGridView, rowIndex, columnIndex) ? this.DataGridView.Rows[rowIndex].Cells[columnIndex] : null;
         }
 
         public DataGridViewColumn GetColumn(int columnIndex) => this.DataGridView.Columns[columnIndex];

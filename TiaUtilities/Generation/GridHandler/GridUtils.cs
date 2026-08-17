@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Data.Common;
 using System.Text.RegularExpressions;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.Placeholders;
@@ -180,9 +181,9 @@ namespace TiaUtilities.Generation.GridHandler
             }
         }
 
-        public static void PasteAsExcel(DataGridView dataGridView, string pasteString, int row, int column, out List<DataGridViewCell> pastedCellList, bool ignoreSingleLineMultiplePasting = false)
+        public static List<DataGridViewCell> PasteAsExcel(DataGridView dataGridView, string pasteString, int row, int column, bool ignoreSingleLineMultiplePasting = false)
         {
-            pastedCellList = [];
+            List<DataGridViewCell> pastedCellList = [];
 
             try
             {
@@ -196,7 +197,7 @@ namespace TiaUtilities.Generation.GridHandler
 
                         foreach (DataGridViewCell cell in dataGridView.SelectedCells)
                         {
-                            if(cell.ReadOnly)
+                            if (cell.ReadOnly)
                             {
                                 continue;
                             }
@@ -205,7 +206,7 @@ namespace TiaUtilities.Generation.GridHandler
                             pastedCellList.Add(cell);
                         }
 
-                        return;
+                        return pastedCellList;
                     }
                 }
 
@@ -227,23 +228,27 @@ namespace TiaUtilities.Generation.GridHandler
                 var rowIndex = startRowIndex;
                 foreach (var pastedRow in pastedRowArray)
                 {
-                    var pastedValueArray = pastedRow.Split('\t');
+                    if(GridUtils.IsRowValid(dataGridView, rowIndex))
+                    {//If row index is invalid, like starting from a negative row, i will ignore the pasting!
+                        var pastedValueArray = pastedRow.Split('\t');
 
-                    var columnCounter = 0;
-                    for (int i = 0; i < pastedValueArray.Length && columnCounter < columnCount; i++)
-                    {
-                        var pastedValue = pastedValueArray[i];
-                        var columnIndex = validColumnIndexes[columnCounter];
-
-                        var cell = dataGridView.Rows[rowIndex]?.Cells[columnIndex];
-                        if (cell != null && !cell.ReadOnly)
+                        var columnCounter = 0;
+                        for (int i = 0; i < pastedValueArray.Length && columnCounter < columnCount; i++)
                         {
-                            cell.Value = pastedValue;
-                            pastedCellList.Add(cell);
-                        }
+                            var pastedValue = pastedValueArray[i];
+                            var columnIndex = validColumnIndexes[columnCounter];
 
-                        columnCounter++;
+                            var cell = dataGridView.Rows[rowIndex]?.Cells[columnIndex];
+                            if (cell != null && !cell.ReadOnly)
+                            {
+                                cell.Value = pastedValue;
+                                pastedCellList.Add(cell);
+                            }
+
+                            columnCounter++;
+                        }
                     }
+
 
                     rowIndex++;
                     if (rowIndex >= rowCount)
@@ -256,26 +261,30 @@ namespace TiaUtilities.Generation.GridHandler
             {
                 Utils.ShowExceptionMessage(ex);
             }
+
+            return pastedCellList;
         }
 
-        public static void PasteAsExcelFromClipboard(DataGridView dataGridView, out List<DataGridViewCell> pastedCellsList)
+        public static List<DataGridViewCell> PasteAsExcelFromClipboard(DataGridView dataGridView)
         {
-            pastedCellsList = [];
-
             if (Clipboard.ContainsText())
             {
                 var clipboardText = Clipboard.GetText();
 
                 var currentCell = dataGridView.CurrentCell;
-                GridUtils.PasteAsExcel(dataGridView, clipboardText, currentCell.RowIndex, currentCell.ColumnIndex, out pastedCellsList);
+                return GridUtils.PasteAsExcel(dataGridView, clipboardText, currentCell.RowIndex, currentCell.ColumnIndex);
             }
             else
             {
+                List<DataGridViewCell> pastedCellsList = [];
+
                 foreach (DataGridViewCell cell in dataGridView.SelectedCells)
                 {
                     cell.Value = null;
                     pastedCellsList.Add(cell);
                 }
+
+                return pastedCellsList;
             }
         }
         #endregion
@@ -358,8 +367,8 @@ namespace TiaUtilities.Generation.GridHandler
         #endregion
 
         public static bool AreSelectedCellsPlanar(
-            DataGridViewSelectedCellCollection selectedCells, 
-            DataGridViewColumnCollection columns, 
+            DataGridViewSelectedCellCollection selectedCells,
+            DataGridViewColumnCollection columns,
             DataGridViewRowCollection rows)
         {//Can you see this is vibe-coded?
          // 1. Prendi solo le celle effettivamente visibili (evita ghost selection su righe/colonne nascoste)
@@ -418,38 +427,14 @@ namespace TiaUtilities.Generation.GridHandler
             return selectedCellsList.Count == gridCalculatedArea;
         }
 
-        public class SelectedCellsBorderCoordinates
-        {
-            public required int Top { get; init; } //Lowest Row Index
-            public required int Bottom { get; init; } //Highest Row Index
-            public required int Left { get; init; } //Lowest Column Index
-            public required int Right { get; init; } //Highest Column Index
 
-            public bool IsTop(DataGridViewCell cell) => cell.RowIndex == this.Top;
-            public bool IsBottom(DataGridViewCell cell) => cell.RowIndex == this.Bottom;
-            public bool IsLeft(DataGridViewCell cell) => cell.ColumnIndex == this.Left;
-            public bool IsRight(DataGridViewCell cell) => cell.ColumnIndex == this.Right;
-        }
+        public static bool IsRowValid(DataGridView dgv, int row) => row >= 0 && row < dgv.RowCount;
 
-        public static SelectedCellsBorderCoordinates GetSelectedCellsBorderCoordinates(DataGridView dataGridView)
-        {
-            int lowestRowIndex = -1;
-            int highestRowIndex = -1;
+        public static bool IsColumnValid(DataGridView dgv, int column) => column >= 0 && column < dgv.ColumnCount;
 
-            int lowestColumnIndex = -1;
-            int highestColumnIndex = -1;
+        public static bool AreCoordinatesValid(DataGridView dgv, int row, int column) => IsRowValid(dgv, row) && IsColumnValid(dgv, column);
 
-            foreach (DataGridViewCell cell in dataGridView.SelectedCells)
-            {
-                lowestRowIndex = (lowestRowIndex == -1 || cell.RowIndex < lowestRowIndex) ? cell.RowIndex : lowestRowIndex;
-                highestRowIndex = (highestRowIndex == -1 || cell.RowIndex > highestRowIndex) ? cell.RowIndex : highestRowIndex;
+        public static int DisplayColumnIndex(this DataGridViewCell cell) => cell.OwningColumn.DisplayIndex;
 
-                lowestColumnIndex = (lowestColumnIndex == -1 || cell.ColumnIndex < lowestColumnIndex) ? cell.ColumnIndex : lowestColumnIndex;
-                highestColumnIndex = (highestColumnIndex == -1 || cell.ColumnIndex > highestColumnIndex) ? cell.ColumnIndex : highestColumnIndex;
-            }
-
-            return new() { Top = lowestRowIndex, Bottom = highestRowIndex, Left = lowestColumnIndex, Right = highestColumnIndex };
-            //return [lowestRowIndex, highestRowIndex, lowestColumnIndex, highestColumnIndex]; //top, bottom, left, right
-        }
     }
 }

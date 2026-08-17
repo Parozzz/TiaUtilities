@@ -8,6 +8,29 @@ namespace TiaUtilities.Generation.GridHandler
 {
     public class GridQOL(DataGridView dataGridView)
     {
+
+        public void Scroll(int amount)
+        {
+            var rowCount = dataGridView.RowCount;
+            var firstDisplayedRowIndex = dataGridView.FirstDisplayedScrollingRowIndex;
+
+            var rowToShow = firstDisplayedRowIndex + amount;
+
+            var displayedRowCount = dataGridView.DisplayedRowCount(false);
+            rowToShow = Math.Max(rowToShow, 0);
+            rowToShow = Math.Min(rowToShow, rowCount - displayedRowCount);
+
+            dataGridView.FirstDisplayedScrollingRowIndex = rowToShow;
+        }
+
+        public void EventMouseWheel_UseWheelDuringSelection(int delta)
+        {
+            if ((Control.MouseButtons & MouseButtons.Left) != 0)
+            {
+                Scroll(-delta / 40);
+            }
+        }
+
         public void EventCellMouseDown_FullRowSelection(int rowIndex, int columnIndex)
         {
             if (columnIndex == -1 && rowIndex >= 0)

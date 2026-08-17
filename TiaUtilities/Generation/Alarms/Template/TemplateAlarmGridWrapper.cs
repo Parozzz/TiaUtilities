@@ -50,7 +50,7 @@ namespace TiaUtilities.Generation.Alarms.Template
             this.gridHandler.Columns.AddTextBox(TemplateData.HMI_ALARM_CLASS, 150);
 
             var hmiParametersColumn = this.gridHandler.Columns.AddButton(TemplateData.HMI_PARAMETERS, 150);
-            hmiParametersColumn.ButtonDoublePressed += (sender, args) =>
+            hmiParametersColumn.ButtonPressed += (sender, args) =>
             {
                 var cell = args.Cell;
                 var rowIndex = args.Cell.RowIndex;
