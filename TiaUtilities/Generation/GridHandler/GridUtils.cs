@@ -107,7 +107,7 @@ namespace TiaUtilities.Generation.GridHandler
         #endregion
 
         #region COPY/PASTE AS EXCEL
-        public static string? GetCopyAsExcelText(DataGridView dataGridView, out List<DataGridViewCell> copiedCellList)
+        public static string? GetCopyAsExcelText(ExcelLikeDataGridView dataGridView, out List<DataGridViewCell> copiedCellList)
         {
             copiedCellList = [];
 
@@ -166,7 +166,7 @@ namespace TiaUtilities.Generation.GridHandler
             return null;
         }
 
-        public static void CopyAsExcelToClipboard(DataGridView dataGridView, out List<DataGridViewCell> pastedCells)
+        public static void CopyAsExcelToClipboard(ExcelLikeDataGridView dataGridView, out List<DataGridViewCell> pastedCells)
         {
             var clipboardText = GridUtils.GetCopyAsExcelText(dataGridView, out pastedCells);
 
@@ -181,7 +181,7 @@ namespace TiaUtilities.Generation.GridHandler
             }
         }
 
-        public static List<DataGridViewCell> PasteAsExcel(DataGridView dataGridView, string pasteString, int row, int column, bool ignoreSingleLineMultiplePasting = false)
+        public static List<DataGridViewCell> PasteAsExcel(ExcelLikeDataGridView dataGridView, string pasteString, int row, int column, bool ignoreSingleLineMultiplePasting = false)
         {
             List<DataGridViewCell> pastedCellList = [];
 
@@ -214,8 +214,7 @@ namespace TiaUtilities.Generation.GridHandler
                 int startRowIndex = row; //The currentCell row index needs to be taken BEFORE adding cells otherwise it will be moved!
                 int startColumnIndex = column;
 
-                var validColumnIndexes = dataGridView.Columns.Cast<DataGridViewColumn>()
-                    .Where(x => x.Visible)
+                var validColumnIndexes = dataGridView.VisibleColumns
                     .Select(x => x.Index)
                     .Where(x => x >= startColumnIndex)
                     .ToArray();
@@ -228,7 +227,7 @@ namespace TiaUtilities.Generation.GridHandler
                 var rowIndex = startRowIndex;
                 foreach (var pastedRow in pastedRowArray)
                 {
-                    if(GridUtils.IsRowValid(dataGridView, rowIndex))
+                    if (GridUtils.IsRowValid(dataGridView, rowIndex))
                     {//If row index is invalid, like starting from a negative row, i will ignore the pasting!
                         var pastedValueArray = pastedRow.Split('\t');
 
@@ -265,7 +264,7 @@ namespace TiaUtilities.Generation.GridHandler
             return pastedCellList;
         }
 
-        public static List<DataGridViewCell> PasteAsExcelFromClipboard(DataGridView dataGridView)
+        public static List<DataGridViewCell> PasteAsExcelFromClipboard(ExcelLikeDataGridView dataGridView)
         {
             if (Clipboard.ContainsText())
             {
@@ -366,51 +365,41 @@ namespace TiaUtilities.Generation.GridHandler
         }
         #endregion
 
-        public static bool AreSelectedCellsPlanar(
-            DataGridViewSelectedCellCollection selectedCells,
-            DataGridViewColumnCollection columns,
-            DataGridViewRowCollection rows)
+        public static bool AreSelectedCellsPlanar(ExcelLikeDataGridView dataGridView)
         {//Can you see this is vibe-coded?
-         // 1. Prendi solo le celle effettivamente visibili (evita ghost selection su righe/colonne nascoste)
-            var selectedCellsList = selectedCells.Cast<DataGridViewCell>()
-                .Where(c => c.Visible && c.OwningColumn.Visible && c.OwningRow.Visible)
-                .ToList();
-
-            if (selectedCellsList.Count == 0)
+            var cellCount = dataGridView.GetCellCount(DataGridViewElementStates.Selected);
+            if (cellCount == 0)
             {
                 return false;
             }
+            else if (cellCount == 1)
+            {
+                return true;
+            }
+
+            var selectedCellsList = dataGridView.SelectedCells.Cast<DataGridViewCell>()
+                                                           .Where(c => c.Visible && c.OwningColumn.Visible && c.OwningRow.Visible)
+                                                           .ToList();
 
             // 2. Identifica colonne e righe uniche coinvolte
             var distinctColumnsList = selectedCellsList.Select(c => c.OwningColumn).Distinct().ToList();
             var distinctRowsList = selectedCellsList.Select(c => c.OwningRow).Distinct().ToList();
 
             // --- CONTROLLO COLONNE CONSECUTIVE ---
-            var columnsMapList = columns.Cast<DataGridViewColumn>()
-                .Where(c => c.Visible)
-                .OrderBy(c => c.DisplayIndex)
-                .ToList();
-
             var columnsIndexList = distinctColumnsList
-                .Select(c => columnsMapList.IndexOf(c))
+                .Select(dataGridView.VisibleColumns.IndexOf)
                 .OrderBy(i => i)
                 .ToList();
 
             bool columnsOK = (columnsIndexList.Last() - columnsIndexList.First()) == (distinctColumnsList.Count - 1);
-
             if (!columnsOK)
             {
                 return false;
             }
 
             // --- CONTROLLO RIGHE CONSECUTIVE ---
-            var rowsMapList = rows.Cast<DataGridViewRow>()
-                .Where(r => r.Visible)
-                .OrderBy(r => r.Index)
-                .ToList();
-
             var rowsIndexList = distinctRowsList
-                .Select(r => rowsMapList.IndexOf(r))
+                .Select(dataGridView.VisibleRows.IndexOf)
                 .OrderBy(i => i)
                 .ToList();
 

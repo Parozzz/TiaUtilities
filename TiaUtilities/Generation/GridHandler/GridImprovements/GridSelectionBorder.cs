@@ -63,7 +63,7 @@ namespace TiaUtilities.Generation.GridHandler.GridImprovements
 
     public class GridSelectionBorder(ExcelLikeDataGridView dataGridView, GridSettings gridSettings)
     {
-        const int EXTRA_PX_BORDER_MOUSE_SELECTION = 4;
+        const int EXTRA_PX_BORDER_MOUSE_SELECTION = 3;
 
         const int BORDER_TOP = 0;
         const int BORDER_RIGHT = 1;
@@ -79,20 +79,25 @@ namespace TiaUtilities.Generation.GridHandler.GridImprovements
 
         public void EventSelectionChanged()
         {
-            var selectedCells = dataGridView.SelectedCells;
-            if (selectedCells == null || selectedCells.Count == 0)
+            if (dataGridView.GetCellCount(DataGridViewElementStates.Selected) == 0)
             {
                 return;
             }
 
-            this.selectionIsPlanar = GridUtils.AreSelectedCellsPlanar(selectedCells, dataGridView.Columns, dataGridView.Rows);
 
+            var selectedCells = dataGridView.SelectedCells;
+
+            this.selectionIsPlanar = GridUtils.AreSelectedCellsPlanar(dataGridView);
             if (this.oldSelectedCellsList.Count > 0)
             {
                 selectedCells.Cast<DataGridViewCell>()
                              .Intersect(oldSelectedCellsList)
                              .Where(c => c.DataGridView == dataGridView) //Sometime it could get confused and select cells from different dataGridView.
                              .ForEach(c => dataGridView.InvalidateCell(c)); //Invalide cells so the are redrawn.
+
+                oldSelectedCellsList
+                    .Where(c => c.DataGridView == dataGridView)
+                    .ForEach(c => dataGridView.InvalidateCell(c));
 
                 this.oldSelectedCellsList.Clear();
             }
@@ -201,36 +206,22 @@ namespace TiaUtilities.Generation.GridHandler.GridImprovements
             return borders;
         }
 
-        public void DrawBorders(Graphics graphics, RectangleF[] borders, Color color)
-        {
-            using Brush borderBrush = new SolidBrush(color);
-
-            GridSelectionBorder.FillRectangleIfNotEmpty(graphics, borderBrush, borders[BORDER_TOP]);
-            GridSelectionBorder.FillRectangleIfNotEmpty(graphics, borderBrush, borders[BORDER_BOTTOM]);
-            GridSelectionBorder.FillRectangleIfNotEmpty(graphics, borderBrush, borders[BORDER_LEFT]);
-            GridSelectionBorder.FillRectangleIfNotEmpty(graphics, borderBrush, borders[BORDER_RIGHT]);
-        }
-
         public void EventPaint(Graphics graphics)
         {
-            if (dataGridView.SelectedCells.Cast<DataGridViewCell>().Any(c => c.Displayed))
+            int cellCount = dataGridView.GetCellCount(DataGridViewElementStates.Selected | DataGridViewElementStates.Displayed);
+            if (cellCount > 0)
             {
                 this.Borders = this.CalculateBorders(gridSettings.BorderWeight); //Do NOT use offset here!
-                this.DrawBorders(graphics, this.Borders, gridSettings.SingleSelectedCellBorderColor);
+                GridSelectionBorder.DrawBorders(graphics, this.Borders, gridSettings.SingleSelectedCellBorderColor);
             }
         }
 
         public void EventMouseMove_CursorInsideBorder(int x, int y)
         {
-            this.CursorInsideBorder = this.IsCursorInsideInflated(x, y, EXTRA_PX_BORDER_MOUSE_SELECTION);
+            this.CursorInsideBorder = !dataGridView.IsCurrentCellInEditMode && this.IsCursorInsideInflated(x, y, EXTRA_PX_BORDER_MOUSE_SELECTION);
         }
 
         public void EventMouseLeave()
-        {
-            this.ClearCursor();
-        }
-
-        public void ClearCursor()
         {
             this.CursorInsideBorder = false;
         }
@@ -244,6 +235,16 @@ namespace TiaUtilities.Generation.GridHandler.GridImprovements
 
             PointF point = new(x, y);
             return topBorder.Contains(point) || bottomBorder.Contains(point) || leftBorder.Contains(point) || rightBorder.Contains(point);
+        }
+
+        public static void DrawBorders(Graphics graphics, RectangleF[] borders, Color color)
+        {
+            using Brush borderBrush = new SolidBrush(color);
+
+            GridSelectionBorder.FillRectangleIfNotEmpty(graphics, borderBrush, borders[BORDER_TOP]);
+            GridSelectionBorder.FillRectangleIfNotEmpty(graphics, borderBrush, borders[BORDER_BOTTOM]);
+            GridSelectionBorder.FillRectangleIfNotEmpty(graphics, borderBrush, borders[BORDER_LEFT]);
+            GridSelectionBorder.FillRectangleIfNotEmpty(graphics, borderBrush, borders[BORDER_RIGHT]);
         }
 
         private static void FillRectangleIfNotEmpty(Graphics graphics, Brush brush, RectangleF rectangle)

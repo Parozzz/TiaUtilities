@@ -19,11 +19,6 @@ namespace TiaUtilities.Generation.GridHandler
         public int RowCount { get => this.DataGridView.RowCount; }
         public int ColumnCount { get => this.DataGridView.ColumnCount; }
 
-        public bool AddRowIndexToRowHeader { get; set; } = true;
-        public bool EnablePasteFromExcel { get; set; } = true;
-        public bool ShowJSContextMenuTopLeft { get; set; } = true;
-
-
         public GridColumnHandler Columns { get; init; }
         public GridDataSource<T> DataSource { get; init; }
         public GridDataChangedHandler DataChangedHandler { get; init; }
@@ -34,7 +29,7 @@ namespace TiaUtilities.Generation.GridHandler
         public event GridDataChangedEventHandler DataChanged = delegate { };
         public event GridDataLoadedEvent DataLoaded = delegate { };
 
-        public event DataGridViewCellEventHandler RowSelectedChanged 
+        public event DataGridViewCellEventHandler RowSelectedChanged
         {
             add => this.DataGridView.RowEnter += value;
             remove => this.DataGridView.RowEnter -= value;
@@ -234,16 +229,8 @@ namespace TiaUtilities.Generation.GridHandler
             this.DataGridView.CellMouseDown += (sender, args) => this.qol.EventCellMouseDown_FullRowSelection(args.RowIndex, args.ColumnIndex);
             this.DataGridView.CellClick += (sender, args) => this.qol.EventCellClick_ImproveComboBox(args.RowIndex, args.ColumnIndex);
             this.DataGridView.CellMouseDoubleClick += (sender, args) => this.qol.EventCellDoubleClick(args.RowIndex, args.ColumnIndex, args.Button);
-
             this.DataGridView.MouseWheel += (sender, args) => this.qol.EventMouseWheel_UseWheelDuringSelection(args.Delta);
-
-            if (AddRowIndexToRowHeader)
-            {
-                this.DataGridView.RowPostPaint += (sender, args) =>
-                {
-                    this.qol.EventRowPostPaint_AddNumbers(args.RowBounds, args.InheritedRowStyle, args.Graphics, args.RowIndex);
-                };
-            }
+            this.DataGridView.RowPostPaint += (sender, args) => this.qol.EventRowPostPaint_AddNumbers(args.RowBounds, args.InheritedRowStyle, args.Graphics, args.RowIndex);
             #endregion
 
             #region EVENTS(SelectionChanged / CellPainting / Paint) - Paint stuff on cells / Draw borders on cells
@@ -339,13 +326,14 @@ namespace TiaUtilities.Generation.GridHandler
                     {
                         if (oldBorders.Length == 4)
                         {
-                            this.SelectionBorder.DrawBorders(args.Graphics, oldBorders, Color.Transparent);
+                            GridSelectionBorder.DrawBorders(args.Graphics, oldBorders, Color.Transparent);
                             oldBorders = [];
                         }
 
                         var offset = this.doDragDropHandler.GetDifferenceFromMouseDown(Cursor.Position);
-                        var bordersWithOffset = this.SelectionBorder.CalculateBorders(this.GridSettings.BorderWeight + 3, offset.Y, offset.X);
-                        this.SelectionBorder.DrawBorders(args.Graphics, bordersWithOffset, this.GridSettings.SingleSelectedCellBorderColor);
+
+                        var bordersWithOffset = this.SelectionBorder.CalculateBorders(this.GridSettings.BorderWeight + 2, offset.Y, offset.X);
+                        GridSelectionBorder.DrawBorders(args.Graphics, bordersWithOffset, this.GridSettings.SingleSelectedCellBorderColor);
 
                         oldBorders = bordersWithOffset;
 
@@ -412,7 +400,6 @@ namespace TiaUtilities.Generation.GridHandler
 
                 if (!this.dragDownHandler.Started && this.SelectionBorder.CursorInsideBorder)
                 {
-                    this.SelectionBorder.ClearCursor();
                     this.doDragDropHandler.EventMouseDown(columnIndex, rowIndex);
                 }
             };
@@ -462,7 +449,6 @@ namespace TiaUtilities.Generation.GridHandler
             this.DataGridView.DragDrop += (sender, args) =>
             {
                 this.doDragDropHandler.EventDragDrop(args.Data, args.X, args.Y);
-                this.SelectionBorder.ClearCursor();
             };
             #endregion
 
