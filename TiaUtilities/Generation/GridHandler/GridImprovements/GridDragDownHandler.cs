@@ -1,17 +1,13 @@
 ﻿using TiaUtilities.Generation.GridHandler.Data;
 
-namespace TiaUtilities.Generation.GridHandler
+namespace TiaUtilities.Generation.GridHandler.GridImprovements
 {
-    public class GridDragDownHandler<T>(GridHandler<T> gridHandler, GridSettings settings) where T : GridData
+    public class GridDragDownHandler(ExcelLikeDataGridView dataGridView, GridHandlerEventCaller gridHandlerEventCaller, GridSettings settings)
     {
         public const int TRIANGLE_SIZE = 13;
 
         public bool Started { get; private set; } = false;
         public bool DraggingDown { get => topSelectionRowIndex == rowIndexStart; }
-
-
-        private readonly GridHandler<T> gridHandler = gridHandler;
-        private DataGridView DataGridView { get => this.gridHandler.InternalDataGridView; }
 
         private int rowIndexStart = -1;
         private int draggedColumnIndex = -1;
@@ -22,7 +18,6 @@ namespace TiaUtilities.Generation.GridHandler
 
         private ToolTip? dragToolTip;
 
-
         public bool RequiresCursorCross(int x, int y, int columnIndex, int rowIndex)
         {
             if (this.Started)
@@ -30,19 +25,19 @@ namespace TiaUtilities.Generation.GridHandler
                 return false;
             }
 
-            var currentCellAddress = this.DataGridView.CurrentCellAddress;
+            var currentCellAddress = dataGridView.CurrentCellAddress;
             if (columnIndex != currentCellAddress.X || rowIndex != currentCellAddress.Y)
             {
                 return false;
             }
 
-            var selectedCellCount = this.DataGridView.GetCellCount(DataGridViewElementStates.Selected);
+            var selectedCellCount = dataGridView.GetCellCount(DataGridViewElementStates.Selected);
             if (selectedCellCount != 1)
             {
                 return false;
             }
 
-            return this.IsInsideTriangle(x, y, this.DataGridView.CurrentCell);
+            return this.IsInsideTriangle(x, y, dataGridView.CurrentCell);
         }
 
         public void EventSelectionChanged()
@@ -56,7 +51,7 @@ namespace TiaUtilities.Generation.GridHandler
             var lowestRowIndex = int.MaxValue;
 
             //When dragging, only allow cell on the column to be selected! I don't care about other ways and want it simple.
-            foreach (DataGridViewCell selectedCell in this.DataGridView.SelectedCells)
+            foreach (DataGridViewCell selectedCell in dataGridView.SelectedCells)
             {
                 bool sameColumn = selectedCell.ColumnIndex == draggedColumnIndex;
                 if (!sameColumn)
@@ -81,9 +76,9 @@ namespace TiaUtilities.Generation.GridHandler
             };
 
             var eventArgs = this.CreateDragEventArgs();
-            this.gridHandler.CallExcelDragPreviewEvent(eventArgs);
+            gridHandlerEventCaller.CallExcelDragPreviewEvent(eventArgs);
 
-            if (!string.IsNullOrEmpty(eventArgs.TooltipString) && this.DataGridView.FindForm() is Form form)
+            if (!string.IsNullOrEmpty(eventArgs.TooltipString) && dataGridView.FindForm() is Form form)
             {
                 dragToolTip.Show(eventArgs.TooltipString, form, form.PointToClient(Cursor.Position));
             }
@@ -91,18 +86,18 @@ namespace TiaUtilities.Generation.GridHandler
 
         public void EventMouseDown(Point location, int columnIndex, int rowIndex)
         {
-            if (this.DataGridView.GetCellCount(DataGridViewElementStates.Selected) != 1)
+            if (dataGridView.GetCellCount(DataGridViewElementStates.Selected) != 1)
             {
                 return;
             }
 
-            var cell = this.DataGridView.Rows[rowIndex].Cells[columnIndex];
+            var cell = dataGridView.Rows[rowIndex].Cells[columnIndex];
             if (cell.ReadOnly)
             {
                 return;
             }
 
-            if (cell == this.DataGridView.CurrentCell && this.IsInsideTriangle(location, cell))
+            if (cell == dataGridView.CurrentCell && this.IsInsideTriangle(location, cell))
             {
                 Started = true;
 
@@ -118,7 +113,7 @@ namespace TiaUtilities.Generation.GridHandler
                 Started = false;
 
                 var eventArgs = this.CreateDragEventArgs();
-                this.gridHandler.CallExcelDragDoneEvent(eventArgs);
+                gridHandlerEventCaller.CallExcelDragDoneEvent(eventArgs);
 
                 this.Clear();
             }
@@ -166,11 +161,11 @@ namespace TiaUtilities.Generation.GridHandler
 
         public void PaintTriangle(Graphics graphics)
         {
-            var currentCell = this.DataGridView.CurrentCell;
-            if (currentCell is DataGridViewTextBoxCell textBoxCell && !textBoxCell.IsInEditMode && !currentCell.ReadOnly && this.DataGridView.SelectedCells.Count == 1)
+            var currentCell = dataGridView.CurrentCell;
+            if (currentCell is DataGridViewTextBoxCell textBoxCell && !textBoxCell.IsInEditMode && !currentCell.ReadOnly && dataGridView.SelectedCells.Count == 1)
             {//I only want to apply the effect when the only selected cell is the current cell.
 
-                var bounds = this.DataGridView.GetCellDisplayRectangle(currentCell.ColumnIndex, currentCell.RowIndex, false);
+                var bounds = dataGridView.GetCellDisplayRectangle(currentCell.ColumnIndex, currentCell.RowIndex, false);
 
                 using var triangleBrush = new SolidBrush(settings.SelectedCellTriangleColor);
 
@@ -194,7 +189,7 @@ namespace TiaUtilities.Generation.GridHandler
                 return false;
             }
 
-            var bounds = this.DataGridView.GetCellDisplayRectangle(cell.ColumnIndex, cell.RowIndex, false);
+            var bounds = dataGridView.GetCellDisplayRectangle(cell.ColumnIndex, cell.RowIndex, false);
 
             var xMin = bounds.Right - TRIANGLE_SIZE;
             var xMax = bounds.Right + 2;

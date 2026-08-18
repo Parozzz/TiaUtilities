@@ -220,7 +220,7 @@ namespace TiaUtilities.Generation.Alarms.Template
                 gridHandler.Columns.Show(TemplateData.CUSTOM_VARIABLE_VALUE);
             }
 
-            gridHandler.Columns.Init();
+            gridHandler.Columns.InitializeColumns();
         }
 
         public void ShowTimer(bool show)
@@ -238,7 +238,7 @@ namespace TiaUtilities.Generation.Alarms.Template
                 gridHandler.Columns.Show(TemplateData.TIMER_VALUE);
             }
 
-            gridHandler.Columns.Init();
+            gridHandler.Columns.InitializeColumns();
         }
 
         public bool IsDirty() => gridHandler.IsDirty();

@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using TiaUtilities.Utility.Extensions;
 
-namespace TiaUtilities.Generation.GridHandler
+namespace TiaUtilities.Generation.GridHandler.GridImprovements
 {
     internal class SelectedCellsBorderCoordinates
     {
@@ -20,44 +20,48 @@ namespace TiaUtilities.Generation.GridHandler
             return $"Top:{Top},Left:{Left},Bottom:{Bottom},Right:{Right}";
         }
 
-        internal static SelectedCellsBorderCoordinates CreateFromGrid(DataGridView dataGridView, int rowOffset = 0, int columnOffset = 0)
+        internal static SelectedCellsBorderCoordinates CreateFromGrid(ExcelLikeDataGridView dataGridView, int rowOffset = 0, int columnOffset = 0)
         {
-            int lowestRowIndex = -1;
-            int highestRowIndex = -1;
-
-            int lowestColumnIndex = -1;
-            int highestColumnIndex = -1;
-
             var selectedCells = dataGridView.SelectedCells.Cast<DataGridViewCell>();
-            foreach (DataGridViewCell cell in selectedCells)
+
+            if (!selectedCells.Any())
             {
-                var rowIndex = cell.RowIndex;
-                var columnIndex = cell.ColumnIndex;
-
-                if (!GridUtils.AreCoordinatesValid(dataGridView, rowIndex, columnIndex))
-                {
-                    continue;
-                }
-
-                lowestRowIndex = (lowestRowIndex == -1 || rowIndex < lowestRowIndex) ? rowIndex : lowestRowIndex;
-                highestRowIndex = (highestRowIndex == -1 || rowIndex > highestRowIndex) ? rowIndex : highestRowIndex;
-
-                lowestColumnIndex = (lowestColumnIndex == -1 || columnIndex < lowestColumnIndex) ? columnIndex : lowestColumnIndex;
-                highestColumnIndex = (highestColumnIndex == -1 || columnIndex > highestColumnIndex) ? columnIndex : highestColumnIndex;
+                return new() { Bottom = 0, Left = 0, Right = 0, Top = 0 };
             }
 
-            return new()
+            // 2. Identifichiamo i limiti correnti della selezione (usando DisplayIndex per le colonne)
+            int lowestDisplayIndex = selectedCells.Min(c => c.OwningColumn.DisplayIndex);
+            int highestDisplayIndex = selectedCells.Max(c => c.OwningColumn.DisplayIndex);
+
+            int lowestRowIndex = selectedCells.Min(c => c.RowIndex);
+            int highestRowIndex = selectedCells.Max(c => c.RowIndex);
+
+            // 3. Calcolo Offset COLONNE: ci spostiamo per indice all'interno della lista 'visibleColumns'
+            int startColPos = dataGridView.VisibleColumns.FindIndex(c => c.DisplayIndex == lowestDisplayIndex);
+            int endColPos = dataGridView.VisibleColumns.FindIndex(c => c.DisplayIndex == highestDisplayIndex);
+
+            int targetLeftPos = Math.Clamp(startColPos + columnOffset, 0, dataGridView.VisibleColumns.Count - 1);
+            int targetRightPos = Math.Clamp(endColPos + columnOffset, 0, dataGridView.VisibleColumns.Count - 1);
+
+            // 4. Calcolo Offset RIGHE: ci spostiamo per indice all'interno della lista 'visibleRows'
+            int startRowPos = dataGridView.VisibleRows.FindIndex(r => r.Index == lowestRowIndex);
+            int endRowPos = dataGridView.VisibleRows.FindIndex(r => r.Index == highestRowIndex);
+
+            int targetTopPos = Math.Clamp(startRowPos + rowOffset, 0, dataGridView.VisibleRows.Count - 1);
+            int targetBottomPos = Math.Clamp(endRowPos + rowOffset, 0, dataGridView.VisibleRows.Count - 1);
+
+            // 5. Restituiamo gli indici reali fisici di origine (Index) derivati dalle posizioni visive traslate
+            return new SelectedCellsBorderCoordinates
             {
-                Top = lowestRowIndex + rowOffset,
-                Bottom = highestRowIndex + rowOffset,
-                Left = lowestColumnIndex + columnOffset,
-                Right = highestColumnIndex + columnOffset,
+                Left = dataGridView.VisibleColumns[targetLeftPos].Index,
+                Right = dataGridView.VisibleColumns[targetRightPos].Index,
+                Top = dataGridView.VisibleRows[targetTopPos].Index,
+                Bottom = dataGridView.VisibleRows[targetBottomPos].Index
             };
         }
     }
 
-
-    public class GridSelectionBorder(DataGridView dataGridView, GridSettings gridSettings)
+    public class GridSelectionBorder(ExcelLikeDataGridView dataGridView, GridSettings gridSettings)
     {
         const int EXTRA_PX_BORDER_MOUSE_SELECTION = 4;
 
@@ -107,8 +111,6 @@ namespace TiaUtilities.Generation.GridHandler
                 var left = Math.Max(0, coords.Left);
                 var right = Math.Max(0, coords.Right);
                 var bottom = Math.Min(dataGridView.RowCount - 1, coords.Bottom);
-
-                Debug.WriteLine($"CalculateBorders. Coords: {coords}");
 
                 DataGridViewCell? topLeftCell, topRightCell, bottomLeftCell, bottomRightCell;
 
@@ -264,3 +266,40 @@ namespace TiaUtilities.Generation.GridHandler
 
     }
 }
+
+/*
+internal static SelectedCellsBorderCoordinates CreateFromGrid(DataGridView dataGridView, int rowOffset = 0, int columnOffset = 0)
+{
+    int lowestRowIndex = -1;
+    int highestRowIndex = -1;
+
+    int lowestColumnIndex = -1;
+    int highestColumnIndex = -1;
+
+    var selectedCells = dataGridView.SelectedCells.Cast<DataGridViewCell>();
+    foreach (DataGridViewCell cell in selectedCells)
+    {
+        var rowIndex = cell.RowIndex;
+        var columnIndex = cell.ColumnIndex;
+
+        if (!GridUtils.AreCoordinatesValid(dataGridView, rowIndex, columnIndex))
+        {
+            continue;
+        }
+
+        lowestRowIndex = (lowestRowIndex == -1 || rowIndex < lowestRowIndex) ? rowIndex : lowestRowIndex;
+        highestRowIndex = (highestRowIndex == -1 || rowIndex > highestRowIndex) ? rowIndex : highestRowIndex;
+
+        lowestColumnIndex = (lowestColumnIndex == -1 || columnIndex < lowestColumnIndex) ? columnIndex : lowestColumnIndex;
+        highestColumnIndex = (highestColumnIndex == -1 || columnIndex > highestColumnIndex) ? columnIndex : highestColumnIndex;
+    }
+
+    return new()
+    {
+        Top = lowestRowIndex + rowOffset,
+        Bottom = highestRowIndex + rowOffset,
+        Left = lowestColumnIndex + columnOffset,
+        Right = highestColumnIndex + columnOffset,
+    };
+}
+*/

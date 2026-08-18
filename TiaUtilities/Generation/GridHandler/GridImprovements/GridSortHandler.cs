@@ -1,32 +1,31 @@
 ﻿using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.UndoRedo;
 
-namespace TiaUtilities.Generation.GridHandler
+namespace TiaUtilities.Generation.GridHandler.GridImprovements
 {
-    public class GridSortHandler<T>(GridHandler<T> gridHandler, UndoRedoHandler undoRedoHandler, IGridRowComparer<T>? comparer) where T : GridData
+    public class GridSortHandler<T>(
+        ExcelLikeDataGridView dataGridView,
+        GridDataSource<T> dataSource, 
+        GridHandlerEventCaller gridHandlerEventCaller,
+        UndoRedoHandler undoRedoHandler, 
+        IGridRowComparer<T>? comparer) where T : GridData
     {
         private SortOrder sortOrder = SortOrder.None;
         private Dictionary<T, int>? noSortIndexSnapshot;
 
-        private DataGridView DataGridView { get => gridHandler.InternalDataGridView; }
-        private GridDataSource<T> DataSource { get => gridHandler.DataSource; }
-
         public Color SortIconColor { get; set; } = Color.Green;
 
-        public void Init()
+        public void EventColumnHeaderMouseClick(MouseButtons button, int columnIndex)
         {
-            this.DataGridView.ColumnHeaderMouseClick += (sender, args) =>
+            if (comparer == null || button != MouseButtons.Left)
             {
-                if (comparer == null || args.Button == MouseButtons.Right)
-                {
-                    return;
-                }
+                return;
+            }
 
-                if (comparer.CanSortColumn(args.ColumnIndex))
-                {
-                    NextColumnSort(args.ColumnIndex);
-                }
-            };
+            if (comparer.CanSortColumn(columnIndex))
+            {
+                NextColumnSort(columnIndex);
+            }
         }
 
         private void NextColumnSort(int columnIndex)
@@ -51,7 +50,7 @@ namespace TiaUtilities.Generation.GridHandler
         private void ColumnSort(SortOrder oldSortOrder, int columnIndex)
         {
             var preSortEventArgs = new GridPreSortEventArgs(oldSortOrder, this.sortOrder, columnIndex);
-            gridHandler.CallPreSortEvent(preSortEventArgs);
+            gridHandlerEventCaller.CallPreSortEvent(preSortEventArgs);
 
             if (preSortEventArgs.Handled)
             {
@@ -60,20 +59,20 @@ namespace TiaUtilities.Generation.GridHandler
 
             this.sortOrder = preSortEventArgs.SortOrder;
 
-            var snapDict = this.DataSource.CreateIndexListSnapshot();
+            var snapDict = dataSource.CreateIndexListSnapshot();
             if (this.sortOrder != SortOrder.None && oldSortOrder == SortOrder.None)
             {
                 this.noSortIndexSnapshot = snapDict;
             }
 
             ClearAllSortGlyphDirection();
-            this.DataGridView.Columns[columnIndex].HeaderCell.SortGlyphDirection = this.sortOrder;
+            dataGridView.Columns[columnIndex].HeaderCell.SortGlyphDirection = this.sortOrder;
 
             if (this.sortOrder == SortOrder.None)
             {
                 if (noSortIndexSnapshot != null)
                 {
-                    this.DataSource.RestoreIndexListSnapshot(noSortIndexSnapshot);
+                    dataSource.RestoreIndexListSnapshot(noSortIndexSnapshot);
                     noSortIndexSnapshot = null;
                 }
             }
@@ -81,26 +80,26 @@ namespace TiaUtilities.Generation.GridHandler
             {
                 comparer.SetSortedColumn(columnIndex);
                 comparer.SetSortOrder(this.sortOrder);
-                this.DataSource.Sort(comparer, this.sortOrder);
+                dataSource.Sort(comparer, this.sortOrder);
             }
 
             undoRedoHandler.AddUndo(() =>
             {
                 this.sortOrder = oldSortOrder;
-                this.DataGridView.Columns[columnIndex].HeaderCell.SortGlyphDirection = oldSortOrder;
+                dataGridView.Columns[columnIndex].HeaderCell.SortGlyphDirection = oldSortOrder;
 
-                var undoSnap = this.DataSource.CreateIndexListSnapshot();
-                this.DataSource.RestoreIndexListSnapshot(snapDict);
-                undoRedoHandler.AddRedo(() => this.DataSource.RestoreIndexListSnapshot(undoSnap));
+                var undoSnap = dataSource.CreateIndexListSnapshot();
+                dataSource.RestoreIndexListSnapshot(snapDict);
+                undoRedoHandler.AddRedo(() => dataSource.RestoreIndexListSnapshot(undoSnap));
             });
 
             var postSortEventArgs = new GridPostSortEventArgs(oldSortOrder, this.sortOrder, columnIndex);
-            gridHandler.CallPostSortEvent(postSortEventArgs);
+            gridHandlerEventCaller.CallPostSortEvent(postSortEventArgs);
         }
 
         private void ClearAllSortGlyphDirection()
         {
-            foreach (DataGridViewColumn column in this.DataGridView.Columns)
+            foreach (DataGridViewColumn column in dataGridView.Columns)
             {
                 column.HeaderCell.SortGlyphDirection = SortOrder.None;
             }
@@ -109,19 +108,19 @@ namespace TiaUtilities.Generation.GridHandler
         public bool IsTopRow(int columnIndex, int rowIndex)
         {
             //Check column index to avoid 0xffffffff (Top left square corner!)
-            return comparer != null && (columnIndex >= 0 && columnIndex < this.DataGridView.ColumnCount) && rowIndex == -1;
+            return comparer != null && GridUtils.IsColumnValid(dataGridView, columnIndex) && rowIndex == -1;
         }
 
         public bool EventCellPainting_DrawText(Rectangle cellBounds, Graphics? graphics, DataGridViewCellStyle? cellStyle, int rowIndex, int columnIndex, object? formattedValue)
         {
-            if (rowIndex != -1 || columnIndex < 0 || columnIndex >= this.DataGridView.ColumnCount || graphics == null || cellStyle == null)
+            if (rowIndex != -1 || !GridUtils.IsColumnValid(dataGridView, columnIndex) || graphics == null || cellStyle == null)
             {
                 return false;
             }
 
             TextRenderer.DrawText(graphics, string.Format("{0}", formattedValue), cellStyle.Font, cellBounds, cellStyle.ForeColor, TextFormatFlags.VerticalCenter | TextFormatFlags.Left);
 
-            var column = this.DataGridView.Columns[columnIndex];
+            var column = dataGridView.Columns[columnIndex];
             if (column.HeaderCell.SortGlyphDirection != SortOrder.None)
             {
                 var sortIcon = column.HeaderCell.SortGlyphDirection == SortOrder.Ascending ? "▲" : "▼";

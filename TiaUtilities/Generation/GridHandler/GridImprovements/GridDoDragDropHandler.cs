@@ -3,9 +3,9 @@ using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Utility;
 using TiaUtilities.Utility.Extensions;
 
-namespace TiaUtilities.Generation.GridHandler
+namespace TiaUtilities.Generation.GridHandler.GridImprovements
 {
-    public class GridDoDragDropHandler<T>(DataGridView dataGridView, GridDataChangedHandler<T> dataChangedHandler, GridSettings gridSettings) where T : GridData
+    public class GridDoDragDropHandler(ExcelLikeDataGridView dataGridView, GridDataChangedHandler dataChangedHandler, GridSettings gridSettings)
     {
         public bool Busy { get; private set; } = false;
         //public Point MouseDownLocation { get; private set; } = Point.Empty;
@@ -37,7 +37,7 @@ namespace TiaUtilities.Generation.GridHandler
 
         }
 
-        public bool EventMouseDown(Point location, int columnIndex, int rowIndex)
+        public bool EventMouseDown(int columnIndex, int rowIndex)
         {
             var text = GridUtils.GetCopyAsExcelText(dataGridView, out var _);
             text = String.IsNullOrEmpty(text) ? "" : text;
@@ -45,10 +45,8 @@ namespace TiaUtilities.Generation.GridHandler
             var cell = dataGridView.Rows[rowIndex].Cells[columnIndex];
             if (!cell.Selected)
             {
-                var selectedCells = dataGridView.SelectedCells;
-
                 DataGridViewCell? closestCell = null;
-                foreach (DataGridViewCell selectedCell in selectedCells)
+                foreach (DataGridViewCell selectedCell in dataGridView.SelectedCells)
                 {
                     if (closestCell == null)
                     {
@@ -109,9 +107,9 @@ namespace TiaUtilities.Generation.GridHandler
             return dataString is not string ? DragDropEffects.None : DragDropEffects.Move;
         }
 
-        public Point GetDifferenceFromMouseDown(Point p, bool useDisplayIndex = false) => GetDifferenceFromMouseDown(p.X, p.Y, useDisplayIndex);
+        public Point GetDifferenceFromMouseDown(Point p, bool ignoreInvisibleColumns = true) => GetDifferenceFromMouseDown(p.X, p.Y, ignoreInvisibleColumns);
 
-        public Point GetDifferenceFromMouseDown(int x, int y, bool useDisplayIndex = false)
+        public Point GetDifferenceFromMouseDown(int x, int y, bool ignoreInvisibileColumns = true)
         {
             if (this.MouseDownCellAddress == Point.Empty)
             {
@@ -126,14 +124,25 @@ namespace TiaUtilities.Generation.GridHandler
                 return Point.Empty;
             }
 
-            var hitColumnIndex = hitTest.ColumnIndex;
-            if(useDisplayIndex)
+            int columnDiff = 0;
+
+            if (ignoreInvisibileColumns)
             {
-                hitColumnIndex = dataGridView.Columns[hitColumnIndex].DisplayIndex;
+                var minColumn = Math.Min(hitTest.ColumnIndex, this.MouseDownCellAddress.X);
+                var maxColumn = Math.Max(hitTest.ColumnIndex, this.MouseDownCellAddress.X);
+
+                columnDiff = dataGridView.Columns.Cast<DataGridViewColumn>()
+                    .Where(c => c.Visible)
+                    .Count(c => c.Index >= minColumn && c.Index <= maxColumn) - 1;
+                columnDiff *= hitTest.ColumnIndex >= this.MouseDownCellAddress.X ? 1 : -1;
+            }
+            else
+            {
+                columnDiff = hitTest.ColumnIndex - this.MouseDownCellAddress.X;
             }
 
-            var hitRowIndex = hitTest.RowIndex;
-            return new() { X = hitColumnIndex - this.MouseDownCellAddress.X, Y = hitRowIndex - this.MouseDownCellAddress.Y };
+
+            return new() { X = columnDiff, Y = hitTest.RowIndex - this.MouseDownCellAddress.Y };
         }
 
         public void EventDragDrop(IDataObject? data, int x, int y)
@@ -141,51 +150,59 @@ namespace TiaUtilities.Generation.GridHandler
             try
             {
                 var dataObj = data?.GetData(typeof(string));
-                if (dataObj is string excelText)
+                if (dataObj is not string excelText)
                 {
-                    var coordDifference = this.GetDifferenceFromMouseDown(x, y, useDisplayIndex: false);
-                    if (coordDifference != Point.Empty)
-                    {
-                        var minRowIndex = dataGridView.SelectedCells.Cast<DataGridViewCell>().Min(c => c.RowIndex);
-                        var minColumnIndex = dataGridView.SelectedCells.Cast<DataGridViewCell>().Min(c => c.ColumnIndex);
-
-                        //These two CAN BE NEGATIVE!!
-                        var pasteColumnIndex = minColumnIndex + coordDifference.X;
-                        var pasteRowIndex = minRowIndex + coordDifference.Y;
-
-                        dataGridView.SuspendLayout();
-
-                        var req = dataChangedHandler.Join();
-                        var pastedCellsList = GridUtils.PasteAsExcel(dataGridView, excelText, pasteRowIndex, pasteColumnIndex, ignoreSingleLineMultiplePasting: true);
-
-                        dataGridView.SelectedCells.Cast<DataGridViewCell>()
-                            .Except(pastedCellsList)
-                            .ForEach(c => c.Value = null); //Clear cell value for cell not pasted
-
-                        dataChangedHandler.End(req);
-
-                        dataGridView.FindForm()?.BeginInvoke(() =>
-                        {
-                            DllImports.RaiseLeftMouse(Cursor.Position); //This fixes the mouse down stuck after dropping.
-
-                            dataGridView.ClearSelection();
-
-                            var gridPoint = dataGridView.PointToClient(Cursor.Position);
-                            var dropHitTest = dataGridView.HitTest(gridPoint.X, gridPoint.Y);
-                            if (dropHitTest.Type == DataGridViewHitTestType.Cell)
-                            {
-                                dataGridView.CurrentCell = dataGridView.Rows[dropHitTest.RowIndex].Cells[dropHitTest.ColumnIndex];
-                            }
-
-                            foreach (var cell in pastedCellsList)
-                            {
-                                cell.Selected = true;
-                            }
-
-                            dataGridView.ResumeLayout(performLayout: false);
-                        });
-                    }
+                    return;
                 }
+
+                var offset = this.GetDifferenceFromMouseDown(x, y, ignoreInvisibileColumns: true);
+                if (offset.IsEmpty)
+                {
+                    return;
+                }
+
+                var selectedCells = dataGridView.SelectedCells.Cast<DataGridViewCell>();
+
+                var minRowIndex = selectedCells.Min(c => c.RowIndex);
+
+                var minColumnDisplayIndex = selectedCells.Min(c => c.OwningColumn.DisplayIndex);
+                var minColumnIndex = dataGridView.VisibleColumns.FindIndex(c => c.DisplayIndex == minColumnDisplayIndex);
+
+                //These two CAN BE NEGATIVE!!
+                var pasteColumnIndex = minColumnIndex + offset.X;
+                var pasteRowIndex = minRowIndex + offset.Y;
+
+                dataGridView.SuspendLayout();
+
+                var req = dataChangedHandler.Join();
+                var pastedCellsList = GridUtils.PasteAsExcel(dataGridView, excelText, pasteRowIndex, pasteColumnIndex, ignoreSingleLineMultiplePasting: true);
+
+                dataGridView.SelectedCells.Cast<DataGridViewCell>()
+                    .Except(pastedCellsList)
+                    .ForEach(c => c.Value = null); //Clear cell value for cell not pasted
+
+                dataChangedHandler.End(req);
+
+                dataGridView.FindForm()?.BeginInvoke(() =>
+                {
+                    DllImports.RaiseLeftMouse(Cursor.Position); //This fixes the mouse down stuck after dropping.
+
+                    dataGridView.ClearSelection();
+
+                    var gridPoint = dataGridView.PointToClient(Cursor.Position);
+                    var dropHitTest = dataGridView.HitTest(gridPoint.X, gridPoint.Y);
+                    if (dropHitTest.Type == DataGridViewHitTestType.Cell)
+                    {
+                        dataGridView.CurrentCell = dataGridView.Rows[dropHitTest.RowIndex].Cells[dropHitTest.ColumnIndex];
+                    }
+
+                    foreach (var cell in pastedCellsList)
+                    {
+                        cell.Selected = true;
+                    }
+
+                    dataGridView.ResumeLayout(performLayout: false);
+                });
             }
             catch (Exception ex)
             {
@@ -195,7 +212,6 @@ namespace TiaUtilities.Generation.GridHandler
             {
                 this.MouseDownCellAddress = Point.Empty;
             }
-
         }
     }
 }

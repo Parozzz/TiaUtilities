@@ -5,21 +5,15 @@ using TiaUtilities.UndoRedo;
 
 namespace TiaUtilities.Generation.GridHandler
 {
-    public class GridDataSource<T> : ISaveable<Dictionary<int, T>> where T : GridData
+    public class GridDataSource<T>(
+        ExcelLikeDataGridView dataGridView, 
+        GridDataChangedHandler dataChangedHandler, 
+        GridHandlerEventCaller gridHandlerEventCaller) : ISaveable<Dictionary<int, T>> where T : GridData
     {
-        private readonly GridHandler<T> gridHandler;
-        private readonly List<T> dataList;
+        private readonly List<T> dataList = [];
 
         public int Count { get => dataList.Count; }
-        public IReadOnlyList<GridDataColumn> DataColumns { get; init; }
-
-        public GridDataSource(GridHandler<T> gridHandler)
-        {
-            this.gridHandler = gridHandler;
-            this.dataList = [];
-
-            this.DataColumns = ValidateColumnList();
-        }
+        public IReadOnlyList<GridDataColumn> DataColumns { get; init; } = ValidateColumnList();
 
         private static IReadOnlyList<GridDataColumn> ValidateColumnList()
         {
@@ -72,26 +66,20 @@ namespace TiaUtilities.Generation.GridHandler
             }
         }
 
-        private void ValidateRowIndex(int index)
+        private int ValidateRowIndex(int index)
         {
             if (index < 0 || index >= this.Count)
             {
-                throw new InvalidEnumArgumentException($"Index {index} out of range for {this.dataList.GetType().FullName}.");
+                throw new IndexOutOfRangeException($"Index {index} out of range for {this.dataList.GetType().FullName}.");
             }
+
+            return index;
         }
 
         public T this[int i]
         {
-            get
-            {
-                ValidateRowIndex(i);
-                return dataList[i];
-            }
-            set
-            {
-                ValidateRowIndex(i);
-                dataList[i] = value; 
-            }
+            get => dataList[this.ValidateRowIndex(i)];
+            set => dataList[this.ValidateRowIndex(i)] = value;
         }
 
         public void Clear()
@@ -115,7 +103,7 @@ namespace TiaUtilities.Generation.GridHandler
                 var data = this.CreateInstance();
 
                 int savedRow = row; //If i don't do this, it will keep the ram value of row (So dataAmount - 1)
-                data.DataPropertyChanged += (sender, args) => this.gridHandler.HandleDataChangedEvent(args, savedRow);
+                data.DataPropertyChanged += (sender, args) => dataChangedHandler.HandleCellChangeEvent(args, savedRow);
 
                 dataList.Add(data);
             }
@@ -123,7 +111,7 @@ namespace TiaUtilities.Generation.GridHandler
             BindingList<T> bindingList = new(this.dataList);
             BindingSource bindingSource = new() { DataSource = bindingList };
 
-            this.gridHandler.SetDataSource(bindingSource);
+            dataGridView.DataSource = bindingSource;
         }
 
         public List<int> GetFirstEmptyRowIndexes(int num)
@@ -161,7 +149,7 @@ namespace TiaUtilities.Generation.GridHandler
                     dataList.Reverse();
                 }
 
-                this.gridHandler.Refresh();
+                dataGridView.Refresh();
             }
         }
 
@@ -187,7 +175,7 @@ namespace TiaUtilities.Generation.GridHandler
                 return xValue.CompareTo(yValue);
             });
 
-            this.gridHandler.Refresh();
+            dataGridView.Refresh();
         }
 
         public int GetFirstNotEmptyIndexStartingFrom(int indexStart)
@@ -228,15 +216,9 @@ namespace TiaUtilities.Generation.GridHandler
             return dict;
         }
 
-        public IEnumerable<T> GetNotEmptyData(int startRow = 0)
-        {
-            return GetNotEmptyDataDict(startRow).Keys;
-        }
+        public IEnumerable<T> GetNotEmptyData(int startRow = 0) => GetNotEmptyDataDict(startRow).Keys;
 
-        public ICollection<int> GetNotEmptyIndexes(int startRow = 0)
-        {
-            return GetNotEmptyDataDict(startRow).Values;
-        }
+        public ICollection<int> GetNotEmptyIndexes(int startRow = 0) => GetNotEmptyDataDict(startRow).Values;
 
         public Dictionary<T, int> GetNotEmptyClonedDataDict()
         {

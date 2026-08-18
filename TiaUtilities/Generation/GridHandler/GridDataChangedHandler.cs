@@ -6,7 +6,7 @@ using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.GridHandler
 {
-    internal class GridDataChangedCache(GridDataPropertyChangedEventArgs args, int row)
+    public class GridDataChangedCache(GridDataPropertyChangedEventArgs args, int row)
     {
         public GridDataPropertyChangedEventArgs Args { get; init; } = args;
         public int Row { get; init; } = row;
@@ -56,11 +56,11 @@ namespace TiaUtilities.Generation.GridHandler
         public required int SourceLineNumber { get; init; }
     }
 
-    public class GridDataChangedHandler<T>(GridHandler<T> gridHandler, UndoRedoHandler undoRedoHandler) where T : GridData
+    public class GridDataChangedHandler(
+        ExcelLikeDataGridView dataGridView, 
+        GridHandlerEventCaller gridHandlerEventCaller, 
+        UndoRedoHandler undoRedoHandler)
     {
-        private readonly GridHandler<T> gridHandler = gridHandler;
-        private readonly UndoRedoHandler undoRedoHandler = undoRedoHandler;
-
         private readonly List<GridDataChangedCache> cachedDataChanged = [];
 
         private GridDataChangedOperationRequest? joinRequest;
@@ -119,7 +119,7 @@ namespace TiaUtilities.Generation.GridHandler
                 this.joinRequest = null;
 
                 this.HandleCache();
-                this.gridHandler.Refresh(); //This is to maintain compatability with old system.
+                dataGridView.Refresh(); //This is to maintain compatability with old system.
             }
             else if(this.suspendRequest != null && this.suspendRequest.Guid == request.Guid)
             {
@@ -129,7 +129,7 @@ namespace TiaUtilities.Generation.GridHandler
 
         internal void HandleCellChangeEvent(GridDataPropertyChangedEventArgs args, int row)
         {
-            if(this.Suspended || this.gridHandler.RowCount <= 0 || this.gridHandler.ColumnCount <= 0)
+            if(this.Suspended || dataGridView.RowCount <= 0 || dataGridView.ColumnCount <= 0)
             {
                 return;
             }
@@ -147,7 +147,7 @@ namespace TiaUtilities.Generation.GridHandler
         {
             if (this.cachedDataChanged.Count > 0)
             {
-                this.gridHandler.CallDataChangedEvent(this.cachedDataChanged);
+                gridHandlerEventCaller.CallDataChangedEvent(this.cachedDataChanged);
                 this.AddUndo(cachedDataChanged);
 
                 this.cachedDataChanged.Clear();
@@ -157,29 +157,35 @@ namespace TiaUtilities.Generation.GridHandler
         private void AddUndo(List<GridDataChangedCache> changedData)
         {
             List<GridDataChangedCache> copyChanges = [.. changedData];
-            this.undoRedoHandler.AddUndo(() =>
+            undoRedoHandler.AddUndo(() =>
             {
-                this.undoRedoHandler.Lock();
-                this.gridHandler.SuspendLayout();
+                undoRedoHandler.Lock();
+
+                dataGridView.SuspendLayout();
 
                 var req = this.Join();
                 copyChanges.ForEach(d => d.RestoreOldValue());
                 this.End(req);
 
-                this.gridHandler.ResumeLayout(refresh: true);
-                this.undoRedoHandler.Unlock();
+                dataGridView.Refresh();
+                dataGridView.ResumeLayout(performLayout: true);
 
-                this.undoRedoHandler.AddRedo(() =>
+                undoRedoHandler.Unlock();
+
+                undoRedoHandler.AddRedo(() =>
                 {
-                    this.undoRedoHandler.Lock();
-                    this.gridHandler.SuspendLayout();
+                    undoRedoHandler.Lock();
+
+                    dataGridView.SuspendLayout();
 
                     var req = this.Join();
                     copyChanges.ForEach(d => d.RestoreNewValue());
                     this.End(req);
 
-                    this.gridHandler.ResumeLayout(refresh: true);
-                    this.undoRedoHandler.Unlock();
+                    dataGridView.Refresh();
+                    dataGridView.ResumeLayout(performLayout: true);
+
+                    undoRedoHandler.Unlock();
 
                     this.AddUndo(copyChanges);
                 });

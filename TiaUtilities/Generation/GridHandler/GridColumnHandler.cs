@@ -12,15 +12,9 @@ namespace TiaUtilities.Generation.GridHandler
         public bool Visible { get; set; } = true;
     }
 
-    public class GridColumnHandler<T> where T : GridData
+    public class GridColumnHandler(ExcelLikeDataGridView dataGridView)
     {
-        private readonly GridHandler<T> gridHandler;
         private readonly List<ColumnInfo> columnInfoList = [];
-
-        public GridColumnHandler(GridHandler<T> gridHandler)
-        {
-            this.gridHandler = gridHandler;
-        }
 
         public DataGridViewTextBoxColumn AddTextBox(GridDataColumn dataColumn, int width)
         {
@@ -85,13 +79,13 @@ namespace TiaUtilities.Generation.GridHandler
             columnInfo.Visible = visible;
             if (init)
             {
-                this.Init();
+                this.InitializeColumns();
             }
         }
 
-        public void Init()
+        public void InitializeColumns()
         {
-            this.gridHandler.ClearColumns();
+            dataGridView.Columns.Clear();
 
             this.columnInfoList.Sort((one, two) => one.DataColumn.ColumnIndex.CompareTo(two.DataColumn.ColumnIndex));
             foreach (var columnInfo in this.columnInfoList)
@@ -108,7 +102,7 @@ namespace TiaUtilities.Generation.GridHandler
 
                 column.Visible = columnInfo.Visible;
 
-                this.gridHandler.AddColumn(column);
+                dataGridView.Columns.Add(column);
             }
         }
     }

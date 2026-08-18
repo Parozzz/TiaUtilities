@@ -3,17 +3,6 @@ using TiaUtilities.Generation.GridHandler.Data;
 
 namespace TiaUtilities.Generation.GridHandler
 {
-    #region SELECTED_ROW_CHANGED
-    public delegate void GridSelectedRowChangedEventHandler(object? sender, GridSelectedRowChangedArgs args);
-
-    public class GridSelectedRowChangedArgs : EventArgs
-    {
-        public int RowIndex { get; set; }
-        public int ColumnIndex { get; set; }
-    }
-
-    #endregion
-
     #region DATA_LOADED
     public delegate void GridDataLoadedEvent(object? sender, EventArgs eventArgs);
     #endregion

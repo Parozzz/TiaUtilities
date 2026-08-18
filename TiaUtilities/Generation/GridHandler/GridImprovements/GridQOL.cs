@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TiaUtilities.Generation.GridHandler
+namespace TiaUtilities.Generation.GridHandler.Improvements
 {
-    public class GridQOL(DataGridView dataGridView)
+    public class GridQOL(ExcelLikeDataGridView dataGridView)
     {
 
         public void Scroll(int amount)
