@@ -104,7 +104,10 @@ namespace SimaticML.XMLClasses
 
                     if (childConfig != null)
                     {
-                        childConfig.SetParentConfiguration(this);
+                        if(childConfig.ParentConfiguration == null)
+                        {
+                            childConfig.SetParentConfiguration(this);
+                        }
                         childConfig.Load(child);
 
                         children.Add(childConfig);

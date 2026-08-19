@@ -102,26 +102,37 @@ namespace TiaUtilities.Generation.Alarms.Module
                 {
                     foreach (var filePath in fileDialog.FileNames)
                     {
+                        if(string.IsNullOrEmpty(filePath))
+                        {
+                            continue;
+                        }
+
                         var xmlNodeConfiguration = SimaticMLAPI.ParseFile(filePath);
                         if (xmlNodeConfiguration is BlockFB blockFB)
                         {
+                            var templateName = blockFB.AttributeList.BlockName;
+                            templateHandler.Remove(templateName);
+
+                            var template = templateHandler.Add(templateName);
                             foreach (var member in blockFB.AttributeList.STATIC.GetItems())
                             {
-                                if (member.MemberName.ToLower().Equals("allarmi"))
+                                if (member.MemberName.StartsWith("allarmi", StringComparison.CurrentCultureIgnoreCase))
                                 {
-                                    var template = templateHandler.AddNewTemplate();
-                                    template.Name = blockFB.AttributeList.BlockName;
+                                    var templateRowData = template.AlarmGridSave.RowData;
 
-                                    var nextGridIndex = template.AlarmGridSave.RowData.Count == 0 ? 0 : (template.AlarmGridSave.RowData.Keys.Max() + 1);
+                                    var nextGridIndex = templateRowData.Count == 0 ? 0 : (templateRowData.Keys.Max() + 1);
                                     foreach (var subMember in member.Members)
                                     {
-                                        TemplateData newTemplateData = new() { AlarmVariable = subMember.MemberName, Description = subMember.Comment[CultureInfo.CurrentCulture] };
+                                        TemplateData newTemplateData = new()
+                                        {
+                                            Enable = true,
+                                            AlarmVariable = subMember.MemberName,
+                                            Description = subMember.Comment[CultureInfo.CurrentCulture]
+                                        };
 
-                                        template.AlarmGridSave.RowData.Add(nextGridIndex, newTemplateData);
+                                        templateRowData.Add(nextGridIndex, newTemplateData);
                                         nextGridIndex++;
                                     }
-
-                                    break;
                                 }
                             }
                         }

@@ -37,7 +37,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
 
             this.templateHandler.SelectedTemplateChanged += (sender, args) => this.HandleTemplateChanged(args.OldTemplate);
 
-            this.addButton.Click += (sender, args) => this.templateHandler.AddNewTemplate();
+            this.addButton.Click += (sender, args) => this.templateHandler.Add();
             this.removeButton.Click += (sender, args) => this.templateHandler.RemoveSelectedTemplate();
             this.renameButton.Click += (sender, args) => this.templateHandler.RenameSelectedTemplate(this);
             this.cloneButton.Click += (sender, args) => this.templateHandler.CloneSelectedTemplate();

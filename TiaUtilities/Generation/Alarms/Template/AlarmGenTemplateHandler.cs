@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using System.ComponentModel;
 using TiaUtilities.CustomControls;
 using TiaUtilities.Languages;
 using TiaUtilities.Utility;
@@ -32,7 +33,7 @@ namespace TiaUtilities.Generation.Alarms.Template
                 var oldTemplate = _selectedTemplate;
                 _selectedTemplate = value;
 
-                if(Utils.AreDifferentObject(oldTemplate, _selectedTemplate))
+                if (Utils.AreDifferentObject(oldTemplate, _selectedTemplate))
                 {
                     this.SelectedTemplateChanged(this, new() { OldTemplate = oldTemplate });
                 }
@@ -60,7 +61,7 @@ namespace TiaUtilities.Generation.Alarms.Template
 
             if (templateCollection.Count == 0)
             {
-                this.AddNewTemplate();
+                this.Add();
             }
             this.SelectedTemplate = this.templateList[0];
         }
@@ -70,7 +71,7 @@ namespace TiaUtilities.Generation.Alarms.Template
             return this.templateList.Select(template => template.Name);
         }
 
-        public AlarmGenTemplate? FindTemplate(string? name)
+        public AlarmGenTemplate? Find(string? name)
         {
             if (name == null)
             {
@@ -88,9 +89,11 @@ namespace TiaUtilities.Generation.Alarms.Template
             return null;
         }
 
-        public AlarmGenTemplate AddNewTemplate()
+        public AlarmGenTemplate Add(string name = "")
         {
-            AlarmGenTemplate newTemplate = new($"New template [{templateList.Count}]");
+            var templateName = string.IsNullOrEmpty(name) ? $"New template [{templateList.Count}]" : name;
+
+            AlarmGenTemplate newTemplate = new(templateName);
             this.templateList.Add(newTemplate);
             this.BindingList.ResetBindings();
 
@@ -99,6 +102,32 @@ namespace TiaUtilities.Generation.Alarms.Template
             this.dirty = true;
 
             return newTemplate;
+        }
+
+        public void Remove(string name)
+        {
+            var template = this.Find(name);
+            this.Remove(template);
+        }
+
+        public void Remove(AlarmGenTemplate? template)
+        {
+            if (template != null)
+            {
+                if (template == this.SelectedTemplate)
+                {
+                    this.BindingList.ResetBindings();
+
+                    var index = this.templateList.IndexOf(template);
+                    if (this.templateList.Count > 0)
+                    {//Select the template above the one just deleted.
+                        this.SelectedTemplate = this.templateList[index - 1];
+                    }
+                }
+
+                this.templateList.Remove(template);
+                this.dirty = true;
+            }
         }
 
         public void RemoveSelectedTemplate()
@@ -115,17 +144,7 @@ namespace TiaUtilities.Generation.Alarms.Template
 
             if (result == DialogResult.Yes)
             {
-                var index = this.templateList.IndexOf(this.SelectedTemplate);
-
-                this.templateList.Remove(this.SelectedTemplate);
-                this.BindingList.ResetBindings();
-
-                if (this.templateList.Count > 0)
-                {//Select the template above the one just deleted.
-                    this.SelectedTemplate = this.templateList[index - 1];
-                }
-
-                this.dirty = true;
+                this.Remove(this.SelectedTemplate);
             }
         }
 

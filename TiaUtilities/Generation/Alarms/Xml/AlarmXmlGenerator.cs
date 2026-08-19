@@ -59,12 +59,7 @@ namespace TiaUtilities.Generation.Alarms.Xml
             //Switching to a Template system broke the ability to use the Partition system of the alarms (AlarmPartitionType.DEVICE / ALARM_TYPE)
             foreach (var deviceData in deviceDataList)
             {
-                if (tabConfig.GroupingType == AlarmGroupingType.GROUP)
-                {
-                    segment = new SimaticLADSegment();
-                }
-
-                var template = templateHandler.FindTemplate(deviceData.Template);
+                var template = templateHandler.Find(deviceData.Template);
                 if (template == null)
                 {
                     continue;
@@ -98,6 +93,12 @@ namespace TiaUtilities.Generation.Alarms.Xml
                     }
                 }
 
+                if (tabConfig.GroupingType == AlarmGroupingType.GROUP)
+                {
+                    segment = new SimaticLADSegment();
+                    segment.Title[LocaleVariables.CULTURE] = placeholdersHandler.ParseNotNull(mainConfig.GroupSegmentName);
+                }
+
                 var startAlarmNum = nextAlarmNum;
                 foreach (var templateData in templateDataList)
                 {
@@ -121,7 +122,7 @@ namespace TiaUtilities.Generation.Alarms.Xml
                     {
                         segment = new SimaticLADSegment();
                         segment.Title[LocaleVariables.CULTURE] = placeholdersHandler.ParseNotNull(mainConfig.OneEachSegmentName);
-                    }
+                    } 
 
                     FillAlarmSegment(tabConfig, segment, placeholdersHandler, parsedTemplateData);
 
