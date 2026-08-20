@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace TiaUtilities.Generation.GridHandler.JSScript
+namespace TiaUtilities.JSScript
 {
     public class ScriptInfo() : ICleanable
     {

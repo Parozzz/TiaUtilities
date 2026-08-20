@@ -528,18 +528,12 @@ namespace TiaUtilities.Generation.Alarms.Xml
                 return;
             }
 
-            XLWorkbook beta80Excel = new();
-            var beta80Sheet = beta80Excel.Worksheets.Add("Allarmi");
-            //CD_ERROR	DSC_ERROR	ERROR_TYPE	CD_GROUP	CD_CONVEYOR
-            beta80Sheet.Cell(1, 1).Value = "CD_ERROR";
-            beta80Sheet.Cell(1, 2).Value = "DSC_ERROR";
-            beta80Sheet.Cell(1, 3).Value = "ERROR_TYPE";
-            beta80Sheet.Cell(1, 4).Value = "CD_GROUP";
-            beta80Sheet.Cell(1, 5).Value = "CD_CONVEYOR";
+            const string updateDBQuery = "IF NOT EXISTS (SELECT 1 FROM Stato_Allarmi WHERE STA_CodiceAllarme = '{Codice}' AND STA_Dispositivo = '{Dispositivo}' AND STA_DispositivoTipo = '{TipoDispositivo}')\r\n    INSERT INTO Stato_Allarmi (STA_CodiceAllarme, STA_TagName, STA_Stato, STA_Dispositivo, STA_DispositivoTipo, STA_Severita, STA_Priorita, STA_Descrizione, STA_ModificatoDa) VALUES ('{Codice}', '{TagName}', 0, '{Dispositivo}', '{TipoDispositivo}', 1, 1, '{Descrizione}', 'Import TiaUtilities')\r\nELSE\r\n    UPDATE Stato_Allarmi SET STA_Descrizione = '{Descrizione}' WHERE STA_CodiceAllarme = '{Codice}' AND STA_Dispositivo = '{Dispositivo}' AND STA_DispositivoTipo = '{TipoDispositivo}'\r\n";
 
-            AlarmXmlHmiAlarmsExcel hmiAlarmsExcel = new();
+            string queryString = "";
 
-            int excelRowIndex = 2; //Starts from 1 and the first is the headers.
+            AlarmXmlBeta80Excel beta80Excel = new();
+            AlarmXmlHmiAlarmsExcel hmiExcel = new();
 
             foreach (var (alarmGroupName, alarmGroupItem) in alarmGroupDict)
             {
@@ -554,32 +548,27 @@ namespace TiaUtilities.Generation.Alarms.Xml
                 using var stream = File.CreateText(exportPath + $"/Texts_{alarmGroupName.Replace("\\", "_").Replace("/", "_")}.txt");
                 stream.Write(alarmGroupItem.AlarmList);
 
-                var beta80AlarmNum = 1;
+                hmiExcel.AddItems(alarmGroupItem.Items);
+                beta80Excel.AddItems(alarmGroupItem.Items);
 
-                foreach (var item in alarmGroupItem.Items)
+                int dbAlarmNum = 1;
+                foreach(var item in alarmGroupItem.Items)
                 {
-                    hmiAlarmsExcel.AddData(item);
-
-                    if (!string.IsNullOrEmpty(item.HmiAlarmText))
-                    {
-                        beta80Sheet.Cell(excelRowIndex, 1).Value = beta80AlarmNum;
-                        beta80Sheet.Cell(excelRowIndex, 2).Value = item.HmiAlarmText;
-                        beta80Sheet.Cell(excelRowIndex, 3).Value = 4;
-                        beta80Sheet.Cell(excelRowIndex, 4).Value = item.TabName.Replace("Z", "");
-                        beta80Sheet.Cell(excelRowIndex, 5).Value = 1;
-                    }
-
-                    beta80AlarmNum++;
-                    excelRowIndex++;
+                    var itemQuery = updateDBQuery.Replace("{Codice}", dbAlarmNum.ToString().PadLeft(4, '0'))
+                                                 .Replace("{TagName}", "")
+                                                 .Replace("{Dispositivo}", "Z" + item.TabName.Trim().ToLower().Replace("z", ""))
+                                                 .Replace("{TipoDispositivo}", "ZONE")
+                                                 .Replace("{Descrizione}", item.AlarmVariableComment);
+                    dbAlarmNum++; 
+                    
+                    queryString += itemQuery + "\r\n";
                 }
-
             }
 
-            var hmiAlarmsPath = $"{exportPath}/HmiAlarms.xlsx";
-            hmiAlarmsExcel.SaveAs(hmiAlarmsPath);
+            File.WriteAllText($"{exportPath}/AllarmiQuery.sql", queryString);
 
-            var beta80Path = $"{exportPath}/Beta80Alarms.xlsx";
-            beta80Excel.SaveAs(beta80Path);
+            hmiExcel.Save(exportPath);
+            //beta80Excel.Save(exportPath);
         }
     }
 }

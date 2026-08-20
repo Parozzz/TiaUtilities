@@ -3,11 +3,11 @@ using SimaticML.Enums;
 using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.Data;
-using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Generation.IO.Configurations;
 using TiaUtilities.Generation.IO.Data;
 using TiaUtilities.Generation.GridHandler.CustomColumns.SuggestionColumn;
+using TiaUtilities.JSScript;
 
 namespace TiaUtilities.Generation.IO.Module.Tab
 {

@@ -6,8 +6,8 @@ using TiaUtilities.Generation.Alarms.Module.Template;
 using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.Data;
-using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.Placeholders;
+using TiaUtilities.JSScript;
 
 namespace TiaUtilities.Generation.Alarms.Template
 {

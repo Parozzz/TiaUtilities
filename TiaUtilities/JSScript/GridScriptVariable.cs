@@ -1,7 +1,8 @@
 ﻿using System.Linq.Expressions;
+using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.Data;
 
-namespace TiaUtilities.Generation.GridHandler.JSScript
+namespace TiaUtilities.JSScript
 {
     public class GridScriptVariable(string programmingName, string valueType)
     {

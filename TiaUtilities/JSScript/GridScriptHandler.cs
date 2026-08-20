@@ -6,8 +6,9 @@ using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Utility.Extensions;
 using TiaUtilities.Editors.ErrorReporting;
 using TiaUtilities.Utility;
+using TiaUtilities.Generation.GridHandler.JSScript;
 
-namespace TiaUtilities.Generation.GridHandler.JSScript
+namespace TiaUtilities.JSScript
 {
     public class GridScriptHandler(ErrorReportThread errorThread) : ICleanable, ISaveable<GridScriptSave>, IGridBindable
     {

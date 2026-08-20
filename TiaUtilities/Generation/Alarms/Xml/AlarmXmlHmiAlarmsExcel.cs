@@ -62,7 +62,15 @@ namespace TiaUtilities.Generation.Alarms.Xml
             rowIndex = 2;
         }
 
-        public void AddData(AlarmXmlItem item)
+        public void AddItems(List<AlarmXmlItem> alarmItems)
+        {
+            foreach(var item in alarmItems)
+            {
+                this.AddItem(item);
+            }
+        }
+
+        public void AddItem(AlarmXmlItem item)
         {
             try
             {
@@ -108,8 +116,9 @@ namespace TiaUtilities.Generation.Alarms.Xml
             }
         }
 
-        public void SaveAs(string filePath)
+        public void Save(string exportPath)
         {
+            var filePath = $"{exportPath}/HmiAlarms.xlsx";
             this.workbook.SaveAs(filePath);
         }
     }

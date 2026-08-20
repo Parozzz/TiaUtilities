@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json;
 using TiaUtilities.Generation.GridHandler;
-using TiaUtilities.Generation.GridHandler.JSScript;
 using TiaUtilities.Generation.IO.Configurations;
 using TiaUtilities.Generation.IO.Module;
 using TiaUtilities.Generation.IO.Module.Tab;
+using TiaUtilities.JSScript;
 
 namespace TiaUtilities.Generation.IO
 {

@@ -1,5 +1,6 @@
 ﻿using FastColoredTextBoxNS;
 using TiaUtilities.Editors;
+using TiaUtilities.JSScript;
 using TiaUtilities.Languages;
 using TiaUtilities.Utility;
 
@@ -218,7 +219,8 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
             fctb.Text = scriptInfo.Text;
             fctb.TextChanged += (sender, args) => scriptInfo.Text = javascriptEditor.GetTextBox().Text;
 
-            tabPage.Controls.Add(fctb);
+            tabPage.Controls.Add(javascriptEditor.GetScintilla());
+            //tabPage.Controls.Add(fctb);
             tabPage.Tag = new TabPageScriptRecord(scriptInfo, javascriptEditor);
         }
 
