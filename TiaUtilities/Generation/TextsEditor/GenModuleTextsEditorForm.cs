@@ -1,4 +1,5 @@
-﻿using TiaUtilities.Generation.GridHandler;
+﻿using TiaUtilities.Editors.ErrorReporting;
+using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.Placeholders;
@@ -21,7 +22,7 @@ namespace TiaUtilities.Generation.TextsEditor
 
             this.exporter = exporter;
 
-            this.gridBindContainer = new(MainForm.JavascriptErrorThread);
+            this.gridBindContainer = new();
             this.previewer = new();
 
             GenPlaceholderHandler placeholderHandler = new();

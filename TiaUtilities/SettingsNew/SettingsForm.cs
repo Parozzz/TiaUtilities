@@ -1,4 +1,4 @@
-﻿using FastColoredTextBoxNS;
+﻿using ScintillaNET;
 using TiaUtilities.CustomControls;
 using TiaUtilities.SettingsNew;
 using TiaUtilities.SettingsNew.Bindings;
@@ -202,7 +202,7 @@ namespace TiaUtilities.Generation.SettingsNew
                         }
                         break;
                     case Keys.Enter:
-                        if(this.ActiveControl is not FastColoredTextBox)
+                        if(this.ActiveControl is not Scintilla)
                         {
                             this.rightSettingsPanel.SelectNextControl(ActiveControl, true, true, true, false);
                             return true;

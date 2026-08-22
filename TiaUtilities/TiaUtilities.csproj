@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="JSScript\JsDoc.json">
+    <EmbeddedResource Include="Editors\myScintilla\JsDoc.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
@@ -34,16 +34,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ClosedXML" Version="0.104.2" />
+    <PackageReference Include="ClosedXML" Version="0.105.1" />
     <PackageReference Include="Cyotek.Windows.Forms.ColorPicker" Version="1.7.2" />
-    <PackageReference Include="FastColoredTextBox.Net6" Version="1.0.0" />
     <PackageReference Include="InformationBox" Version="1.5.0.242" />
     <PackageReference Include="Jint" Version="4.16.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="Scintilla5.NET" Version="7.0.0" />
-    <PackageReference Include="ScintillaLexers5.NET" Version="1.1.19" />
-    <PackageReference Include="Svg" Version="3.4.7" />
-    <PackageReference Include="WindowsAPICodePack" Version="8.0.6" />
+    <PackageReference Include="Svg" Version="3.4.8" />
+    <PackageReference Include="WindowsAPICodePack" Version="8.0.15.2" />
   </ItemGroup>
 
   <ItemGroup>

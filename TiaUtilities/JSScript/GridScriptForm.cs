@@ -1,61 +1,43 @@
-﻿using FastColoredTextBoxNS;
-using TiaUtilities.Editors;
-using TiaUtilities.JSScript;
+﻿using TiaUtilities.Editors;
 using TiaUtilities.Languages;
 using TiaUtilities.Utility;
+using TiaUtilities.Utility.Extensions;
 
-namespace TiaUtilities.Generation.GridHandler.JSScript
+namespace TiaUtilities.JSScript
 {
     public partial class GridScriptForm : Form
     {
         public record TabPageScriptRecord(ScriptInfo Script, JavascriptEditor Editor);
 
         private readonly GridScriptHandler scriptHandler;
-        private readonly FastColoredTextBox jsonContextTextBox;
         
+        public IEnumerable<GridScriptVariable> Variables {
+            get => _variables;
+            set 
+            { 
+                _variables = value;
+                this.UpdateVariables();
+            }
+        }
+        private IEnumerable<GridScriptVariable> _variables = [];
+
+        private readonly JsonEditor contextEditor;
+
         public GridScriptForm(GridScriptHandler scriptHandler)
         {
             InitializeComponent();
-
             this.scriptHandler = scriptHandler;
-            this.jsonContextTextBox = new();
+
+            this.contextEditor = new(this.jsonContextScintilla);
         }
 
         public void Init()
         {
-            #region JSON_CONTEXT_TEXT_BOX_CONFIGURATION
-            this.jsonContextTextBox.ReadOnly = true;
-            this.jsonContextTextBox.BorderStyle = BorderStyle.FixedSingle;
+            this.contextEditor.InitControl(borderStyle: ScintillaNET.BorderStyle.FixedSingle, backColor: SystemColors.Control);
+            this.contextEditor.Text = "{}"; //Avoid throwing errors at startup.
 
-            this.jsonContextTextBox.AutoSize = true;
-            this.jsonContextTextBox.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            this.jsonContextTextBox.Dock = DockStyle.Fill;
-
-            this.jsonContextTextBox.BackColor = SystemColors.Control;
-
-            this.jsonContextTextBox.Language = Language.JSON;
-            // == INDENTATION ==
-            this.jsonContextTextBox.AutoIndent = true;
-            this.jsonContextTextBox.AutoIndentExistingLines = true;
-            this.jsonContextTextBox.AutoIndentChars = true;
-            this.jsonContextTextBox.TabLength = 4;
-            // == LINE NUMBERS ==
-            this.jsonContextTextBox.ShowLineNumbers = false;
-            this.jsonContextTextBox.LineNumberStartValue = 0;
-            // == CARET ==
-            this.jsonContextTextBox.CaretVisible = true;
-            this.jsonContextTextBox.CaretBlinking = true;
-            this.jsonContextTextBox.ShowCaretWhenInactive = false;
-            this.jsonContextTextBox.WideCaret = false;
-
-            this.jsonContextTextBox.CharHeight = 16; //Default 14
-            this.jsonContextTextBox.LineInterval = 4; //Default 0
-
-            this.jsonContextTextBox.AcceptsTab = true;
-            this.jsonContextTextBox.AcceptsReturn = true;
-            this.jsonContextTextBox.ShowFoldingLines = true;
-            this.jsonContextPanel.Controls.Add(jsonContextTextBox);
-            #endregion
+            var contextEditorControl = this.contextEditor.GetControl();
+            contextEditorControl.ReadOnly = true;
 
             #region LOG_TEXT_BOX
             var menuItem = new ToolStripMenuItem(Locale.GENERICS_CLEAR);
@@ -73,7 +55,6 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
             };
             #endregion
 
-
             this.variablesTreeView.NodeMouseDoubleClick += (sender, args) =>
             {
                 var currentRecord = this.GetCurrentTabPageRecord();
@@ -84,9 +65,9 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
 
                 if(args.Node.Tag is GridScriptVariable variable)
                 {
-                    var textBox = currentRecord.Editor.GetTextBox();
-                    textBox.InsertText(variable.Name);
-                    textBox.Focus();
+                    var editor = currentRecord.Editor;
+                    editor.InsertText(variable.Name);
+                    editor.FocusControl();
                 }
             };
 
@@ -109,28 +90,13 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
             this.scriptTabControl.TabPreRemoved += (sender, args) =>
             {
                 var tabPage = args.TabPage;
-                if (tabPage.Tag is not TabPageScriptRecord record)
+                if (tabPage.Tag is TabPageScriptRecord record)
                 {
-                    return;
+                    this.scriptHandler.Scripts.Remove(record.Script);
                 }
-
-                this.scriptHandler.Scripts.Remove(record.Script);
             };
 
-            this.scriptTabControl.Selected += (sender, args) =>
-            {
-                var tabPage = args.TabPage;
-
-                var currentRecord = this.GetCurrentTabPageRecord();
-                currentRecord?.Editor.UnregisterErrorReporter(this.scriptHandler.ErrorThread);
-
-                if (tabPage?.Tag is not TabPageScriptRecord record)
-                {
-                    return;
-                }
-
-                record.Editor.RegisterErrorReporter(this.scriptHandler.ErrorThread);
-            };
+            this.scriptTabControl.Selected += (sender, args) => { };
 
             this.scriptTabControl.TabNameUserChanged += (sender, args) =>
             {
@@ -147,7 +113,6 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                 record.Script.Name = fixedNewName;
             };
 
-            this.autoFormatButton.Click += (sender, args) => this.GetCurrentTabPageRecord()?.Editor.GetTextBox().DoAutoIndent();
             this.executeAllButton.Click += (sender, args) => this.scriptHandler.ParseJS(this.GetCurrentTabPageRecord());
             this.executeLineButton.Click += (sender, args) => this.scriptHandler.ParseJS(this.GetCurrentTabPageRecord(), singleExecution: true);
 
@@ -157,12 +122,6 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
                 AddJavascriptControl(tabPage, script);
                 this.scriptTabControl.TabPages.Add(tabPage);
             }
-
-            this.FormClosed += (sender, args) =>
-            {
-                var currentRecord = this.GetCurrentTabPageRecord();
-                currentRecord?.Editor.UnregisterErrorReporter(this.scriptHandler.ErrorThread);
-            };
 
             this.Translate();
         }
@@ -185,44 +144,52 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
             this.topLabel.Text = Locale.GRID_SCRIPT_JS_EXPRESSION;
             this.logLabel.Text = $"Log > {GridScriptHandler.ENGINE_LOG_FUNCTION} [string]";
             this.jsonContextLabel.Text = Locale.GRID_SCRIPT_JSON_CONTEXT;
-
-            this.autoFormatButton.Text = Locale.GRID_SCRIPT_AUTO_FORMAT;
             this.executeAllButton.Text = Locale.GRID_SCRIPT_EXECUTE_ALL;
             this.executeLineButton.Text = Locale.GRID_SCRIPT_EXECUTE_ONE_LINE;
         }
 
-        public void UpdateVariableView(IEnumerable<GridScriptVariable> variables)
+        private void UpdateVariables()
         {
+            if(_variables == null || !_variables.Any())
+            {
+                return;
+            }
+
             this.variablesTreeView.SuspendLayout();
             this.variablesTreeView.Nodes.Clear();
 
-            foreach (var v in variables)
+            foreach (var v in _variables)
             {
                 var node = this.variablesTreeView.Nodes.Add($"{v.Name}, {v.ValueType}");
                 node.Tag = v;
             }
 
+            var suggestions = this.CreateEditorSuggestion();
+            this.scriptTabControl.TabPages.Cast<TabPage>()
+                .Where(t => t.Tag is TabPageScriptRecord)
+                .Select(t => t.Tag)
+                .Cast<TabPageScriptRecord>()
+                .ForEach(r => r.Editor.Suggestions = suggestions);
+
             this.variablesTreeView.ResumeLayout();
         }
 
-        private static void AddJavascriptControl(TabPage tabPage, ScriptInfo scriptInfo)
+        private void AddJavascriptControl(TabPage tabPage, ScriptInfo scriptInfo)
         {
-            JavascriptEditor javascriptEditor = new();
-            javascriptEditor.InitControl();
-
-            var fctb = javascriptEditor.GetTextBox();
-            fctb.AutoSize = true;
-            fctb.Dock = DockStyle.Fill;
-            fctb.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            JavascriptEditor jsEditor = new();
+            jsEditor.InitControl();
+            jsEditor.Text = scriptInfo.Text;
+            jsEditor.TextChanged += (sender, args) => scriptInfo.Text = jsEditor.Text;
+            jsEditor.Suggestions = CreateEditorSuggestion(); ;
 
             tabPage.Text = scriptInfo.Name;
-            fctb.Text = scriptInfo.Text;
-            fctb.TextChanged += (sender, args) => scriptInfo.Text = javascriptEditor.GetTextBox().Text;
 
-            tabPage.Controls.Add(javascriptEditor.GetScintilla());
+            tabPage.Controls.Add(jsEditor.GetControl());
             //tabPage.Controls.Add(fctb);
-            tabPage.Tag = new TabPageScriptRecord(scriptInfo, javascriptEditor);
+            tabPage.Tag = new TabPageScriptRecord(scriptInfo, jsEditor);
         }
+
+        private string CreateEditorSuggestion() => String.Join(' ', this._variables.Select(v => $"{v.Name}"));
 
         public void UpdateLog(string logString)
         {
@@ -231,7 +198,7 @@ namespace TiaUtilities.Generation.GridHandler.JSScript
 
         public void UpdateJsonContext(string contextString)
         {
-            this.jsonContextTextBox.Text = contextString;
+            this.contextEditor.Text = contextString;
         }
 
         private TabPageScriptRecord? GetCurrentTabPageRecord()

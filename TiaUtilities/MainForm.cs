@@ -14,7 +14,6 @@ using TiaUtilities.DbVisualization;
 using TiaUtilities.Editors.ErrorReporting;
 using TiaUtilities.Generation;
 using TiaUtilities.Generation.Alarms;
-using TiaUtilities.Generation.Alarms.Data;
 using TiaUtilities.Generation.Alarms.Module;
 using TiaUtilities.Generation.Configuration;
 using TiaUtilities.Generation.Configuration.Utility;
@@ -54,9 +53,6 @@ namespace TiaUtilities
         }
 
         private readonly TimedSaveHandler autoSaveHandler;
-        private readonly ErrorReportThread errorThread;
-
-        public static readonly ErrorReportThread JavascriptErrorThread = new();
 
         public MainForm()
         {
@@ -66,8 +62,6 @@ namespace TiaUtilities
             Settings.Save(); //To create file if not exist!
 
             this.autoSaveHandler = new TimedSaveHandler();
-            this.errorThread = new();
-
             Init();
         }
 
@@ -84,12 +78,6 @@ namespace TiaUtilities
 
             LogHandler.INSTANCE.Init();
             LogHandler.INSTANCE.Start();
-
-            JavascriptErrorThread.Init();
-            JavascriptErrorThread.Start();
-
-            this.errorThread.Init();
-            this.errorThread.Start();
 
             MainForm.LoadLanguage();
             MainForm.LoadTIAVersion();
@@ -248,7 +236,7 @@ namespace TiaUtilities
 
         private GenModuleForm OpenIOGenModuleForm()
         {
-            IOGenModule ioGenProject = new(this.errorThread);
+            IOGenModule ioGenProject = new();
             GenModuleForm projectForm = new(ioGenProject, autoSaveHandler)
             {
                 Width = 1400,
@@ -260,7 +248,7 @@ namespace TiaUtilities
 
         private GenModuleForm OpenAlarmGenModuleForm()
         {
-            AlarmGenModule alarmGenProject = new(this.errorThread);
+            AlarmGenModule alarmGenProject = new();
             GenModuleForm projectForm = new(alarmGenProject, autoSaveHandler)
             {
                 Width = 1400,

@@ -74,9 +74,9 @@ namespace TiaUtilities.Generation.IO.Module
         public SettingsBindings SettingsBindings { get; init; }
         private readonly SettingsFormCache settingsFormCache;
 
-        public IOGenModule(ErrorReportThread errorThread)
+        public IOGenModule()
         {
-            this.gridBindContainer = new(errorThread);
+            this.gridBindContainer = new();
 
             this.mainConfig = new();
             GenUtils.CopyJsonFieldsAndProperties(MainForm.Settings.PresetIOMainConfiguration, this.mainConfig);

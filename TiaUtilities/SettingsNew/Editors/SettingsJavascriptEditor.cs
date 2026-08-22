@@ -1,6 +1,4 @@
-﻿using DocumentFormat.OpenXml.Bibliography;
-using FastColoredTextBoxNS;
-using TiaUtilities.Editors;
+﻿using TiaUtilities.Editors;
 using TiaUtilities.Editors.ErrorReporting;
 using TiaUtilities.SettingsNew.FormHelpers;
 
@@ -8,49 +6,47 @@ namespace TiaUtilities.SettingsNew.Editors
 {
     public class SettingsJavascriptEditor : SettingsEditor
     {
-        private readonly JavascriptEditor editor;
-        private FastColoredTextBox Control { get => editor.GetTextBox(); }
+        private readonly JavascriptEditor jsEditor;
 
         public SettingsJavascriptEditor(SettingsFormValueImpl value, bool useContextMenu) : base(value, useContextMenu)
         {
-            this.editor = new JavascriptEditor();
-            this.editor.InitControl();
+            this.jsEditor = new JavascriptEditor();
+            this.jsEditor.InitControl();
 
-            this.Control.Dock = DockStyle.Fill;
-            this.Control.MinimumSize = new Size(0, 400);
-            this.Control.Font = SettingsFormConstants.VALUE_CONTROL_FONT;
-            this.Control.TextChanged += (sender, args) => this.SaveToConfiguration();
+            this.jsEditor.TextChanged += (sender, args) => this.SaveToConfiguration();
+
+            var control = this.jsEditor.GetControl();
+            control.MinimumSize = new Size(0, 400);
+            control.Font = SettingsFormConstants.VALUE_CONTROL_FONT;
 
             if (useContextMenu)
             {
-                var _ = SettingsFormUtils.AddContextualMenu(this.Control, value);
+                var _ = SettingsFormUtils.AddContextualMenu(this.jsEditor.GetControl(), value);
             }
         }
 
         public override Control GetControl()
         {
-            return this.Control;
+            return this.jsEditor.GetControl();
         }
 
         protected override Control GetControlForEvents()
         {
-            return this.Control;
+            return this.jsEditor.GetControl();
         }
 
         public override void LoadFromConfiguration()
         {
-            this.Control.Text = "" + this.Value.GetConfigurationValue();
+            this.jsEditor.Text = "" + this.Value.GetConfigurationValue();
         }
 
         public override void SaveToConfiguration()
         {
-            this.Value.SetConfigurationValue(this.Control.Text);
+            this.Value.SetConfigurationValue(this.jsEditor.Text);
         }
 
         public override void AddFormCallbacks(Form form)
         {
-            this.editor.RegisterErrorReporter(MainForm.JavascriptErrorThread);
-            form.FormClosing += (sender, args) => this.editor.UnregisterErrorReporter(MainForm.JavascriptErrorThread);
         }
     }
 }

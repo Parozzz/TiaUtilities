@@ -1,5 +1,4 @@
 ﻿using ClosedXML.Excel;
-using FastColoredTextBoxNS;
 using InfoBox;
 using Jint;
 using Microsoft.WindowsAPICodePack.Dialogs;
@@ -29,7 +28,7 @@ namespace TiaUtilities
             _ = typeof(Engine); //Jint
             _ = typeof(XLWorkbook); //ClosedXML
             _ = typeof(CommonOpenFileDialog); //WindowsAPICodePack
-            _ = typeof(FastColoredTextBox);
+            _ = typeof(ScintillaNET.Scintilla);
 
             DropDownMenuScrollWheelHandler.Enable(true);
 

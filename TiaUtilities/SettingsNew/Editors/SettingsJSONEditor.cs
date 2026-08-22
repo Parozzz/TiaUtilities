@@ -1,48 +1,41 @@
-﻿using FastColoredTextBoxNS;
-using TiaUtilities.Editors;
+﻿using TiaUtilities.Editors;
 using TiaUtilities.SettingsNew.FormHelpers;
 
 namespace TiaUtilities.SettingsNew.Editors
 {
     public class SettingsJSONEditor : SettingsEditor
     {
-        private readonly JsonEditor editor;
-        private FastColoredTextBox Control { get => editor.GetTextBox(); }
+        private readonly JsonEditor jsonEditor;
 
         public SettingsJSONEditor(SettingsFormValueImpl value, bool useContextMenu) : base(value, useContextMenu)
         {
-            this.editor = new JsonEditor();
-            this.editor.InitControl();
+            this.jsonEditor = new JsonEditor();
+            this.jsonEditor.InitControl();
 
-            this.Control.Dock = DockStyle.Fill;
-            this.Control.MinimumSize = new Size(0, 500);
-            this.Control.Font = SettingsFormConstants.VALUE_CONTROL_FONT;
-            this.Control.TextChanged += (sender, args) => this.SaveToConfiguration();
+            var control = this.jsonEditor.GetControl();
+            control.Dock = DockStyle.Fill;
+            control.MinimumSize = new Size(0, 500);
+            control.Font = SettingsFormConstants.VALUE_CONTROL_FONT;
+            control.TextChanged += (sender, args) => this.SaveToConfiguration();
 
             if (useContextMenu)
             {
-                var _ = SettingsFormUtils.AddContextualMenu(this.Control, value);
+                var _ = SettingsFormUtils.AddContextualMenu(control, value);
             }
         }
 
-        public override Control GetControl()
-        {
-            return this.Control;
-        }
+        public override Control GetControl() => this.jsonEditor.GetControl();
 
-        protected override Control GetControlForEvents()
-        {
-            return this.Control;
-        }
+        protected override Control GetControlForEvents() => this.GetControl();
 
         public override void LoadFromConfiguration()
         {
-            this.Control.Text = "" + this.Value.GetConfigurationValue();
+            this.jsonEditor.Text = "" + this.Value.GetConfigurationValue();
         }
 
         public override void SaveToConfiguration()
         {
-            this.Value.SetConfigurationValue(this.Control.Text);
+            this.Value.SetConfigurationValue(this.jsonEditor.Text);
         }
     }
 }

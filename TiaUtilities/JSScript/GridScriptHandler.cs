@@ -4,18 +4,14 @@ using System.Collections.ObjectModel;
 using TiaUtilities.Configuration;
 using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Utility.Extensions;
-using TiaUtilities.Editors.ErrorReporting;
 using TiaUtilities.Utility;
-using TiaUtilities.Generation.GridHandler.JSScript;
 
 namespace TiaUtilities.JSScript
 {
-    public class GridScriptHandler(ErrorReportThread errorThread) : ICleanable, ISaveable<GridScriptSave>, IGridBindable
+    public class GridScriptHandler() : ICleanable, ISaveable<GridScriptSave>, IGridBindable
     {
         public const string ENGINE_LOG_FUNCTION = "log";
         public const string ENGINE_ROW_VARIABLE = "row";
-
-        public ErrorReportThread ErrorThread { get; init; } = errorThread;
 
         public ObservableCollection<ScriptInfo> Scripts { get; init; } = [];
         private readonly ObservableCollection<GridScriptVariable> gridVariables = [];
@@ -33,7 +29,7 @@ namespace TiaUtilities.JSScript
             this.jsonContext.Changed += (sender, args) => form?.UpdateJsonContext(args.NewValue);
 
             this.gridVariables.CollectionChanged += (sender, args) => this.UpdateFormVariableView();
-            this.gridVariables.CollectionChanged += (sender, args) => this.UpdateFormVariableView();
+            this.customVariables.CollectionChanged += (sender, args) => this.UpdateFormVariableView();
 
             if (this.Scripts.Count == 0)
             {
@@ -108,7 +104,7 @@ namespace TiaUtilities.JSScript
 
             try
             {
-                var tableScript = record.Editor.GetTextBox().Text;
+                var tableScript = record.Editor.Text;
 
                 var preparedScript = Engine.PrepareScript(tableScript, strict: true);
 
@@ -257,7 +253,10 @@ namespace TiaUtilities.JSScript
 
         private void UpdateFormVariableView()
         {
-            form?.UpdateVariableView(this.JoinAllVariables());
+            if(form != null)
+            {
+                form.Variables = this.JoinAllVariables();
+            }
         }
 
         private class GridJSVariable(GridScriptVariable scriptVariable)

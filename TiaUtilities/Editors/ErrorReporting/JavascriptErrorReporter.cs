@@ -2,14 +2,15 @@
 
 namespace TiaUtilities.Editors.ErrorReporting
 {
-    public class JavascriptErrorReporter(Func<string> scriptFunc) : ErrorReporter
+    public class JavascriptErrorReporter(Func<string> textCallback, Func<bool> pausedCallback) : ErrorReporter(textCallback, pausedCallback)
     {
         public const int RUN_TIME_MS = 333;
 
-        private volatile string? script;
-        private volatile ReportedError? error;
-
         public override bool Busy { get => this._busy; set => this._busy = value; }
+
+        private volatile string? _scriptText;
+        private volatile ReportedError? _error;
+
         private volatile bool _busy;
 
         public void SetBusy()
@@ -24,32 +25,29 @@ namespace TiaUtilities.Editors.ErrorReporting
 
         public override void ExecuteSync()
         {
-            base.Complete(error == null ? [] : [error]); //Report error from previous run!
-            this.script = scriptFunc(); //Get the script sync for the next async execution!
+            base.Complete(_error == null ? [] : [_error]); //Report error from previous run!
+            this._scriptText = base.Text; //Get the script sync for the next async execution!
         }
 
         public override void ExecuteAsync()
         {
-            error = null;
-            if (script != null)
+            _error = null;
+            if (_scriptText != null)
             {
                 try
                 {
-                    ParseErrorCollector errorCollector = new();
-                    var parsingOptions = new ParserOptions()
-                    {
+                    Parser parser = new(new()
+                    {//ErrorHandler does not work. Only outputs 1 error at the time
                         AllowReturnOutsideFunction = true,
                         Tolerant = false,
-                        CheckPrivateFields = true,
-                        ErrorHandler = errorCollector,
-                    };
+                        CheckPrivateFields = true
+                    });
 
-                    var parsedScript = new Parser(parsingOptions).ParseScript(script, strict: true);
-                    error = CreateError(errorCollector.Errors.FirstOrDefault());
+                    parser.ParseScript(_scriptText, strict: true);
                 }
                 catch (ParseErrorException parseEx)
                 {
-                    error = CreateError(parseEx.Error);
+                    _error = CreateError(parseEx.Error);
                 }
             }
 

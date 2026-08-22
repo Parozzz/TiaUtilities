@@ -1,5 +1,4 @@
-﻿using FastColoredTextBoxNS;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using TiaUtilities.Generation.Configuration.Utility;
 using TiaUtilities.Editors;
 using TiaUtilities.Editors.ErrorReporting;
@@ -11,8 +10,6 @@ namespace TiaUtilities.Generation.Configuration.Lines
         private readonly IConfigGroup configGroup;
         private readonly JsonEditor editor;
 
-        private FastColoredTextBox Control { get => editor.GetTextBox(); }
-
         private Action<string>? textChangedAction;
         private Action? transferToOtherTextAction;
 
@@ -23,26 +20,27 @@ namespace TiaUtilities.Generation.Configuration.Lines
             this.editor = new JsonEditor();
             this.editor.InitControl();
 
-            this.Control.TextChanged += TextChangedEventHandler;
+            var control = editor.GetControl();
+            control.TextChanged += TextChangedEventHandler;
         }
 
         private void TextChangedEventHandler(object? sender, EventArgs args)
         {
-            var text = Control.Text;
-            textChangedAction?.Invoke(text);
+            textChangedAction?.Invoke(this.editor.Text);
         }
 
         public ConfigJSONLine Readonly()
         {
-            Control.ReadOnly = true;
-            Control.BackColor = SystemColors.Control;
+            var control = this.editor.GetControl();
+            control.ReadOnly = true;
+            control.BackColor = SystemColors.Control;
             return this;
         }
 
         public override ConfigJSONLine ControlText(IConvertible? value)
         {
             base.ControlText(value);
-            Control.ClearUndo(); //Avoid beeing able to undo after the text has been added.
+            this.editor.ClearUndo(); //Avoid beeing able to undo after the text has been added.
             return this;
         }
 
@@ -60,7 +58,7 @@ namespace TiaUtilities.Generation.Configuration.Lines
             this.textChangedAction = str => propertyInfo.SetValue(configuration, nullable ? str : (str ?? ""));
             this.transferToOtherTextAction = () =>
             {
-                var str = this.Control.Text;
+                var str = this.editor.Text;
                 foreach (var otherConfig in otherConfigurations)
                 {
                     propertyInfo.SetValue(otherConfig, str);
@@ -76,14 +74,12 @@ namespace TiaUtilities.Generation.Configuration.Lines
 
         public ConfigJSONLine RegisterErrorThreadWithForm(ErrorReportThread errorThread, Form form)
         {
-            this.editor.RegisterErrorReporter(errorThread);
-            form.FormClosing += (sender, args) => this.editor.UnregisterErrorReporter(errorThread);
             return this;
         }
 
         public override Control GetControl()
         {
-            return Control;
+            return this.editor.GetControl();
         }
     }
 }

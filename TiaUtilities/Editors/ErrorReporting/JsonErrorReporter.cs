@@ -2,34 +2,35 @@
 
 namespace TiaUtilities.Editors.ErrorReporting
 {
-    public class JsonErrorReporter(Func<string> scriptFunc) : ErrorReporter
+    public class JsonErrorReporter(Func<string> textCallback, Func<bool> pausedCallback) : ErrorReporter(textCallback, pausedCallback)
     {
         public const int RUN_TIME_MS = 333;
 
-        private volatile string? script;
-        private volatile ReportedError? error;
-
         public override bool Busy { get => this._busy; set => this._busy = value; }
+
+        private volatile string? _scriptText;
+        private volatile ReportedError? _error;
+
         private volatile bool _busy;
 
         public override void ExecuteSync()
         {
-            base.Complete(error == null ? [] : [error]); //Report error from previous run!
-            this.script = scriptFunc(); //Get the script sync for the next async execution!
+            base.Complete(_error == null ? [] : [_error]); //Report error from previous run!
+            this._scriptText = base.Text; //Get the script sync for the next async execution!
         }
 
         public override void ExecuteAsync()
         {
-            error = null;
-            if (script != null)
+            _error = null;
+            if (_scriptText != null)
             {
                 try
                 {
-                    JsonDocument.Parse(script);
+                    JsonDocument.Parse(_scriptText);
                 }
                 catch (JsonException ex)
                 {
-                    error = CreateError(ex);
+                    _error = CreateError(ex);
                 }
             }
 

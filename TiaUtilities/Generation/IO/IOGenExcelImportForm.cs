@@ -22,7 +22,6 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
     {
         public const string ROW_SPECIAL_CHAR = "$";
 
-        private readonly ErrorReportThread errorThread;
         private readonly IOExcelImportConfiguration excelImportConfig;
         private readonly GridHandler<IOGenExcelImportData> gridHandler;
 
@@ -33,7 +32,6 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
         {
             InitializeComponent();
 
-            this.errorThread = gridBindContainer.GridScriptHandler.ErrorThread;
             this.excelImportConfig = configuration;
             this.gridHandler = new(gridSettings, gridBindContainer, new(), new()) { InitializeRowCount = 1999 };
 

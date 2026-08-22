@@ -4,13 +4,13 @@ using TiaUtilities.JSScript;
 
 namespace TiaUtilities.Generation.GridHandler.Binds
 {
-    public class GridBindContainer(ErrorReportThread errorThread) : ICleanable
+    public class GridBindContainer() : ICleanable
     {
         private Form? form;
         private GridHandlerBind? handlerBind;
 
         private GridFindForm? findForm;
-        public GridScriptHandler GridScriptHandler { get; init; } = new(errorThread);
+        public GridScriptHandler GridScriptHandler { get; init; } = new();
 
         public void Init(Form form)
         {

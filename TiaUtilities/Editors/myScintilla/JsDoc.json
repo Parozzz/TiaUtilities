@@ -1,0 +1,132 @@
+[
+    {
+        "Name": "parseInt",
+        "Syntax": "parseInt(string, [radix])",
+        "Description": "Parses a string argument and returns an integer of the specified radix or base."
+    },
+    {
+        "Name": "parseFloat",
+        "Syntax": "parseFloat(string)",
+        "Description": "Parses a string argument and returns a floating point number."
+    },
+    {
+        "Name": "isNaN",
+        "Syntax": "isNaN(value)",
+        "Description": "Determines whether a value is NaN (Not-a-Number) or not."
+    },
+    {
+        "Name": "encodeURI",
+        "Syntax": "encodeURI(uri)",
+        "Description": "Encodes a Uniform Resource Identifier (URI) by replacing each instance of certain characters with escape sequences."
+    },
+    {
+        "Name": "decodeURI",
+        "Syntax": "decodeURI(encodedURI)",
+        "Description": "Decodes a Uniform Resource Identifier (URI) previously created by encodeURI."
+    },
+    {
+        "Name": "Math.abs",
+        "Syntax": "Math.abs(x)",
+        "Description": "Returns the absolute value of a number."
+    },
+    {
+        "Name": "Math.ceil",
+        "Syntax": "Math.ceil(x)",
+        "Description": "Rounds a number up to the next largest integer."
+    },
+    {
+        "Name": "Math.floor",
+        "Syntax": "Math.floor(x)",
+        "Description": "Rounds a number down to the nearest integer."
+    },
+    {
+        "Name": "Math.round",
+        "Syntax": "Math.round(x)",
+        "Description": "Returns the value of a number rounded to the nearest integer."
+    },
+    {
+        "Name": "Math.max",
+        "Syntax": "Math.max(val1, val2, ...)",
+        "Description": "Returns the largest of zero or more numbers."
+    },
+    {
+        "Name": "Math.min",
+        "Syntax": "Math.min(val1, val2, ...)",
+        "Description": "Returns the smallest of zero or more numbers."
+    },
+    {
+        "Name": "Math.random",
+        "Syntax": "Math.random()",
+        "Description": "Returns a floating-point, pseudo-random number in the range 0 (inclusive) up to but not including 1 (exclusive)."
+    },
+    {
+        "Name": "Math.sqrt",
+        "Syntax": "Math.sqrt(x)",
+        "Description": "Returns the square root of a number."
+    },
+    {
+        "Name": "Math.pow",
+        "Syntax": "Math.pow(base, exponent)",
+        "Description": "Returns the base raised to the exponent power."
+    },
+    {
+        "Name": "JSON.parse",
+        "Syntax": "JSON.parse(text, [reviver])",
+        "Description": "Parses a JSON string, constructing the JavaScript value or object described by the string."
+    },
+    {
+        "Name": "JSON.stringify",
+        "Syntax": "JSON.stringify(value, [replacer], [space])",
+        "Description": "Converts a JavaScript value or object into a JSON formatted string."
+    },
+    {
+        "Name": "Array.isArray",
+        "Syntax": "Array.isArray(value)",
+        "Description": "Determines whether the passed value is an Array."
+    },
+    {
+        "Name": "Array.from",
+        "Syntax": "Array.from(arrayLike, [mapFn])",
+        "Description": "Creates a new, shallow-copied Array instance from an array-like or iterable object."
+    },
+    {
+        "Name": "Object.keys",
+        "Syntax": "Object.keys(obj)",
+        "Description": "Returns an array of a given object's own enumerable property names."
+    },
+    {
+        "Name": "Object.values",
+        "Syntax": "Object.values(obj)",
+        "Description": "Returns an array of a given object's own enumerable string-keyed property values."
+    },
+    {
+        "Name": "Object.assign",
+        "Syntax": "Object.assign(target, ...sources)",
+        "Description": "Copies all enumerable own properties from one or more source objects to a target object."
+    },
+    {
+        "Name": "Date.now",
+        "Syntax": "Date.now()",
+        "Description": "Returns the number of milliseconds elapsed since January 1, 1970 00:00:00 UTC."
+    },
+    {
+        "Name": "Date.parse",
+        "Syntax": "Date.parse(dateString)",
+        "Description": "Parses a string representation of a date, and returns the number of milliseconds since epoch."
+    },
+    {
+        "Name": "console.log",
+        "Syntax": "console.log(...data)",
+        "Description": "Outputs a message to the debugging console."
+    },
+    {
+        "Name": "console.error",
+        "Syntax": "console.error(...data)",
+        "Description": "Outputs an error message to the debugging console."
+    },
+    {
+        "Name": "console.warn",
+        "Syntax": "console.warn(...data)",
+        "Description": "Outputs a warning message to the debugging console."
+    }
+]

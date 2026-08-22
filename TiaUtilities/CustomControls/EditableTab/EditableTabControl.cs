@@ -479,6 +479,8 @@ namespace TiaUtilities.CustomControls.EditableTab
                 }
 
                 this.TabPages.Remove(tabPage);
+                tabPage.Dispose(); //Ooops was memory leaking before.
+
                 closeRequest.Closed = true;
             }
         }

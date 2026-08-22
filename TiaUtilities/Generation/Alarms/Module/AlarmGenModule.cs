@@ -46,9 +46,9 @@ namespace TiaUtilities.Generation.Alarms.Module
 
         private AlarmGenTemplateForm? shownTemplateForm = null;
 
-        public AlarmGenModule(ErrorReportThread errorThread)
+        public AlarmGenModule()
         {
-            this.gridBindContainer = new(errorThread);
+            this.gridBindContainer = new();
 
             this.control = new();
             this.mainConfig = new();
