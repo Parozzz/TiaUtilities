@@ -62,7 +62,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             this.deviceGridHandler.Init();
             this.deviceDataPreview.Function = (column, deviceData) => null;
 
-            this.deviceGridHandler.ScriptVariableList.Add(GridScriptVariable.ReadOnlyValue("tabName", () => this.TabPage.Text));
+            this.deviceGridHandler.ScriptVariableList.Add(JSScriptVariable.ReadOnlyValue("tabName", () => this.TabPage.Text));
             #endregion
 
             this.TabPage.TextChanged += (sender, args) => this.dirty = true;

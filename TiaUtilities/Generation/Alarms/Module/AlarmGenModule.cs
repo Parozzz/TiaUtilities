@@ -32,7 +32,7 @@ namespace TiaUtilities.Generation.Alarms.Module
         public const int TEMPLATE_GRID_ROW_COUNT = 499;
 
         private readonly GridBindContainer gridBindContainer;
-        private GridScriptHandler GridScriptHandler { get => this.gridBindContainer.GridScriptHandler; }
+        private JSScriptHandler GridScriptHandler { get => this.gridBindContainer.GridScriptHandler; }
 
         private readonly AlarmGenControl control;
         private readonly AlarmMainConfiguration mainConfig;

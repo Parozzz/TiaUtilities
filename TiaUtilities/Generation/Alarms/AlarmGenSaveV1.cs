@@ -10,7 +10,7 @@ namespace TiaUtilities.Generation.Alarms
     {
         public static readonly int VERSION = 1; //Read via Reflection
 
-        [JsonProperty] public GridScriptSave ScriptSave { get; set; } = new();
+        [JsonProperty] public JSScriptSave ScriptSave { get; set; } = new();
 
         [JsonProperty] public AlarmMainConfiguration AlarmMainConfig { get; set; } = new();
         [JsonProperty] public List<AlarmGenTabSave> TabSaves { get; set; } = [];

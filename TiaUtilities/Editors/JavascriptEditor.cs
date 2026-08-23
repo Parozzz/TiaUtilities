@@ -25,7 +25,7 @@ namespace TiaUtilities.Editors
             set => this.jsScintilla.Scintilla.Text = value;
         }
 
-        public string Suggestions
+        public IEnumerable<string> Suggestions
         {
             get => this.jsScintilla.Suggestions;
             set => this.jsScintilla.Suggestions = value;

@@ -10,7 +10,7 @@ namespace TiaUtilities.Generation.GridHandler.Binds
         private GridHandlerBind? handlerBind;
 
         private GridFindForm? findForm;
-        public GridScriptHandler GridScriptHandler { get; init; } = new();
+        public JSScriptHandler GridScriptHandler { get; init; } = new();
 
         public void Init(Form form)
         {
@@ -32,7 +32,7 @@ namespace TiaUtilities.Generation.GridHandler.Binds
             handlerBind = handler == null ? null : GridHandlerBind.CreateBind(handler);
 
             findForm?.BindToGridHandler(handlerBind);
-            GridScriptHandler.BindToGridHandler(handlerBind);
+            this.GridScriptHandler.BindToGridHandler(handlerBind);
         }
 
         public void ShowFindForm<T>(GridHandler<T> handler) where T : GridData

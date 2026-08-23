@@ -1,34 +1,39 @@
-﻿using TiaUtilities.Editors;
+﻿using DocumentFormat.OpenXml.Bibliography;
+using TiaUtilities.Editors;
+using TiaUtilities.Editors.myScintilla;
 using TiaUtilities.Languages;
 using TiaUtilities.Utility;
 using TiaUtilities.Utility.Extensions;
+using static TiaUtilities.JSScript.IJsScriptExecutionData;
 
 namespace TiaUtilities.JSScript
 {
-    public partial class GridScriptForm : Form
+    public partial class JSScriptForm : Form
     {
         public record TabPageScriptRecord(ScriptInfo Script, JavascriptEditor Editor);
 
-        private readonly GridScriptHandler scriptHandler;
+        private readonly JSScriptHandler scriptHandler;
         
-        public IEnumerable<GridScriptVariable> Variables {
-            get => _variables;
+        public IJsScriptExecutionData.DataDescriptor? DataDescriptor {
+            get => _dataDescriptor;
             set 
-            { 
-                _variables = value;
+            {
+                _dataDescriptor = value;
                 this.UpdateVariables();
             }
         }
-        private IEnumerable<GridScriptVariable> _variables = [];
+        private IJsScriptExecutionData.DataDescriptor? _dataDescriptor;
 
         private readonly JsonEditor contextEditor;
+        private readonly LoggerScintilla logger;
 
-        public GridScriptForm(GridScriptHandler scriptHandler)
+        public JSScriptForm(JSScriptHandler scriptHandler)
         {
             InitializeComponent();
             this.scriptHandler = scriptHandler;
 
             this.contextEditor = new(this.jsonContextScintilla);
+            this.logger = new(this.loggerScintilla);
         }
 
         public void Init()
@@ -39,22 +44,24 @@ namespace TiaUtilities.JSScript
             var contextEditorControl = this.contextEditor.GetControl();
             contextEditorControl.ReadOnly = true;
 
-            #region LOG_TEXT_BOX
-            var menuItem = new ToolStripMenuItem(Locale.GENERICS_CLEAR);
-            menuItem.Click += (sender, args) => this.scriptHandler.ClearLog();
+            this.logger.InitControl(borderStyle: ScintillaNET.BorderStyle.FixedSingle, backColor: SystemColors.Control);
 
-            var contextMenu = new ContextMenuStrip();
-            contextMenu.Items.Add(menuItem);
-            this.logTextBox.ContextMenuStrip = contextMenu;
+            var loggerControl = this.logger.Scintilla;
 
-            //Scroll to the end after text is changed!
-            this.logTextBox.TextChanged += (sender, args) =>
+            var contextMenu = loggerControl.ContextMenuStrip;
+            if(contextMenu == null)
             {
-                this.logTextBox.Select(this.logTextBox.TextLength + 1, 0);
-                this.logTextBox.ScrollToCaret();
-            };
-            #endregion
+                contextMenu = new();
+            } else
+            {
+                contextMenu.Items.Add(new ToolStripSeparator());
+            }
+            var clearLogMenuItem = new ToolStripMenuItem(Locale.GENERICS_CLEAR);
+            clearLogMenuItem.Click += (sender, args) => this.ClearLog();
 
+            contextMenu.Items.Add(clearLogMenuItem);
+
+            /*
             this.variablesTreeView.NodeMouseDoubleClick += (sender, args) =>
             {
                 var currentRecord = this.GetCurrentTabPageRecord();
@@ -63,14 +70,14 @@ namespace TiaUtilities.JSScript
                     return;
                 }
 
-                if(args.Node.Tag is GridScriptVariable variable)
+                if(args.Node.Tag is JSScriptVariable variable)
                 {
                     var editor = currentRecord.Editor;
                     editor.InsertText(variable.Name);
                     editor.FocusControl();
                 }
             };
-
+            */
             this.scriptTabControl.TabPreAdded += (sender, args) =>
             {
                 var tabPage = args.TabPage;
@@ -142,7 +149,7 @@ namespace TiaUtilities.JSScript
         private void Translate()
         {
             this.topLabel.Text = Locale.GRID_SCRIPT_JS_EXPRESSION;
-            this.logLabel.Text = $"Log > {GridScriptHandler.ENGINE_LOG_FUNCTION} [string]";
+            this.logLabel.Text = $"Log > {JSScriptHandler.ENGINE_CONSOLE_CLASS} [string]";
             this.jsonContextLabel.Text = Locale.GRID_SCRIPT_JSON_CONTEXT;
             this.executeAllButton.Text = Locale.GRID_SCRIPT_EXECUTE_ALL;
             this.executeLineButton.Text = Locale.GRID_SCRIPT_EXECUTE_ONE_LINE;
@@ -150,7 +157,7 @@ namespace TiaUtilities.JSScript
 
         private void UpdateVariables()
         {
-            if(_variables == null || !_variables.Any())
+            if(_dataDescriptor == null || (_dataDescriptor.SimpleProperties.Count == 0 && _dataDescriptor.ObjectProperties.Count == 0))
             {
                 return;
             }
@@ -158,18 +165,20 @@ namespace TiaUtilities.JSScript
             this.variablesTreeView.SuspendLayout();
             this.variablesTreeView.Nodes.Clear();
 
-            foreach (var v in _variables)
+            var dataName = _dataDescriptor.Name;
+
+            var dataNode = this.variablesTreeView.Nodes.Add(dataName);
+            foreach (var (pName, pType) in _dataDescriptor.SimpleProperties)
             {
-                var node = this.variablesTreeView.Nodes.Add($"{v.Name}, {v.ValueType}");
-                node.Tag = v;
+                var node = dataNode.Nodes.Add($"{pName} [{pType}]");
             }
 
-            var suggestions = this.CreateEditorSuggestion();
             this.scriptTabControl.TabPages.Cast<TabPage>()
                 .Where(t => t.Tag is TabPageScriptRecord)
                 .Select(t => t.Tag)
                 .Cast<TabPageScriptRecord>()
-                .ForEach(r => r.Editor.Suggestions = suggestions);
+                .Select(r => r.Editor)
+                .ForEach(this.UpdateEditorSuggestion);
 
             this.variablesTreeView.ResumeLayout();
         }
@@ -180,20 +189,32 @@ namespace TiaUtilities.JSScript
             jsEditor.InitControl();
             jsEditor.Text = scriptInfo.Text;
             jsEditor.TextChanged += (sender, args) => scriptInfo.Text = jsEditor.Text;
-            jsEditor.Suggestions = CreateEditorSuggestion(); ;
-
-            tabPage.Text = scriptInfo.Name;
+            this.UpdateEditorSuggestion(jsEditor);
 
             tabPage.Controls.Add(jsEditor.GetControl());
-            //tabPage.Controls.Add(fctb);
+
+            tabPage.Text = scriptInfo.Name;
             tabPage.Tag = new TabPageScriptRecord(scriptInfo, jsEditor);
         }
 
-        private string CreateEditorSuggestion() => String.Join(' ', this._variables.Select(v => $"{v.Name}"));
-
-        public void UpdateLog(string logString)
+        private void UpdateEditorSuggestion(JavascriptEditor editor)
         {
-            this.logTextBox.Text = logString;
+            if (_dataDescriptor == null || (_dataDescriptor.SimpleProperties.Count == 0 && _dataDescriptor.ObjectProperties.Count == 0))
+            {
+                return;
+            }
+
+            editor.Suggestions = _dataDescriptor.SimpleProperties.Select(p => $"{_dataDescriptor.Name}.{p.Key}");
+        }
+
+        public void ClearLog()
+        {
+            this.logger.Scintilla.ClearAll();
+        }
+
+        public void InsertLog(DateTime dateTime, LoggerScintilla.LogLevel logLevel, string text)
+        {
+            this.logger.AppendLine(dateTime, logLevel, text);
         }
 
         public void UpdateJsonContext(string contextString)

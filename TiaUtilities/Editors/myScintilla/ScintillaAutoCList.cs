@@ -4,7 +4,7 @@ namespace TiaUtilities.Editors.myScintilla
 {
     public class ScintillaAutoCList(Scintilla scintilla)
     {
-        public string Suggestions { get; set; } = "";
+        public IEnumerable<string> Suggestions { get; set; } = [];
 
         public void EventCharAdded_Show()
         {
@@ -18,7 +18,7 @@ namespace TiaUtilities.Editors.myScintilla
             {
                 if (!scintilla.AutoCActive)
                 {
-                    var autoCompleteList = ScintillaUtils.JS_SUGGESTIONS.Concat(Suggestions.Split(" ")).OrderBy(x => x, StringComparer.Ordinal);
+                    var autoCompleteList = ScintillaUtils.JS_SUGGESTIONS.Concat(Suggestions).OrderBy(x => x, StringComparer.Ordinal);
 
                     var autoCompleteStr = String.Join(" ", autoCompleteList);
                     scintilla.AutoCShow(lenEntered, autoCompleteStr);

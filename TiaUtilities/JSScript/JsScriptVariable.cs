@@ -4,11 +4,11 @@ using TiaUtilities.Generation.GridHandler.Data;
 
 namespace TiaUtilities.JSScript
 {
-    public class GridScriptVariable(string programmingName, string valueType)
+    public class JSScriptVariable(string programmingName, string valueType)
     {
-        public static GridScriptVariable CreateFromGrid<H>(GridDataColumn column, GridHandler<H> gridHandler) where H : GridData
+        public static JSScriptVariable CreateFromGrid<H>(GridDataColumn column, GridHandler<H> gridHandler) where H : GridData
         {
-            GridScriptVariable scriptVariable = new(column.ProgrammingFriendlyName, column.PropertyInfo.PropertyType.Name)
+            JSScriptVariable scriptVariable = new(column.ProgrammingFriendlyName, column.PropertyInfo.PropertyType.Name)
             {
                 Get = row => column.GetValueFrom(gridHandler.DataSource[row]),
                 CreateCachedCellChange = (row, v) =>
@@ -20,7 +20,7 @@ namespace TiaUtilities.JSScript
             return scriptVariable;
         }
 
-        public static GridScriptVariable ReadOnlyValue(string programmingFriendlyName, Expression<Func<object>> getExpression)
+        public static JSScriptVariable ReadOnlyValue(string programmingFriendlyName, Expression<Func<object>> getExpression)
         {
             var typeName = getExpression.Body.Type.Name;
 

@@ -21,12 +21,6 @@ namespace TiaUtilities.Editors
             }
         }
 
-        public string Suggestions
-        {
-            get => this.jsonScintilla.Suggestions;
-            set => this.jsonScintilla.Suggestions = value;
-        }
-
         private readonly JsonScintilla jsonScintilla;
         private readonly JsonErrorReporter jsonErrorReporter;
 

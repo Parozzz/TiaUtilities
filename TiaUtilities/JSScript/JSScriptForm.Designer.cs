@@ -2,7 +2,7 @@
 
 namespace TiaUtilities.JSScript
 {
-    partial class GridScriptForm
+    partial class JSScriptForm
     {
         /// <summary>
         /// Required designer variable.
@@ -36,7 +36,6 @@ namespace TiaUtilities.JSScript
             infoSplitContainer = new SplitContainer();
             logPanel = new TableLayoutPanel();
             logLabel = new Label();
-            logTextBox = new TextBox();
             jsonContextPanel = new TableLayoutPanel();
             jsonContextLabel = new Label();
             jsonContextScintilla = new ScintillaNET.Scintilla();
@@ -50,6 +49,7 @@ namespace TiaUtilities.JSScript
             executeAllButton = new Button();
             miniToolStrip = new ToolStrip();
             toolStrip1 = new ToolStrip();
+            loggerScintilla = new ScintillaNET.Scintilla();
             mainPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)centralSplitContainer).BeginInit();
             centralSplitContainer.Panel1.SuspendLayout();
@@ -149,7 +149,7 @@ namespace TiaUtilities.JSScript
             logPanel.ColumnCount = 1;
             logPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             logPanel.Controls.Add(logLabel, 0, 0);
-            logPanel.Controls.Add(logTextBox, 0, 1);
+            logPanel.Controls.Add(loggerScintilla, 0, 1);
             logPanel.Dock = DockStyle.Fill;
             logPanel.Location = new Point(0, 0);
             logPanel.Margin = new Padding(3, 4, 3, 4);
@@ -171,19 +171,6 @@ namespace TiaUtilities.JSScript
             logLabel.TabIndex = 0;
             logLabel.Text = "Log";
             logLabel.TextAlign = ContentAlignment.MiddleCenter;
-            // 
-            // logTextBox
-            // 
-            logTextBox.BackColor = SystemColors.Control;
-            logTextBox.BorderStyle = BorderStyle.FixedSingle;
-            logTextBox.Dock = DockStyle.Fill;
-            logTextBox.Location = new Point(3, 29);
-            logTextBox.Margin = new Padding(3, 4, 3, 4);
-            logTextBox.Multiline = true;
-            logTextBox.Name = "logTextBox";
-            logTextBox.ScrollBars = ScrollBars.Both;
-            logTextBox.Size = new Size(508, 61);
-            logTextBox.TabIndex = 4;
             // 
             // jsonContextPanel
             // 
@@ -390,6 +377,17 @@ namespace TiaUtilities.JSScript
             toolStrip1.TabIndex = 3;
             toolStrip1.Text = "toolStrip1";
             // 
+            // loggerScintilla
+            // 
+            loggerScintilla.AutocompleteListSelectedBackColor = Color.FromArgb(0, 120, 212);
+            loggerScintilla.Dock = DockStyle.Fill;
+            loggerScintilla.LexerName = null;
+            loggerScintilla.Location = new Point(3, 28);
+            loggerScintilla.Name = "loggerScintilla";
+            loggerScintilla.ScrollWidth = 57;
+            loggerScintilla.Size = new Size(508, 63);
+            loggerScintilla.TabIndex = 1;
+            // 
             // GridScriptForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
@@ -440,7 +438,6 @@ namespace TiaUtilities.JSScript
         private SplitContainer infoSplitContainer;
         private TableLayoutPanel logPanel;
         private Label logLabel;
-        private TextBox logTextBox;
         private TableLayoutPanel jsonContextPanel;
         private Label jsonContextLabel;
         private EditableTabControl scriptTabControl;
@@ -450,5 +447,6 @@ namespace TiaUtilities.JSScript
         private SplitContainer scriptSplitContainer;
         private SplitContainer centralSplitContainer;
         private ScintillaNET.Scintilla jsonContextScintilla;
+        private ScintillaNET.Scintilla loggerScintilla;
     }
 }

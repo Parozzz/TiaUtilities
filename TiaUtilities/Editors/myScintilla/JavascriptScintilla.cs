@@ -95,7 +95,7 @@ namespace TiaUtilities.Editors.myScintilla
         public Scintilla Scintilla { get; init; }
 
         /** Add suggestion for the popup divided by an empty space. */
-        public string Suggestions { get => this.autoCList.Suggestions; set => this.autoCList.Suggestions = value; }
+        public IEnumerable<string> Suggestions { get => this.autoCList.Suggestions; set => this.autoCList.Suggestions = value; }
 
         public ScintillaTooltip.Error? CurrentError
         {

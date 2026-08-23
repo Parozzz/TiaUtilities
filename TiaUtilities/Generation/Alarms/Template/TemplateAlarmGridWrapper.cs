@@ -199,7 +199,7 @@ namespace TiaUtilities.Generation.Alarms.Template
 
         public Control GetGridControl() => this.gridHandler.GetControl();
 
-        public void AddScriptVariable(GridScriptVariable scriptVariable)
+        public void AddScriptVariable(JSScriptVariable scriptVariable)
         {
             gridHandler.ScriptVariableList.Add(scriptVariable);
         }

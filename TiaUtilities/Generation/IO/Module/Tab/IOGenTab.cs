@@ -153,8 +153,8 @@ namespace TiaUtilities.Generation.IO.Module.Tab
             #endregion
 
             #region GRID_SCRIPT_CUSTOM_VARIABLES
-            this.GridHandler.ScriptVariableList.Add(GridScriptVariable.ReadOnlyValue("tabName", () => this.TabPage.Text));
-            this.GridHandler.ScriptVariableList.Add(GridScriptVariable.ReadOnlyValue("suggestions", () => this.module.GetSuggestions(false).ToArray()));
+            this.GridHandler.ScriptVariableList.Add(JSScriptVariable.ReadOnlyValue("tabName", () => this.TabPage.Text));
+            this.GridHandler.ScriptVariableList.Add(JSScriptVariable.ReadOnlyValue("suggestions", () => this.module.GetSuggestions(false).ToArray()));
             #endregion
 
             #region DIRTY

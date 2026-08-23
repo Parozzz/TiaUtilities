@@ -2,7 +2,7 @@
 
 namespace TiaUtilities.JSScript
 {
-    public class GridScriptSave
+    public class JSScriptSave
     {
         [JsonProperty] public List<ScriptInfo> Scripts { get; set; } = [];
     }

@@ -83,9 +83,6 @@ namespace TiaUtilities.Editors.myScintilla
 
         public Scintilla Scintilla { get; init; }
 
-        /** Add suggestion for the popup divided by an empty space. */
-        public string Suggestions { get => this.autoCList.Suggestions; set => this.autoCList.Suggestions = value; }
-
         public ScintillaTooltip.Error? CurrentError
         {
             get => this.tooltip.CurrentError;
@@ -94,7 +91,6 @@ namespace TiaUtilities.Editors.myScintilla
 
         private readonly ScintillaHighlighter highlighter;
         private readonly ScintillaTooltip tooltip;
-        private readonly ScintillaAutoCList autoCList;
         private readonly ScintillaBrackets brackets;
 
         public JsonScintilla(Scintilla? scintilla = null)
@@ -103,7 +99,6 @@ namespace TiaUtilities.Editors.myScintilla
 
             this.highlighter = new(this.Scintilla);
             this.tooltip = new(this.Scintilla);
-            this.autoCList = new(this.Scintilla);
             this.brackets = new(this.Scintilla);
         }
 
@@ -164,7 +159,6 @@ namespace TiaUtilities.Editors.myScintilla
                     return;
                 }
                 
-                //this.autoCList.EventCharAdded_Show();
                 //this.tooltip.EventCharAdded_ShowOnBracket(args.Char);
                 
                 var ignoredClosingifExistsDone = this.brackets.EventCharAdded_IgnoreClosingIfExists(args.Char, ScintillaUtils.IsJSBrace);

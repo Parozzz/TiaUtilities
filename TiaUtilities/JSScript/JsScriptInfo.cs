@@ -4,7 +4,6 @@ namespace TiaUtilities.JSScript
 {
     public class ScriptInfo() : ICleanable
     {
-        private string _name = "JS_SCRIPT";
         [JsonProperty] public string Name
         {
             get => _name;
@@ -14,8 +13,8 @@ namespace TiaUtilities.JSScript
                 this.dirty = true;
             }
         }
+        private string _name = "JS_SCRIPT";
 
-        private string _text = string.Empty;
         [JsonProperty] public string Text
         {
             get => _text;
@@ -25,6 +24,7 @@ namespace TiaUtilities.JSScript
                 this.dirty = true;
             }
         }
+        private string _text = string.Empty;
 
         private bool dirty;
 

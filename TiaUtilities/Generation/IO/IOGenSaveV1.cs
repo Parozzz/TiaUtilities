@@ -14,7 +14,7 @@ namespace TiaUtilities.Generation.IO
         [JsonProperty] public IOMainConfiguration MainConfig { get; set; } = new();
         [JsonProperty] public IOExcelImportConfiguration ExcelImportConfiguration { get; set; } = new();
 
-        [JsonProperty] public GridScriptSave ScriptSave { get; set; } = new();
+        [JsonProperty] public JSScriptSave ScriptSave { get; set; } = new();
 
         [JsonProperty] public GridSave<IOSuggestionData> SuggestionGrid { get; set; } = new();
         [JsonProperty] public List<IOGenTabSave> TabSaves { get; set; } = [];

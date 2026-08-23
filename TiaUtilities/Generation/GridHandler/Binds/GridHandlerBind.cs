@@ -86,8 +86,8 @@ namespace TiaUtilities.Generation.GridHandler.Binds
         public required Action<GridDataColumn, int, string> SetColumnData { get; init; }
         public required Func<GridDataColumn, int, string?> GetColumnStringData { get; init; }
 
-        public IReadOnlyList<GridScriptVariable> ScriptVariables { get => this.GetScriptVariables(); }
-        public required Func<IReadOnlyList<GridScriptVariable>> GetScriptVariables { private get; init; }
+        public IReadOnlyList<JSScriptVariable> ScriptVariables { get => this.GetScriptVariables(); }
+        public required Func<IReadOnlyList<JSScriptVariable>> GetScriptVariables { private get; init; }
 
         public required Predicate<int> IsGridDataEmpty { get; init; }
         public required Predicate<object?> IsSameGridHandler { get; init; }

@@ -22,7 +22,7 @@ namespace TiaUtilities.Generation.GridHandler
         public GridColumnHandler Columns { get; init; }
         public GridDataSource<T> DataSource { get; init; }
         public GridDataChangedHandler DataChangedHandler { get; init; }
-        public List<GridScriptVariable> ScriptVariableList { get; init; }
+        public List<JSScriptVariable> ScriptVariableList { get; init; }
         public GridSelectionBorder SelectionBorder { get; init; }
 
 
@@ -561,14 +561,13 @@ namespace TiaUtilities.Generation.GridHandler
             };
             #endregion
 
-            #region EVENTS(MouseClick/CellMouseClick) Javascripts - Add context menu to top left cell
+            #region EVENTS(CellMouseClick) Javascripts - Add context menu to top left cell
             foreach (var column in this.DataSource.DataColumns)
             {
-                var scriptVariable = GridScriptVariable.CreateFromGrid(column, this);
+                var scriptVariable = JSScriptVariable.CreateFromGrid(column, this);
                 this.ScriptVariableList.Add(scriptVariable);
             }
 
-            this.DataGridView.MouseClick += (sender, args) => this.gridBindFactory.ChangeBind(this);
             this.DataGridView.CellMouseClick += (sender, args) =>
             {
                 if (args.RowIndex == -1 && args.ColumnIndex == -1 && args.Button == MouseButtons.Right)
@@ -581,6 +580,10 @@ namespace TiaUtilities.Generation.GridHandler
                     contextMenu.Show(this.DataGridView, this.DataGridView.PointToClient(Cursor.Position));
                 }
             };
+            #endregion
+
+            #region EVENTS(MouseClick) Change GridBind
+            this.DataGridView.MouseClick += (sender, args) => this.gridBindFactory.ChangeBind(this);
             #endregion
 
             #region EVENTS(ColumnHeaderMouseClick) - SortHandler
