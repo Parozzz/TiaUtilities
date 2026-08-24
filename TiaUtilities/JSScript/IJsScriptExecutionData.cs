@@ -15,7 +15,9 @@ namespace TiaUtilities.JSScript
 
             public readonly Dictionary<string, string> SimpleProperties = []; //key, value type
 
-            public readonly Dictionary<string, DataDescriptor> ObjectProperties = [];
+            public readonly List<DataDescriptor> ComplexProperties = [];
+
+            public DataDescriptor AddComplex(string name) => new() { Name = name };
         }
 
 
@@ -23,6 +25,6 @@ namespace TiaUtilities.JSScript
 
         public DataDescriptor Descriptor { get; init; }
 
-        public void Done();
+        public void Done(Object? result);
     }
 }

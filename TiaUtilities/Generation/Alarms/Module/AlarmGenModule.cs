@@ -1,19 +1,17 @@
-﻿using ClosedXML.Excel;
-using InfoBox;
+﻿using InfoBox;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using SimaticML.API;
 using SimaticML.Blocks;
 using System.Diagnostics;
 using System.Globalization;
 using TiaUtilities.Configuration;
-using TiaUtilities.Editors.ErrorReporting;
 using TiaUtilities.Generation.Alarms.Configurations;
 using TiaUtilities.Generation.Alarms.Data;
 using TiaUtilities.Generation.Alarms.Module.Tab;
 using TiaUtilities.Generation.Alarms.Module.Template;
 using TiaUtilities.Generation.Alarms.Template;
 using TiaUtilities.Generation.Alarms.Xml;
-using TiaUtilities.Generation.GridHandler.Binds;
+using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Generation.TextsEditor;
@@ -31,8 +29,8 @@ namespace TiaUtilities.Generation.Alarms.Module
         public const int DEVICE_GRID_ROW_COUNT = 199;
         public const int TEMPLATE_GRID_ROW_COUNT = 499;
 
-        private readonly GridBindContainer gridBindContainer;
-        private JSScriptHandler GridScriptHandler { get => this.gridBindContainer.GridScriptHandler; }
+        private readonly MultiGridOperationHandler multiGrid;
+        private JSScriptHandler JsScriptHandler { get => this.multiGrid.JsScriptHandler; }
 
         private readonly AlarmGenControl control;
         private readonly AlarmMainConfiguration mainConfig;
@@ -48,7 +46,7 @@ namespace TiaUtilities.Generation.Alarms.Module
 
         public AlarmGenModule()
         {
-            this.gridBindContainer = new();
+            this.multiGrid = new();
 
             this.control = new();
             this.mainConfig = new();
@@ -69,7 +67,7 @@ namespace TiaUtilities.Generation.Alarms.Module
                 var currentTabConfig = GetCurrentTabConfiguration();
                 if (currentTabConfig != null)
                 {
-                    shownTemplateForm = new AlarmGenTemplateForm(mainConfig, currentTabConfig, this.gridBindContainer, templateHandler);
+                    shownTemplateForm = new AlarmGenTemplateForm(mainConfig, currentTabConfig, this.multiGrid, templateHandler);
                     shownTemplateForm.Init();
                     shownTemplateForm.Show(this.control);
                     shownTemplateForm.FormClosed += (sender, args) =>
@@ -146,7 +144,7 @@ namespace TiaUtilities.Generation.Alarms.Module
             form.importExportMenuItem.DropDownItems.Add(importTemplatesFromFb);
             #endregion
 
-            this.gridBindContainer.Init(form);
+            this.multiGrid.Init(form);
 
             #region TEMPLATE_HANDLER
             this.templateHandler.Init([]);
@@ -225,7 +223,7 @@ namespace TiaUtilities.Generation.Alarms.Module
 
         private void TabCreation(TabPage tabPage, AlarmGenTabSave? save = null)
         {
-            AlarmGenTab alarmTab = new(this.gridBindContainer, this, this.mainConfig, this.templateHandler, tabPage);
+            AlarmGenTab alarmTab = new(this.multiGrid, this, this.mainConfig, this.templateHandler, tabPage);
             alarmTab.Init();
 
             if (save == null)
@@ -252,7 +250,7 @@ namespace TiaUtilities.Generation.Alarms.Module
             this.control.tabControl.TabPages.Clear();
         }
 
-        public bool IsDirty() => this.mainConfig.IsDirty() || this.alarmTabList.Any(x => x.IsDirty()) || this.GridScriptHandler.IsDirty() || this.templateHandler.IsDirty();
+        public bool IsDirty() => this.mainConfig.IsDirty() || this.alarmTabList.Any(x => x.IsDirty()) || this.JsScriptHandler.IsDirty() || this.templateHandler.IsDirty();
         public void Wash()
         {
             this.mainConfig.Wash();
@@ -260,7 +258,7 @@ namespace TiaUtilities.Generation.Alarms.Module
             {
                 tab.Wash();
             }
-            this.GridScriptHandler.Wash();
+            this.JsScriptHandler.Wash();
             this.templateHandler.IsDirty();
         }
 
@@ -268,7 +266,7 @@ namespace TiaUtilities.Generation.Alarms.Module
         {
             var projectSave = new AlarmGenSaveV1()
             {
-                ScriptSave = this.GridScriptHandler.CreateSave(),
+                ScriptSave = this.JsScriptHandler.CreateSave(),
                 TemplateSaves = this.templateHandler.CreateSave()
             };
 
@@ -292,7 +290,7 @@ namespace TiaUtilities.Generation.Alarms.Module
 
             this.Clear();
 
-            this.GridScriptHandler.LoadSave(loadedSave.ScriptSave);
+            this.JsScriptHandler.LoadSave(loadedSave.ScriptSave);
             this.templateHandler.LoadSave(loadedSave.TemplateSaves);
             GenUtils.CopyJsonFieldsAndProperties(loadedSave.AlarmMainConfig, mainConfig);
 

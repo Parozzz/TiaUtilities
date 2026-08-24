@@ -1,5 +1,4 @@
-﻿using TiaUtilities.Generation.GridHandler.Binds;
-using TiaUtilities.Generation.GridHandler.Data;
+﻿using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.Alarms.Configurations;
@@ -12,7 +11,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
 {
     public class AlarmGenTab : ICleanable, ISaveable<AlarmGenTabSave>
     {
-        private readonly GridBindContainer gridBindContainer;
+        private readonly MultiGridOperationHandler multiGrid;
         private readonly AlarmGenModule module;
         private readonly AlarmMainConfiguration mainConfig;
         private readonly AlarmGenTemplateHandler templateHandler;
@@ -28,10 +27,10 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
 
         private bool dirty = false;
 
-        public AlarmGenTab(GridBindContainer bindContainer, AlarmGenModule module, AlarmMainConfiguration mainConfig, AlarmGenTemplateHandler templateHandler, TabPage tabPage)
+        public AlarmGenTab(MultiGridOperationHandler multiGrid, AlarmGenModule module, AlarmMainConfiguration mainConfig, AlarmGenTemplateHandler templateHandler, TabPage tabPage)
         {
             this.module = module;
-            this.gridBindContainer = bindContainer;
+            this.multiGrid = multiGrid;
             this.mainConfig = mainConfig;
             this.templateHandler = templateHandler;
             this.TabPage = tabPage;
@@ -41,7 +40,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             
             AlarmGenPlaceholdersHandler placeholdersHandler = new(mainConfig, this.TabConfig);
             this.deviceDataPreview = new();
-            this.deviceGridHandler = new(MainForm.Settings.GridSettings, this.gridBindContainer, this.deviceDataPreview, placeholdersHandler) { InitializeRowCount = AlarmGenModule.DEVICE_GRID_ROW_COUNT };
+            this.deviceGridHandler = new(MainForm.Settings.GridSettings, this.multiGrid, this.deviceDataPreview, placeholdersHandler) { InitializeRowCount = AlarmGenModule.DEVICE_GRID_ROW_COUNT };
         }
 
         public void Init()
@@ -71,7 +70,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
 
         public void Selected()
         {
-            this.gridBindContainer.ChangeBind(this.deviceGridHandler);
+            this.multiGrid.SetActiveGrid(this.deviceGridHandler);
         }
 
         private void Translate()
@@ -125,7 +124,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
                 }
             }
 
-            this.deviceGridHandler.Refresh();
+            this.deviceGridHandler.ViewManipulator.Refresh();
         }
 
         public Control GetGridControl() => this.deviceGridHandler.GetControl();

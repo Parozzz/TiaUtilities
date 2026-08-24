@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 using TiaUtilities.Generation.Configuration.Utility;
-using TiaUtilities.Editors;
+using TiaUtilities.Editors.Javascript;
 
 namespace TiaUtilities.Generation.Configuration.Lines
 {

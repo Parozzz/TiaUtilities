@@ -1,4 +1,4 @@
-﻿using TiaUtilities.Editors;
+﻿using TiaUtilities.Editors.Json;
 using TiaUtilities.SettingsNew.FormHelpers;
 
 namespace TiaUtilities.SettingsNew.Editors

@@ -25,7 +25,11 @@ namespace TiaUtilities.Generation.GridHandler
         {
             this.GridHandler = handler;
 
-            this.JsScriptHandler.SetExecutionData()
+            if(this.GridHandler != null)
+            {
+                GridScriptExecutionData executionData = new(this.GridHandler);
+                this.JsScriptHandler.SetExecutionData(executionData);
+            }
         }
 
         public void ShowFindForm(IGridHandler? handler)

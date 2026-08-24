@@ -343,20 +343,11 @@ for row validation</value>
   <data name="GRID_SETTINGS_BORDERS_SELECTED_CELL_COLOR" xml:space="preserve">
     <value>Selection</value>
   </data>
-  <data name="GRID_SCRIPT_JS_EXPRESSION" xml:space="preserve">
-    <value>Javascript Expression</value>
-  </data>
   <data name="GRID_SCRIPT_JSON_CONTEXT" xml:space="preserve">
     <value>JSON Context</value>
   </data>
   <data name="GRID_SCRIPT_VARIABLES" xml:space="preserve">
     <value>Variables: </value>
-  </data>
-  <data name="GRID_SCRIPT_EXECUTE_ONE_LINE" xml:space="preserve">
-    <value>Execute on selected line</value>
-  </data>
-  <data name="GRID_SCRIPT_EXECUTE_ALL" xml:space="preserve">
-    <value>Execute on all lines</value>
   </data>
   <data name="GRID_SCRIPT_AUTO_FORMAT" xml:space="preserve">
     <value>Format Code</value>
@@ -869,5 +860,8 @@ Use $ followed by Excel column name for extracting values from imported spreadsh
   </data>
   <data name="ALARM_SETTINGS_PREFIXES_TIMER" xml:space="preserve">
     <value>Timer</value>
+  </data>
+  <data name="GRID_SCRIPT_TOOLS_RUN" xml:space="preserve">
+    <value>Run selected script</value>
   </data>
 </root>

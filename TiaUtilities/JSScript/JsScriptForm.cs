@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Bibliography;
-using TiaUtilities.Editors;
+using TiaUtilities.Editors.Javascript;
+using TiaUtilities.Editors.Json;
 using TiaUtilities.Editors.myScintilla;
 using TiaUtilities.Languages;
 using TiaUtilities.Utility;
@@ -47,11 +48,13 @@ namespace TiaUtilities.JSScript
             this.logger.InitControl(borderStyle: ScintillaNET.BorderStyle.FixedSingle, backColor: SystemColors.Control);
 
             var loggerControl = this.logger.Scintilla;
+            loggerControl.ReadOnly = true;
 
             var contextMenu = loggerControl.ContextMenuStrip;
             if(contextMenu == null)
             {
                 contextMenu = new();
+                loggerControl.ContextMenuStrip = contextMenu;
             } else
             {
                 contextMenu.Items.Add(new ToolStripSeparator());
@@ -120,8 +123,10 @@ namespace TiaUtilities.JSScript
                 record.Script.Name = fixedNewName;
             };
 
-            this.executeAllButton.Click += (sender, args) => this.scriptHandler.ParseJS(this.GetCurrentTabPageRecord());
-            this.executeLineButton.Click += (sender, args) => this.scriptHandler.ParseJS(this.GetCurrentTabPageRecord(), singleExecution: true);
+            this.runButton.Click += (sender, args) => this.scriptHandler.ParseJS(this.GetCurrentTabPageRecord());
+
+            //this.executeAllButton.Click += (sender, args) => this.scriptHandler.ParseJS(this.GetCurrentTabPageRecord());
+            //this.executeLineButton.Click += (sender, args) => this.scriptHandler.ParseJS(this.GetCurrentTabPageRecord(), singleExecution: true);
 
             foreach (var script in this.scriptHandler.Scripts)
             {
@@ -148,16 +153,15 @@ namespace TiaUtilities.JSScript
 
         private void Translate()
         {
-            this.topLabel.Text = Locale.GRID_SCRIPT_JS_EXPRESSION;
-            this.logLabel.Text = $"Log > {JSScriptHandler.ENGINE_CONSOLE_CLASS} [string]";
+            this.consoleLabel.Text = JSScriptHandler.ENGINE_CONSOLE_CLASS;
             this.jsonContextLabel.Text = Locale.GRID_SCRIPT_JSON_CONTEXT;
-            this.executeAllButton.Text = Locale.GRID_SCRIPT_EXECUTE_ALL;
-            this.executeLineButton.Text = Locale.GRID_SCRIPT_EXECUTE_ONE_LINE;
+
+            new ToolTip().SetToolTip(this.runButton, Locale.GRID_SCRIPT_TOOLS_RUN);
         }
 
         private void UpdateVariables()
         {
-            if(_dataDescriptor == null || (_dataDescriptor.SimpleProperties.Count == 0 && _dataDescriptor.ObjectProperties.Count == 0))
+            if(_dataDescriptor == null || (_dataDescriptor.SimpleProperties.Count == 0 && _dataDescriptor.ComplexProperties.Count == 0))
             {
                 return;
             }
@@ -165,13 +169,15 @@ namespace TiaUtilities.JSScript
             this.variablesTreeView.SuspendLayout();
             this.variablesTreeView.Nodes.Clear();
 
+            JSScriptForm.AddDescriptorToTree(this.variablesTreeView.Nodes, _dataDescriptor);
+            /*
             var dataName = _dataDescriptor.Name;
 
             var dataNode = this.variablesTreeView.Nodes.Add(dataName);
             foreach (var (pName, pType) in _dataDescriptor.SimpleProperties)
             {
                 var node = dataNode.Nodes.Add($"{pName} [{pType}]");
-            }
+            }*/
 
             this.scriptTabControl.TabPages.Cast<TabPage>()
                 .Where(t => t.Tag is TabPageScriptRecord)
@@ -180,7 +186,42 @@ namespace TiaUtilities.JSScript
                 .Select(r => r.Editor)
                 .ForEach(this.UpdateEditorSuggestion);
 
+            this.variablesTreeView.ExpandAll();
             this.variablesTreeView.ResumeLayout();
+        }
+
+        private static void AddDescriptorToTree(TreeNodeCollection parentNodes, DataDescriptor dataDescriptor)
+        {
+            var dataName = dataDescriptor.Name;
+
+            var dataNode = parentNodes.Add(dataName);
+            foreach (var (pName, pType) in dataDescriptor.SimpleProperties)
+            {
+                dataNode.Nodes.Add($"{pName} [{pType}]");
+            }
+
+            foreach (var subDescriptor in dataDescriptor.ComplexProperties)
+            {
+                JSScriptForm.AddDescriptorToTree(dataNode.Nodes, subDescriptor);
+            }
+        }
+
+        private static IEnumerable<string> CreateDescriptorSuggestions(string parentName, DataDescriptor dataDescriptor)
+        {
+            var enumerable = dataDescriptor.SimpleProperties.Select(p => $"{parentName}.{dataDescriptor.Name}.{p.Key}");
+
+            var childEnumerable = dataDescriptor.ComplexProperties.SelectMany(d => CreateDescriptorSuggestions(dataDescriptor.Name, d));
+            return enumerable.Concat(childEnumerable);
+        }
+
+        private void UpdateEditorSuggestion(JavascriptEditor editor)
+        {
+            if (_dataDescriptor == null || (_dataDescriptor.SimpleProperties.Count == 0 && _dataDescriptor.ComplexProperties.Count == 0))
+            {
+                return;
+            }
+
+            editor.Suggestions = CreateDescriptorSuggestions("", _dataDescriptor).ToList(); // _dataDescriptor.SimpleProperties.Select(p => $"{_dataDescriptor.Name}.{p.Key}");
         }
 
         private void AddJavascriptControl(TabPage tabPage, ScriptInfo scriptInfo)
@@ -195,16 +236,6 @@ namespace TiaUtilities.JSScript
 
             tabPage.Text = scriptInfo.Name;
             tabPage.Tag = new TabPageScriptRecord(scriptInfo, jsEditor);
-        }
-
-        private void UpdateEditorSuggestion(JavascriptEditor editor)
-        {
-            if (_dataDescriptor == null || (_dataDescriptor.SimpleProperties.Count == 0 && _dataDescriptor.ObjectProperties.Count == 0))
-            {
-                return;
-            }
-
-            editor.Suggestions = _dataDescriptor.SimpleProperties.Select(p => $"{_dataDescriptor.Name}.{p.Key}");
         }
 
         public void ClearLog()

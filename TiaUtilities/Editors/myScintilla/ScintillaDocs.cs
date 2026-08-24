@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Text.Json;
+using TiaUtilities.Editors.Javascript;
 
 namespace TiaUtilities.Editors.myScintilla
 {

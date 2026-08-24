@@ -1,10 +1,8 @@
-﻿using Newtonsoft.Json;
-using TiaUtilities.Generation.Alarms.Configurations;
+﻿using TiaUtilities.Generation.Alarms.Configurations;
 using TiaUtilities.Generation.Alarms.Data;
 using TiaUtilities.Generation.Alarms.Module;
 using TiaUtilities.Generation.Alarms.Module.Template;
 using TiaUtilities.Generation.GridHandler;
-using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.JSScript;
@@ -21,10 +19,10 @@ namespace TiaUtilities.Generation.Alarms.Template
 
         public List<TemplateData> TemplateDataList { get => new(gridHandler.DataSource.GetNotEmptyClonedDataDict().Keys); } //Return CLONED data, otherwise operations on the xml generation will affect the table!
 
-        public TemplateAlarmGridWrapper(GenPlaceholderHandler placeholderHandler, GridBindContainer bindContainer)
+        public TemplateAlarmGridWrapper(GenPlaceholderHandler placeholderHandler, MultiGridOperationHandler multiGrid)
         {
             this.previewer = new();
-            this.gridHandler = new(MainForm.Settings.GridSettings, bindContainer, previewer, placeholderHandler) { InitializeRowCount = AlarmGenModule.TEMPLATE_GRID_ROW_COUNT };
+            this.gridHandler = new(MainForm.Settings.GridSettings, multiGrid, previewer, placeholderHandler) { InitializeRowCount = AlarmGenModule.TEMPLATE_GRID_ROW_COUNT };
         }
 
         public void Init(AlarmMainConfiguration mainConfig, AlarmTabConfiguration tabConfig, Func<AlarmTemplateConfiguration> getTemplateConfig)
@@ -171,11 +169,11 @@ namespace TiaUtilities.Generation.Alarms.Template
                             gridHandler.DataSource[changedCellData.RowIndex].Enable = false;
                         }
 
-                        this.gridHandler.RefreshRow(changedCellData.RowIndex);
+                        this.gridHandler.ViewManipulator.RefreshRow(changedCellData.RowIndex);
                     }
                     else if (changedCellData.Column == TemplateData.DESCRIPTION)
                     {
-                        this.gridHandler.RefreshRow(changedCellData.RowIndex);
+                        this.gridHandler.ViewManipulator.RefreshRow(changedCellData.RowIndex);
                     }
                 }
             };
@@ -194,7 +192,7 @@ namespace TiaUtilities.Generation.Alarms.Template
 
         public void Refresh()
         {
-            this.gridHandler.Refresh();
+            this.gridHandler.ViewManipulator.Refresh();
         }
 
         public Control GetGridControl() => this.gridHandler.GetControl();

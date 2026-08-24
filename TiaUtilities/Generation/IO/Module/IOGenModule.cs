@@ -4,9 +4,7 @@ using SimaticML.API;
 using SimaticML.Blocks;
 using SimaticML.TagTable;
 using TiaUtilities.Configuration;
-using TiaUtilities.Editors.ErrorReporting;
 using TiaUtilities.Generation.GridHandler;
-using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.IO.Configurations;
 using TiaUtilities.Generation.IO.Data;
@@ -59,7 +57,7 @@ namespace TiaUtilities.Generation.IO.Module
     {
         private record GenTabRowRecord(IOGenTab GenTab, IOData IOData, int Row);
 
-        private readonly GridBindContainer gridBindContainer;
+        private readonly MultiGridOperationHandler multiGrid;
 
         private readonly IOMainConfiguration mainConfig;
         private readonly IOExcelImportConfiguration excelImportConfig;
@@ -76,7 +74,7 @@ namespace TiaUtilities.Generation.IO.Module
 
         public IOGenModule()
         {
-            this.gridBindContainer = new();
+            this.multiGrid = new();
 
             this.mainConfig = new();
             GenUtils.CopyJsonFieldsAndProperties(MainForm.Settings.PresetIOMainConfiguration, this.mainConfig);
@@ -85,7 +83,7 @@ namespace TiaUtilities.Generation.IO.Module
             GenUtils.CopyJsonFieldsAndProperties(MainForm.Settings.PresetIOExcelImportConfiguration, this.excelImportConfig);
 
             this.suggestionPreviewer = new();
-            this.suggestionGridHandler = new(MainForm.Settings.GridSettings, this.gridBindContainer, suggestionPreviewer, new(), new IOSuggesttionRowComparare()) { InitializeRowCount = 9999 };
+            this.suggestionGridHandler = new(MainForm.Settings.GridSettings, this.multiGrid, suggestionPreviewer, new(), new IOSuggesttionRowComparare()) { InitializeRowCount = 9999 };
 
             this.control = new(suggestionGridHandler.GetControl());
 
@@ -104,7 +102,7 @@ namespace TiaUtilities.Generation.IO.Module
             ToolStripMenuItem importExcelMenuItem = new(Locale.IO_GEN_FORM_IMPEXP_IMPORT_EXCEL);
             importExcelMenuItem.Click += (sender, args) =>
             {
-                IOGenerationExcelImportForm excelImportForm = new(MainForm.Settings.GridSettings, this.gridBindContainer, this.excelImportConfig);
+                IOGenerationExcelImportForm excelImportForm = new(MainForm.Settings.GridSettings, this.multiGrid, this.excelImportConfig);
 
                 var dialogResult = excelImportForm.ShowDialog();
                 if (dialogResult == DialogResult.OK)
@@ -283,7 +281,7 @@ namespace TiaUtilities.Generation.IO.Module
             suggestionGridHandler.Columns.AddTextBox(IOSuggestionData.VALUE, 0);
             #endregion
 
-            this.gridBindContainer.Init(form);
+            this.multiGrid.Init(form);
             this.suggestionGridHandler.Init();
 
             #region SUGGESTIONS GRID - EVENTS - TOOL TIP / CELL CHANGE
@@ -376,7 +374,7 @@ namespace TiaUtilities.Generation.IO.Module
 
             form.Shown += (sender, args) =>
             {
-                this.suggestionGridHandler.AutoResizeColumnHeadersHeight();
+                this.suggestionGridHandler.ViewManipulator.AutoResizeColumnHeadersHeight();
                 if (this.control.tabControl.TabCount == 0)
                 { //Check required because Load could be called before form is shown!
                     this.control.tabControl.AddTabs();
@@ -390,7 +388,7 @@ namespace TiaUtilities.Generation.IO.Module
 
         private void TabCreation(TabPage tabPage, IOGenTabSave? save = null)
         {
-            IOGenTab ioGenTab = new(MainForm.Settings.GridSettings, this.gridBindContainer, this, tabPage, this.mainConfig);
+            IOGenTab ioGenTab = new(MainForm.Settings.GridSettings, this.multiGrid, this, tabPage, this.mainConfig);
             ioGenTab.Init();
             
             if (save == null)
@@ -417,7 +415,7 @@ namespace TiaUtilities.Generation.IO.Module
             this.control.tabControl.TabPages.Clear();
         }
 
-        public bool IsDirty() => mainConfig.IsDirty() || suggestionGridHandler.IsDirty() || ioTabList.Any(x => x.IsDirty()) || this.gridBindContainer.IsDirty();
+        public bool IsDirty() => mainConfig.IsDirty() || suggestionGridHandler.IsDirty() || ioTabList.Any(x => x.IsDirty()) || this.multiGrid.IsDirty();
         public void Wash()
         {
             this.mainConfig.Wash();
@@ -426,7 +424,7 @@ namespace TiaUtilities.Generation.IO.Module
             {
                 tab.Wash();
             }
-            this.gridBindContainer.Wash();
+            this.multiGrid.Wash();
         }
 
         public Control? GetControl()
@@ -465,7 +463,7 @@ namespace TiaUtilities.Generation.IO.Module
             IOGenSaveV1 save = new()
             {
                 SuggestionGrid = this.suggestionGridHandler.CreateSave(),
-                ScriptSave = this.gridBindContainer.GridScriptHandler.CreateSave()
+                ScriptSave = this.multiGrid.JsScriptHandler.CreateSave()
             };
 
             GenUtils.CopyJsonFieldsAndProperties(mainConfig, save.MainConfig);
@@ -489,7 +487,7 @@ namespace TiaUtilities.Generation.IO.Module
 
             this.Clear();
 
-            this.gridBindContainer.GridScriptHandler.LoadSave(loadedSave.ScriptSave);
+            this.multiGrid.JsScriptHandler.LoadSave(loadedSave.ScriptSave);
             this.suggestionGridHandler.LoadSave(loadedSave.SuggestionGrid);
 
             GenUtils.CopyJsonFieldsAndProperties(loadedSave.MainConfig, mainConfig);
@@ -545,11 +543,11 @@ namespace TiaUtilities.Generation.IO.Module
 
         public void UpdateSuggestionColors()
         {
-            suggestionGridHandler.SuspendLayout();
+            this.suggestionGridHandler.ViewManipulator.SuspendLayout();
 
-            foreach (var rowIndex in suggestionGridHandler.DataSource.GetNotEmptyIndexes())
+            foreach (var rowIndex in this.suggestionGridHandler.DataSource.GetNotEmptyIndexes())
             {
-                var cell = suggestionGridHandler.GetCell(rowIndex, IOSuggestionData.VALUE);
+                var cell = this.suggestionGridHandler.ViewManipulator.GetCell(rowIndex, IOSuggestionData.VALUE);
                 if(cell != null)
                 {
                     cell.Style.BackColor = SystemColors.ControlLightLight;
@@ -568,7 +566,7 @@ namespace TiaUtilities.Generation.IO.Module
                 }
             }
 
-            var suggestionDict = suggestionGridHandler.DataSource.GetNotEmptyDataDict();
+            var suggestionDict = this.suggestionGridHandler.DataSource.GetNotEmptyDataDict();
             foreach (var suggestionEntry in suggestionDict)
             {
                 var suggestion = suggestionEntry.Key;
@@ -577,7 +575,7 @@ namespace TiaUtilities.Generation.IO.Module
                 var foundData = rows.Where(d => d.IOData.Variable == suggestion.Value);
                 if (foundData.Any())
                 {
-                    var cell = suggestionGridHandler.GetCell(row, IOSuggestionData.VALUE);
+                    var cell = this.suggestionGridHandler.ViewManipulator.GetCell(row, IOSuggestionData.VALUE);
                     if(cell != null)
                     {
                         cell.Style.BackColor = cell.Style.SelectionBackColor = Color.LightGreen;
@@ -585,7 +583,7 @@ namespace TiaUtilities.Generation.IO.Module
                 }
             }
 
-            suggestionGridHandler.ResumeLayout(refresh: true);
+            this.suggestionGridHandler.ViewManipulator.ResumeLayout(refresh: true);
         }
 
         private void AddConfigurationBindings(SettingsBindings settingsBindings)

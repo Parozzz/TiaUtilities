@@ -1,8 +1,8 @@
-﻿using TiaUtilities.Generation.GridHandler.Binds;
-using TiaUtilities.Generation.Placeholders;
+﻿using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Languages;
 using TiaUtilities.Generation.Alarms.Configurations;
 using TiaUtilities.Generation.Alarms.Template;
+using TiaUtilities.Generation.GridHandler;
 
 namespace TiaUtilities.Generation.Alarms.Module.Template
 {
@@ -16,13 +16,13 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
         private AlarmGenTemplate? SelectedTemplate { get => this.templateHandler.SelectedTemplate; set => this.templateHandler.SelectedTemplate = value; }
 
         public AlarmGenTemplateForm(AlarmMainConfiguration mainConfig, AlarmTabConfiguration tabConfig,
-            GridBindContainer bindContainer, AlarmGenTemplateHandler templateHandler)
+            MultiGridOperationHandler multiGrid, AlarmGenTemplateHandler templateHandler)
         {
             this.mainConfig = mainConfig;
             this.tabConfig = tabConfig;
 
             AlarmGenPlaceholdersHandler placeholdersHandler = new(mainConfig, tabConfig);
-            this.templateDataGridWrapper = new(placeholdersHandler, bindContainer);
+            this.templateDataGridWrapper = new(placeholdersHandler, multiGrid);
 
             this.templateHandler = templateHandler;
 

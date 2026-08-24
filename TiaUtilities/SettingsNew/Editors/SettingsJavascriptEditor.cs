@@ -1,5 +1,5 @@
-﻿using TiaUtilities.Editors;
-using TiaUtilities.Editors.ErrorReporting;
+﻿using TiaUtilities.Editors.ErrorReporting;
+using TiaUtilities.Editors.Javascript;
 using TiaUtilities.SettingsNew.FormHelpers;
 
 namespace TiaUtilities.SettingsNew.Editors

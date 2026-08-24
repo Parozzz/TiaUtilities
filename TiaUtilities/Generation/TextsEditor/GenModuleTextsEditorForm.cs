@@ -1,6 +1,4 @@
-﻿using TiaUtilities.Editors.ErrorReporting;
-using TiaUtilities.Generation.GridHandler;
-using TiaUtilities.Generation.GridHandler.Binds;
+﻿using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.Placeholders;
 

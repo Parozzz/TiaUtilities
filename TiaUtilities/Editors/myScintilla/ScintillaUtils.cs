@@ -47,6 +47,7 @@ namespace TiaUtilities.Editors.myScintilla
             "if",
             "import",
             "in",
+            "of",
             "instanceof",
             "isNaN",
             "JSON",

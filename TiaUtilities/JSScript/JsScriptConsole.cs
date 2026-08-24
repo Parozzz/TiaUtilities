@@ -10,8 +10,6 @@ namespace TiaUtilities.JSScript
     {
         public event JsScriptConsoleLogEvent LogEvent = delegate { };
 
-        public string Test = "";
-
         public void log(string message) {
             var dateTime = DateTime.Now;
             var level = LoggerScintilla.LogLevel.INFO;

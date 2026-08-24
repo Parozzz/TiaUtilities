@@ -1,7 +1,6 @@
 ﻿using SimaticML;
 using SimaticML.Enums;
 using TiaUtilities.Generation.GridHandler;
-using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Generation.IO.Configurations;
@@ -16,7 +15,7 @@ namespace TiaUtilities.Generation.IO.Module.Tab
         private const int MERKER_ADDRESS_COLUMN_SIZE = 80;
 
         private readonly IOGenModule module;
-        private readonly GridBindContainer gridBindFactory;
+        private readonly MultiGridOperationHandler multiGrid;
         private readonly IOMainConfiguration mainConfig;
 
         public TabPage TabPage { get; init; }
@@ -29,10 +28,10 @@ namespace TiaUtilities.Generation.IO.Module.Tab
 
         private bool dirty = false;
 
-        public IOGenTab(GridSettings gridSettings, GridBindContainer gridBindFactory, IOGenModule module, TabPage tabPage, IOMainConfiguration mainConfig)
+        public IOGenTab(GridSettings gridSettings, MultiGridOperationHandler multiGrid, IOGenModule module, TabPage tabPage, IOMainConfiguration mainConfig)
         {
             this.module = module;
-            this.gridBindFactory = gridBindFactory;
+            this.multiGrid = multiGrid;
             this.mainConfig = mainConfig;
 
             this.TabPage = tabPage;
@@ -43,7 +42,7 @@ namespace TiaUtilities.Generation.IO.Module.Tab
             this.Previewer = new();
 
             IOGenPlaceholderHandler placeholdersHandler = new(this.Previewer, this.mainConfig, TabConfig);
-            this.GridHandler = new(gridSettings, gridBindFactory, this.Previewer, placeholdersHandler, new IOGenComparer()) { InitializeRowCount = 2999 };
+            this.GridHandler = new(gridSettings, multiGrid, this.Previewer, placeholdersHandler, new IOGenComparer()) { InitializeRowCount = 2999 };
         }
 
         public void Init()
@@ -164,7 +163,7 @@ namespace TiaUtilities.Generation.IO.Module.Tab
 
         public void Selected()
         {
-            this.gridBindFactory.ChangeBind(this.GridHandler);
+            this.multiGrid.SetActiveGrid(this.GridHandler);
         }
 
         public bool IsDirty() => this.dirty || this.TabConfig.IsDirty() || this.GridHandler.IsDirty();
@@ -207,11 +206,11 @@ namespace TiaUtilities.Generation.IO.Module.Tab
 
         private void UpdateDuplicatedIOValues()
         {
-            this.GridHandler.SuspendLayout();
+            this.GridHandler.ViewManipulator.SuspendLayout();
 
             for(int rowIndex = 0; rowIndex < this.GridHandler.DataSource.Count; rowIndex++)
             {
-                var addressCell = this.GridHandler.GetCell(rowIndex, IOData.ADDRESS);
+                var addressCell = this.GridHandler.ViewManipulator.GetCell(rowIndex, IOData.ADDRESS);
                 if (addressCell != null)
                 {
                     addressCell.ToolTipText = string.Empty;
@@ -219,7 +218,7 @@ namespace TiaUtilities.Generation.IO.Module.Tab
                     addressCell.Style.SelectionBackColor = Color.LightGray;
                 }
 
-                var ioNameCell = this.GridHandler.GetCell(rowIndex, IOData.IO_NAME);
+                var ioNameCell = this.GridHandler.ViewManipulator.GetCell(rowIndex, IOData.IO_NAME);
                 if (ioNameCell != null)
                 {
                     ioNameCell.ToolTipText = string.Empty;
@@ -245,7 +244,7 @@ namespace TiaUtilities.Generation.IO.Module.Tab
                 {
                     var rowIndex = entry.Value;
 
-                    var ioNameCell = this.GridHandler.GetCell(rowIndex, IOData.IO_NAME);
+                    var ioNameCell = this.GridHandler.ViewManipulator.GetCell(rowIndex, IOData.IO_NAME);
                     if(ioNameCell != null)
                     {
                         ioNameCell.ToolTipText = tooltipText;
@@ -266,7 +265,7 @@ namespace TiaUtilities.Generation.IO.Module.Tab
                 {
                     var rowIndex = entry.Value;
 
-                    var addressCell = this.GridHandler.GetCell(rowIndex, IOData.ADDRESS);
+                    var addressCell = this.GridHandler.ViewManipulator.GetCell(rowIndex, IOData.ADDRESS);
                     if(addressCell != null)
                     {
                         addressCell.ToolTipText = tooltipText;
@@ -275,7 +274,7 @@ namespace TiaUtilities.Generation.IO.Module.Tab
                 }
             }
 
-            this.GridHandler.ResumeLayout(refresh: true);
+            this.GridHandler.ViewManipulator.ResumeLayout(refresh: true);
         }
     }
 }

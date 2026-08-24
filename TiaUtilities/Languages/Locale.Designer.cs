@@ -1564,33 +1564,6 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Execute on all lines.
-        /// </summary>
-        internal static string GRID_SCRIPT_EXECUTE_ALL {
-            get {
-                return ResourceManager.GetString("GRID_SCRIPT_EXECUTE_ALL", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Execute on selected line.
-        /// </summary>
-        internal static string GRID_SCRIPT_EXECUTE_ONE_LINE {
-            get {
-                return ResourceManager.GetString("GRID_SCRIPT_EXECUTE_ONE_LINE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Javascript Expression.
-        /// </summary>
-        internal static string GRID_SCRIPT_JS_EXPRESSION {
-            get {
-                return ResourceManager.GetString("GRID_SCRIPT_JS_EXPRESSION", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Cerca una stringa localizzata simile a JSON Context.
         /// </summary>
         internal static string GRID_SCRIPT_JSON_CONTEXT {
@@ -1605,6 +1578,15 @@ namespace TiaUtilities.Languages {
         internal static string GRID_SCRIPT_OPEN_JAVASCRIPT_CONTEXT {
             get {
                 return ResourceManager.GetString("GRID_SCRIPT_OPEN_JAVASCRIPT_CONTEXT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Run selected script.
+        /// </summary>
+        internal static string GRID_SCRIPT_TOOLS_RUN {
+            get {
+                return ResourceManager.GetString("GRID_SCRIPT_TOOLS_RUN", resourceCulture);
             }
         }
         

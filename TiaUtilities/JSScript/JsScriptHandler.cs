@@ -119,9 +119,10 @@ namespace TiaUtilities.JSScript
 
                 try
                 {
+                    Object? data = null;
                     if(executionData != null)
                     {
-                        var data = executionData.RequestData();
+                        data = executionData.RequestData();
                         engine.SetValue(executionData.Descriptor.Name, data);
                     }
 
@@ -130,7 +131,7 @@ namespace TiaUtilities.JSScript
                     var eval = engine.Evaluate(preparedScript);
                     if (!eval.IsBoolean() || eval.AsBoolean())
                     {
-                        executionData?.Done();
+                        executionData?.Done(data);
                     }
 
                     timeLogger.StopAndSave();

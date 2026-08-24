@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using TiaUtilities.Generation.Configuration.Utility;
-using TiaUtilities.Editors;
 using TiaUtilities.Editors.ErrorReporting;
+using TiaUtilities.Editors.Json;
 
 namespace TiaUtilities.Generation.Configuration.Lines
 {

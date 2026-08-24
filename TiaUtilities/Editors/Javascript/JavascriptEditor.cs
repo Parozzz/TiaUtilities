@@ -1,8 +1,7 @@
 ﻿using ScintillaNET;
 using TiaUtilities.Editors.ErrorReporting;
-using TiaUtilities.Editors.myScintilla;
 
-namespace TiaUtilities.Editors
+namespace TiaUtilities.Editors.Javascript
 {
     public class JsDoc
     {
@@ -21,8 +20,8 @@ namespace TiaUtilities.Editors
 
         public string Text
         {
-            get => this.jsScintilla.Scintilla.Text;
-            set => this.jsScintilla.Scintilla.Text = value;
+            get => this.jsScintilla.Text;
+            set => this.jsScintilla.Text = value;
         }
 
         public IEnumerable<string> Suggestions

@@ -30,43 +30,44 @@ namespace TiaUtilities.JSScript
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(JSScriptForm));
             mainPanel = new TableLayoutPanel();
-            topLabel = new Label();
-            centralSplitContainer = new SplitContainer();
-            infoSplitContainer = new SplitContainer();
-            logPanel = new TableLayoutPanel();
-            logLabel = new Label();
-            jsonContextPanel = new TableLayoutPanel();
-            jsonContextLabel = new Label();
-            jsonContextScintilla = new ScintillaNET.Scintilla();
-            scriptSplitContainer = new SplitContainer();
+            toolsFlowPanel = new FlowLayoutPanel();
+            toolsLabel = new Label();
+            toolsSplitter = new Splitter();
+            runButton = new Button();
+            bottom = new SplitContainer();
+            left = new SplitContainer();
             variablesPanel = new TableLayoutPanel();
             variablesLabel = new Label();
             variablesTreeView = new TreeView();
+            right = new SplitContainer();
             scriptTabControl = new EditableTabControl();
-            buttonPanel = new TableLayoutPanel();
-            executeLineButton = new Button();
-            executeAllButton = new Button();
+            jsonContextPanel = new TableLayoutPanel();
+            jsonContextLabel = new Label();
+            jsonContextScintilla = new ScintillaNET.Scintilla();
+            logPanel = new TableLayoutPanel();
+            consoleLabel = new Label();
+            loggerScintilla = new ScintillaNET.Scintilla();
             miniToolStrip = new ToolStrip();
             toolStrip1 = new ToolStrip();
-            loggerScintilla = new ScintillaNET.Scintilla();
             mainPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)centralSplitContainer).BeginInit();
-            centralSplitContainer.Panel1.SuspendLayout();
-            centralSplitContainer.Panel2.SuspendLayout();
-            centralSplitContainer.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)infoSplitContainer).BeginInit();
-            infoSplitContainer.Panel1.SuspendLayout();
-            infoSplitContainer.Panel2.SuspendLayout();
-            infoSplitContainer.SuspendLayout();
-            logPanel.SuspendLayout();
-            jsonContextPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)scriptSplitContainer).BeginInit();
-            scriptSplitContainer.Panel1.SuspendLayout();
-            scriptSplitContainer.Panel2.SuspendLayout();
-            scriptSplitContainer.SuspendLayout();
+            toolsFlowPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)bottom).BeginInit();
+            bottom.Panel1.SuspendLayout();
+            bottom.Panel2.SuspendLayout();
+            bottom.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)left).BeginInit();
+            left.Panel1.SuspendLayout();
+            left.Panel2.SuspendLayout();
+            left.SuspendLayout();
             variablesPanel.SuspendLayout();
-            buttonPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)right).BeginInit();
+            right.Panel1.SuspendLayout();
+            right.Panel2.SuspendLayout();
+            right.SuspendLayout();
+            jsonContextPanel.SuspendLayout();
+            logPanel.SuspendLayout();
             SuspendLayout();
             // 
             // mainPanel
@@ -75,102 +76,179 @@ namespace TiaUtilities.JSScript
             mainPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             mainPanel.ColumnCount = 1;
             mainPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            mainPanel.Controls.Add(topLabel, 0, 0);
-            mainPanel.Controls.Add(centralSplitContainer, 0, 1);
-            mainPanel.Controls.Add(buttonPanel, 0, 2);
+            mainPanel.Controls.Add(toolsFlowPanel, 0, 0);
+            mainPanel.Controls.Add(bottom, 0, 1);
             mainPanel.Dock = DockStyle.Fill;
             mainPanel.Location = new Point(0, 0);
             mainPanel.Margin = new Padding(3, 4, 3, 4);
             mainPanel.Name = "mainPanel";
-            mainPanel.RowCount = 3;
-            mainPanel.RowStyles.Add(new RowStyle());
+            mainPanel.RowCount = 2;
+            mainPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
             mainPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            mainPanel.RowStyles.Add(new RowStyle());
-            mainPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 27F));
-            mainPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 27F));
-            mainPanel.Size = new Size(914, 600);
+            mainPanel.Size = new Size(1182, 753);
             mainPanel.TabIndex = 0;
             // 
-            // topLabel
+            // toolsFlowPanel
             // 
-            topLabel.AutoSize = true;
-            topLabel.Dock = DockStyle.Top;
-            topLabel.Font = new Font("Segoe UI", 14.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            topLabel.Location = new Point(3, 0);
-            topLabel.Name = "topLabel";
-            topLabel.Size = new Size(908, 32);
-            topLabel.TabIndex = 0;
-            topLabel.Text = "JS Expression";
-            topLabel.TextAlign = ContentAlignment.MiddleCenter;
+            toolsFlowPanel.AutoSize = true;
+            toolsFlowPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            toolsFlowPanel.Controls.Add(toolsLabel);
+            toolsFlowPanel.Controls.Add(toolsSplitter);
+            toolsFlowPanel.Controls.Add(runButton);
+            toolsFlowPanel.Dock = DockStyle.Fill;
+            toolsFlowPanel.Location = new Point(0, 0);
+            toolsFlowPanel.Margin = new Padding(0);
+            toolsFlowPanel.Name = "toolsFlowPanel";
+            toolsFlowPanel.Size = new Size(1182, 40);
+            toolsFlowPanel.TabIndex = 2;
             // 
-            // centralSplitContainer
+            // toolsLabel
             // 
-            centralSplitContainer.Dock = DockStyle.Fill;
-            centralSplitContainer.Location = new Point(3, 36);
-            centralSplitContainer.Margin = new Padding(3, 4, 3, 4);
-            centralSplitContainer.Name = "centralSplitContainer";
-            centralSplitContainer.Orientation = Orientation.Horizontal;
+            toolsLabel.AutoSize = true;
+            toolsLabel.Dock = DockStyle.Fill;
+            toolsLabel.Location = new Point(3, 0);
+            toolsLabel.Name = "toolsLabel";
+            toolsLabel.Size = new Size(44, 41);
+            toolsLabel.TabIndex = 1;
+            toolsLabel.Text = "Tools";
+            toolsLabel.TextAlign = ContentAlignment.MiddleCenter;
             // 
-            // centralSplitContainer.Panel1
+            // toolsSplitter
             // 
-            centralSplitContainer.Panel1.Controls.Add(infoSplitContainer);
+            toolsSplitter.BackColor = Color.Black;
+            toolsSplitter.Cursor = Cursors.Hand;
+            toolsSplitter.Location = new Point(53, 3);
+            toolsSplitter.Name = "toolsSplitter";
+            toolsSplitter.Size = new Size(4, 35);
+            toolsSplitter.TabIndex = 2;
+            toolsSplitter.TabStop = false;
             // 
-            // centralSplitContainer.Panel2
+            // runButton
             // 
-            centralSplitContainer.Panel2.Controls.Add(scriptSplitContainer);
-            centralSplitContainer.Size = new Size(908, 504);
-            centralSplitContainer.SplitterDistance = 94;
-            centralSplitContainer.SplitterWidth = 13;
-            centralSplitContainer.TabIndex = 1;
+            runButton.BackgroundImage = Properties.Resources.play_6444203_007435;
+            runButton.BackgroundImageLayout = ImageLayout.Zoom;
+            runButton.FlatAppearance.BorderSize = 0;
+            runButton.FlatAppearance.MouseDownBackColor = Color.DarkGray;
+            runButton.FlatAppearance.MouseOverBackColor = Color.Gainsboro;
+            runButton.FlatStyle = FlatStyle.Flat;
+            runButton.ImageAlign = ContentAlignment.MiddleLeft;
+            runButton.Location = new Point(63, 3);
+            runButton.Name = "runButton";
+            runButton.Size = new Size(35, 35);
+            runButton.TabIndex = 0;
+            runButton.UseVisualStyleBackColor = true;
             // 
-            // infoSplitContainer
+            // bottom
             // 
-            infoSplitContainer.Dock = DockStyle.Fill;
-            infoSplitContainer.Location = new Point(0, 0);
-            infoSplitContainer.Margin = new Padding(3, 4, 3, 4);
-            infoSplitContainer.Name = "infoSplitContainer";
+            bottom.Dock = DockStyle.Fill;
+            bottom.Location = new Point(3, 44);
+            bottom.Margin = new Padding(3, 4, 3, 4);
+            bottom.Name = "bottom";
+            bottom.Orientation = Orientation.Horizontal;
             // 
-            // infoSplitContainer.Panel1
+            // bottom.Panel1
             // 
-            infoSplitContainer.Panel1.Controls.Add(logPanel);
+            bottom.Panel1.Controls.Add(left);
             // 
-            // infoSplitContainer.Panel2
+            // bottom.Panel2
             // 
-            infoSplitContainer.Panel2.Controls.Add(jsonContextPanel);
-            infoSplitContainer.Size = new Size(908, 94);
-            infoSplitContainer.SplitterDistance = 514;
-            infoSplitContainer.SplitterWidth = 11;
-            infoSplitContainer.TabIndex = 3;
+            bottom.Panel2.Controls.Add(logPanel);
+            bottom.Size = new Size(1176, 705);
+            bottom.SplitterDistance = 572;
+            bottom.SplitterWidth = 13;
+            bottom.TabIndex = 1;
             // 
-            // logPanel
+            // left
             // 
-            logPanel.AutoSize = true;
-            logPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            logPanel.ColumnCount = 1;
-            logPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            logPanel.Controls.Add(logLabel, 0, 0);
-            logPanel.Controls.Add(loggerScintilla, 0, 1);
-            logPanel.Dock = DockStyle.Fill;
-            logPanel.Location = new Point(0, 0);
-            logPanel.Margin = new Padding(3, 4, 3, 4);
-            logPanel.Name = "logPanel";
-            logPanel.RowCount = 2;
-            logPanel.RowStyles.Add(new RowStyle());
-            logPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            logPanel.Size = new Size(514, 94);
-            logPanel.TabIndex = 0;
+            left.Dock = DockStyle.Fill;
+            left.Location = new Point(0, 0);
+            left.Margin = new Padding(3, 4, 3, 4);
+            left.Name = "left";
             // 
-            // logLabel
+            // left.Panel1
             // 
-            logLabel.AutoSize = true;
-            logLabel.Dock = DockStyle.Top;
-            logLabel.Font = new Font("Segoe UI", 11.25F);
-            logLabel.Location = new Point(3, 0);
-            logLabel.Name = "logLabel";
-            logLabel.Size = new Size(508, 25);
-            logLabel.TabIndex = 0;
-            logLabel.Text = "Log";
-            logLabel.TextAlign = ContentAlignment.MiddleCenter;
+            left.Panel1.Controls.Add(variablesPanel);
+            // 
+            // left.Panel2
+            // 
+            left.Panel2.Controls.Add(right);
+            left.Size = new Size(1176, 572);
+            left.SplitterDistance = 221;
+            left.SplitterWidth = 10;
+            left.TabIndex = 1;
+            // 
+            // variablesPanel
+            // 
+            variablesPanel.AutoScroll = true;
+            variablesPanel.AutoSize = true;
+            variablesPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            variablesPanel.ColumnCount = 1;
+            variablesPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            variablesPanel.Controls.Add(variablesLabel, 0, 0);
+            variablesPanel.Controls.Add(variablesTreeView, 0, 1);
+            variablesPanel.Dock = DockStyle.Fill;
+            variablesPanel.Location = new Point(0, 0);
+            variablesPanel.Margin = new Padding(3, 4, 3, 4);
+            variablesPanel.Name = "variablesPanel";
+            variablesPanel.RowCount = 2;
+            variablesPanel.RowStyles.Add(new RowStyle());
+            variablesPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            variablesPanel.Size = new Size(221, 572);
+            variablesPanel.TabIndex = 1;
+            // 
+            // variablesLabel
+            // 
+            variablesLabel.AutoSize = true;
+            variablesLabel.Dock = DockStyle.Fill;
+            variablesLabel.Font = new Font("Segoe UI", 11.25F);
+            variablesLabel.Location = new Point(3, 0);
+            variablesLabel.Name = "variablesLabel";
+            variablesLabel.Size = new Size(215, 25);
+            variablesLabel.TabIndex = 2;
+            variablesLabel.Text = "Variables";
+            variablesLabel.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // variablesTreeView
+            // 
+            variablesTreeView.BackColor = SystemColors.Control;
+            variablesTreeView.BorderStyle = BorderStyle.FixedSingle;
+            variablesTreeView.Dock = DockStyle.Fill;
+            variablesTreeView.Location = new Point(3, 29);
+            variablesTreeView.Margin = new Padding(3, 4, 3, 4);
+            variablesTreeView.Name = "variablesTreeView";
+            variablesTreeView.Size = new Size(215, 539);
+            variablesTreeView.TabIndex = 3;
+            // 
+            // right
+            // 
+            right.Dock = DockStyle.Fill;
+            right.Location = new Point(0, 0);
+            right.Name = "right";
+            // 
+            // right.Panel1
+            // 
+            right.Panel1.Controls.Add(scriptTabControl);
+            // 
+            // right.Panel2
+            // 
+            right.Panel2.Controls.Add(jsonContextPanel);
+            right.Size = new Size(945, 572);
+            right.SplitterDistance = 649;
+            right.TabIndex = 0;
+            // 
+            // scriptTabControl
+            // 
+            scriptTabControl.AllowDrop = true;
+            scriptTabControl.Dock = DockStyle.Fill;
+            scriptTabControl.DrawMode = TabDrawMode.OwnerDrawFixed;
+            scriptTabControl.Font = new Font("Microsoft Sans Serif", 9F, FontStyle.Italic);
+            scriptTabControl.Location = new Point(0, 0);
+            scriptTabControl.Name = "scriptTabControl";
+            scriptTabControl.Padding = new Point(12, 5);
+            scriptTabControl.RequireConfirmationBeforeClosing = false;
+            scriptTabControl.SelectedIndex = 0;
+            scriptTabControl.Size = new Size(649, 572);
+            scriptTabControl.TabIndex = 0;
             // 
             // jsonContextPanel
             // 
@@ -196,7 +274,7 @@ namespace TiaUtilities.JSScript
             jsonContextPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 27F));
             jsonContextPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 27F));
             jsonContextPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 27F));
-            jsonContextPanel.Size = new Size(383, 94);
+            jsonContextPanel.Size = new Size(292, 572);
             jsonContextPanel.TabIndex = 0;
             // 
             // jsonContextLabel
@@ -206,7 +284,7 @@ namespace TiaUtilities.JSScript
             jsonContextLabel.Font = new Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
             jsonContextLabel.Location = new Point(3, 0);
             jsonContextLabel.Name = "jsonContextLabel";
-            jsonContextLabel.Size = new Size(377, 25);
+            jsonContextLabel.Size = new Size(286, 25);
             jsonContextLabel.TabIndex = 0;
             jsonContextLabel.Text = "JSON CONTEXT";
             jsonContextLabel.TextAlign = ContentAlignment.MiddleCenter;
@@ -220,137 +298,49 @@ namespace TiaUtilities.JSScript
             jsonContextScintilla.Location = new Point(3, 28);
             jsonContextScintilla.Name = "jsonContextScintilla";
             jsonContextScintilla.ScrollWidth = 57;
-            jsonContextScintilla.Size = new Size(377, 63);
+            jsonContextScintilla.Size = new Size(286, 541);
             jsonContextScintilla.TabIndex = 1;
             // 
-            // scriptSplitContainer
+            // logPanel
             // 
-            scriptSplitContainer.Dock = DockStyle.Fill;
-            scriptSplitContainer.Location = new Point(0, 0);
-            scriptSplitContainer.Margin = new Padding(3, 4, 3, 4);
-            scriptSplitContainer.Name = "scriptSplitContainer";
+            logPanel.AutoSize = true;
+            logPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            logPanel.ColumnCount = 1;
+            logPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            logPanel.Controls.Add(consoleLabel, 0, 0);
+            logPanel.Controls.Add(loggerScintilla, 0, 1);
+            logPanel.Dock = DockStyle.Fill;
+            logPanel.Location = new Point(0, 0);
+            logPanel.Margin = new Padding(3, 4, 3, 4);
+            logPanel.Name = "logPanel";
+            logPanel.RowCount = 2;
+            logPanel.RowStyles.Add(new RowStyle());
+            logPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            logPanel.Size = new Size(1176, 120);
+            logPanel.TabIndex = 0;
             // 
-            // scriptSplitContainer.Panel1
+            // consoleLabel
             // 
-            scriptSplitContainer.Panel1.Controls.Add(variablesPanel);
+            consoleLabel.AutoSize = true;
+            consoleLabel.Dock = DockStyle.Top;
+            consoleLabel.Font = new Font("Segoe UI", 11.25F);
+            consoleLabel.Location = new Point(3, 0);
+            consoleLabel.Name = "consoleLabel";
+            consoleLabel.Size = new Size(1170, 25);
+            consoleLabel.TabIndex = 0;
+            consoleLabel.Text = "Console";
+            consoleLabel.TextAlign = ContentAlignment.MiddleCenter;
             // 
-            // scriptSplitContainer.Panel2
+            // loggerScintilla
             // 
-            scriptSplitContainer.Panel2.Controls.Add(scriptTabControl);
-            scriptSplitContainer.Size = new Size(908, 397);
-            scriptSplitContainer.SplitterDistance = 171;
-            scriptSplitContainer.SplitterWidth = 10;
-            scriptSplitContainer.TabIndex = 1;
-            // 
-            // variablesPanel
-            // 
-            variablesPanel.AutoScroll = true;
-            variablesPanel.AutoSize = true;
-            variablesPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            variablesPanel.ColumnCount = 1;
-            variablesPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            variablesPanel.Controls.Add(variablesLabel, 0, 0);
-            variablesPanel.Controls.Add(variablesTreeView, 0, 1);
-            variablesPanel.Dock = DockStyle.Fill;
-            variablesPanel.Location = new Point(0, 0);
-            variablesPanel.Margin = new Padding(3, 4, 3, 4);
-            variablesPanel.Name = "variablesPanel";
-            variablesPanel.RowCount = 2;
-            variablesPanel.RowStyles.Add(new RowStyle());
-            variablesPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            variablesPanel.Size = new Size(171, 397);
-            variablesPanel.TabIndex = 1;
-            // 
-            // variablesLabel
-            // 
-            variablesLabel.AutoSize = true;
-            variablesLabel.Dock = DockStyle.Fill;
-            variablesLabel.Font = new Font("Segoe UI", 11.25F);
-            variablesLabel.Location = new Point(3, 0);
-            variablesLabel.Name = "variablesLabel";
-            variablesLabel.Size = new Size(165, 25);
-            variablesLabel.TabIndex = 2;
-            variablesLabel.Text = "Variables";
-            variablesLabel.TextAlign = ContentAlignment.MiddleCenter;
-            // 
-            // variablesTreeView
-            // 
-            variablesTreeView.BackColor = SystemColors.Control;
-            variablesTreeView.BorderStyle = BorderStyle.FixedSingle;
-            variablesTreeView.Dock = DockStyle.Fill;
-            variablesTreeView.Location = new Point(3, 29);
-            variablesTreeView.Margin = new Padding(3, 4, 3, 4);
-            variablesTreeView.Name = "variablesTreeView";
-            variablesTreeView.Size = new Size(165, 364);
-            variablesTreeView.TabIndex = 3;
-            // 
-            // scriptTabControl
-            // 
-            scriptTabControl.AllowDrop = true;
-            scriptTabControl.Dock = DockStyle.Fill;
-            scriptTabControl.DrawMode = TabDrawMode.OwnerDrawFixed;
-            scriptTabControl.Font = new Font("Microsoft Sans Serif", 9F, FontStyle.Italic);
-            scriptTabControl.Location = new Point(0, 0);
-            scriptTabControl.Name = "scriptTabControl";
-            scriptTabControl.Padding = new Point(12, 5);
-            scriptTabControl.RequireConfirmationBeforeClosing = false;
-            scriptTabControl.SelectedIndex = 0;
-            scriptTabControl.Size = new Size(727, 397);
-            scriptTabControl.TabIndex = 0;
-            // 
-            // buttonPanel
-            // 
-            buttonPanel.AutoSize = true;
-            buttonPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            buttonPanel.ColumnCount = 2;
-            buttonPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.3333321F));
-            buttonPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.3333321F));
-            buttonPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.3333321F));
-            buttonPanel.Controls.Add(executeLineButton, 1, 0);
-            buttonPanel.Controls.Add(executeAllButton, 0, 0);
-            buttonPanel.Dock = DockStyle.Fill;
-            buttonPanel.Location = new Point(23, 547);
-            buttonPanel.Margin = new Padding(23, 3, 23, 3);
-            buttonPanel.Name = "buttonPanel";
-            buttonPanel.RowCount = 1;
-            buttonPanel.RowStyles.Add(new RowStyle());
-            buttonPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            buttonPanel.Size = new Size(868, 50);
-            buttonPanel.TabIndex = 2;
-            // 
-            // executeLineButton
-            // 
-            executeLineButton.AutoSize = true;
-            executeLineButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            executeLineButton.Dock = DockStyle.Top;
-            executeLineButton.FlatAppearance.BorderColor = SystemColors.ControlDarkDark;
-            executeLineButton.FlatAppearance.BorderSize = 2;
-            executeLineButton.FlatStyle = FlatStyle.Flat;
-            executeLineButton.Font = new Font("Segoe UI", 12F);
-            executeLineButton.Location = new Point(437, 4);
-            executeLineButton.Margin = new Padding(3, 4, 3, 4);
-            executeLineButton.Name = "executeLineButton";
-            executeLineButton.Size = new Size(428, 42);
-            executeLineButton.TabIndex = 2;
-            executeLineButton.Text = "ExecuteOne";
-            executeLineButton.UseVisualStyleBackColor = true;
-            // 
-            // executeAllButton
-            // 
-            executeAllButton.AutoSize = true;
-            executeAllButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            executeAllButton.Dock = DockStyle.Top;
-            executeAllButton.FlatAppearance.BorderColor = SystemColors.ControlDarkDark;
-            executeAllButton.FlatAppearance.BorderSize = 2;
-            executeAllButton.FlatStyle = FlatStyle.Flat;
-            executeAllButton.Font = new Font("Segoe UI", 12F);
-            executeAllButton.Location = new Point(3, 4);
-            executeAllButton.Margin = new Padding(3, 4, 3, 4);
-            executeAllButton.Name = "executeAllButton";
-            executeAllButton.Size = new Size(428, 42);
-            executeAllButton.TabIndex = 1;
-            executeAllButton.Text = "ExecuteAll";
-            executeAllButton.UseVisualStyleBackColor = true;
+            loggerScintilla.AutocompleteListSelectedBackColor = Color.FromArgb(0, 120, 212);
+            loggerScintilla.Dock = DockStyle.Fill;
+            loggerScintilla.LexerName = null;
+            loggerScintilla.Location = new Point(3, 28);
+            loggerScintilla.Name = "loggerScintilla";
+            loggerScintilla.ScrollWidth = 57;
+            loggerScintilla.Size = new Size(1170, 89);
+            loggerScintilla.TabIndex = 1;
             // 
             // miniToolStrip
             // 
@@ -377,51 +367,41 @@ namespace TiaUtilities.JSScript
             toolStrip1.TabIndex = 3;
             toolStrip1.Text = "toolStrip1";
             // 
-            // loggerScintilla
-            // 
-            loggerScintilla.AutocompleteListSelectedBackColor = Color.FromArgb(0, 120, 212);
-            loggerScintilla.Dock = DockStyle.Fill;
-            loggerScintilla.LexerName = null;
-            loggerScintilla.Location = new Point(3, 28);
-            loggerScintilla.Name = "loggerScintilla";
-            loggerScintilla.ScrollWidth = 57;
-            loggerScintilla.Size = new Size(508, 63);
-            loggerScintilla.TabIndex = 1;
-            // 
-            // GridScriptForm
+            // JSScriptForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(914, 600);
+            ClientSize = new Size(1182, 753);
             Controls.Add(mainPanel);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(3, 4, 3, 4);
-            Name = "GridScriptForm";
-            Text = "GridScriptForm";
+            Name = "JSScriptForm";
+            Text = "Javascript Editor";
             mainPanel.ResumeLayout(false);
             mainPanel.PerformLayout();
-            centralSplitContainer.Panel1.ResumeLayout(false);
-            centralSplitContainer.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)centralSplitContainer).EndInit();
-            centralSplitContainer.ResumeLayout(false);
-            infoSplitContainer.Panel1.ResumeLayout(false);
-            infoSplitContainer.Panel1.PerformLayout();
-            infoSplitContainer.Panel2.ResumeLayout(false);
-            infoSplitContainer.Panel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)infoSplitContainer).EndInit();
-            infoSplitContainer.ResumeLayout(false);
-            logPanel.ResumeLayout(false);
-            logPanel.PerformLayout();
-            jsonContextPanel.ResumeLayout(false);
-            jsonContextPanel.PerformLayout();
-            scriptSplitContainer.Panel1.ResumeLayout(false);
-            scriptSplitContainer.Panel1.PerformLayout();
-            scriptSplitContainer.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)scriptSplitContainer).EndInit();
-            scriptSplitContainer.ResumeLayout(false);
+            toolsFlowPanel.ResumeLayout(false);
+            toolsFlowPanel.PerformLayout();
+            bottom.Panel1.ResumeLayout(false);
+            bottom.Panel2.ResumeLayout(false);
+            bottom.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)bottom).EndInit();
+            bottom.ResumeLayout(false);
+            left.Panel1.ResumeLayout(false);
+            left.Panel1.PerformLayout();
+            left.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)left).EndInit();
+            left.ResumeLayout(false);
             variablesPanel.ResumeLayout(false);
             variablesPanel.PerformLayout();
-            buttonPanel.ResumeLayout(false);
-            buttonPanel.PerformLayout();
+            right.Panel1.ResumeLayout(false);
+            right.Panel2.ResumeLayout(false);
+            right.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)right).EndInit();
+            right.ResumeLayout(false);
+            jsonContextPanel.ResumeLayout(false);
+            jsonContextPanel.PerformLayout();
+            logPanel.ResumeLayout(false);
+            logPanel.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -429,24 +409,25 @@ namespace TiaUtilities.JSScript
         #endregion
 
         private TableLayoutPanel mainPanel;
-        private Label topLabel;
         private TableLayoutPanel buttonPanel;
-        private Button executeLineButton;
-        private Button executeAllButton;
         private ToolStrip miniToolStrip;
         private ToolStrip toolStrip1;
-        private SplitContainer infoSplitContainer;
         private TableLayoutPanel logPanel;
-        private Label logLabel;
+        private Label consoleLabel;
         private TableLayoutPanel jsonContextPanel;
         private Label jsonContextLabel;
         private EditableTabControl scriptTabControl;
         private TableLayoutPanel variablesPanel;
         private Label variablesLabel;
         private TreeView variablesTreeView;
-        private SplitContainer scriptSplitContainer;
-        private SplitContainer centralSplitContainer;
+        private SplitContainer left;
+        private SplitContainer bottom;
         private ScintillaNET.Scintilla jsonContextScintilla;
         private ScintillaNET.Scintilla loggerScintilla;
+        private SplitContainer right;
+        private FlowLayoutPanel toolsFlowPanel;
+        private Button runButton;
+        private Label toolsLabel;
+        private Splitter toolsSplitter;
     }
 }

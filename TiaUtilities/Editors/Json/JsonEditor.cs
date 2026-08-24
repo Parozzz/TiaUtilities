@@ -1,24 +1,14 @@
 ﻿using ScintillaNET;
 using TiaUtilities.Editors.ErrorReporting;
-using TiaUtilities.Editors.myScintilla;
 
-namespace TiaUtilities.Editors
+namespace TiaUtilities.Editors.Json
 {
     public class JsonEditor
     {
         public string Text
         {
-            get => this.jsonScintilla.Scintilla.Text;
-            set
-            {
-                var scintilla = this.jsonScintilla.Scintilla;
-
-                var wasReadOnly = scintilla.ReadOnly;
-
-                scintilla.ReadOnly = false;
-                this.jsonScintilla.Scintilla.Text = value;
-                scintilla.ReadOnly = wasReadOnly;
-            }
+            get => this.jsonScintilla.Text;
+            set => this.jsonScintilla.Text = value;
         }
 
         private readonly JsonScintilla jsonScintilla;

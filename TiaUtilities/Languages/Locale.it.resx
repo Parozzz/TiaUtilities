@@ -343,20 +343,11 @@ validità riga</value>
   <data name="GRID_SETTINGS_BORDERS_SELECTED_CELL_COLOR" xml:space="preserve">
     <value>Selezione</value>
   </data>
-  <data name="GRID_SCRIPT_JS_EXPRESSION" xml:space="preserve">
-    <value>Espressione Javascript</value>
-  </data>
   <data name="GRID_SCRIPT_JSON_CONTEXT" xml:space="preserve">
     <value>Contesto JSON</value>
   </data>
   <data name="GRID_SCRIPT_VARIABLES" xml:space="preserve">
     <value>Variabili: </value>
-  </data>
-  <data name="GRID_SCRIPT_EXECUTE_ONE_LINE" xml:space="preserve">
-    <value>Esegui su riga selezionata</value>
-  </data>
-  <data name="GRID_SCRIPT_EXECUTE_ALL" xml:space="preserve">
-    <value>Esegui su tabella</value>
   </data>
   <data name="GRID_SCRIPT_AUTO_FORMAT" xml:space="preserve">
     <value>Auto Formattazione</value>
@@ -869,5 +860,8 @@ Usa $ seguito dal nome della colonna Excel per estrarre i valori dal foglio di c
   </data>
   <data name="ALARM_SETTINGS_PREFIXES_TIMER" xml:space="preserve">
     <value>Timer</value>
+  </data>
+  <data name="GRID_SCRIPT_TOOLS_RUN" xml:space="preserve">
+    <value>Esegui script selezionato</value>
   </data>
 </root>

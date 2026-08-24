@@ -43,6 +43,19 @@ namespace TiaUtilities.Editors.myScintilla
             scintilla.Indicators[ScintillaHighlighter.INDICATOR].Alpha = 128;
         }
 
+        public string Text
+        {
+            get => this.Scintilla.Text;
+            set
+            {
+                var wasReadOnly = this.Scintilla.ReadOnly;
+
+                this.Scintilla.ReadOnly = false;
+                this.Scintilla.Text = value;
+                this.Scintilla.ReadOnly = wasReadOnly;
+            }
+        }
+
         public Scintilla Scintilla { get; init; }
 
         private readonly ScintillaHighlighter highlighter;
@@ -118,10 +131,14 @@ namespace TiaUtilities.Editors.myScintilla
 
         public void AppendLine(DateTime dateTime, LogLevel level, string text)
         {
+            var wasReadOnly = this.Scintilla.ReadOnly;
+
             var timeStr = dateTime.ToString("dd-MM-yy HH:mm:ss.fff");
 
             var line = $"{timeStr} [{level}] > {text}\r\n";
+            this.Scintilla.ReadOnly = false;
             this.Scintilla.AppendText(line);
+            this.Scintilla.ReadOnly = wasReadOnly;
 
             this.Scintilla.FirstVisibleLine = this.Scintilla.Lines.Count - 1;
         }

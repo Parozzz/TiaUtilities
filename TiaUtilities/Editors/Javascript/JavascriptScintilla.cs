@@ -2,10 +2,11 @@
 using System.Reflection;
 using System.Text.Json;
 using TiaUtilities.Editors.ErrorReporting;
+using TiaUtilities.Editors.myScintilla;
 using TiaUtilities.Utility;
 using Style = ScintillaNET.Style;
 
-namespace TiaUtilities.Editors.myScintilla
+namespace TiaUtilities.Editors.Javascript
 {
     public class JavascriptScintilla
     {
@@ -90,6 +91,19 @@ namespace TiaUtilities.Editors.myScintilla
             scintilla.Indicators[ScintillaHighlighter.INDICATOR].Style = IndicatorStyle.GradientCenter;
             scintilla.Indicators[ScintillaHighlighter.INDICATOR].ForeColor = Color.DarkGray;
             scintilla.Indicators[ScintillaHighlighter.INDICATOR].Alpha = 128;
+        }
+
+        public string Text
+        {
+            get => this.Scintilla.Text;
+            set
+            {
+                var wasReadOnly = this.Scintilla.ReadOnly;
+
+                this.Scintilla.ReadOnly = false;
+                this.Scintilla.Text = value;
+                this.Scintilla.ReadOnly = wasReadOnly;
+            }
         }
 
         public Scintilla Scintilla { get; init; }

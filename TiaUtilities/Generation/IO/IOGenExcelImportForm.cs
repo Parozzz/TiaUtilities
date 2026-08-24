@@ -3,11 +3,7 @@ using InfoBox;
 using Jint;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Text.RegularExpressions;
-using TiaUtilities.Editors.ErrorReporting;
-using TiaUtilities.Generation.Configuration;
-using TiaUtilities.Generation.Configuration.Utility;
 using TiaUtilities.Generation.GridHandler;
-using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.IO.Configurations;
 using TiaUtilities.Generation.IO.Data;
 using TiaUtilities.Generation.SettingsNew;
@@ -28,12 +24,12 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
         private readonly SettingsBindings settingsBindings;
         public IEnumerable<IOGenExcelImportData> ImportDataEnumerable { get => gridHandler.DataSource.GetNotEmptyDataDict().Keys; }
 
-        public IOGenerationExcelImportForm(GridSettings gridSettings, GridBindContainer gridBindContainer, IOExcelImportConfiguration configuration)
+        public IOGenerationExcelImportForm(GridSettings gridSettings, MultiGridOperationHandler multiGrid, IOExcelImportConfiguration configuration)
         {
             InitializeComponent();
 
             this.excelImportConfig = configuration;
-            this.gridHandler = new(gridSettings, gridBindContainer, new(), new()) { InitializeRowCount = 1999 };
+            this.gridHandler = new(gridSettings, multiGrid, new(), new()) { InitializeRowCount = 1999 };
 
             this.settingsBindings = new();
 
