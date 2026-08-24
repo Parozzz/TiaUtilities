@@ -1,5 +1,4 @@
 ﻿using System.Collections.Immutable;
-using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Generation.GridHandler.CustomColumns;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.GridHandler.GridImprovements;
@@ -12,7 +11,7 @@ using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.GridHandler
 {
-    public class GridHandler<T> : IGridHandlerEventCalls, ICleanable, ISaveable<GridSave<T>> where T : GridData
+    public class GridHandler<T> : IGridHandler, IGridHandlerEventCalls, ICleanable, ISaveable<GridSave<T>> where T : GridData
     {
         public required uint InitializeRowCount { get; set; } = 9;
 
@@ -21,10 +20,11 @@ namespace TiaUtilities.Generation.GridHandler
 
         public GridColumnHandler Columns { get; init; }
         public GridDataSource<T> DataSource { get; init; }
+        IGridDataSource IGridHandler.DataSource { get => DataSource; }
         public GridDataChangedHandler DataChangedHandler { get; init; }
         public List<JSScriptVariable> ScriptVariableList { get; init; }
         public GridSelectionBorder SelectionBorder { get; init; }
-
+        public GridViewManipulator ViewManipulator { get; init; }
 
         public event GridDataChangedEventHandler DataChanged = delegate { };
         public event GridDataLoadedEvent DataLoaded = delegate { };
@@ -52,8 +52,7 @@ namespace TiaUtilities.Generation.GridHandler
         internal GridDataPreviewer<T> DataPreviewer { get; init; }
         private ExcelLikeDataGridView DataGridView { get; init; }
 
-
-        private readonly GridBindContainer gridBindFactory;
+        private readonly MultiGridOperationHandler multiGrid;
         private readonly GridHandlerEventCaller eventCaller;
         private readonly GenPlaceholderHandler placeholderHandler;
 
@@ -68,14 +67,14 @@ namespace TiaUtilities.Generation.GridHandler
         private bool dirty;
 
         public GridHandler(GridSettings settings,
-            GridBindContainer gridBindFactory,
+            MultiGridOperationHandler multiGrid,
             GridDataPreviewer<T> previewer,
             GenPlaceholderHandler placeholderHandler,
             IGridRowComparer<T>? comparer = null)
         {
 
             this.GridSettings = settings;
-            this.gridBindFactory = gridBindFactory;
+            this.multiGrid = multiGrid;
             this.DataPreviewer = previewer;
             this.placeholderHandler = placeholderHandler;
 
@@ -86,15 +85,17 @@ namespace TiaUtilities.Generation.GridHandler
 
             this.Columns = new(this.DataGridView);
             this.DataChangedHandler = new(this.DataGridView, eventCaller, this.undoRedoHandler);
-            this.DataSource = new(this.DataGridView, this.DataChangedHandler, eventCaller);
+            this.DataSource = new(this.DataGridView, this.DataChangedHandler);
 
             this.ScriptVariableList = [];
-            this.SelectionBorder = new(this.DataGridView, this.GridSettings);
 
             this.doDragDropHandler = new(this.DataGridView, this.DataChangedHandler, this.GridSettings);
             this.dragDownHandler = new(this.DataGridView, eventCaller, settings);
             this.sortHandler = new(this.DataGridView, this.DataSource, eventCaller, this.undoRedoHandler, comparer);
             this.qol = new(this.DataGridView);
+
+            this.SelectionBorder = new(this.DataGridView, this.GridSettings);
+            this.ViewManipulator = new(this.DataGridView, this.DataChangedHandler);
         }
 
         #region Call Events
@@ -128,39 +129,7 @@ namespace TiaUtilities.Generation.GridHandler
         void IGridHandlerEventCalls.CallLoadDataEvent() => this.DataLoaded(this.DataGridView, new());
         #endregion
 
-        public void RefreshRow(int rowIndex)
-        {
-            if (GridUtils.IsRowValid(this.DataGridView, rowIndex))
-            {
-                var row = this.DataGridView.Rows[rowIndex];
-                foreach (DataGridViewCell cell in row.Cells)
-                {
-                    this.RefreshCell(cell);
-                }
-            }
-        }
 
-        public void RefreshCell(DataGridViewCell cell) => this.DataGridView.InvalidateCell(cell);
-
-        public void RefreshCell(int columnIndex, int rowIndex) => this.DataGridView.InvalidateCell(columnIndex, rowIndex);
-
-        public void Refresh()
-        {
-            this.DataGridView.RefreshEdit();
-            this.DataGridView.Refresh();
-        }
-
-        public void SuspendLayout() => this.DataGridView.SuspendLayout();
-
-        public void ResumeLayout(bool refresh = false, bool performLayout = true)
-        {
-            if (refresh)
-            {
-                this.Refresh();
-            }
-
-            this.DataGridView.ResumeLayout(performLayout);
-        }
 
         public void Init()
         {
@@ -438,7 +407,7 @@ namespace TiaUtilities.Generation.GridHandler
                     }
                 }
 
-                this.Refresh(); //Force refresh also during DoDragDrop!
+                this.ViewManipulator.Refresh(); //Force refresh also during DoDragDrop!
             };
 
             this.DataGridView.DragOver += (sender, args) =>
@@ -468,7 +437,7 @@ namespace TiaUtilities.Generation.GridHandler
                         undoRedoHandler.Redo();
                         break;
                     case Keys.X | Keys.Control:
-                        this.SuspendLayout();
+                        this.ViewManipulator.SuspendLayout();
 
                         GridUtils.CopyAsExcelToClipboard(this.DataGridView, out var copiedCellsList);
 
@@ -479,7 +448,7 @@ namespace TiaUtilities.Generation.GridHandler
                         }
                         this.DataChangedHandler.End(ctrlXReq);
 
-                        this.ResumeLayout();
+                        this.ViewManipulator.ResumeLayout();
                         break;
                     case Keys.C | Keys.Control:
                         GridUtils.CopyAsExcelToClipboard(this.DataGridView, out var _);
@@ -491,16 +460,16 @@ namespace TiaUtilities.Generation.GridHandler
                         GridUtils.PasteAsExcelFromClipboard(this.DataGridView);
                         this.DataChangedHandler.End(ctrlVReq);
 
-                        this.Refresh(); //This is required since for some special column type (Like checkbox) is needed.
+                        this.ViewManipulator.Refresh(); //This is required since for some special column type (Like checkbox) is needed.
                         break;
                     case Keys.F | Keys.Control:
-                        this.gridBindFactory.ShowFindForm(this);
+                        this.multiGrid.ShowFindForm(this);
                         break;
                     case Keys.J | Keys.Control:
-                        this.gridBindFactory.ShowGridScript(this);
+                        this.multiGrid.ShowGridScript(this);
                         break;
                     case Keys.Delete:
-                        this.DeleteSelectedCells();
+                        this.ViewManipulator.DeleteSelectedCells();
                         break;
                     case Keys.Escape:
                         this.DataGridView.RefreshEdit(); //This is required to refresh checkbox otherwise, if the undo is in a selected cell, it will not update visually (DATA IS CHANGED!)
@@ -573,7 +542,7 @@ namespace TiaUtilities.Generation.GridHandler
                 if (args.RowIndex == -1 && args.ColumnIndex == -1 && args.Button == MouseButtons.Right)
                 {
                     var menuItem = new ToolStripMenuItem { Text = Locale.GRID_SCRIPT_OPEN_JAVASCRIPT_CONTEXT };
-                    menuItem.Click += (sender, args) => { this.gridBindFactory.ShowGridScript(); };
+                    menuItem.Click += (sender, args) => { this.multiGrid.ShowGridScript(); };
 
                     var contextMenu = new ContextMenuStrip();
                     contextMenu.Items.Add(menuItem);
@@ -583,7 +552,7 @@ namespace TiaUtilities.Generation.GridHandler
             #endregion
 
             #region EVENTS(MouseClick) Change GridBind
-            this.DataGridView.MouseClick += (sender, args) => this.gridBindFactory.ChangeBind(this);
+            this.DataGridView.MouseClick += (sender, args) => this.multiGrid.SetActiveGrid(this);
             #endregion
 
             #region EVENTS(ColumnHeaderMouseClick) - SortHandler
@@ -633,26 +602,7 @@ namespace TiaUtilities.Generation.GridHandler
 
         public Form? FindForm() => this.DataGridView.FindForm();
 
-        public void AutoResizeColumns() => this.DataGridView.AutoResizeColumns();
 
-        public void AutoResizeColumnHeadersHeight() => this.DataGridView.AutoResizeColumnHeadersHeight();
-
-        public DataGridViewCell? GetCurrentCell() => this.DataGridView.CurrentCell;
-
-        public void ChangeCurrentCell(int rowIndex, int columnIndex)
-        {
-            if (GridUtils.AreCoordinatesValid(this.DataGridView, rowIndex, columnIndex))
-            {
-                this.DataGridView.CurrentCell = this.DataGridView.Rows[rowIndex].Cells[columnIndex];
-            }
-        }
-
-        public DataGridViewCell? GetCell(int rowIndex, GridDataColumn column) => this.GetCell(rowIndex, column.ColumnIndex);
-
-        public DataGridViewCell? GetCell(int rowIndex, int columnIndex)
-        {
-            return GridUtils.AreCoordinatesValid(this.DataGridView, rowIndex, columnIndex) ? this.DataGridView.Rows[rowIndex].Cells[columnIndex] : null;
-        }
 
         public DataGridViewColumn GetColumn(int columnIndex) => this.DataGridView.Columns[columnIndex];
 
@@ -668,7 +618,7 @@ namespace TiaUtilities.Generation.GridHandler
                     {
                         checkBoxCell.Value = !boolValue;
                         //this.ChangeCell(new GridCellChange(currentCell) { OldValue = boolValue, NewValue = !boolValue });
-                        this.Refresh(); //Needed for checkbox cell
+                        this.ViewManipulator.Refresh(); //Needed for checkbox cell
 
                         if (currentCell.RowIndex < this.DataGridView.RowCount)
                         {//Move the cursor to the next cell below, same as default behaviour that i am overriding
@@ -689,18 +639,6 @@ namespace TiaUtilities.Generation.GridHandler
             }
 
             return false;
-        }
-
-        public void DeleteSelectedCells()
-        {
-            var req = this.DataChangedHandler.Join();
-
-            foreach (DataGridViewCell selectedCell in DataGridView.SelectedCells)
-            {
-                selectedCell.Value = null; //Set value to null so it will clear also checkboxes
-            }
-
-            this.DataChangedHandler.End(req);
         }
 
         public void AppendData(IEnumerable<T> dataEnumerable)

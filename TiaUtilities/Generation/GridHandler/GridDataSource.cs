@@ -6,9 +6,8 @@ using TiaUtilities.UndoRedo;
 namespace TiaUtilities.Generation.GridHandler
 {
     public class GridDataSource<T>(
-        ExcelLikeDataGridView dataGridView, 
-        GridDataChangedHandler dataChangedHandler, 
-        GridHandlerEventCaller gridHandlerEventCaller) : ISaveable<Dictionary<int, T>> where T : GridData
+        ExcelLikeDataGridView dataGridView,
+        GridDataChangedHandler dataChangedHandler) : IGridDataSource, ISaveable<Dictionary<int, T>> where T : IGridData
     {
         private readonly List<T> dataList = [];
 
@@ -66,15 +65,7 @@ namespace TiaUtilities.Generation.GridHandler
             }
         }
 
-        private int ValidateRowIndex(int index)
-        {
-            if (index < 0 || index >= this.Count)
-            {
-                throw new IndexOutOfRangeException($"Index {index} out of range for {this.dataList.GetType().FullName}.");
-            }
-
-            return index;
-        }
+        private int ValidateRowIndex(int index) => index >= 0 && index < this.Count ? index : throw new IndexOutOfRangeException($"Index {index} out of range for {this.dataList.GetType().FullName}.");
 
         public T this[int i]
         {
@@ -94,7 +85,7 @@ namespace TiaUtilities.Generation.GridHandler
         {
             foreach (var data in this.dataList)
             {
-                data.ClearDataChangedDelegate();
+                data.Dispose();
             }
 
             this.dataList.Clear();
@@ -241,6 +232,48 @@ namespace TiaUtilities.Generation.GridHandler
         {
             return GetNotEmptyClonedDataDict().Keys;
         }
-    }
 
+        public IGridData GetGeneric(int index) => this[index];
+
+        Dictionary<IGridData, int> IGridDataSource.GetGenericNotEmptyDataDict(int startRow)
+        {
+            if (startRow >= dataList.Count)
+            {
+                return [];
+            }
+
+            Dictionary<IGridData, int> dict = [];
+            for (var x = startRow; x < dataList.Count; x++)
+            {
+                var data = dataList[x];
+                if (!data.IsEmpty())
+                {
+                    dict.Add(data, x);
+                }
+            }
+            return dict;
+        }
+
+        IEnumerable<IGridData> IGridDataSource.GetGenericNotEmptyData(int startRow) => ((IGridDataSource)this).GetGenericNotEmptyDataDict(startRow).Keys;
+
+        Dictionary<IGridData, int> IGridDataSource.GetGenericNotEmptyClonedDataDict()
+        {
+            var notEmptyDict = new Dictionary<IGridData, int>();
+
+            for (var x = 0; x < dataList.Count; x++)
+            {
+                var data = dataList[x];
+                if (!data.IsEmpty())
+                {
+                    var dataClone = this.CreateInstance();
+                    GridUtils.CopyGridDataValues(data, dataClone);
+                    notEmptyDict.Add(dataClone, x);
+                }
+            }
+            return notEmptyDict;
+        }
+
+        IEnumerable<IGridData> IGridDataSource.GetGenericNotEmptyClonedData() => ((IGridDataSource)this).GetGenericNotEmptyClonedDataDict().Keys;
+
+    }
 }

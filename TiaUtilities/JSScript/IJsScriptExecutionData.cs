@@ -19,7 +19,7 @@ namespace TiaUtilities.JSScript
         }
 
 
-        public Func<Object> RequestData { get; init; }
+        public Func<Object> RequestData { get; }
 
         public DataDescriptor Descriptor { get; init; }
 

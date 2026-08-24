@@ -1,12 +1,8 @@
-﻿using Acornima.Ast;
-using DocumentFormat.OpenXml.Math;
-using Jint;
+﻿using Jint;
 using System.Collections.ObjectModel;
 using TiaUtilities.Configuration;
-using TiaUtilities.Generation.GridHandler.Binds;
 using TiaUtilities.Utility;
 using TiaUtilities.Utility.Extensions;
-using static TiaUtilities.JSScript.IJsScriptExecutionData;
 
 namespace TiaUtilities.JSScript
 {

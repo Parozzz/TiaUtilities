@@ -9,7 +9,7 @@ namespace TiaUtilities.Generation.GridHandler
 {
     public static class GridUtils
     {
-        public static void CopyGridDataValues(GridData copyFrom, GridData moveTo)
+        public static void CopyGridDataValues(IGridData copyFrom, IGridData moveTo)
         {
             if (copyFrom.GetType() == moveTo.GetType())
             {
@@ -418,6 +418,8 @@ namespace TiaUtilities.Generation.GridHandler
 
 
         public static bool IsRowValid(DataGridView dgv, int row) => row >= 0 && row < dgv.RowCount;
+
+        public static int ValidateRow(DataGridView dgv, int row) => IsRowValid(dgv, row) ? row : throw new IndexOutOfRangeException("Row outside range");
 
         public static bool IsColumnValid(DataGridView dgv, int column) => column >= 0 && column < dgv.ColumnCount;
 

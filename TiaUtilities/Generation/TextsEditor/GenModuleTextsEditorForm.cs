@@ -12,7 +12,7 @@ namespace TiaUtilities.Generation.TextsEditor
 
         private readonly ITextsEditorExporter exporter;
 
-        private readonly GridBindContainer gridBindContainer;
+        private readonly MultiGridOperationHandler multiGrid;
         private readonly GridDataPreviewer<TextsEditorData> previewer;
         private readonly GridHandler<TextsEditorData> gridHandler;
 
@@ -22,11 +22,11 @@ namespace TiaUtilities.Generation.TextsEditor
 
             this.exporter = exporter;
 
-            this.gridBindContainer = new();
+            this.multiGrid = new();
             this.previewer = new();
 
             GenPlaceholderHandler placeholderHandler = new();
-            this.gridHandler = new(MainForm.Settings.GridSettings, this.gridBindContainer, this.previewer, placeholderHandler, new TextsEditorDataComparer()) { InitializeRowCount = 1 };
+            this.gridHandler = new(MainForm.Settings.GridSettings, this.multiGrid, this.previewer, placeholderHandler, new TextsEditorDataComparer()) { InitializeRowCount = 1 };
 
             Init();
         }

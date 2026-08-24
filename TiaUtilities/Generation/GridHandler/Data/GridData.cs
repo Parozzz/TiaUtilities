@@ -5,7 +5,7 @@ using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.GridHandler.Data
 {
-    public abstract class GridData : INotifyPropertyChanged
+    public abstract class GridData : IGridData
     { //CLASS THAT IMPLEMENT THIS MUST HAVE AN EMPTY CONSTRUCTOR!
 
         private class StoredData
@@ -18,12 +18,6 @@ namespace TiaUtilities.Generation.GridHandler.Data
         public event GridDataPropertyChangedEvent DataPropertyChanged = delegate { };
 
         private readonly Dictionary<string, StoredData> objectDict = [];
-
-        public void ClearDataChangedDelegate()
-        {
-            this.PropertyChanged = delegate { };
-            this.DataPropertyChanged = delegate { };
-        }
 
         public void Set(object? newValue, [CallerMemberName] string propertyName = "")
         {
@@ -133,6 +127,12 @@ namespace TiaUtilities.Generation.GridHandler.Data
         public abstract IReadOnlyList<GridDataColumn> GetColumns();
 
         public abstract GridDataColumn GetColumn(int column);
+
+        public void Dispose()
+        {
+            this.PropertyChanged = delegate { };
+            this.DataPropertyChanged = delegate { };
+        }
 
     }
 
