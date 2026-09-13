@@ -199,11 +199,6 @@ namespace TiaUtilities.Generation.IO.Module.Tab
             GenUtils.CopyJsonFieldsAndProperties(save.TabConfig, TabConfig);
         }
 
-        public bool ProcessCmdKey(ref Message msg, Keys keyData)
-        {
-            return GridHandler.ProcessCmdKey(ref msg, keyData);
-        }
-
         private void UpdateDuplicatedIOValues()
         {
             this.GridHandler.ViewManipulator.SuspendLayout();

@@ -3,11 +3,131 @@ using TiaUtilities.Generation.Alarms.Configurations;
 using TiaUtilities.Generation.IO.Configurations;
 using TiaUtilities.Languages;
 using TiaUtilities.SettingsNew.Bindings;
+using TiaUtilities.SettingsStep;
 
 namespace TiaUtilities.Generation.Alarms
 {
     public static class AlarmGenUtils
     {
+
+        public static List<SettingsStepContext> CreateSettingsGlobalContext()
+        {
+            var blocksContext = new SettingsStepContext("Blocks", "Settings for generated blocks")
+                .CreateBinder<AlarmMainConfiguration>()
+                .StartGroup(Locale.ALARM_SETTINGS_FC)
+                    .Add(x => x.FCBlockName, Locale.GENERICS_NAME)
+                    .Add(x => x.FCBlockNumber, Locale.GENERICS_NUMBER)
+                .StartGroup(Locale.ALARM_SETTINGS_UDT)
+                    .Add(x => x.UDTBlockName, Locale.GENERICS_NAME, Locale.ALARM_SETTINGS_UDT_DESCR)
+                .End();
+            var enablingsContext = new SettingsStepContext(Locale.ALARM_SETTINGS_ENABLE)
+                .CreateBinder<AlarmMainConfiguration>()
+                .StartGroup(Locale.ALARM_SETTINGS_ENABLE)
+                        .Add(x => x.EnableCustomVariable, Locale.ALARM_SETTINGS_ENABLE_CUSTOM_VAR, Locale.ALARM_SETTINGS_ENABLE_CUSTOM_VAR_DESCR)
+                        .Add(x => x.EnableTimer, Locale.ALARM_SETTINGS_ENABLE_TIMER, Locale.ALARM_SETTINGS_ENABLE_TIMER_DESCR)
+                .End();
+
+            var segmentsNameContext = new SettingsStepContext(Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME)
+                .CreateBinder<AlarmMainConfiguration>()
+                .StartGroup(Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME)
+                    .Add(x => x.OneEachSegmentName, Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME_ONE_EACH, Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME_ONE_EACH_DESCR)
+                    .Add(x => x.OneEachEmptyAlarmSegmentName, Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME_ONE_EACH_SPARE)
+                    .Add(x => x.GroupSegmentName, Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME_GROUP_EACH, Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME_GROUP_EACH_DESCR)
+                    .Add(x => x.GroupEmptyAlarmSegmentName, Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME_GROUP_EACH_SPARE)
+                .End();
+
+            var alarmContext = new SettingsStepContext("Alarm", "Settings for alarm properties")
+                .CreateBinder<AlarmMainConfiguration>()
+                .Add(x => x.AlarmNumFormat, Locale.ALARM_SETTINGS_ALARM_NUM_PLACEHOLDER_FORMAT, description: Locale.ALARM_SETTINGS_ALARM_NUM_PLACEHOLDER_FORMAT_DESCR)
+                .StartGroup("PLC")
+                    .Add(x => x.AlarmNameTemplate, Locale.ALARM_SETTINGS_UDT_ALARM_VARIABLE_NAME)
+                    .Add(x => x.AlarmCommentTemplate, Locale.ALARM_SETTINGS_UDT_ALARM_VARIABLE_COMMENT)
+                    .Add(x => x.AlarmCommentTemplateSpare, Locale.ALARM_SETTINGS_UDT_ALARM_VARIABLE_SPARE_COMMENT)
+                .StartGroup(Locale.GENERICS_HMI)
+                    .Add(x => x.HmiNameTemplate, Locale.ALARM_SETTINGS_HMI_ITEM_NAME, Locale.ALARM_SETTINGS_HMI_ITEM_NAME_DESCR)
+                    .Add(x => x.HmiTextTemplate, Locale.ALARM_SETTINGS_HMI_ITEM_TEXT, Locale.ALARM_SETTINGS_HMI_ITEM_TEXT_DESCR)
+                    .Add(x => x.HmiTriggerTagTemplate, Locale.ALARM_SETTINGS_HMI_TRIGGER_TAG, Locale.ALARM_SETTINGS_HMI_TRIGGER_TAG_DESCR)
+                    .Add(x => x.HmiTriggerTagUseWordArray, Locale.ALARM_SETTINGS_HMI_USE_WORD_ARRAY, Locale.ALARM_SETTINGS_HMI_USE_WORD_ARRAY_DESCR)
+                .End();
+
+            return [enablingsContext, blocksContext, segmentsNameContext, alarmContext];
+        }
+        
+        public static List<SettingsStepContext> CreateSettingsTabContext()
+        {
+            var blocksContext = new SettingsStepContext("Blocks")
+                .CreateBinder<AlarmTabConfiguration>()
+                .StartGroup(Locale.ALARM_SETTINGS_FC)
+                    .Add(x => x.GroupingType, Locale.ALARM_SETTINGS_TAB_GROUPING_TYPE, description: Locale.ALARM_SETTINGS_TAB_GROUPING_TYPE_DESCR)
+                .End();
+
+            var variablesContext = new SettingsStepContext("Variables")
+                .CreateBinder<AlarmTabConfiguration>()
+                .StartGroup(Locale.ALARM_SETTINGS_PREFIXES)
+                    .Add(x => x.AlarmAddressPrefix, Locale.ALARM_SETTINGS_PREFIXES_ALARM)
+                    .Add(x => x.Coil1AddressPrefix, Locale.ALARM_SETTINGS_PREFIXES_COIL1)
+                    .Add(x => x.Coil2AddressPrefix, Locale.ALARM_SETTINGS_PREFIXES_COIL2)
+                    .Add(x => x.TimerAddressPrefix, Locale.ALARM_SETTINGS_PREFIXES_TIMER)
+
+                .StartGroup(Locale.ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_COIL1)
+                    .Add(x => x.DefaultCoil1Address, Locale.GENERICS_ADDRESS, Locale.GENERICS_DESCR_SET_SLASH_TO_DISABLE)
+                    .Add(x => x.DefaultCoil1Type, Locale.GENERICS_TYPE)
+
+                .StartGroup(Locale.ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_COIL2)
+                    .Add(x => x.DefaultCoil2Address, Locale.GENERICS_ADDRESS, Locale.GENERICS_DESCR_SET_SLASH_TO_DISABLE)
+                    .Add(x => x.DefaultCoil2Type, Locale.GENERICS_TYPE)
+
+                .StartGroup(Locale.ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_TIMER)
+                    .Add(x => x.DefaultTimerAddress, Locale.GENERICS_ADDRESS, Locale.GENERICS_DESCR_SET_SLASH_TO_DISABLE)
+                    .Add(x => x.DefaultTimerType, Locale.GENERICS_TYPE, options: new() { StringSelections = ["TON", "TOF"] })
+                    .Add(x => x.DefaultTimerValue, Locale.GENERICS_VALUE, "It must be formatted the same as in TiaPortal (eg. T#0s, T#100ms)")
+
+                .StartGroup(Locale.ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_CUSTOM_VAR)
+                    .Add(x => x.DefaultCustomVarAddress, Locale.GENERICS_ADDRESS, Locale.GENERICS_DESCR_SET_SLASH_TO_DISABLE)
+                    .Add(x => x.DefaultCustomVarValue, Locale.GENERICS_VALUE)
+                .End();
+
+            var alarmsContext = new SettingsStepContext("Alarms")
+                .CreateBinder<AlarmTabConfiguration>()
+                .StartGroup(Locale.ALARM_SETTINGS_TAB_ALARM_NUMS)
+                    .Add(x => x.TotalAlarmNum, Locale.ALARM_SETTINGS_TAB_ALARM_NUMS_TOTAL, Locale.ALARM_SETTINGS_TAB_ALARM_NUMS_TOTAL_DESCR)
+                    .Add(x => x.StartingAlarmNum, Locale.ALARM_SETTINGS_TAB_ALARM_NUMS_START, Locale.ALARM_SETTINGS_TAB_ALARM_NUMS_START_DESCR)
+
+                .StartGroup(Locale.ALARM_SETTINGS_TAB_SPARE)
+                    .Add(x => x.EmptyAlarmContactAddress, Locale.ALARM_SETTINGS_TAB_SPARE_ADDRESS)
+                    .Add(x => x.EmptyAlarmAtEnd, Locale.ALARM_SETTINGS_TAB_SPARE_EMPTY_NUM_AT_END, Locale.ALARM_SETTINGS_TAB_SPARE_EMPTY_NUM_AT_END_DESCR)
+                    .Add(x => x.SkipNumberAfterGroup, Locale.ALARM_SETTINGS_TAB_SPARE_GROUP_SKIP, Locale.ALARM_SETTINGS_TAB_SPARE_GROUP_SKIP_DESCR)
+                    .Add(x => x.AntiSlipNumber, Locale.ALARM_SETTINGS_TAB_SPARE_ANTI_SLIP, Locale.ALARM_SETTINGS_TAB_SPARE_ANTI_SLIP_DESCR)
+                    .Add(x => x.GenerateEmptyAlarmAntiSlip, Locale.ALARM_SETTINGS_TAB_SPARE_ANTI_SLIP_GEN_EMPTY)
+                .End();
+
+            var hmiContext = new SettingsStepContext(Locale.GENERICS_HMI)
+                .CreateBinder<AlarmTabConfiguration>()
+                .StartGroup(Locale.GENERICS_HMI)
+                    .Add(x => x.HmiStartID, Locale.ALARM_SETTINGS_TAB_HMI_START_ID, Locale.ALARM_SETTINGS_TAB_HMI_START_ID_DESCR)
+                    .Add(x => x.DefaultHmiAlarmClass, Locale.ALARM_SETTINGS_TAB_HMI_DEFAULT_ALARM_CLASS, Locale.ALARM_SETTINGS_TAB_HMI_DEFAULT_ALARM_CLASS_DESCR)
+                .End();
+
+            var placeholdersContext = new SettingsStepContext("Placeholders")
+                .CreateBinder<AlarmTabConfiguration>()
+                .StartGroup(Locale.ALARM_SETTINGS_TAB_PLACEHOLDERS)
+                    .Add(x => x.CustomPlaceholdersJSON, "Placeholders", description: Locale.ALARM_SETTINGS_TAB_PLACEHOLDERS_DESC, options: new() { StringSpecifiedEditor = SettingsStep.ControlFactory.SettingsFactoryOptions.StringCustomEditor.JSON })
+
+                .End();
+
+            return [blocksContext, variablesContext, alarmsContext, hmiContext, placeholdersContext];
+        }
+        
+        public static List<SettingsStepContext> CreateSettingsTemplateContexts()
+        {
+            var context = new SettingsStepContext("Alarms")
+                .CreateBinder<AlarmTemplateConfiguration>()
+                .Add(x => x.StandaloneAlarms, Locale.ALARM_SETTINGS_TEMPLATE_STANDALONE_ALARMS, Locale.ALARM_SETTINGS_TEMPLATE_STANDALONE_ALARMS_DESC)
+                .End();
+
+            return [context];
+        }
+        
         public static void AddMainConfigBindings(SettingsBindings settingsBindings, AlarmMainConfiguration mainConfig)
         {
             settingsBindings

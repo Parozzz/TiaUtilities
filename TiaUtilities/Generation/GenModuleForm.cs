@@ -177,11 +177,6 @@ namespace TiaUtilities.Generation
                         this.module.OpenPlaceholderViewer(this);
                         return true;
                 }
-
-                if (this.module.ProcessCmdKey(ref msg, keyData))
-                {
-                    return true;
-                }
             }
             catch (Exception ex)
             {

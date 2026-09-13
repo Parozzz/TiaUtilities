@@ -87,7 +87,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
                 }
             };
 
-            this.lengthTextBox.KeyPress += ControlUtils.UnsignedKeyPressEventHandler;
+            this.lengthTextBox.KeyPress += ControlUtils.UnsignedNumberKeyPressEventHandler;
             this.lengthTextBox.TextChanged += (sender, args) =>
             {
                 if (!loadingControls && int.TryParse(this.lengthTextBox.Text, out var length))
@@ -96,7 +96,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
                 }
             };
 
-            this.precisionTextBox.KeyPress += ControlUtils.UnsignedKeyPressEventHandler;
+            this.precisionTextBox.KeyPress += ControlUtils.UnsignedNumberKeyPressEventHandler;
             this.precisionTextBox.TextChanged += (sender, args) =>
             {
                 if (!loadingControls && int.TryParse(this.precisionTextBox.Text, out var precision))

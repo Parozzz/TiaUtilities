@@ -20,6 +20,7 @@ using TiaUtilities.Languages;
 using TiaUtilities.Resources;
 using TiaUtilities.SettingsNew;
 using TiaUtilities.SettingsNew.Bindings;
+using TiaUtilities.SettingsStep;
 using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.Alarms.Module
@@ -219,7 +220,16 @@ namespace TiaUtilities.Generation.Alarms.Module
             this.AddConfigurationBindings(this.SettingsBindings);
         }
 
-        public void ToggleSettingsFormVisibility() => this.settingsFormCache.ToggleVisibility();
+        public void ToggleSettingsFormVisibility()
+        {
+            var containers = this.GetSettingsContainers();
+
+            SettingsStepForm form = new();
+            form.SetContainers(containers);
+            form.ShowDialog();
+
+            //this.settingsFormCache.ToggleVisibility();
+        }
 
         private void TabCreation(TabPage tabPage, AlarmGenTabSave? save = null)
         {
@@ -342,15 +352,33 @@ namespace TiaUtilities.Generation.Alarms.Module
             return Locale.ALARM_GEN_FORM;
         }
 
-        public bool ProcessCmdKey(ref Message msg, Keys keyData)
+        private List<SettingsStepContainer> GetSettingsContainers()
         {
-            var selectedTab = this.control.tabControl.SelectedTab;
-            if (selectedTab != null && selectedTab.Tag is AlarmGenTab alarmGenTab)
+            List<SettingsStepContainer> containers = [];
+
+            var globalContexts = AlarmGenUtils.CreateSettingsGlobalContext();
+            var tabContexts = AlarmGenUtils.CreateSettingsTabContext();
+            var templateContexts = AlarmGenUtils.CreateSettingsTemplateContexts();
+
+            SettingsStepContainer globalContainer = new(this.mainConfig, "Global", "Settings");
+            globalContainer.AddRange(globalContexts);
+            containers.Add(globalContainer);
+
+            foreach(var tab in this.alarmTabList)
             {
-                return alarmGenTab.ProcessCmdKey(ref msg, keyData);
+                SettingsStepContainer tabContainer = new(tab.TabConfig, "TAB", tab.Name);
+                tabContainer.AddRange(tabContexts);
+                containers.Add(tabContainer);
             }
 
-            return false;
+            foreach(var template in this.templateHandler.BindingList)
+            {
+                SettingsStepContainer templateContainer = new(template.TemplateConfig, "TEMPLATE", template.Name);
+                templateContainer.AddRange(templateContexts);
+                containers.Add(templateContainer);
+            }
+
+            return containers;
         }
 
         private void AddConfigurationBindings(SettingsBindings settingsBindings)
@@ -455,27 +483,17 @@ namespace TiaUtilities.Generation.Alarms.Module
         {
             var splitter = GenModuleTextsEditorForm.REFERENCE_EDITOR_SPLITTER;
 
-            var startMillis = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            var endMillis = startMillis;
             foreach (var tab in this.alarmTabList)
             {
                 var tabTextReferences = textReferences.Where(r => this.CheckTextReferenceID1(r, "TAB", tab.Name));
                 this.SetTextReferencesToDataField(tabTextReferences, tab.DeviceDataList, d => d.Name);
             }
 
-            endMillis = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            Debug.WriteLine("Tab: " + (endMillis - startMillis));
-            startMillis = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-
             foreach (var template in this.templateHandler.BindingList)
             {
                 var templateTextReferenced = textReferences.Where(r => this.CheckTextReferenceID1(r, "TEMPLATE", template.Name));
                 this.SetTextReferencesToDataField(templateTextReferenced, template.AlarmGridSave.RowData.Values, d => d.AlarmVariable);
             }
-
-            endMillis = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            Debug.WriteLine("Template: " + (endMillis - startMillis));
-            startMillis = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             /*
             foreach (var textReference in textReferences)
             {

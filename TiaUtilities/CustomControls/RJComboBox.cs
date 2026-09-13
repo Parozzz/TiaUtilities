@@ -278,8 +278,7 @@ namespace TiaUtilities.CustomControls
                 BorderColor = Color.Transparent,
                 BorderFocusColor = Color.Transparent,
                 ReadOnly = true,
-                TextLeftPadding = 2,
-                TextTopBottomPadding = 5,
+                Padding = new(2, 5, 0, 5),
             };
             this.textBox.MouseEnter += (sender, args) => this.OnMouseLeave(args);
             this.textBox.MouseLeave += (sender, args) => this.OnMouseLeave(args);

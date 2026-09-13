@@ -23,6 +23,7 @@ using TiaUtilities.Generation.IO.Module;
 using TiaUtilities.Generation.SettingsNew;
 using TiaUtilities.Languages;
 using TiaUtilities.Resources;
+using TiaUtilities.SettingsNew;
 using TiaUtilities.SettingsNew.Bindings;
 using TiaUtilities.Utility;
 using Timer = System.Windows.Forms.Timer;
@@ -452,7 +453,7 @@ namespace TiaUtilities
                 var directory = "";
                 foreach (var filePath in fileDialog.FileNames)
                 {
-                    if(directory == "")
+                    if (directory == "")
                     {
                         directory = Path.GetDirectoryName(filePath);
                     }
@@ -484,10 +485,10 @@ namespace TiaUtilities
 
                             foreach (var subElement in member.SubElements)
                             {
-                                if(int.TryParse(subElement.Path, out int path))
+                                if (int.TryParse(subElement.Path, out int path))
                                 {
-                                    string text = ""; 
-                                    
+                                    string text = "";
+
                                     var comment = subElement.Comment;
                                     if (comment != null && comment.GetItems().Count > 0)
                                     {
@@ -503,10 +504,10 @@ namespace TiaUtilities
                         }
 
                         var subSection = parameterMember.SubSection;
-                        if(subSection != null)
+                        if (subSection != null)
                         {
                             var subSectionMembers = subSection.GetItems();
-                            if(subSectionMembers != null)
+                            if (subSectionMembers != null)
                             {
                                 var tempiMember = subSectionMembers.FirstOrDefault(m => m.MemberName.ToLower().Equals("tempi"));
                                 var varMember = subSectionMembers.FirstOrDefault(m => m.MemberName.ToLower().Equals("variabili"));
@@ -529,6 +530,11 @@ namespace TiaUtilities
 
                 workbook.SaveAs($"{directory}/textsExcel.xlsx");
             }
+        }
+
+        private void TestStepSettingsMenuItem_Click(object sender, EventArgs e)
+        {
+            new SettingsStepForm().Show();
         }
     }
 }

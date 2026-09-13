@@ -30,7 +30,7 @@ namespace TiaUtilities.Generation
         /// </summary>
         private void InitializeComponent()
         {
-            placeholderListBox = new NoScrollbarListBox();
+            placeholderListBox = new ListBoxNoScrollbars();
             SuspendLayout();
             // 
             // placeholderListBox
@@ -64,6 +64,6 @@ namespace TiaUtilities.Generation
 
         #endregion
 
-        private NoScrollbarListBox placeholderListBox;
+        private ListBoxNoScrollbars placeholderListBox;
     }
 }

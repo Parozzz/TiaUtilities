@@ -85,9 +85,5 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
             this.selectLabel.Text = Locale.ALARM_TEMPLATE_SELECT_TEMPLATE;
         }
 
-        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
-        {
-            return this.templateDataGridWrapper.ProcessCmdKey(ref msg, keyData) || base.ProcessCmdKey(ref msg, keyData);
-        }
     }
 }

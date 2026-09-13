@@ -43,6 +43,7 @@
             svgToolStripMenuItem = new ToolStripMenuItem();
             dbVisualizationMenuItem = new ToolStripMenuItem();
             exportAllMembersToolStripMenuItem = new ToolStripMenuItem();
+            createTextListsExcelToolStripMenuItem = new ToolStripMenuItem();
             questionMarkMenuItem = new ToolStripMenuItem();
             LogWorker = new System.ComponentModel.BackgroundWorker();
             MainLayoutPanel = new TableLayoutPanel();
@@ -50,7 +51,7 @@
             ioGenButton = new Button();
             alarmGenButton = new Button();
             duplicateDBButton = new Button();
-            createTextListsExcelToolStripMenuItem = new ToolStripMenuItem();
+            testStepSettingsMenuItem = new ToolStripMenuItem();
             TopMenuStrip.SuspendLayout();
             MainLayoutPanel.SuspendLayout();
             bottomPanel.SuspendLayout();
@@ -62,8 +63,8 @@
             TopMenuStrip.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, programMenuItem, testToolStripMenuItem, questionMarkMenuItem });
             TopMenuStrip.Location = new Point(0, 0);
             TopMenuStrip.Name = "TopMenuStrip";
-            TopMenuStrip.Padding = new Padding(5, 2, 0, 2);
-            TopMenuStrip.Size = new Size(906, 29);
+            TopMenuStrip.Padding = new Padding(6, 3, 0, 3);
+            TopMenuStrip.Size = new Size(1035, 38);
             TopMenuStrip.TabIndex = 11;
             TopMenuStrip.Text = "menuStrip1";
             // 
@@ -72,101 +73,108 @@
             fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { saveMenuItem, loadToolStripMenuItem, toolStripSeparator2 });
             fileToolStripMenuItem.Font = new Font("Segoe UI", 12F);
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            fileToolStripMenuItem.Size = new Size(46, 25);
+            fileToolStripMenuItem.Size = new Size(56, 32);
             fileToolStripMenuItem.Text = "File";
             // 
             // saveMenuItem
             // 
             saveMenuItem.Name = "saveMenuItem";
-            saveMenuItem.Size = new Size(114, 26);
+            saveMenuItem.Size = new Size(141, 32);
             saveMenuItem.Text = "Save";
             // 
             // loadToolStripMenuItem
             // 
             loadToolStripMenuItem.Name = "loadToolStripMenuItem";
-            loadToolStripMenuItem.Size = new Size(114, 26);
+            loadToolStripMenuItem.Size = new Size(141, 32);
             loadToolStripMenuItem.Text = "Load";
             loadToolStripMenuItem.Click += LoadToolStripMenuItem_Click;
             // 
             // toolStripSeparator2
             // 
             toolStripSeparator2.Name = "toolStripSeparator2";
-            toolStripSeparator2.Size = new Size(111, 6);
+            toolStripSeparator2.Size = new Size(138, 6);
             // 
             // programMenuItem
             // 
             programMenuItem.DropDownItems.AddRange(new ToolStripItem[] { programSettingsMenuItem });
             programMenuItem.Font = new Font("Segoe UI", 12F);
             programMenuItem.Name = "programMenuItem";
-            programMenuItem.Size = new Size(83, 25);
+            programMenuItem.Size = new Size(102, 32);
             programMenuItem.Text = "Program";
             // 
             // programSettingsMenuItem
             // 
             programSettingsMenuItem.Name = "programSettingsMenuItem";
-            programSettingsMenuItem.Size = new Size(136, 26);
+            programSettingsMenuItem.Size = new Size(169, 32);
             programSettingsMenuItem.Text = "Settings";
             // 
             // testToolStripMenuItem
             // 
-            testToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { importXMLToolStripMenuItem, jSToolStripMenuItem, sampleXMLMenuItem, testProjectMenuItem, svgToolStripMenuItem, dbVisualizationMenuItem, exportAllMembersToolStripMenuItem, createTextListsExcelToolStripMenuItem });
+            testToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { importXMLToolStripMenuItem, jSToolStripMenuItem, sampleXMLMenuItem, testProjectMenuItem, svgToolStripMenuItem, dbVisualizationMenuItem, exportAllMembersToolStripMenuItem, createTextListsExcelToolStripMenuItem, testStepSettingsMenuItem });
             testToolStripMenuItem.Font = new Font("Segoe UI", 12F);
             testToolStripMenuItem.Name = "testToolStripMenuItem";
-            testToolStripMenuItem.Size = new Size(48, 25);
+            testToolStripMenuItem.Size = new Size(59, 32);
             testToolStripMenuItem.Text = "Test";
             // 
             // importXMLToolStripMenuItem
             // 
             importXMLToolStripMenuItem.Name = "importXMLToolStripMenuItem";
-            importXMLToolStripMenuItem.Size = new Size(216, 26);
+            importXMLToolStripMenuItem.Size = new Size(268, 32);
             importXMLToolStripMenuItem.Text = "Import XML";
             importXMLToolStripMenuItem.Click += ImportXMLToolStripMenuItem_Click;
             // 
             // jSToolStripMenuItem
             // 
             jSToolStripMenuItem.Name = "jSToolStripMenuItem";
-            jSToolStripMenuItem.Size = new Size(216, 26);
+            jSToolStripMenuItem.Size = new Size(268, 32);
             jSToolStripMenuItem.Text = "JS";
             jSToolStripMenuItem.Click += JSToolStripMenuItem_Click;
             // 
             // sampleXMLMenuItem
             // 
             sampleXMLMenuItem.Name = "sampleXMLMenuItem";
-            sampleXMLMenuItem.Size = new Size(216, 26);
+            sampleXMLMenuItem.Size = new Size(268, 32);
             sampleXMLMenuItem.Text = "Sample XML";
             // 
             // testProjectMenuItem
             // 
             testProjectMenuItem.Name = "testProjectMenuItem";
-            testProjectMenuItem.Size = new Size(216, 26);
+            testProjectMenuItem.Size = new Size(268, 32);
             testProjectMenuItem.Text = "Project";
             // 
             // svgToolStripMenuItem
             // 
             svgToolStripMenuItem.Name = "svgToolStripMenuItem";
-            svgToolStripMenuItem.Size = new Size(216, 26);
+            svgToolStripMenuItem.Size = new Size(268, 32);
             svgToolStripMenuItem.Text = "Svg";
             svgToolStripMenuItem.Click += SvgToolStripMenuItem_Click;
             // 
             // dbVisualizationMenuItem
             // 
             dbVisualizationMenuItem.Name = "dbVisualizationMenuItem";
-            dbVisualizationMenuItem.Size = new Size(216, 26);
+            dbVisualizationMenuItem.Size = new Size(268, 32);
             dbVisualizationMenuItem.Text = "DbVisualization";
             dbVisualizationMenuItem.Click += dbVisualizationMenuItem_Click;
             // 
             // exportAllMembersToolStripMenuItem
             // 
             exportAllMembersToolStripMenuItem.Name = "exportAllMembersToolStripMenuItem";
-            exportAllMembersToolStripMenuItem.Size = new Size(216, 26);
+            exportAllMembersToolStripMenuItem.Size = new Size(268, 32);
             exportAllMembersToolStripMenuItem.Text = "ExportAllMembers";
             exportAllMembersToolStripMenuItem.Click += exportAllMembersToolStripMenuItem_Click;
+            // 
+            // createTextListsExcelToolStripMenuItem
+            // 
+            createTextListsExcelToolStripMenuItem.Name = "createTextListsExcelToolStripMenuItem";
+            createTextListsExcelToolStripMenuItem.Size = new Size(268, 32);
+            createTextListsExcelToolStripMenuItem.Text = "CreateTextListsExcel";
+            createTextListsExcelToolStripMenuItem.Click += CreateTextListsExcelToolStripMenuItem_Click;
             // 
             // questionMarkMenuItem
             // 
             questionMarkMenuItem.Font = new Font("Segoe UI", 12F);
             questionMarkMenuItem.Name = "questionMarkMenuItem";
-            questionMarkMenuItem.Size = new Size(29, 25);
+            questionMarkMenuItem.Size = new Size(35, 32);
             questionMarkMenuItem.Text = "?";
             questionMarkMenuItem.Click += QuestionMarkMenuItem_Click;
             // 
@@ -180,13 +188,13 @@
             MainLayoutPanel.Controls.Add(bottomPanel, 0, 1);
             MainLayoutPanel.Dock = DockStyle.Fill;
             MainLayoutPanel.Location = new Point(0, 0);
-            MainLayoutPanel.Margin = new Padding(4, 3, 4, 3);
+            MainLayoutPanel.Margin = new Padding(5, 4, 5, 4);
             MainLayoutPanel.Name = "MainLayoutPanel";
             MainLayoutPanel.RowCount = 2;
             MainLayoutPanel.RowStyles.Add(new RowStyle());
             MainLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            MainLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            MainLayoutPanel.Size = new Size(906, 331);
+            MainLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 27F));
+            MainLayoutPanel.Size = new Size(1035, 441);
             MainLayoutPanel.TabIndex = 14;
             // 
             // bottomPanel
@@ -197,9 +205,10 @@
             bottomPanel.Controls.Add(ioGenButton);
             bottomPanel.Controls.Add(alarmGenButton);
             bottomPanel.Controls.Add(duplicateDBButton);
-            bottomPanel.Location = new Point(59, 49);
+            bottomPanel.Location = new Point(57, 65);
+            bottomPanel.Margin = new Padding(3, 4, 3, 4);
             bottomPanel.Name = "bottomPanel";
-            bottomPanel.Size = new Size(787, 262);
+            bottomPanel.Size = new Size(920, 349);
             bottomPanel.TabIndex = 1;
             // 
             // ioGenButton
@@ -210,10 +219,11 @@
             ioGenButton.FlatStyle = FlatStyle.Flat;
             ioGenButton.Font = new Font("Segoe UI", 21.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
             ioGenButton.ForeColor = SystemColors.ButtonFace;
-            ioGenButton.Location = new Point(3, 3);
-            ioGenButton.MinimumSize = new Size(256, 256);
+            ioGenButton.Location = new Point(3, 4);
+            ioGenButton.Margin = new Padding(3, 4, 3, 4);
+            ioGenButton.MinimumSize = new Size(293, 341);
             ioGenButton.Name = "ioGenButton";
-            ioGenButton.Size = new Size(256, 256);
+            ioGenButton.Size = new Size(293, 341);
             ioGenButton.TabIndex = 0;
             ioGenButton.Text = "IO Generation";
             ioGenButton.TextAlign = ContentAlignment.BottomCenter;
@@ -227,10 +237,11 @@
             alarmGenButton.FlatStyle = FlatStyle.Flat;
             alarmGenButton.Font = new Font("Segoe UI", 20.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
             alarmGenButton.ForeColor = SystemColors.ButtonFace;
-            alarmGenButton.Location = new Point(265, 3);
-            alarmGenButton.MinimumSize = new Size(256, 256);
+            alarmGenButton.Location = new Point(302, 4);
+            alarmGenButton.Margin = new Padding(3, 4, 3, 4);
+            alarmGenButton.MinimumSize = new Size(293, 341);
             alarmGenButton.Name = "alarmGenButton";
-            alarmGenButton.Size = new Size(257, 256);
+            alarmGenButton.Size = new Size(316, 341);
             alarmGenButton.TabIndex = 1;
             alarmGenButton.Text = "Alarm Generation";
             alarmGenButton.TextAlign = ContentAlignment.BottomCenter;
@@ -244,30 +255,31 @@
             duplicateDBButton.FlatStyle = FlatStyle.Flat;
             duplicateDBButton.Font = new Font("Segoe UI", 20.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
             duplicateDBButton.ForeColor = SystemColors.ButtonFace;
-            duplicateDBButton.Location = new Point(528, 3);
-            duplicateDBButton.MinimumSize = new Size(256, 256);
+            duplicateDBButton.Location = new Point(624, 4);
+            duplicateDBButton.Margin = new Padding(3, 4, 3, 4);
+            duplicateDBButton.MinimumSize = new Size(293, 341);
             duplicateDBButton.Name = "duplicateDBButton";
-            duplicateDBButton.Size = new Size(256, 256);
+            duplicateDBButton.Size = new Size(293, 341);
             duplicateDBButton.TabIndex = 2;
             duplicateDBButton.Text = "Duplicate DB";
             duplicateDBButton.TextAlign = ContentAlignment.BottomCenter;
             duplicateDBButton.UseVisualStyleBackColor = false;
             // 
-            // createTextListsExcelToolStripMenuItem
+            // testStepSettingsMenuItem
             // 
-            createTextListsExcelToolStripMenuItem.Name = "createTextListsExcelToolStripMenuItem";
-            createTextListsExcelToolStripMenuItem.Size = new Size(216, 26);
-            createTextListsExcelToolStripMenuItem.Text = "CreateTextListsExcel";
-            createTextListsExcelToolStripMenuItem.Click += CreateTextListsExcelToolStripMenuItem_Click;
+            testStepSettingsMenuItem.Name = "testStepSettingsMenuItem";
+            testStepSettingsMenuItem.Size = new Size(268, 32);
+            testStepSettingsMenuItem.Text = "TestStepSettings";
+            testStepSettingsMenuItem.Click += TestStepSettingsMenuItem_Click;
             // 
             // MainForm
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(906, 331);
+            ClientSize = new Size(1035, 441);
             Controls.Add(MainLayoutPanel);
             MainMenuStrip = TopMenuStrip;
-            Margin = new Padding(4, 3, 4, 3);
+            Margin = new Padding(5, 4, 5, 4);
             Name = "MainForm";
             Text = "AppoggioMan";
             TopMenuStrip.ResumeLayout(false);
@@ -306,6 +318,7 @@
         private ToolStripMenuItem exportAllMembersToolStripMenuItem;
         private ToolStripMenuItem questionMarkMenuItem;
         private ToolStripMenuItem createTextListsExcelToolStripMenuItem;
+        private ToolStripMenuItem testStepSettingsMenuItem;
     }
 }
 

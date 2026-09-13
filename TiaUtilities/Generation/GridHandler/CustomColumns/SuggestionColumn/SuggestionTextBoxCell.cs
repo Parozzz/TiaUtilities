@@ -83,7 +83,7 @@ namespace TiaUtilities.Generation.GridHandler.CustomColumns.SuggestionColumn
 
                 editingControl.FindForm()?.Focus();
                 editingControl.Focus();
-                //This trasfer the key data from the DropDown to the editing control.
+                //This trasfer the key data (and the focus back) from the DropDown to the editing control.
                 DllImports.PostMessage(editingControl.Handle, DllImports.WM_KEYDOWN, (int)args1.KeyData, 0);
             };
 

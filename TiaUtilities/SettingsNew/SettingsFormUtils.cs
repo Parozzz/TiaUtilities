@@ -1,4 +1,5 @@
 ﻿using TiaUtilities.Languages;
+using TiaUtilities.Resources;
 using TiaUtilities.SettingsNew.FormHelpers;
 using TiaUtilities.Utility.Extensions;
 
@@ -13,6 +14,7 @@ namespace TiaUtilities.SettingsNew
                 Text = SettingsFormUtils.GetSetToOtherText(formValue),
                 Image = Image.FromFile("Resources/Images/noun-transfer-7710063.png")
             };
+            
             setToOther.Click += (sender, args) =>
             {
                 //This only transfers ONE value to the other configuration, the one contextMenu is applied

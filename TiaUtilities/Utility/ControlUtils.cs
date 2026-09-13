@@ -7,6 +7,24 @@ namespace TiaUtilities.Utility
 {
     public static class ControlUtils
     {
+        public static bool SetStyle(Control c, ControlStyles Style, bool value)
+        {
+            bool retval = false;
+
+            if (c != null)
+            {
+                Type typeTB = typeof(Control);
+                System.Reflection.MethodInfo misSetStyle = typeTB.GetMethod("SetStyle", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+                if (misSetStyle != null)
+                {
+                    misSetStyle.Invoke(c, new object[] { Style, value });
+                    retval = true;
+                }
+            }
+            return retval;
+        }
+
         public static void SetDoubleBuffered(Control c)
         {
             ArgumentNullException.ThrowIfNull(c);
@@ -126,7 +144,7 @@ namespace TiaUtilities.Utility
             comboBox.DataSource = dataSourceList;
         }
 
-        public static void SignedKeyPressEventHandler(object? sender, KeyPressEventArgs args)
+        public static void SignedNumberKeyPressEventHandler(object? sender, KeyPressEventArgs args)
         {
             if (args.KeyChar == (char)Keys.Cancel || args.KeyChar == (char)Keys.Enter || args.KeyChar == (char)Keys.Back)
             {
@@ -137,7 +155,18 @@ namespace TiaUtilities.Utility
             args.Handled = !isKeyValid;
         }
 
-        public static void UnsignedKeyPressEventHandler(object? sender, KeyPressEventArgs args)
+        public static void FloatingNumberKeyPressEventHandler(object? sender, KeyPressEventArgs args)
+        {
+            if (args.KeyChar == (char)Keys.Cancel || args.KeyChar == (char)Keys.Enter || args.KeyChar == (char)Keys.Back)
+            {
+                return;
+            }
+
+            var isKeyValid = char.IsNumber(args.KeyChar) || args.KeyChar == '+' || args.KeyChar == '-' || args.KeyChar == '.' || args.KeyChar == ',';
+            args.Handled = !isKeyValid;
+        }
+
+        public static void UnsignedNumberKeyPressEventHandler(object? sender, KeyPressEventArgs args)
         {
             if (args.KeyChar == (char)Keys.Cancel || args.KeyChar == (char)Keys.Enter || args.KeyChar == (char)Keys.Back)
             {
@@ -152,7 +181,7 @@ namespace TiaUtilities.Utility
         private const UInt32 WPARAM_RIGHT_SCROLL = 0x00780000;
         public static int WncProcHorizontalScrollWheel(Message m)
         {
-            if (m.Msg == 0x20E) //WM_MOUSEHWHEEL
+            if (m.Msg == DllImports.WM_MOUSEHWHEEL)
             {
                 if(m.WParam == WPARAM_LEFT_SCROLL)
                 {

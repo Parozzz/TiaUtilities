@@ -1,8 +1,8 @@
 ﻿namespace TiaUtilities.CustomControls
 {
-    public class NoScrollbarListBox : ListBox
+    public class ListBoxNoScrollbars : ListBox
     {
-        public NoScrollbarListBox()
+        public ListBoxNoScrollbars()
         {
             this.DoubleBuffered = true;
         }

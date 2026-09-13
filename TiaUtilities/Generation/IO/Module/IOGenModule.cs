@@ -510,17 +510,6 @@ namespace TiaUtilities.Generation.IO.Module
             }
         }
 
-        public bool ProcessCmdKey(ref Message msg, Keys keyData)
-        {
-            var selectedTab = this.control.tabControl.SelectedTab;
-            if (selectedTab != null && selectedTab.Tag is IOGenTab ioGenTab)
-            {
-                return ioGenTab.ProcessCmdKey(ref msg, keyData);
-            }
-
-            return false;
-        }
-
         public string GetFormLocalizatedName()
         {
             return Locale.IO_GEN_FORM_NAME;

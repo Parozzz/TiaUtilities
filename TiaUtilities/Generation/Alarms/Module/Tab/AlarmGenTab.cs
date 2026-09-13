@@ -107,11 +107,6 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             deviceGridHandler.LoadSave(save.DeviceGrid);
         }
 
-        public bool ProcessCmdKey(ref Message msg, Keys keyData)
-        {
-            return deviceGridHandler.ProcessCmdKey(ref msg, keyData);
-        }
-
         public void ParseTemplateRenamed(string oldName, string newName)
         {
             var indexes = deviceGridHandler.DataSource.GetNotEmptyIndexes();

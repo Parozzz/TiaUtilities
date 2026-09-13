@@ -5,6 +5,12 @@ namespace TiaUtilities.Editors.Json
 {
     public class JsonEditor
     {
+        public event EventHandler TextChanged
+        {
+            add => this.jsonScintilla.Scintilla.TextChanged += value;
+            remove => this.jsonScintilla.Scintilla.TextChanged -= value;
+        }
+
         public string Text
         {
             get => this.jsonScintilla.Text;

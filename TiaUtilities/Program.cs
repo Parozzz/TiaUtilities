@@ -4,6 +4,7 @@ using Jint;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using TiaUtilities.Generation.GridHandler.CustomColumns;
 using TiaUtilities.Languages;
+using TiaUtilities.SettingsNew;
 using TiaUtilities.Utility;
 
 namespace TiaUtilities
@@ -50,6 +51,8 @@ namespace TiaUtilities
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
                 Application.Run(new MainForm());
+
+                //Application.Run(new StepSettingsForm());
             }
             catch (Exception ex)
             {

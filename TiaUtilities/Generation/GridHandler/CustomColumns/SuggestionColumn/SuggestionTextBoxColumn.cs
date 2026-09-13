@@ -26,22 +26,21 @@ namespace TiaUtilities.Generation.GridHandler.CustomColumns.SuggestionColumn
             {
                 return false;
             }
-
+            
             if (keyData == Keys.Up || keyData == Keys.Down)
-            {
-                //DropDown already support scrolling with arrows! This will focus it to enable it.
-                var focused = dropDown.Focused;
-                dropDown.Focus();
+            {//DropDown already support scrolling with arrows! This will focus it to enable it.
+                var focused = this.dropDown.Focused;
+                this.dropDown.Focus();
+                this.dropDown.Select();
                 if (!focused) //This will avoid that the first arrow sent is skipped!
                 {
                     SendKeys.SendWait(keyData == Keys.Up ? "{UP}" : "{DOWN}");
+                    return true; //Only ignore the first key to allow the message to be propagated to the dropdown.
                 }
-                return true;
             }
 
             return false;
         }
-
 
         internal void UpdateVisibileSuggestions(string text)
         {

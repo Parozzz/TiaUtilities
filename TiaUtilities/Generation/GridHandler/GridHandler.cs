@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using System.Collections.Immutable;
 using TiaUtilities.Generation.GridHandler.CustomColumns;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.GridHandler.GridImprovements;
@@ -8,6 +9,7 @@ using TiaUtilities.JSScript;
 using TiaUtilities.Languages;
 using TiaUtilities.UndoRedo;
 using TiaUtilities.Utility;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace TiaUtilities.Generation.GridHandler
 {
@@ -78,7 +80,7 @@ namespace TiaUtilities.Generation.GridHandler
             this.DataPreviewer = previewer;
             this.placeholderHandler = placeholderHandler;
 
-            this.DataGridView = new();
+            this.DataGridView = new(this.ProcessCmdKey);
 
             this.eventCaller = new(this);
             this.undoRedoHandler = new();
@@ -128,8 +130,6 @@ namespace TiaUtilities.Generation.GridHandler
 
         void IGridHandlerEventCalls.CallLoadDataEvent() => this.DataLoaded(this.DataGridView, new());
         #endregion
-
-
 
         public void Init()
         {
@@ -606,7 +606,7 @@ namespace TiaUtilities.Generation.GridHandler
 
         public DataGridViewColumn GetColumn(int columnIndex) => this.DataGridView.Columns[columnIndex];
 
-        public bool ProcessCmdKey(ref Message msg, Keys keyData)
+        private bool ProcessCmdKey(Message msg, Keys keyData)
         {
             //For custom columns, focused must not be checked (eg. for columns with dropdown this would kill the interaction).
             if (this.DataGridView.Focused)
@@ -669,19 +669,25 @@ namespace TiaUtilities.Generation.GridHandler
         public Control GetControl() => this.DataGridView;
     }
 
-    public class ExcelLikeDataGridView : DataGridView
+    public class ExcelLikeDataGridView : DataGridView, IMessageFilter
     {
         public ImmutableList<DataGridViewColumn> VisibleColumns { get; private set; } = [];
         public ImmutableList<DataGridViewRow> VisibleRows { get; private set; } = [];
 
-        public ExcelLikeDataGridView()
+        private readonly Func<Message, Keys, bool> processCmdKeyCallback;
+
+        public ExcelLikeDataGridView(Func<Message, Keys, bool> processCmdKeyCallback)
         {
+            this.processCmdKeyCallback = processCmdKeyCallback;
+
             this.SetStyle(ControlStyles.SupportsTransparentBackColor, true); //this is the key
             this.DoubleBuffered = true;
         }
 
         protected override void OnHandleCreated(EventArgs e)
         {
+            Application.AddMessageFilter(this);
+
             // BUG => System.InvalidOperationException: 'L'operazione non può essere eseguita mentre è in corso il ridimensionamento di una colonna con riempimento automatico.'
             // FIX = https://stackoverflow.com/questions/34344499/invalidoperationexception-this-operation-cannot-be-performed-while-an-auto-fill
 
@@ -692,6 +698,12 @@ namespace TiaUtilities.Generation.GridHandler
 
             var topLeftHeaderCell = TopLeftHeaderCell;
             base.OnHandleCreated(e);
+        }
+
+        protected override void OnHandleDestroyed(EventArgs e)
+        {
+            Application.RemoveMessageFilter(this);
+            base.OnHandleDestroyed(e);
         }
 
         protected override void OnColumnDisplayIndexChanged(DataGridViewColumnEventArgs e)
@@ -757,5 +769,15 @@ namespace TiaUtilities.Generation.GridHandler
                                     .ToImmutableList();
         }
 
+        public bool PreFilterMessage(ref Message m)
+        {
+            if(m.Msg == DllImports.WM_KEYDOWN || m.Msg == DllImports.WM_SYSKEYDOWN)
+            {
+                Keys keyCode = (Keys)m.WParam;
+                return processCmdKeyCallback(m, keyCode);
+            }
+
+            return false; //Handle message normally
+        }
     }
 }

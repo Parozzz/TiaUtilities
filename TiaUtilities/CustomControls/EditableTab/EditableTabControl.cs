@@ -1,41 +1,12 @@
-﻿using DocumentFormat.OpenXml.Drawing.Charts;
-using DocumentFormat.OpenXml.Office2010.ExcelAc;
-using InfoBox;
-using System.Runtime.InteropServices;
+﻿using InfoBox;
 using TiaUtilities.Languages;
 using TiaUtilities.Styles;
 using TiaUtilities.Utility;
 
 namespace TiaUtilities.CustomControls.EditableTab
 {
-    public delegate void EditableTabPreRemovedEventHandler(object? sender, EditableTabPreRemoveEventArgs args);
-    public class EditableTabPreRemoveEventArgs(TabPage tabPage, int tabIndex) : EventArgs
-    {
-        public TabPage TabPage { get; init; } = tabPage;
-        public int TabIndex { get; init; } = tabIndex;
-        public bool Cancel { get; set; }
-    }
-
-    public delegate void EditableTabPreAddEventHandler(object? sender, EditableTabPreAddEventArgs args);
-    public class EditableTabPreAddEventArgs(TabPage tabPage) : EventArgs
-    {
-        public TabPage TabPage { get; init; } = tabPage;
-        public bool Cancel { get; set; }
-    }
-
-    public delegate void EditableTabNameChangedEventHandler(object? sender, EditableTabNameChangedEventArgs args);
-    public class EditableTabNameChangedEventArgs(TabPage tabPage, string newName, string oldName) : EventArgs
-    {
-        public TabPage TabPage { get; init; } = tabPage;
-        public string NewName { get; set; } = newName;
-        public string OldName { get; init; } = oldName;
-        public bool Handled { get; set; } = false;
-    }
-
     public class EditableTabControl : TabControl
     {
-        [DllImport("user32.dll")]
-        private static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wp, IntPtr lp);
         private const int TCM_SETMINTABWIDTH = 0x1300 + 49;
 
         private const int SELECTED_TAB_RECT_SIDE_PADDING = 4;
@@ -70,7 +41,7 @@ namespace TiaUtilities.CustomControls.EditableTab
             this.AllowDrop = true;
 
             //This allows tab to be small 
-            this.HandleCreated += (sender, args) => SendMessage(this.Handle, TCM_SETMINTABWIDTH, IntPtr.Zero, (IntPtr)16);
+            this.HandleCreated += (sender, args) => DllImports.SendMessage(this.Handle, TCM_SETMINTABWIDTH, IntPtr.Zero, (IntPtr)16);
             this.Selecting += (sender, args) =>
             {
                 if (tabClosed || args.TabPage is EditableNewTabPage)
@@ -197,7 +168,7 @@ namespace TiaUtilities.CustomControls.EditableTab
         {
             base.OnPreviewKeyDown(e);
 
-            if(e.KeyData == (Keys.Enter | Keys.Control))
+            if (e.KeyData == (Keys.Enter | Keys.Control))
             {
                 this.HandleContextMenuOnKeyboard();
             }
@@ -369,13 +340,13 @@ namespace TiaUtilities.CustomControls.EditableTab
 
         private void HandleContextMenuOnKeyboard()
         {
-            if(this.SelectedTab == null)
+            if (this.SelectedTab == null)
             {
                 return;
             }
 
             var contextMenu = EditableTabControlContextMenuFactory.CreateContextMenu(this, this.SelectedTab);
-            
+
             Point point = new(this.SelectedTab.Left, this.SelectedTab.Top);
             contextMenu.Show(this.SelectedTab.PointToScreen(point));
         }
@@ -443,7 +414,7 @@ namespace TiaUtilities.CustomControls.EditableTab
 
         public void CloseTabs(IEnumerable<CloseRequest> closeRequests, bool forceClosing = false)
         {
-            if(!closeRequests.Any())
+            if (!closeRequests.Any())
             {
                 return;
             }
@@ -540,6 +511,31 @@ namespace TiaUtilities.CustomControls.EditableTab
 
         protected override void OnPaintBackground(PaintEventArgs e) { }
     }
+
+    public delegate void EditableTabPreRemovedEventHandler(object? sender, EditableTabPreRemoveEventArgs args);
+    public class EditableTabPreRemoveEventArgs(TabPage tabPage, int tabIndex) : EventArgs
+    {
+        public TabPage TabPage { get; init; } = tabPage;
+        public int TabIndex { get; init; } = tabIndex;
+        public bool Cancel { get; set; }
+    }
+
+    public delegate void EditableTabPreAddEventHandler(object? sender, EditableTabPreAddEventArgs args);
+    public class EditableTabPreAddEventArgs(TabPage tabPage) : EventArgs
+    {
+        public TabPage TabPage { get; init; } = tabPage;
+        public bool Cancel { get; set; }
+    }
+
+    public delegate void EditableTabNameChangedEventHandler(object? sender, EditableTabNameChangedEventArgs args);
+    public class EditableTabNameChangedEventArgs(TabPage tabPage, string newName, string oldName) : EventArgs
+    {
+        public TabPage TabPage { get; init; } = tabPage;
+        public string NewName { get; set; } = newName;
+        public string OldName { get; init; } = oldName;
+        public bool Handled { get; set; } = false;
+    }
+
 }
 
 

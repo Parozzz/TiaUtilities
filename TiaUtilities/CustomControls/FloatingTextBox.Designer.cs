@@ -52,8 +52,7 @@
             textBox.Size = new Size(800, 40);
             textBox.TabIndex = 0;
             textBox.TextAlign = HorizontalAlignment.Left;
-            textBox.TextLeftPadding = 10;
-            textBox.TextTopBottomPadding = 10;
+            textBox.Padding = new(10, 10, 0, 10);
             textBox.UnderlineColor = Color.HotPink;
             textBox.Underlined = false;
             // 

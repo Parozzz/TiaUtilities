@@ -11,12 +11,13 @@ namespace TiaUtilities.Configuration
         
         public void UpdateValue(T value)
         {
-            if (Utils.AreDifferentObject(this._value, value))
-            {
-                Changed(this, new(this._value, value));
-            }
+            var oldValue = _value;
 
             this._value = value;
+            if(Utils.AreDifferentObject(this._value, oldValue))
+            {
+                Changed(this, new(oldValue, this._value));
+            }
         }
     }
 

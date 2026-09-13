@@ -12,6 +12,7 @@ namespace TiaUtilities.Utility
             return Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         }
 
+
         public static ICollection<T> SingletonCollection<T>(T data)
         {
             return new System.Collections.ObjectModel.ReadOnlyCollection<T>(new T[] { data });

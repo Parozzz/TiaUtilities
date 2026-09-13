@@ -245,7 +245,5 @@ namespace TiaUtilities.Generation.Alarms.Template
         {
             gridHandler.Wash();
         }
-
-        public bool ProcessCmdKey(ref Message msg, Keys keyData) => gridHandler.ProcessCmdKey(ref msg, keyData);
     }
 }

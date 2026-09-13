@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.GridHandler.CustomColumns.SuggestionColumn
 {
@@ -25,6 +26,17 @@ namespace TiaUtilities.Generation.GridHandler.CustomColumns.SuggestionColumn
             this.ShowItemToolTips = false; // I don't need it. Sometimes ghost tool tips remain after clicking item.
             this.CanOverflow = false;
             this.DoubleBuffered = true;
+
+        }
+
+        protected override void OnHandleCreated(EventArgs e)
+        {
+            base.OnHandleCreated(e);
+        }
+
+        protected override void OnHandleDestroyed(EventArgs e)
+        {
+            base.OnHandleDestroyed(e);
         }
 
         protected override void OnItemAdded(ToolStripItemEventArgs e)

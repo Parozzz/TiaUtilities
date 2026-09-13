@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Drawing.Drawing2D;
+using TiaUtilities.Utility;
 
 namespace TiaUtilities.CustomControls
 {
@@ -12,8 +13,7 @@ namespace TiaUtilities.CustomControls
             get => borderColor;
             set
             {
-                borderColor = value;
-                this.Invalidate();
+                borderColor = value; this.Invalidate();
             }
         }
         private Color borderColor = Color.MediumSlateBlue;
@@ -29,49 +29,53 @@ namespace TiaUtilities.CustomControls
         [Category("RJ Code Advance")]
         public int BorderSize
         {
-            get => borderSize;
+            get => _borderSize;
             set
             {
                 if (value >= 1)
                 {
-                    borderSize = value;
+                    _borderSize = value;
                     this.Invalidate();
                 }
             }
         }
-        private int borderSize = 2;
 
-        [Category("RJ Code Advance")]
+
+        [Category("Underline")]
         public bool Underlined
         {
-            get => underlined;
-            set
-            {
-                underlined = value;
-                this.Invalidate();
-            }
+            get => _underlined;
+            set { _underlined = value; this.Invalidate(); }
         }
-        private bool underlined = false;
 
-        [Category("RJ Code Advance")]
+        [Category("Underline")]
         public Color UnderlineColor
         {
-            get => underlineColor;
-            set
-            {
-                underlineColor = value;
-                this.Invalidate();
-            }
+            get => _underlineColor;
+            set { _underlineColor = value; this.Invalidate(); }
         }
-        private Color underlineColor = Color.HotPink;
+
+        [Category("Underline")]
+        public Color UnderlineFocusColor
+        {
+            get => _underlineFocusColor;
+            set { _underlineFocusColor = value; this.Invalidate(); }
+        }
+
+        [Category("Underline")]
+        public int UnderlineBottomPadding
+        {
+            get => _underlineBottomPadding;
+            set { _underlineBottomPadding = value; this.Invalidate(); }
+        }
+
 
         [Category("RJ Code Advance")]
         public bool PasswordChar
         {
-            get => isPasswordChar;
-            set => isPasswordChar = value;
+            get => _isPasswordChar;
+            set => _isPasswordChar = value;
         }
-        private bool isPasswordChar = false;
 
         [Category("RJ Code Advance")]
         public bool Multiline
@@ -84,22 +88,14 @@ namespace TiaUtilities.CustomControls
         public override Color BackColor
         {
             get => base.BackColor;
-            set
-            {
-                base.BackColor = value;
-                textBox.BackColor = value;
-            }
+            set { base.BackColor = value; textBox.BackColor = value; }
         }
 
         [Category("RJ Code Advance")]
         public override Color ForeColor
         {
             get => base.ForeColor;
-            set
-            {
-                base.ForeColor = value;
-                textBox.ForeColor = value;
-            }
+            set { base.ForeColor = value; textBox.ForeColor = value; }
         }
 
         [Category("RJ Code Advance")]
@@ -118,7 +114,7 @@ namespace TiaUtilities.CustomControls
         }
 
         [Category("RJ Code Advance")]
-        public override string Text
+        public override string? Text
         {
             get => textBox.Text;
             set => textBox.Text = value;
@@ -133,7 +129,7 @@ namespace TiaUtilities.CustomControls
                 if (value >= 0)
                 {
                     borderRadius = value;
-                    this.Invalidate();//Redraw control
+                    this.RicalculatePadding();
                 }
             }
         }
@@ -142,54 +138,33 @@ namespace TiaUtilities.CustomControls
         [Category("RJ Code Advance")]
         public bool ReadOnly
         {
-            get => readOnly;
-            set
-            {
-                readOnly = value;
-                this.textBox.ReadOnly = value;
-            }
+            get => _readOnly;
+            set { _readOnly = value; this.textBox.ReadOnly = value; }
         }
-        private bool readOnly = false;
 
         [Category("RJ Code Advance")]
         public int TextLeftPadding
         {
-            get => base.Padding.Left;
-            set
-            {
-                var padding = base.Padding;
-                base.Padding = new Padding(value, padding.Top, padding.Right, padding.Bottom);
-            }
+            get => _leftTextPadding;
+            set { _leftTextPadding = value; this.RicalculatePadding(); }
         }
 
         [Category("RJ Code Advance")]
         public int TextTopBottomPadding
         {
-            get => base.Padding.Left;
-            set
-            {
-                var padding = base.Padding;
-                base.Padding = new Padding(padding.Left, value, padding.Right, value);
-            }
+            get => base.Padding.Top;
+            set { _topBottomTextPadding = value; this.RicalculatePadding(); } 
         }
 
         public override DockStyle Dock
         {
             get => base.Dock;
-            set
-            {
-                base.Dock = value;
-                this.textBox.Dock = value;
-            }
+            set { base.Dock = value; this.textBox.Dock = value; }
         }
         public override AnchorStyles Anchor
         {
             get => base.Anchor;
-            set
-            {
-                base.Anchor = value;
-                this.textBox.Anchor = value;
-            }
+            set { base.Anchor = value; this.textBox.Anchor = value; }
         }
         public HorizontalAlignment TextAlign
         {
@@ -209,10 +184,27 @@ namespace TiaUtilities.CustomControls
 
         private bool isFocused = false;
 
+        private int _borderSize = 2;
+        private bool _isPasswordChar = false;
+        private bool _readOnly = false;
+
+        private bool _underlined = false;
+        private Color _underlineColor = Color.FromArgb(127, Color.HotPink);
+        private Color _underlineFocusColor = Color.HotPink;
+        private int _underlineBottomPadding = 0;
+
+        private int _leftTextPadding = 3;
+        private int _topBottomTextPadding = 3;
+
         public RJTextBox()
         {
             //Created by designer
             InitializeComponent();
+            base.DoubleBuffered = true;
+
+            ControlUtils.SetDoubleBuffered(this.textBox);
+            ControlUtils.SetStyle(this.textBox, ControlStyles.SupportsTransparentBackColor | ControlStyles.AllPaintingInWmPaint, true);
+
             this.textBox.Click += (sender, args) => this.OnClick(args);
             this.textBox.TextChanged += (sender, args) => this.OnTextChanged(args);
             this.textBox.Enter += (sender, args) =>
@@ -228,6 +220,17 @@ namespace TiaUtilities.CustomControls
             this.textBox.KeyPress += (sender, args) => this.OnKeyPress(args);
             this.textBox.MouseEnter += (sender, args) => this.OnMouseEnter(args);
             this.textBox.MouseLeave += (sender, args) => this.OnMouseLeave(args);
+        }
+
+        private void RicalculatePadding()
+        {
+            var padding = base.Padding;
+            base.Padding = new Padding(_leftTextPadding, 
+                _topBottomTextPadding + _borderSize, 
+                padding.Right, 
+                _topBottomTextPadding + _borderSize);
+
+            this.Invalidate();//Redraw control
         }
 
         protected override void OnResize(EventArgs e)
@@ -254,8 +257,8 @@ namespace TiaUtilities.CustomControls
             {
                 //-Fields
                 var rectBorderSmooth = this.ClientRectangle;
-                var rectBorder = Rectangle.Inflate(rectBorderSmooth, -borderSize, -borderSize);
-                int smoothSize = borderSize > 0 ? borderSize : 1;
+                var rectBorder = Rectangle.Inflate(rectBorderSmooth, -_borderSize, -_borderSize);
+                int smoothSize = _borderSize > 0 ? _borderSize : 1;
 
                 using var pathBorderSmooth = GetFigurePath(rectBorderSmooth, borderRadius);
                 using Pen penBorderSmooth = new(this.Parent.BackColor, smoothSize);
@@ -270,19 +273,22 @@ namespace TiaUtilities.CustomControls
                 graphics.SmoothingMode = SmoothingMode.AntiAlias;
                 graphics.DrawPath(penBorderSmooth, pathBorderSmooth); //Draw border smoothing
 
-                if (underlined) //Line Style
+                if (_underlined) //Line Style
                 {
                     //Draw border
                     graphics.SmoothingMode = SmoothingMode.None;
 
-                    using var underlinePen = new Pen(underlineColor, borderSize);
-                    graphics.DrawLine(underlinePen, 0, this.Height - 1, this.Width, this.Height - 1);
+                    var color = isFocused ? _underlineFocusColor : _underlineColor;
+                    var y = this.Height - _underlineBottomPadding - 1;
+
+                    using var underlinePen = new Pen(color, _borderSize);
+                    graphics.DrawLine(underlinePen, 0, y, this.Width, y);
                 }
                 else //Normal Style
                 {
-                    using var pathBorder = GetFigurePath(rectBorder, borderRadius - borderSize);
+                    using var pathBorder = GetFigurePath(rectBorder, borderRadius - _borderSize);
 
-                    using var penBorder = new Pen(isFocused ? borderFocusColor : borderColor, borderSize);
+                    using var penBorder = new Pen(isFocused ? borderFocusColor : borderColor, _borderSize);
                     penBorder.Alignment = PenAlignment.Center;
                     graphics.DrawPath(penBorder, pathBorder); //Draw border
                 }
@@ -293,14 +299,17 @@ namespace TiaUtilities.CustomControls
                 //Draw border
                 this.Region = new Region(this.ClientRectangle);
 
-                if (underlined) //Line Style
+                if (_underlined) //Line Style
                 {
-                    using var underlinePen = new Pen(underlineColor, borderSize);
-                    graphics.DrawLine(underlinePen, 0, this.Height - 1, this.Width, this.Height - 1);
+                    var color = isFocused ? _underlineFocusColor : _underlineColor;
+                    var y = this.Height - _underlineBottomPadding - 1;
+
+                    using var underlinePen = new Pen(color, _borderSize);
+                    graphics.DrawLine(underlinePen, 0, y, this.Width, y);
                 }
                 else //Normal Style
                 {
-                    using var penBorder = new Pen(isFocused ? borderFocusColor : borderColor, borderSize);
+                    using var penBorder = new Pen(isFocused ? borderFocusColor : borderColor, _borderSize);
                     penBorder.Alignment = PenAlignment.Inset;
                     graphics.DrawRectangle(penBorder, 0, 0, this.Width - 0.5F, this.Height - 0.5F);
                 }
@@ -325,12 +334,12 @@ namespace TiaUtilities.CustomControls
             GraphicsPath pathTxt;
             if (Multiline)
             {
-                pathTxt = GetFigurePath(textBox.ClientRectangle, borderRadius - borderSize);
+                pathTxt = GetFigurePath(textBox.ClientRectangle, borderRadius - _borderSize);
                 textBox.Region = new Region(pathTxt);
             }
             else
             {
-                pathTxt = GetFigurePath(textBox.ClientRectangle, borderSize * 2);
+                pathTxt = GetFigurePath(textBox.ClientRectangle, _borderSize * 2);
                 textBox.Region = new Region(pathTxt);
             }
             pathTxt.Dispose();

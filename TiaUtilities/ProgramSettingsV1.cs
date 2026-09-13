@@ -39,6 +39,7 @@ namespace TiaUtilities
 
         [JsonProperty] public Dictionary<Guid, string> SaveFileDialogPath { get => this.GetAs<Dictionary<Guid, string>>(); set => this.Set(value); }
 
+        private readonly Dictionary<Type, ObservableConfiguration> presetConfigurationsDict = [];
         public ProgramSettingsV1()
         {
             this.LastDBDuplicationFileName = "";
@@ -58,15 +59,32 @@ namespace TiaUtilities
             this.GridSettings = new();
 
             this.PresetIOMainConfiguration = new();
+            this.AddPresetConfigurationToDict(this.PresetIOMainConfiguration);
+
             this.PresetIOTabConfiguration = new();
+            this.AddPresetConfigurationToDict(this.PresetIOTabConfiguration);
+
             this.PresetIOExcelImportConfiguration = new();
+            this.AddPresetConfigurationToDict(this.PresetIOExcelImportConfiguration);
 
             this.PresetAlarmMainConfiguration = new();
+            this.AddPresetConfigurationToDict(this.PresetAlarmMainConfiguration);
+
             this.PresetAlarmTabConfiguration = new();
+            this.AddPresetConfigurationToDict(this.PresetAlarmTabConfiguration);
+
             this.PresetTemplateConfiguration = new();
+            this.AddPresetConfigurationToDict(this.PresetTemplateConfiguration);
 
             this.SaveFileDialogPath = [];
         }
+
+        private void AddPresetConfigurationToDict<Config>(Config presetConfiguration) where Config : ObservableConfiguration
+        {
+            this.presetConfigurationsDict.Add(typeof(Config), presetConfiguration);
+        }
+
+        public ObservableConfiguration? GetPresetConfiguration(Type type) => this.presetConfigurationsDict.TryGetValue(type, out var cfg) ? cfg : null;
 
         public string? GetSavedFileDialogPath(Guid guid)
         {

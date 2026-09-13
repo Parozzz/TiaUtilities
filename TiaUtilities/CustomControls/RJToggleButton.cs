@@ -102,6 +102,9 @@ namespace TiaUtilities.CustomControls
         public RJToggleButton()
         {
             this.MinimumSize = new Size(45, 22);
+            this.DoubleBuffered = true;
+            base.SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint, true);
+
         }
 
         //Methods
@@ -119,12 +122,30 @@ namespace TiaUtilities.CustomControls
             return path;
         }
 
+        private Color GetFirstNotTrasparentParentBackground(Control? parent)
+        {
+            if(parent == null)
+            {
+                return Form.DefaultBackColor;
+            }
+
+            if(parent.BackColor != Color.Transparent)
+            {
+                return parent.BackColor;
+            }
+
+            return GetFirstNotTrasparentParentBackground(parent.Parent);
+        }
+
         protected override void OnPaint(PaintEventArgs args)
         {
+            args.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+
+            var backColor = GetFirstNotTrasparentParentBackground(this.Parent);
+            args.Graphics.Clear(backColor);
+
             int toggleHeight = this.Height - 5;
             int toggleWidth = (int)Math.Floor(this.Width * this.toggleWidthPercentage / 100d);
-            args.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            args.Graphics.Clear(this.Parent.BackColor);
 
             var path = GetFigurePath();
 
