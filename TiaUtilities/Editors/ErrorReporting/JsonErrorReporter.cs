@@ -26,7 +26,7 @@ namespace TiaUtilities.Editors.ErrorReporting
             {
                 try
                 {
-                    JsonDocument.Parse(_scriptText);
+                    JsonDocument.Parse(_scriptText, new() { AllowTrailingCommas = true });
                 }
                 catch (JsonException ex)
                 {
