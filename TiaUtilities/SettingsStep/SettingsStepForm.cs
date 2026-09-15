@@ -1,10 +1,8 @@
 ﻿using System.Data;
 using System.Diagnostics;
 using TiaUtilities.Configuration;
+using TiaUtilities.CustomControls;
 using TiaUtilities.Generation;
-using TiaUtilities.Generation.Alarms;
-using TiaUtilities.Generation.Alarms.Configurations;
-using TiaUtilities.Languages;
 using TiaUtilities.Resources;
 using TiaUtilities.SettingsStep;
 using TiaUtilities.Styles;
@@ -18,7 +16,7 @@ namespace TiaUtilities.SettingsNew
         private class ComboBoxSourceItem
         {
             public required string Text { get; init; }
-            public required SettingsStepContainer Container { get; init; }
+            public required SettingsStepSequence Model { get; init; }
 
             public override string ToString()
             {
@@ -26,19 +24,22 @@ namespace TiaUtilities.SettingsNew
             }
         }
 
-        private const int MAIN_PANEL_ROW = 2;
+
+        private const int STEP_PANEL_ROW = 2;
+        private const int CONTROLS_PANEL_ROW = 3;
 
         private const string ARROW_CHAR = "↦";
         private const string PREVIOUS_ARROW = "⇦";
         private const string NEXT_ARROW = "⇨";
 
 
-        internal Dictionary<Type, List<SettingsStepContainer>> ConfigurationTypeContainerDict { get; init; }
+        internal Dictionary<Type, List<SettingsStepSequence>> ConfigurationTypeModelDict { get; init; }
 
-        private readonly List<SettingsStepContainer> containers;
-
-        private readonly ObservableObject<SettingsStepContainer?> selectedContainer;
+        private readonly ObservableObject<SettingsStepSequence?> selectedConfigurationData;
         private readonly ObservableObject<int> selectedStep;
+
+        private readonly TableLayoutPanelNoScrollbarsColorizable controlsPanel;
+        private readonly List<SettingsStepSequence> sequences;
 
         private int currentStepCount = 0;
 
@@ -49,74 +50,152 @@ namespace TiaUtilities.SettingsNew
             this.DoubleBuffered = true;
             ControlUtils.SetDoubleBuffered(this.mainTable);
             ControlUtils.SetDoubleBuffered(this.stepFlowPanel);
-            ControlUtils.SetDoubleBuffered(this.bottomPanel);
 
-            this.containers = [];
-            this.ConfigurationTypeContainerDict = [];
-
+            this.sequences = [];
+            this.ConfigurationTypeModelDict = [];
             this.selectedStep = new(-1);
-            this.selectedContainer = new(null);
+            this.selectedConfigurationData = new(null);
 
+            this.controlsPanel = this.InitControlsPanel();
             this.InitControls();
 
-            //this.AddTestMappings();
+        }
+
+        private TableLayoutPanelNoScrollbarsColorizable InitControlsPanel()
+        {
+            TableLayoutPanelNoScrollbarsColorizable controlsPanel = new()
+            {
+                BackColor = Color.Transparent,
+                Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top,
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                ColumnCount = 5,
+                ColumnStyles = {
+                    new(SizeType.Percent, 50f), //For centering the table in the panel
+                    new(SizeType.AutoSize), //Value Name Label
+                    new(SizeType.AutoSize), //Value Control
+                    new(SizeType.Absolute, 25f),
+                    new(SizeType.Percent, 50f)  //For centering the table in the panel
+                },
+                CellBorderStyle = TableLayoutPanelCellBorderStyle.None,
+                //Padding = new(10),
+                Margin = new(10),
+            };
+
+            Panel middlePanel = new()
+            {
+                BackColor = Color.Transparent,
+                Dock = DockStyle.Fill,
+                AutoScroll = true,
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                Controls = { controlsPanel },
+                Padding = Padding.Empty,
+                Margin = new(5),
+            };
+            ControlUtils.SetDoubleBuffered(middlePanel);
+
+            this.mainTable.Controls.Add(middlePanel, 0, CONTROLS_PANEL_ROW);
+            return controlsPanel;
+
+            /*
+                ScrollableControl scrollableControl = new()
+                {
+                    Dock = DockStyle.Fill,
+                    AutoScroll = true,
+                    AutoScrollMinSize = new(0, 0),
+                    AutoScrollMargin = new(0, 0),
+                    Controls = { middlePanel },
+                    Padding = Padding.Empty,
+                    Margin = Padding.Empty,
+                };
+                ControlUtils.SetDoubleBuffered(scrollableControl);
+            */
         }
 
         private void InitControls()
         {
-            this.selectedContainer.Changed += (sender, args) =>
+            this.mainTable.AddCellStyle(new()
+            {
+                Column = 0,
+                Row = STEP_PANEL_ROW,
+                BorderWidth = 2,
+                BorderRadius = new(5),
+                BorderColor = Color.FromArgb(64, Color.LightSkyBlue),
+                Padding = new(-1)
+            });
+
+            this.mainTable.AddCellStyle(new()
+            {
+                Column = 0,
+                Row = STEP_PANEL_ROW,
+                RowSpan = 2,
+                BorderWidth = 2,
+                BorderRadius = new(5),
+                BorderColor = Color.FromArgb(127, Color.LightSkyBlue),
+                Padding = new(-1),
+            });
+
+            this.selectedConfigurationNameLabel.Font = StyleManager.Fonts.BIG_BOLD;
+            this.selectedConfigurationNameLabel.Text = "";
+
+            this.selectedConfigurationData.Changed += (sender, args) =>
             {
                 var oldContainer = args.OldValue;
                 var newContainer = args.NewValue;
 
-                this.stepFlowPanel.SuspendLayout();
-
                 var oldStep = this.selectedStep.Value;
+
+                this.stepFlowPanel.SuspendLayout();
+                this.stepFlowPanel.Controls.Clear();
+
+                this.selectedConfigurationNameLabel.Text = "No Selection";
+
 
                 this.selectedStep.Value = -1;
                 this.currentStepCount = 0;
 
-                this.stepFlowPanel.Controls.Clear();
-
                 if (oldContainer != null)
                 {
-                    var mappings = oldContainer.GetMappings(this);
-                    foreach (var mapping in mappings)
+                    var panelControlsList = oldContainer.GetPanelControlsList(this);
+                    foreach (var tableLayout in panelControlsList)
                     {
-                        mapping.StepLabel.BorderWidth = 0;
-                        mapping.StepLabel.BorderColor = Color.Transparent;
+                        tableLayout.StepLabel.BorderWidth = 0;
+                        tableLayout.StepLabel.BorderColor = Color.Transparent;
                     }
                 }
 
                 if (newContainer != null)
                 {
-                    var mappings = newContainer.GetMappings(this);
-                    this.currentStepCount = mappings.Count;
+                    this.selectedConfigurationNameLabel.Text = $"{newContainer.GroupName} - {newContainer.Name}";
+
+                    var panelControlsList = newContainer.GetPanelControlsList(this);
+                    this.currentStepCount = panelControlsList.Count;
 
                     List<Label> stepLabels = [];
-                    for (int x = 0; x < mappings.Count; x++)
+                    for (int x = 0; x < panelControlsList.Count; x++)
                     {
-                        var mapping = mappings[x];
+                        var panelControls = panelControlsList[x];
 
-                        if (!mapping.ListenersRegistered)
+                        if (!panelControls.ListenersRegistered)
                         {
-                            mapping.RegisterListeners();
+                            panelControls.RegisterListeners();
 
                             var step = x;
-                            mapping.StepLabel.Click += (sender, args) => this.selectedStep.Value = step;
+                            panelControls.StepLabel.Click += (sender, args) => this.selectedStep.Value = step;
                         }
 
-                        stepLabels.Add(mapping.StepLabel);
+                        stepLabels.Add(panelControls.StepLabel);
                     }
 
                     var l = stepLabels.SelectMany((x, index) =>
                         index < stepLabels.Count - 1 ?
-                        new[] { x, SettingsStepMapper.CreateStepLabel(ARROW_CHAR, arrow: true) } :
+                        new[] { x, SettingsStepPanelControls.CreateStepLabel(ARROW_CHAR, arrow: true) } :
                         new[] { x }
                     ).ToArray();
                     this.stepFlowPanel.Controls.AddRange(l);
 
-                    if (mappings.InRange(oldStep))
+                    if (panelControlsList.InRange(oldStep))
                     {//Keep the same selected step if is in range of the new
                         this.selectedStep.Value = oldStep;
                     }
@@ -130,35 +209,29 @@ namespace TiaUtilities.SettingsNew
                 var oldValue = args.OldValue;
                 var newValue = args.NewValue;
 
-                this.mainTable.SuspendLayout();
+                this.controlsPanel.SuspendLayout();
 
-                var centralControl = this.mainTable.GetControlFromPosition(0, MAIN_PANEL_ROW);
-                if (centralControl != null)
-                {
-                    this.mainTable.Controls.Remove(centralControl);
-                }
+                this.controlsPanel.RowStyles.Clear();
+                this.controlsPanel.Controls.Clear();
+                this.controlsPanel.ClearCellStyles();
 
-                var container = this.selectedContainer.Value;
+                var container = this.selectedConfigurationData.Value;
                 if (container != null)
                 {
-                    var mappings = container.GetMappings(this);
+                    var panelControlsList = container.GetPanelControlsList(this);
 
-                    if (mappings.TryGet(oldValue, out var oldMapping))
+                    if (panelControlsList.TryGet(oldValue, out var oldPanelControls))
                     {
-                        //oldMapping.StepLabel.Margin = new(2);
-                        oldMapping.StepLabel.BorderWidth = 0;
-                        oldMapping.StepLabel.BorderColor = Color.Transparent;
-
-                        this.mainTable.Controls.Remove(oldMapping.Control);
+                        oldPanelControls.StepLabel.BorderWidth = 0;
+                        oldPanelControls.StepLabel.BorderColor = Color.Transparent;
                     }
 
-                    if (mappings.TryGet(newValue, out var newMapping))
+                    if (panelControlsList.TryGet(newValue, out var newPanelControls))
                     {
-                        //newMapping.StepLabel.Margin = Padding.Empty;
-                        newMapping.StepLabel.BorderWidth = 2;
-                        newMapping.StepLabel.BorderColor = Color.FromArgb(127, Color.Black);
+                        newPanelControls.StepLabel.BorderWidth = 2;
+                        newPanelControls.StepLabel.BorderColor = Color.FromArgb(127, Color.Black);
 
-                        this.mainTable.Controls.Add(newMapping.Control, 0, MAIN_PANEL_ROW);
+                        newPanelControls.ApplyControls(this.controlsPanel);
                     }
                     else
                     {
@@ -166,39 +239,28 @@ namespace TiaUtilities.SettingsNew
                     }
                 }
 
-                this.mainTable.ResumeLayout(performLayout: true);
+                this.controlsPanel.ResumeLayout(performLayout: true);
             };
 
-            this.buttonNext.Click += (sender, args) =>
-            {
-                var step = this.selectedStep.Value;
-                this.selectedStep.Value = Math.Min(step + 1, this.currentStepCount - 1);
-            };
-
-            this.buttonPrevious.Click += (sender, args) =>
-            {
-                var step = this.selectedStep.Value;
-                this.selectedStep.Value = Math.Max(step - 1, 0);
-            };
-
-            this.selectContainerComboBox.BackColor = Form.DefaultBackColor;
-            this.selectContainerComboBox.Font = StyleManager.Fonts.NORMAL_SEMIBOLD;
-            this.selectContainerComboBox.DropDownClosed += (sender, args) =>
+            this.selectConfigurationComboBox.BackColor = Form.DefaultBackColor;
+            this.selectConfigurationComboBox.Font = StyleManager.Fonts.NORMAL_SEMIBOLD;
+            this.selectConfigurationComboBox.DropDownClosed += (sender, args) =>
             {//Remove focus on ComboBox after closing drop down to avoid having it selected (Annoying).
                 this.BeginInvoke(() => this.ActiveControl = null);
             };
-            this.selectContainerComboBox.DisplayMember = nameof(ComboBoxSourceItem.Text);
-            this.selectContainerComboBox.ValueMember = nameof(ComboBoxSourceItem.Container);
-            this.selectContainerComboBox.FilterPredicate = (item, text) =>
+            this.selectConfigurationComboBox.DisplayMember = nameof(ComboBoxSourceItem.Text);
+            this.selectConfigurationComboBox.ValueMember = nameof(ComboBoxSourceItem.Model);
+            this.selectConfigurationComboBox.FilterPredicate = (item, text) =>
             {
                 var i = (ComboBoxSourceItem)item;
-                return CalcolaMatchCustom(i.Text, text);
+                return CalculateMatchCustom(i.Text, text);
             };
-            this.selectContainerComboBox.SelectedValueChanged += (sender, args) =>
+            this.selectConfigurationComboBox.SelectedValueChanged += (sender, args) =>
             {
-                if (this.selectContainerComboBox.SelectedItem is ComboBoxSourceItem item)
+                Debug.WriteLine("SelectedValueChanged");
+                if (this.selectConfigurationComboBox.SelectedItem is ComboBoxSourceItem item)
                 {
-                    this.selectedContainer.Value = item.Container;
+                    this.selectedConfigurationData.Value = item.Model;
                 }
             };
 
@@ -209,10 +271,10 @@ namespace TiaUtilities.SettingsNew
             ToolStripMenuItem saveToPresetItem = new() { Image = ImageResources.EFFECT };
             saveToPresetItem.Click += (sender, args) =>
             {
-                var selectedItem = this.selectContainerComboBox.SelectedItem;
+                var selectedItem = this.selectConfigurationComboBox.SelectedItem;
                 if (selectedItem is ComboBoxSourceItem sourceItem)
                 {
-                    var configuration = sourceItem.Container.Configuration;
+                    var configuration = sourceItem.Model.Configuration;
 
                     var presetConfiguration = MainForm.Settings.GetPresetConfiguration(configuration.GetType());
                     if (presetConfiguration != null)
@@ -227,9 +289,9 @@ namespace TiaUtilities.SettingsNew
             {
                 contextMenu.BeginInvoke(() =>
                 {
-                    if (this.selectContainerComboBox.SelectedItem is ComboBoxSourceItem item)
+                    if (this.selectConfigurationComboBox.SelectedItem is ComboBoxSourceItem item)
                     {
-                        saveToPresetItem.Text = $"Save as default configuration ({item.Container.Configuration.GetType().Name})";
+                        saveToPresetItem.Text = $"Save as default configuration ({item.Model.Configuration.GetType().Name})";
 
                         actualConfigurationNameLabel.Text = item.Text;
                         contextMenu.Refresh();
@@ -240,47 +302,44 @@ namespace TiaUtilities.SettingsNew
 
 
             contextMenu.Items.AddRange([actualConfigurationNameLabel, new ToolStripSeparator(), saveToPresetItem]);
-            this.selectContainerComboBox.ContextMenuStrip = contextMenu;
+            this.selectConfigurationComboBox.ContextMenuStrip = contextMenu;
         }
 
-        public void SetContainers(IEnumerable<SettingsStepContainer> containers)
+        public void SetSequences(IEnumerable<SettingsStepSequence> configurationDataEnumerable)
         {
-            this.containers.Clear();
-            this.ConfigurationTypeContainerDict.Clear();
-            if (!containers.Any())
+            this.sequences.Clear();
+            this.ConfigurationTypeModelDict.Clear();
+            if (!configurationDataEnumerable.Any())
             {
-                this.selectedContainer.Value = null;
+                this.selectedConfigurationData.Value = null;
                 return;
             }
 
-            foreach (var container in containers)
+            foreach (var model in configurationDataEnumerable)
             {
-                var cfgType = container.Configuration.GetType();
+                var cfgType = model.Configuration.GetType();
 
-                var tryGetOK = this.ConfigurationTypeContainerDict.TryGetValue(cfgType, out var typeContainers);
+                var tryGetOK = this.ConfigurationTypeModelDict.TryGetValue(cfgType, out var typeContainers);
                 if (!tryGetOK)
                 {
                     typeContainers = [];
-                    this.ConfigurationTypeContainerDict.Add(cfgType, typeContainers);
+                    this.ConfigurationTypeModelDict.Add(cfgType, typeContainers);
                 }
 
-                typeContainers?.Add(container);
+                typeContainers?.Add(model);
             }
 
-            var items = containers.Select(c => new ComboBoxSourceItem() { Text = $"{c.GroupName} - {c.Name}", Container = c });
+            var items = configurationDataEnumerable.Select(c => new ComboBoxSourceItem() { Text = $"{c.GroupName} - {c.Name}", Model = c });
 
-            var maxWidth = items.Max(i => TextRenderer.MeasureText(i.Text, this.selectContainerComboBox.Font, Size.Empty, TextFormatFlags.TextBoxControl).Width);
-            this.selectContainerComboBox.Width = maxWidth + (int)(maxWidth * 0.15);
-            this.selectContainerComboBox.SetFilterableSource(items);
+            var maxWidth = items.Max(i => TextRenderer.MeasureText(i.Text, this.selectConfigurationComboBox.Font, Size.Empty, TextFormatFlags.TextBoxControl).Width);
+            this.selectConfigurationComboBox.Width = maxWidth + (int)(maxWidth * 0.15);
+            this.selectConfigurationComboBox.SetFilterableSource(items);
 
-            this.containers.AddRange(containers);
-            this.selectedContainer.Value = containers.First();
+            this.sequences.AddRange(configurationDataEnumerable);
+            this.selectedConfigurationData.Value = configurationDataEnumerable.First();
         }
 
-        /// <summary>
-        /// Logica di Matching Personalizzata
-        /// </summary>
-        private static bool CalcolaMatchCustom(string testoOggetto, string testoCercato)
+        private static bool CalculateMatchCustom(string testoOggetto, string testoCercato)
         {
             // 1. Logica Multi-Parola: "mil acme" trova "Acme Corporation (Milano)"
             string[] paroleCercate = testoCercato.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -301,49 +360,6 @@ namespace TiaUtilities.SettingsNew
             );
 
             return acronimo.StartsWith(testoCercato, StringComparison.OrdinalIgnoreCase);
-        }
-
-        private void AddTestMappings()
-        {
-            AlarmMainConfiguration mainCfg = new()
-            {
-                AlarmCommentTemplate = "COMMENT!",
-                FCBlockNumber = 123,
-            };
-
-            AlarmTabConfiguration tabCfg = new();
-
-
-            var step1Context = new SettingsStepContext("STEP1", "Descrizione dello step1")
-                .CreateBinder<AlarmMainConfiguration>()
-                .StartGroup(Locale.ALARM_SETTINGS_FC).Add(x => x.FCBlockName, Locale.GENERICS_NAME)
-                                                     .Add(x => x.FCBlockNumber, Locale.GENERICS_NUMBER)
-                                                     .Add(x => x.EnableCustomVariable, Locale.ALARM_SETTINGS_ENABLE_CUSTOM_VAR, Locale.ALARM_SETTINGS_ENABLE_CUSTOM_VAR_DESCR)
-                                                     .Add(x => x.EnableTimer, Locale.ALARM_SETTINGS_ENABLE_TIMER, Locale.ALARM_SETTINGS_ENABLE_TIMER_DESCR)
-                .StartGroup("HMI").Add(x => x.HmiNameTemplate, Locale.ALARM_SETTINGS_HMI_NAME, options: new() { PlaceholdersCallback = (str) => str })
-                                  .Add(x => x.HmiTextTemplate, Locale.ALARM_SETTINGS_HMI_ITEM_TEXT, Locale.ALARM_SETTINGS_HMI_ITEM_TEXT_DESCR)
-                                  .Add(x => x.HmiTriggerTagTemplate, Locale.ALARM_SETTINGS_HMI_TRIGGER_TAG, Locale.ALARM_SETTINGS_HMI_TRIGGER_TAG_DESCR)
-                                  .AddDivider()
-                                  .AddText("TITLE!!", "Description??", new() { TextAlign = ContentAlignment.MiddleLeft })
-                                  .Add(x => x.FCBlockNumber, Locale.GENERICS_NUMBER)
-                .End();
-
-            var step2Context = new SettingsStepContext("STEP2", "Descrizione dello step1")
-                .CreateBinder<AlarmMainConfiguration>()
-                .StartGroup(Locale.ALARM_SETTINGS_FC).Add(x => x.FCBlockName, Locale.GENERICS_NAME)
-                                                     .Add(x => x.FCBlockNumber, Locale.GENERICS_NUMBER)
-                .End();
-
-            var mainContexts = AlarmGenUtils.CreateSettingsGlobalContext();
-            var tabContexts = AlarmGenUtils.CreateSettingsTabContext();
-
-            SettingsStepContainer container = new(mainCfg, "GLOBAL", "Configuration");
-            container.AddRange(mainContexts);
-
-            SettingsStepContainer container2 = new(tabCfg, "TAB", "Hot tab 1");
-            container2.AddRange(tabContexts);
-
-            this.SetContainers([container, container2]);
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -383,3 +399,50 @@ namespace TiaUtilities.SettingsNew
         }
     }
 }
+
+/*
+         private void AddTestMappings()
+        {
+            AlarmMainConfiguration mainCfg = new()
+            {
+                AlarmCommentTemplate = "COMMENT!",
+                FCBlockNumber = 123,
+            };
+
+            AlarmTabConfiguration tabCfg = new();
+
+
+            var step1Context = new SettingsStepDescriptor("STEP1", "Descrizione dello step1")
+                .CreateBinder<AlarmMainConfiguration>()
+                .StartGroup(Locale.ALARM_SETTINGS_FC).Add(x => x.FCBlockName, Locale.GENERICS_NAME)
+                                                     .Add(x => x.FCBlockNumber, Locale.GENERICS_NUMBER)
+                                                     .Add(x => x.EnableCustomVariable, Locale.ALARM_SETTINGS_ENABLE_CUSTOM_VAR, Locale.ALARM_SETTINGS_ENABLE_CUSTOM_VAR_DESCR)
+                                                     .Add(x => x.EnableTimer, Locale.ALARM_SETTINGS_ENABLE_TIMER, Locale.ALARM_SETTINGS_ENABLE_TIMER_DESCR)
+                .StartGroup("HMI").Add(x => x.HmiNameTemplate, Locale.ALARM_SETTINGS_HMI_NAME, options: new() { PlaceholdersCallback = (str) => str })
+                                  .Add(x => x.HmiTextTemplate, Locale.ALARM_SETTINGS_HMI_ITEM_TEXT, Locale.ALARM_SETTINGS_HMI_ITEM_TEXT_DESCR)
+                                  .Add(x => x.HmiTriggerTagTemplate, Locale.ALARM_SETTINGS_HMI_TRIGGER_TAG, Locale.ALARM_SETTINGS_HMI_TRIGGER_TAG_DESCR)
+                                  .AddDivider()
+                                  .AddText("TITLE!!", "Description??", new() { TextAlign = ContentAlignment.MiddleLeft })
+                                  .Add(x => x.FCBlockNumber, Locale.GENERICS_NUMBER)
+                .End();
+
+            var step2Context = new SettingsStepDescriptor("STEP2", "Descrizione dello step1")
+                .CreateBinder<AlarmMainConfiguration>()
+                .StartGroup(Locale.ALARM_SETTINGS_FC).Add(x => x.FCBlockName, Locale.GENERICS_NAME)
+                                                     .Add(x => x.FCBlockNumber, Locale.GENERICS_NUMBER)
+                .End();
+
+            var mainContexts = AlarmGenUtils.CreateGlobalSettingsStepDescriptors();
+            var tabContexts = AlarmGenUtils.CreateTabSettingsStepDescriptors();
+
+            SettingsStep.SettingsStepSequence container = new(mainCfg, "GLOBAL", "Configuration");
+            container.AddRange(mainContexts);
+
+            SettingsStep.SettingsStepSequence container2 = new(tabCfg, "TAB", "Hot tab 1");
+            container2.AddRange(tabContexts);
+
+            this.SetSequences([container, container2]);
+        }
+
+ 
+ */

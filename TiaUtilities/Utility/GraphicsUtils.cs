@@ -9,7 +9,18 @@ namespace TiaUtilities.Utility
 {
     public static class GraphicsUtils
     {
-        public static void DrawRoundedRectangle(Graphics graphics, Pen pen, Rectangle bounds, int cornerRadius)
+        public class BorderRadius(int topLeft, int topRight, int bottomLeft, int bottomRight)
+        {
+            public int TopLeft { get; init; } = topLeft;
+            public int TopRight { get; init; } = topRight;
+            public int BottomLeft { get; init; } = bottomLeft;
+            public int BottomRight { get; init; } = bottomRight;
+
+            public BorderRadius(int all) : this(all, all, all, all) { }
+            public BorderRadius(int top, int bottom) : this(top, top, bottom, bottom) { }
+        }
+
+        public static void DrawRoundedRectangle(Graphics graphics, Pen pen, Rectangle bounds, BorderRadius cornerRadius)
         {
             Validate.NotNull(graphics);
             Validate.NotNull(pen);
@@ -19,7 +30,7 @@ namespace TiaUtilities.Utility
             graphics.DrawPath(pen, path);
         }
 
-        public static void FillRoundedRectangle(Graphics graphics, Brush brush, Rectangle bounds, int cornerRadius)
+        public static void FillRoundedRectangle(Graphics graphics, Brush brush, Rectangle bounds, BorderRadius cornerRadius)
         {
             Validate.NotNull(graphics);
             Validate.NotNull(brush);
@@ -29,34 +40,59 @@ namespace TiaUtilities.Utility
             graphics.FillPath(brush, path);
         }
 
-        private static GraphicsPath CreateRoundedRectanglePath(Rectangle bounds, int radius)
+        private static GraphicsPath CreateRoundedRectanglePath(Rectangle bounds, BorderRadius radii)
         {
-            int diameter = radius * 2;
-            Size size = new(diameter, diameter);
-            Rectangle arc = new(bounds.Location, size);
-
             GraphicsPath path = new();
 
-            if (radius == 0)
+            if (radii.TopLeft == 0 && radii.TopRight == 0 && radii.BottomLeft == 0 && radii.BottomRight == 0)
             {
                 path.AddRectangle(bounds);
                 return path;
             }
 
-            // Angolo in alto a sinistra
-            path.AddArc(arc, 180, 90);
+            if (radii.TopLeft > 0)
+            {
+                int diameter = radii.TopLeft * 2;
+                Rectangle arc = new(bounds.Left, bounds.Top, diameter, diameter);
+                path.AddArc(arc, 180, 90);
+            }
+            else
+            {
+                path.AddLine(bounds.Left, bounds.Top, bounds.Left, bounds.Top);
+            }
 
-            // Angolo in alto a destra
-            arc.X = bounds.Right - diameter;
-            path.AddArc(arc, 270, 90);
+            if (radii.TopRight > 0)
+            {
+                int diameter = radii.TopRight * 2;
+                Rectangle arc = new(bounds.Right - diameter, bounds.Top, diameter, diameter);
+                path.AddArc(arc, 270, 90);
+            }
+            else
+            {
+                path.AddLine(bounds.Right, bounds.Top, bounds.Right, bounds.Top);
+            }
 
-            // Angolo in basso a destra
-            arc.Y = bounds.Bottom - diameter;
-            path.AddArc(arc, 0, 90);
+            if (radii.BottomRight > 0)
+            {
+                int diameter = radii.BottomRight * 2;
+                Rectangle arc = new(bounds.Right - diameter, bounds.Bottom - diameter, diameter, diameter);
+                path.AddArc(arc, 0, 90);
+            }
+            else
+            {
+                path.AddLine(bounds.Right, bounds.Bottom, bounds.Right, bounds.Bottom);
+            }
 
-            // Angolo in basso a sinistra
-            arc.X = bounds.Left;
-            path.AddArc(arc, 90, 90);
+            if (radii.BottomLeft > 0)
+            {
+                int diameter = radii.BottomLeft * 2;
+                Rectangle arc = new(bounds.Left, bounds.Bottom - diameter, diameter, diameter);
+                path.AddArc(arc, 90, 90);
+            }
+            else
+            {
+                path.AddLine(bounds.Left, bounds.Bottom, bounds.Left, bounds.Bottom);
+            }
 
             path.CloseFigure();
             return path;

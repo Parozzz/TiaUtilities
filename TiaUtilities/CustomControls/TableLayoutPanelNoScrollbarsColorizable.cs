@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
 using TiaUtilities.Utility;
+using static TiaUtilities.Utility.GraphicsUtils;
 
 namespace TiaUtilities.CustomControls
 {
@@ -20,11 +21,11 @@ namespace TiaUtilities.CustomControls
             public Color BackColor { get => _backColor; set { _backColor = value; this.TableLayoutPanel?.Invalidate(); } }
             public Color BorderColor { get => _borderColor; set { _borderColor = value; this.TableLayoutPanel?.Invalidate(); } }
             public int BorderWidth { get => _borderWidth; set { _borderWidth = value; this.TableLayoutPanel?.Invalidate(); } }
-            public int BorderRadius { get => _borderRadius; set { _borderRadius = value; this.TableLayoutPanel?.Invalidate(); } }
+            public BorderRadius BorderRadius { get => _borderRadius; set { _borderRadius = value; this.TableLayoutPanel?.Invalidate(); } }
             public int ColumnSpan { get => _columnSpan; set { _columnSpan = value; this.TableLayoutPanel?.Invalidate(); } }
             public int RowSpan { get => _rowSpan; set { _rowSpan = value; this.TableLayoutPanel?.Invalidate(); } }
+            public Padding Padding { get => _padding; set { _padding = value; this.TableLayoutPanel?.Invalidate(); } }
             public bool FitToControls { get => _fitToControls; set { _fitToControls = value; this.TableLayoutPanel?.Invalidate(); } }
-            public Padding FitToControlsPadding { get => _fitToControlsPadding; set { _fitToControlsPadding = value; this.TableLayoutPanel?.Invalidate(); } }
 
             public Rectangle Bounds { get; internal set; } = Rectangle.Empty;
             public bool MouseInside { get; internal set; } = false;
@@ -34,11 +35,11 @@ namespace TiaUtilities.CustomControls
             private Color _backColor = Color.Transparent;
             private Color _borderColor = Color.Transparent;
             private int _borderWidth = 1;
-            private int _borderRadius = 3;
+            private BorderRadius _borderRadius = new(3);
             private int _columnSpan = 1;
             private int _rowSpan = 1;
             private bool _fitToControls = true;
-            private Padding _fitToControlsPadding = new(3);
+            private Padding _padding = new(0);
 
             internal TableLayoutPanelNoScrollbarsColorizable? TableLayoutPanel { get; set; }
 
@@ -62,7 +63,7 @@ namespace TiaUtilities.CustomControls
 
         public TableLayoutPanelNoScrollbarsColorizable()
         {
-            SetStyle(ControlStyles.Selectable | ControlStyles.OptimizedDoubleBuffer | ControlStyles.AllPaintingInWmPaint, true);
+            SetStyle(ControlStyles.Selectable | ControlStyles.OptimizedDoubleBuffer | ControlStyles.AllPaintingInWmPaint | ControlStyles.ResizeRedraw, true);
             this.DoubleBuffered = true;
         }
 
@@ -98,6 +99,17 @@ namespace TiaUtilities.CustomControls
             this.cellStyles.Remove(cellStyle);
             cellStyle.TableLayoutPanel = null;
 
+            this.Invalidate();
+        }
+
+        public void ClearCellStyles()
+        {
+            foreach(var cellStyle in this.cellStyles)
+            {
+                cellStyle.TableLayoutPanel = null;
+            }
+
+            this.cellStyles.Clear();
             this.Invalidate();
         }
 
@@ -139,21 +151,19 @@ namespace TiaUtilities.CustomControls
                     {
                         targetRect = GetSpannedCellBounds(startCol, startRow, style.ColumnSpan, style.RowSpan);
                     }
-                    else
-                    {
-                        var p = style.FitToControlsPadding;
-                        targetRect = Rectangle.FromLTRB(
-                            targetRect.Left - p.Left,
-                            targetRect.Top - p.Top,
-                            targetRect.Right + p.Right,
-                            targetRect.Bottom + p.Bottom
-                        );
-                    }
                 }
                 else
                 {
                     targetRect = GetSpannedCellBounds(startCol, startRow, style.ColumnSpan, style.RowSpan);
                 }
+
+                var p = style.Padding;
+                targetRect = Rectangle.FromLTRB(
+                    targetRect.Left - p.Left,
+                    targetRect.Top - p.Top,
+                    targetRect.Right + p.Right,
+                    targetRect.Bottom + p.Bottom
+                );
 
                 style.Bounds = targetRect;
 

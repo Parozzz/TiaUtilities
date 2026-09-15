@@ -2,7 +2,6 @@
 using Microsoft.WindowsAPICodePack.Dialogs;
 using SimaticML.API;
 using SimaticML.Blocks;
-using System.Diagnostics;
 using System.Globalization;
 using TiaUtilities.Configuration;
 using TiaUtilities.Generation.Alarms.Configurations;
@@ -222,10 +221,10 @@ namespace TiaUtilities.Generation.Alarms.Module
 
         public void ToggleSettingsFormVisibility()
         {
-            var containers = this.GetSettingsContainers();
+            var containers = this.GetSettingsStepSequences();
 
             SettingsStepForm form = new();
-            form.SetContainers(containers);
+            form.SetSequences(containers);
             form.ShowDialog();
 
             //this.settingsFormCache.ToggleVisibility();
@@ -352,33 +351,33 @@ namespace TiaUtilities.Generation.Alarms.Module
             return Locale.ALARM_GEN_FORM;
         }
 
-        private List<SettingsStepContainer> GetSettingsContainers()
+        private List<SettingsStepSequence> GetSettingsStepSequences()
         {
-            List<SettingsStepContainer> containers = [];
+            List<SettingsStepSequence> sequenceList = [];
 
-            var globalContexts = AlarmGenUtils.CreateSettingsGlobalContext();
-            var tabContexts = AlarmGenUtils.CreateSettingsTabContext();
-            var templateContexts = AlarmGenUtils.CreateSettingsTemplateContexts();
+            var globalStepDescriptors = AlarmGenUtils.CreateGlobalSettingsStepDescriptors();
+            var tablStepDescriptors = AlarmGenUtils.CreateTabSettingsStepDescriptors();
+            var templateStepDescriptors = AlarmGenUtils.CreateTemplateSettingsStepDescriptor();
 
-            SettingsStepContainer globalContainer = new(this.mainConfig, "Global", "Settings");
-            globalContainer.AddRange(globalContexts);
-            containers.Add(globalContainer);
+            SettingsStepSequence globalSequence = new(this.mainConfig, "Global", "Settings");
+            globalSequence.AddRange(globalStepDescriptors);
+            sequenceList.Add(globalSequence);
 
             foreach(var tab in this.alarmTabList)
             {
-                SettingsStepContainer tabContainer = new(tab.TabConfig, "TAB", tab.Name);
-                tabContainer.AddRange(tabContexts);
-                containers.Add(tabContainer);
+                SettingsStepSequence tabSequence = new(tab.TabConfig, "Tab", tab.Name);
+                tabSequence.AddRange(tablStepDescriptors);
+                sequenceList.Add(tabSequence);
             }
 
             foreach(var template in this.templateHandler.BindingList)
             {
-                SettingsStepContainer templateContainer = new(template.TemplateConfig, "TEMPLATE", template.Name);
-                templateContainer.AddRange(templateContexts);
-                containers.Add(templateContainer);
+                SettingsStepSequence templateSequence = new(template.TemplateConfig, "Template", template.Name);
+                templateSequence.AddRange(templateStepDescriptors);
+                sequenceList.Add(templateSequence);
             }
 
-            return containers;
+            return sequenceList;
         }
 
         private void AddConfigurationBindings(SettingsBindings settingsBindings)

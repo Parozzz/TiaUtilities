@@ -10,9 +10,9 @@ namespace TiaUtilities.Generation.Alarms
     public static class AlarmGenUtils
     {
 
-        public static List<SettingsStepContext> CreateSettingsGlobalContext()
+        public static List<SettingsStepDescriptor> CreateGlobalSettingsStepDescriptors()
         {
-            var blocksContext = new SettingsStepContext("Blocks", "Settings for generated blocks")
+            var blocksStepDescriptor = new SettingsStepDescriptor("Blocks", "Settings for generated blocks")
                 .CreateBinder<AlarmMainConfiguration>()
                 .StartGroup(Locale.ALARM_SETTINGS_FC)
                     .Add(x => x.FCBlockName, Locale.GENERICS_NAME)
@@ -20,14 +20,14 @@ namespace TiaUtilities.Generation.Alarms
                 .StartGroup(Locale.ALARM_SETTINGS_UDT)
                     .Add(x => x.UDTBlockName, Locale.GENERICS_NAME, Locale.ALARM_SETTINGS_UDT_DESCR)
                 .End();
-            var enablingsContext = new SettingsStepContext(Locale.ALARM_SETTINGS_ENABLE)
+            var enablingsStepDescriptor = new SettingsStepDescriptor(Locale.ALARM_SETTINGS_ENABLE)
                 .CreateBinder<AlarmMainConfiguration>()
                 .StartGroup(Locale.ALARM_SETTINGS_ENABLE)
                         .Add(x => x.EnableCustomVariable, Locale.ALARM_SETTINGS_ENABLE_CUSTOM_VAR, Locale.ALARM_SETTINGS_ENABLE_CUSTOM_VAR_DESCR)
                         .Add(x => x.EnableTimer, Locale.ALARM_SETTINGS_ENABLE_TIMER, Locale.ALARM_SETTINGS_ENABLE_TIMER_DESCR)
                 .End();
 
-            var segmentsNameContext = new SettingsStepContext(Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME)
+            var segmentNamesStepDescriptor = new SettingsStepDescriptor(Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME)
                 .CreateBinder<AlarmMainConfiguration>()
                 .StartGroup(Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME)
                     .Add(x => x.OneEachSegmentName, Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME_ONE_EACH, Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME_ONE_EACH_DESCR)
@@ -36,7 +36,7 @@ namespace TiaUtilities.Generation.Alarms
                     .Add(x => x.GroupEmptyAlarmSegmentName, Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME_GROUP_EACH_SPARE)
                 .End();
 
-            var alarmContext = new SettingsStepContext("Alarm", "Settings for alarm properties")
+            var alarmStepDescriptor = new SettingsStepDescriptor("Alarm", "Settings for alarm properties")
                 .CreateBinder<AlarmMainConfiguration>()
                 .Add(x => x.AlarmNumFormat, Locale.ALARM_SETTINGS_ALARM_NUM_PLACEHOLDER_FORMAT, description: Locale.ALARM_SETTINGS_ALARM_NUM_PLACEHOLDER_FORMAT_DESCR)
                 .StartGroup("PLC")
@@ -50,18 +50,18 @@ namespace TiaUtilities.Generation.Alarms
                     .Add(x => x.HmiTriggerTagUseWordArray, Locale.ALARM_SETTINGS_HMI_USE_WORD_ARRAY, Locale.ALARM_SETTINGS_HMI_USE_WORD_ARRAY_DESCR)
                 .End();
 
-            return [enablingsContext, blocksContext, segmentsNameContext, alarmContext];
+            return [enablingsStepDescriptor, blocksStepDescriptor, segmentNamesStepDescriptor, alarmStepDescriptor];
         }
         
-        public static List<SettingsStepContext> CreateSettingsTabContext()
+        public static List<SettingsStepDescriptor> CreateTabSettingsStepDescriptors()
         {
-            var blocksContext = new SettingsStepContext("Blocks")
+            var blocksStepDescriptor = new SettingsStepDescriptor("Blocks")
                 .CreateBinder<AlarmTabConfiguration>()
                 .StartGroup(Locale.ALARM_SETTINGS_FC)
                     .Add(x => x.GroupingType, Locale.ALARM_SETTINGS_TAB_GROUPING_TYPE, description: Locale.ALARM_SETTINGS_TAB_GROUPING_TYPE_DESCR)
                 .End();
 
-            var variablesContext = new SettingsStepContext("Variables")
+            var variablesStepDescriptor = new SettingsStepDescriptor("Variables")
                 .CreateBinder<AlarmTabConfiguration>()
                 .StartGroup(Locale.ALARM_SETTINGS_PREFIXES)
                     .Add(x => x.AlarmAddressPrefix, Locale.ALARM_SETTINGS_PREFIXES_ALARM)
@@ -87,7 +87,7 @@ namespace TiaUtilities.Generation.Alarms
                     .Add(x => x.DefaultCustomVarValue, Locale.GENERICS_VALUE)
                 .End();
 
-            var alarmsContext = new SettingsStepContext("Alarms")
+            var alarmsStepDescriptor = new SettingsStepDescriptor("Alarms")
                 .CreateBinder<AlarmTabConfiguration>()
                 .StartGroup(Locale.ALARM_SETTINGS_TAB_ALARM_NUMS)
                     .Add(x => x.TotalAlarmNum, Locale.ALARM_SETTINGS_TAB_ALARM_NUMS_TOTAL, Locale.ALARM_SETTINGS_TAB_ALARM_NUMS_TOTAL_DESCR)
@@ -101,31 +101,31 @@ namespace TiaUtilities.Generation.Alarms
                     .Add(x => x.GenerateEmptyAlarmAntiSlip, Locale.ALARM_SETTINGS_TAB_SPARE_ANTI_SLIP_GEN_EMPTY)
                 .End();
 
-            var hmiContext = new SettingsStepContext(Locale.GENERICS_HMI)
+            var hmiStepDescriptor = new SettingsStepDescriptor(Locale.GENERICS_HMI)
                 .CreateBinder<AlarmTabConfiguration>()
                 .StartGroup(Locale.GENERICS_HMI)
                     .Add(x => x.HmiStartID, Locale.ALARM_SETTINGS_TAB_HMI_START_ID, Locale.ALARM_SETTINGS_TAB_HMI_START_ID_DESCR)
                     .Add(x => x.DefaultHmiAlarmClass, Locale.ALARM_SETTINGS_TAB_HMI_DEFAULT_ALARM_CLASS, Locale.ALARM_SETTINGS_TAB_HMI_DEFAULT_ALARM_CLASS_DESCR)
                 .End();
 
-            var placeholdersContext = new SettingsStepContext("Placeholders")
+            var placeholdersStepDescriptor = new SettingsStepDescriptor("Placeholders")
                 .CreateBinder<AlarmTabConfiguration>()
                 .StartGroup(Locale.ALARM_SETTINGS_TAB_PLACEHOLDERS)
                     .Add(x => x.CustomPlaceholdersJSON, "Placeholders", description: Locale.ALARM_SETTINGS_TAB_PLACEHOLDERS_DESC, options: new() { StringSpecifiedEditor = SettingsStep.ControlFactory.SettingsFactoryOptions.StringCustomEditor.JSON })
 
                 .End();
 
-            return [blocksContext, variablesContext, alarmsContext, hmiContext, placeholdersContext];
+            return [blocksStepDescriptor, variablesStepDescriptor, alarmsStepDescriptor, hmiStepDescriptor, placeholdersStepDescriptor];
         }
         
-        public static List<SettingsStepContext> CreateSettingsTemplateContexts()
+        public static List<SettingsStepDescriptor> CreateTemplateSettingsStepDescriptor()
         {
-            var context = new SettingsStepContext("Alarms")
+            var descriptor = new SettingsStepDescriptor("Alarms")
                 .CreateBinder<AlarmTemplateConfiguration>()
                 .Add(x => x.StandaloneAlarms, Locale.ALARM_SETTINGS_TEMPLATE_STANDALONE_ALARMS, Locale.ALARM_SETTINGS_TEMPLATE_STANDALONE_ALARMS_DESC)
                 .End();
 
-            return [context];
+            return [descriptor];
         }
         
         public static void AddMainConfigBindings(SettingsBindings settingsBindings, AlarmMainConfiguration mainConfig)

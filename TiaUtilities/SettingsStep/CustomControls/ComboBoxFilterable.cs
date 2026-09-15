@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.ComponentModel;
+using System.Diagnostics;
+using TiaUtilities.Utility;
 
 namespace TiaUtilities.SettingsStep.CustomControls
 {
@@ -12,6 +14,7 @@ namespace TiaUtilities.SettingsStep.CustomControls
         public Func<object, string, bool> FilterPredicate { get; set; }
 
         private IList? _fullList;
+        private string? _lastFilterString;
         private bool _isFiltering;
 
         public ComboBoxFilterable()
@@ -80,50 +83,98 @@ namespace TiaUtilities.SettingsStep.CustomControls
             }
 
             string searchText = this.Text;
-            int selectionStart = this.SelectionStart;
+            var selectionStart = this.SelectionStart;
+            //Debug.WriteLine($"OnTextUpdate SearchText: {searchText}, LastFilteringString: {_lastFilterString}");
 
             _isFiltering = true;
 
             if (string.IsNullOrWhiteSpace(searchText))
             {
-                // Ripristina lista completa se l'input è vuoto
                 this.DataSource = _fullList;
-                this.Text = string.Empty;
                 this.DroppedDown = true;
+
+                this.BeginInvoke(() =>
+                {
+                    this.Text = string.Empty;
+                    this.SelectionStart = selectionStart;
+                });
             }
             else
             {
-                // Filtra la lista usando il predicato custom
                 var filteredList = _fullList.Cast<object>()
                     .Where(item => FilterPredicate(item, searchText))
                     .ToList();
 
-                if (filteredList.Count <= 0)
+                var listsEquality = false;
+                if(this.DataSource is IList dataSourceList)
                 {
-                    this.DataSource = null;
+                    listsEquality = dataSourceList.Cast<object>().SequenceEqual(filteredList);
                 }
-                else
+
+                if(!listsEquality)
                 {
                     this.DataSource = filteredList;
-                    this.Text = searchText;
-                    this.SelectionStart = selectionStart;
-
-                    if (filteredList.Count > 0)
+                    this.DroppedDown = true;
+                    this.BeginInvoke(() =>
                     {
-                        this.DroppedDown = true;
-                        Cursor.Current = Cursors.Default;
-                    }
-                    else
-                    {
-                        this.DroppedDown = false;
-                    }
+                        this.Text = searchText;
+                        this.SelectionStart = selectionStart; //After each input it would move the caret to the first position. }
+                    });
                 }
-
-
-
             }
 
+            _lastFilterString = searchText;
             _isFiltering = false;
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            // Se perde il focus ed è presente una ricerca senza risultati (Items.Count == 0)
+            /*
+            if (m.Msg == DllImports.WM_KILLFOCUS && _fullList != null && this.Items.Count == 0)
+            {
+                // Ripristina la lista completa prima che la classe base provi a leggere SelectedItem
+                this.DataSource = _fullList;
+                this.SelectedIndex = -1;
+                this.Text = _lastFilterString;
+            }
+            */
+            try
+            {
+                base.WndProc(ref m);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                // Paracadute finale per intercettare l'eccezione nativa di WinForms 
+                // nel caso in cui get_SelectedItem() venga chiamato internamente.
+                this.DataSource = _fullList;
+                this.SelectedIndex = _fullList == null || _fullList.Count == 0 ? -1 : 0;
+                this.Text = _lastFilterString;
+            }
+        }
+
+        protected override void OnValidating(CancelEventArgs e)
+        {
+            if (_fullList != null && this.Items.Count == 0)
+            {
+                // Se si esce dal controllo con una ricerca senza risultati, 
+                // ripristina la lista originaria e pulisce il testo o deseleziona.
+                this.DataSource = _fullList;
+                this.SelectedIndex = -1;
+                this.Text = string.Empty;
+            }
+
+            base.OnValidating(e);
+        }
+
+        protected override void OnDropDownClosed(EventArgs e)
+        {
+            base.OnDropDownClosed(e);
+        }
+
+        protected override void OnSelectedValueChanged(EventArgs e)
+        {
+            base.OnSelectedValueChanged(e);
         }
 
         protected override void OnDataSourceChanged(EventArgs e)

@@ -7,7 +7,7 @@ using TiaUtilities.Utility;
 
 namespace TiaUtilities.SettingsStep
 {
-    public class SettingsStepContext(string name, string description = "")
+    public class SettingsStepDescriptor(string name, string description = "")
     {
         public class StepGroup
         {
@@ -18,10 +18,10 @@ namespace TiaUtilities.SettingsStep
 
         public class Binder<Config> where Config : ObservableConfiguration
         {
-            private readonly SettingsStepContext stepContext;
+            private readonly SettingsStepDescriptor stepContext;
             private StepGroup? _lastStepGroup;
 
-            internal Binder(SettingsStepContext stepContext)
+            internal Binder(SettingsStepDescriptor stepContext)
             {
                 this.stepContext = stepContext;
             }
@@ -122,7 +122,7 @@ namespace TiaUtilities.SettingsStep
                 return this._lastStepGroup!;
             }
 
-            public SettingsStepContext End() => this.stepContext;
+            public SettingsStepDescriptor End() => this.stepContext;
         }
 
         public string Name { get; init; } = name;

@@ -77,7 +77,7 @@ namespace TiaUtilities.SettingsStep.CustomControls
                 backgroundRect.Inflate(-this._borderWidth, -this._borderWidth);
 
                 using SolidBrush brush = new(this._activeColor);
-                GraphicsUtils.FillRoundedRectangle(pevent.Graphics, brush, backgroundRect, this._borderRadius);
+                GraphicsUtils.FillRoundedRectangle(pevent.Graphics, brush, backgroundRect, new(this._borderRadius));
             }
         }
 
@@ -95,7 +95,7 @@ namespace TiaUtilities.SettingsStep.CustomControls
                     e.ClipRectangle.Height - this._borderWidth - 1
                 );
 
-                GraphicsUtils.DrawRoundedRectangle(e.Graphics, pen, borderRect, this._borderRadius);
+                GraphicsUtils.DrawRoundedRectangle(e.Graphics, pen, borderRect, new(this._borderRadius));
             }
         }
     }

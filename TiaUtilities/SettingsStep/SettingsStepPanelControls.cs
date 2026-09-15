@@ -12,24 +12,37 @@ using TiaUtilities.Utility.Extensions;
 
 namespace TiaUtilities.SettingsStep
 {
-    public class SettingsStepMapper
+    public class SettingsStepPanelControls
     {
+        public class PanelControlPosition
+        {
+            public required Control Control { get; init; }
+            public required int Column { get; init; }
+            public required int Row { get; init; }
+            public int ColumnSpan { get; set; } = 0;
+            public int RowSpan { get; set; } = 0;
+
+            public override string ToString() => $"C-{Column}, CS-{ColumnSpan}, R-{Row}, RS-{RowSpan}";
+        }
+
         private const int VALUE_ROW_GAP = 4;
         private const int GROUP_ROW_GAP = 10;
 
-        public SettingsStepContext Context { get; init; }
+        public SettingsStepDescriptor Context { get; init; }
 
         public LabelColorizable StepLabel { get; init; }
-        public Control Control { get; init; }
         public bool ListenersRegistered { get; private set; } = false;
 
-        private readonly SettingsStepContainer container;
+        private readonly SettingsStepSequence container;
         private readonly ObservableConfiguration configuration;
         private readonly List<Predicate<PropertyChangedEventArgs>> propertyChangedPredicates;
         private readonly PropertyChangedEventHandler configurationPropertyChanged;
 
+        private readonly List<PanelControlPosition> controlPositions;
+        private readonly List<RowStyle> tableRows;
+        private readonly List<TableLayoutPanelNoScrollbarsColorizable.CellStyle> tableCellStyles;
 
-        public SettingsStepMapper(SettingsStepForm form, SettingsStepContainer container, SettingsStepContext context, ObservableConfiguration configuration)
+        public SettingsStepPanelControls(SettingsStepForm form, SettingsStepSequence container, SettingsStepDescriptor context, ObservableConfiguration configuration)
         {
             this.container = container;
             this.Context = context;
@@ -38,7 +51,7 @@ namespace TiaUtilities.SettingsStep
             this.propertyChangedPredicates = [];
             this.configurationPropertyChanged = (sender, args) => propertyChangedPredicates.ForEach(p => p.Invoke(args));
 
-            (this.StepLabel, this.Control) = this.BuildControls(form);
+            (this.StepLabel, this.controlPositions, this.tableRows, this.tableCellStyles) = this.BuildControls(form);
         }
 
         public void RegisterListeners()
@@ -52,7 +65,7 @@ namespace TiaUtilities.SettingsStep
             this.ListenersRegistered = true;
         }
 
-        private (LabelColorizable, Control) BuildControls(SettingsStepForm form)
+        private (LabelColorizable, List<PanelControlPosition>, List<RowStyle>, List<TableLayoutPanelNoScrollbarsColorizable.CellStyle>) BuildControls(SettingsStepForm form)
         {
             const int COLUMN_VALUE_LABEL = 1;
             const int COLUMN_VALUE_CONTROL = 2;
@@ -61,28 +74,14 @@ namespace TiaUtilities.SettingsStep
             const int COLUMN_START = 1;
             const int COLUMN_END = 3;
 
-            TableLayoutPanelNoScrollbarsColorizable tablePanel = new()
-            {
-                BackColor = Color.Transparent,
-                Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top,
-                AutoSize = true,
-                AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                ColumnCount = 5,
-                ColumnStyles = {
-                    new(SizeType.Percent, 50f), //For centering the table in the panel
-                    new(SizeType.AutoSize), //Value Name Label
-                    new(SizeType.AutoSize), //Value Control
-                    new(SizeType.Absolute, 25f),
-                    new(SizeType.Percent, 50f)  //For centering the table in the panel
-                },
-                CellBorderStyle = TableLayoutPanelCellBorderStyle.None,
-                Padding = new(10),
-            };
+
             //tablePanel.HandleCreated += (sender, args) => tablePanel.AutoScroll = true;
 
             var groups = this.Context.GetGroups();
 
-            Dictionary<Control, ControlPosition> positionDict = [];
+            List<PanelControlPosition> controlPositions = [];
+            List<RowStyle> rows = [];
+            List<TableLayoutPanelNoScrollbarsColorizable.CellStyle> cellStyles = [];
 
             int rowCounter = 0;
 
@@ -94,34 +93,33 @@ namespace TiaUtilities.SettingsStep
                     continue;
                 }
 
-                tablePanel.RowStyles.Add(new(SizeType.AutoSize)); //Group Label row
+                rows.Add(new(SizeType.AutoSize)); //Group Label row
 
-                Enumerable.Range(1, factories.Count * 2)
-                    .Select(i => i % 2 == 0 ? new RowStyle(SizeType.Absolute, VALUE_ROW_GAP) : new RowStyle(SizeType.AutoSize))
-                    .ForEach(r => tablePanel.RowStyles.Add(r)); //*2 for value and padding.
-
-                tablePanel.RowStyles.Add(new(SizeType.Absolute, GROUP_ROW_GAP));
-
-                var groupLabel = SettingsStepMapper.CreateGroupLabel(group.Name);
-                positionDict.Add(groupLabel, new()
+                var groupLabel = SettingsStepPanelControls.CreateGroupLabel(group.Name);
+                controlPositions.Add(new()
                 {
+                    Control = groupLabel,
                     Column = COLUMN_START,
                     Row = rowCounter,
                     ColumnSpan = COLUMN_END - COLUMN_START + 1
                 });
                 rowCounter += 1;
 
-                tablePanel.AddCellStyle(new()
+                Enumerable.Range(1, factories.Count * 2)
+                    .Select(i => i % 2 == 0 ? new RowStyle(SizeType.Absolute, VALUE_ROW_GAP) : new RowStyle(SizeType.AutoSize))
+                    .ForEach(r => rows.Add(r)); //*2 for value and padding.
+
+                cellStyles.Add(new()
                 {
                     Column = COLUMN_START,
                     Row = rowCounter,
                     BackColor = Color.Transparent,
-                    BorderColor = Color.DarkBlue,
+                    BorderColor = Color.DarkGray,
                     BorderWidth = 1,
                     ColumnSpan = COLUMN_END - COLUMN_START + 1,
                     RowSpan = factories.Count * 2,
                     FitToControls = true,
-                    FitToControlsPadding = new Padding(6, 6, 8, 6),
+                    Padding = new Padding(6, 6, 8, 6),
                 });
 
                 foreach (var factory in factories)
@@ -135,8 +133,9 @@ namespace TiaUtilities.SettingsStep
                             continue;
                         }
 
-                        positionDict.Add(nameLabel, new()
+                        controlPositions.Add(new()
                         {
+                            Control = nameLabel,
                             Column = COLUMN_START,
                             Row = rowCounter,
                             ColumnSpan = COLUMN_END - COLUMN_START + 1,
@@ -165,7 +164,7 @@ namespace TiaUtilities.SettingsStep
                         var tooltip = ControlUtils.CreateStandardToolTip();
                         transferToAllButton.MouseHover += (sender, args) =>
                         {
-                            var tryGetOK = form.ConfigurationTypeContainerDict.TryGetValue(this.configuration.GetType(), out var containers);
+                            var tryGetOK = form.ConfigurationTypeModelDict.TryGetValue(this.configuration.GetType(), out var containers);
                             var count = tryGetOK && containers != null ? containers.Count(c => c != this.container) : 0;
 
                             var caption = $"{Locale.SETTINGS_FORM_CONTEXT_MENU_SET_TO_OTHERS} ({count})";
@@ -177,7 +176,7 @@ namespace TiaUtilities.SettingsStep
                         {
                             if (transferToAllButton.BackgroundImage == null)
                             {
-                                var tryGetOK = form.ConfigurationTypeContainerDict.TryGetValue(this.configuration.GetType(), out var containers);
+                                var tryGetOK = form.ConfigurationTypeModelDict.TryGetValue(this.configuration.GetType(), out var containers);
                                 var count = tryGetOK && containers != null ? containers.Count(c => c != this.container) : 0;
 
                                 if (count > 0)
@@ -203,7 +202,7 @@ namespace TiaUtilities.SettingsStep
                             cellStyle.BackColor = Color.Transparent;
                         }
 
-                        TableLayoutPanelNoScrollbarsColorizable.CellStyle backColorCellStyle = new()
+                        cellStyles.Add(new()
                         {
                             Column = COLUMN_START,
                             ColumnSpan = COLUMN_END - COLUMN_START + 1,
@@ -212,93 +211,87 @@ namespace TiaUtilities.SettingsStep
                             BorderColor = Color.Transparent,
                             BorderWidth = 0,
                             FitToControls = true,
-                            FitToControlsPadding = Padding.Empty,
+                            Padding = Padding.Empty,
                             MouseEnterCallback = MouseEnter,
                             MouseLeaveCallback = MouseLeave,
-                        };
-                        tablePanel.AddCellStyle(backColorCellStyle);
+                        });
 
                         if (nameLabel == null)
                         {
-                            positionDict.Add(control, new() { Column = COLUMN_VALUE_LABEL, ColumnSpan = 3, Row = rowCounter });
+                            controlPositions.Add(new() { Control = control, Column = COLUMN_VALUE_LABEL, ColumnSpan = 3, Row = rowCounter });
                         }
                         else
                         {
-                            positionDict.Add(nameLabel, new() { Column = COLUMN_VALUE_LABEL, Row = rowCounter });
-                            positionDict.Add(control, new() { Column = COLUMN_VALUE_CONTROL, Row = rowCounter });
-                            positionDict.Add(transferToAllButton, new() { Column = COLUMN_ICON, Row = rowCounter });
+                            controlPositions.Add(new() { Control = nameLabel, Column = COLUMN_VALUE_LABEL, Row = rowCounter });
+                            controlPositions.Add(new() { Control = control, Column = COLUMN_VALUE_CONTROL, Row = rowCounter });
+                            controlPositions.Add(new() { Control = transferToAllButton, Column = COLUMN_ICON, Row = rowCounter });
                         }
                     }
 
                     rowCounter += 2; //Skip 2 = Value row and padding
                 }
 
+                rows.Add(new(SizeType.Absolute, GROUP_ROW_GAP));
                 rowCounter += 1; //Skip 1 = Padding row
 
             }
 
-            positionDict.Add(SettingsControls.GetDividerLabel(Color.Transparent),
-                new()
-                {
-                    Column = COLUMN_VALUE_LABEL,
-                    Row = rowCounter + 1,
-                    ColumnSpan = tablePanel.ColumnCount
-                }
-            );
-
-            tablePanel.Controls.AddRange([.. positionDict.Keys]);
-
-            foreach (var (control, pos) in positionDict)
+            controlPositions.Add(new()
             {
-                tablePanel.SetCellPosition(control, new(pos.Column, pos.Row));
-                if (pos.ColumnSpan > 0)
-                {
-                    tablePanel.SetColumnSpan(control, pos.ColumnSpan);
-                }
+                Control = SettingsControls.GetDividerLabel(Color.Transparent),
+                Column = COLUMN_VALUE_LABEL,
+                Row = rowCounter + 1,
+                ColumnSpan = 5
+            });
 
-                if (pos.RowSpan > 0)
-                {
-                    tablePanel.SetRowSpan(control, pos.RowSpan);
-                }
-            }
 
             var stepLabel = CreateStepLabel(this.Context.Name, arrow: false);
             ControlUtils.CreateStandardToolTip().SetToolTip(stepLabel, this.Context.Description);
 
-            Panel middlePanel = new()
-            {
-                BackColor = Color.Transparent,
-                Dock = DockStyle.Fill,
-                AutoScroll = true,
-                AutoSize = true,
-                AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                Controls = { tablePanel },
-            };
-            ControlUtils.SetDoubleBuffered(middlePanel);
+            return (stepLabel, controlPositions, rows, cellStyles);
+        }
 
-            ScrollableControl scrollableControl = new()
+        public void ApplyControls(TableLayoutPanelNoScrollbarsColorizable panel)
+        {
+            foreach (var row in this.tableRows)
             {
-                Dock = DockStyle.Fill,
-                AutoScroll = true,
-                AutoScrollMinSize = new(0, 0),
-                AutoScrollMargin = new(0, 0),
-                Controls = { middlePanel },
-            };
-            ControlUtils.SetDoubleBuffered(scrollableControl);
+                panel.RowStyles.Add(row);
+            }
 
-            return (stepLabel, scrollableControl);
+            panel.Controls.AddRange([.. this.controlPositions.Select(p => p.Control)]);
+
+            foreach (var pos in this.controlPositions)
+            {
+                panel.SetCellPosition(pos.Control, new(pos.Column, pos.Row));
+                if (pos.ColumnSpan > 0)
+                {
+                    panel.SetColumnSpan(pos.Control, pos.ColumnSpan);
+                }
+
+                if (pos.RowSpan > 0)
+                {
+                    panel.SetRowSpan(pos.Control, pos.RowSpan);
+                }
+            }
+
+            foreach (var style in this.tableCellStyles)
+            {
+                panel.AddCellStyle(style);
+            }
+
         }
 
         private static Label CreateGroupLabel(string text)
         {
+            var emptyText = string.IsNullOrEmpty(text);
             return new LabelColorizable()
             {
                 BackColor = Form.DefaultBackColor,
                 HoverColor = Form.DefaultBackColor,
                 ClickedColor = Form.DefaultBackColor,
 
-                BorderColor = ControlPaint.LightLight(Color.DarkBlue),
-                BorderWidth = 1,
+                BorderColor = ControlPaint.Dark(Color.DarkGray, 0.2f),
+                BorderWidth = emptyText ? 0 : 1,
 
                 Anchor = AnchorStyles.Top | AnchorStyles.Left,
                 //Dock = DockStyle.Fill,
@@ -308,8 +301,8 @@ namespace TiaUtilities.SettingsStep
                 BorderStyle = BorderStyle.None,
                 Text = text,
                 TextAlign = ContentAlignment.MiddleCenter,
-                Padding = Padding.Empty,
-                Margin = new(1),
+                Padding = emptyText ? Padding.Empty : new(5, 2, 5, 2),
+                Margin = emptyText ? Padding.Empty : new(2),
             };
         }
 
@@ -326,7 +319,7 @@ namespace TiaUtilities.SettingsStep
                 BorderColor = Color.Transparent,
 
                 Text = text,
-                Font = arrow ? StyleManager.Fonts.NORMAL_BOLD : StyleManager.Fonts.BIG_BOLD,
+                Font = arrow ? StyleManager.Fonts.NORMAL_SEMIBOLD : StyleManager.Fonts.BIG_SEMIBOLD,
                 TextAlign = ContentAlignment.MiddleCenter,
                 AutoSize = true,
                 Dock = DockStyle.Fill,
@@ -335,16 +328,6 @@ namespace TiaUtilities.SettingsStep
                 Padding = arrow ? Padding.Empty : new(4),
                 Margin = Padding.Empty,
             };
-        }
-
-        public class ControlPosition
-        {
-            public required int Column { get; init; }
-            public required int Row { get; init; }
-            public int ColumnSpan { get; set; } = 0;
-            public int RowSpan { get; set; } = 0;
-
-            public override string ToString() => $"C-{Column}, CS-{ColumnSpan}, R-{Row}, RS-{RowSpan}";
         }
 
     }
