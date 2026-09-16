@@ -36,12 +36,10 @@ namespace TiaUtilities.SettingsNew
         internal Dictionary<Type, List<SettingsStepSequence>> ConfigurationTypeModelDict { get; init; }
 
         private readonly ObservableObject<SettingsStepSequence?> selectedSequence;
-        private readonly ObservableObject<int> selectedStep;
+        private readonly ObservableObject<SettingsStepPanelControls?> selectedPanelControls;
 
         //private readonly TableLayoutPanelNoScrollbarsColorizable controlsPanel;
         private readonly List<SettingsStepSequence> sequences;
-
-        private int currentStepCount = 0;
 
         public SettingsStepForm()
         {
@@ -54,7 +52,7 @@ namespace TiaUtilities.SettingsNew
 
             this.sequences = [];
             this.ConfigurationTypeModelDict = [];
-            this.selectedStep = new(-1);
+            this.selectedPanelControls = new(null);
             this.selectedSequence = new(null);
 
             this.InitControls();
@@ -105,9 +103,9 @@ namespace TiaUtilities.SettingsNew
                 MaximumSize = new(24, 24),
                 Text = "",
                 FlatStyle = FlatStyle.Flat,
-                FlatAppearance = { 
-                    BorderSize = 0, 
-                    MouseOverBackColor = Color.FromArgb(127, Color.LightSkyBlue), 
+                FlatAppearance = {
+                    BorderSize = 0,
+                    MouseOverBackColor = Color.FromArgb(127, Color.LightSkyBlue),
                     MouseDownBackColor = Color.FromArgb(127, Color.LightGreen)
                 },
                 Padding = Padding.Empty,
@@ -161,50 +159,38 @@ namespace TiaUtilities.SettingsNew
 
             this.selectedSequence.Changed += (sender, args) =>
             {
-                var oldContainer = args.OldValue;
-                var newContainer = args.NewValue;
+                var oldSequence = args.OldValue;
+                var newSequence = args.NewValue;
 
-                var oldStep = this.selectedStep.Value;
+                var oldPanelControls = this.selectedPanelControls.Value;
 
                 this.stepFlowPanel.SuspendLayout();
                 this.stepFlowPanel.Controls.Clear();
 
                 this.selectedConfigurationNameLabel.Text = "No Selection";
 
+                this.selectedPanelControls.Value = null;
 
-                this.selectedStep.Value = -1;
-                this.currentStepCount = 0;
-
-                if (oldContainer != null)
+                if (oldSequence != null)
                 {
-                    var panelControlsList = oldContainer.GetPanelControlsList(this);
-                    foreach (var tableLayout in panelControlsList)
+                    foreach (var panelControls in oldSequence.PanelControls)
                     {
-                        tableLayout.StepLabel.BorderWidth = 0;
-                        tableLayout.StepLabel.BorderColor = Color.Transparent;
+                        panelControls.StepLabelClick = null;
+
+                        panelControls.StepLabel.BorderWidth = 0;
+                        panelControls.StepLabel.BorderColor = Color.Transparent;
                     }
                 }
 
-                if (newContainer != null)
+                if (newSequence != null)
                 {
-                    this.selectedConfigurationNameLabel.Text = $"{newContainer.GroupName} - {newContainer.Name}";
-
-                    var panelControlsList = newContainer.GetPanelControlsList(this);
-                    this.currentStepCount = panelControlsList.Count;
+                    newSequence.Init(this);
+                    this.selectedConfigurationNameLabel.Text = newSequence.FullName;
 
                     List<Label> stepLabels = [];
-                    for (int x = 0; x < panelControlsList.Count; x++)
+                    foreach (var panelControls in newSequence.PanelControls)
                     {
-                        var panelControls = panelControlsList[x];
-
-                        if (!panelControls.ListenersRegistered)
-                        {
-                            panelControls.RegisterListeners();
-
-                            var step = x;
-                            panelControls.StepLabel.Click += (sender, args) => this.selectedStep.Value = step;
-                        }
-
+                        panelControls.StepLabelClick = () => this.selectedPanelControls.Value = panelControls;
                         stepLabels.Add(panelControls.StepLabel);
                     }
 
@@ -215,9 +201,13 @@ namespace TiaUtilities.SettingsNew
                     ).ToArray();
                     this.stepFlowPanel.Controls.AddRange(l);
 
-                    if (panelControlsList.InRange(oldStep))
-                    {//Keep the same selected step if is in range of the new
-                        this.selectedStep.Value = oldStep;
+                    if (oldPanelControls != null)
+                    {
+                        var activePanelControls = newSequence.PanelControls.FirstOrDefault(p => p.StepLabel.Text.Contains(oldPanelControls.StepLabel.Text, StringComparison.OrdinalIgnoreCase));
+                        if (activePanelControls != null)
+                        {
+                            this.selectedPanelControls.Value = activePanelControls;
+                        }
                     }
                 }
 
@@ -225,11 +215,11 @@ namespace TiaUtilities.SettingsNew
             };
             #endregion
 
-            #region SELECTED_STEP
-            this.selectedStep.Changed += (sender, args) =>
+            #region SELECTED_PANEL_CONTROLS
+            this.selectedPanelControls.Changed += (sender, args) =>
             {
-                var oldValue = args.OldValue;
-                var newValue = args.NewValue;
+                var oldPanelControls = args.OldValue;
+                var newPanelControls = args.NewValue;
 
                 this.controlsPanel.SuspendLayout();
 
@@ -237,28 +227,18 @@ namespace TiaUtilities.SettingsNew
                 this.controlsPanel.Controls.Clear();
                 this.controlsPanel.ClearCellStyles();
 
-                var container = this.selectedSequence.Value;
-                if (container != null)
+                if (oldPanelControls != null)
                 {
-                    var panelControlsList = container.GetPanelControlsList(this);
+                    oldPanelControls.StepLabel.BorderWidth = 0;
+                    oldPanelControls.StepLabel.BorderColor = Color.Transparent;
+                }
 
-                    if (panelControlsList.TryGet(oldValue, out var oldPanelControls))
-                    {
-                        oldPanelControls.StepLabel.BorderWidth = 0;
-                        oldPanelControls.StepLabel.BorderColor = Color.Transparent;
-                    }
+                if (newPanelControls != null)
+                {
+                    newPanelControls.StepLabel.BorderWidth = 2;
+                    newPanelControls.StepLabel.BorderColor = Color.FromArgb(127, Color.Black);
 
-                    if (panelControlsList.TryGet(newValue, out var newPanelControls))
-                    {
-                        newPanelControls.StepLabel.BorderWidth = 2;
-                        newPanelControls.StepLabel.BorderColor = Color.FromArgb(127, Color.Black);
-
-                        newPanelControls.ApplyControls(this.controlsPanel);
-                    }
-                    else
-                    {
-                        this.selectedStep.Value = -1;
-                    }
+                    newPanelControls.ApplyControls(this.controlsPanel);
                 }
 
                 this.controlsPanel.ResumeLayout(performLayout: true);
@@ -289,38 +269,38 @@ namespace TiaUtilities.SettingsNew
             #endregion
         }
 
-        public void SetSequences(IEnumerable<SettingsStepSequence> configurationDataEnumerable)
+        public void SetSequences(IEnumerable<SettingsStepSequence> sequences)
         {
             this.sequences.Clear();
             this.ConfigurationTypeModelDict.Clear();
-            if (!configurationDataEnumerable.Any())
+            if (!sequences.Any())
             {
                 this.selectedSequence.Value = null;
                 return;
             }
 
-            foreach (var model in configurationDataEnumerable)
+            foreach (var sequence in sequences)
             {
-                var cfgType = model.Configuration.GetType();
+                var cfgType = sequence.Configuration.GetType();
 
-                var tryGetOK = this.ConfigurationTypeModelDict.TryGetValue(cfgType, out var typeContainers);
+                var tryGetOK = this.ConfigurationTypeModelDict.TryGetValue(cfgType, out var configurationSequences);
                 if (!tryGetOK)
                 {
-                    typeContainers = [];
-                    this.ConfigurationTypeModelDict.Add(cfgType, typeContainers);
+                    configurationSequences = [];
+                    this.ConfigurationTypeModelDict.Add(cfgType, configurationSequences);
                 }
 
-                typeContainers?.Add(model);
+                configurationSequences?.Add(sequence);
             }
 
-            var items = configurationDataEnumerable.Select(c => new ComboBoxSourceItem() { Text = $"{c.GroupName} - {c.Name}", Sequence = c });
+            var items = sequences.Select(s => new ComboBoxSourceItem() { Text = s.FullName, Sequence = s });
 
             var maxWidth = items.Max(i => TextRenderer.MeasureText(i.Text, this.selectConfigurationComboBox.Font, Size.Empty, TextFormatFlags.TextBoxControl).Width);
             this.selectConfigurationComboBox.Width = maxWidth + (int)(maxWidth * 0.15);
             this.selectConfigurationComboBox.SetFilterableSource(items);
 
-            this.sequences.AddRange(configurationDataEnumerable);
-            this.selectedSequence.Value = configurationDataEnumerable.First();
+            this.sequences.AddRange(sequences);
+            this.selectedSequence.Value = sequences.First();
         }
 
         private static bool CalculateMatchCustom(string testoOggetto, string testoCercato)
@@ -346,6 +326,32 @@ namespace TiaUtilities.SettingsNew
             return acronimo.StartsWith(testoCercato, StringComparison.OrdinalIgnoreCase);
         }
 
+        private void SelectNextPrevious(bool next)
+        {
+            var sequence = this.selectedSequence.Value;
+            var panelControls = this.selectedPanelControls.Value;
+            if (sequence == null || panelControls == null)
+            {
+                return;
+            }
+
+            var count = sequence.PanelControls.Count;
+
+            var indexOf = sequence.PanelControls.IndexOf(panelControls);
+
+            int newIndex = 0;
+            if(next)
+            {
+                newIndex = indexOf >= count - 1 ? 0 : indexOf + 1;
+            }
+            else
+            {
+                newIndex = indexOf <= 0 ? count - 1 : indexOf - 1;
+            }
+            this.selectedPanelControls.Value = sequence.PanelControls[newIndex];
+
+        }
+
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             int step = -1;
@@ -356,27 +362,11 @@ namespace TiaUtilities.SettingsNew
             }
             else if (keyData == Keys.PageUp || keyData == (Keys.Right | Keys.Control))
             {
-                var currentStep = this.selectedStep.Value;
-                step = currentStep >= this.currentStepCount - 1 ? 0 : currentStep + 1;
+                SelectNextPrevious(true);
             }
             else if (keyData == Keys.PageDown || keyData == (Keys.Left | Keys.Control))
             {
-                var currentStep = this.selectedStep.Value;
-                step = currentStep <= 0 ? this.currentStepCount - 1 : currentStep - 1;
-            }
-
-            if (step >= 0 && step < this.currentStepCount)
-            {
-                if (this.selectedStep.Value != step)
-                {
-                    this.selectedStep.Value = step;
-                }
-                else
-                {
-                    this.selectedStep.Value = -1;
-                }
-
-                return true;
+                SelectNextPrevious(false);
             }
 
             return base.ProcessCmdKey(ref msg, keyData);

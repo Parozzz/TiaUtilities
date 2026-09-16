@@ -30,6 +30,7 @@ namespace TiaUtilities.SettingsStep
 
         public SettingsStepDescriptor Descriptor { get; init; }
         public LabelColorizable StepLabel { get; init; }
+        public Action? StepLabelClick { get; set; }
 
         public bool ListenersRegistered { get; private set; } = false;
 
@@ -249,7 +250,9 @@ namespace TiaUtilities.SettingsStep
 
 
             var stepLabel = CreateStepLabel(this.Descriptor.Name, arrow: false);
-            ControlUtils.CreateStandardToolTip().SetToolTip(stepLabel, this.Descriptor.Description);
+            stepLabel.Click += (sender, args) => this.StepLabelClick?.Invoke();
+
+            ControlUtils.CreateToolTip().SetToolTip(stepLabel, this.Descriptor.Description);
 
             return (stepLabel, controlPositions, rows, cellStyles);
         }
