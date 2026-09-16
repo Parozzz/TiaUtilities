@@ -351,28 +351,72 @@ namespace TiaUtilities.Generation.Alarms.Module
             return Locale.ALARM_GEN_FORM;
         }
 
+        private GenPlaceholderHandler? CreateGenericPlaceholderHandler()
+        {
+            var currentTabName = this.GetCurrentTabName();
+            var currentTab = this.GetCurrenTab();
+
+            AlarmGenPlaceholdersHandler? placeholdersHandler = null;
+            if (currentTabName != null && currentTab != null)
+            {
+                placeholdersHandler = new(this.mainConfig, currentTab.TabConfig)
+                {
+                    TabName = currentTabName
+                };
+
+                if (currentTab.DeviceDataList.Count > 0)
+                {
+                    var firstDeviceData = currentTab.DeviceDataList[0];
+                    placeholdersHandler.DeviceData = firstDeviceData;
+                }
+
+                if(this.templateHandler.BindingList.Count > 0)
+                {
+                    var firstTemplate = this.templateHandler.BindingList[0];
+                    if(firstTemplate.AlarmGridSave.RowData.Count > 0)
+                    {
+                        var firstTemplateData = firstTemplate.AlarmGridSave.RowData[0];
+                        placeholdersHandler.TemplateData = firstTemplateData;
+                    }
+                }
+
+                placeholdersHandler.LoadJSONObject(currentTab.TabConfig.CustomPlaceholdersJSON);
+
+                placeholdersHandler.SetAlarmNum(0, this.mainConfig.AlarmNumFormat);
+                placeholdersHandler.SetStartEndAlarmNum(0, 999, this.mainConfig.AlarmNumFormat);
+            }
+
+            return placeholdersHandler;
+        }
+
         private List<SettingsStepSequence> GetSettingsStepSequences()
         {
+            string ParsePlaceholders(string str)
+            {
+                var placeholderHandler = this.CreateGenericPlaceholderHandler();
+                return placeholderHandler == null ? str : placeholderHandler.ParseNotNull(str);
+            }
+
             List<SettingsStepSequence> sequenceList = [];
 
             var globalStepDescriptors = AlarmGenUtils.CreateGlobalSettingsStepDescriptors();
             var tablStepDescriptors = AlarmGenUtils.CreateTabSettingsStepDescriptors();
             var templateStepDescriptors = AlarmGenUtils.CreateTemplateSettingsStepDescriptor();
 
-            SettingsStepSequence globalSequence = new(this.mainConfig, "Global", "Settings");
+            SettingsStepSequence globalSequence = new(this.mainConfig, "Global", "Settings") {  PlaceholdersCallBack = ParsePlaceholders }; 
             globalSequence.AddRange(globalStepDescriptors);
             sequenceList.Add(globalSequence);
 
             foreach(var tab in this.alarmTabList)
             {
-                SettingsStepSequence tabSequence = new(tab.TabConfig, "Tab", tab.Name);
+                SettingsStepSequence tabSequence = new(tab.TabConfig, "Tab", tab.Name) { PlaceholdersCallBack = ParsePlaceholders };
                 tabSequence.AddRange(tablStepDescriptors);
                 sequenceList.Add(tabSequence);
             }
 
             foreach(var template in this.templateHandler.BindingList)
             {
-                SettingsStepSequence templateSequence = new(template.TemplateConfig, "Template", template.Name);
+                SettingsStepSequence templateSequence = new(template.TemplateConfig, "Template", template.Name) { PlaceholdersCallBack = ParsePlaceholders };
                 templateSequence.AddRange(templateStepDescriptors);
                 sequenceList.Add(templateSequence);
             }
@@ -410,8 +454,10 @@ namespace TiaUtilities.Generation.Alarms.Module
 
         private AlarmTabConfiguration? GetCurrentTabConfiguration()
         {
-            return this.control.tabControl.SelectedTab?.Tag is AlarmGenTab genTab ? genTab.TabConfig : null;
+            return this.GetCurrenTab()?.TabConfig;
         }
+
+        private AlarmGenTab? GetCurrenTab() => this.control.tabControl.SelectedTab?.Tag is AlarmGenTab genTab ? genTab : null;
 
         private Dictionary<string, ObservableConfiguration> GetTabConfigurationDict()
         {

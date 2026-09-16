@@ -10,7 +10,7 @@ namespace TiaUtilities.SettingsStep.ControlFactory
     {
         private const int TEXT_BOX_MIN_WIDTH = 300;
 
-        public static TextBox GetTextBox(string sampleText, string startText, SettingsFactoryOptions? options)
+        public static TextBox GetTextBox(string sampleText, string startText, SettingsFactoryGeneralOptions generalOptions, SettingsFactoryCreateOptions createOptions)
         {
             var font = StyleManager.Fonts.NORMAL;
 
@@ -33,16 +33,16 @@ namespace TiaUtilities.SettingsStep.ControlFactory
             };
             ControlUtils.SetDoubleBuffered(textBox);
 
-            if (options != null && options.MinWidth > 0)
+            if (generalOptions.MinWidth > 0)
             {
                 var minSize = textBox.MinimumSize;
-                textBox.MinimumSize = new(options.MinWidth, minSize.Height);
+                textBox.MinimumSize = new(generalOptions.MinWidth, minSize.Height);
             }
 
             return textBox;
         }
 
-        public static ComboBox GetComboBox(IEnumerable<string> items, SettingsFactoryOptions? options)
+        public static ComboBox GetComboBox(IEnumerable<string> items, SettingsFactoryGeneralOptions generalOptions, SettingsFactoryCreateOptions createOptions)
         {
             var font = StyleManager.Fonts.NORMAL;
 
@@ -70,10 +70,10 @@ namespace TiaUtilities.SettingsStep.ControlFactory
                 form?.BeginInvoke(() => form.ActiveControl = null);
             };
 
-            if (options != null && options.MinWidth > 0)
+            if (generalOptions.MinWidth > 0)
             {
                 var minSize = comboBox.MinimumSize;
-                comboBox.MinimumSize = new(options.MinWidth, minSize.Height);
+                comboBox.MinimumSize = new(generalOptions.MinWidth, minSize.Height);
             }
 
             return comboBox;
@@ -101,7 +101,7 @@ namespace TiaUtilities.SettingsStep.ControlFactory
             return editor;
         }
 
-        public static CheckBox GetCheckBox(SettingsFactoryOptions? options)
+        public static CheckBox GetCheckBox(SettingsFactoryGeneralOptions generalOptions, SettingsFactoryCreateOptions createOptions)
         {
             CheckBox checkBox = new()
             {
@@ -116,16 +116,16 @@ namespace TiaUtilities.SettingsStep.ControlFactory
                 Cursor = Cursors.Hand,
             };
 
-            if (options != null && options.MinWidth > 0)
+            if (generalOptions.MinWidth > 0)
             {
                 var minSize = checkBox.MinimumSize;
-                checkBox.MinimumSize = new(options.MinWidth, minSize.Height);
+                checkBox.MinimumSize = new(generalOptions.MinWidth, minSize.Height);
             }
 
             return checkBox;
         }
 
-        public static Label GetText(string text, SettingsFactoryOptions? options)
+        public static Label GetText(string text, SettingsFactoryGeneralOptions generalOptions, SettingsFactoryCreateOptions createOptions)
         {
             Label label = new()
             {
@@ -139,15 +139,15 @@ namespace TiaUtilities.SettingsStep.ControlFactory
                 TextAlign = ContentAlignment.MiddleCenter,
             };
 
-            if (options != null && options.TextAlign != null)
+            if (generalOptions.TextAlign != null)
             {
-                label.TextAlign = (ContentAlignment)options.TextAlign;
+                label.TextAlign = (ContentAlignment)generalOptions.TextAlign;
             }
 
             return label;
         }
 
-        public static Label GetNameLabel(string text, string description, SettingsFactoryOptions? options, Func<string>? controlTextCallback = null)
+        public static Label GetNameLabel(string text, string description, SettingsFactoryGeneralOptions generalOptions, SettingsFactoryCreateOptions createOptions, Func<string>? controlTextCallback = null)
         {
             var label = new LabelWithTooltip()
             {
@@ -177,7 +177,7 @@ namespace TiaUtilities.SettingsStep.ControlFactory
                 label.Symbols.Add(descriptionItem);
             }
 
-            if (options != null && controlTextCallback != null && options.PlaceholdersCallback != null)
+            if (controlTextCallback != null && generalOptions.SupportPlaceholders && createOptions.PlaceholdersCallback != null)
             {
                 LabelWithTooltip.LabelItem placeholderItem = new()
                 {
@@ -188,7 +188,8 @@ namespace TiaUtilities.SettingsStep.ControlFactory
                     OnHover = item =>
                     {
                         var controlText = controlTextCallback();
-                        var parsedText = options.PlaceholdersCallback(controlText);
+
+                        var parsedText = createOptions.PlaceholdersCallback(controlText);
                         item.TooltipText = parsedText;
                     }
                 };
@@ -200,7 +201,7 @@ namespace TiaUtilities.SettingsStep.ControlFactory
             return label;
         }
 
-        public static Label GetDividerLabel(Color backColor, SettingsFactoryOptions? options = null)
+        public static Label GetDividerLabel(Color backColor)
         {
             return new()
             {

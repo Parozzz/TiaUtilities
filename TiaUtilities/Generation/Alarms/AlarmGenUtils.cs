@@ -15,38 +15,38 @@ namespace TiaUtilities.Generation.Alarms
             var blocksStepDescriptor = new SettingsStepDescriptor("Blocks", "Settings for generated blocks")
                 .CreateBinder<AlarmMainConfiguration>()
                 .StartGroup(Locale.ALARM_SETTINGS_FC)
-                    .Add(x => x.FCBlockName, Locale.GENERICS_NAME)
+                    .Add(x => x.FCBlockName, Locale.GENERICS_NAME, options: new() { SupportPlaceholders = true })
                     .Add(x => x.FCBlockNumber, Locale.GENERICS_NUMBER)
                 .StartGroup(Locale.ALARM_SETTINGS_UDT)
-                    .Add(x => x.UDTBlockName, Locale.GENERICS_NAME, Locale.ALARM_SETTINGS_UDT_DESCR)
+                    .Add(x => x.UDTBlockName, Locale.GENERICS_NAME, Locale.ALARM_SETTINGS_UDT_DESCR, options: new() { SupportPlaceholders = true })
                 .End();
             var enablingsStepDescriptor = new SettingsStepDescriptor(Locale.ALARM_SETTINGS_ENABLE)
                 .CreateBinder<AlarmMainConfiguration>()
                 .StartGroup(Locale.ALARM_SETTINGS_ENABLE)
-                        .Add(x => x.EnableCustomVariable, Locale.ALARM_SETTINGS_ENABLE_CUSTOM_VAR, Locale.ALARM_SETTINGS_ENABLE_CUSTOM_VAR_DESCR)
-                        .Add(x => x.EnableTimer, Locale.ALARM_SETTINGS_ENABLE_TIMER, Locale.ALARM_SETTINGS_ENABLE_TIMER_DESCR)
+                    .Add(x => x.EnableCustomVariable, Locale.ALARM_SETTINGS_ENABLE_CUSTOM_VAR, Locale.ALARM_SETTINGS_ENABLE_CUSTOM_VAR_DESCR)
+                    .Add(x => x.EnableTimer, Locale.ALARM_SETTINGS_ENABLE_TIMER, Locale.ALARM_SETTINGS_ENABLE_TIMER_DESCR)
                 .End();
 
             var segmentNamesStepDescriptor = new SettingsStepDescriptor(Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME)
                 .CreateBinder<AlarmMainConfiguration>()
                 .StartGroup(Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME)
-                    .Add(x => x.OneEachSegmentName, Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME_ONE_EACH, Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME_ONE_EACH_DESCR)
-                    .Add(x => x.OneEachEmptyAlarmSegmentName, Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME_ONE_EACH_SPARE)
-                    .Add(x => x.GroupSegmentName, Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME_GROUP_EACH, Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME_GROUP_EACH_DESCR)
-                    .Add(x => x.GroupEmptyAlarmSegmentName, Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME_GROUP_EACH_SPARE)
+                    .Add(x => x.OneEachSegmentName, Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME_ONE_EACH, Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME_ONE_EACH_DESCR, options: new() { SupportPlaceholders = true })
+                    .Add(x => x.OneEachEmptyAlarmSegmentName, Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME_ONE_EACH_SPARE, options: new() { SupportPlaceholders = true })
+                    .Add(x => x.GroupSegmentName, Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME_GROUP_EACH, Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME_GROUP_EACH_DESCR, options: new() { SupportPlaceholders = true })
+                    .Add(x => x.GroupEmptyAlarmSegmentName, Locale.ALARM_SETTINGS_TAB_SEGMENT_NAME_GROUP_EACH_SPARE, options: new() { SupportPlaceholders = true })
                 .End();
 
             var alarmStepDescriptor = new SettingsStepDescriptor("Alarm", "Settings for alarm properties")
                 .CreateBinder<AlarmMainConfiguration>()
-                .Add(x => x.AlarmNumFormat, Locale.ALARM_SETTINGS_ALARM_NUM_PLACEHOLDER_FORMAT, description: Locale.ALARM_SETTINGS_ALARM_NUM_PLACEHOLDER_FORMAT_DESCR)
+                .Add(x => x.AlarmNumFormat, Locale.ALARM_SETTINGS_ALARM_NUM_PLACEHOLDER_FORMAT, description: Locale.ALARM_SETTINGS_ALARM_NUM_PLACEHOLDER_FORMAT_DESCR, options: new() { })
                 .StartGroup("PLC")
-                    .Add(x => x.AlarmNameTemplate, Locale.ALARM_SETTINGS_UDT_ALARM_VARIABLE_NAME)
-                    .Add(x => x.AlarmCommentTemplate, Locale.ALARM_SETTINGS_UDT_ALARM_VARIABLE_COMMENT)
-                    .Add(x => x.AlarmCommentTemplateSpare, Locale.ALARM_SETTINGS_UDT_ALARM_VARIABLE_SPARE_COMMENT)
+                    .Add(x => x.AlarmNameTemplate, Locale.ALARM_SETTINGS_UDT_ALARM_VARIABLE_NAME, options: new() { SupportPlaceholders = true })
+                    .Add(x => x.AlarmCommentTemplate, Locale.ALARM_SETTINGS_UDT_ALARM_VARIABLE_COMMENT, options: new() { SupportPlaceholders = true })
+                    .Add(x => x.AlarmCommentTemplateSpare, Locale.ALARM_SETTINGS_UDT_ALARM_VARIABLE_SPARE_COMMENT, options: new() { SupportPlaceholders = true })
                 .StartGroup(Locale.GENERICS_HMI)
-                    .Add(x => x.HmiNameTemplate, Locale.ALARM_SETTINGS_HMI_ITEM_NAME, Locale.ALARM_SETTINGS_HMI_ITEM_NAME_DESCR)
-                    .Add(x => x.HmiTextTemplate, Locale.ALARM_SETTINGS_HMI_ITEM_TEXT, Locale.ALARM_SETTINGS_HMI_ITEM_TEXT_DESCR)
-                    .Add(x => x.HmiTriggerTagTemplate, Locale.ALARM_SETTINGS_HMI_TRIGGER_TAG, Locale.ALARM_SETTINGS_HMI_TRIGGER_TAG_DESCR)
+                    .Add(x => x.HmiNameTemplate, Locale.ALARM_SETTINGS_HMI_ITEM_NAME, Locale.ALARM_SETTINGS_HMI_ITEM_NAME_DESCR, options: new() { SupportPlaceholders = true })
+                    .Add(x => x.HmiTextTemplate, Locale.ALARM_SETTINGS_HMI_ITEM_TEXT, Locale.ALARM_SETTINGS_HMI_ITEM_TEXT_DESCR, options: new() { SupportPlaceholders = true })
+                    .Add(x => x.HmiTriggerTagTemplate, Locale.ALARM_SETTINGS_HMI_TRIGGER_TAG, Locale.ALARM_SETTINGS_HMI_TRIGGER_TAG_DESCR, options: new() { SupportPlaceholders = true })
                     .Add(x => x.HmiTriggerTagUseWordArray, Locale.ALARM_SETTINGS_HMI_USE_WORD_ARRAY, Locale.ALARM_SETTINGS_HMI_USE_WORD_ARRAY_DESCR)
                 .End();
 
@@ -64,26 +64,26 @@ namespace TiaUtilities.Generation.Alarms
             var variablesStepDescriptor = new SettingsStepDescriptor("Variables")
                 .CreateBinder<AlarmTabConfiguration>()
                 .StartGroup(Locale.ALARM_SETTINGS_PREFIXES)
-                    .Add(x => x.AlarmAddressPrefix, Locale.ALARM_SETTINGS_PREFIXES_ALARM)
-                    .Add(x => x.Coil1AddressPrefix, Locale.ALARM_SETTINGS_PREFIXES_COIL1)
-                    .Add(x => x.Coil2AddressPrefix, Locale.ALARM_SETTINGS_PREFIXES_COIL2)
-                    .Add(x => x.TimerAddressPrefix, Locale.ALARM_SETTINGS_PREFIXES_TIMER)
+                    .Add(x => x.AlarmAddressPrefix, Locale.ALARM_SETTINGS_PREFIXES_ALARM, options: new() { SupportPlaceholders = true })
+                    .Add(x => x.Coil1AddressPrefix, Locale.ALARM_SETTINGS_PREFIXES_COIL1, options: new() { SupportPlaceholders = true })
+                    .Add(x => x.Coil2AddressPrefix, Locale.ALARM_SETTINGS_PREFIXES_COIL2, options: new() { SupportPlaceholders = true })
+                    .Add(x => x.TimerAddressPrefix, Locale.ALARM_SETTINGS_PREFIXES_TIMER, options: new() { SupportPlaceholders = true })
 
                 .StartGroup(Locale.ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_COIL1)
-                    .Add(x => x.DefaultCoil1Address, Locale.GENERICS_ADDRESS, Locale.GENERICS_DESCR_SET_SLASH_TO_DISABLE)
+                    .Add(x => x.DefaultCoil1Address, Locale.GENERICS_ADDRESS, Locale.GENERICS_DESCR_SET_SLASH_TO_DISABLE, options: new() { SupportPlaceholders = true })
                     .Add(x => x.DefaultCoil1Type, Locale.GENERICS_TYPE)
 
                 .StartGroup(Locale.ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_COIL2)
-                    .Add(x => x.DefaultCoil2Address, Locale.GENERICS_ADDRESS, Locale.GENERICS_DESCR_SET_SLASH_TO_DISABLE)
+                    .Add(x => x.DefaultCoil2Address, Locale.GENERICS_ADDRESS, Locale.GENERICS_DESCR_SET_SLASH_TO_DISABLE, options: new() { SupportPlaceholders = true })
                     .Add(x => x.DefaultCoil2Type, Locale.GENERICS_TYPE)
 
                 .StartGroup(Locale.ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_TIMER)
-                    .Add(x => x.DefaultTimerAddress, Locale.GENERICS_ADDRESS, Locale.GENERICS_DESCR_SET_SLASH_TO_DISABLE)
+                    .Add(x => x.DefaultTimerAddress, Locale.GENERICS_ADDRESS, Locale.GENERICS_DESCR_SET_SLASH_TO_DISABLE, options: new() { SupportPlaceholders = true })
                     .Add(x => x.DefaultTimerType, Locale.GENERICS_TYPE, options: new() { StringSelections = ["TON", "TOF"] })
                     .Add(x => x.DefaultTimerValue, Locale.GENERICS_VALUE, "It must be formatted the same as in TiaPortal (eg. T#0s, T#100ms)")
 
                 .StartGroup(Locale.ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_CUSTOM_VAR)
-                    .Add(x => x.DefaultCustomVarAddress, Locale.GENERICS_ADDRESS, Locale.GENERICS_DESCR_SET_SLASH_TO_DISABLE)
+                    .Add(x => x.DefaultCustomVarAddress, Locale.GENERICS_ADDRESS, Locale.GENERICS_DESCR_SET_SLASH_TO_DISABLE, options: new() { SupportPlaceholders = true })
                     .Add(x => x.DefaultCustomVarValue, Locale.GENERICS_VALUE)
                 .End();
 
@@ -94,7 +94,7 @@ namespace TiaUtilities.Generation.Alarms
                     .Add(x => x.StartingAlarmNum, Locale.ALARM_SETTINGS_TAB_ALARM_NUMS_START, Locale.ALARM_SETTINGS_TAB_ALARM_NUMS_START_DESCR)
 
                 .StartGroup(Locale.ALARM_SETTINGS_TAB_SPARE)
-                    .Add(x => x.EmptyAlarmContactAddress, Locale.ALARM_SETTINGS_TAB_SPARE_ADDRESS)
+                    .Add(x => x.EmptyAlarmContactAddress, Locale.ALARM_SETTINGS_TAB_SPARE_ADDRESS, options: new() { SupportPlaceholders = true })
                     .Add(x => x.EmptyAlarmAtEnd, Locale.ALARM_SETTINGS_TAB_SPARE_EMPTY_NUM_AT_END, Locale.ALARM_SETTINGS_TAB_SPARE_EMPTY_NUM_AT_END_DESCR)
                     .Add(x => x.SkipNumberAfterGroup, Locale.ALARM_SETTINGS_TAB_SPARE_GROUP_SKIP, Locale.ALARM_SETTINGS_TAB_SPARE_GROUP_SKIP_DESCR)
                     .Add(x => x.AntiSlipNumber, Locale.ALARM_SETTINGS_TAB_SPARE_ANTI_SLIP, Locale.ALARM_SETTINGS_TAB_SPARE_ANTI_SLIP_DESCR)
@@ -105,13 +105,13 @@ namespace TiaUtilities.Generation.Alarms
                 .CreateBinder<AlarmTabConfiguration>()
                 .StartGroup(Locale.GENERICS_HMI)
                     .Add(x => x.HmiStartID, Locale.ALARM_SETTINGS_TAB_HMI_START_ID, Locale.ALARM_SETTINGS_TAB_HMI_START_ID_DESCR)
-                    .Add(x => x.DefaultHmiAlarmClass, Locale.ALARM_SETTINGS_TAB_HMI_DEFAULT_ALARM_CLASS, Locale.ALARM_SETTINGS_TAB_HMI_DEFAULT_ALARM_CLASS_DESCR)
+                    .Add(x => x.DefaultHmiAlarmClass, Locale.ALARM_SETTINGS_TAB_HMI_DEFAULT_ALARM_CLASS, Locale.ALARM_SETTINGS_TAB_HMI_DEFAULT_ALARM_CLASS_DESCR, options: new() { SupportPlaceholders = true })
                 .End();
 
             var placeholdersStepDescriptor = new SettingsStepDescriptor("Placeholders")
                 .CreateBinder<AlarmTabConfiguration>()
                 .StartGroup(Locale.ALARM_SETTINGS_TAB_PLACEHOLDERS)
-                    .Add(x => x.CustomPlaceholdersJSON, "Placeholders", description: Locale.ALARM_SETTINGS_TAB_PLACEHOLDERS_DESC, options: new() { StringSpecifiedEditor = SettingsStep.ControlFactory.SettingsFactoryOptions.StringCustomEditor.JSON })
+                    .Add(x => x.CustomPlaceholdersJSON, "Placeholders", description: Locale.ALARM_SETTINGS_TAB_PLACEHOLDERS_DESC, options: new() { StringSpecifiedEditor = SettingsStep.ControlFactory.SettingsFactoryGeneralOptions.StringCustomEditor.JSON })
 
                 .End();
 

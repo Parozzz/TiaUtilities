@@ -12,7 +12,7 @@ namespace TiaUtilities.SettingsStep.ControlFactory.Impl
 
         private readonly NumberType numberType;
 
-        public SettingsNumberFactory(SettingsConfigurationProperty configurationProperty, string name, string description, SettingsFactoryOptions? options = null)
+        public SettingsNumberFactory(SettingsConfigurationProperty configurationProperty, string name, string description, SettingsFactoryGeneralOptions options)
             : base(configurationProperty, name, description, options)
         {
             Validate.NotNull(this.ConfigurationProperty);
@@ -35,16 +35,16 @@ namespace TiaUtilities.SettingsStep.ControlFactory.Impl
             }
         }
 
-        public override (Label, Control, Predicate<PropertyChangedEventArgs>) Create(ObservableConfiguration configuration)
+        public override (Label, Control, Predicate<PropertyChangedEventArgs>) Create(ObservableConfiguration configuration, SettingsFactoryCreateOptions createOptions)
         {
             Validate.NotNull(this.ConfigurationProperty);
 
-            var nameLabel = SettingsControls.GetNameLabel(this.Name, this.Description, this.Options);
+            var nameLabel = SettingsControls.GetNameLabel(this.Name, this.Description, this.GeneralOptions, createOptions);
 
             var startValue = this.ConfigurationProperty.GetFrom(configuration);
             var startText = startValue?.ToString() ?? "";
 
-            var textBox = SettingsControls.GetTextBox(SAMPLE_TEXT, startText, this.Options);
+            var textBox = SettingsControls.GetTextBox(SAMPLE_TEXT, startText, this.GeneralOptions, createOptions);
 
             switch (this.numberType)
             {
@@ -106,7 +106,7 @@ namespace TiaUtilities.SettingsStep.ControlFactory.Impl
                     return false;
                 }
 
-                this.Options?.PropertyChangedCallback?.Invoke(); //This way also handles property changed from the control!
+                this.GeneralOptions?.PropertyChangedCallback?.Invoke(); //This way also handles property changed from the control!
                 if (setInProgress)
                 {
                     return false;

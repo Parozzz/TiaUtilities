@@ -28,12 +28,12 @@ namespace TiaUtilities.SettingsStep
         private const int VALUE_ROW_GAP = 4;
         private const int GROUP_ROW_GAP = 10;
 
-        public SettingsStepDescriptor Context { get; init; }
-
+        public SettingsStepDescriptor Descriptor { get; init; }
         public LabelColorizable StepLabel { get; init; }
+
         public bool ListenersRegistered { get; private set; } = false;
 
-        private readonly SettingsStepSequence container;
+        private readonly SettingsStepSequence sequence;
         private readonly ObservableConfiguration configuration;
         private readonly List<Predicate<PropertyChangedEventArgs>> propertyChangedPredicates;
         private readonly PropertyChangedEventHandler configurationPropertyChanged;
@@ -42,10 +42,10 @@ namespace TiaUtilities.SettingsStep
         private readonly List<RowStyle> tableRows;
         private readonly List<TableLayoutPanelNoScrollbarsColorizable.CellStyle> tableCellStyles;
 
-        public SettingsStepPanelControls(SettingsStepForm form, SettingsStepSequence container, SettingsStepDescriptor context, ObservableConfiguration configuration)
+        public SettingsStepPanelControls(SettingsStepForm form, SettingsStepSequence sequence, SettingsStepDescriptor descriptor, ObservableConfiguration configuration)
         {
-            this.container = container;
-            this.Context = context;
+            this.sequence = sequence;
+            this.Descriptor = descriptor;
 
             this.configuration = configuration;
             this.propertyChangedPredicates = [];
@@ -77,7 +77,7 @@ namespace TiaUtilities.SettingsStep
 
             //tablePanel.HandleCreated += (sender, args) => tablePanel.AutoScroll = true;
 
-            var groups = this.Context.GetGroups();
+            var groups = this.Descriptor.GetGroups();
 
             List<PanelControlPosition> controlPositions = [];
             List<RowStyle> rows = [];
@@ -124,7 +124,10 @@ namespace TiaUtilities.SettingsStep
 
                 foreach (var factory in factories)
                 {
-                    var (nameLabel, control, predicate) = factory.Create(configuration);
+                    var (nameLabel, control, predicate) = factory.Create(configuration, new()
+                    {
+                        PlaceholdersCallback = str => this.sequence.PlaceholdersCallBack == null ? str : this.sequence.PlaceholdersCallBack(str)
+                    });
 
                     if (control == null || predicate == null) //If no predicate is provided, means is not a binded control and will not have a label
                     {
@@ -165,7 +168,7 @@ namespace TiaUtilities.SettingsStep
                         transferToAllButton.MouseHover += (sender, args) =>
                         {
                             var tryGetOK = form.ConfigurationTypeModelDict.TryGetValue(this.configuration.GetType(), out var containers);
-                            var count = tryGetOK && containers != null ? containers.Count(c => c != this.container) : 0;
+                            var count = tryGetOK && containers != null ? containers.Count(c => c != this.sequence) : 0;
 
                             var caption = $"{Locale.SETTINGS_FORM_CONTEXT_MENU_SET_TO_OTHERS} ({count})";
                             tooltip.Show(caption, transferToAllButton);
@@ -177,7 +180,7 @@ namespace TiaUtilities.SettingsStep
                             if (transferToAllButton.BackgroundImage == null)
                             {
                                 var tryGetOK = form.ConfigurationTypeModelDict.TryGetValue(this.configuration.GetType(), out var containers);
-                                var count = tryGetOK && containers != null ? containers.Count(c => c != this.container) : 0;
+                                var count = tryGetOK && containers != null ? containers.Count(c => c != this.sequence) : 0;
 
                                 if (count > 0)
                                 {
@@ -245,8 +248,8 @@ namespace TiaUtilities.SettingsStep
             });
 
 
-            var stepLabel = CreateStepLabel(this.Context.Name, arrow: false);
-            ControlUtils.CreateStandardToolTip().SetToolTip(stepLabel, this.Context.Description);
+            var stepLabel = CreateStepLabel(this.Descriptor.Name, arrow: false);
+            ControlUtils.CreateStandardToolTip().SetToolTip(stepLabel, this.Descriptor.Description);
 
             return (stepLabel, controlPositions, rows, cellStyles);
         }
@@ -312,6 +315,8 @@ namespace TiaUtilities.SettingsStep
             {
                 BackColor = Color.Transparent,
 
+                Cursor = arrow ? Cursors.Default : Cursors.Hand,
+
                 HoverColor = arrow ? Color.Transparent : Color.FromArgb(68, Color.CornflowerBlue),
                 ClickedColor = arrow ? Color.Transparent : Color.FromArgb(127, Color.CornflowerBlue),
 
@@ -325,6 +330,7 @@ namespace TiaUtilities.SettingsStep
                 Dock = DockStyle.Fill,
                 FlatStyle = FlatStyle.Flat,
                 BorderStyle = BorderStyle.None,
+
                 Padding = arrow ? Padding.Empty : new(4),
                 Margin = Padding.Empty,
             };

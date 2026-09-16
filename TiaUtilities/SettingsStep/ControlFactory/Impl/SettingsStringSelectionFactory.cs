@@ -6,22 +6,18 @@ using TiaUtilities.Utility;
 
 namespace TiaUtilities.SettingsStep.ControlFactory.Impl
 {
-    public class SettingsStringSelectionFactory : SettingsControlFactory
+    public class SettingsStringSelectionFactory(SettingsConfigurationProperty? configurationProperty, string name, string description, SettingsFactoryGeneralOptions options) 
+        : SettingsControlFactory(configurationProperty, name, description, options)
     {
         public required IEnumerable<string> Selections { get; init; }
 
-        public SettingsStringSelectionFactory(SettingsConfigurationProperty? configurationProperty, string name, string description, SettingsFactoryOptions? options = null) :
-            base(configurationProperty, name, description, options)
-        {
-        }
-
-        public override (Label, Control, Predicate<PropertyChangedEventArgs>) Create(ObservableConfiguration configuration)
+        public override (Label, Control, Predicate<PropertyChangedEventArgs>) Create(ObservableConfiguration configuration, SettingsFactoryCreateOptions createOptions)
         {
             Validate.NotNull(this.ConfigurationProperty);
 
-            var nameLabel = SettingsControls.GetNameLabel(this.Name, this.Description, this.Options, () => $"{this.ConfigurationProperty?.GetFrom(configuration)}");
+            var nameLabel = SettingsControls.GetNameLabel(this.Name, this.Description, this.GeneralOptions, createOptions, () => $"{this.ConfigurationProperty?.GetFrom(configuration)}");
 
-            var comboBox = SettingsControls.GetComboBox(Selections, this.Options);
+            var comboBox = SettingsControls.GetComboBox(Selections, this.GeneralOptions, createOptions);
             ControlUtils.CreateComboBoxObjectDataSource(comboBox, Selections.ToList(), editable: false);
 
             var startValue = this.ConfigurationProperty.GetFrom(configuration);
@@ -48,7 +44,7 @@ namespace TiaUtilities.SettingsStep.ControlFactory.Impl
                     return false;
                 }
 
-                this.Options?.PropertyChangedCallback?.Invoke(); //This way also handles property changed from the control!
+                this.GeneralOptions?.PropertyChangedCallback?.Invoke(); //This way also handles property changed from the control!
                 if (setInProgress)
                 {
                     return false;

@@ -42,7 +42,7 @@ namespace TiaUtilities.SettingsStep.CustomControls
 
         public new Color BackColor { get; set; } = Color.Transparent;
 
-        private readonly ToolTip toolTip = ControlUtils.CreateQuickToolTip(fading: true);
+        private readonly ToolTip toolTip = ControlUtils.CreateToolTip(longAutoPop: true, quick: true, fading: true);
 
         public LabelWithTooltip()
         {

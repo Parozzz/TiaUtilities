@@ -7,22 +7,22 @@ namespace TiaUtilities.SettingsStep.ControlFactory.Impl
     public class SettingsBoolFactory : SettingsControlFactory
     {
 
-        public SettingsBoolFactory(SettingsConfigurationProperty configurationProperty, string name, string description, SettingsFactoryOptions? options = null) 
+        public SettingsBoolFactory(SettingsConfigurationProperty configurationProperty, string name, string description, SettingsFactoryGeneralOptions options = null) 
             : base(configurationProperty, name, description, options)
         {
             this.ConfigurationProperty = configurationProperty;
             this.Name = name;
             this.Description = description;
-            this.Options = options;
+            this.GeneralOptions = options;
         }
 
-        public override (Label, Control, Predicate<PropertyChangedEventArgs>) Create(ObservableConfiguration configuration)
+        public override (Label, Control, Predicate<PropertyChangedEventArgs>) Create(ObservableConfiguration configuration, SettingsFactoryCreateOptions createOptions)
         {
             Validate.NotNull(this.ConfigurationProperty);
 
-            var nameLabel = SettingsControls.GetNameLabel(this.Name, this.Description, this.Options);
+            var nameLabel = SettingsControls.GetNameLabel(this.Name, this.Description, this.GeneralOptions, createOptions);
 
-            var checkBox = SettingsControls.GetCheckBox(this.Options);
+            var checkBox = SettingsControls.GetCheckBox(this.GeneralOptions, createOptions);
 
             var startValue = this.ConfigurationProperty.GetFrom(configuration);
             this.UpdateChecked(checkBox, startValue);
@@ -42,7 +42,7 @@ namespace TiaUtilities.SettingsStep.ControlFactory.Impl
                     return false;
                 }
 
-                this.Options?.PropertyChangedCallback?.Invoke(); //This way also handles property changed from the control!
+                this.GeneralOptions?.PropertyChangedCallback?.Invoke(); //This way also handles property changed from the control!
                 if (setInProgress)
                 {
                     return false;

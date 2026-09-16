@@ -8,16 +8,12 @@ using TiaUtilities.Configuration;
 
 namespace TiaUtilities.SettingsStep.ControlFactory.Impl
 {
-    public class SettingsTextFactory : SettingsControlFactory
+    public class SettingsTextFactory(string name, string description, SettingsFactoryGeneralOptions options) 
+        : SettingsControlFactory(null, name, description, options)
     {
-        public SettingsTextFactory(string name, string description, SettingsFactoryOptions? options = null) 
-            : base(null, name, description, options)
+        public override (Label, Control?, Predicate<PropertyChangedEventArgs>?) Create(ObservableConfiguration configuration, SettingsFactoryCreateOptions createOptions)
         {
-        }
-
-        public override (Label, Control?, Predicate<PropertyChangedEventArgs>?) Create(ObservableConfiguration configuration)
-        {
-            var label = SettingsControls.GetText(this.Name, this.Options);
+            var label = SettingsControls.GetText(this.Name, this.GeneralOptions, createOptions);
             return (label, null, null);
         }
     }

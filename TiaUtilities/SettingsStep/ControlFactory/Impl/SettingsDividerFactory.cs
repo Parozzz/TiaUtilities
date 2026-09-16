@@ -3,17 +3,12 @@ using TiaUtilities.Configuration;
 
 namespace TiaUtilities.SettingsStep.ControlFactory.Impl
 {
-    public class SettingsDividerFactory : SettingsControlFactory
+    public class SettingsDividerFactory(SettingsFactoryGeneralOptions options)
+        : SettingsControlFactory(null, "", "", options)
     {
-        public SettingsDividerFactory(SettingsFactoryOptions? options)
-            : base(null, "", "", options)
+        public override (Label, Control?, Predicate<PropertyChangedEventArgs>?) Create(ObservableConfiguration configuration, SettingsFactoryCreateOptions createOptions)
         {
-            this.Options = options;
-        }
-
-        public override (Label, Control?, Predicate<PropertyChangedEventArgs>?) Create(ObservableConfiguration configuration)
-        {
-            var dividerLabel = SettingsControls.GetDividerLabel(Color.Black, this.Options);
+            var dividerLabel = SettingsControls.GetDividerLabel(Color.Black);
             return (dividerLabel, null, null);
         }
     }

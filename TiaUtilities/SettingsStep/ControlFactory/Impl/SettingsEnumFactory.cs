@@ -10,25 +10,21 @@ using TiaUtilities.Utility;
 
 namespace TiaUtilities.SettingsStep.ControlFactory.Impl
 {
-    public class SettingsEnumFactory : SettingsControlFactory
+    public class SettingsEnumFactory(SettingsConfigurationProperty? configurationProperty, string name, string description, SettingsFactoryGeneralOptions options) 
+        : SettingsControlFactory(configurationProperty, name, description, options)
     {
 
         public required Type EnumType { get; init; }
 
-        public SettingsEnumFactory(SettingsConfigurationProperty? configurationProperty, string name, string description, SettingsFactoryOptions? options = null) 
-            : base(configurationProperty, name, description, options)
-        {
-        }
-
-        public override (Label, Control, Predicate<PropertyChangedEventArgs>) Create(ObservableConfiguration configuration)
+        public override (Label, Control, Predicate<PropertyChangedEventArgs>) Create(ObservableConfiguration configuration, SettingsFactoryCreateOptions createOptions)
         {
             Validate.NotNull(this.ConfigurationProperty);
 
-            var nameLabel = SettingsControls.GetNameLabel(this.Name, this.Description, this.Options, () => $"{this.ConfigurationProperty?.GetFrom(configuration)}");
+            var nameLabel = SettingsControls.GetNameLabel(this.Name, this.Description, this.GeneralOptions, createOptions, () => $"{this.ConfigurationProperty?.GetFrom(configuration)}");
 
             var translatedEnumTexts = Enum.GetValues(this.EnumType).Cast<Enum>().Select(e => e.GetTranslation());
 
-            var comboBox = SettingsControls.GetComboBox(translatedEnumTexts, this.Options);
+            var comboBox = SettingsControls.GetComboBox(translatedEnumTexts, this.GeneralOptions, createOptions);
             ControlUtils.CreateComboBoxEnumDataSource(comboBox, this.EnumType);
 
             var startValue = this.ConfigurationProperty.GetFrom(configuration);
@@ -38,7 +34,7 @@ namespace TiaUtilities.SettingsStep.ControlFactory.Impl
             comboBox.SelectedValueChanged += (sender, args) =>
             {
                 var value = comboBox.SelectedValue;
-                if(value.GetType() == this.EnumType)
+                if(value?.GetType() == this.EnumType)
                 {
                     setInProgress = true;
                     this.ConfigurationProperty.SetTo(configuration, value);
@@ -54,7 +50,7 @@ namespace TiaUtilities.SettingsStep.ControlFactory.Impl
                     return false;
                 }
 
-                this.Options?.PropertyChangedCallback?.Invoke(); //This way also handles property changed from the control!
+                this.GeneralOptions?.PropertyChangedCallback?.Invoke(); //This way also handles property changed from the control!
                 if (setInProgress)
                 {
                     return false;

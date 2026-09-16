@@ -63,6 +63,19 @@ namespace TiaUtilities.Utility
             };
         }
 
+        public static ToolTip CreateToolTip(bool longAutoPop = false, bool quick = false, bool fading = true)
+        {
+            return new()
+            {
+                InitialDelay = quick ? 500 : 1500,
+                ReshowDelay = quick ? 100 : 800,
+                AutomaticDelay = quick ? 300 : 1000, 
+                AutoPopDelay = longAutoPop ? 20000 : 5000,
+                UseFading = fading,
+                UseAnimation = false,
+            };
+        }
+
         public static void CreateComboBoxEnumDataSource(ComboBox comboBox, Type enumType, bool editable = false)
         {
             if (!editable)

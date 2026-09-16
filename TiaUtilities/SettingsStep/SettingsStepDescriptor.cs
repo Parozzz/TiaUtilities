@@ -37,22 +37,24 @@ namespace TiaUtilities.SettingsStep
                 return this;
             }
 
-            public Binder<Config> AddDivider(SettingsFactoryOptions? options = default)
+            public Binder<Config> AddDivider(SettingsFactoryGeneralOptions? options = default)
             {
                 var group = this.StartEmptyGroupIfNeeded();
-                group.Factories.Add(new SettingsDividerFactory(options));
+                group.Factories.Add(new SettingsDividerFactory(options ?? new()));
                 return this;
             }
 
-            public Binder<Config> AddText(string text, string description = "", SettingsFactoryOptions? options = default)
+            public Binder<Config> AddText(string text, string description = "", SettingsFactoryGeneralOptions? options = default)
             {
                 var group = this.StartEmptyGroupIfNeeded();
-                group.Factories.Add(new SettingsTextFactory(text, description, options));
+                group.Factories.Add(new SettingsTextFactory(text, description, options ?? new()));
                 return this;
             }
 
-            public Binder<Config> Add<Prop>(Expression<Func<Config, Prop>> propertyLambda, string name, string description = "", SettingsFactoryOptions? options = default)
+            public Binder<Config> Add<Prop>(Expression<Func<Config, Prop>> propertyLambda, string name, string description = "", SettingsFactoryGeneralOptions? options = default)
             {
+                options ??= new();
+
                 Expression body = propertyLambda.Body;
 
                 //If the system cast a simple type (int, uint, long ...) to another type, it will recover the original operand.
@@ -70,15 +72,15 @@ namespace TiaUtilities.SettingsStep
                     var type = propInfo.PropertyType;
                     if (type == typeof(string))
                     {
-                        if(options?.StringSpecifiedEditor == SettingsFactoryOptions.StringCustomEditor.JS)
+                        if(options.StringSpecifiedEditor == SettingsFactoryGeneralOptions.StringCustomEditor.JS)
                         {
                             factory = new SettingsJavascriptFactory(configurationProperty, name, description, options);
                         }
-                        else if(options?.StringSpecifiedEditor == SettingsFactoryOptions.StringCustomEditor.JSON)
+                        else if(options.StringSpecifiedEditor == SettingsFactoryGeneralOptions.StringCustomEditor.JSON)
                         {
                             factory = new SettingsJSONFactory(configurationProperty, name, description, options);
                         }
-                        else if(options?.StringSelections != null)
+                        else if(options.StringSelections != null)
                         {
                             factory = new SettingsStringSelectionFactory(configurationProperty, name, description, options) { Selections = options.StringSelections };
                         }
@@ -100,7 +102,6 @@ namespace TiaUtilities.SettingsStep
                         factory = new SettingsEnumFactory(configurationProperty, name, description, options) { EnumType = type };
                     }
 
-                    
 
                     if (factory != null)
                     {

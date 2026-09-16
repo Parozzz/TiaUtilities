@@ -10,6 +10,8 @@ namespace TiaUtilities.SettingsStep
         public string Name { get; init; } = name;
         public ObservableConfiguration Configuration { get; init; } = configuration;
 
+        public Func<string, string>? PlaceholdersCallBack { get; set; } = null;
+
         private readonly List<SettingsStepDescriptor> descriptors = [];
         private readonly List<SettingsStepPanelControls> panelControlsList = [];
 

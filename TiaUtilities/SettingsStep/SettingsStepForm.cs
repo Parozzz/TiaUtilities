@@ -16,7 +16,7 @@ namespace TiaUtilities.SettingsNew
         private class ComboBoxSourceItem
         {
             public required string Text { get; init; }
-            public required SettingsStepSequence Model { get; init; }
+            public required SettingsStepSequence Sequence { get; init; }
 
             public override string ToString()
             {
@@ -35,10 +35,10 @@ namespace TiaUtilities.SettingsNew
 
         internal Dictionary<Type, List<SettingsStepSequence>> ConfigurationTypeModelDict { get; init; }
 
-        private readonly ObservableObject<SettingsStepSequence?> selectedConfigurationData;
+        private readonly ObservableObject<SettingsStepSequence?> selectedSequence;
         private readonly ObservableObject<int> selectedStep;
 
-        private readonly TableLayoutPanelNoScrollbarsColorizable controlsPanel;
+        //private readonly TableLayoutPanelNoScrollbarsColorizable controlsPanel;
         private readonly List<SettingsStepSequence> sequences;
 
         private int currentStepCount = 0;
@@ -50,71 +50,20 @@ namespace TiaUtilities.SettingsNew
             this.DoubleBuffered = true;
             ControlUtils.SetDoubleBuffered(this.mainTable);
             ControlUtils.SetDoubleBuffered(this.stepFlowPanel);
+            ControlUtils.SetDoubleBuffered(this.bottomPanel);
 
             this.sequences = [];
             this.ConfigurationTypeModelDict = [];
             this.selectedStep = new(-1);
-            this.selectedConfigurationData = new(null);
+            this.selectedSequence = new(null);
 
-            this.controlsPanel = this.InitControlsPanel();
             this.InitControls();
 
         }
 
-        private TableLayoutPanelNoScrollbarsColorizable InitControlsPanel()
-        {
-            TableLayoutPanelNoScrollbarsColorizable controlsPanel = new()
-            {
-                BackColor = Color.Transparent,
-                Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top,
-                AutoSize = true,
-                AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                ColumnCount = 5,
-                ColumnStyles = {
-                    new(SizeType.Percent, 50f), //For centering the table in the panel
-                    new(SizeType.AutoSize), //Value Name Label
-                    new(SizeType.AutoSize), //Value Control
-                    new(SizeType.Absolute, 25f),
-                    new(SizeType.Percent, 50f)  //For centering the table in the panel
-                },
-                CellBorderStyle = TableLayoutPanelCellBorderStyle.None,
-                //Padding = new(10),
-                Margin = new(10),
-            };
-
-            Panel middlePanel = new()
-            {
-                BackColor = Color.Transparent,
-                Dock = DockStyle.Fill,
-                AutoScroll = true,
-                AutoSize = true,
-                AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                Controls = { controlsPanel },
-                Padding = Padding.Empty,
-                Margin = new(5),
-            };
-            ControlUtils.SetDoubleBuffered(middlePanel);
-
-            this.mainTable.Controls.Add(middlePanel, 0, CONTROLS_PANEL_ROW);
-            return controlsPanel;
-
-            /*
-                ScrollableControl scrollableControl = new()
-                {
-                    Dock = DockStyle.Fill,
-                    AutoScroll = true,
-                    AutoScrollMinSize = new(0, 0),
-                    AutoScrollMargin = new(0, 0),
-                    Controls = { middlePanel },
-                    Padding = Padding.Empty,
-                    Margin = Padding.Empty,
-                };
-                ControlUtils.SetDoubleBuffered(scrollableControl);
-            */
-        }
-
         private void InitControls()
         {
+            #region MAIN_TABLE_CELL_STYLES
             this.mainTable.AddCellStyle(new()
             {
                 Column = 0,
@@ -135,11 +84,82 @@ namespace TiaUtilities.SettingsNew
                 BorderColor = Color.FromArgb(127, Color.LightSkyBlue),
                 Padding = new(-1),
             });
+            #endregion
 
+            #region SELECTED_CONFIGURATION_AS_DEFAULT_BUTTON
+
+            ImageList imageList = new()
+            {
+                Images = { ImageResources.EFFECT },
+                ImageSize = new(16, 16),
+            };
+
+            Button selectedAsDefaultButton = new()
+            {
+                Anchor = AnchorStyles.None,
+                ImageList = imageList,
+                ImageIndex = 0,
+                ImageAlign = ContentAlignment.MiddleCenter,
+                TextImageRelation = TextImageRelation.Overlay,
+                MinimumSize = new(24, 24),
+                MaximumSize = new(24, 24),
+                Text = "",
+                FlatStyle = FlatStyle.Flat,
+                FlatAppearance = { 
+                    BorderSize = 0, 
+                    MouseOverBackColor = Color.FromArgb(127, Color.LightSkyBlue), 
+                    MouseDownBackColor = Color.FromArgb(127, Color.LightGreen)
+                },
+                Padding = Padding.Empty,
+                Margin = Padding.Empty,
+            };
+
+            var selectedAsDefaultTooltip = ControlUtils.CreateToolTip(quick: true);
+            selectedAsDefaultButton.MouseHover += (sender, args) =>
+            {
+                var selectedSequence = this.selectedSequence.Value;
+                if (selectedSequence != null)
+                {
+                    selectedAsDefaultTooltip.Show($"Save as default configuration ({selectedSequence.Name} => {selectedSequence.Configuration.GetType().Name})", selectedAsDefaultButton);
+                }
+            };
+
+            selectedAsDefaultButton.Click += (sender, args) =>
+            {
+                var selectedSequence = this.selectedSequence.Value;
+                if (selectedSequence != null)
+                {
+                    var configuration = selectedSequence.Configuration;
+
+                    var presetConfiguration = MainForm.Settings.GetPresetConfiguration(configuration.GetType());
+                    if (presetConfiguration != null)
+                    {
+                        GenUtils.CopySamePublicFieldsAndProperties(configuration, presetConfiguration);
+                    }
+                }
+            };
+
+            this.selectedConfigurationPanel.Controls.Add(selectedAsDefaultButton);
+            #endregion
+
+            #region CONTROLS_PANEL
+            this.controlsPanel.RowStyles.Clear();
+            this.controlsPanel.ColumnStyles.Clear();
+
+            this.controlsPanel.ColumnCount = 5;
+
+            this.controlsPanel.ColumnStyles.Add(new(SizeType.Percent, 50f)); //For centering the table in the panel
+            this.controlsPanel.ColumnStyles.Add(new(SizeType.AutoSize)); //Value Name Label
+            this.controlsPanel.ColumnStyles.Add(new(SizeType.AutoSize)); //Value Control
+            this.controlsPanel.ColumnStyles.Add(new(SizeType.Absolute, 25f));
+            this.controlsPanel.ColumnStyles.Add(new(SizeType.Percent, 50f)); //For centering the table in the panel
+            #endregion
+
+            #region SELECTED_CONFIGURATION
             this.selectedConfigurationNameLabel.Font = StyleManager.Fonts.BIG_BOLD;
             this.selectedConfigurationNameLabel.Text = "";
 
-            this.selectedConfigurationData.Changed += (sender, args) =>
+            this.selectedSequence.Changed += (sender, args) =>
             {
                 var oldContainer = args.OldValue;
                 var newContainer = args.NewValue;
@@ -203,7 +223,9 @@ namespace TiaUtilities.SettingsNew
 
                 this.stepFlowPanel.ResumeLayout(performLayout: true);
             };
+            #endregion
 
+            #region SELECTED_STEP
             this.selectedStep.Changed += (sender, args) =>
             {
                 var oldValue = args.OldValue;
@@ -215,7 +237,7 @@ namespace TiaUtilities.SettingsNew
                 this.controlsPanel.Controls.Clear();
                 this.controlsPanel.ClearCellStyles();
 
-                var container = this.selectedConfigurationData.Value;
+                var container = this.selectedSequence.Value;
                 if (container != null)
                 {
                     var panelControlsList = container.GetPanelControlsList(this);
@@ -241,7 +263,9 @@ namespace TiaUtilities.SettingsNew
 
                 this.controlsPanel.ResumeLayout(performLayout: true);
             };
+            #endregion
 
+            #region SELECT_CONFIGURATION_COMBOBOX
             this.selectConfigurationComboBox.BackColor = Form.DefaultBackColor;
             this.selectConfigurationComboBox.Font = StyleManager.Fonts.NORMAL_SEMIBOLD;
             this.selectConfigurationComboBox.DropDownClosed += (sender, args) =>
@@ -249,60 +273,20 @@ namespace TiaUtilities.SettingsNew
                 this.BeginInvoke(() => this.ActiveControl = null);
             };
             this.selectConfigurationComboBox.DisplayMember = nameof(ComboBoxSourceItem.Text);
-            this.selectConfigurationComboBox.ValueMember = nameof(ComboBoxSourceItem.Model);
+            this.selectConfigurationComboBox.ValueMember = nameof(ComboBoxSourceItem.Sequence);
             this.selectConfigurationComboBox.FilterPredicate = (item, text) =>
             {
                 var i = (ComboBoxSourceItem)item;
                 return CalculateMatchCustom(i.Text, text);
             };
-            this.selectConfigurationComboBox.SelectedValueChanged += (sender, args) =>
+            this.selectConfigurationComboBox.SelectionChangeCommitted += (sender, args) =>
             {
-                Debug.WriteLine("SelectedValueChanged");
                 if (this.selectConfigurationComboBox.SelectedItem is ComboBoxSourceItem item)
                 {
-                    this.selectedConfigurationData.Value = item.Model;
+                    this.selectedSequence.Value = item.Sequence;
                 }
             };
-
-            ContextMenuStrip contextMenu = new();
-
-            ToolStripLabel actualConfigurationNameLabel = new() { AutoSize = true };
-
-            ToolStripMenuItem saveToPresetItem = new() { Image = ImageResources.EFFECT };
-            saveToPresetItem.Click += (sender, args) =>
-            {
-                var selectedItem = this.selectConfigurationComboBox.SelectedItem;
-                if (selectedItem is ComboBoxSourceItem sourceItem)
-                {
-                    var configuration = sourceItem.Model.Configuration;
-
-                    var presetConfiguration = MainForm.Settings.GetPresetConfiguration(configuration.GetType());
-                    if (presetConfiguration != null)
-                    {
-                        GenUtils.CopySamePublicFieldsAndProperties(configuration, presetConfiguration);
-                    }
-                }
-
-            };
-
-            contextMenu.VisibleChanged += (sender, args) =>
-            {
-                contextMenu.BeginInvoke(() =>
-                {
-                    if (this.selectConfigurationComboBox.SelectedItem is ComboBoxSourceItem item)
-                    {
-                        saveToPresetItem.Text = $"Save as default configuration ({item.Model.Configuration.GetType().Name})";
-
-                        actualConfigurationNameLabel.Text = item.Text;
-                        contextMenu.Refresh();
-                        contextMenu.PerformLayout();
-                    }
-                });
-            };
-
-
-            contextMenu.Items.AddRange([actualConfigurationNameLabel, new ToolStripSeparator(), saveToPresetItem]);
-            this.selectConfigurationComboBox.ContextMenuStrip = contextMenu;
+            #endregion
         }
 
         public void SetSequences(IEnumerable<SettingsStepSequence> configurationDataEnumerable)
@@ -311,7 +295,7 @@ namespace TiaUtilities.SettingsNew
             this.ConfigurationTypeModelDict.Clear();
             if (!configurationDataEnumerable.Any())
             {
-                this.selectedConfigurationData.Value = null;
+                this.selectedSequence.Value = null;
                 return;
             }
 
@@ -329,14 +313,14 @@ namespace TiaUtilities.SettingsNew
                 typeContainers?.Add(model);
             }
 
-            var items = configurationDataEnumerable.Select(c => new ComboBoxSourceItem() { Text = $"{c.GroupName} - {c.Name}", Model = c });
+            var items = configurationDataEnumerable.Select(c => new ComboBoxSourceItem() { Text = $"{c.GroupName} - {c.Name}", Sequence = c });
 
             var maxWidth = items.Max(i => TextRenderer.MeasureText(i.Text, this.selectConfigurationComboBox.Font, Size.Empty, TextFormatFlags.TextBoxControl).Width);
             this.selectConfigurationComboBox.Width = maxWidth + (int)(maxWidth * 0.15);
             this.selectConfigurationComboBox.SetFilterableSource(items);
 
             this.sequences.AddRange(configurationDataEnumerable);
-            this.selectedConfigurationData.Value = configurationDataEnumerable.First();
+            this.selectedSequence.Value = configurationDataEnumerable.First();
         }
 
         private static bool CalculateMatchCustom(string testoOggetto, string testoCercato)

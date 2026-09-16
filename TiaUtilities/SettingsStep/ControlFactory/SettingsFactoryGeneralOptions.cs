@@ -1,6 +1,6 @@
 ﻿namespace TiaUtilities.SettingsStep.ControlFactory
 {
-    public class SettingsFactoryOptions
+    public class SettingsFactoryGeneralOptions
     {
         public enum StringCustomEditor { NONE, JS, JSON }
 
@@ -9,7 +9,7 @@
         public IEnumerable<string>? StringSelections { get; set; }
         public StringCustomEditor StringSpecifiedEditor { get; set; } = StringCustomEditor.NONE;
 
-        public Func<string, string>? PlaceholdersCallback { get; set; }
+        public bool SupportPlaceholders { get; set; } = false;
         public Action? PropertyChangedCallback { get; set; }
     }
 }

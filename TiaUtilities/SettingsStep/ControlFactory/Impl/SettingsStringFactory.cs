@@ -6,25 +6,21 @@ using TiaUtilities.Utility;
 
 namespace TiaUtilities.SettingsStep.ControlFactory.Impl
 {
-    public class SettingsStringFactory : SettingsControlFactory
+    public class SettingsStringFactory(SettingsConfigurationProperty? configurationProperty, string name, string description, SettingsFactoryGeneralOptions options) 
+        : SettingsControlFactory(configurationProperty, name, description, options)
     {
         private const string SAMPLE_TEXT = "AaBbCcDdEeFfGgHhIiLlJjKkMmNnOoPpQqRrSsTtUuVvZz!?";
 
-        public SettingsStringFactory(SettingsConfigurationProperty? configurationProperty, string name, string description, SettingsFactoryOptions? options = null) :
-            base(configurationProperty, name, description, options)
-        {
-        }
-
-        public override (Label, Control, Predicate<PropertyChangedEventArgs>) Create(ObservableConfiguration configuration)
+        public override (Label, Control, Predicate<PropertyChangedEventArgs>) Create(ObservableConfiguration configuration, SettingsFactoryCreateOptions createOptions)
         {
             Validate.NotNull(this.ConfigurationProperty);
 
-            var nameLabel = SettingsControls.GetNameLabel(this.Name, this.Description, this.Options, () => $"{this.ConfigurationProperty?.GetFrom(configuration)}");
+            var nameLabel = SettingsControls.GetNameLabel(this.Name, this.Description, this.GeneralOptions, createOptions, () => $"{this.ConfigurationProperty?.GetFrom(configuration)}");
             
             var startValue = this.ConfigurationProperty.GetFrom(configuration);
             var startText = startValue?.ToString() ?? "";
 
-            var textBox = SettingsControls.GetTextBox(SAMPLE_TEXT, startText, this.Options);
+            var textBox = SettingsControls.GetTextBox(SAMPLE_TEXT, startText, this.GeneralOptions, createOptions);
 
             var setInProgress = false;
             textBox.TextChanged += (sender, args) =>
@@ -44,7 +40,7 @@ namespace TiaUtilities.SettingsStep.ControlFactory.Impl
                     return false;
                 }
 
-                this.Options?.PropertyChangedCallback?.Invoke(); //This way also handles property changed from the control!
+                this.GeneralOptions?.PropertyChangedCallback?.Invoke(); //This way also handles property changed from the control!
                 if (setInProgress)
                 {
                     return false;

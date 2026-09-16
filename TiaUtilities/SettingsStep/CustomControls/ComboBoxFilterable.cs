@@ -129,16 +129,6 @@ namespace TiaUtilities.SettingsStep.CustomControls
 
         protected override void WndProc(ref Message m)
         {
-            // Se perde il focus ed è presente una ricerca senza risultati (Items.Count == 0)
-            /*
-            if (m.Msg == DllImports.WM_KILLFOCUS && _fullList != null && this.Items.Count == 0)
-            {
-                // Ripristina la lista completa prima che la classe base provi a leggere SelectedItem
-                this.DataSource = _fullList;
-                this.SelectedIndex = -1;
-                this.Text = _lastFilterString;
-            }
-            */
             try
             {
                 base.WndProc(ref m);
@@ -150,21 +140,13 @@ namespace TiaUtilities.SettingsStep.CustomControls
                 this.DataSource = _fullList;
                 this.SelectedIndex = _fullList == null || _fullList.Count == 0 ? -1 : 0;
                 this.Text = _lastFilterString;
-            }
-        }
 
-        protected override void OnValidating(CancelEventArgs e)
-        {
-            if (_fullList != null && this.Items.Count == 0)
-            {
-                // Se si esce dal controllo con una ricerca senza risultati, 
-                // ripristina la lista originaria e pulisce il testo o deseleziona.
-                this.DataSource = _fullList;
-                this.SelectedIndex = -1;
-                this.Text = string.Empty;
+                this.BeginInvoke(() =>
+                {
+                    var text = this.GetDisplayMember(this.SelectedItem);
+                    this.Text = text;
+                });
             }
-
-            base.OnValidating(e);
         }
 
         protected override void OnDropDownClosed(EventArgs e)
@@ -215,14 +197,32 @@ namespace TiaUtilities.SettingsStep.CustomControls
                 return false;
             }
 
-            // Estrae il testo da confrontare
-            string itemText = string.IsNullOrEmpty(this.DisplayMember)
-                ? item.ToString()
-                : item.GetType().GetProperty(this.DisplayMember)?.GetValue(item, null)?.ToString() ?? item.ToString();
+            string itemText = this.GetDisplayMember(item);
 
-            // Controlla che tutte le parole cercate siano presenti
             string[] searchWords = searchText.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             return searchWords.All(word => itemText.Contains(word, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private string GetDisplayMember(object? item)
+        {
+            if(item == null)
+            {
+                return "NULL";
+            }
+
+            if(string.IsNullOrEmpty(this.DisplayMember))
+            {
+                return $"{item}";
+            }
+
+            var itemProperty = item.GetType().GetProperty(this.DisplayMember);
+            if(itemProperty == null)
+            {
+                return $"{item}";
+            }
+
+            var itemValue = itemProperty.GetValue(item, null);
+            return itemValue == null ? $"{item}" : $"{itemValue}";
         }
     }
 }
