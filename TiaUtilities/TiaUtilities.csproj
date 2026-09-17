@@ -136,6 +136,9 @@
     <None Update="Resources\Images\drag-8187494.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\Images\dropdown_6972189.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\Images\DuplicateDB.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -173,6 +176,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Images\questionmark_8412440_007435.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Images\search_8180752.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Images\subtitle-8187463.png">

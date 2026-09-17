@@ -10,40 +10,48 @@ using TiaUtilities.Styles;
 
 namespace TiaUtilities.SettingsStep
 {
-    public class SettingsSearchPanel
+    public class SettingsSearchPanelControls
     {
         private static readonly char[] WordSeparators = [' ', ',', '.', ';', ':', '-', '_', '!', '?'];
 
+        private readonly TableLayoutPanelColorizable panel;
         private readonly List<SettingsStepSequence> sequences;
         private readonly List<SettingsLineControls> lines;
-        private readonly TableLayoutPanelColorizable panel;
 
-
-        public SettingsSearchPanel(List<SettingsStepSequence> sequences)
+        public SettingsSearchPanelControls(TableLayoutPanelColorizable panel, List<SettingsStepSequence> sequences)
         {
+            this.panel = panel;
             this.sequences = sequences;
             this.lines = [];
-
-            this.panel = this.InitControls();
         }
 
-        private TableLayoutPanelColorizable InitControls()
+        public void InitPanel()
         {
-            TableLayoutPanelColorizable panel = new()
-            {
-                Dock = DockStyle.Top,
-                ColumnCount = 5,
-                ColumnStyles =
-                {
-                    new(SizeType.Percent, 100f),
-                    new(SizeType.AutoSize), //Context label
-                    new(SizeType.AutoSize), //Main Label
-                    new(SizeType.AutoSize), //Control
-                    new(SizeType.Percent, 100f)
-                }
-            };
+            this.Clear();
 
-            return panel;
+            this.panel.ColumnCount = 5;
+            this.panel.ColumnStyles.Add(new(SizeType.Percent, 100f));
+            this.panel.ColumnStyles.Add(new(SizeType.AutoSize)); //Context label
+            this.panel.ColumnStyles.Add(new(SizeType.AutoSize)); //Main Label
+            this.panel.ColumnStyles.Add(new(SizeType.AutoSize)); //Control
+            this.panel.ColumnStyles.Add(new(SizeType.Percent, 100f));
+        }
+
+        public void Clear()
+        {
+            this.panel.SuspendLayout();
+
+            this.panel.Controls.Clear();
+
+            this.panel.RowCount = 0;
+            this.panel.RowStyles.Clear();
+
+            this.panel.ColumnCount = 0;
+            this.panel.ColumnStyles.Clear();
+
+            this.panel.ClearCellStyles();
+
+            this.panel.ResumeLayout();
         }
 
         public void UpdateSearchText(string searchText)
@@ -54,19 +62,20 @@ namespace TiaUtilities.SettingsStep
 
             this.panel.Controls.Clear();
 
-            var lines = SettingsSearchPanel.GetLines(this.sequences.SelectMany(s => s.PanelControls).SelectMany(p => p.Lines), searchText, 999);
+            var lines = SettingsSearchPanelControls.GetLines(this.sequences.SelectMany(s => s.PanelControls).SelectMany(p => p.Lines), searchText, 999);
 
             List<SettingsLineControls> searchLines = [];
 
             int rowIndex = 0;
             foreach(var line in lines)
             {
-                var context = $"[{String.Join(" - ", line.Keyphrases)}]";
+                var context =  $"[{String.Join(" / ", line.ContextPhrases.Where(str => !string.IsNullOrWhiteSpace(str)))}]";
 
                 var contextLabel = CreateContextLabel(context);
 
                 SettingsLineControls searchLine = new()
                 {
+                    Name = line.Name,
                     MainControl = new(line.MainControl.Control) { Column = CONTROL_COLUMN , Row = rowIndex }
                 };
 
@@ -81,6 +90,8 @@ namespace TiaUtilities.SettingsStep
                 rowIndex++;
             }
 
+            this.panel.SuspendLayout();
+
             this.panel.Controls.AddRange([.. searchLines.SelectMany(l => l.GetAllControls())]);
 
             foreach(var searchLine in searchLines)
@@ -89,6 +100,7 @@ namespace TiaUtilities.SettingsStep
                 searchLine.MainControl.SetPositionToPanel(this.panel);
             }
 
+            this.panel.ResumeLayout(performLayout: true);
         }
 
         private static IEnumerable<SettingsLineControls> GetLines(
@@ -117,7 +129,7 @@ namespace TiaUtilities.SettingsStep
                 {
                     Item = lc,
                     // Per ogni Keyphrase conta quante parole della ricerca sono presenti, poi prende il punteggio massimo
-                    MaxScore = lc.Keyphrases.Count == 0 ? 0 : lc.Keyphrases.Max(kp => GetMatchScore(kp, searchWords))
+                    MaxScore = lc.ContextPhrases.Count == 0 ? 0 : lc.ContextPhrases.Max(kp => GetMatchScore(kp, searchWords))
                 })
                 .Where(x => x.MaxScore > 0)          // Scarta chi non ha nessuna corrispondenza
                 .OrderByDescending(x => x.MaxScore)   // Prima chi ha più parole in comune

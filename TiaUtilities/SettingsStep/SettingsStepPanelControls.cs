@@ -90,6 +90,7 @@ namespace TiaUtilities.SettingsStep
                 var groupLabel = SettingsStepPanelControls.CreateGroupLabel(group.Name);
                 lines.Add(new()
                 {
+                    Name = "GroupLabel",
                     MainControl = new(groupLabel) { Column = COLUMN_START, Row = rowCounter, ColumnSpan = COLUMN_END - COLUMN_START + 1 }
                 });
                 rowCounter += 1;
@@ -127,6 +128,7 @@ namespace TiaUtilities.SettingsStep
 
                         lines.Add(new()
                         {
+                            Name = factory.Name,
                             MainControl = new(nameLabel) { Column = COLUMN_START, Row = rowCounter, ColumnSpan = COLUMN_END - COLUMN_START + 1 }
                         });
                     }
@@ -205,6 +207,7 @@ namespace TiaUtilities.SettingsStep
                         {
                             line = new()
                             {
+                                Name = factory.Name,
                                 MainControl = new(control) { Column = COLUMN_VALUE_LABEL, Row = rowCounter, ColumnSpan = 3 },
                             };
                         }
@@ -212,6 +215,7 @@ namespace TiaUtilities.SettingsStep
                         {
                             line = new()
                             {
+                                Name = factory.Name,
                                 Labels = {
                                     new(nameLabel) { Column = COLUMN_VALUE_LABEL, Row = rowCounter }
                                 },
@@ -222,7 +226,7 @@ namespace TiaUtilities.SettingsStep
                             };
                         }
 
-                        line.Keyphrases.AddRange([group.Name, factory.Name]);
+                        line.ContextPhrases.AddRange([this.Sequence.FullName, this.Descriptor.Name, group.Name]);
                         lines.Add(line);
                     }
 
@@ -237,6 +241,7 @@ namespace TiaUtilities.SettingsStep
             var divider = SettingsControls.GetDividerLabel(Color.Transparent);
             lines.Add(new()
             {
+                Name = "Divider",
                 MainControl = new(divider) { Column = COLUMN_VALUE_LABEL, Row = rowCounter + 1, ColumnSpan = COLUMN_END - COLUMN_START + 1 }
             });
 

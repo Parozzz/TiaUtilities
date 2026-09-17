@@ -37,10 +37,12 @@ namespace TiaUtilities.SettingsStep
             public override string ToString() => $"C-{Column}, CS-{ColumnSpan}, R-{Row}, RS-{RowSpan}";
         }
 
+        public required string Name { get; init; }
+
         public required PanelControl<Control> MainControl { get; init; }
         public List<PanelControl<Label>> Labels { get; init; } = [];
         public List<PanelControl<Button>> Buttons { get; init; } = [];
-        public List<string> Keyphrases { get; init; } = [];
+        public List<string> ContextPhrases { get; init; } = [];
 
         public List<Control> GetAllControls()
         {

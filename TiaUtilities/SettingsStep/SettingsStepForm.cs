@@ -34,9 +34,12 @@ namespace TiaUtilities.SettingsNew
 
         private readonly ObservableObject<SettingsStepSequence?> selectedSequence;
         private readonly ObservableObject<SettingsStepPanelControls?> selectedPanelControls;
+        private readonly ObservableObject<bool> searchMode;
 
         //private readonly TableLayoutPanelNoScrollbarsColorizable controlsPanel;
         private readonly List<SettingsStepSequence> sequences;
+
+        private readonly SettingsSearchPanelControls searchPanelControls;
 
         public SettingsStepForm()
         {
@@ -49,8 +52,12 @@ namespace TiaUtilities.SettingsNew
 
             this.sequences = [];
             this.ConfigurationTypeModelDict = [];
+
             this.selectedPanelControls = new(null);
             this.selectedSequence = new(null);
+            this.searchMode = new(false);
+
+            this.searchPanelControls = new(this.searchPanel, this.sequences);
 
             this.InitControls();
 
@@ -79,6 +86,26 @@ namespace TiaUtilities.SettingsNew
                 BorderColor = Color.FromArgb(127, Color.LightSkyBlue),
                 Padding = new(-1),
             });
+            #endregion
+
+            #region TOGGLE_MODE_BUTTON
+            ImageList toggleImageList = new()
+            {
+                Images = { ImageResources.DROPDOWN, ImageResources.SEARCH },
+                ImageSize = new(22, 22),
+            };
+
+            this.toggleModeButton.Text = "";
+
+            this.toggleModeButton.ImageList = toggleImageList;
+            this.toggleModeButton.ImageIndex = 0;
+            this.toggleModeButton.ImageAlign = ContentAlignment.MiddleCenter;
+
+            this.toggleModeButton.Click += (sender, args) =>
+            {
+                this.searchMode.Value = !this.searchMode.Value;
+                this.toggleModeButton.ImageIndex = this.searchMode.Value ? 1 : 0;
+            };
             #endregion
 
             #region SELECTED_CONFIGURATION_AS_DEFAULT_BUTTON
@@ -265,6 +292,49 @@ namespace TiaUtilities.SettingsNew
                     this.selectedSequence.Value = item.Sequence;
                 }
             };
+            #endregion
+
+            #region SEARCH_CONTROLS
+            this.searchTextBox.BackColor = Form.DefaultBackColor;
+            this.searchTextBox.TextChanged += (sender, args) =>
+            {
+                this.searchPanelControls.UpdateSearchText(this.searchTextBox.Text);
+            };
+            #endregion
+
+            #region SEARCH_MODE
+
+            void UpdateVisibilityForSearchMode(bool searchModeActive)
+            {
+                if (searchModeActive)
+                {
+                    this.selectConfigurationComboBox.Visible = false;
+                    this.selectConfigurationLabel.Visible = false;
+                    this.stepFlowPanel.Visible = false;
+                    this.controlsPanel.Visible = false;
+                    this.controlsPanel.Controls.Clear();
+
+                    this.searchLabel.Visible = true;
+                    this.searchTextBox.Visible = true;
+                    this.searchPanel.Visible = true;
+                    this.searchPanelControls.InitPanel();
+                }
+                else
+                {
+                    this.selectConfigurationComboBox.Visible = true;
+                    this.selectConfigurationLabel.Visible = true;
+                    this.stepFlowPanel.Visible = true;
+                    this.controlsPanel.Visible = true;
+
+                    this.searchLabel.Visible = false;
+                    this.searchTextBox.Visible = false;
+                    this.searchPanel.Visible = false;
+                    this.searchPanelControls.Clear();
+                }
+            }
+
+            UpdateVisibilityForSearchMode(this.searchMode.Value);
+            this.searchMode.Changed += (sender, args) => UpdateVisibilityForSearchMode(args.NewValue);
             #endregion
         }
 
