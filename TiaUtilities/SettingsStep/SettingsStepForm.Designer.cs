@@ -33,7 +33,7 @@ namespace TiaUtilities.SettingsNew
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingsStepForm));
-            mainTable = new TableLayoutPanelNoScrollbarsColorizable();
+            mainTable = new TableLayoutPanelColorizable();
             selectedConfigurationPanel = new FlowLayoutPanel();
             selectedConfigurationNameLabel = new Label();
             selectConfigurationPanel = new FlowLayoutPanel();
@@ -41,7 +41,7 @@ namespace TiaUtilities.SettingsNew
             selectConfigurationComboBox = new ComboBoxFilterable();
             stepFlowPanel = new FlowLayoutPanel();
             bottomPanel = new Panel();
-            controlsPanel = new TableLayoutPanelNoScrollbarsColorizable();
+            controlsPanel = new TableLayoutPanelColorizable();
             mainTable.SuspendLayout();
             selectedConfigurationPanel.SuspendLayout();
             selectConfigurationPanel.SuspendLayout();
@@ -203,14 +203,14 @@ namespace TiaUtilities.SettingsNew
 
         #endregion
 
-        private TableLayoutPanelNoScrollbarsColorizable mainTable;
+        private TableLayoutPanelColorizable mainTable;
         private FlowLayoutPanel selectConfigurationPanel;
         private Label selectConfigurationLabel;
         private ComboBoxFilterable selectConfigurationComboBox;
         private FlowLayoutPanel stepFlowPanel;
         private Label selectedConfigurationNameLabel;
         private Panel bottomPanel;
-        private TableLayoutPanelNoScrollbarsColorizable controlsPanel;
+        private TableLayoutPanelColorizable controlsPanel;
         private FlowLayoutPanel selectedConfigurationPanel;
     }
 }

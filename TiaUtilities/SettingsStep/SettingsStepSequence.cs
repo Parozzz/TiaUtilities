@@ -8,15 +8,9 @@ namespace TiaUtilities.SettingsStep
 {
     public class SettingsStepSequence
     {
-        public class PanelControlsContainer : IEnumerable<SettingsStepPanelControls>
+        public class PanelControlsContainer(List<SettingsStepPanelControls> panelControlsList) : IEnumerable<SettingsStepPanelControls>
         {
-            public int Count { get => this.panelControlsList.Count; }
-
-            private readonly List<SettingsStepPanelControls> panelControlsList;
-            public PanelControlsContainer(List<SettingsStepPanelControls> panelControlsList)
-            {
-                this.panelControlsList = panelControlsList;
-            }
+            public int Count { get => panelControlsList.Count; }
 
             public int IndexOf(SettingsStepPanelControls panelControls) => panelControlsList.IndexOf(panelControls);
 
@@ -26,18 +20,18 @@ namespace TiaUtilities.SettingsStep
 
             public SettingsStepPanelControls? this[int index]
             {
-                get => this.panelControlsList.TryGet(index, out var panelControls) ? panelControls : null;
+                get => panelControlsList.TryGet(index, out var panelControls) ? panelControls : null;
                 set
                 {
-                    if (this.panelControlsList.InRange(index))
+                    if (panelControlsList.InRange(index))
                     {
                         if (value == null)
                         {
-                            this.panelControlsList.RemoveAt(index);
+                            panelControlsList.RemoveAt(index);
                         }
                         else
                         {
-                            this.panelControlsList[index] = value;
+                            panelControlsList[index] = value;
                         }
                     }
                 }

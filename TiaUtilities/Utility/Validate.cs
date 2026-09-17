@@ -14,5 +14,14 @@ namespace TiaUtilities.Utility
 
             return obj;
         }
+        public static void IsTrue( bool condition, string? message = null, [CallerArgumentExpression(nameof(condition))] string? paramName = null)
+        {
+            if (!condition)
+            {
+                // Se l'utente specifica un messaggio usa quello, altrimenti ne genera uno automatico con l'espressione
+                string errorMessage = message ?? $"'{paramName}' is not True.";
+                throw new ArgumentException(errorMessage, paramName);
+            }
+        }
     }
 }

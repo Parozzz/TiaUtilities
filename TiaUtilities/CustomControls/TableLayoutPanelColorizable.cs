@@ -12,7 +12,7 @@ namespace TiaUtilities.CustomControls
     [ProvideProperty("CellPosition", typeof(Control))]
     [DefaultProperty(nameof(ColumnCount))]
     [Docking(DockingBehavior.Never)]
-    public class TableLayoutPanelNoScrollbarsColorizable : TableLayoutPanel, IMessageFilter
+    public class TableLayoutPanelColorizable : TableLayoutPanel, IMessageFilter
     {
         public class CellStyle
         {
@@ -41,7 +41,7 @@ namespace TiaUtilities.CustomControls
             private bool _fitToControls = true;
             private Padding _padding = new(0);
 
-            internal TableLayoutPanelNoScrollbarsColorizable? TableLayoutPanel { get; set; }
+            internal TableLayoutPanelColorizable? TableLayoutPanel { get; set; }
 
             internal void MouseState(bool newState)
             {
@@ -61,7 +61,7 @@ namespace TiaUtilities.CustomControls
 
         private readonly HashSet<CellStyle> cellStyles = [];
 
-        public TableLayoutPanelNoScrollbarsColorizable()
+        public TableLayoutPanelColorizable()
         {
             SetStyle(ControlStyles.Selectable | ControlStyles.OptimizedDoubleBuffer | ControlStyles.AllPaintingInWmPaint | ControlStyles.ResizeRedraw, true);
             this.DoubleBuffered = true;

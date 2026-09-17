@@ -1,13 +1,10 @@
 ﻿using System.Data;
-using System.Diagnostics;
 using TiaUtilities.Configuration;
-using TiaUtilities.CustomControls;
 using TiaUtilities.Generation;
 using TiaUtilities.Resources;
 using TiaUtilities.SettingsStep;
 using TiaUtilities.Styles;
 using TiaUtilities.Utility;
-using TiaUtilities.Utility.Extensions;
 
 namespace TiaUtilities.SettingsNew
 {
@@ -235,6 +232,8 @@ namespace TiaUtilities.SettingsNew
 
                 if (newPanelControls != null)
                 {
+                    Utility.Validate.IsTrue(newPanelControls.Sequence == this.selectedSequence.Value);
+
                     newPanelControls.StepLabel.BorderWidth = 2;
                     newPanelControls.StepLabel.BorderColor = Color.FromArgb(127, Color.Black);
 

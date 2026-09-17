@@ -14,16 +14,6 @@ namespace TiaUtilities.SettingsStep
 {
     public class SettingsStepPanelControls
     {
-        public class PanelControlPosition
-        {
-            public required Control Control { get; init; }
-            public required int Column { get; init; }
-            public required int Row { get; init; }
-            public int ColumnSpan { get; set; } = 0;
-            public int RowSpan { get; set; } = 0;
-
-            public override string ToString() => $"C-{Column}, CS-{ColumnSpan}, R-{Row}, RS-{RowSpan}";
-        }
 
         private const int VALUE_ROW_GAP = 4;
         private const int GROUP_ROW_GAP = 10;
@@ -32,27 +22,28 @@ namespace TiaUtilities.SettingsStep
         public LabelColorizable StepLabel { get; init; }
         public Action? StepLabelClick { get; set; }
 
+        public SettingsStepSequence Sequence { get; init; }
+        public List<SettingsLineControls> Lines { get; init; }
+
         public bool ListenersRegistered { get; private set; } = false;
 
-        private readonly SettingsStepSequence sequence;
         private readonly ObservableConfiguration configuration;
         private readonly List<Predicate<PropertyChangedEventArgs>> propertyChangedPredicates;
         private readonly PropertyChangedEventHandler configurationPropertyChanged;
 
-        private readonly List<PanelControlPosition> controlPositions;
         private readonly List<RowStyle> tableRows;
-        private readonly List<TableLayoutPanelNoScrollbarsColorizable.CellStyle> tableCellStyles;
+        private readonly List<TableLayoutPanelColorizable.CellStyle> tableCellStyles;
 
         public SettingsStepPanelControls(SettingsStepForm form, SettingsStepSequence sequence, SettingsStepDescriptor descriptor, ObservableConfiguration configuration)
         {
-            this.sequence = sequence;
+            this.Sequence = sequence;
             this.Descriptor = descriptor;
 
             this.configuration = configuration;
             this.propertyChangedPredicates = [];
             this.configurationPropertyChanged = (sender, args) => propertyChangedPredicates.ForEach(p => p.Invoke(args));
 
-            (this.StepLabel, this.controlPositions, this.tableRows, this.tableCellStyles) = this.BuildControls(form);
+            (this.StepLabel, this.Lines, this.tableRows, this.tableCellStyles) = this.BuildControls(form);
         }
 
         public void RegisterListeners()
@@ -66,7 +57,7 @@ namespace TiaUtilities.SettingsStep
             this.ListenersRegistered = true;
         }
 
-        private (LabelColorizable, List<PanelControlPosition>, List<RowStyle>, List<TableLayoutPanelNoScrollbarsColorizable.CellStyle>) BuildControls(SettingsStepForm form)
+        private (LabelColorizable, List<SettingsLineControls>, List<RowStyle>, List<TableLayoutPanelColorizable.CellStyle>) BuildControls(SettingsStepForm form)
         {
             const int COLUMN_VALUE_LABEL = 1;
             const int COLUMN_VALUE_CONTROL = 2;
@@ -80,9 +71,9 @@ namespace TiaUtilities.SettingsStep
 
             var groups = this.Descriptor.GetGroups();
 
-            List<PanelControlPosition> controlPositions = [];
+            List<SettingsLineControls> lines = [];
             List<RowStyle> rows = [];
-            List<TableLayoutPanelNoScrollbarsColorizable.CellStyle> cellStyles = [];
+            List<TableLayoutPanelColorizable.CellStyle> cellStyles = [];
 
             int rowCounter = 0;
 
@@ -97,18 +88,11 @@ namespace TiaUtilities.SettingsStep
                 rows.Add(new(SizeType.AutoSize)); //Group Label row
 
                 var groupLabel = SettingsStepPanelControls.CreateGroupLabel(group.Name);
-                controlPositions.Add(new()
+                lines.Add(new()
                 {
-                    Control = groupLabel,
-                    Column = COLUMN_START,
-                    Row = rowCounter,
-                    ColumnSpan = COLUMN_END - COLUMN_START + 1
+                    MainControl = new(groupLabel) { Column = COLUMN_START, Row = rowCounter, ColumnSpan = COLUMN_END - COLUMN_START + 1 }
                 });
                 rowCounter += 1;
-
-                Enumerable.Range(1, factories.Count * 2)
-                    .Select(i => i % 2 == 0 ? new RowStyle(SizeType.Absolute, VALUE_ROW_GAP) : new RowStyle(SizeType.AutoSize))
-                    .ForEach(r => rows.Add(r)); //*2 for value and padding.
 
                 cellStyles.Add(new()
                 {
@@ -123,11 +107,15 @@ namespace TiaUtilities.SettingsStep
                     Padding = new Padding(6, 6, 8, 6),
                 });
 
+                Enumerable.Range(1, factories.Count * 2)
+                    .Select(i => i % 2 == 0 ? new RowStyle(SizeType.Absolute, VALUE_ROW_GAP) : new RowStyle(SizeType.AutoSize))
+                    .ForEach(rows.Add); //*2 for value and padding.
+
                 foreach (var factory in factories)
                 {
                     var (nameLabel, control, predicate) = factory.Create(configuration, new()
                     {
-                        PlaceholdersCallback = str => this.sequence.PlaceholdersCallBack == null ? str : this.sequence.PlaceholdersCallBack(str)
+                        PlaceholdersCallback = str => this.Sequence.PlaceholdersCallBack?.Invoke(str) ?? str
                     });
 
                     if (control == null || predicate == null) //If no predicate is provided, means is not a binded control and will not have a label
@@ -137,12 +125,9 @@ namespace TiaUtilities.SettingsStep
                             continue;
                         }
 
-                        controlPositions.Add(new()
+                        lines.Add(new()
                         {
-                            Control = nameLabel,
-                            Column = COLUMN_START,
-                            Row = rowCounter,
-                            ColumnSpan = COLUMN_END - COLUMN_START + 1,
+                            MainControl = new(nameLabel) { Column = COLUMN_START, Row = rowCounter, ColumnSpan = COLUMN_END - COLUMN_START + 1 }
                         });
                     }
                     else
@@ -169,42 +154,11 @@ namespace TiaUtilities.SettingsStep
                         transferToAllButton.MouseHover += (sender, args) =>
                         {
                             var tryGetOK = form.ConfigurationTypeModelDict.TryGetValue(this.configuration.GetType(), out var containers);
-                            var count = tryGetOK && containers != null ? containers.Count(c => c != this.sequence) : 0;
+                            var count = tryGetOK && containers != null ? containers.Count(c => c != this.Sequence) : 0;
 
                             var caption = $"{Locale.SETTINGS_FORM_CONTEXT_MENU_SET_TO_OTHERS} ({count})";
                             tooltip.Show(caption, transferToAllButton);
                         };
-
-
-                        void MouseEnter(TableLayoutPanelNoScrollbarsColorizable.CellStyle cellStyle)
-                        {
-                            if (transferToAllButton.BackgroundImage == null)
-                            {
-                                var tryGetOK = form.ConfigurationTypeModelDict.TryGetValue(this.configuration.GetType(), out var containers);
-                                var count = tryGetOK && containers != null ? containers.Count(c => c != this.sequence) : 0;
-
-                                if (count > 0)
-                                {
-                                    transferToAllButton.BackgroundImage = ImageResources.TRANSFER;
-                                    transferToAllButton.FlatAppearance.MouseOverBackColor = Form.DefaultBackColor;
-                                }
-                            }
-
-                            control.BackColor = Color.AntiqueWhite;
-                            cellStyle.BackColor = Color.AntiqueWhite;
-                        }
-
-                        void MouseLeave(TableLayoutPanelNoScrollbarsColorizable.CellStyle cellStyle)
-                        {
-                            if (transferToAllButton.BackgroundImage != null)
-                            {
-                                transferToAllButton.BackgroundImage = null;
-                                transferToAllButton.FlatAppearance.MouseOverBackColor = Color.Transparent;
-                            }
-
-                            control.BackColor = Form.DefaultBackColor;
-                            cellStyle.BackColor = Color.Transparent;
-                        }
 
                         cellStyles.Add(new()
                         {
@@ -216,20 +170,60 @@ namespace TiaUtilities.SettingsStep
                             BorderWidth = 0,
                             FitToControls = true,
                             Padding = Padding.Empty,
-                            MouseEnterCallback = MouseEnter,
-                            MouseLeaveCallback = MouseLeave,
+                            MouseEnterCallback = cellStyle =>
+                            {
+                                if (transferToAllButton.BackgroundImage == null)
+                                {
+                                    var tryGetOK = form.ConfigurationTypeModelDict.TryGetValue(this.configuration.GetType(), out var containers);
+                                    var count = tryGetOK && containers != null ? containers.Count(c => c != this.Sequence) : 0;
+
+                                    if (count > 0)
+                                    {
+                                        transferToAllButton.BackgroundImage = ImageResources.TRANSFER;
+                                        transferToAllButton.FlatAppearance.MouseOverBackColor = Form.DefaultBackColor;
+                                    }
+                                }
+
+                                control.BackColor = Color.AntiqueWhite;
+                                cellStyle.BackColor = Color.AntiqueWhite;
+                            },
+                            MouseLeaveCallback = cellStyle =>
+                            {
+                                if (transferToAllButton.BackgroundImage != null)
+                                {
+                                    transferToAllButton.BackgroundImage = null;
+                                    transferToAllButton.FlatAppearance.MouseOverBackColor = Color.Transparent;
+                                }
+
+                                control.BackColor = Form.DefaultBackColor;
+                                cellStyle.BackColor = Color.Transparent;
+                            },
                         });
 
+                        SettingsLineControls line;
                         if (nameLabel == null)
                         {
-                            controlPositions.Add(new() { Control = control, Column = COLUMN_VALUE_LABEL, ColumnSpan = 3, Row = rowCounter });
+                            line = new()
+                            {
+                                MainControl = new(control) { Column = COLUMN_VALUE_LABEL, Row = rowCounter, ColumnSpan = 3 },
+                            };
                         }
                         else
                         {
-                            controlPositions.Add(new() { Control = nameLabel, Column = COLUMN_VALUE_LABEL, Row = rowCounter });
-                            controlPositions.Add(new() { Control = control, Column = COLUMN_VALUE_CONTROL, Row = rowCounter });
-                            controlPositions.Add(new() { Control = transferToAllButton, Column = COLUMN_ICON, Row = rowCounter });
+                            line = new()
+                            {
+                                Labels = {
+                                    new(nameLabel) { Column = COLUMN_VALUE_LABEL, Row = rowCounter }
+                                },
+                                MainControl = new(control) { Column = COLUMN_VALUE_CONTROL, Row = rowCounter },
+                                Buttons = {
+                                    new(transferToAllButton) { Column = COLUMN_ICON, Row = rowCounter }
+                                }
+                            };
                         }
+
+                        line.Keyphrases.AddRange([group.Name, factory.Name]);
+                        lines.Add(line);
                     }
 
                     rowCounter += 2; //Skip 2 = Value row and padding
@@ -240,12 +234,10 @@ namespace TiaUtilities.SettingsStep
 
             }
 
-            controlPositions.Add(new()
+            var divider = SettingsControls.GetDividerLabel(Color.Transparent);
+            lines.Add(new()
             {
-                Control = SettingsControls.GetDividerLabel(Color.Transparent),
-                Column = COLUMN_VALUE_LABEL,
-                Row = rowCounter + 1,
-                ColumnSpan = 5
+                MainControl = new(divider) { Column = COLUMN_VALUE_LABEL, Row = rowCounter + 1, ColumnSpan = COLUMN_END - COLUMN_START + 1 }
             });
 
 
@@ -254,37 +246,35 @@ namespace TiaUtilities.SettingsStep
 
             ControlUtils.CreateToolTip().SetToolTip(stepLabel, this.Descriptor.Description);
 
-            return (stepLabel, controlPositions, rows, cellStyles);
+            return (stepLabel, lines, rows, cellStyles);
         }
 
-        public void ApplyControls(TableLayoutPanelNoScrollbarsColorizable panel)
+        public void ApplyControls(TableLayoutPanelColorizable panel)
         {
             foreach (var row in this.tableRows)
             {
                 panel.RowStyles.Add(row);
             }
 
-            panel.Controls.AddRange([.. this.controlPositions.Select(p => p.Control)]);
+            panel.Controls.AddRange([.. this.Lines.SelectMany(l => l.GetAllControls())]);
 
-            foreach (var pos in this.controlPositions)
+            foreach (var line in this.Lines)
             {
-                panel.SetCellPosition(pos.Control, new(pos.Column, pos.Row));
-                if (pos.ColumnSpan > 0)
+                line.Labels.ForEach(l => l.SetPositionToPanel(panel));
+
+                var mainControl = line.MainControl;
+                if (mainControl != null)
                 {
-                    panel.SetColumnSpan(pos.Control, pos.ColumnSpan);
+                    mainControl.SetPositionToPanel(panel);
                 }
 
-                if (pos.RowSpan > 0)
-                {
-                    panel.SetRowSpan(pos.Control, pos.RowSpan);
-                }
+                line.Buttons.ForEach(b => b.SetPositionToPanel(panel));
             }
 
             foreach (var style in this.tableCellStyles)
             {
                 panel.AddCellStyle(style);
             }
-
         }
 
         private static Label CreateGroupLabel(string text)

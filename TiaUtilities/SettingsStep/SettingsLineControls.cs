@@ -1,0 +1,54 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using static TiaUtilities.SettingsStep.SettingsLineControls;
+
+namespace TiaUtilities.SettingsStep
+{
+    public class SettingsLineControls
+    {
+
+        public class PanelControl<T>(T control) where T : Control
+        {
+            public T Control { get; init; } = control;
+
+            public required int Column { get; init; }
+            public required int Row { get; init; }
+            public int ColumnSpan { get; set; } = 0;
+            public int RowSpan { get; set; } = 0;
+
+            public void SetPositionToPanel(TableLayoutPanel panel)
+            {
+                panel.SetCellPosition(this.Control, new(this.Column, this.Row));
+                if (this.ColumnSpan > 0)
+                {
+                    panel.SetColumnSpan(this.Control, this.ColumnSpan);
+                }
+
+                if (this.RowSpan > 0)
+                {
+                    panel.SetRowSpan(this.Control, this.RowSpan);
+                }
+            }
+
+
+            public override string ToString() => $"C-{Column}, CS-{ColumnSpan}, R-{Row}, RS-{RowSpan}";
+        }
+
+        public required PanelControl<Control> MainControl { get; init; }
+        public List<PanelControl<Label>> Labels { get; init; } = [];
+        public List<PanelControl<Button>> Buttons { get; init; } = [];
+        public List<string> Keyphrases { get; init; } = [];
+
+        public List<Control> GetAllControls()
+        {
+            return [
+                this.MainControl.Control,
+                .. this.Labels.Select(l => l.Control),
+                .. this.Buttons.Select(l => l.Control)
+            ];
+        }
+    }
+}
