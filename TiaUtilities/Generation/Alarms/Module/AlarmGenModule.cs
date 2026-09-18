@@ -26,8 +26,8 @@ namespace TiaUtilities.Generation.Alarms.Module
 {
     public class AlarmGenModule : IGenModule
     {
-        public const int DEVICE_GRID_ROW_COUNT = 199;
-        public const int TEMPLATE_GRID_ROW_COUNT = 499;
+        public const int DEVICE_GRID_ROW_COUNT = 999;
+        public const int TEMPLATE_GRID_ROW_COUNT = 999;
 
         private readonly MultiGridOperationHandler multiGrid;
         private JSScriptHandler JsScriptHandler { get => this.multiGrid.JsScriptHandler; }

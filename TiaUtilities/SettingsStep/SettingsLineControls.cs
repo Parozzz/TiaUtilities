@@ -40,17 +40,28 @@ namespace TiaUtilities.SettingsStep
         public required string Name { get; init; }
 
         public required PanelControl<Control> MainControl { get; init; }
-        public List<PanelControl<Label>> Labels { get; init; } = [];
+        public PanelControl<Label>? Label { get; init; }
         public List<PanelControl<Button>> Buttons { get; init; } = [];
         public List<string> ContextPhrases { get; init; } = [];
 
-        public List<Control> GetAllControls()
+        public void AddAllControls(TableLayoutPanel panel)
         {
-            return [
-                this.MainControl.Control,
-                .. this.Labels.Select(l => l.Control),
-                .. this.Buttons.Select(l => l.Control)
-            ];
+            if (this.Label != null)
+            {
+                panel.Controls.Add(this.Label.Control);
+            }
+            panel.Controls.Add(this.MainControl.Control);
+            this.Buttons.ForEach(b => panel.Controls.Add(b.Control));
         }
+
+        public void SetAllPositionsToPanel(TableLayoutPanel panel)
+        {
+            this.MainControl.SetPositionToPanel(panel);
+            if(this.Label != null)
+            {
+                this.Label.SetPositionToPanel(panel);
+            }
+            this.Buttons.ForEach(b => b.SetPositionToPanel(panel));
+        } 
     }
 }

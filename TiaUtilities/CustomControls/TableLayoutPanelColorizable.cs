@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel;
-using System.Diagnostics;
+using System.Drawing.Drawing2D;
 using TiaUtilities.Utility;
 using static TiaUtilities.Utility.GraphicsUtils;
 
@@ -18,13 +18,17 @@ namespace TiaUtilities.CustomControls
         {
             public required int Column { get; init; }
             public required int Row { get; init; }
+            public int ColumnSpan { get => _columnSpan; set { _columnSpan = value; this.TableLayoutPanel?.Invalidate(); } }
+            public int RowSpan { get => _rowSpan; set { _rowSpan = value; this.TableLayoutPanel?.Invalidate(); } }
+
             public Color BackColor { get => _backColor; set { _backColor = value; this.TableLayoutPanel?.Invalidate(); } }
+
             public Color BorderColor { get => _borderColor; set { _borderColor = value; this.TableLayoutPanel?.Invalidate(); } }
             public int BorderWidth { get => _borderWidth; set { _borderWidth = value; this.TableLayoutPanel?.Invalidate(); } }
             public BorderRadius BorderRadius { get => _borderRadius; set { _borderRadius = value; this.TableLayoutPanel?.Invalidate(); } }
-            public int ColumnSpan { get => _columnSpan; set { _columnSpan = value; this.TableLayoutPanel?.Invalidate(); } }
-            public int RowSpan { get => _rowSpan; set { _rowSpan = value; this.TableLayoutPanel?.Invalidate(); } }
+
             public Padding Padding { get => _padding; set { _padding = value; this.TableLayoutPanel?.Invalidate(); } }
+
             public bool FitToControls { get => _fitToControls; set { _fitToControls = value; this.TableLayoutPanel?.Invalidate(); } }
 
             public Rectangle Bounds { get; internal set; } = Rectangle.Empty;
@@ -63,7 +67,10 @@ namespace TiaUtilities.CustomControls
 
         public TableLayoutPanelColorizable()
         {
-            SetStyle(ControlStyles.Selectable | ControlStyles.OptimizedDoubleBuffer | ControlStyles.AllPaintingInWmPaint | ControlStyles.ResizeRedraw, true);
+            SetStyle(ControlStyles.Selectable | 
+                ControlStyles.OptimizedDoubleBuffer | 
+                ControlStyles.AllPaintingInWmPaint | 
+                ControlStyles.ResizeRedraw, true);
             this.DoubleBuffered = true;
         }
 
@@ -134,8 +141,16 @@ namespace TiaUtilities.CustomControls
             return false;
         }
 
+        protected override void OnPaintBackground(PaintEventArgs e)
+        {
+            base.OnPaintBackground(e);
+            this.DrawCellStyles(e.Graphics);
+        }
+
         private void DrawCellStyles(Graphics g)
         {
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+
             foreach (var style in this.cellStyles)
             {
                 int startCol = style.Column;
@@ -193,16 +208,13 @@ namespace TiaUtilities.CustomControls
                         targetRect.Height - 1
                     );
 
-                    using Pen pen = new(style.BorderColor, style.BorderWidth);
-                    GraphicsUtils.DrawRoundedRectangle(g, pen, borderRect, style.BorderRadius);
+                    if(borderRect.Width > 0 && borderRect.Height > 0)
+                    {
+                        using Pen pen = new(style.BorderColor, style.BorderWidth) { Alignment = PenAlignment.Inset };
+                        GraphicsUtils.DrawRoundedRectangle(g, pen, borderRect, style.BorderRadius);
+                    }
                 }
             }
-        }
-
-        protected override void OnPaintBackground(PaintEventArgs e)
-        {
-            base.OnPaintBackground(e);
-            this.DrawCellStyles(e.Graphics);
         }
 
         protected override void OnCellPaint(TableLayoutCellPaintEventArgs e)
@@ -256,13 +268,13 @@ namespace TiaUtilities.CustomControls
                 return Rectangle.Empty;
             }
 
-            int x = 0;
+            int x = this.AutoScrollPosition.X;
             for (int i = 0; i < startCol && i < widths.Length; i++)
             {
                 x += widths[i];
             }
 
-            int y = 0;
+            int y = this.AutoScrollPosition.Y;
             for (int j = 0; j < startRow && j < heights.Length; j++)
             {
                 y += heights[j];

@@ -1,4 +1,5 @@
-﻿using TiaUtilities.Utility;
+﻿using System.Drawing.Drawing2D;
+using TiaUtilities.Utility;
 
 namespace TiaUtilities.SettingsStep.CustomControls
 {
@@ -71,13 +72,18 @@ namespace TiaUtilities.SettingsStep.CustomControls
         {
             base.OnPaintBackground(pevent);
 
-            if(this._activeColor.A > 0)
+            if(this._activeColor.A > 0 && this.Width > 0 && this.Height > 0)
             {
-                var backgroundRect = pevent.ClipRectangle;
+                pevent.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+
+                var backgroundRect = this.ClientRectangle;
                 backgroundRect.Inflate(-this._borderWidth, -this._borderWidth);
 
-                using SolidBrush brush = new(this._activeColor);
-                GraphicsUtils.FillRoundedRectangle(pevent.Graphics, brush, backgroundRect, new(this._borderRadius));
+                if(backgroundRect.Width > 0 && backgroundRect.Height > 0)
+                {
+                    using SolidBrush brush = new(this._activeColor);
+                    GraphicsUtils.FillRoundedRectangle(pevent.Graphics, brush, backgroundRect, new(this._borderRadius));
+                }
             }
         }
 
@@ -85,17 +91,23 @@ namespace TiaUtilities.SettingsStep.CustomControls
         {
             base.OnPaint(e);
 
-            if (this._borderColor.A > 0 && this._borderWidth > 0)
+            if (this._borderColor.A > 0 && this._borderWidth > 0 && this.Width > 0 && this.Height > 0)
             {
-                using Pen pen = new(this._borderColor, this._borderWidth);
+                e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+
                 Rectangle borderRect = new(
                     this._borderWidth,
                     this._borderWidth,
-                    e.ClipRectangle.Width - this._borderWidth - 1,
-                    e.ClipRectangle.Height - this._borderWidth - 1
+                    this.ClientRectangle.Width - this._borderWidth - 1,
+                    this.ClientRectangle.Height - this._borderWidth - 1
                 );
 
-                GraphicsUtils.DrawRoundedRectangle(e.Graphics, pen, borderRect, new(this._borderRadius));
+                if(borderRect.Width > 0 && borderRect.Height > 0)
+                {
+                    using Pen pen = new(this._borderColor, this._borderWidth) { Alignment = PenAlignment.Inset };
+                    GraphicsUtils.DrawRoundedRectangle(e.Graphics, pen, borderRect, new(this._borderRadius));
+                }
+
             }
         }
     }

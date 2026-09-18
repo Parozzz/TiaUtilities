@@ -5,6 +5,7 @@ using TiaUtilities.Resources;
 using TiaUtilities.SettingsStep;
 using TiaUtilities.Styles;
 using TiaUtilities.Utility;
+using static TiaUtilities.SettingsStep.SettingsLineControls;
 
 namespace TiaUtilities.SettingsNew
 {
@@ -29,6 +30,18 @@ namespace TiaUtilities.SettingsNew
         private const string PREVIOUS_ARROW = "⇦";
         private const string NEXT_ARROW = "⇨";
 
+        private const int WS_EX_COMPOSITED = 0x02000000;
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams cp = base.CreateParams;
+                // Attiva lo stile WS_EX_COMPOSITED (0x02000000)
+                // Costringe Windows a ridisegnare tutti i controlli figli bottom-up in un unico buffer
+                cp.ExStyle |= WS_EX_COMPOSITED;
+                return cp;
+            }
+        }
 
         internal Dictionary<Type, List<SettingsStepSequence>> ConfigurationTypeModelDict { get; init; }
 
@@ -194,40 +207,37 @@ namespace TiaUtilities.SettingsNew
                 this.selectedConfigurationNameLabel.Text = "No Selection";
 
                 this.selectedPanelControls.Value = null;
-
+                
                 if (oldSequence != null)
                 {
                     foreach (var panelControls in oldSequence.PanelControls)
                     {
                         panelControls.StepLabelClick = null;
-
-                        panelControls.StepLabel.BorderWidth = 0;
-                        panelControls.StepLabel.BorderColor = Color.Transparent;
+                        panelControls.SectionLabel.BorderWidth = 0;
                     }
                 }
 
                 if (newSequence != null)
                 {
-                    newSequence.Init(this);
                     this.selectedConfigurationNameLabel.Text = newSequence.FullName;
 
-                    List<Label> stepLabels = [];
+                    List<Control> sectionsControls = [];
                     foreach (var panelControls in newSequence.PanelControls)
                     {
                         panelControls.StepLabelClick = () => this.selectedPanelControls.Value = panelControls;
-                        stepLabels.Add(panelControls.StepLabel);
+                        sectionsControls.Add(panelControls.SectionLabel);
                     }
 
-                    var l = stepLabels.SelectMany((x, index) =>
-                        index < stepLabels.Count - 1 ?
-                        new[] { x, SettingsStepPanelControls.CreateStepLabel(ARROW_CHAR, arrow: true) } :
+                    var l = sectionsControls.SelectMany((x, index) =>
+                        index < sectionsControls.Count - 1 ?
+                        new[] { x, SettingsStepPanelControls.CreateSectionLabel(ARROW_CHAR, arrow: true) } :
                         new[] { x }
                     ).ToArray();
                     this.stepFlowPanel.Controls.AddRange(l);
 
                     if (oldPanelControls != null)
                     {
-                        var activePanelControls = newSequence.PanelControls.FirstOrDefault(p => p.StepLabel.Text.Contains(oldPanelControls.StepLabel.Text, StringComparison.OrdinalIgnoreCase));
+                        var activePanelControls = newSequence.PanelControls.FirstOrDefault(p => p.SectionLabel.Text.Contains(oldPanelControls.SectionLabel.Text, StringComparison.OrdinalIgnoreCase));
                         if (activePanelControls != null)
                         {
                             this.selectedPanelControls.Value = activePanelControls;
@@ -253,17 +263,14 @@ namespace TiaUtilities.SettingsNew
 
                 if (oldPanelControls != null)
                 {
-                    oldPanelControls.StepLabel.BorderWidth = 0;
-                    oldPanelControls.StepLabel.BorderColor = Color.Transparent;
+                    oldPanelControls.SectionLabel.BorderWidth = 0;
                 }
 
                 if (newPanelControls != null)
                 {
                     Utility.Validate.IsTrue(newPanelControls.Sequence == this.selectedSequence.Value);
 
-                    newPanelControls.StepLabel.BorderWidth = 2;
-                    newPanelControls.StepLabel.BorderColor = Color.FromArgb(127, Color.Black);
-
+                    newPanelControls.SectionLabel.BorderWidth = 1;
                     newPanelControls.ApplyControls(this.controlsPanel);
                 }
 
@@ -350,6 +357,8 @@ namespace TiaUtilities.SettingsNew
 
             foreach (var sequence in sequences)
             {
+                sequence.Init(this);
+
                 var cfgType = sequence.Configuration.GetType();
 
                 var tryGetOK = this.ConfigurationTypeModelDict.TryGetValue(cfgType, out var configurationSequences);

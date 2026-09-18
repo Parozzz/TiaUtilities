@@ -19,7 +19,7 @@ namespace TiaUtilities.SettingsStep
         private const int GROUP_ROW_GAP = 10;
 
         public SettingsStepDescriptor Descriptor { get; init; }
-        public LabelColorizable StepLabel { get; init; }
+        public LabelColorizable SectionLabel { get; init; }
         public Action? StepLabelClick { get; set; }
 
         public SettingsStepSequence Sequence { get; init; }
@@ -43,7 +43,7 @@ namespace TiaUtilities.SettingsStep
             this.propertyChangedPredicates = [];
             this.configurationPropertyChanged = (sender, args) => propertyChangedPredicates.ForEach(p => p.Invoke(args));
 
-            (this.StepLabel, this.Lines, this.tableRows, this.tableCellStyles) = this.BuildControls(form);
+            (this.SectionLabel, this.Lines, this.tableRows, this.tableCellStyles) = this.BuildControls(form);
         }
 
         public void RegisterListeners()
@@ -216,9 +216,7 @@ namespace TiaUtilities.SettingsStep
                             line = new()
                             {
                                 Name = factory.Name,
-                                Labels = {
-                                    new(nameLabel) { Column = COLUMN_VALUE_LABEL, Row = rowCounter }
-                                },
+                                Label = new(nameLabel) { Column = COLUMN_VALUE_LABEL, Row = rowCounter },
                                 MainControl = new(control) { Column = COLUMN_VALUE_CONTROL, Row = rowCounter },
                                 Buttons = {
                                     new(transferToAllButton) { Column = COLUMN_ICON, Row = rowCounter }
@@ -246,12 +244,12 @@ namespace TiaUtilities.SettingsStep
             });
 
 
-            var stepLabel = CreateStepLabel(this.Descriptor.Name, arrow: false);
-            stepLabel.Click += (sender, args) => this.StepLabelClick?.Invoke();
+            var sectionLabel = CreateSectionLabel(this.Descriptor.Name, arrow: false);
+            sectionLabel.Click += (sender, args) => this.StepLabelClick?.Invoke();
 
-            ControlUtils.CreateToolTip().SetToolTip(stepLabel, this.Descriptor.Description);
+            ControlUtils.CreateToolTip().SetToolTip(sectionLabel, this.Descriptor.Description);
 
-            return (stepLabel, lines, rows, cellStyles);
+            return (sectionLabel, lines, rows, cellStyles);
         }
 
         public void ApplyControls(TableLayoutPanelColorizable panel)
@@ -261,20 +259,8 @@ namespace TiaUtilities.SettingsStep
                 panel.RowStyles.Add(row);
             }
 
-            panel.Controls.AddRange([.. this.Lines.SelectMany(l => l.GetAllControls())]);
-
-            foreach (var line in this.Lines)
-            {
-                line.Labels.ForEach(l => l.SetPositionToPanel(panel));
-
-                var mainControl = line.MainControl;
-                if (mainControl != null)
-                {
-                    mainControl.SetPositionToPanel(panel);
-                }
-
-                line.Buttons.ForEach(b => b.SetPositionToPanel(panel));
-            }
+            this.Lines.ForEach(l => l.AddAllControls(panel));
+            this.Lines.ForEach(l => l.SetAllPositionsToPanel(panel));
 
             foreach (var style in this.tableCellStyles)
             {
@@ -307,7 +293,7 @@ namespace TiaUtilities.SettingsStep
             };
         }
 
-        public static LabelColorizable CreateStepLabel(string text, bool arrow)
+        public static LabelColorizable CreateSectionLabel(string text, bool arrow)
         {
             return new LabelColorizable()
             {
@@ -319,7 +305,7 @@ namespace TiaUtilities.SettingsStep
                 ClickedColor = arrow ? Color.Transparent : Color.FromArgb(127, Color.CornflowerBlue),
 
                 BorderWidth = 0,
-                BorderColor = Color.Transparent,
+                BorderColor = Color.FromArgb(100, Color.Black),
 
                 Text = text,
                 Font = arrow ? StyleManager.Fonts.NORMAL_SEMIBOLD : StyleManager.Fonts.BIG_SEMIBOLD,
