@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 using TiaUtilities.Configuration;
-using TiaUtilities.CustomControls;
+using TiaUtilities.CustomControls.tableColorizable;
 using TiaUtilities.Languages;
 using TiaUtilities.Resources;
 using TiaUtilities.SettingsNew;
@@ -32,7 +32,7 @@ namespace TiaUtilities.SettingsStep
         private readonly PropertyChangedEventHandler configurationPropertyChanged;
 
         private readonly List<RowStyle> tableRows;
-        private readonly List<TableLayoutPanelColorizable.CellStyle> tableCellStyles;
+        private readonly List<TableCellStyle> tableCellStyles;
 
         public SettingsStepPanelControls(SettingsStepForm form, SettingsStepSequence sequence, SettingsStepDescriptor descriptor, ObservableConfiguration configuration)
         {
@@ -57,7 +57,7 @@ namespace TiaUtilities.SettingsStep
             this.ListenersRegistered = true;
         }
 
-        private (LabelColorizable, List<SettingsLineControls>, List<RowStyle>, List<TableLayoutPanelColorizable.CellStyle>) BuildControls(SettingsStepForm form)
+        private (LabelColorizable, List<SettingsLineControls>, List<RowStyle>, List<TableCellStyle>) BuildControls(SettingsStepForm form)
         {
             const int COLUMN_VALUE_LABEL = 1;
             const int COLUMN_VALUE_CONTROL = 2;
@@ -73,7 +73,7 @@ namespace TiaUtilities.SettingsStep
 
             List<SettingsLineControls> lines = [];
             List<RowStyle> rows = [];
-            List<TableLayoutPanelColorizable.CellStyle> cellStyles = [];
+            List<TableCellStyle> cellStyles = [];
 
             int rowCounter = 0;
 

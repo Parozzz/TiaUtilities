@@ -4,6 +4,7 @@ using TiaUtilities.Generation.IO.Configurations;
 using TiaUtilities.Languages;
 using TiaUtilities.SettingsNew.Bindings;
 using TiaUtilities.SettingsStep;
+using static TiaUtilities.SettingsStep.ControlFactory.SettingsFactoryGeneralOptions;
 
 namespace TiaUtilities.Generation.Alarms
 {
@@ -50,7 +51,13 @@ namespace TiaUtilities.Generation.Alarms
                     .Add(x => x.HmiTriggerTagUseWordArray, Locale.ALARM_SETTINGS_HMI_USE_WORD_ARRAY, Locale.ALARM_SETTINGS_HMI_USE_WORD_ARRAY_DESCR)
                 .End();
 
-            return [enablingsStepDescriptor, blocksStepDescriptor, segmentNamesStepDescriptor, alarmStepDescriptor];
+            var sqlQueryDescriptor = new SettingsStepDescriptor("SQl", "SQL query for database")
+                .CreateBinder<AlarmMainConfiguration>()
+                .StartGroup("Query")
+                    .Add(x => x.DatabaseQuery, "", options: new() { StringSpecifiedEditor = StringCustomEditor.TSQL, MinWidth = 1600 })
+                .End();
+
+            return [enablingsStepDescriptor, blocksStepDescriptor, segmentNamesStepDescriptor, alarmStepDescriptor, sqlQueryDescriptor];
         }
         
         public static List<SettingsStepDescriptor> CreateTabSettingsStepDescriptors()
@@ -111,7 +118,7 @@ namespace TiaUtilities.Generation.Alarms
             var placeholdersStepDescriptor = new SettingsStepDescriptor("Placeholders")
                 .CreateBinder<AlarmTabConfiguration>()
                 .StartGroup(Locale.ALARM_SETTINGS_TAB_PLACEHOLDERS)
-                    .Add(x => x.CustomPlaceholdersJSON, "Placeholders", description: Locale.ALARM_SETTINGS_TAB_PLACEHOLDERS_DESC, options: new() { StringSpecifiedEditor = SettingsStep.ControlFactory.SettingsFactoryGeneralOptions.StringCustomEditor.JSON })
+                    .Add(x => x.CustomPlaceholdersJSON, "Placeholders", description: Locale.ALARM_SETTINGS_TAB_PLACEHOLDERS_DESC, options: new() { StringSpecifiedEditor = StringCustomEditor.JSON })
 
                 .End();
 

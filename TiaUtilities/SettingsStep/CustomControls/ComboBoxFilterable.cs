@@ -129,6 +129,11 @@ namespace TiaUtilities.SettingsStep.CustomControls
 
         protected override void WndProc(ref Message m)
         {
+            if(m.Msg == DllImports.WM_MOUSEWHEEL && !this.DroppedDown)
+            {//Avoid having the scroll wheel to change values. Annoying since scrolling can casually change value.
+                return;
+            }
+
             try
             {
                 base.WndProc(ref m);

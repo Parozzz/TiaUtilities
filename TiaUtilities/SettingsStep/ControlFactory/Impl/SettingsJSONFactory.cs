@@ -17,7 +17,7 @@ namespace TiaUtilities.SettingsStep.ControlFactory.Impl
 
             var nameLabel = SettingsControls.GetNameLabel(this.Name, this.Description, this.GeneralOptions, createOptions, () => $"{this.ConfigurationProperty?.GetFrom(configuration)}");
 
-            var editor = SettingsControls.GetJSONEditor();
+            var editor = SettingsControls.GetJSONEditor(this.GeneralOptions, createOptions);
 
             var startValue = this.ConfigurationProperty.GetFrom(configuration);
             editor.Text = $"{startValue}";

@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Diagnostics;
 using TiaUtilities.Configuration;
 using TiaUtilities.Generation;
 using TiaUtilities.Resources;
@@ -207,7 +208,7 @@ namespace TiaUtilities.SettingsNew
                 this.selectedConfigurationNameLabel.Text = "No Selection";
 
                 this.selectedPanelControls.Value = null;
-                
+
                 if (oldSequence != null)
                 {
                     foreach (var panelControls in oldSequence.PanelControls)
@@ -303,9 +304,21 @@ namespace TiaUtilities.SettingsNew
 
             #region SEARCH_CONTROLS
             this.searchTextBox.BackColor = Form.DefaultBackColor;
-            this.searchTextBox.TextChanged += (sender, args) =>
+            /*this.searchTextBox.TextChanged += (sender, args) =>
             {
                 this.searchPanelControls.UpdateSearchText(this.searchTextBox.Text);
+            };*/
+            this.searchTextBox.LostFocus += (sender, args) =>
+            {
+                this.searchPanelControls.UpdateSearchText(this.searchTextBox.Text);
+            };
+
+            this.searchTextBox.KeyDown += (sender, args) =>
+            {
+                if (args.KeyData == Keys.Enter || args.KeyData == Keys.Tab)
+                {
+                    this.searchPanelControls.UpdateSearchText(this.searchTextBox.Text);
+                }
             };
             #endregion
 
@@ -418,7 +431,7 @@ namespace TiaUtilities.SettingsNew
             var indexOf = sequence.PanelControls.IndexOf(panelControls);
 
             int newIndex = 0;
-            if(next)
+            if (next)
             {
                 newIndex = indexOf >= count - 1 ? 0 : indexOf + 1;
             }

@@ -80,6 +80,10 @@ namespace TiaUtilities.SettingsStep
                         {
                             factory = new SettingsJSONFactory(configurationProperty, name, description, options);
                         }
+                        else if(options.StringSpecifiedEditor == SettingsFactoryGeneralOptions.StringCustomEditor.TSQL)
+                        {
+                            factory = new SettingsTSQLFactory(configurationProperty, name, description, options);
+                        }
                         else if(options.StringSelections != null)
                         {
                             factory = new SettingsStringSelectionFactory(configurationProperty, name, description, options) { Selections = options.StringSelections };

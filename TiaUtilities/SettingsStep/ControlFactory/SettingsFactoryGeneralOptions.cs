@@ -2,7 +2,7 @@
 {
     public class SettingsFactoryGeneralOptions
     {
-        public enum StringCustomEditor { NONE, JS, JSON }
+        public enum StringCustomEditor { NONE, JS, JSON, TSQL }
 
         public int MinWidth { get; set; } = -1;
         public ContentAlignment? TextAlign { get; set; }

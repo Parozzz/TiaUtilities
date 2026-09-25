@@ -1,4 +1,4 @@
-﻿using TiaUtilities.CustomControls;
+﻿using TiaUtilities.CustomControls.tableColorizable;
 using TiaUtilities.Resources;
 using TiaUtilities.SettingsStep.CustomControls;
 

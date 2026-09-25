@@ -43,6 +43,8 @@ namespace TiaUtilities.Generation.Alarms.Configurations
         [JsonProperty] public bool EnableCustomVariable { get => this.GetAs<bool>(); set => this.Set(value); }
         [JsonProperty] public bool EnableTimer { get => this.GetAs<bool>(); set => this.Set(value); }
 
+        [JsonProperty] public string DatabaseQuery { get => this.GetAs<string>(); set => this.Set(value); }
+
         public AlarmMainConfiguration()
         {
             this.FCBlockName = "fcAlarmGeneration";
@@ -65,6 +67,8 @@ namespace TiaUtilities.Generation.Alarms.Configurations
 
             this.EnableCustomVariable = true;
             this.EnableTimer = true;
+
+            this.DatabaseQuery = "IF NOT EXISTS (SELECT 1 FROM Stato_Allarmi WHERE STA_CodiceAllarme = {Codice} AND STA_Dispositivo = {Dispositivo} AND STA_DispositivoTipo = {TipoDispositivo})\r\n\tINSERT INTO Stato_Allarmi (STA_CodiceAllarme, STA_TagName, STA_Stato, STA_Dispositivo, STA_DispositivoTipo, STA_Severita, STA_Priorita, STA_Descrizione, STA_ModificatoDa) VALUES ('{Codice}', '{TagName}', 0, '{Dispositivo}', '{TipoDispositivo}', 1, 1, '{Descrizione}', 'Import TiaUtilities')\r\nELSE\r\n\tUPDATE Stato_Allarmi SET STA_Descrizione = {Descrizione} WHERE STA_CodiceAllarme = {Codice} AND STA_Dispositivo = {Dispositivo} AND STA_DispositivoTipo = {TipoDispositivo}";
         }
     }
 }

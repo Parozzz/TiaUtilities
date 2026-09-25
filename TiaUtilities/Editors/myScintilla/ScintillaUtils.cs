@@ -112,6 +112,16 @@ namespace TiaUtilities.Editors.myScintilla
             };
         }
 
+        public static BraceType IsTSQLBrace(int c)
+        {
+            return c switch
+            {
+                '(' or '['  => BraceType.Opening,
+                ')' or ']' => BraceType.Closing,
+                _ => BraceType.None,
+            };
+        }
+
         public static char GetMatchingJSBrace(int c)
         {
             return c switch

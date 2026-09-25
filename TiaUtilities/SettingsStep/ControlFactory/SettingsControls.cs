@@ -1,5 +1,6 @@
 ﻿using TiaUtilities.Editors.Javascript;
 using TiaUtilities.Editors.Json;
+using TiaUtilities.Editors.T_SQL;
 using TiaUtilities.SettingsStep.CustomControls;
 using TiaUtilities.Styles;
 using TiaUtilities.Utility;
@@ -61,7 +62,7 @@ namespace TiaUtilities.SettingsStep.ControlFactory
                 BackColor = Form.DefaultBackColor,
                 ForeColor = Form.DefaultForeColor,
 
-                Margin = new(8, 0, 8, 0)
+                Margin = new(8, 0, 8, 0),
             };
 
             comboBox.DropDownClosed += (sender, args) =>
@@ -79,7 +80,7 @@ namespace TiaUtilities.SettingsStep.ControlFactory
             return comboBox;
         }
 
-        public static JavascriptEditor GetJavascriptEditor()
+        public static JavascriptEditor GetJavascriptEditor(SettingsFactoryGeneralOptions generalOptions, SettingsFactoryCreateOptions createOptions)
         {
             JavascriptEditor editor = new();
             editor.InitControl();
@@ -87,16 +88,45 @@ namespace TiaUtilities.SettingsStep.ControlFactory
             var control = editor.GetControl();
             control.MinimumSize = new(550, 480);
 
+            if (generalOptions.MinWidth > 0)
+            {
+                var minSize = control.MinimumSize;
+                control.MinimumSize = new(generalOptions.MinWidth, minSize.Height);
+            }
+
             return editor;
         }
 
-        public static JsonEditor GetJSONEditor()
+        public static JsonEditor GetJSONEditor(SettingsFactoryGeneralOptions generalOptions, SettingsFactoryCreateOptions createOptions)
         {
             JsonEditor editor = new();
             editor.InitControl();
 
             var control = editor.GetControl();
             control.MinimumSize = new(550, 480);
+
+            if (generalOptions.MinWidth > 0)
+            {
+                var minSize = control.MinimumSize;
+                control.MinimumSize = new(generalOptions.MinWidth, minSize.Height);
+            }
+
+            return editor;
+        }
+
+        public static TSQLEditor GetTSQLEditor(SettingsFactoryGeneralOptions generalOptions, SettingsFactoryCreateOptions createOptions)
+        {
+            TSQLEditor editor = new();
+            editor.InitControl();
+
+            var control = editor.GetControl();
+            control.MinimumSize = new(550, 480);
+
+            if (generalOptions.MinWidth > 0)
+            {
+                var minSize = control.MinimumSize;
+                control.MinimumSize = new(generalOptions.MinWidth, minSize.Height);
+            }
 
             return editor;
         }

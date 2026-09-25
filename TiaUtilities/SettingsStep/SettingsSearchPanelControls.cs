@@ -1,14 +1,6 @@
-﻿using DocumentFormat.OpenXml.Bibliography;
-using DocumentFormat.OpenXml.Drawing.Diagrams;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using TiaUtilities.CustomControls;
-using TiaUtilities.Resources;
+using TiaUtilities.CustomControls.tableColorizable;
 using TiaUtilities.SettingsStep.CustomControls;
 using TiaUtilities.Styles;
 using TiaUtilities.Utility.Extensions;
@@ -42,6 +34,8 @@ namespace TiaUtilities.SettingsStep
         private readonly List<SettingsStepSequence> sequences;
         private readonly List<SettingsLineControls> searchLines;
 
+        private string actualSearchText = "";
+
         public SettingsSearchPanelControls(TableLayoutPanelColorizable panel, List<SettingsStepSequence> sequences)
         {
             this.panel = panel;
@@ -51,6 +45,8 @@ namespace TiaUtilities.SettingsStep
 
         public void InitPanel()
         {
+            this.actualSearchText = "";
+
             this.panel.SuspendLayout();
 
             this.Clear();
@@ -66,6 +62,8 @@ namespace TiaUtilities.SettingsStep
 
         public void Clear()
         {
+            this.actualSearchText = "";
+
             this.panel.SuspendLayout();
 
             this.panel.Controls.Clear();
@@ -83,16 +81,25 @@ namespace TiaUtilities.SettingsStep
 
         public void UpdateSearchText(string searchText)
         {
+            if(searchText == actualSearchText)
+            {
+                return;
+            }
+
+            actualSearchText = searchText;
+
             Cursor.Current = Cursors.WaitCursor;
 
             this.panel.SuspendLayout();
-            this.panel.ClearCellStyles();
-
             SuspendDrawing(this.panel);
+
+            this.panel.Visible = false;
+
+            this.panel.ClearCellStyles();
 
             this.searchLines.Clear();
 
-            var lines = SettingsSearchPanelControls.GetLines(this.sequences.SelectMany(s => s.PanelControls).SelectMany(p => p.Lines), searchText);
+            var lines = SettingsSearchPanelControls.GetLines(this.sequences.SelectMany(s => s.PanelControls).SelectMany(p => p.Lines), searchText).ToList();
 
             int rowCounter = 0;
             foreach(var line in lines)
@@ -123,33 +130,32 @@ namespace TiaUtilities.SettingsStep
                 };
 
                 this.searchLines.Add(searchLine);
-                
-                this.panel.AddCellStyle(new()
-                {
-                    Column = CONTEXT_LABEL_COLUMN,
-                    ColumnSpan = CONTROL_COLUMN - CONTEXT_LABEL_COLUMN + 1,
-                    Row = rowCounter,
-                    BackColor = Color.Transparent, // Color.AntiqueWhite,
-                    BorderColor = Color.Transparent,
-                    BorderWidth = 0,
-                    FitToControls = true,
-                    Padding = Padding.Empty,
-                    MouseEnterCallback = cellStyle =>
-                    {
-                        line.MainControl.Control.BackColor = Color.AntiqueWhite;
-                        cellStyle.BackColor = Color.AntiqueWhite;
-                    },
-                    MouseLeaveCallback = cellStyle =>
-                    {
-                        line.MainControl.Control.BackColor = Form.DefaultBackColor;
-                        cellStyle.BackColor = Color.Transparent;
-                    },
-                });
-                
                 rowCounter++;
             }
 
-            Debug.WriteLine($"UpdateSearchText Rows:{rowCounter}");
+            this.panel.SetDynamicCellStyle(new()
+            {
+                Column = CONTEXT_LABEL_COLUMN,
+                ColumnSpan = CONTROL_COLUMN - CONTEXT_LABEL_COLUMN + 1,
+                StartRow = 0,
+                BackColor = Color.AntiqueWhite, // Color.AntiqueWhite,
+                BorderColor = Color.Transparent,
+                BorderWidth = 0,
+                FitToControls = true,
+                Padding = Padding.Empty,
+                RowChangedCallback = args =>
+                {
+                    if(lines.TryGet(args.oldRow, out var oldLine))
+                    {
+                        oldLine.MainControl.Control.BackColor = Form.DefaultBackColor;
+                    }
+
+                    if(lines.TryGet(args.newRow, out var newLine))
+                    {
+                        newLine.MainControl.Control.BackColor = Color.AntiqueWhite;
+                    }
+                }
+            });
 
             this.panel.RowStyles.Clear();
             Enumerable.Range(0, rowCounter)
@@ -157,11 +163,12 @@ namespace TiaUtilities.SettingsStep
                 .ForEach(rs => this.panel.RowStyles.Add(rs));
 
             this.panel.Controls.Clear();
-
             this.searchLines.ForEach(l => l.AddAllControls(this.panel));
             this.searchLines.ForEach(l => l.SetAllPositionsToPanel(this.panel));
 
-            this.panel.ResumeLayout(performLayout: true);
+            this.panel.Visible = true;
+
+            this.panel.ResumeLayout();
             ResumeDrawing(this.panel);
 
             Cursor.Current = Cursors.Default;
@@ -175,8 +182,19 @@ namespace TiaUtilities.SettingsStep
             {
                 return [];
             }
+            
+            // Dividiamo il testo di ricerca in parole individuali (ignorando spazi multipli)
+            var searchWords = searchText
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-            return lines.Where(l => l.Name.Contains(searchText, StringComparison.InvariantCultureIgnoreCase));
+            return lines.Where(item =>
+                // "Tutte le parole..."
+                searchWords.All(word =>
+                    // "...devono trovarsi nel Name O in almeno una ContextPhrase"
+                    item.Name.Contains(word, StringComparison.OrdinalIgnoreCase) ||
+                    item.ContextPhrases.Any(phrase => phrase.Contains(word, StringComparison.OrdinalIgnoreCase))
+                )
+            ).OrderBy(i => i.Name, StringComparer.OrdinalIgnoreCase);
         }
 
         private static Label CreateContextLabel(string text)

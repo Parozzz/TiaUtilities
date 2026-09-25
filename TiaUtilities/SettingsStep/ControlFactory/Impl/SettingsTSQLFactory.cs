@@ -2,21 +2,22 @@
 using TiaUtilities.Configuration;
 using TiaUtilities.CustomControls;
 using TiaUtilities.Editors.Javascript;
+using TiaUtilities.Editors.Json;
 using TiaUtilities.SettingsNew;
 using TiaUtilities.Utility;
 
 namespace TiaUtilities.SettingsStep.ControlFactory.Impl
 {
-    public class SettingsJavascriptFactory(SettingsConfigurationProperty? configurationProperty, string name, string description, SettingsFactoryGeneralOptions options)
+    public class SettingsTSQLFactory(SettingsConfigurationProperty? configurationProperty, string name, string description, SettingsFactoryGeneralOptions options) 
         : SettingsControlFactory(configurationProperty, name, description, options)
     {
-        public override (Label, Control, Predicate<PropertyChangedEventArgs>) Create(ObservableConfiguration configuration, SettingsFactoryCreateOptions createOptions)
+        public override (Label?, Control, Predicate<PropertyChangedEventArgs>) Create(ObservableConfiguration configuration, SettingsFactoryCreateOptions createOptions)
         {
             Validate.NotNull(this.ConfigurationProperty);
 
             var nameLabel = SettingsControls.GetNameLabel(this.Name, this.Description, this.GeneralOptions, createOptions, () => $"{this.ConfigurationProperty?.GetFrom(configuration)}");
 
-            var editor = SettingsControls.GetJavascriptEditor(this.GeneralOptions, createOptions);
+            var editor = SettingsControls.GetTSQLEditor(this.GeneralOptions, createOptions);
 
             var startValue = this.ConfigurationProperty.GetFrom(configuration);
             editor.Text = $"{startValue}";
@@ -50,7 +51,7 @@ namespace TiaUtilities.SettingsStep.ControlFactory.Impl
                 return true;
             }
 
-            return (nameLabel, editor.GetControl(), propertyChangedPredicate);
+            return (null, editor.GetControl(), propertyChangedPredicate);
         }
     }
 }

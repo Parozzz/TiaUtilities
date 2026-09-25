@@ -44,6 +44,7 @@ namespace TiaUtilities.Utility
         public const int WM_GETFONT = 0x0031;
         public const int WM_NCCALCSIZE = 0x0083;
         public const int WM_NCPAINT = 0x0085;
+        public const int WM_NCMOUSEMOVE = 0x00A0; //Non-Client area mouse movements
         public const int WM_KEYDOWN = 0x0100;
         public const int WM_KEYUP = 0x0101;
         public const int WM_CHAR = 0x0102;
