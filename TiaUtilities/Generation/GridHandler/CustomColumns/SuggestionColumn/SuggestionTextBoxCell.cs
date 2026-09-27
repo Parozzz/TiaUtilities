@@ -27,12 +27,12 @@ namespace TiaUtilities.Generation.GridHandler.CustomColumns.SuggestionColumn
                 return;
             }
 
-            if (this.OwningColumn is not SuggestionTextBoxColumn column || column.GetItemsFunc == null)
+            if (this.OwningColumn is not SuggestionTextBoxColumn column || column.ItemsCallback == null)
             {
                 return;
             }
 
-            if (column.dropDown != null)
+            if (column.ActiveDropDown != null)
             {
                 return;
             }
@@ -43,7 +43,7 @@ namespace TiaUtilities.Generation.GridHandler.CustomColumns.SuggestionColumn
                 return;
             }
 
-            var items = column.GetItemsFunc().Where(v => v != null);
+            var items = column.ItemsCallback().Where(v => v != null);
             if (items == null || !items.Any())
             {
                 return;
@@ -99,7 +99,7 @@ namespace TiaUtilities.Generation.GridHandler.CustomColumns.SuggestionColumn
             };
             dropDown.Show(dataGridView, showPoint);
 
-            column.dropDown = dropDown;
+            column.ActiveDropDown = dropDown;
         }
 
         public override void DetachEditingControl()
@@ -113,13 +113,14 @@ namespace TiaUtilities.Generation.GridHandler.CustomColumns.SuggestionColumn
                 }
                 column.inEditMode = false;
 
-                if (column.dropDown != null)
+                if (column.ActiveDropDown != null)
                 {
-                    column.dropDown.AutoClose = true; //If i do not set AutoClose to true, the dropdown WILL NOT CLOSE!
-                    column.dropDown.Hide();
-                    column.dropDown.Close();
+                    column.ActiveDropDown.AutoClose = true; //If i do not set AutoClose to true, the dropdown WILL NOT CLOSE!
+                    column.ActiveDropDown.Hide();
+                    column.ActiveDropDown.Close();
+                    column.ActiveDropDown.Dispose();
 
-                    column.dropDown = null;
+                    column.ActiveDropDown = null;
                 }
             }
 

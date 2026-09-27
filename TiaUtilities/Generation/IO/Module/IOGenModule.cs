@@ -15,8 +15,7 @@ using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Generation.TextsEditor;
 using TiaUtilities.Languages;
 using TiaUtilities.Resources;
-using TiaUtilities.SettingsNew;
-using TiaUtilities.SettingsNew.Bindings;
+using TiaUtilities.SettingsStep;
 using TiaUtilities.Utility;
 using TiaUtilities.Utility.Extensions;
 
@@ -69,8 +68,7 @@ namespace TiaUtilities.Generation.IO.Module
 
         private readonly List<IOGenTab> ioTabList;
 
-        public SettingsBindings SettingsBindings { get; init; }
-        private readonly SettingsFormCache settingsFormCache;
+        public List<IGenModule.ModuleControl> ModuleControls { get; init; } = [];
 
         public IOGenModule()
         {
@@ -88,14 +86,12 @@ namespace TiaUtilities.Generation.IO.Module
             this.control = new(suggestionGridHandler.GetControl());
 
             this.ioTabList = [];
-            this.SettingsBindings = new();
-            this.settingsFormCache = new(this.SettingsBindings, this.control);
         }
 
         public void Init(GenModuleForm form)
         {
             #region TOP_BUTTONS_STRIP
-            this.control.setupButton.Click += (sender, args) => this.ToggleSettingsFormVisibility();
+            this.control.setupButton.Click += (sender, args) => this.ShowSettings();
             #endregion
 
             #region IMPORT_EXPORT_MENU_ITEMS
@@ -188,7 +184,7 @@ namespace TiaUtilities.Generation.IO.Module
                     this.UpdateSuggestionColors();
 
                     var fileName = fileDialog.FileName;
-                    if(fileName != null)
+                    if (fileName != null)
                     {
                         MainForm.Settings.SetSavedFileDialogPath(FileDialogResources.GENERATION_IO_IMPORT_SUGGESTIONS, Path.GetDirectoryName(fileName));
                     }
@@ -324,8 +320,8 @@ namespace TiaUtilities.Generation.IO.Module
             #endregion
 
             #region TAB CONTROL
-            this.control.tabControl.TabPreAdded += (sender, args) => TabCreation(args.TabPage);
-            this.control.tabControl.TabPreRemoved += (sender, args) =>
+            this.control.tabControl.TabAdded += (sender, args) => TabCreation(args.TabPage);
+            this.control.tabControl.TabRemoved += (sender, args) =>
             {
                 if (args.TabPage.Tag is IOGenTab ioGenTab)
                 {
@@ -333,7 +329,7 @@ namespace TiaUtilities.Generation.IO.Module
                 }
             };
 
-            this.control.tabControl.TabNameUserChanged += (sender, args) =>
+            this.control.tabControl.TabRenamed += (sender, args) =>
             {
                 var newName = args.NewName;
                 foreach (var loopTab in this.ioTabList)
@@ -348,8 +344,6 @@ namespace TiaUtilities.Generation.IO.Module
                         args.NewName = fixedNewName;
                     }
                 }
-
-                this.SettingsBindings.Update();
             };
 
             this.control.tabControl.Selected += (sender, args) =>
@@ -357,18 +351,7 @@ namespace TiaUtilities.Generation.IO.Module
                 if (args.TabPage?.Tag is IOGenTab tab)
                 {
                     tab.Selected();
-                    this.SettingsBindings.Update();
                 }
-            };
-            #endregion
-
-            #region SETTINGS_BINDINGS
-            void placeholderRequestEvent(object? sender, PlaceholderViewRequestEventArgs args) => this.OpenPlaceholderViewer(args.Form);
-            this.SettingsBindings.PlaceholderViewerRequestEvent += placeholderRequestEvent;
-
-            form.FormClosed += (sender, args) =>
-            {
-                this.SettingsBindings.PlaceholderViewerRequestEvent -= placeholderRequestEvent;
             };
             #endregion
 
@@ -380,17 +363,24 @@ namespace TiaUtilities.Generation.IO.Module
                     this.control.tabControl.AddTabs();
                 }
             };
-
-            this.AddConfigurationBindings(this.SettingsBindings);
         }
 
-        public void ToggleSettingsFormVisibility() => this.settingsFormCache.ToggleVisibility();
+        public void ShowSettings()
+        {
+            var sequences = this.GetSettingsStepSequences();
+
+            SettingsForm form = new();
+            form.SetSequences(sequences);
+            form.ShowDialog();
+
+            //this.settingsFormCache.ToggleVisibility();
+        }
 
         private void TabCreation(TabPage tabPage, IOGenTabSave? save = null)
         {
             IOGenTab ioGenTab = new(MainForm.Settings.GridSettings, this.multiGrid, this, tabPage, this.mainConfig);
             ioGenTab.Init();
-            
+
             if (save == null)
             {
                 ioGenTab.Name = Utils.CheckEqualityAndAddNumberAtEnd("IoTab", this.ioTabList.Select(tab => tab.Name));
@@ -409,8 +399,6 @@ namespace TiaUtilities.Generation.IO.Module
 
         public void Clear()
         {
-            this.SettingsBindings.Clear();
-
             this.ioTabList.Clear();
             this.control.tabControl.TabPages.Clear();
         }
@@ -502,7 +490,6 @@ namespace TiaUtilities.Generation.IO.Module
 
             this.UpdateSuggestionColors();
 
-            this.AddConfigurationBindings(this.SettingsBindings);
             //Seems that the Selected event is not called in this case. Doing it manually.
             if (this.control.tabControl.SelectedTab?.Tag is IOGenTab tab)
             {
@@ -537,7 +524,7 @@ namespace TiaUtilities.Generation.IO.Module
             foreach (var rowIndex in this.suggestionGridHandler.DataSource.GetNotEmptyIndexes())
             {
                 var cell = this.suggestionGridHandler.ViewManipulator.GetCell(rowIndex, IOSuggestionData.VALUE);
-                if(cell != null)
+                if (cell != null)
                 {
                     cell.Style.BackColor = SystemColors.ControlLightLight;
                     cell.Style.SelectionBackColor = Color.LightGray;
@@ -565,7 +552,7 @@ namespace TiaUtilities.Generation.IO.Module
                 if (foundData.Any())
                 {
                     var cell = this.suggestionGridHandler.ViewManipulator.GetCell(row, IOSuggestionData.VALUE);
-                    if(cell != null)
+                    if (cell != null)
                     {
                         cell.Style.BackColor = cell.Style.SelectionBackColor = Color.LightGreen;
                     }
@@ -575,14 +562,59 @@ namespace TiaUtilities.Generation.IO.Module
             this.suggestionGridHandler.ViewManipulator.ResumeLayout(refresh: true);
         }
 
-        private void AddConfigurationBindings(SettingsBindings settingsBindings)
+        private GenPlaceholderHandler? CreateGenericPlaceholderHandler()
         {
-            IOGenUtils.AddMainConfigBindings(settingsBindings, this.mainConfig);
-            IOGenUtils.AddTabConfigSettings(settingsBindings, 
-                this.GetCurrentTabName,
-                this.IsAnyTabSelected,
-                this.GetCurrentTabConfiguration, 
-                this.GetTabConfigurationDict);
+            var currentTabName = this.GetCurrentTabName();
+            var currentTab = this.GetCurrentTab();
+
+            IOGenPlaceholderHandler? placeholdersHandler = null;
+            if (currentTabName != null && currentTab != null)
+            {
+                placeholdersHandler = new(currentTab.Previewer, this.mainConfig, currentTab.TabConfig)
+                {
+                    TabName = currentTabName
+                };
+
+                var firstIOData = currentTab.GridHandler.DataSource.GetNotEmptyData().FirstOrDefault();
+                if (firstIOData != null)
+                {
+                    placeholdersHandler.IOData = firstIOData;
+                }
+            }
+
+            return placeholdersHandler;
+        }
+
+        private List<SettingsSequence> GetSettingsStepSequences()
+        {
+            string ParsePlaceholders(string str)
+            {
+                var placeholderHandler = this.CreateGenericPlaceholderHandler();
+                return placeholderHandler == null ? str : placeholderHandler.ParseNotNull(str);
+            }
+
+            List<SettingsSequence> sequenceList = [];
+
+            var globalDescriptors = IOGenUtils.CreateGlobalSettingsDescriptors();
+            var excelDescriptors = IOGenUtils.CreateExcelSettingsDescriptors();
+            var tabDescriptors = IOGenUtils.CreateTabSettingsDescriptors();
+
+            SettingsSequence globalSequence = new(this.mainConfig, "Global", "Settings") { PlaceholdersCallBack = ParsePlaceholders };
+            globalSequence.AddRange(globalDescriptors);
+            sequenceList.Add(globalSequence);
+
+            SettingsSequence excelSequence = new(this.excelImportConfig, "Global", "Excel") { PlaceholdersCallBack = ParsePlaceholders };
+            excelSequence.AddRange(excelDescriptors);
+            sequenceList.Add(excelSequence);
+
+            foreach (var tab in this.ioTabList)
+            {
+                SettingsSequence tabSequence = new(tab.TabConfig, "Tab", tab.Name) { PlaceholdersCallBack = ParsePlaceholders };
+                tabSequence.AddRange(tabDescriptors);
+                sequenceList.Add(tabSequence);
+            }
+
+            return sequenceList;
         }
 
         private string GetCurrentTabName()
@@ -598,15 +630,17 @@ namespace TiaUtilities.Generation.IO.Module
 
         private IOTabConfiguration? GetCurrentTabConfiguration()
         {
-            return this.control.tabControl.SelectedTab?.Tag is IOGenTab genTab ? genTab.TabConfig : null;
+            return this.GetCurrentTab()?.TabConfig;
         }
+
+        private IOGenTab? GetCurrentTab() => this.control.tabControl.SelectedTab?.Tag is IOGenTab genTab ? genTab : null;
 
         private Dictionary<string, ObservableConfiguration> GetTabConfigurationDict()
         {
             Dictionary<string, ObservableConfiguration> dict = [];
             foreach (var tab in this.ioTabList)
             {
-                if(!dict.TryAdd(tab.Name, tab.TabConfig))
+                if (!dict.TryAdd(tab.Name, tab.TabConfig))
                 {
                     dict.Add(tab.Name + "*", tab.TabConfig);
                 }

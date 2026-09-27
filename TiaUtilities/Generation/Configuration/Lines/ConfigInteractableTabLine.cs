@@ -29,13 +29,13 @@ namespace TiaUtilities.Generation.Configuration.Lines
         {
             this.tabControl = new();
 
-            this.tabControl.TabPreAdded += (sender, args) =>
+            this.tabControl.TabAdded += (sender, args) =>
             {
                 var tabPage = args.TabPage;
                 this.tabAddedAction?.Invoke(tabPage);
             };
 
-            this.tabControl.TabPreRemoved += (sender, args) =>
+            this.tabControl.TabRemoved += (sender, args) =>
             {
                 var tabPage = args.TabPage;
                 this.tabRemovedAction?.Invoke(tabPage);
@@ -47,7 +47,7 @@ namespace TiaUtilities.Generation.Configuration.Lines
                 this.tabSelectedChangedAction?.Invoke(tabPage);
             };
 
-            this.tabControl.TabNameUserChanged += (sender, args) =>
+            this.tabControl.TabRenamed += (sender, args) =>
             {
                 var tabPage = args.TabPage;
                 tabChangedNameAction?.Invoke(tabPage);

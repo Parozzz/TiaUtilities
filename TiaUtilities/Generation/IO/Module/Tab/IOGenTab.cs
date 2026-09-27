@@ -60,8 +60,8 @@ namespace TiaUtilities.Generation.IO.Module.Tab
             this.GridHandler.Columns.AddCheckBox(IOData.NEGATED, 50);
             this.GridHandler.Columns.AddTextBox(IOData.IO_NAME, 110);
 
-            var variableAddressColumn = this.GridHandler.Columns.Add(new SuggestionTextBoxColumn(), IOData.VARIABLE, 200);
-            variableAddressColumn.SetGetItemsFunc(() => module.GetSuggestions(filterAlreadyUsed: true));
+            var variableAddressColumn = new SuggestionTextBoxColumn() { ItemsCallback = () => module.GetSuggestions(filterAlreadyUsed: true) };
+            this.GridHandler.Columns.Add(variableAddressColumn, IOData.VARIABLE, 200);
 
             this.GridHandler.Columns.AddTextBox(IOData.MERKER_ADDRESS, MERKER_ADDRESS_COLUMN_SIZE);
             this.GridHandler.Columns.AddTextBox(IOData.COMMENT, 0);

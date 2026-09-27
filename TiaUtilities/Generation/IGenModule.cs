@@ -1,11 +1,17 @@
 ﻿using TiaUtilities.Generation.TextsEditor;
-using TiaUtilities.SettingsNew.Bindings;
 
 namespace TiaUtilities.Generation
 {
     public interface IGenModule : ICleanable, ISaveable<object>, ITextsEditorExporter
     {
-        public abstract SettingsBindings SettingsBindings { get; init; }
+
+        public class ModuleControl
+        {
+            public required string Name { get; init; }
+            public required Func<Control> RequestControlCallback { get; init; }
+        }
+
+        public List<ModuleControl> ModuleControls { get; init; }
 
         public void Init(GenModuleForm form);
 
@@ -13,13 +19,11 @@ namespace TiaUtilities.Generation
 
         public void ExportXML(string folderPath);
 
-        public Control? GetControl();
-
         public string GetFormLocalizatedName();
 
         public void OpenPlaceholderViewer(IWin32Window? window = null);
 
-        public void ToggleSettingsFormVisibility();
+        public void ShowSettings();
 
     }
 }

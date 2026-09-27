@@ -11,20 +11,16 @@ using System.Globalization;
 using System.Xml;
 using TiaUtilities.Constants;
 using TiaUtilities.DbVisualization;
-using TiaUtilities.Editors.ErrorReporting;
 using TiaUtilities.Generation;
 using TiaUtilities.Generation.Alarms;
 using TiaUtilities.Generation.Alarms.Module;
 using TiaUtilities.Generation.Configuration;
 using TiaUtilities.Generation.Configuration.Utility;
-using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.IO;
 using TiaUtilities.Generation.IO.Module;
-using TiaUtilities.Generation.SettingsNew;
 using TiaUtilities.Languages;
 using TiaUtilities.Resources;
-using TiaUtilities.SettingsNew;
-using TiaUtilities.SettingsNew.Bindings;
+using TiaUtilities.SettingsStep;
 using TiaUtilities.Utility;
 using Timer = System.Windows.Forms.Timer;
 
@@ -33,7 +29,6 @@ namespace TiaUtilities
     public partial class MainForm : Form
     {
         public static ProgramSettingsV1 Settings { get; private set; } = new();
-        public static SettingsBindings SettingsBindings { get; private set; } = new();
 
         private static void LoadLanguage()
         {
@@ -69,7 +64,7 @@ namespace TiaUtilities
         private void Init()
         {
             this.saveMenuItem.Click += (sender, args) => MainForm.Settings.Save();
-            this.programSettingsMenuItem.Click += (sender, args) => new SettingsForm(MainForm.SettingsBindings).ShowDialog(this);
+            this.programSettingsMenuItem.Click += (sender, args) => MainForm.ShowSettingsForm();
 
             this.sampleXMLMenuItem.Click += (sender, args) =>
             {
@@ -83,36 +78,6 @@ namespace TiaUtilities
             MainForm.LoadLanguage();
             MainForm.LoadTIAVersion();
             this.autoSaveHandler.Start(MainForm.Settings.AutoSaveTime * 1000);
-
-            MainForm.SettingsBindings
-                .MacroSection(() => Locale.GENERICS_PROGRAM, () => true, () => MainForm.Settings)
-
-                .Section(Locale.PROGRAM_SETTINGS_AUTO_SAVE)
-                .AddInt(nameof(ProgramSettingsV1.AutoSaveTime))
-
-                .Section(Locale.PROGRAM_SETTINGS_LANGUAGE)
-                .AddStringList(nameof(ProgramSettingsV1.IetfLanguage), ["it-IT", "en-US"])
-
-                .Section(Locale.PROGRAM_SETTINGS_TIA_VERSION)
-                .AddUnsignedNumberList(nameof(ProgramSettingsV1.TIAVersion), [16, 17, 18, 19])
-
-                .MacroSection(() => Locale.GRID_SETTINGS, () => true, () => MainForm.Settings.GridSettings)
-
-                .Section(Locale.GRID_SETTINGS_SELECTED_CELL)
-                .AddColor(nameof(GridSettings.SelectedCellBackColor), Locale.GRID_SETTINGS_SELECTED_CELL_BACK_COLOR)
-                .AddColor(nameof(GridSettings.SelectedCellForeColor), Locale.GRID_SETTINGS_SELECTED_CELL_FORE_COLOR)
-
-                .Section(Locale.GRID_SETTINGS_BORDERS)
-                .AddInt(nameof(GridSettings.BorderWeight), Locale.GRID_SETTINGS_BORDERS_WEIGHT)
-                .AddColor(nameof(GridSettings.SingleSelectedCellBorderColor), Locale.GRID_SETTINGS_BORDERS_SELECTED_CELL_COLOR)
-                .AddColor(nameof(GridSettings.DragDropStartCellSelectedBackColor), Locale.GRID_SETTINGS_DRAG_DROP_CELL_BACK)
-
-                .Section(Locale.GRID_SETTINGS_DRAG_DOWN)
-                .AddColor(nameof(GridSettings.SelectedCellTriangleColor), Locale.GRID_SETTINGS_DRAG_DOWN_TRIANGLE_COLOR)
-                .AddColor(nameof(GridSettings.DragSelectedCellBorderColor), Locale.GRID_SETTINGS_DRAG_DOWN_CELL_BACK)
-
-                .Section(Locale.GRID_SETTINGS_PREVIEW)
-                .AddColor(nameof(GridSettings.PreviewColor), Locale.GRID_SETTINGS_PREVIEW_FORE_COLOR);
 
             MainForm.Settings.PropertyChanged += (sender, args) =>
             {
@@ -191,7 +156,7 @@ namespace TiaUtilities
                 switch (keyData)
                 {
                     case Keys.P | Keys.Control:
-                        new SettingsForm(MainForm.SettingsBindings).ShowDialog(this);
+                        MainForm.ShowSettingsForm();
                         return true;
                     case Keys.S | Keys.Control:
                         MainForm.Settings.Save();
@@ -208,6 +173,40 @@ namespace TiaUtilities
 
             // Call the base class
             return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        public static void ShowSettingsForm()
+        {
+            var programDescriptor = new SettingsSequencePanelDescriptor(Locale.GENERICS_PROGRAM)
+                .CreateBinder<ProgramSettingsV1>()
+                .StartGroup(Locale.GENERICS_SETTINGS)
+                    .Add(x => x.AutoSaveTime, Locale.PROGRAM_SETTINGS_AUTO_SAVE)
+                    .Add(x => x.IetfLanguage, Locale.PROGRAM_SETTINGS_LANGUAGE, options: new() { StringSelections = ["it-IT", "en-US"] })
+                    .Add(x => x.TIAVersion, Locale.PROGRAM_SETTINGS_TIA_VERSION)//, options: new() { StringSelections = [16, 17, 18, 19] })
+                .End();
+            
+            var gridDescriptor = new SettingsSequencePanelDescriptor(Locale.GRID_SETTINGS)
+                .CreateBinder<ProgramSettingsV1>()
+                .StartGroup(Locale.GRID_SETTINGS_SELECTED_CELL)
+                    .Add(x => x.GridSettings.SelectedCellBackColor, Locale.GRID_SETTINGS_SELECTED_CELL_BACK_COLOR)
+                    .Add(x => x.GridSettings.SelectedCellForeColor, Locale.GRID_SETTINGS_SELECTED_CELL_FORE_COLOR)
+                .StartGroup(Locale.GRID_SETTINGS_BORDERS)
+                    .Add(x => x.GridSettings.BorderWeight, Locale.GRID_SETTINGS_BORDERS_WEIGHT)
+                    .Add(x => x.GridSettings.SingleSelectedCellBorderColor, Locale.GRID_SETTINGS_BORDERS_SELECTED_CELL_COLOR)
+                    .Add(x => x.GridSettings.DragDropStartCellSelectedBackColor, Locale.GRID_SETTINGS_DRAG_DROP_CELL_BACK)
+                .StartGroup(Locale.GRID_SETTINGS_DRAG_DOWN)
+                    .Add(x => x.GridSettings.SelectedCellTriangleColor, Locale.GRID_SETTINGS_DRAG_DOWN_TRIANGLE_COLOR)
+                    .Add(x => x.GridSettings.DragSelectedCellBorderColor, Locale.GRID_SETTINGS_DRAG_DOWN_CELL_BACK)
+                .StartGroup(Locale.GRID_SETTINGS_PREVIEW)
+                    .Add(x => x.GridSettings.PreviewColor, Locale.GRID_SETTINGS_PREVIEW_FORE_COLOR)
+                .End();
+
+            SettingsSequence programSequence = new(MainForm.Settings, Locale.GENERICS_SETTINGS, Locale.GENERICS_PROGRAM);
+            programSequence.AddRange([programDescriptor, gridDescriptor]);
+
+            SettingsForm settingsForm = new();
+            settingsForm.SetSequences([programSequence]);
+            settingsForm.ShowDialog();
         }
 
         private void LoadToolStripMenuItem_Click(object sender, EventArgs e)
@@ -534,7 +533,7 @@ namespace TiaUtilities
 
         private void TestStepSettingsMenuItem_Click(object sender, EventArgs e)
         {
-            new SettingsStepForm().Show();
+            new SettingsForm().Show();
         }
     }
 }

@@ -25,18 +25,20 @@ namespace TiaUtilities.Utility
             return retval;
         }
 
-        public static void SetDoubleBuffered(Control c)
+        public static C SetDoubleBuffered<C>(C c) where C : Control
         {
             ArgumentNullException.ThrowIfNull(c);
             //Taxes: Remote Desktop Connection and painting
             //http://blogs.msdn.com/oldnewthing/archive/2006/01/03/508694.aspx
             if (SystemInformation.TerminalServerSession)
             {
-                return;
+                return c;
             }
                 
             PropertyInfo? aProp = typeof(Control).GetProperty("DoubleBuffered", BindingFlags.NonPublic | BindingFlags.Instance);
             aProp?.SetValue(c, true, null);
+
+            return c;
         }
 
         public static ToolTip CreateStandardToolTip()
@@ -63,7 +65,7 @@ namespace TiaUtilities.Utility
             };
         }
 
-        public static ToolTip CreateToolTip(bool longAutoPop = false, bool quick = false, bool fading = true)
+        public static ToolTip CreateToolTip(bool longAutoPop = false,  bool quick = false, bool fading = true)
         {
             return new()
             {
@@ -192,7 +194,7 @@ namespace TiaUtilities.Utility
 
         private const UInt32 WPARAM_LEFT_SCROLL = 0xff880000;
         private const UInt32 WPARAM_RIGHT_SCROLL = 0x00780000;
-        public static int WncProcHorizontalScrollWheel(Message m)
+        public static int WncProcHScrollWheel(Message m)
         {
             if (m.Msg == DllImports.WM_MOUSEHWHEEL)
             {

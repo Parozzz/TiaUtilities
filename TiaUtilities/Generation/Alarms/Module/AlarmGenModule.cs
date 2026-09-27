@@ -4,6 +4,7 @@ using SimaticML.API;
 using SimaticML.Blocks;
 using System.Globalization;
 using TiaUtilities.Configuration;
+using TiaUtilities.CustomControls.EditableTab;
 using TiaUtilities.Generation.Alarms.Configurations;
 using TiaUtilities.Generation.Alarms.Data;
 using TiaUtilities.Generation.Alarms.Module.Tab;
@@ -17,8 +18,6 @@ using TiaUtilities.Generation.TextsEditor;
 using TiaUtilities.JSScript;
 using TiaUtilities.Languages;
 using TiaUtilities.Resources;
-using TiaUtilities.SettingsNew;
-using TiaUtilities.SettingsNew.Bindings;
 using TiaUtilities.SettingsStep;
 using TiaUtilities.Utility;
 
@@ -32,54 +31,65 @@ namespace TiaUtilities.Generation.Alarms.Module
         private readonly MultiGridOperationHandler multiGrid;
         private JSScriptHandler JsScriptHandler { get => this.multiGrid.JsScriptHandler; }
 
-        private readonly AlarmGenControl control;
+        private readonly EditableTabControl tabControl;
+        //private readonly AlarmGenTemplateControl templateControl;
+        private readonly SettingsControl settingsControl;
+
         private readonly AlarmMainConfiguration mainConfig;
         private readonly AlarmGenTemplateHandler templateHandler;
 
         private readonly List<AlarmGenTab> alarmTabList;
         public IEnumerable<AlarmTabConfiguration> TabConfigurations { get => this.alarmTabList.Select(tab => tab.TabConfig); }
 
-        public SettingsBindings SettingsBindings { get; init; }
-        private readonly SettingsFormCache settingsFormCache;
-
-        private AlarmGenTemplateForm? shownTemplateForm = null;
+        public List<IGenModule.ModuleControl> ModuleControls { get; init; }
 
         public AlarmGenModule()
         {
             this.multiGrid = new();
 
-            this.control = new();
+            this.tabControl = new()
+            {
+                Dock = DockStyle.Fill,
+                Padding = new Point(12, 5),
+                RequireConfirmationBeforeClosing = true,
+                SelectedIndex = 0,
+            };
+            //this.templateControl = this.CreateTemplateControl();
+
+            this.settingsControl = new()
+            {
+                Dock = DockStyle.Fill,
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
+            };
+            this.settingsControl.InitControls();
+
             this.mainConfig = new();
             this.templateHandler = new();
             GenUtils.CopyJsonFieldsAndProperties(MainForm.Settings.PresetAlarmMainConfiguration, this.mainConfig);
 
             this.alarmTabList = [];
-            this.SettingsBindings = new();
-            this.settingsFormCache = new(this.SettingsBindings, this.control);
+
+            this.ModuleControls = [
+                new() { Name = "Grids", RequestControlCallback = () => this.tabControl },
+                new() { Name = Locale.DEVICE_DATA_TEMPLATE, RequestControlCallback = this.CreateTemplateControl },
+                new() {
+                    Name = Locale.GENERICS_SETTINGS,
+                    RequestControlCallback = () => {
+                        var sequences = this.GetSettingsSequences();
+                        this.settingsControl.SetSequences(sequences);
+
+                        return this.settingsControl;
+                    }
+                },
+            ];
         }
 
         public void Init(GenModuleForm form)
         {
+            this.multiGrid.Init(form);
+
             #region TOP_BUTTONS_STRIP
-            this.control.setupButton.Click += (sender, args) => this.ToggleSettingsFormVisibility();
-            this.control.changeTemplateButton.Click += (sender, args) =>
-            {
-                var currentTabConfig = GetCurrentTabConfiguration();
-                if (currentTabConfig != null)
-                {
-                    shownTemplateForm = new AlarmGenTemplateForm(mainConfig, currentTabConfig, this.multiGrid, templateHandler);
-                    shownTemplateForm.Init();
-                    shownTemplateForm.Show(this.control);
-                    shownTemplateForm.FormClosed += (sender, args) =>
-                    {
-                        shownTemplateForm = null;
-                        this.SettingsBindings.Reload();
-                    };
-
-                    this.SettingsBindings.Reload();
-                }
-            };
-
             ToolStripMenuItem importTemplatesFromFb = new("Import templates from FB");
             importTemplatesFromFb.Click += (sender, args) =>
             {
@@ -100,7 +110,7 @@ namespace TiaUtilities.Generation.Alarms.Module
                 {
                     foreach (var filePath in fileDialog.FileNames)
                     {
-                        if(string.IsNullOrEmpty(filePath))
+                        if (string.IsNullOrEmpty(filePath))
                         {
                             continue;
                         }
@@ -144,8 +154,6 @@ namespace TiaUtilities.Generation.Alarms.Module
             form.importExportMenuItem.DropDownItems.Add(importTemplatesFromFb);
             #endregion
 
-            this.multiGrid.Init(form);
-
             #region TEMPLATE_HANDLER
             this.templateHandler.Init([]);
             this.templateHandler.TemplateRenamed += (sender, args) =>
@@ -154,15 +162,12 @@ namespace TiaUtilities.Generation.Alarms.Module
                 {
                     tab.ParseTemplateRenamed(args.OldName, args.NewName);
                 }
-
-                this.SettingsBindings.Update();
             };
-            this.templateHandler.SelectedTemplateChanged += (sender, args) => this.SettingsBindings.Update();
             #endregion
 
             #region TAB_CONTROL
-            this.control.tabControl.TabPreAdded += (sender, args) => TabCreation(args.TabPage);
-            this.control.tabControl.TabPreRemoved += (sender, args) =>
+            this.tabControl.TabAdded += (sender, args) => TabCreation(args.TabPage);
+            this.tabControl.TabRemoved += (sender, args) =>
             {
                 if (args.TabPage.Tag is AlarmGenTab tab)
                 {
@@ -170,7 +175,7 @@ namespace TiaUtilities.Generation.Alarms.Module
                 }
             };
 
-            this.control.tabControl.TabNameUserChanged += (sender, args) =>
+            this.tabControl.TabRenamed += (sender, args) =>
             {
                 var newName = args.NewName;
                 foreach (var loopTab in this.alarmTabList)
@@ -185,46 +190,31 @@ namespace TiaUtilities.Generation.Alarms.Module
                         args.NewName = fixedNewName;
                     }
                 }
-
-                this.SettingsBindings.Update();
             };
-            this.control.tabControl.Selected += (sender, args) =>
+            this.tabControl.Selected += (sender, args) =>
             {
                 if (args.TabPage?.Tag is AlarmGenTab tab)
                 {
                     tab.Selected();
-                    this.SettingsBindings.Update();
                 }
-            };
-            #endregion
-
-            #region SETTINGS_BINDINGS 
-            void placeholderRequestEvent(object? sender, PlaceholderViewRequestEventArgs args) => this.OpenPlaceholderViewer(args.Form);
-            this.SettingsBindings.PlaceholderViewerRequestEvent += placeholderRequestEvent;
-
-            form.FormClosed += (sender, args) =>
-            {
-                this.SettingsBindings.PlaceholderViewerRequestEvent -= placeholderRequestEvent;
             };
             #endregion
 
             form.Shown += (sender, args) =>
             {
-                if (this.control.tabControl.TabCount == 0)
+                if (this.tabControl.TabCount == 0)
                 { //Check required because Load could be called before form is shown!
-                    this.control.tabControl.AddTabs();
+                    this.tabControl.AddTabs();
                 }
             };
-
-            this.AddConfigurationBindings(this.SettingsBindings);
         }
 
-        public void ToggleSettingsFormVisibility()
+        public void ShowSettings()
         {
-            var containers = this.GetSettingsStepSequences();
+            var sequences = this.GetSettingsSequences();
 
-            SettingsStepForm form = new();
-            form.SetSequences(containers);
+            SettingsForm form = new();
+            form.SetSequences(sequences);
             form.ShowDialog();
 
             //this.settingsFormCache.ToggleVisibility();
@@ -253,10 +243,8 @@ namespace TiaUtilities.Generation.Alarms.Module
 
         public void Clear()
         {
-            this.SettingsBindings.Clear();
-
             this.alarmTabList.Clear();
-            this.control.tabControl.TabPages.Clear();
+            this.tabControl.TabPages.Clear();
         }
 
         public bool IsDirty() => this.mainConfig.IsDirty() || this.alarmTabList.Any(x => x.IsDirty()) || this.JsScriptHandler.IsDirty() || this.templateHandler.IsDirty();
@@ -307,13 +295,11 @@ namespace TiaUtilities.Generation.Alarms.Module
             {
                 TabPage tabPage = new();
                 TabCreation(tabPage, tabSave);
-                this.control.tabControl.TabPages.Add(tabPage);
+                this.tabControl.TabPages.Add(tabPage);
             }
 
-            this.AddConfigurationBindings(this.SettingsBindings);
-
             //Seems that the Selected event is not called in this case. Doing it manually.
-            if (this.control.tabControl.SelectedTab?.Tag is AlarmGenTab tab)
+            if (this.tabControl.SelectedTab?.Tag is AlarmGenTab tab)
             {
                 tab.Selected();
             }
@@ -329,18 +315,9 @@ namespace TiaUtilities.Generation.Alarms.Module
             ioXmlGenerator.ExportXML(folderPath);
         }
 
-        public Control? GetControl()
-        {
-            return this.control;
-        }
-
         public void OpenPlaceholderViewer(IWin32Window? window = null)
         {
-            var form = window ?? this.control.FindForm();
-            if (form == null)
-            {
-                return;
-            }
+            var form = window ?? this.tabControl.FindForm();
 
             var placeholderForm = new PlaceholderViewerForm(GenPlaceholders.Alarms.PLACEHOLDER_LIST);
             placeholderForm.Show(form);
@@ -354,7 +331,7 @@ namespace TiaUtilities.Generation.Alarms.Module
         private GenPlaceholderHandler? CreateGenericPlaceholderHandler()
         {
             var currentTabName = this.GetCurrentTabName();
-            var currentTab = this.GetCurrenTab();
+            var currentTab = this.GetCurrentTab();
 
             AlarmGenPlaceholdersHandler? placeholdersHandler = null;
             if (currentTabName != null && currentTab != null)
@@ -370,10 +347,10 @@ namespace TiaUtilities.Generation.Alarms.Module
                     placeholdersHandler.DeviceData = firstDeviceData;
                 }
 
-                if(this.templateHandler.BindingList.Count > 0)
+                if (this.templateHandler.BindingList.Count > 0)
                 {
                     var firstTemplate = this.templateHandler.BindingList[0];
-                    if(firstTemplate.AlarmGridSave.RowData.Count > 0)
+                    if (firstTemplate.AlarmGridSave.RowData.Count > 0)
                     {
                         var firstTemplateData = firstTemplate.AlarmGridSave.RowData[0];
                         placeholdersHandler.TemplateData = firstTemplateData;
@@ -389,7 +366,7 @@ namespace TiaUtilities.Generation.Alarms.Module
             return placeholdersHandler;
         }
 
-        private List<SettingsStepSequence> GetSettingsStepSequences()
+        private List<SettingsSequence> GetSettingsSequences()
         {
             string ParsePlaceholders(string str)
             {
@@ -397,26 +374,26 @@ namespace TiaUtilities.Generation.Alarms.Module
                 return placeholderHandler == null ? str : placeholderHandler.ParseNotNull(str);
             }
 
-            List<SettingsStepSequence> sequenceList = [];
+            List<SettingsSequence> sequenceList = [];
 
             var globalStepDescriptors = AlarmGenUtils.CreateGlobalSettingsStepDescriptors();
             var tablStepDescriptors = AlarmGenUtils.CreateTabSettingsStepDescriptors();
             var templateStepDescriptors = AlarmGenUtils.CreateTemplateSettingsStepDescriptor();
 
-            SettingsStepSequence globalSequence = new(this.mainConfig, "Global", "Settings") {  PlaceholdersCallBack = ParsePlaceholders }; 
+            SettingsSequence globalSequence = new(this.mainConfig, "Global", "Settings") { PlaceholdersCallBack = ParsePlaceholders };
             globalSequence.AddRange(globalStepDescriptors);
             sequenceList.Add(globalSequence);
 
-            foreach(var tab in this.alarmTabList)
+            foreach (var tab in this.alarmTabList)
             {
-                SettingsStepSequence tabSequence = new(tab.TabConfig, "Tab", tab.Name) { PlaceholdersCallBack = ParsePlaceholders };
+                SettingsSequence tabSequence = new(tab.TabConfig, "Tab", tab.Name) { PlaceholdersCallBack = ParsePlaceholders };
                 tabSequence.AddRange(tablStepDescriptors);
                 sequenceList.Add(tabSequence);
             }
 
-            foreach(var template in this.templateHandler.BindingList)
+            foreach (var template in this.templateHandler.BindingList)
             {
-                SettingsStepSequence templateSequence = new(template.TemplateConfig, "Template", template.Name) { PlaceholdersCallBack = ParsePlaceholders };
+                SettingsSequence templateSequence = new(template.TemplateConfig, "Template", template.Name) { PlaceholdersCallBack = ParsePlaceholders };
                 templateSequence.AddRange(templateStepDescriptors);
                 sequenceList.Add(templateSequence);
             }
@@ -424,40 +401,39 @@ namespace TiaUtilities.Generation.Alarms.Module
             return sequenceList;
         }
 
-        private void AddConfigurationBindings(SettingsBindings settingsBindings)
+        private AlarmGenTemplateControl CreateTemplateControl()
         {
-            AlarmGenUtils.AddMainConfigBindings(settingsBindings, this.mainConfig);
+            var currentTabConfig = this.GetCurrentTabConfiguration();
 
-            AlarmGenUtils.AddTabConfigSettings(settingsBindings,
-                this.GetCurrentTabName,
-                this.IsAnyTabSelected,
-                this.GetCurrentTabConfiguration,
-                this.GetTabConfigurationDict);
+            Validate.NotNull(currentTabConfig);
 
-            AlarmGenUtils.AddTemplateConfigSettings(settingsBindings,
-                this.GetActiveTemplateName,
-                this.IsTemplateVisible,
-                this.GetActiveTemplateConfiguration,
-                this.GetTemplateConfigurationDict);
+            AlarmGenTemplateControl control = new(this.mainConfig, currentTabConfig, this.multiGrid, this.templateHandler)
+            {
+                Dock = DockStyle.Fill,
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
+            };
+            control.Init();
+            return control;
         }
 
         private string GetCurrentTabName()
         {
-            var tabPage = this.control.tabControl.SelectedTab;
+            var tabPage = this.tabControl.SelectedTab;
             return tabPage == null ? "" : tabPage.Text;
         }
 
         private bool IsAnyTabSelected()
         {
-            return this.control.tabControl.SelectedTab != null;
+            return this.tabControl.SelectedTab != null;
         }
 
         private AlarmTabConfiguration? GetCurrentTabConfiguration()
         {
-            return this.GetCurrenTab()?.TabConfig;
+            return this.GetCurrentTab()?.TabConfig;
         }
 
-        private AlarmGenTab? GetCurrenTab() => this.control.tabControl.SelectedTab?.Tag is AlarmGenTab genTab ? genTab : null;
+        private AlarmGenTab? GetCurrentTab() => this.tabControl.SelectedTab?.Tag is AlarmGenTab genTab ? genTab : null;
 
         private Dictionary<string, ObservableConfiguration> GetTabConfigurationDict()
         {
@@ -476,11 +452,6 @@ namespace TiaUtilities.Generation.Alarms.Module
         {
             var selectedTemplate = this.templateHandler.SelectedTemplate;
             return selectedTemplate == null ? "" : selectedTemplate.Name;
-        }
-
-        private bool IsTemplateVisible()
-        {
-            return shownTemplateForm != null && shownTemplateForm.Visible;
         }
 
         private AlarmTemplateConfiguration? GetActiveTemplateConfiguration()

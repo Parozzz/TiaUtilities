@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using TiaUtilities.Generation.SettingsNew;
-using TiaUtilities.Languages;
+﻿using TiaUtilities.Languages;
 using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation

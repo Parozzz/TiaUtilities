@@ -35,6 +35,9 @@ namespace TiaUtilities.Utility
         [DllImport("user32.dll")]
         private static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
 
+        public const int MOUSEEVENTF_LEFTDOWN = 0x02;
+        public const int MOUSEEVENTF_LEFTUP = 0x04;
+
         public const int WM_ACTIVATE = 0x0006;
         public const int WM_SETFOCUS = 0x0007;
         public const int WM_KILLFOCUS = 0x0008;
@@ -53,12 +56,16 @@ namespace TiaUtilities.Utility
         public const int WM_LBUTTONDOWN = 0x0201;
         public const int WM_LBUTTONUP = 0x0202;
         public const int WM_LBUTTONDBLCLK = 0x203;
+        public const int WM_RBUTTONDOWN = 0x0204;
+        public const int WM_RBUTTONUP = 0x0205;
+        public const int WM_RBUTTONDBLCLK = 0x0206;
         public const int WM_MOUSEWHEEL = 0x020A;
         public const int WM_MOUSEHWHEEL = 0x020E;
-        public const int WM_MOUSELEAVE = 0x2A3;
+        public const int WM_MOUSELEAVE = 0x02A3;
 
-        public const int MOUSEEVENTF_LEFTDOWN = 0x02;
-        public const int MOUSEEVENTF_LEFTUP = 0x04;
+        public const int TCM_SETMINTABWIDTH = 0x1300 + 49;
+
+
 
         public const int SB_SHOW_VERT = 0x1;
         public const int SB_SHOW_BOTH = 0x3;

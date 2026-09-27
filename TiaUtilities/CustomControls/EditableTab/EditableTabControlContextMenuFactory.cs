@@ -48,38 +48,17 @@ namespace TiaUtilities.CustomControls.EditableTab
                 {
                     var oldSelectedTab = tabControl.SelectedTab;
 
-                    Dictionary<EditableTabControlQuickEditForm.RowData, EditableTabControl.CloseRequest?> rowDataWithCloseDict = [];
+                    List<TabPage> tabsToRemove = [];
                     foreach (var rowData in quickEditForm.RowsData)
                     {
-                        tabControl.RenameTab(rowData.TabPage, rowData.NameTextBox.Text);
-
-                        EditableTabControl.CloseRequest? closeRequest = null;
+                        rowData.TabPage.Text = rowData.NameTextBox.Text;
                         if (rowData.Info.NeedsDeletition)
                         {
-                            closeRequest = new() { TabPage = rowData.TabPage };
+                            tabsToRemove.Add(rowData.TabPage);
                         }
-
-                        rowDataWithCloseDict.Add(rowData, closeRequest);
                     }
 
-                    var closeRequests = rowDataWithCloseDict.Values.WhereNotNull();
-                    if (closeRequests.Any())
-                    {
-                        tabControl.CloseTabs(closeRequests);
-                    }
-
-                    var pages = rowDataWithCloseDict.OrderBy(p => p.Key.Info.Index)
-                                                    .Where(p => p.Value is null || !p.Value.Closed)
-                                                    .Select(p => p.Key.TabPage)
-                                                    .ToArray();
-
-                    tabControl.TabPages.Clear();
-                    tabControl.TabPages.AddRange(pages);
-
-                    if (oldSelectedTab != null && oldSelectedTab.Parent != null)
-                    {
-                        tabControl.SelectedTab = oldSelectedTab;
-                    }
+                    tabControl.CloseTabs(tabsToRemove);
                 }
 
                 tabControl.ResumeLayout(true);
@@ -161,7 +140,7 @@ namespace TiaUtilities.CustomControls.EditableTab
                     return;
                 }
 
-                tabControl.RenameTab(tabPage, editNameTextBox.Text);
+                tabPage.Text = editNameTextBox.Text;
             };
 
             return contextMenu;

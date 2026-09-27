@@ -38,7 +38,7 @@ namespace TiaUtilities.CustomControls.tableColorizable
         private bool _fitToControls = true;
         private Padding _padding = new(0);
 
-        internal TableLayoutPanelColorizable? TableLayoutPanel { get; set; }
+        public TableLayoutPanelColorizable? TableLayoutPanel { get; internal set; }
 
         internal void MouseState(bool newState)
         {

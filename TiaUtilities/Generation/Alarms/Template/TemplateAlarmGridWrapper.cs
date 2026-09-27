@@ -17,7 +17,7 @@ namespace TiaUtilities.Generation.Alarms.Template
         private readonly GridDataPreviewer<TemplateData> previewer;
         private readonly GridHandler<TemplateData> gridHandler;
 
-        public List<TemplateData> TemplateDataList { get => new(gridHandler.DataSource.GetNotEmptyClonedDataDict().Keys); } //Return CLONED data, otherwise operations on the xml generation will affect the table!
+        public List<TemplateData> TemplateDataList { get => [.. gridHandler.DataSource.GetNotEmptyClonedDataDict().Keys]; } //Return CLONED data, otherwise operations on the xml generation will affect the table!
 
         public TemplateAlarmGridWrapper(GenPlaceholderHandler placeholderHandler, MultiGridOperationHandler multiGrid)
         {

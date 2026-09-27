@@ -1,9 +1,6 @@
-﻿using DocumentFormat.OpenXml.Drawing.Charts;
-using TiaUtilities.Languages;
+﻿using TiaUtilities.Languages;
 using TiaUtilities.Resources;
 using TiaUtilities.Utility;
-using TiaUtilities.Utility.Extensions;
-using static TiaUtilities.SettingsNew.SettingsValueNameLabel;
 
 namespace TiaUtilities.CustomControls.EditableTab
 {
@@ -65,11 +62,6 @@ namespace TiaUtilities.CustomControls.EditableTab
             int index = 0;
             foreach (TabPage tabPage in this.tabControl.TabPages)
             {
-                if (tabPage is EditableNewTabPage)
-                {
-                    index++;
-                    continue;
-                }
 
                 CreateTabEditControl(tabPage, index);
                 index++;

@@ -5,14 +5,35 @@ using TiaUtilities.UndoRedo;
 
 namespace TiaUtilities.Generation.GridHandler
 {
-    public class GridDataSource<T>(
-        ExcelLikeDataGridView dataGridView,
-        GridDataChangedHandler dataChangedHandler) : IGridDataSource, ISaveable<Dictionary<int, T>> where T : IGridData
+    public class GridDataSource<T> : IGridDataSource, ISaveable<Dictionary<int, T>> where T : IGridData
     {
-        private readonly List<T> dataList = [];
-
+        public IReadOnlyList<GridDataColumn> DataColumns { get; init; }
         public int Count { get => dataList.Count; }
-        public IReadOnlyList<GridDataColumn> DataColumns { get; init; } = ValidateColumnList();
+
+        private readonly ExcelLikeDataGridView dataGridView;
+        private readonly GridDataChangedHandler dataChangedHandler;
+        private readonly List<T> dataList;
+
+        private readonly GridDataPropertyChangedEvent dataPropertyChanged;
+
+        public GridDataSource(ExcelLikeDataGridView dataGridView, GridDataChangedHandler dataChangedHandler)
+        {
+            this.DataColumns = GridDataSource<T>.ValidateColumnList();
+
+            this.dataGridView = dataGridView;
+            this.dataChangedHandler = dataChangedHandler;
+            this.dataList = [];
+
+            this.dataPropertyChanged = (sender, args) =>
+            {
+                var data = args.Data;
+                if (data is T t)
+                {
+                    var row = this.dataList.IndexOf(t);
+                    this.dataChangedHandler.HandleCellChangeEvent(args, row);
+                }
+            };
+        }
 
         private static IReadOnlyList<GridDataColumn> ValidateColumnList()
         {
@@ -80,7 +101,7 @@ namespace TiaUtilities.Generation.GridHandler
                 data.Clear();
             }
         }
-
+ 
         public void InitializeData(uint dataAmount)
         {
             foreach (var data in this.dataList)
@@ -92,17 +113,16 @@ namespace TiaUtilities.Generation.GridHandler
             for (int row = 0; row < dataAmount; row++)
             {
                 var data = this.CreateInstance();
+                data.DataPropertyChanged += this.dataPropertyChanged;
 
-                int savedRow = row; //If i don't do this, it will keep the ram value of row (So dataAmount - 1)
-                data.DataPropertyChanged += (sender, args) => dataChangedHandler.HandleCellChangeEvent(args, savedRow);
-
-                dataList.Add(data);
+                this.dataList.Add(data);
             }
 
-            BindingList<T> bindingList = new(this.dataList);
-            BindingSource bindingSource = new() { DataSource = bindingList };
+            //BindingList<T> bindingList = new(this.dataList);
+            //BindingSource bindingSource = new() { DataSource = bindingList };
 
-            dataGridView.DataSource = bindingSource;
+            this.dataGridView.RowCount = this.dataList.Count;
+            //dataGridView.DataSource = bindingSource;
         }
 
         public List<int> GetFirstEmptyRowIndexes(int num)

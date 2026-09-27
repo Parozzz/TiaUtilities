@@ -50,8 +50,8 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             this.deviceGridHandler.ExcelDragDone += (sender, args) => GridUtils.DragDone(args, deviceGridHandler);
 
             //Columns before GridHandler.Init()
-            SuggestionTextBoxColumn templateSuggestionColumn = new();
-            templateSuggestionColumn.SetGetItemsFunc(templateHandler.GetAllNames);
+            SuggestionTextBoxColumn templateSuggestionColumn = new() { ItemsCallback = templateHandler.GetAllNames };
+
             //COLUMNS
             this.deviceGridHandler.Columns.AddTextBox(DeviceData.NAME, 125);
             this.deviceGridHandler.Columns.Add(templateSuggestionColumn, DeviceData.TEMPLATE, 200);

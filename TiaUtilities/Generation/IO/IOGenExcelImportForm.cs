@@ -6,10 +6,8 @@ using System.Text.RegularExpressions;
 using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.IO.Configurations;
 using TiaUtilities.Generation.IO.Data;
-using TiaUtilities.Generation.SettingsNew;
 using TiaUtilities.Languages;
 using TiaUtilities.Resources;
-using TiaUtilities.SettingsNew.Bindings;
 using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.IO.Module.ExcelImporter
@@ -21,7 +19,6 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
         private readonly IOExcelImportConfiguration excelImportConfig;
         private readonly GridHandler<IOGenExcelImportData> gridHandler;
 
-        private readonly SettingsBindings settingsBindings;
         public IEnumerable<IOGenExcelImportData> ImportDataEnumerable { get => gridHandler.DataSource.GetNotEmptyDataDict().Keys; }
 
         public IOGenerationExcelImportForm(GridSettings gridSettings, MultiGridOperationHandler multiGrid, IOExcelImportConfiguration configuration)
@@ -30,8 +27,6 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
 
             this.excelImportConfig = configuration;
             this.gridHandler = new(gridSettings, multiGrid, new(), new()) { InitializeRowCount = 1999 };
-
-            this.settingsBindings = new();
 
             Init();
         }
@@ -78,8 +73,7 @@ namespace TiaUtilities.Generation.IO.Module.ExcelImporter
 
             gridHandler.Init();
 
-            IOGenUtils.AddExcelImporterSettingsBindings(this.settingsBindings, this.excelImportConfig);
-            this.setupButton.Click += (sender, args) => new SettingsForm(this.settingsBindings).ShowDialog(this);
+            //this.setupButton.Click += (sender, args) => new SettingsForm(this.settingsBindings).ShowDialog(this);
 
             this.importExcelButton.Click += (sender, args) =>
             {

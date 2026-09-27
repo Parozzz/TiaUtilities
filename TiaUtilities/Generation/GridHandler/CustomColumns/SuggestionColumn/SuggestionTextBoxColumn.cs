@@ -5,8 +5,9 @@ namespace TiaUtilities.Generation.GridHandler.CustomColumns.SuggestionColumn
 {
     public class SuggestionTextBoxColumn : DataGridViewTextBoxColumn, IGridCustomColumnProcessCmdKey
     {
-        internal ToolStripDropDown? dropDown;
-        internal Func<IEnumerable<string?>>? GetItemsFunc;
+        public required Func<IEnumerable<string>> ItemsCallback;
+
+        internal ToolStripDropDown? ActiveDropDown { get; set; }
 
         internal bool inEditMode;
 
@@ -15,23 +16,18 @@ namespace TiaUtilities.Generation.GridHandler.CustomColumns.SuggestionColumn
             this.CellTemplate = new SuggestionTextBoxCell();
         }
 
-        public void SetGetItemsFunc(Func<IEnumerable<string?>> GetItemsFunc)
-        {
-            this.GetItemsFunc = GetItemsFunc;
-        }
-
         public bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            if (this.dropDown == null || !inEditMode)
+            if (this.ActiveDropDown == null || this.ActiveDropDown.IsDisposed || !inEditMode)
             {
                 return false;
             }
             
             if (keyData == Keys.Up || keyData == Keys.Down)
             {//DropDown already support scrolling with arrows! This will focus it to enable it.
-                var focused = this.dropDown.Focused;
-                this.dropDown.Focus();
-                this.dropDown.Select();
+                var focused = this.ActiveDropDown.Focused;
+                this.ActiveDropDown.Focus();
+                this.ActiveDropDown.Select();
                 if (!focused) //This will avoid that the first arrow sent is skipped!
                 {
                     SendKeys.SendWait(keyData == Keys.Up ? "{UP}" : "{DOWN}");
@@ -44,15 +40,15 @@ namespace TiaUtilities.Generation.GridHandler.CustomColumns.SuggestionColumn
 
         internal void UpdateVisibileSuggestions(string text)
         {
-            if (this.dropDown == null || !inEditMode)
+            if (this.ActiveDropDown == null || this.ActiveDropDown.IsDisposed || !inEditMode)
             {
                 return;
             }
 
-            this.dropDown.SuspendLayout(); //Without this is unusable. Cursor blink and is SLLLLLOOOOOOWWWW.
+            this.ActiveDropDown.SuspendLayout(); //Without this is unusable. Cursor blink and is SLLLLLOOOOOOWWWW.
 
             int visibleItemCount = 0;
-            foreach (ToolStripItem item in this.dropDown.Items)
+            foreach (ToolStripItem item in this.ActiveDropDown.Items)
             {
                 var itemText = item.Text;
                 item.Visible = text != null && itemText != null && itemText.Contains(text, StringComparison.OrdinalIgnoreCase);// && !itemText.Equals(text, StringComparison.OrdinalIgnoreCase);
@@ -62,8 +58,8 @@ namespace TiaUtilities.Generation.GridHandler.CustomColumns.SuggestionColumn
                 }
             }
 
-            this.dropDown.MinimumSize = new Size(0, visibleItemCount <= 6 ? 25 * visibleItemCount : 0); //If there too little elements, they are not displayed correctly. This fixes it.
-            this.dropDown.ResumeLayout(true);
+            this.ActiveDropDown.MinimumSize = new Size(0, visibleItemCount <= 6 ? 25 * visibleItemCount : 0); //If there too little elements, they are not displayed correctly. This fixes it.
+            this.ActiveDropDown.ResumeLayout(true);
         }
     }
 }

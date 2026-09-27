@@ -4,7 +4,6 @@ using Jint;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using TiaUtilities.Generation.GridHandler.CustomColumns;
 using TiaUtilities.Languages;
-using TiaUtilities.SettingsNew;
 using TiaUtilities.Utility;
 
 namespace TiaUtilities

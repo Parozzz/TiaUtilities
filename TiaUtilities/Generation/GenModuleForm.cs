@@ -1,30 +1,40 @@
 ﻿using InfoBox;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Reflection;
+using TiaUtilities.Configuration;
 using TiaUtilities.Constants;
-using TiaUtilities.Generation.SettingsNew;
 using TiaUtilities.Generation.TextsEditor;
 using TiaUtilities.Languages;
 using TiaUtilities.Resources;
+using TiaUtilities.SettingsStep.CustomControls;
+using TiaUtilities.Styles;
 using TiaUtilities.Utility;
+using TiaUtilities.Utility.Extensions;
 
 namespace TiaUtilities.Generation
 {
     public partial class GenModuleForm : Form
     {
+        private const int CONTROL_ROW = 2;
+
         private readonly IGenModule module;
         private readonly TimedSaveHandler autoSaveHandler;
 
         private bool projectLoading = false;
-
         protected string? openProjectFilePath;
+
+        private readonly ObservableObject<IGenModule.ModuleControl?> activeModuleControl;
+        private readonly Dictionary<IGenModule.ModuleControl, LabelColorizable> moduleControlLabelDict;
 
         public GenModuleForm(IGenModule generationProject, TimedSaveHandler autoSaveHandler)
         {
+            InitializeComponent();
+
             this.module = generationProject;
             this.autoSaveHandler = autoSaveHandler;
 
-            InitializeComponent();
+            this.activeModuleControl = new(null);
+            this.moduleControlLabelDict = [];
 
             Init();
         }
@@ -72,8 +82,8 @@ namespace TiaUtilities.Generation
             #endregion
 
             #region TOP_MENU_PROGRAM
-            this.programSettingsMenuItem.Click += (sender, args) => new SettingsForm(MainForm.SettingsBindings).Show(this);
-            this.programModuleSetupMenuItem.Click += (sender, args) => this.module.ToggleSettingsFormVisibility();
+            this.programSettingsMenuItem.Click += (sender, args) => MainForm.ShowSettingsForm();
+            this.programModuleSetupMenuItem.Click += (sender, args) => this.module.ShowSettings();
             #endregion
 
             #region TOP_MENU_IMPORT_EXPORT
@@ -123,9 +133,74 @@ namespace TiaUtilities.Generation
             this.FormClosed += (sender, args) => this.autoSaveHandler.RemoveTickEventHandler(eventHandler);
             #endregion
 
-            module.Init(this);
+            this.module.Init(this);
 
-            this.formTableLayout.Controls.Add(this.module.GetControl());
+            var labels = module.ModuleControls.Select(m =>
+            {
+                LabelColorizable label = new()
+                {
+                    AutoSize = true,
+
+                    BackColor = Color.Transparent,
+                    MouseHoverBackColor = Color.FromArgb(40, Color.Cyan),
+                    MouseDownBackColor = Color.FromArgb(120, Color.Cyan),
+
+                    BorderRadius = 4,
+                    BorderWidth = 0,
+                    BorderColor = Color.DimGray,
+
+                    Padding = new(4),
+                    Margin = new(5),
+                    Text = m.Name,
+
+                    Font = StyleManager.Fonts.NORMAL_BOLD,
+                };
+                label.Click += (sender, args) => this.activeModuleControl.Value = m;
+
+                this.moduleControlLabelDict.Add(m, label);
+
+                return label;
+            });
+            this.selectControlButtonPanel.Controls.AddRange([.. labels]);
+
+            this.activeModuleControl.Changed += (sender, args) =>
+            {
+                var oldModuleControl = args.OldValue;
+                var newModuleControl = args.NewValue;
+
+                this.selectControlButtonPanel.SuspendLayout();
+                this.formTableLayout.SuspendLayout();
+
+                var tableControls = this.formTableLayout.Controls;
+
+                var oldControl = this.formTableLayout.GetControlFromPosition(0, CONTROL_ROW);
+                tableControls.Remove(oldControl);
+
+                if(oldModuleControl != null)
+                {
+                    if(this.moduleControlLabelDict.TryGetValue(oldModuleControl, out var label))
+                    {
+                        label.Margin = new(5);
+                        label.BorderWidth = 0;
+                    }
+                }
+
+                if(newModuleControl != null)
+                {
+                    var control = newModuleControl.RequestControlCallback();
+                    tableControls.Add(control, 0, CONTROL_ROW);
+
+                    if (this.moduleControlLabelDict.TryGetValue(newModuleControl, out var label))
+                    {
+                        label.Margin = new(4);
+                        label.BorderWidth = 1;
+                    }
+                }
+
+                this.formTableLayout.ResumeLayout();
+                this.selectControlButtonPanel.ResumeLayout();
+            };
+            this.activeModuleControl.Value = this.module.ModuleControls.FirstOrDefault();
 
             Translate();
         }
@@ -148,8 +223,6 @@ namespace TiaUtilities.Generation
 
             this.importExportMenuItem.Text = Locale.GEN_FORM_IMPORT_EXPORT;
             this.exportXMLMenuItem.Text = Locale.GEN_FORM_IMPORT_EXPORT_EXPORT_XML;
-
-
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -171,7 +244,7 @@ namespace TiaUtilities.Generation
                         this.ModuleLoad();
                         return true; //Return required otherwise will write the letter.
                     case Keys.I | Keys.Control:
-                        new SettingsForm(this.module.SettingsBindings).Show(this);
+                        this.module.ShowSettings();
                         return true;
                     case Keys.Q | Keys.Control:
                         this.module.OpenPlaceholderViewer(this);
@@ -211,7 +284,7 @@ namespace TiaUtilities.Generation
 
 
             var filePath = this.openProjectFilePath;
-            if(string.IsNullOrEmpty(filePath))
+            if (string.IsNullOrEmpty(filePath))
             {
                 filePath = MainForm.Settings.GetSavedFileDialogPath(FileDialogResources.GENERATION_SAVE);
             }
@@ -235,7 +308,7 @@ namespace TiaUtilities.Generation
             projectLoading = true;
 
             var filePath = this.openProjectFilePath;
-            if(string.IsNullOrEmpty(filePath))
+            if (string.IsNullOrEmpty(filePath))
             {
                 filePath = MainForm.Settings.GetSavedFileDialogPath(FileDialogResources.GENERATION_LOAD);
             }

@@ -1,14 +1,14 @@
 ﻿using SimaticML;
 using SimaticML.Enums;
-using TiaUtilities.Configuration;
 using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.IO.Configurations;
 using TiaUtilities.Generation.IO.Data;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Languages;
-using TiaUtilities.SettingsNew.Bindings;
+using TiaUtilities.SettingsStep;
 using TiaUtilities.Utility;
+using static TiaUtilities.SettingsStep.ControlFactory.SettingsFactoryGeneralOptions;
 
 namespace TiaUtilities.Generation.IO
 {
@@ -86,83 +86,78 @@ namespace TiaUtilities.Generation.IO
             }
         }
 
-        public static void AddMainConfigBindings(SettingsBindings settingsBindings, IOMainConfiguration mainConfig)
+        public static List<SettingsSequencePanelDescriptor> CreateGlobalSettingsDescriptors()
         {
-            mainConfig.Subscribe(() => mainConfig.MemoryType, v => settingsBindings.Update());
+            var genericStepDescriptor = new SettingsSequencePanelDescriptor(Locale.GENERICS_CONFIGURATION)
+            .CreateBinder<IOMainConfiguration>()
+            .StartGroup(Locale.GENERICS_CONFIGURATION)
+                .Add(x => x.GroupingType, Locale.IO_SETTINGS_GROUPING_TYPE, Locale.IO_SETTINGS_GROUPING_TYPE_DESC)
+                .Add(x => x.MemoryType, Locale.IO_SETTINGS_MEMORY_TYPE, Locale.IO_SETTINGS_MEMORY_TYPE_DESC)
+            .End();
 
-            settingsBindings
-                .MacroSection("IO Gen", true, mainConfig, MainForm.Settings.PresetIOMainConfiguration)
+            var ioTableStepDescriptor = new SettingsSequencePanelDescriptor(Locale.IO_GEN_CONFIG_IO_TABLE)
+                .CreateBinder<IOMainConfiguration>()
+                .StartGroup(Locale.IO_GEN_CONFIG_IO_TABLE)
+                    .Add(x => x.IOTableName, Locale.GENERICS_NAME, Locale.IO_SETTINGS_IO_TABLE_NAME_DESC, options: new() { SupportPlaceholders = true })
+                    .Add(x => x.IOTableSplitEvery, Locale.IO_SETTINGS_IO_TABLE_SPLIT_EVERY, Locale.IO_SETTINGS_IO_TABLE_SPLIT_EVERY_DESC)
+                    .Add(x => x.DefaultIoName, Locale.IO_SETTINGS_IO_TABLE_DEFAULT_NAME, Locale.IO_SETTINGS_IO_TABLE_DEFAULT_NAME_DESC, options: new() { SupportPlaceholders = true })
+                .End();
 
-                .Section(Locale.GENERICS_CONFIGURATION)
-                .AddEnum(nameof(IOMainConfiguration.GroupingType), Locale.IO_SETTINGS_GROUPING_TYPE, Locale.IO_SETTINGS_GROUPING_TYPE_DESC)
-                .AddEnum(nameof(IOMainConfiguration.MemoryType), Locale.IO_SETTINGS_MEMORY_TYPE, Locale.IO_SETTINGS_MEMORY_TYPE_DESC)
+            var aliasDbStepDescriptor = new SettingsSequencePanelDescriptor(Locale.IO_GEN_CONFIG_ALIAS_DB/*, enabledFunc: () => mainConfig.MemoryType == IOMemoryTypeEnum.DB*/)
+                .CreateBinder<IOMainConfiguration>()
+                .StartGroup(Locale.IO_GEN_CONFIG_ALIAS_DB)
+                    .Add(x => x.DBName, Locale.GENERICS_NAME, Locale.IO_SETTINGS_ALIAS_DB_NAME_DESC.Replace("<placeholder>", GenPlaceholders.IO.CONFIG_DB_NAME), options: new() { SupportPlaceholders = true })
+                    .Add(x => x.DBNumber, Locale.GENERICS_NUMBER, Locale.IO_SETTINGS_ALIAS_DB_NUMBER_DESC.Replace("<placeholder>", GenPlaceholders.IO.CONFIG_DB_NAME))
+                    .Add(x => x.DefaultDBInputVariable, Locale.IO_SETTINGS_ALIAS_DB_INPUT_DEFAULT, "", options: new() { SupportPlaceholders = true })
+                    .Add(x => x.DefaultDBOutputVariable, Locale.IO_SETTINGS_ALIAS_DB_OUTPUT_DEFAULT, "", options: new() { SupportPlaceholders = true })
+                .End();
 
-                .Section(Locale.IO_GEN_CONFIG_IO_TABLE)
-                .AddString(nameof(IOMainConfiguration.IOTableName), Locale.GENERICS_NAME, Locale.IO_SETTINGS_IO_TABLE_NAME_DESC)
-                .SetHasPlaceholderSupportDotMark()
-                .AddString(nameof(IOMainConfiguration.IOTableSplitEvery), Locale.IO_SETTINGS_IO_TABLE_SPLIT_EVERY, Locale.IO_SETTINGS_IO_TABLE_SPLIT_EVERY_DESC)
-                .AddString(nameof(IOMainConfiguration.DefaultIoName), Locale.IO_SETTINGS_IO_TABLE_DEFAULT_NAME, Locale.IO_SETTINGS_IO_TABLE_DEFAULT_NAME_DESC)
-                .SetHasPlaceholderSupportDotMark()
+            var aliasTableStepDescriptor = new SettingsSequencePanelDescriptor(Locale.IO_GEN_CONFIG_ALIAS_TABLE/*, enabledFunc: () => mainConfig.MemoryType == IOMemoryTypeEnum.MERKER*/)
+                .CreateBinder<IOMainConfiguration>()
+                .StartGroup(Locale.IO_GEN_CONFIG_ALIAS_TABLE)
+                    .Add(x => x.VariableTableName, Locale.GENERICS_NAME, Locale.IO_SETTINGS_ALIAS_TABLE_NAME_DESC, options: new() { SupportPlaceholders = true })
+                    .Add(x => x.VariableTableSplitEvery, Locale.IO_SETTINGS_ALIAS_TABLE_SPLIT_EVERY, Locale.IO_SETTINGS_IO_TABLE_SPLIT_EVERY_DESC)
+                    .Add(x => x.VariableTableInputStartAddress, Locale.IO_SETTINGS_ALIAS_TABLE_INPUT_START_NUMBER, "")
+                    .Add(x => x.DefaultMerkerInputVariable, Locale.IO_SETTINGS_ALIAS_TABLE_INPUT_DEFAULT_NAME, "", options: new() { SupportPlaceholders = true })
+                    .Add(x => x.VariableTableOutputStartAddress, Locale.IO_SETTINGS_ALIAS_TABLE_OUTPUT_START_NUMBER, "")
+                    .Add(x => x.DefaultMerkerOutputVariable, Locale.IO_SETTINGS_ALIAS_TABLE_OUTPUT_DEFAULT_NAME, "", options: new() { SupportPlaceholders = true })
+                .End();
 
-                .Section(Locale.IO_GEN_CONFIG_ALIAS_DB, enabledFunc: () => mainConfig.MemoryType == IOMemoryTypeEnum.DB)
-                .AddString(nameof(IOMainConfiguration.DBName), Locale.GENERICS_NAME, Locale.IO_SETTINGS_ALIAS_DB_NAME_DESC.Replace("<placeholder>", GenPlaceholders.IO.CONFIG_DB_NAME)).SetHasPlaceholderSupportDotMark()
-                .AddUInt(nameof(IOMainConfiguration.DBNumber), Locale.GENERICS_NUMBER, Locale.IO_SETTINGS_ALIAS_DB_NUMBER_DESC.Replace("<placeholder>", GenPlaceholders.IO.CONFIG_DB_NAME))
-                .AddString(nameof(IOMainConfiguration.DefaultDBInputVariable), Locale.IO_SETTINGS_ALIAS_DB_INPUT_DEFAULT, "")
-                .SetHasPlaceholderSupportDotMark()
-                .AddString(nameof(IOMainConfiguration.DefaultDBOutputVariable), Locale.IO_SETTINGS_ALIAS_DB_OUTPUT_DEFAULT, "")
-                .SetHasPlaceholderSupportDotMark()
-
-
-                .Section(Locale.IO_GEN_CONFIG_ALIAS_TABLE, enabledFunc: () => mainConfig.MemoryType == IOMemoryTypeEnum.MERKER)
-                .AddString(nameof(IOMainConfiguration.VariableTableName), Locale.GENERICS_NAME, Locale.IO_SETTINGS_ALIAS_TABLE_NAME_DESC)
-                .SetHasPlaceholderSupportDotMark()
-                .AddUInt(nameof(IOMainConfiguration.VariableTableSplitEvery), Locale.IO_SETTINGS_ALIAS_TABLE_SPLIT_EVERY, Locale.IO_SETTINGS_IO_TABLE_SPLIT_EVERY_DESC)
-                .AddUInt(nameof(IOMainConfiguration.VariableTableInputStartAddress), Locale.IO_SETTINGS_ALIAS_TABLE_INPUT_START_NUMBER, "")
-                .AddUInt(nameof(IOMainConfiguration.DefaultMerkerInputVariable), Locale.IO_SETTINGS_ALIAS_TABLE_INPUT_DEFAULT_NAME, "")
-                .SetHasPlaceholderSupportDotMark()
-                .AddUInt(nameof(IOMainConfiguration.VariableTableOutputStartAddress), Locale.IO_SETTINGS_ALIAS_TABLE_OUTPUT_START_NUMBER, "")
-                .AddUInt(nameof(IOMainConfiguration.DefaultMerkerOutputVariable), Locale.IO_SETTINGS_ALIAS_TABLE_OUTPUT_DEFAULT_NAME, "")
-                .SetHasPlaceholderSupportDotMark();
+            return [genericStepDescriptor, ioTableStepDescriptor, aliasDbStepDescriptor, aliasTableStepDescriptor];
         }
 
-        public static void AddTabConfigSettings(SettingsBindings settingsBindings,
-            Func<string> nameFunc, Func<bool> isVisibileFunc,
-            Func<IOTabConfiguration?> tabConfigFunc, Func<Dictionary<string, ObservableConfiguration>> tabDictFunc)
+        public static List<SettingsSequencePanelDescriptor> CreateTabSettingsDescriptors()
         {
-            settingsBindings
-                .MacroSection(nameFunc, isVisibileFunc, tabConfigFunc, MainForm.Settings.PresetIOTabConfiguration, tabDictFunc)
+            var fcStepDescriptor = new SettingsSequencePanelDescriptor(Locale.IO_GEN_CONFIG_FC)
+            .CreateBinder<IOTabConfiguration>()
+            .StartGroup(Locale.IO_GEN_CONFIG_FC)
+                .Add(x => x.FCBlockName, Locale.GENERICS_NAME, "", options: new() { SupportPlaceholders = true })
+                .Add(x => x.FCBlockNumber, Locale.GENERICS_NUMBER, "")
+            .End();
 
-                .Section(Locale.IO_GEN_CONFIG_FC)
-                .AddString(nameof(IOTabConfiguration.FCBlockName), Locale.GENERICS_NAME, "")
-                .SetHasPlaceholderSupportDotMark()
-                .AddString(nameof(IOTabConfiguration.FCBlockNumber), Locale.GENERICS_NUMBER, "")
+            var segmentStepDescriptor = new SettingsSequencePanelDescriptor(Locale.IO_GEN_CONFIG_SEGMENT)
+                .CreateBinder<IOTabConfiguration>()
+                .StartGroup(Locale.IO_GEN_CONFIG_SEGMENT)
+                    .Add(x => x.SegmentNameBitGrouping, Locale.IO_SETTINGS_SEGMENT_BIT_GROUPING, "", options: new() { SupportPlaceholders = true })
+                    .Add(x => x.SegmentNameByteGrouping, Locale.IO_SETTINGS_SEGMENT_BYTE_GROUPING, "", options: new() { SupportPlaceholders = true })
+                .End();
 
-                .Section(Locale.IO_GEN_CONFIG_SEGMENT)
-                .AddString(nameof(IOTabConfiguration.SegmentNameBitGrouping), Locale.IO_SETTINGS_SEGMENT_BIT_GROUPING, "")
-                .SetHasPlaceholderSupportDotMark()
-                .AddString(nameof(IOTabConfiguration.SegmentNameByteGrouping), Locale.IO_SETTINGS_SEGMENT_BYTE_GROUPING, "")
-                .SetHasPlaceholderSupportDotMark();
+            return [fcStepDescriptor, segmentStepDescriptor];
         }
 
-        public static void AddExcelImporterSettingsBindings(SettingsBindings settingsBindings, IOExcelImportConfiguration excelImportConfig)
+        public static List<SettingsSequencePanelDescriptor> CreateExcelSettingsDescriptors()
         {
-            settingsBindings
-                .MacroSection(Locale.IO_SETTINGS_EXCELIMPORT, true, excelImportConfig, MainForm.Settings.PresetIOExcelImportConfiguration)
+            var descriptor = new SettingsSequencePanelDescriptor(Locale.GENERICS_ADDRESS)
+                .CreateBinder<IOExcelImportConfiguration>()
+                .StartGroup(Locale.GENERICS_ADDRESS)
+                    .Add(x => x.AddressCellConfig, Locale.GENERICS_ADDRESS, description: Locale.IO_SETTINGS_EXCELIMPORT_ADDRESS_DESC)
+                    .Add(x => x.IONameCellConfig, Locale.IO_SETTINGS_EXCELIMPORT_IO_NAME, description: Locale.IO_SETTINGS_EXCELIMPORT_IO_NAME_DESC, options: new() { StringSpecifiedEditor = StringCustomEditor.JS })
+                    .Add(x => x.CommentCellConfig, Locale.GENERICS_COMMENT, description: Locale.IO_SETTINGS_EXCELIMPORT_COMMENT_DESC)
+                    .Add(x => x.StartingRow, Locale.IO_SETTINGS_EXCELIMPORT_STARTING_ROW, description: Locale.IO_SETTINGS_EXCELIMPORT_STARTING_ROW_DESC)
+                    .Add(x => x.IgnoreRowExpressionConfig, Locale.IO_SETTINGS_EXCELIMPORT_EXPRESSION, description: Locale.IO_SETTINGS_EXCELIMPORT_EXPRESSION_DESC, options: new() { StringSpecifiedEditor = StringCustomEditor.JS })
+                .End();
 
-                .Section(Locale.GENERICS_ADDRESS)
-                .AddString(nameof(IOExcelImportConfiguration.AddressCellConfig), description: Locale.IO_SETTINGS_EXCELIMPORT_ADDRESS_DESC)
-
-                .Section(Locale.IO_SETTINGS_EXCELIMPORT_IO_NAME)
-                .AddJavascript(nameof(IOExcelImportConfiguration.IONameCellConfig), description: Locale.IO_SETTINGS_EXCELIMPORT_IO_NAME_DESC)
-
-                .Section(Locale.GENERICS_COMMENT)
-                .AddString(nameof(IOExcelImportConfiguration.CommentCellConfig), description: Locale.IO_SETTINGS_EXCELIMPORT_COMMENT_DESC)
-
-                .Section(Locale.IO_SETTINGS_EXCELIMPORT_STARTING_ROW)
-                .AddString(nameof(IOExcelImportConfiguration.StartingRow), description: Locale.IO_SETTINGS_EXCELIMPORT_STARTING_ROW_DESC)
-
-                .Section(Locale.IO_SETTINGS_EXCELIMPORT_EXPRESSION)
-                .AddJavascript(nameof(IOExcelImportConfiguration.IgnoreRowExpressionConfig), description: Locale.IO_SETTINGS_EXCELIMPORT_EXPRESSION_DESC);
+            return [descriptor];
         }
     }
 }

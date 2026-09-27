@@ -1,19 +1,19 @@
-﻿using TiaUtilities.Generation.Alarms.Module.Template;
-using TiaUtilities.Generation.Alarms.Module;
+﻿using TiaUtilities.Properties;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
-namespace TiaUtilities.Generation.Alarms.Module.Template
+namespace TiaUtilities.Generation.Alarms.Template
 {
-    partial class AlarmGenTemplateForm
+    partial class AlarmGenTemplateControl
     {
-        /// <summary>
-        /// Required designer variable.
+        /// <summary> 
+        /// Variabile di progettazione necessaria.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// Clean up any resources being used.
+        /// <summary> 
+        /// Pulire le risorse in uso.
         /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        /// <param name="disposing">ha valore true se le risorse gestite devono essere eliminate, false in caso contrario.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -23,19 +23,19 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
             base.Dispose(disposing);
         }
 
-        #region Windows Form Designer generated code
+        #region Codice generato da Progettazione componenti
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
+        /// <summary> 
+        /// Metodo necessario per il supporto della finestra di progettazione. Non modificare 
+        /// il contenuto del metodo con l'editor di codice.
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AlarmGenTemplateForm));
             mainPanel = new TableLayoutPanel();
             topPanel = new FlowLayoutPanel();
             selectPanel = new TableLayoutPanel();
             selectLabel = new Label();
+            selectComboBox = new TiaUtilities.CustomControls.FlatComboBox();
             addButton = new Button();
             removeButton = new Button();
             renameButton = new Button();
@@ -54,12 +54,11 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
             mainPanel.Controls.Add(topPanel, 0, 0);
             mainPanel.Dock = DockStyle.Fill;
             mainPanel.Location = new Point(0, 0);
-            mainPanel.Margin = new Padding(3, 4, 3, 4);
             mainPanel.Name = "mainPanel";
             mainPanel.RowCount = 2;
             mainPanel.RowStyles.Add(new RowStyle());
             mainPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            mainPanel.Size = new Size(1810, 1015);
+            mainPanel.Size = new Size(1584, 761);
             mainPanel.TabIndex = 0;
             // 
             // topPanel
@@ -72,10 +71,9 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
             topPanel.Controls.Add(renameButton);
             topPanel.Controls.Add(cloneButton);
             topPanel.Dock = DockStyle.Fill;
-            topPanel.Location = new Point(3, 4);
-            topPanel.Margin = new Padding(3, 4, 3, 4);
+            topPanel.Location = new Point(3, 3);
             topPanel.Name = "topPanel";
-            topPanel.Size = new Size(1804, 30);
+            topPanel.Size = new Size(1578, 37);
             topPanel.TabIndex = 0;
             // 
             // selectPanel
@@ -87,12 +85,12 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
             selectPanel.ColumnStyles.Add(new ColumnStyle());
             selectPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             selectPanel.Controls.Add(selectLabel, 0, 0);
-            selectPanel.Location = new Point(3, 4);
-            selectPanel.Margin = new Padding(3, 4, 3, 4);
+            selectPanel.Controls.Add(selectComboBox, 1, 0);
+            selectPanel.Location = new Point(3, 3);
             selectPanel.Name = "selectPanel";
             selectPanel.RowCount = 1;
             selectPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            selectPanel.Size = new Size(124, 22);
+            selectPanel.Size = new Size(265, 31);
             selectPanel.TabIndex = 0;
             // 
             // selectLabel
@@ -101,90 +99,89 @@ namespace TiaUtilities.Generation.Alarms.Module.Template
             selectLabel.Dock = DockStyle.Fill;
             selectLabel.Location = new Point(4, 1);
             selectLabel.Name = "selectLabel";
-            selectLabel.Size = new Size(115, 20);
+            selectLabel.Size = new Size(90, 29);
             selectLabel.TabIndex = 0;
             selectLabel.Text = "Select Template";
             selectLabel.TextAlign = ContentAlignment.MiddleLeft;
             // 
+            // selectComboBox
+            // 
+            selectComboBox.BackColor = SystemColors.Control;
+            selectComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            selectComboBox.FormattingEnabled = true;
+            selectComboBox.Location = new Point(101, 4);
+            selectComboBox.Name = "selectComboBox";
+            selectComboBox.Size = new Size(160, 28);
+            selectComboBox.TabIndex = 1;
+            // 
             // addButton
             // 
+            addButton.AutoSize = true;
             addButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            addButton.BackgroundImage = (Image)resources.GetObject("addButton.BackgroundImage");
-            addButton.BackgroundImageLayout = ImageLayout.Zoom;
-            addButton.Dock = DockStyle.Left;
             addButton.FlatAppearance.BorderColor = SystemColors.Control;
             addButton.FlatStyle = FlatStyle.Flat;
             addButton.Font = new Font("Segoe UI", 11F);
-            addButton.Location = new Point(139, 0);
-            addButton.Margin = new Padding(9, 0, 0, 0);
+            addButton.Location = new Point(279, 0);
+            addButton.Margin = new Padding(8, 0, 0, 0);
             addButton.Name = "addButton";
-            addButton.Size = new Size(42, 30);
+            addButton.Size = new Size(37, 37);
             addButton.TabIndex = 1;
+            addButton.Text = "ADD";
             addButton.UseVisualStyleBackColor = true;
             // 
             // removeButton
             // 
+            removeButton.AutoSize = true;
             removeButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            removeButton.BackgroundImage = (Image)resources.GetObject("removeButton.BackgroundImage");
-            removeButton.BackgroundImageLayout = ImageLayout.Zoom;
-            removeButton.Dock = DockStyle.Left;
             removeButton.FlatAppearance.BorderColor = SystemColors.Control;
             removeButton.FlatStyle = FlatStyle.Flat;
             removeButton.Font = new Font("Segoe UI", 11F);
-            removeButton.Location = new Point(190, 0);
-            removeButton.Margin = new Padding(9, 0, 0, 0);
+            removeButton.Location = new Point(324, 0);
+            removeButton.Margin = new Padding(8, 0, 0, 0);
             removeButton.Name = "removeButton";
-            removeButton.Size = new Size(42, 30);
+            removeButton.Size = new Size(37, 37);
             removeButton.TabIndex = 2;
+            removeButton.Text = "REMOVE";
             removeButton.UseVisualStyleBackColor = true;
             // 
             // renameButton
             // 
+            renameButton.AutoSize = true;
             renameButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            renameButton.BackgroundImage = (Image)resources.GetObject("renameButton.BackgroundImage");
-            renameButton.BackgroundImageLayout = ImageLayout.Zoom;
-            renameButton.Dock = DockStyle.Left;
             renameButton.FlatAppearance.BorderColor = SystemColors.Control;
             renameButton.FlatStyle = FlatStyle.Flat;
             renameButton.Font = new Font("Segoe UI", 11F);
-            renameButton.Location = new Point(241, 0);
-            renameButton.Margin = new Padding(9, 0, 0, 0);
+            renameButton.Location = new Point(369, 0);
+            renameButton.Margin = new Padding(8, 0, 0, 0);
             renameButton.Name = "renameButton";
-            renameButton.Size = new Size(46, 30);
+            renameButton.Size = new Size(40, 37);
             renameButton.TabIndex = 3;
+            renameButton.Text = "RENAME";
             renameButton.UseVisualStyleBackColor = true;
             // 
             // cloneButton
             // 
+            cloneButton.AutoSize = true;
             cloneButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            cloneButton.BackgroundImage = (Image)resources.GetObject("cloneButton.BackgroundImage");
-            cloneButton.BackgroundImageLayout = ImageLayout.Zoom;
-            cloneButton.Dock = DockStyle.Left;
             cloneButton.FlatAppearance.BorderColor = SystemColors.Control;
             cloneButton.FlatStyle = FlatStyle.Flat;
             cloneButton.Font = new Font("Segoe UI", 11F);
-            cloneButton.Location = new Point(296, 0);
-            cloneButton.Margin = new Padding(9, 0, 0, 0);
+            cloneButton.Location = new Point(417, 0);
+            cloneButton.Margin = new Padding(8, 0, 0, 0);
             cloneButton.Name = "cloneButton";
-            cloneButton.Size = new Size(46, 30);
+            cloneButton.Size = new Size(40, 37);
             cloneButton.TabIndex = 4;
+            cloneButton.Text = "CLONE";
             cloneButton.UseVisualStyleBackColor = true;
             // 
-            // AlarmGenTemplateForm
+            // AlarmGenTemplateControl
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1810, 1015);
+            AutoSizeMode = AutoSizeMode.GrowAndShrink;
             Controls.Add(mainPanel);
-            DoubleBuffered = true;
-            Margin = new Padding(3, 4, 3, 4);
-            MaximizeBox = false;
-            MinimizeBox = false;
-            Name = "AlarmGenTemplateForm";
-            ShowIcon = false;
-            ShowInTaskbar = false;
-            StartPosition = FormStartPosition.CenterParent;
-            Text = "Template Editor";
+            Name = "AlarmGenTemplateControl";
+            Size = new Size(700, 250);
             mainPanel.ResumeLayout(false);
             mainPanel.PerformLayout();
             topPanel.ResumeLayout(false);

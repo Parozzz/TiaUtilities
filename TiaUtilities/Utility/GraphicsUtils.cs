@@ -40,7 +40,7 @@ namespace TiaUtilities.Utility
             graphics.FillPath(brush, path);
         }
 
-        private static GraphicsPath CreateRoundedRectanglePath(Rectangle bounds, BorderRadius radii)
+        public static GraphicsPath CreateRoundedRectanglePath(Rectangle bounds, BorderRadius radii)
         {
             GraphicsPath path = new();
 

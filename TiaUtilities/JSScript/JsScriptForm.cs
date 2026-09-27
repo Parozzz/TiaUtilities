@@ -81,7 +81,7 @@ namespace TiaUtilities.JSScript
                 }
             };
             */
-            this.scriptTabControl.TabPreAdded += (sender, args) =>
+            this.scriptTabControl.TabAdded += (sender, args) =>
             {
                 var tabPage = args.TabPage;
 
@@ -97,7 +97,7 @@ namespace TiaUtilities.JSScript
                 this.scriptHandler.Scripts.Add(script);
             };
 
-            this.scriptTabControl.TabPreRemoved += (sender, args) =>
+            this.scriptTabControl.TabRemoved += (sender, args) =>
             {
                 var tabPage = args.TabPage;
                 if (tabPage.Tag is TabPageScriptRecord record)
@@ -108,7 +108,7 @@ namespace TiaUtilities.JSScript
 
             this.scriptTabControl.Selected += (sender, args) => { };
 
-            this.scriptTabControl.TabNameUserChanged += (sender, args) =>
+            this.scriptTabControl.TabRenamed += (sender, args) =>
             {
                 var tabPage = args.TabPage;
                 if (tabPage.Tag is not TabPageScriptRecord record)

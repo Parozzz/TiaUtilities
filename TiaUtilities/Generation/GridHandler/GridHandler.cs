@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using TiaUtilities.Generation.GridHandler.CustomColumns;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.GridHandler.GridImprovements;
@@ -561,6 +562,22 @@ namespace TiaUtilities.Generation.GridHandler
 
             this.GridSettings.PropertyChanged += (sender, args) => this.DataGridView.Refresh();
             this.DataGridView.VisibleChanged += (sender, args) => this.DataGridView.AutoResizeColumnHeadersHeight();
+
+
+            this.DataGridView.VirtualMode = true;
+            this.DataGridView.CellValueNeeded += (sender, args) =>
+            {
+                var value = this.DataSource[args.RowIndex][args.ColumnIndex];
+                args.Value = value;
+
+                //Debug.WriteLine($"CellValueNeeded R.{args.RowIndex}, C.{args.ColumnIndex}, V.{args.Value}");
+            };
+
+            this.DataGridView.CellValuePushed += (sender, args) =>
+            {
+                this.DataSource[args.RowIndex][args.ColumnIndex] = args.Value;
+                //Debug.WriteLine($"CellValuePushed R.{args.RowIndex}, C.{args.ColumnIndex}, V.{args.Value}");
+            };
 
             this.DataGridView.ResumeLayout(true);
 
