@@ -4,7 +4,7 @@
     {
         public static class Generation
         {
-            public const string TAB_NAME = "{tab_name}";
+            public const string TAB_NAME = "{tab_name}"; 
         }
 
         public static class IO

@@ -122,7 +122,7 @@ namespace TiaUtilities.Generation.Alarms.Xml
                     {
                         segment = new SimaticLADSegment();
                         segment.Title[LocaleVariables.CULTURE] = placeholdersHandler.ParseNotNull(mainConfig.OneEachSegmentName);
-                    } 
+                    }
 
                     FillAlarmSegment(tabConfig, segment, placeholdersHandler, parsedTemplateData);
 
@@ -236,11 +236,11 @@ namespace TiaUtilities.Generation.Alarms.Xml
 
             var alarmVariableName = placeholdersHandler.ParseNotNull(mainConfig.AlarmNameTemplate);
             var alarmVariableComment = placeholdersHandler.ParseNotNull(commentTemplate);
-            
+
             var hmiAlarmName = placeholdersHandler.ParseNotNull(mainConfig.HmiNameTemplate);
 
             var hmiTextTemplate = mainConfig.HmiTextTemplate;
-            if(!string.IsNullOrEmpty(templateData?.HmiAlarmText))
+            if (!string.IsNullOrEmpty(templateData?.HmiAlarmText))
             {//Since ALARM_HMI_TEXT) placeholder needs to substitute the default alarm description, i will replace the placeholder so the formatting is still valid
                 hmiTextTemplate = hmiTextTemplate.Replace(GenPlaceholders.Alarms.ALARM_DESCRIPTION, GenPlaceholders.Alarms.ALARM_HMI_TEXT);
             }
@@ -259,7 +259,7 @@ namespace TiaUtilities.Generation.Alarms.Xml
                     jsonString = placeholdersHandler.ParseNotNull(jsonString);
 
                     var parametersJsonObject = JsonConvert.DeserializeObject<AlarmGenHmiParametersForm.ParameterJsonObject>(jsonString);
-                    if(parametersJsonObject != null)
+                    if (parametersJsonObject != null)
                     {
                         hmiParameters.AddRange(parametersJsonObject.Dict.Values);
                     }
@@ -267,34 +267,45 @@ namespace TiaUtilities.Generation.Alarms.Xml
                 catch { }
             }
 
+            var databaseQuery = placeholdersHandler.ParseNotNull(mainConfig.DatabaseQuery);
+            databaseQuery = GenPlaceholdersRegex.StripPlaceholders(databaseQuery);
+
             AlarmXmlItem item;
             if (this.mainConfig.HmiTriggerTagUseWordArray)
             {
                 var triggerByte = (alarmNum - 1) / 16;
                 var triggerBit = (alarmNum - 1) % 16;
-                item = new(tabName,
-                    alarmVariableName,
-                    alarmVariableComment,
-                    ID,
-                    hmiAlarmName,
-                    hmiAlarmText,
-                    hmiAlarmClass,
-                    hmiTriggerTag + $"[{triggerByte}]",
-                    triggerBit,
-                    hmiParameters);
+                item = new()
+                {
+                    TabName = tabName,
+                    AlarmVariableName = alarmVariableName,
+                    AlarmVariableComment = alarmVariableComment,
+                    HmiID = ID,
+                    HmiAlarmName = hmiAlarmName,
+                    HmiAlarmText = hmiAlarmText,
+                    HmiAlarmClass = hmiAlarmClass,
+                    HmiTriggerTag = hmiTriggerTag + $"[{triggerByte}]",
+                    HmiTriggerBit = triggerBit,
+                    DatabaseQuery = databaseQuery,
+                    HmiFields = hmiParameters,
+                };
             }
             else
             {
-                item = new(tabName,
-                    alarmVariableName,
-                    alarmVariableComment,
-                    ID,
-                    hmiAlarmName,
-                    hmiAlarmText,
-                    hmiAlarmClass,
-                    hmiTriggerTag,
-                    hmiTriggerBit: 0,
-                    hmiParameters);
+                item = new()
+                {
+                    TabName = tabName,
+                    AlarmVariableName = alarmVariableName,
+                    AlarmVariableComment = alarmVariableComment,
+                    HmiID = ID,
+                    HmiAlarmName = hmiAlarmName,
+                    HmiAlarmText = hmiAlarmText,
+                    HmiAlarmClass = hmiAlarmClass,
+                    HmiTriggerTag = hmiTriggerTag,
+                    HmiTriggerBit = 0,
+                    DatabaseQuery = databaseQuery,
+                    HmiFields = hmiParameters,
+                };
             }
 
             ID++;
@@ -528,8 +539,6 @@ namespace TiaUtilities.Generation.Alarms.Xml
                 return;
             }
 
-            const string updateDBQuery = "IF NOT EXISTS (SELECT 1 FROM Stato_Allarmi WHERE STA_CodiceAllarme = '{Codice}' AND STA_Dispositivo = '{Dispositivo}' AND STA_DispositivoTipo = '{TipoDispositivo}')\r\n    INSERT INTO Stato_Allarmi (STA_CodiceAllarme, STA_TagName, STA_Stato, STA_Dispositivo, STA_DispositivoTipo, STA_Severita, STA_Priorita, STA_Descrizione, STA_ModificatoDa) VALUES ('{Codice}', '{TagName}', 0, '{Dispositivo}', '{TipoDispositivo}', 1, 1, '{Descrizione}', 'Import TiaUtilities')\r\nELSE\r\n    UPDATE Stato_Allarmi SET STA_Descrizione = '{Descrizione}' WHERE STA_CodiceAllarme = '{Codice}' AND STA_Dispositivo = '{Dispositivo}' AND STA_DispositivoTipo = '{TipoDispositivo}'\r\n";
-
             string queryString = "";
 
             AlarmXmlBeta80Excel beta80Excel = new();
@@ -552,15 +561,11 @@ namespace TiaUtilities.Generation.Alarms.Xml
                 beta80Excel.AddItems(alarmGroupItem.Items);
 
                 int dbAlarmNum = 1;
-                foreach(var item in alarmGroupItem.Items)
+                foreach (var item in alarmGroupItem.Items)
                 {
-                    var itemQuery = updateDBQuery.Replace("{Codice}", dbAlarmNum.ToString().PadLeft(4, '0'))
-                                                 .Replace("{TagName}", "")
-                                                 .Replace("{Dispositivo}", "Z" + item.TabName.Trim().ToLower().Replace("z", ""))
-                                                 .Replace("{TipoDispositivo}", "ZONE")
-                                                 .Replace("{Descrizione}", item.AlarmVariableComment);
-                    dbAlarmNum++; 
-                    
+                    var itemQuery = item.DatabaseQuery;
+                    dbAlarmNum++;
+
                     queryString += itemQuery + "\r\n";
                 }
             }

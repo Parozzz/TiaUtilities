@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Text.RegularExpressions;
 using TiaUtilities.Generation.Alarms.Data;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.IO.Data;
@@ -13,7 +14,7 @@ namespace TiaUtilities.Generation.Placeholders
 
         public void Clear()
         {
-            placeholdersDict.Clear();
+            this.placeholdersDict.Clear();
         }
 
         public string TabName { set => AddOrReplace(GenPlaceholders.Generation.TAB_NAME, new StringGenPlaceholderData() { Value = value }); }
@@ -143,6 +144,7 @@ namespace TiaUtilities.Generation.Placeholders
 
             return anyFound;
         }
+
     }
 
 }

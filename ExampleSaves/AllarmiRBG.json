@@ -1,0 +1,2545 @@
+{
+  "Type": "AlarmGeneration",
+  "Version": 1,
+  "Object": {
+    "ScriptSave": {
+      "Scripts": [
+        {
+          "Name": "JS_SCRIPT",
+          "Text": "description = description.replace(\"RBG\", \"{device_name}\");"
+        }
+      ]
+    },
+    "AlarmMainConfig": {
+      "FCBlockName": "fcAlarmGeneration_{tab_name}",
+      "FCBlockNumber": 100,
+      "UDTBlockName": "UdtAlm_{tab_name}",
+      "AlarmNumFormat": "000.###",
+      "AlarmNameTemplate": "Alm{alarm_num}",
+      "AlarmCommentTemplate": "Alm{alarm_num} - {device_name}: {alarm_description}",
+      "AlarmCommentTemplateSpare": "Alm{alarm_num} - SPARE",
+      "HmiNameTemplate": "{tab_name}_Alm{alarm_num}",
+      "HmiTextTemplate": "{device_name} - Alm{alarm_num} - {alarm_description}",
+      "HmiTriggerTagTemplate": "{tab_name}_AlmHMI_NoInv_AlmHmi",
+      "HmiTriggerTagUseWordArray": true,
+      "OneEachSegmentName": "Alm{alarm_num} - {device_description} {alarm_description}",
+      "OneEachEmptyAlarmSegmentName": "Alm{alarm_num} - SPARE",
+      "GroupSegmentName": "Alm{alarm_num_start} ~ {alarm_num_end} - {device_description}",
+      "GroupEmptyAlarmSegmentName": "Alm{alarm_num_start} ~ {alarm_num_end} - SPARE",
+      "EnableCustomVariable": false,
+      "EnableTimer": false,
+      "DatabaseQuery": "-- Allarme: {sql_codice}, Dispositivo: {sql_dispositivo}, Tipo: {sql_tipoDispositivo}, Testo: {alarm_description}\r\nIF NOT EXISTS (SELECT 1 FROM Stato_Allarmi WHERE STA_CodiceAllarme = {sql_codice} AND STA_Dispositivo = '{sql_dispositivo}' AND STA_DispositivoTipo = '{sql_tipoDispositivo}')\r\n\tINSERT INTO Stato_Allarmi (STA_CodiceAllarme, STA_TagName, STA_Stato, STA_Dispositivo, STA_DispositivoTipo, STA_Severita, STA_Priorita, STA_Descrizione, STA_ModificatoDa) VALUES ('{sql_codice}', '', 0, '{sql_dispositivo}', '{sql_tipoDispositivo}', 1, 1, 'Alm.{alarm_num} - {device_name} - {alarm_description}', 'Import TiaUtilities')\r\nELSE\r\n\tUPDATE Stato_Allarmi SET STA_Descrizione = 'Alm.{alarm_num} - {device_name} - {alarm_description}' WHERE STA_CodiceAllarme = {sql_codice} AND STA_Dispositivo = '{sql_dispositivo}' AND STA_DispositivoTipo = '{sql_tipoDispositivo}'\r\n-- END"
+    },
+    "TabSaves": [
+      {
+        "Name": "RBG1",
+        "TabConfig": {
+          "GroupingType": 0,
+          "TotalAlarmNum": 352,
+          "StartingAlarmNum": 1,
+          "AntiSlipNumber": 0,
+          "SkipNumberAfterGroup": 0,
+          "HmiStartID": 20000,
+          "DefaultHmiAlarmClass": "No Acknowledgement",
+          "GenerateEmptyAlarmAntiSlip": false,
+          "EmptyAlarmAtEnd": 0,
+          "EmptyAlarmContactAddress": "FALSE",
+          "DefaultCustomVarAddress": "Alm{tab_name}.Level[{alarm_num}]",
+          "DefaultCustomVarValue": "0",
+          "DefaultCoil1Address": "Alm{tab_name}.Act.Alm{alarm_num}",
+          "DefaultCoil1Type": 1,
+          "DefaultCoil2Address": "Alm{tab_name}.Mem.Alm{alarm_num}",
+          "DefaultCoil2Type": 3,
+          "DefaultTimerAddress": "/",
+          "DefaultTimerType": "TON",
+          "DefaultTimerValue": "T#0s",
+          "AlarmAddressPrefix": "{device_name}.Allarmi.",
+          "Coil1AddressPrefix": "",
+          "Coil2AddressPrefix": "",
+          "TimerAddressPrefix": "",
+          "CustomPlaceholdersJSON": "{\r\n    \"sql_codice\": \"{alarm_num}\",\r\n    \"sql_dispositivo\": \"TR01\",\r\n    \"sql_tipoDispositivo\": \"TR\",\r\n}"
+        },
+        "DeviceGrid": {
+          "RowData": {
+            "0": {
+              "Name": "RBG1",
+              "Template": "RBG"
+            }
+          }
+        }
+      }
+    ],
+    "TemplateSaves": [
+      {
+        "Name": "RBG",
+        "AlarmGrid": {
+          "RowData": {
+            "0": {
+              "Enable": true,
+              "AlarmVariable": "1",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "FIFO trasmissione telegrammi pieno"
+            },
+            "1": {
+              "Enable": true,
+              "AlarmVariable": "2",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ausiliari non inseriti"
+            },
+            "2": {
+              "Enable": true,
+              "AlarmVariable": "3",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Mancanza 24Vdc"
+            },
+            "3": {
+              "Enable": true,
+              "AlarmVariable": "4",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Emergenza fungo pulsantiera"
+            },
+            "4": {
+              "Enable": true,
+              "AlarmVariable": "5",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Emergenza fungo quadro (0505SB1)"
+            },
+            "5": {
+              "Enable": true,
+              "AlarmVariable": "6",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse X: Emergenza oltrecorsa avanti (115B1)"
+            },
+            "6": {
+              "Enable": true,
+              "AlarmVariable": "7",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Y: Emergenza oltrecorsa alto (238B1)"
+            },
+            "7": {
+              "Enable": true,
+              "AlarmVariable": "8",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Emergenza fungo lato opposto quadro (0505SB2)"
+            },
+            "8": {
+              "Enable": true,
+              "AlarmVariable": "9",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Emergenza generale da terra"
+            },
+            "9": {
+              "Enable": true,
+              "AlarmVariable": "10",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Emergenza barriere da terra"
+            },
+            "10": {
+              "Enable": true,
+              "AlarmVariable": "11",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Emergenza SLS- velocità manuale eccessiva"
+            },
+            "11": {
+              "Enable": true,
+              "AlarmVariable": "12",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Handling: Errore comunicazione safe - Trasmissione"
+            },
+            "12": {
+              "Enable": true,
+              "AlarmVariable": "13",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Handling: Errore comunicazione safe - Ricezione"
+            },
+            "13": {
+              "Enable": true,
+              "AlarmVariable": "14",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Errore grave safety"
+            },
+            "14": {
+              "Enable": true,
+              "AlarmVariable": "15",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Emergenza tensione fune sollevamento (117B3)"
+            },
+            "15": {
+              "Enable": true,
+              "AlarmVariable": "16",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Emergenza paracadute (238B3)"
+            },
+            "16": {
+              "Enable": true,
+              "AlarmVariable": "17",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Emergenza fungo su tamburo fune (0505SB3)"
+            },
+            "17": {
+              "Enable": true,
+              "AlarmVariable": "18",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse X: Emergenza oltrecorsa indietro (115B2)"
+            },
+            "18": {
+              "Enable": true,
+              "AlarmVariable": "19",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Y: Emergenza oltrecorsa basso (238B2)"
+            },
+            "19": {
+              "Enable": true,
+              "AlarmVariable": "20",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Connessione con dispositivo errato"
+            },
+            "20": {
+              "Enable": true,
+              "AlarmVariable": "21",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Porta QE aperta"
+            },
+            "21": {
+              "Enable": true,
+              "AlarmVariable": "22",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Errore comunicazione safe - Trasmissione"
+            },
+            "22": {
+              "Enable": true,
+              "AlarmVariable": "23",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Errore comunicazione safe - Ricezione"
+            },
+            "23": {
+              "Enable": true,
+              "AlarmVariable": "24",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse X: Anomalia teleruttore freno - comando plc"
+            },
+            "24": {
+              "Enable": true,
+              "AlarmVariable": "25",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Y: Anomalia teleruttore freno - comando plc"
+            },
+            "25": {
+              "Enable": true,
+              "AlarmVariable": "26",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "26": {
+              "Enable": true,
+              "AlarmVariable": "27",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse X: Discrepanza quota / sensore a terra HOMING Safe"
+            },
+            "27": {
+              "Enable": true,
+              "AlarmVariable": "28",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Y: Discrepanza quota / sensore a terra HOMING Safe"
+            },
+            "28": {
+              "Enable": true,
+              "AlarmVariable": "29",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse X: Timeout homing safe"
+            },
+            "29": {
+              "Enable": true,
+              "AlarmVariable": "30",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Y: Timeout homing safe"
+            },
+            "30": {
+              "Enable": true,
+              "AlarmVariable": "31",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Y: Overspeed (117B2)"
+            },
+            "31": {
+              "Enable": true,
+              "AlarmVariable": "32",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Y: Sovraccarico fune culla colonna anteriore (052K1)"
+            },
+            "32": {
+              "Enable": true,
+              "AlarmVariable": "33",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Y: Sovraccarico fune culla colonna posteriore (052K2)"
+            },
+            "33": {
+              "Enable": true,
+              "AlarmVariable": "34",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Y: Presenza trave motore di sollevamento"
+            },
+            "34": {
+              "Enable": true,
+              "AlarmVariable": "35",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "35": {
+              "Enable": true,
+              "AlarmVariable": "36",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "24V freni (016FA1)"
+            },
+            "36": {
+              "Enable": true,
+              "AlarmVariable": "37",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "24V drive (015FA4)"
+            },
+            "37": {
+              "Enable": true,
+              "AlarmVariable": "38",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "24V bordo macchina (015FA3)"
+            },
+            "38": {
+              "Enable": true,
+              "AlarmVariable": "39",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Allarme temperatura QE"
+            },
+            "39": {
+              "Enable": true,
+              "AlarmVariable": "40",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "40": {
+              "Enable": true,
+              "AlarmVariable": "41",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse X: Non referenziato"
+            },
+            "41": {
+              "Enable": true,
+              "AlarmVariable": "42",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse X: Allarme tecnologico"
+            },
+            "42": {
+              "Enable": true,
+              "AlarmVariable": "43",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse X: Limite Software superato"
+            },
+            "43": {
+              "Enable": true,
+              "AlarmVariable": "44",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse X: "
+            },
+            "44": {
+              "Enable": true,
+              "AlarmVariable": "45",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse X: "
+            },
+            "45": {
+              "Enable": true,
+              "AlarmVariable": "46",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse X: "
+            },
+            "46": {
+              "Enable": true,
+              "AlarmVariable": "47",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse X: "
+            },
+            "47": {
+              "Enable": true,
+              "AlarmVariable": "48",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse X: "
+            },
+            "48": {
+              "Enable": true,
+              "AlarmVariable": "49",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse X: "
+            },
+            "49": {
+              "Enable": true,
+              "AlarmVariable": "50",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse X: "
+            },
+            "50": {
+              "Enable": true,
+              "AlarmVariable": "51",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse X: "
+            },
+            "51": {
+              "Enable": true,
+              "AlarmVariable": "52",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse X: "
+            },
+            "52": {
+              "Enable": true,
+              "AlarmVariable": "53",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse X:"
+            },
+            "53": {
+              "Enable": true,
+              "AlarmVariable": "54",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse X: Oltrecorsa Avanti"
+            },
+            "54": {
+              "Enable": true,
+              "AlarmVariable": "55",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse X: Oltrecorsa Indietro"
+            },
+            "55": {
+              "Enable": true,
+              "AlarmVariable": "56",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse X: "
+            },
+            "56": {
+              "Enable": true,
+              "AlarmVariable": "57",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse X: "
+            },
+            "57": {
+              "Enable": true,
+              "AlarmVariable": "58",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse X: "
+            },
+            "58": {
+              "Enable": true,
+              "AlarmVariable": "59",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse X: "
+            },
+            "59": {
+              "Enable": true,
+              "AlarmVariable": "60",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse X: "
+            },
+            "60": {
+              "Enable": true,
+              "AlarmVariable": "61",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Y: Non referenziato"
+            },
+            "61": {
+              "Enable": true,
+              "AlarmVariable": "62",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Y: Allarme tecnologico"
+            },
+            "62": {
+              "Enable": true,
+              "AlarmVariable": "63",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Y: Limite Software superato"
+            },
+            "63": {
+              "Enable": true,
+              "AlarmVariable": "64",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Y: "
+            },
+            "64": {
+              "Enable": true,
+              "AlarmVariable": "65",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Y: "
+            },
+            "65": {
+              "Enable": true,
+              "AlarmVariable": "66",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Y: "
+            },
+            "66": {
+              "Enable": true,
+              "AlarmVariable": "67",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Y: "
+            },
+            "67": {
+              "Enable": true,
+              "AlarmVariable": "68",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Y: "
+            },
+            "68": {
+              "Enable": true,
+              "AlarmVariable": "69",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Y: "
+            },
+            "69": {
+              "Enable": true,
+              "AlarmVariable": "70",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Y: "
+            },
+            "70": {
+              "Enable": true,
+              "AlarmVariable": "71",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Y: "
+            },
+            "71": {
+              "Enable": true,
+              "AlarmVariable": "72",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Y: "
+            },
+            "72": {
+              "Enable": true,
+              "AlarmVariable": "73",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Y: "
+            },
+            "73": {
+              "Enable": true,
+              "AlarmVariable": "74",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Y: Oltrecorsa alto"
+            },
+            "74": {
+              "Enable": true,
+              "AlarmVariable": "75",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Y: Oltrecorsa basso"
+            },
+            "75": {
+              "Enable": true,
+              "AlarmVariable": "76",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Y: SPARE Oltrecorsa"
+            },
+            "76": {
+              "Enable": true,
+              "AlarmVariable": "77",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Y: Contemporaneità oltrecorsa"
+            },
+            "77": {
+              "Enable": true,
+              "AlarmVariable": "78",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Y: Quota encoder non plausibile"
+            },
+            "78": {
+              "Enable": true,
+              "AlarmVariable": "79",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Y: "
+            },
+            "79": {
+              "Enable": true,
+              "AlarmVariable": "80",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Y: pastiglia termica resistenza di frenatura"
+            },
+            "80": {
+              "Enable": true,
+              "AlarmVariable": "81",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Y: scatto termico ventilatore"
+            },
+            "81": {
+              "Enable": true,
+              "AlarmVariable": "82",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Trattenitori: Scatto termico freno"
+            },
+            "82": {
+              "Enable": true,
+              "AlarmVariable": "83",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Sistema rigenerativo non pronto"
+            },
+            "83": {
+              "Enable": true,
+              "AlarmVariable": "84",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AsseZ: "
+            },
+            "84": {
+              "Enable": true,
+              "AlarmVariable": "85",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AsseZ: "
+            },
+            "85": {
+              "Enable": true,
+              "AlarmVariable": "86",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AsseZ:"
+            },
+            "86": {
+              "Enable": true,
+              "AlarmVariable": "87",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AsseZ: "
+            },
+            "87": {
+              "Enable": true,
+              "AlarmVariable": "88",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AsseZ:"
+            },
+            "88": {
+              "Enable": true,
+              "AlarmVariable": "89",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AsseZ:"
+            },
+            "89": {
+              "Enable": true,
+              "AlarmVariable": "90",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AsseZ:"
+            },
+            "90": {
+              "Enable": true,
+              "AlarmVariable": "91",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AsseZ:"
+            },
+            "91": {
+              "Enable": true,
+              "AlarmVariable": "92",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Non al centro fuori dal ciclo automatico"
+            },
+            "92": {
+              "Enable": true,
+              "AlarmVariable": "93",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AsseZ: Quota AKF oltre il limite Pos"
+            },
+            "93": {
+              "Enable": true,
+              "AlarmVariable": "94",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AsseZ: Quota AKF oltre il limite Neg"
+            },
+            "94": {
+              "Enable": true,
+              "AlarmVariable": "95",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AsseZ:"
+            },
+            "95": {
+              "Enable": true,
+              "AlarmVariable": "96",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AsseZ:"
+            },
+            "96": {
+              "Enable": true,
+              "AlarmVariable": "97",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo: Stato sensori imbarco da baia non ok"
+            },
+            "97": {
+              "Enable": true,
+              "AlarmVariable": "98",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo: Sensori verifica UDC non concordi"
+            },
+            "98": {
+              "Enable": true,
+              "AlarmVariable": "99",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo: Timeout carico da baia"
+            },
+            "99": {
+              "Enable": true,
+              "AlarmVariable": "100",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo: Timeout scarico a baia"
+            },
+            "100": {
+              "Enable": true,
+              "AlarmVariable": "101",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo: Controllo sagoma culla"
+            },
+            "101": {
+              "Enable": true,
+              "AlarmVariable": "102",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "102": {
+              "Enable": true,
+              "AlarmVariable": "103",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "103": {
+              "Enable": true,
+              "AlarmVariable": "104",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "104": {
+              "Enable": true,
+              "AlarmVariable": "105",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo: Dati missione non ok"
+            },
+            "105": {
+              "Enable": true,
+              "AlarmVariable": "106",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo: Missione doppia incongruente"
+            },
+            "106": {
+              "Enable": true,
+              "AlarmVariable": "107",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo: Culla1 cella inesistent o disabilitata"
+            },
+            "107": {
+              "Enable": true,
+              "AlarmVariable": "108",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo: Culla2 cella inesistent o disabilitata"
+            },
+            "108": {
+              "Enable": true,
+              "AlarmVariable": "109",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo: Quote di destinazione oltre i limiti"
+            },
+            "109": {
+              "Enable": true,
+              "AlarmVariable": "110",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo: "
+            },
+            "110": {
+              "Enable": true,
+              "AlarmVariable": "111",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo: Timeout di posizionamento"
+            },
+            "111": {
+              "Enable": true,
+              "AlarmVariable": "112",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo: Internal error"
+            },
+            "112": {
+              "Enable": true,
+              "AlarmVariable": "113",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo: "
+            },
+            "113": {
+              "Enable": true,
+              "AlarmVariable": "114",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo: "
+            },
+            "114": {
+              "Enable": true,
+              "AlarmVariable": "115",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo: "
+            },
+            "115": {
+              "Enable": true,
+              "AlarmVariable": "116",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo: "
+            },
+            "116": {
+              "Enable": true,
+              "AlarmVariable": "117",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "ALMEXT, non usare"
+            },
+            "117": {
+              "Enable": true,
+              "AlarmVariable": "118",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "ALMEXT, non usare"
+            },
+            "118": {
+              "Enable": true,
+              "AlarmVariable": "119",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo Culla1: Anomalia sensori di presenza dopo sbarco"
+            },
+            "119": {
+              "Enable": true,
+              "AlarmVariable": "120",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo Culla2: Anomalia sensori di presenza dopo sbarco"
+            },
+            "120": {
+              "Enable": true,
+              "AlarmVariable": "121",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo Culla1: Incongruenza tra la missione e lo stato di presenza culla"
+            },
+            "121": {
+              "Enable": true,
+              "AlarmVariable": "122",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo Culla2: Incongruenza tra la missione e lo stato di presenza culla"
+            },
+            "122": {
+              "Enable": true,
+              "AlarmVariable": "123",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo Culla1: errore durante l'allineamento dell'UDC"
+            },
+            "123": {
+              "Enable": true,
+              "AlarmVariable": "124",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo Culla1: timeout allineamento dell'UDC"
+            },
+            "124": {
+              "Enable": true,
+              "AlarmVariable": "125",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo: Quota X non ok con culla non al centro"
+            },
+            "125": {
+              "Enable": true,
+              "AlarmVariable": "126",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo: Quota Y non ok con culla non al centro"
+            },
+            "126": {
+              "Enable": true,
+              "AlarmVariable": "127",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "127": {
+              "Enable": true,
+              "AlarmVariable": "128",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "128": {
+              "Enable": true,
+              "AlarmVariable": "129",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo Culla1: Errore ingombro sx al termine del ciclo"
+            },
+            "129": {
+              "Enable": true,
+              "AlarmVariable": "130",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo Culla2: Errore ingombro dx al termine del ciclo"
+            },
+            "130": {
+              "Enable": true,
+              "AlarmVariable": "131",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "131": {
+              "Enable": true,
+              "AlarmVariable": "132",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "132": {
+              "Enable": true,
+              "AlarmVariable": "133",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "133": {
+              "Enable": true,
+              "AlarmVariable": "134",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "134": {
+              "Enable": true,
+              "AlarmVariable": "135",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "135": {
+              "Enable": true,
+              "AlarmVariable": "136",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "136": {
+              "Enable": true,
+              "AlarmVariable": "137",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "137": {
+              "Enable": true,
+              "AlarmVariable": "138",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "138": {
+              "Enable": true,
+              "AlarmVariable": "139",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "139": {
+              "Enable": true,
+              "AlarmVariable": "140",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo: Errore telecamera Leuze corrente sinistra"
+            },
+            "140": {
+              "Enable": true,
+              "AlarmVariable": "141",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo: Errore telecamera Leuze corrente destra"
+            },
+            "141": {
+              "Enable": true,
+              "AlarmVariable": "142",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo: Lettura corrente al di fuori della tolleranza di posizionamento"
+            },
+            "142": {
+              "Enable": true,
+              "AlarmVariable": "143",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Ciclo: Verifica posizione dopo ricerca corrente fuori tolleranza"
+            },
+            "143": {
+              "Enable": true,
+              "AlarmVariable": "144",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "144": {
+              "Enable": true,
+              "AlarmVariable": "145",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "145": {
+              "Enable": true,
+              "AlarmVariable": "146",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "146": {
+              "Enable": true,
+              "AlarmVariable": "147",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Comunicazione con handling KO"
+            },
+            "147": {
+              "Enable": true,
+              "AlarmVariable": "148",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "148": {
+              "Enable": true,
+              "AlarmVariable": "149",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "149": {
+              "Enable": true,
+              "AlarmVariable": "150",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "150": {
+              "Enable": true,
+              "AlarmVariable": "151",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Handling: Ingombro baia inferiore"
+            },
+            "151": {
+              "Enable": true,
+              "AlarmVariable": "152",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Handling: Ingombro baia superiore"
+            },
+            "152": {
+              "Enable": true,
+              "AlarmVariable": "153",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Assi in manutenzione. Disattivare per ciclo."
+            },
+            "153": {
+              "Enable": true,
+              "AlarmVariable": "154",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Errore configurazione Wifi "
+            },
+            "154": {
+              "Enable": true,
+              "AlarmVariable": "155",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Handling: Anomalia comunicazione"
+            },
+            "155": {
+              "Enable": true,
+              "AlarmVariable": "156",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "WMS: Errore connessione"
+            },
+            "156": {
+              "Enable": true,
+              "AlarmVariable": "157",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "WMS: Timeout ricezione ACK"
+            },
+            "157": {
+              "Enable": true,
+              "AlarmVariable": "158",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "WMS: Errore codifica telegramma"
+            },
+            "158": {
+              "Enable": true,
+              "AlarmVariable": "159",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "WMS: Errore decodifica telegramma"
+            },
+            "159": {
+              "Enable": true,
+              "AlarmVariable": "160",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "WMS: Allarme logico da WCS"
+            },
+            "160": {
+              "Enable": true,
+              "AlarmVariable": "161",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Missione: TelBRPO_Troppe missioni consecutive"
+            },
+            "161": {
+              "Enable": true,
+              "AlarmVariable": "162",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Missione: Altra missione già presente su culla"
+            },
+            "162": {
+              "Enable": true,
+              "AlarmVariable": "163",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Missione: Doppia missione sulla stessa culla"
+            },
+            "163": {
+              "Enable": true,
+              "AlarmVariable": "164",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Missione: Doppia missione incongruente"
+            },
+            "164": {
+              "Enable": true,
+              "AlarmVariable": "165",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Missione: Sorgente e destinazione in culla"
+            },
+            "165": {
+              "Enable": true,
+              "AlarmVariable": "166",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Missione: Errore decodifica missione"
+            },
+            "166": {
+              "Enable": true,
+              "AlarmVariable": "167",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Missione: Culla non determinabile"
+            },
+            "167": {
+              "Enable": true,
+              "AlarmVariable": "168",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Missione Culla1: Sorgente non ok"
+            },
+            "168": {
+              "Enable": true,
+              "AlarmVariable": "169",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Missione Culla1: Destinazione non ok"
+            },
+            "169": {
+              "Enable": true,
+              "AlarmVariable": "170",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Missione Culla2: Sorgente non ok"
+            },
+            "170": {
+              "Enable": true,
+              "AlarmVariable": "171",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Missione Culla2: Destinazione non ok"
+            },
+            "171": {
+              "Enable": true,
+              "AlarmVariable": "172",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Missione A: Posizionamento (PO) incongruente"
+            },
+            "172": {
+              "Enable": true,
+              "AlarmVariable": "173",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Missione A: Prelievo/Deposito (BR) incongruente"
+            },
+            "173": {
+              "Enable": true,
+              "AlarmVariable": "174",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Missione B: Posizionamento (PO) incongruente"
+            },
+            "174": {
+              "Enable": true,
+              "AlarmVariable": "175",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Missione B: Prelievo/Deposito (BR) incongruente"
+            },
+            "175": {
+              "Enable": true,
+              "AlarmVariable": "176",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "176": {
+              "Enable": true,
+              "AlarmVariable": "177",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "177": {
+              "Enable": true,
+              "AlarmVariable": "178",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "178": {
+              "Enable": true,
+              "AlarmVariable": "179",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "179": {
+              "Enable": true,
+              "AlarmVariable": "180",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}"
+            },
+            "180": {
+              "Enable": true,
+              "AlarmVariable": "181",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}"
+            },
+            "181": {
+              "Enable": true,
+              "AlarmVariable": "182",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "182": {
+              "Enable": true,
+              "AlarmVariable": "183",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Controllo deceleratore avanti"
+            },
+            "183": {
+              "Enable": true,
+              "AlarmVariable": "184",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Controllo deceleratore indietro"
+            },
+            "184": {
+              "Enable": true,
+              "AlarmVariable": "185",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Prolunga connessa. Disconnettere per ciclo."
+            },
+            "185": {
+              "Enable": true,
+              "AlarmVariable": "186",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Errore feedback Teleruttore prolunga"
+            },
+            "186": {
+              "Enable": true,
+              "AlarmVariable": "187",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Asse Catene: Allarme inverter catene"
+            },
+            "187": {
+              "Enable": true,
+              "AlarmVariable": "188",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}"
+            },
+            "188": {
+              "Enable": true,
+              "AlarmVariable": "189",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}"
+            },
+            "189": {
+              "Enable": true,
+              "AlarmVariable": "190",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "190": {
+              "Enable": true,
+              "AlarmVariable": "191",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "191": {
+              "Enable": true,
+              "AlarmVariable": "192",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "192": {
+              "Enable": true,
+              "AlarmVariable": "193",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "193": {
+              "Enable": true,
+              "AlarmVariable": "194",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "194": {
+              "Enable": true,
+              "AlarmVariable": "195",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "195": {
+              "Enable": true,
+              "AlarmVariable": "196",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "196": {
+              "Enable": true,
+              "AlarmVariable": "197",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "197": {
+              "Enable": true,
+              "AlarmVariable": "198",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "198": {
+              "Enable": true,
+              "AlarmVariable": "199",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "199": {
+              "Enable": true,
+              "AlarmVariable": "200",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Errore canale safety paracadute (238B3)"
+            },
+            "200": {
+              "Enable": true,
+              "AlarmVariable": "201",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Errore canale safety oltrecorsa Y alto (238B1)"
+            },
+            "201": {
+              "Enable": true,
+              "AlarmVariable": "202",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Errore canale safety oltrecorsa X avanti (115B1)"
+            },
+            "202": {
+              "Enable": true,
+              "AlarmVariable": "203",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Errore canale safety emergenze "
+            },
+            "203": {
+              "Enable": true,
+              "AlarmVariable": "204",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Sottocarico fune culla colonna anteriore (052K1)"
+            },
+            "204": {
+              "Enable": true,
+              "AlarmVariable": "205",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Sottocarico fune culla colonna posteriore (052K2)"
+            },
+            "205": {
+              "Enable": true,
+              "AlarmVariable": "206",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Errore canale safety trave motore sollevamento (119B2)"
+            },
+            "206": {
+              "Enable": true,
+              "AlarmVariable": "207",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "207": {
+              "Enable": true,
+              "AlarmVariable": "208",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Errore canale safety sls asse X"
+            },
+            "208": {
+              "Enable": true,
+              "AlarmVariable": "209",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Errore canale safety sls asse Y"
+            },
+            "209": {
+              "Enable": true,
+              "AlarmVariable": "210",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Errore profisafe asse X "
+            },
+            "210": {
+              "Enable": true,
+              "AlarmVariable": "211",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Errore profisafe asse Y"
+            },
+            "211": {
+              "Enable": true,
+              "AlarmVariable": "212",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "212": {
+              "Enable": true,
+              "AlarmVariable": "213",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Errore canale sensore homing X"
+            },
+            "213": {
+              "Enable": true,
+              "AlarmVariable": "214",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Errore canale sensore homing Y"
+            },
+            "214": {
+              "Enable": true,
+              "AlarmVariable": "215",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Errore canale overspeed LHD (117B2)"
+            },
+            "215": {
+              "Enable": true,
+              "AlarmVariable": "216",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Errore canale monitoraggio fune (117B3)"
+            },
+            "216": {
+              "Enable": true,
+              "AlarmVariable": "217",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "217": {
+              "Enable": true,
+              "AlarmVariable": "218",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "218": {
+              "Enable": true,
+              "AlarmVariable": "219",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "219": {
+              "Enable": true,
+              "AlarmVariable": "220",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "220": {
+              "Enable": true,
+              "AlarmVariable": "221",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "221": {
+              "Enable": true,
+              "AlarmVariable": "222",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "222": {
+              "Enable": true,
+              "AlarmVariable": "223",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "223": {
+              "Enable": true,
+              "AlarmVariable": "224",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "224": {
+              "Enable": true,
+              "AlarmVariable": "225",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "225": {
+              "Enable": true,
+              "AlarmVariable": "226",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Discrepanza quote baie automazione/safety"
+            },
+            "226": {
+              "Enable": true,
+              "AlarmVariable": "227",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Errore feedback teleruttore (125QM1)"
+            },
+            "227": {
+              "Enable": true,
+              "AlarmVariable": "228",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "228": {
+              "Enable": true,
+              "AlarmVariable": "229",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "229": {
+              "Enable": true,
+              "AlarmVariable": "230",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "230": {
+              "Enable": true,
+              "AlarmVariable": "231",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "231": {
+              "Enable": true,
+              "AlarmVariable": "232",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "232": {
+              "Enable": true,
+              "AlarmVariable": "233",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "233": {
+              "Enable": true,
+              "AlarmVariable": "234",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "234": {
+              "Enable": true,
+              "AlarmVariable": "235",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "235": {
+              "Enable": true,
+              "AlarmVariable": "236",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "236": {
+              "Enable": true,
+              "AlarmVariable": "237",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "237": {
+              "Enable": true,
+              "AlarmVariable": "238",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": ""
+            },
+            "238": {
+              "Enable": true,
+              "AlarmVariable": "239",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Errore Profinet Lenze i550 Centratore Dx"
+            },
+            "239": {
+              "Enable": true,
+              "AlarmVariable": "240",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Errore Profinet PLC"
+            },
+            "240": {
+              "Enable": true,
+              "AlarmVariable": "241",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Errore Profinet IO Device QE"
+            },
+            "241": {
+              "Enable": true,
+              "AlarmVariable": "242",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Errore Profinet IO Device culla"
+            },
+            "242": {
+              "Enable": true,
+              "AlarmVariable": "243",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Errore Scalance culla"
+            },
+            "243": {
+              "Enable": true,
+              "AlarmVariable": "244",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Errore Scalance QE"
+            },
+            "244": {
+              "Enable": true,
+              "AlarmVariable": "245",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Errore Profinet IPS248 Sx"
+            },
+            "245": {
+              "Enable": true,
+              "AlarmVariable": "246",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Errore Profinet IPS248 Dx"
+            },
+            "246": {
+              "Enable": true,
+              "AlarmVariable": "247",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Errore Profinet Lenze C520"
+            },
+            "247": {
+              "Enable": true,
+              "AlarmVariable": "248",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Errore Profinet Lenze i950 AsseXm"
+            },
+            "248": {
+              "Enable": true,
+              "AlarmVariable": "249",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Errore Profinet Lenze i950 AsseXs"
+            },
+            "249": {
+              "Enable": true,
+              "AlarmVariable": "250",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Errore Profinet Lenze i950 AsseY"
+            },
+            "250": {
+              "Enable": true,
+              "AlarmVariable": "251",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Errore Profinet Lenze i550 Catene"
+            },
+            "251": {
+              "Enable": true,
+              "AlarmVariable": "252",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "Errore Profinet Lenze i550 Centratore Sx"
+            },
+            "252": {
+              "Enable": true,
+              "AlarmVariable": "253",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "LenzeController: Error present"
+            },
+            "253": {
+              "Enable": true,
+              "AlarmVariable": "254",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "LenzeController: CommError"
+            },
+            "254": {
+              "Enable": true,
+              "AlarmVariable": "255",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "LenzeController: Ethercat network error"
+            },
+            "255": {
+              "Enable": true,
+              "AlarmVariable": "256",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "LenzeController: SlaveNotPresent"
+            },
+            "256": {
+              "Enable": true,
+              "AlarmVariable": "257",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: nessun AKF assegnato"
+            },
+            "257": {
+              "Enable": true,
+              "AlarmVariable": "258",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: collegamento AKF non Ok"
+            },
+            "258": {
+              "Enable": true,
+              "AlarmVariable": "259",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Errore comunicazione Live bit"
+            },
+            "259": {
+              "Enable": true,
+              "AlarmVariable": "260",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: modo operativo KO"
+            },
+            "260": {
+              "Enable": true,
+              "AlarmVariable": "261",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Alto ad inizio ciclo"
+            },
+            "261": {
+              "Enable": true,
+              "AlarmVariable": "262",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Non in centro"
+            },
+            "262": {
+              "Enable": true,
+              "AlarmVariable": "263",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Non pronto"
+            },
+            "263": {
+              "Enable": true,
+              "AlarmVariable": "264",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Allarme presente"
+            },
+            "264": {
+              "Enable": true,
+              "AlarmVariable": "265",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Timeout sollevamento"
+            },
+            "265": {
+              "Enable": true,
+              "AlarmVariable": "266",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Timeout posi corridoio"
+            },
+            "266": {
+              "Enable": true,
+              "AlarmVariable": "267",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Timeout posi home"
+            },
+            "267": {
+              "Enable": true,
+              "AlarmVariable": "268",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Timeout reset Alarm HUBLOCK"
+            },
+            "268": {
+              "Enable": true,
+              "AlarmVariable": "269",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Timeout abbassamento"
+            },
+            "269": {
+              "Enable": true,
+              "AlarmVariable": "270",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Errore fbk teleruttore ricarica (112QM1)"
+            },
+            "270": {
+              "Enable": true,
+              "AlarmVariable": "271",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Allarme caricabatterie"
+            },
+            "271": {
+              "Enable": true,
+              "AlarmVariable": "272",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: "
+            },
+            "272": {
+              "Enable": true,
+              "AlarmVariable": "273",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: "
+            },
+            "273": {
+              "Enable": true,
+              "AlarmVariable": "274",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: "
+            },
+            "274": {
+              "Enable": true,
+              "AlarmVariable": "275",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: "
+            },
+            "275": {
+              "Enable": true,
+              "AlarmVariable": "276",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: "
+            },
+            "276": {
+              "Enable": true,
+              "AlarmVariable": "277",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: "
+            },
+            "277": {
+              "Enable": true,
+              "AlarmVariable": "278",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: "
+            },
+            "278": {
+              "Enable": true,
+              "AlarmVariable": "279",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: "
+            },
+            "279": {
+              "Enable": true,
+              "AlarmVariable": "280",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: "
+            },
+            "280": {
+              "Enable": true,
+              "AlarmVariable": "281",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: "
+            },
+            "281": {
+              "Enable": true,
+              "AlarmVariable": "282",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: "
+            },
+            "282": {
+              "Enable": true,
+              "AlarmVariable": "283",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: "
+            },
+            "283": {
+              "Enable": true,
+              "AlarmVariable": "284",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: "
+            },
+            "284": {
+              "Enable": true,
+              "AlarmVariable": "285",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: "
+            },
+            "285": {
+              "Enable": true,
+              "AlarmVariable": "286",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: "
+            },
+            "286": {
+              "Enable": true,
+              "AlarmVariable": "287",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: "
+            },
+            "287": {
+              "Enable": true,
+              "AlarmVariable": "288",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: "
+            },
+            "288": {
+              "Enable": true,
+              "AlarmVariable": "289",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: "
+            },
+            "289": {
+              "Enable": true,
+              "AlarmVariable": "290",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: "
+            },
+            "290": {
+              "Enable": true,
+              "AlarmVariable": "291",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: "
+            },
+            "291": {
+              "Enable": true,
+              "AlarmVariable": "292",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: "
+            },
+            "292": {
+              "Enable": true,
+              "AlarmVariable": "293",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: "
+            },
+            "293": {
+              "Enable": true,
+              "AlarmVariable": "294",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: "
+            },
+            "294": {
+              "Enable": true,
+              "AlarmVariable": "295",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: "
+            },
+            "295": {
+              "Enable": true,
+              "AlarmVariable": "296",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: "
+            },
+            "296": {
+              "Enable": true,
+              "AlarmVariable": "297",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: "
+            },
+            "297": {
+              "Enable": true,
+              "AlarmVariable": "298",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: "
+            },
+            "298": {
+              "Enable": true,
+              "AlarmVariable": "299",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: "
+            },
+            "299": {
+              "Enable": true,
+              "AlarmVariable": "300",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Emergenza attiva"
+            },
+            "300": {
+              "Enable": true,
+              "AlarmVariable": "301",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Barra di sicurezza intervenuta"
+            },
+            "301": {
+              "Enable": true,
+              "AlarmVariable": "302",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Monitoraggio corridoio direzione positiva + intervenuto"
+            },
+            "302": {
+              "Enable": true,
+              "AlarmVariable": "303",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Monitoraggio corridoio direzione negativa - intervenuto"
+            },
+            "303": {
+              "Enable": true,
+              "AlarmVariable": "304",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF Asse X: Termica KO"
+            },
+            "304": {
+              "Enable": true,
+              "AlarmVariable": "305",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF Asse X: Errore da drive MiControl"
+            },
+            "305": {
+              "Enable": true,
+              "AlarmVariable": "306",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF Asse Y: Termica KO"
+            },
+            "306": {
+              "Enable": true,
+              "AlarmVariable": "307",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF Asse Y: Errore da drive MiControl"
+            },
+            "307": {
+              "Enable": true,
+              "AlarmVariable": "308",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF Asse Y: Lettura contemporanea sensore alto / basso"
+            },
+            "308": {
+              "Enable": true,
+              "AlarmVariable": "309",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF Asse Y: Timeout movimento"
+            },
+            "309": {
+              "Enable": true,
+              "AlarmVariable": "310",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Monitoraggio sensore materiale direzione positiva + intervenuto"
+            },
+            "310": {
+              "Enable": true,
+              "AlarmVariable": "311",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Monitoraggio sensore materiale direzione negativa - intervenuto"
+            },
+            "311": {
+              "Enable": true,
+              "AlarmVariable": "312",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Timeout di comunicazione con Master RBG"
+            },
+            "312": {
+              "Enable": true,
+              "AlarmVariable": "313",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF Asse X: Non referenziato"
+            },
+            "313": {
+              "Enable": true,
+              "AlarmVariable": "314",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Warning livello di carica"
+            },
+            "314": {
+              "Enable": true,
+              "AlarmVariable": "315",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Livello di carica troppo bassa"
+            },
+            "315": {
+              "Enable": true,
+              "AlarmVariable": "316",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Errore da bilancia"
+            },
+            "316": {
+              "Enable": true,
+              "AlarmVariable": "317",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Peso massimo superato"
+            },
+            "317": {
+              "Enable": true,
+              "AlarmVariable": "318",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Errore in logica di automazione"
+            },
+            "318": {
+              "Enable": true,
+              "AlarmVariable": "319",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Modifica parametri attiva. Disattivare per ciclo."
+            },
+            "319": {
+              "Enable": true,
+              "AlarmVariable": "320",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Velocità troppo alta in zona di reference."
+            },
+            "320": {
+              "Enable": true,
+              "AlarmVariable": "321",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Posizione di destinazione fuori dai limiti software."
+            },
+            "321": {
+              "Enable": true,
+              "AlarmVariable": "322",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF:  Errore di inseguimento."
+            },
+            "322": {
+              "Enable": true,
+              "AlarmVariable": "323",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: SPARE"
+            },
+            "323": {
+              "Enable": true,
+              "AlarmVariable": "324",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: SPARE"
+            },
+            "324": {
+              "Enable": true,
+              "AlarmVariable": "325",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF Collisione: Intervenuto durante uscita in corridoio in direzione positiva +. Posizione non raggiungibile."
+            },
+            "325": {
+              "Enable": true,
+              "AlarmVariable": "326",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF Collisione: Intervenuto durante uscita in corridoio in direzione negativa +. Posizione non raggiungibile."
+            },
+            "326": {
+              "Enable": true,
+              "AlarmVariable": "327",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF Collisione: Intervenuto durante rietro in culla in posizione alta in direzione positiva +. Posizione non raggiungibile."
+            },
+            "327": {
+              "Enable": true,
+              "AlarmVariable": "328",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF Collisione: Intervenuto durante rietro in culla in posizione alta in direzione negativa -. Posizione non raggiungibile."
+            },
+            "328": {
+              "Enable": true,
+              "AlarmVariable": "329",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Tensione troppo alta Batteria 1"
+            },
+            "329": {
+              "Enable": true,
+              "AlarmVariable": "330",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Tensione troppo alta Batteria 2"
+            },
+            "330": {
+              "Enable": true,
+              "AlarmVariable": "331",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Tensione troppo alta Batteria 3"
+            },
+            "331": {
+              "Enable": true,
+              "AlarmVariable": "332",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Tensione troppo alta Batteria 4"
+            },
+            "332": {
+              "Enable": true,
+              "AlarmVariable": "333",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Monitoriaggio corsia intervenuto. Sensori controllo corsia dir. positiva."
+            },
+            "333": {
+              "Enable": true,
+              "AlarmVariable": "334",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: Monitoriaggio corsia intervenuto. Sensori controllo corsia dir. negativa."
+            },
+            "334": {
+              "Enable": true,
+              "AlarmVariable": "335",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: SPARE"
+            },
+            "335": {
+              "Enable": true,
+              "AlarmVariable": "336",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: SPARE"
+            },
+            "336": {
+              "Enable": true,
+              "AlarmVariable": "337",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: SPARE"
+            },
+            "337": {
+              "Enable": true,
+              "AlarmVariable": "338",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: SPARE"
+            },
+            "338": {
+              "Enable": true,
+              "AlarmVariable": "339",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: SPARE"
+            },
+            "339": {
+              "Enable": true,
+              "AlarmVariable": "340",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: SPARE"
+            },
+            "340": {
+              "Enable": true,
+              "AlarmVariable": "341",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: SPARE"
+            },
+            "341": {
+              "Enable": true,
+              "AlarmVariable": "342",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: SPARE"
+            },
+            "342": {
+              "Enable": true,
+              "AlarmVariable": "343",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: SPARE"
+            },
+            "343": {
+              "Enable": true,
+              "AlarmVariable": "344",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: SPARE"
+            },
+            "344": {
+              "Enable": true,
+              "AlarmVariable": "345",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: SPARE"
+            },
+            "345": {
+              "Enable": true,
+              "AlarmVariable": "346",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: SPARE"
+            },
+            "346": {
+              "Enable": true,
+              "AlarmVariable": "347",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "AKF: SPARE"
+            },
+            "347": {
+              "Enable": true,
+              "AlarmVariable": "348",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "SPARE"
+            },
+            "348": {
+              "Enable": true,
+              "AlarmVariable": "349",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "SPARE"
+            },
+            "349": {
+              "Enable": true,
+              "AlarmVariable": "350",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "SPARE"
+            },
+            "350": {
+              "Enable": true,
+              "AlarmVariable": "351",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "SPARE"
+            },
+            "351": {
+              "Enable": true,
+              "AlarmVariable": "352",
+              "AlarmNegated": false,
+              "HmiAlarmClass": "{device_name}",
+              "Description": "SPARE"
+            }
+          }
+        },
+        "TemplateConfig": {
+          "StandaloneAlarms": true
+        }
+      }
+    ]
+  }
+}

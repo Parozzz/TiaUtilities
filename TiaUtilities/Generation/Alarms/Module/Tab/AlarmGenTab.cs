@@ -23,7 +23,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
         private readonly GridDataPreviewer<DeviceData> deviceDataPreview;
         private readonly GridHandler<DeviceData> deviceGridHandler;
 
-        public List<DeviceData> DeviceDataList { get => new(deviceGridHandler.DataSource.GetNotEmptyClonedDataDict().Keys); } //Return CLONED data, otherwise operations on the xml generation will affect the table!
+        public List<DeviceData> DeviceDataList { get => [.. deviceGridHandler.DataSource.GetNotEmptyClonedDataDict().Keys]; } //Return CLONED data, otherwise operations on the xml generation will affect the table!
 
         private bool dirty = false;
 
@@ -101,10 +101,10 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
 
         public void LoadSave(AlarmGenTabSave save)
         {
-            TabPage.Text = save.Name;
+            this.TabPage.Text = save.Name;
             GenUtils.CopyJsonFieldsAndProperties(save.TabConfig, TabConfig);
 
-            deviceGridHandler.LoadSave(save.DeviceGrid);
+            this.deviceGridHandler.LoadSave(save.DeviceGrid);
         }
 
         public void ParseTemplateRenamed(string oldName, string newName)

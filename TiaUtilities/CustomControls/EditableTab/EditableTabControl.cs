@@ -324,7 +324,7 @@ namespace TiaUtilities.CustomControls.EditableTab
         {
             if (e.Control is TabPage tabPage)
             {
-                if(this.removedTabFromEvent == tabPage)
+                if (this.removedTabFromEvent == tabPage)
                 { //Also don't call ControlAdded event
                     return;
                 }
@@ -364,7 +364,7 @@ namespace TiaUtilities.CustomControls.EditableTab
                         return;
                     }
 
-                    if(this.RemoveMetadata(tabPage, out var metadata)) //In case is been removed before creating metadata, avoid creating new.
+                    if (this.RemoveMetadata(tabPage, out var metadata)) //In case is been removed before creating metadata, avoid creating new.
                     {
                         tabPage.TextChanged -= metadata.TextChanged;
                     }
@@ -374,6 +374,17 @@ namespace TiaUtilities.CustomControls.EditableTab
             }
 
             base.OnControlRemoved(e);
+        }
+
+        public TabPage AddTab()
+        {
+            TabPage tabPage = new();
+
+            this.SuspendLayout();
+            this.TabPages.Add(tabPage);
+            this.ResumeLayout();
+
+            return ControlUtils.SetDoubleBuffered(tabPage);
         }
 
         public void AddTabs(int count = 1)
@@ -465,7 +476,7 @@ namespace TiaUtilities.CustomControls.EditableTab
 
         private void HandleTabTextChanged(object? sender, EventArgs args)
         {
-            if(sender is not TabPage tabPage)
+            if (sender is not TabPage tabPage)
             {
                 return;
             }
@@ -478,14 +489,18 @@ namespace TiaUtilities.CustomControls.EditableTab
 
             metadata.renamingInProgress = true;
 
-            TabRenamedEventArgs renamedArgs = new(tabPage, tabPage.Text, metadata.OldName);
-            TabRenamed(this, renamedArgs);
-            if (!renamedArgs.Handled && !String.Equals(tabPage.Text, renamedArgs.NewName))
+            try
             {
-                tabPage.Text = renamedArgs.NewName;
-            }
+                TabRenamedEventArgs renamedArgs = new(tabPage, tabPage.Text, metadata.OldName);
+                TabRenamed(this, renamedArgs);
+                if (!renamedArgs.Handled && !String.Equals(tabPage.Text, renamedArgs.NewName))
+                {
+                    tabPage.Text = renamedArgs.NewName;
+                }
 
-            metadata.OldName = tabPage.Text;
+                metadata.OldName = tabPage.Text;
+            }
+            catch (Exception) { }
 
             metadata.renamingInProgress = false;
         }

@@ -1,19 +1,21 @@
 ﻿namespace TiaUtilities.Generation.Alarms.Xml
 {
-    public class AlarmXmlItem(string tabName, string alarmVariableName, string alarmVariableComment, uint hmiID, string hmiAlarmName, string hmiAlarmText, string hmiAlarmClass, string hmiTriggerTag, uint hmiTriggerBit, List<AlarmXmlHmiParameter> hmiFields)
+    public class AlarmXmlItem()
     {
-        public string TabName { get; init; } = tabName;
-        public string AlarmVariableName { get; init; } = alarmVariableName;
-        public string AlarmVariableComment { get; init; } = alarmVariableComment;
+        public required string TabName { get; init; }
+        public required string AlarmVariableName { get; init; }
+        public required string AlarmVariableComment { get; init; }
 
-        public uint HmiID { get; init; } = hmiID;
-        public string HmiAlarmName { get; init; } = hmiAlarmName;
-        public string HmiAlarmText { get; init; } = hmiAlarmText;
-        public string HmiAlarmClass { get; init; } = hmiAlarmClass;
-        public string HmiTriggerTag { get; init; } = hmiTriggerTag;
-        public uint HmiTriggerBit { get; init; } = hmiTriggerBit;
+        public required uint HmiID { get; init; }
+        public required string HmiAlarmName { get; init; }
+        public required string HmiAlarmText { get; init; }
+        public required string HmiAlarmClass { get; init; }
+        public required string HmiTriggerTag { get; init; }
+        public required uint HmiTriggerBit { get; init; }
 
-        public List<AlarmXmlHmiParameter> HmiFields { get; init; } = hmiFields;
+        public required string DatabaseQuery { get; init; }
+
+        public required List<AlarmXmlHmiParameter> HmiFields { get; init; }
 
         public override string ToString()
         {

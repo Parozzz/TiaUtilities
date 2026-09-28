@@ -43,6 +43,8 @@ namespace TiaUtilities.Generation.Alarms.Module
 
         public List<IGenModule.ModuleControl> ModuleControls { get; init; }
 
+        private bool loadingSave = false;
+
         public AlarmGenModule()
         {
             this.multiGrid = new();
@@ -166,9 +168,22 @@ namespace TiaUtilities.Generation.Alarms.Module
             #endregion
 
             #region TAB_CONTROL
-            this.tabControl.TabAdded += (sender, args) => TabCreation(args.TabPage);
+            this.tabControl.TabAdded += (sender, args) =>
+            {
+                if(this.loadingSave)
+                {
+                    return;
+                }
+
+                this.TabCreation(args.TabPage);
+            };
             this.tabControl.TabRemoved += (sender, args) =>
             {
+                if (this.loadingSave)
+                {
+                    return;
+                }
+
                 if (args.TabPage.Tag is AlarmGenTab tab)
                 {
                     this.alarmTabList.Remove(tab);
@@ -177,6 +192,11 @@ namespace TiaUtilities.Generation.Alarms.Module
 
             this.tabControl.TabRenamed += (sender, args) =>
             {
+                if (this.loadingSave)
+                {
+                    return;
+                }
+
                 var newName = args.NewName;
                 foreach (var loopTab in this.alarmTabList)
                 {
@@ -229,7 +249,7 @@ namespace TiaUtilities.Generation.Alarms.Module
             {
                 alarmTab.Name = Utils.CheckEqualityAndAddNumberAtEnd("AlarmTab", this.alarmTabList.Select(tab => tab.Name));
             }
-            if (save != null)
+            else
             {
                 alarmTab.LoadSave(save);
                 alarmTab.Name = Utils.CheckEqualityAndAddNumberAtEnd(alarmTab.Name, this.alarmTabList.Select(tab => tab.Name)); //In case the loaded file has a duplicated name!
@@ -285,24 +305,35 @@ namespace TiaUtilities.Generation.Alarms.Module
                 return;
             }
 
-            this.Clear();
+            this.loadingSave = true;
 
-            this.JsScriptHandler.LoadSave(loadedSave.ScriptSave);
-            this.templateHandler.LoadSave(loadedSave.TemplateSaves);
-            GenUtils.CopyJsonFieldsAndProperties(loadedSave.AlarmMainConfig, mainConfig);
-
-            foreach (var tabSave in loadedSave.TabSaves)
+            try
             {
-                TabPage tabPage = new();
-                TabCreation(tabPage, tabSave);
-                this.tabControl.TabPages.Add(tabPage);
+                this.Clear();
+
+                this.JsScriptHandler.LoadSave(loadedSave.ScriptSave);
+                this.templateHandler.LoadSave(loadedSave.TemplateSaves);
+                GenUtils.CopyJsonFieldsAndProperties(loadedSave.AlarmMainConfig, mainConfig);
+
+                foreach (var tabSave in loadedSave.TabSaves)
+                {
+                    var tabPage = this.tabControl.AddTab();
+                    TabCreation(tabPage, tabSave);
+                }
+
+                //Seems that the Selected event is not called in this case. Doing it manually.
+                if (this.tabControl.SelectedTab?.Tag is AlarmGenTab tab)
+                {
+                    tab.Selected();
+                }
+            }
+            catch (Exception ex)
+            {
+                Utils.ShowExceptionMessage(ex);
             }
 
-            //Seems that the Selected event is not called in this case. Doing it manually.
-            if (this.tabControl.SelectedTab?.Tag is AlarmGenTab tab)
-            {
-                tab.Selected();
-            }
+            this.loadingSave = false;
+
         }
 
         public void ExportXML(string folderPath)
