@@ -15,6 +15,8 @@ namespace TiaUtilities.Generation
 {
     public partial class GenModuleForm : Form
     {
+        private enum SplitMode { NO_SPLIT, VERTICAL }
+
         private const int CONTROL_ROW = 2;
 
         private readonly IGenModule module;
@@ -23,7 +25,9 @@ namespace TiaUtilities.Generation
         private bool projectLoading = false;
         protected string? openProjectFilePath;
 
-        private readonly ObservableObject<IGenModule.ModuleControl?> activeModuleControl;
+        private readonly ObservableObject<SplitMode> splitMode;
+        private readonly ObservableObject<IGenModule.ModuleControl?> panel1ModuleControl;
+        private readonly ObservableObject<IGenModule.ModuleControl?> panel2ModuleControl;
         private readonly Dictionary<IGenModule.ModuleControl, LabelColorizable> moduleControlLabelDict;
 
         public GenModuleForm(IGenModule generationProject, TimedSaveHandler autoSaveHandler)
@@ -33,7 +37,11 @@ namespace TiaUtilities.Generation
             this.module = generationProject;
             this.autoSaveHandler = autoSaveHandler;
 
-            this.activeModuleControl = new(null);
+            this.splitMode = new(SplitMode.NO_SPLIT);
+
+            this.panel1ModuleControl = new(null);
+            this.panel2ModuleControl = new(null);
+
             this.moduleControlLabelDict = [];
 
             Init();
@@ -121,6 +129,11 @@ namespace TiaUtilities.Generation
             };
             #endregion
 
+            #region TOP_MENU_VIEW
+            this.viewSingleMenuItem.Click += (sender, args) => this.splitMode.Value = SplitMode.NO_SPLIT;
+            this.viewSplitMenuItem.Click += (sender, args) => this.splitMode.Value = SplitMode.VERTICAL;
+            #endregion
+
             #region AUTO_SAVE
             void eventHandler(object? sender, EventArgs args)
             {
@@ -134,6 +147,24 @@ namespace TiaUtilities.Generation
             #endregion
 
             this.module.Init(this);
+
+            this.splitMode.Changed += (sender, args) =>
+            {
+                var oldSplitMode = args.OldValue;
+                var newSplitMode = args.NewValue;
+
+                if(newSplitMode == SplitMode.VERTICAL)
+                {
+                    this.bottomSplitContainer.Panel2Collapsed = false;
+                }
+                else
+                {
+                    this.bottomSplitContainer.Panel2Collapsed = true;
+                    this.panel2ModuleControl.Value = null;
+                }
+
+                this.UpdateControlsLabels();
+            };
 
             var labels = module.ModuleControls.Select(m =>
             {
@@ -149,60 +180,110 @@ namespace TiaUtilities.Generation
                     BorderWidth = 0,
                     BorderColor = Color.DimGray,
 
-                    Padding = new(4),
-                    Margin = new(5),
+                    Padding = new(6),
+                    Margin = new(4),
                     Text = m.Name,
+                    TextAlign = ContentAlignment.MiddleCenter,
 
                     Font = StyleManager.Fonts.NORMAL_BOLD,
                 };
-                label.Click += (sender, args) => this.activeModuleControl.Value = m;
+                label.MouseClick += (sender, args) =>
+                {
+                    if (args.Button == MouseButtons.Left || splitMode.Value == SplitMode.NO_SPLIT)
+                    {
+                        this.panel1ModuleControl.Value = m;
+                    }
+                    else if (args.Button == MouseButtons.Right)
+                    {
+                        this.panel2ModuleControl.Value = m;
+                    }
+                };
 
                 this.moduleControlLabelDict.Add(m, label);
-
                 return label;
             });
             this.selectControlButtonPanel.Controls.AddRange([.. labels]);
 
-            this.activeModuleControl.Changed += (sender, args) =>
+            this.panel1ModuleControl.Changed += (sender, args) =>
             {
                 var oldModuleControl = args.OldValue;
                 var newModuleControl = args.NewValue;
 
-                this.selectControlButtonPanel.SuspendLayout();
-                this.formTableLayout.SuspendLayout();
-
-                var tableControls = this.formTableLayout.Controls;
-
-                var oldControl = this.formTableLayout.GetControlFromPosition(0, CONTROL_ROW);
-                tableControls.Remove(oldControl);
-
-                if(oldModuleControl != null)
+                if(newModuleControl == panel2ModuleControl.Value)
                 {
-                    if(this.moduleControlLabelDict.TryGetValue(oldModuleControl, out var label))
-                    {
-                        label.Margin = new(5);
-                        label.BorderWidth = 0;
-                    }
+                    panel2ModuleControl.Value = null;
                 }
 
-                if(newModuleControl != null)
+                this.bottomSplitContainer.SuspendLayout();
+                this.bottomSplitContainer.Panel1.Controls.Clear();
+
+                if (newModuleControl != null)
                 {
                     var control = newModuleControl.RequestControlCallback();
-                    tableControls.Add(control, 0, CONTROL_ROW);
-
-                    if (this.moduleControlLabelDict.TryGetValue(newModuleControl, out var label))
-                    {
-                        label.Margin = new(4);
-                        label.BorderWidth = 1;
-                    }
+                    this.bottomSplitContainer.Panel1.Controls.Add(control);
                 }
 
-                this.formTableLayout.ResumeLayout();
-                this.selectControlButtonPanel.ResumeLayout();
+                this.UpdateControlsLabels();
+                this.bottomSplitContainer.ResumeLayout();
+            }; 
+            
+            this.panel2ModuleControl.Changed += (sender, args) =>
+            {
+                var oldModuleControl = args.OldValue;
+                var newModuleControl = args.NewValue;
+
+                if (newModuleControl == panel1ModuleControl.Value)
+                {
+                    panel1ModuleControl.Value = null;
+                }
+
+                this.bottomSplitContainer.SuspendLayout();
+                this.bottomSplitContainer.Panel2.Controls.Clear();
+
+                if (newModuleControl != null)
+                {
+                    var control = newModuleControl.RequestControlCallback();
+                    this.bottomSplitContainer.Panel2.Controls.Add(control);
+                }
+
+                this.UpdateControlsLabels();
+                this.bottomSplitContainer.ResumeLayout();
             };
-            this.activeModuleControl.Value = this.module.ModuleControls.FirstOrDefault();
+
+            this.bottomSplitContainer.Panel1Collapsed = false;
+            this.bottomSplitContainer.Panel2Collapsed = true;
+
+            this.panel1ModuleControl.Value = this.module.ModuleControls.FirstOrDefault();
 
             Translate();
+        }
+
+        private void UpdateControlsLabels()
+        {
+            this.moduleControlLabelDict.Values.ForEach(l =>
+            {
+                l.BorderWidth = 0;
+            });
+
+            var pos1Control = this.panel1ModuleControl.Value;
+            if(pos1Control != null)
+            {
+                if (this.moduleControlLabelDict.TryGetValue(pos1Control, out var label))
+                {
+                    label.BorderWidth = 2;
+                    label.BorderColor = Color.DimGray;
+                }
+            }
+
+            var pos2Control = this.panel2ModuleControl.Value;
+            if (pos2Control != null)
+            {
+                if (this.moduleControlLabelDict.TryGetValue(pos2Control, out var label))
+                {
+                    label.BorderWidth = 2;
+                    label.BorderColor = Color.CadetBlue;
+                }
+            }
         }
 
         private void Translate()
@@ -354,5 +435,6 @@ namespace TiaUtilities.Generation
             var version = versionPropertyType.GetValue(null);
             return version is int intVersion ? intVersion : LEGACY_VERSION;
         }
+
     }
 }

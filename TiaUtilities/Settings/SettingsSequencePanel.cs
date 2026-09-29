@@ -16,14 +16,9 @@ namespace TiaUtilities.SettingsStep
     {
         public class TrasferToAllButton
         {
-
-            public Button Control { get; init; }
-
-            private WeakReference<SettingsControl>? settingsControlWeak;
-            private WeakReference<SettingsSequence>? sequenceWeak;
-            private WeakReference<ObservableConfiguration>? configurationWeak;
-
+            private readonly Button control;
             private readonly ToolTip ToolTip = ControlUtils.CreateToolTip(quick: true);
+            private EventHandler? click;
 
             public TrasferToAllButton()
             {
@@ -35,7 +30,7 @@ namespace TiaUtilities.SettingsStep
                     ImageSize = new Size(maxSize.Width - 2, maxSize.Height - 2),
                 };
 
-                this.Control = new()
+                this.control = new()
                 {
                     Anchor = AnchorStyles.None,
 
@@ -59,86 +54,56 @@ namespace TiaUtilities.SettingsStep
                     Padding = Padding.Empty,
                     Margin = Padding.Empty,
                 };
-
-                this.Control.MouseHover += (sender, args) => ShowTooltip();
-            }
-
-            private (SettingsControl, SettingsSequence, ObservableConfiguration)? GetWeakReferences()
-            {
-                if (this.settingsControlWeak == null || this.sequenceWeak == null || this.configurationWeak == null)
-                {
-                    this.settingsControlWeak = null;
-                    this.sequenceWeak = null;
-                    this.configurationWeak = null;
-                    return null;
-                }
-
-                if (!settingsControlWeak.TryGetTarget(out var settingsControl) ||
-                    !sequenceWeak.TryGetTarget(out var sequence) ||
-                    !configurationWeak.TryGetTarget(out var observableConfiguration))
-                {
-                    this.settingsControlWeak = null;
-                    this.sequenceWeak = null;
-                    this.configurationWeak = null;
-                    return null;
-                }
-
-                return (settingsControl, sequence, observableConfiguration);
             }
 
             public void ShowAt(TableLayoutPanel panel, int column, int row,
-                SettingsControl settingsControl, SettingsSequence sequence, ObservableConfiguration configuration)
+                SettingsControl settingsControl, SettingsSequence sequence,
+                ObservableConfiguration configuration, SettingsConfigurationProperty property)
             {
                 this.Remove();
 
-                var count = TrasferToAllButton.GetSequencesCount(settingsControl, sequence, configuration);
-                if(count <= 0)
-                {
-                    return;
-                }
-
-                panel.Controls.Add(this.Control, column, row);
-
-                this.settingsControlWeak = new(settingsControl);
-                this.sequenceWeak = new(sequence);
-                this.configurationWeak = new(configuration);
-            }
-
-            public void Remove()
-            {
-                this.Control.Parent?.Controls.Remove(this.Control); 
-
-                this.settingsControlWeak = null;
-                this.sequenceWeak = null;
-                this.configurationWeak = null;
-
-                this.ToolTip.RemoveAll();
-            }
-
-            private void ShowTooltip()
-            {
-                var tuple = GetWeakReferences();
-                if (tuple == null)
-                {
-                    return;
-                }
-
-                var (settingsControl, sequence, configuration) = tuple.Value;
-
-                var count = TrasferToAllButton.GetSequencesCount(settingsControl, sequence, configuration);
-                var caption = $"{Locale.SETTINGS_FORM_CONTEXT_MENU_SET_TO_OTHERS} ({count})";
-                this.ToolTip.SetToolTip(this.Control, caption);
-            }
-
-            private static int GetSequencesCount(SettingsControl settingsControl, SettingsSequence sequence, ObservableConfiguration configuration)
-            {
                 var count = 0;
-                if (settingsControl.ConfigurationTypeModelDict.TryGetValue(configuration.GetType(), out var sequences))
+                if (settingsControl.ConfigurationTypeSequenceDict.TryGetValue(configuration.GetType(), out var sequences))
                 {
                     count = sequences.Count(c => c != sequence);
                 }
 
-                return count;
+                if (count <= 0)
+                {
+                    return;
+                }
+
+                panel.Controls.Add(this.control, column, row);
+
+                var caption = $"{Locale.SETTINGS_FORM_CONTEXT_MENU_SET_TO_OTHERS} ({count})";
+                this.ToolTip.SetToolTip(this.control, caption);
+
+                this.click = (sender, args) =>
+                {
+                    if (settingsControl.ConfigurationTypeSequenceDict.TryGetValue(configuration.GetType(), out var sequences))
+                    {
+                        var value = property.GetFrom(configuration);
+                        if (value != null)
+                        {
+                            sequences.Where(s => sequence != s).ForEach(s => property.SetTo(s.Configuration, value));
+                        }
+                    }
+                };
+                this.control.Click += this.click;
+            }
+
+            public void Remove()
+            {
+                this.control.Parent?.Controls.Remove(this.control);
+
+                if (this.click != null)
+                {
+                    this.control.Click -= this.click;
+                    this.click = null;
+                }
+
+                this.ToolTip.Hide(this.control);
+                this.ToolTip.RemoveAll();
             }
         }
 
@@ -150,9 +115,6 @@ namespace TiaUtilities.SettingsStep
 
         public SettingsSequence Sequence { get; init; }
         public SettingsSequencePanelDescriptor Descriptor { get; init; }
-
-        public LabelColorizable Label { get; init; }
-        public Action? LabelClick { get; set; }
 
         public List<SettingsSequencePanelLine> Lines { get; init; }
 
@@ -174,7 +136,7 @@ namespace TiaUtilities.SettingsStep
             this.propertyChangedPredicates = [];
             this.configurationPropertyChanged = (sender, args) => propertyChangedPredicates.ForEach(p => p.Invoke(args));
 
-            (this.Label, this.Lines, this.tableRows, this.tableCellStyles) = this.BuildControls(settingsControl);
+            (this.Lines, this.tableRows, this.tableCellStyles) = this.BuildControls(settingsControl);
         }
 
         public void RegisterListeners()
@@ -184,7 +146,7 @@ namespace TiaUtilities.SettingsStep
                 return;
             }
 
-            configuration.PropertyChanged += configurationPropertyChanged;
+            this.configuration.PropertyChanged += configurationPropertyChanged;
             this.ListenersRegistered = true;
         }
 
@@ -195,11 +157,11 @@ namespace TiaUtilities.SettingsStep
                 return;
             }
 
-            configuration.PropertyChanged -= configurationPropertyChanged;
+            this.configuration.PropertyChanged -= configurationPropertyChanged;
             this.ListenersRegistered = false;
         }
 
-        private (LabelColorizable, List<SettingsSequencePanelLine>, List<RowStyle>, List<TableCellStyle>) BuildControls(SettingsControl settingsControl)
+        private (List<SettingsSequencePanelLine>, List<RowStyle>, List<TableCellStyle>) BuildControls(SettingsControl settingsControl)
         {
             const int COLUMN_VALUE_LABEL = 1;
             const int COLUMN_VALUE_CONTROL = 2;
@@ -208,15 +170,12 @@ namespace TiaUtilities.SettingsStep
             const int COLUMN_START = 1;
             const int COLUMN_END = 3;
 
-            var groups = this.Descriptor.GetGroups();
-
             List<SettingsSequencePanelLine> lines = [];
             List<RowStyle> rows = [];
             List<TableCellStyle> cellStyles = [];
 
             int rowCounter = 0;
-
-            foreach (var group in groups)
+            foreach (var group in this.Descriptor.GetGroups())
             {
                 var factories = group.Factories;
                 if (factories.Count == 0)
@@ -230,7 +189,7 @@ namespace TiaUtilities.SettingsStep
                 lines.Add(new()
                 {
                     Name = "GroupLabel",
-                    MainControl = new(groupLabel) { Column = COLUMN_START, Row = rowCounter, ColumnSpan = COLUMN_END - COLUMN_START + 1 }
+                    Main = new(groupLabel) { Column = COLUMN_START, Row = rowCounter, ColumnSpan = COLUMN_END - COLUMN_START + 1 }
                 });
                 rowCounter += 1;
 
@@ -268,7 +227,7 @@ namespace TiaUtilities.SettingsStep
                         lines.Add(new()
                         {
                             Name = factory.Name,
-                            MainControl = new(nameLabel) { Column = COLUMN_START, Row = rowCounter, ColumnSpan = COLUMN_END - COLUMN_START + 1 }
+                            Main = new(nameLabel) { Column = COLUMN_START, Row = rowCounter, ColumnSpan = COLUMN_END - COLUMN_START + 1 }
                         });
                     }
                     else
@@ -289,9 +248,16 @@ namespace TiaUtilities.SettingsStep
                             MouseEnterCallback = cellStyle =>
                             {
                                 var panel = cellStyle.TableLayoutPanel;
-                                if(panel != null)
+                                if (panel != null && factory.ConfigurationProperty != null)
                                 {
-                                    SettingsSequencePanel.TRANSFER_TO_ALL_BUTTON.ShowAt(panel, COLUMN_ICON, savedRow, settingsControl, this.Sequence, this.configuration);
+                                    SettingsSequencePanel.TRANSFER_TO_ALL_BUTTON.ShowAt(
+                                        panel,
+                                        COLUMN_ICON, savedRow,
+                                        settingsControl,
+                                        this.Sequence,
+                                        this.configuration, 
+                                        factory.ConfigurationProperty
+                                    );
                                 }
 
                                 control.BackColor = Color.AntiqueWhite;
@@ -312,7 +278,7 @@ namespace TiaUtilities.SettingsStep
                             line = new()
                             {
                                 Name = factory.Name,
-                                MainControl = new(control) { Column = COLUMN_VALUE_LABEL, Row = rowCounter, ColumnSpan = 3 },
+                                Main = new(control) { Column = COLUMN_VALUE_LABEL, Row = rowCounter, ColumnSpan = 3 },
                             };
                         }
                         else
@@ -321,10 +287,7 @@ namespace TiaUtilities.SettingsStep
                             {
                                 Name = factory.Name,
                                 Label = new(nameLabel) { Column = COLUMN_VALUE_LABEL, Row = rowCounter },
-                                MainControl = new(control) { Column = COLUMN_VALUE_CONTROL, Row = rowCounter },
-                                /*Buttons = {
-                                    new(transferToAllButton) { Column = COLUMN_ICON, Row = rowCounter }
-                                }*/
+                                Main = new(control) { Column = COLUMN_VALUE_CONTROL, Row = rowCounter },
                             };
                         }
 
@@ -339,20 +302,23 @@ namespace TiaUtilities.SettingsStep
                 rowCounter += 1; //Skip 1 = Padding row
 
             }
-            
+
             var divider = SettingsControls.GetDividerPanel(Color.Transparent);
             lines.Add(new()
             {
                 Name = "Divider",
-                MainControl = new(divider) { Column = COLUMN_VALUE_LABEL, Row = rowCounter + 1, ColumnSpan = COLUMN_END - COLUMN_START + 1 }
+                Main = new(divider) { Column = COLUMN_VALUE_LABEL, Row = rowCounter + 1, ColumnSpan = COLUMN_END - COLUMN_START + 1 }
             });
 
-            var sectionLabel = CreateSectionLabel(this.Descriptor.Name, symbol: false);
-            sectionLabel.Click += (sender, args) => this.LabelClick?.Invoke();
+            return (lines, rows, cellStyles);
+        }
 
-            ControlUtils.CreateToolTip().SetToolTip(sectionLabel, this.Descriptor.Description);
+        public LabelColorizable CreateSelectControl()
+        {
+            var selectControl = CreateSelectLabelColorizable(this.Descriptor.Name, symbol: false);
+            ControlUtils.CreateToolTip().SetToolTip(selectControl, this.Descriptor.Description);
 
-            return (sectionLabel, lines, rows, cellStyles);
+            return selectControl;
         }
 
         public void ApplyControls(TableLayoutPanelColorizable panel)
@@ -362,8 +328,7 @@ namespace TiaUtilities.SettingsStep
                 panel.RowStyles.Add(row);
             }
 
-            this.Lines.ForEach(l => l.AddAllControls(panel));
-            this.Lines.ForEach(l => l.SetAllPositionsToPanel(panel));
+            this.Lines.ForEach(l => l.AddToPanel(panel));
 
             foreach (var style in this.tableCellStyles)
             {
@@ -396,7 +361,7 @@ namespace TiaUtilities.SettingsStep
             };
         }
 
-        public static LabelColorizable CreateSectionLabel(string text, bool symbol)
+        public static LabelColorizable CreateSelectLabelColorizable(string text, bool symbol)
         {
             return new LabelColorizable()
             {

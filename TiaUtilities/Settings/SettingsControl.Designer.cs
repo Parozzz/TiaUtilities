@@ -38,7 +38,7 @@ namespace TiaUtilities.SettingsStep
             selectConfigurationPanel = new FlowLayoutPanel();
             toggleModeButton = new Button();
             selectConfigurationLabel = new Label();
-            selectConfigurationComboBox = new ComboBoxFilterable();
+            selectSequenceComboBox = new ComboBoxFilterable();
             searchLabel = new Label();
             searchTextBox = new TextBox();
             sequenceButtonsPanel = new FlowLayoutPanel();
@@ -63,13 +63,13 @@ namespace TiaUtilities.SettingsStep
             mainTable.Location = new Point(0, 0);
             mainTable.Margin = new Padding(0);
             mainTable.Name = "mainTable";
-            mainTable.Padding = new Padding(4);
+            mainTable.Padding = new Padding(4, 3, 4, 3);
             mainTable.RowCount = 3;
             mainTable.RowStyles.Add(new RowStyle());
             mainTable.RowStyles.Add(new RowStyle());
             mainTable.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            mainTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            mainTable.Size = new Size(900, 768);
+            mainTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 15F));
+            mainTable.Size = new Size(788, 576);
             mainTable.TabIndex = 0;
             // 
             // selectConfigurationPanel
@@ -78,15 +78,15 @@ namespace TiaUtilities.SettingsStep
             selectConfigurationPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             selectConfigurationPanel.Controls.Add(toggleModeButton);
             selectConfigurationPanel.Controls.Add(selectConfigurationLabel);
-            selectConfigurationPanel.Controls.Add(selectConfigurationComboBox);
+            selectConfigurationPanel.Controls.Add(selectSequenceComboBox);
             selectConfigurationPanel.Controls.Add(searchLabel);
             selectConfigurationPanel.Controls.Add(searchTextBox);
             selectConfigurationPanel.Dock = DockStyle.Fill;
-            selectConfigurationPanel.Location = new Point(4, 4);
+            selectConfigurationPanel.Location = new Point(4, 3);
             selectConfigurationPanel.Margin = new Padding(0);
             selectConfigurationPanel.Name = "selectConfigurationPanel";
-            selectConfigurationPanel.Padding = new Padding(4);
-            selectConfigurationPanel.Size = new Size(892, 38);
+            selectConfigurationPanel.Padding = new Padding(4, 3, 4, 3);
+            selectConfigurationPanel.Size = new Size(780, 31);
             selectConfigurationPanel.TabIndex = 0;
             // 
             // toggleModeButton
@@ -95,10 +95,10 @@ namespace TiaUtilities.SettingsStep
             toggleModeButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             toggleModeButton.FlatAppearance.BorderSize = 0;
             toggleModeButton.FlatStyle = FlatStyle.Flat;
-            toggleModeButton.Location = new Point(4, 4);
-            toggleModeButton.Margin = new Padding(0, 0, 9, 0);
+            toggleModeButton.Location = new Point(4, 3);
+            toggleModeButton.Margin = new Padding(0, 0, 8, 0);
             toggleModeButton.Name = "toggleModeButton";
-            toggleModeButton.Size = new Size(46, 30);
+            toggleModeButton.Size = new Size(39, 25);
             toggleModeButton.TabIndex = 3;
             toggleModeButton.Text = "IMG";
             toggleModeButton.UseVisualStyleBackColor = true;
@@ -107,47 +107,47 @@ namespace TiaUtilities.SettingsStep
             // 
             selectConfigurationLabel.Anchor = AnchorStyles.None;
             selectConfigurationLabel.AutoSize = true;
-            selectConfigurationLabel.Location = new Point(59, 9);
-            selectConfigurationLabel.Margin = new Padding(0, 0, 9, 0);
+            selectConfigurationLabel.Location = new Point(51, 8);
+            selectConfigurationLabel.Margin = new Padding(0, 0, 8, 0);
             selectConfigurationLabel.Name = "selectConfigurationLabel";
-            selectConfigurationLabel.Size = new Size(176, 20);
+            selectConfigurationLabel.Size = new Size(138, 15);
             selectConfigurationLabel.TabIndex = 0;
             selectConfigurationLabel.Text = "Seleziona configurazione";
             selectConfigurationLabel.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // selectConfigurationComboBox
             // 
-            selectConfigurationComboBox.Anchor = AnchorStyles.None;
-            selectConfigurationComboBox.DrawMode = DrawMode.OwnerDrawFixed;
-            selectConfigurationComboBox.DropDownHoveredBackColor = Color.LightSeaGreen;
-            selectConfigurationComboBox.DropDownHoveredForeColor = Color.Black;
-            selectConfigurationComboBox.FlatStyle = FlatStyle.System;
-            selectConfigurationComboBox.FormattingEnabled = true;
-            selectConfigurationComboBox.Location = new Point(244, 5);
-            selectConfigurationComboBox.Margin = new Padding(0);
-            selectConfigurationComboBox.Name = "selectConfigurationComboBox";
-            selectConfigurationComboBox.Size = new Size(133, 28);
-            selectConfigurationComboBox.TabIndex = 0;
-            selectConfigurationComboBox.TabStop = false;
+            selectSequenceComboBox.Anchor = AnchorStyles.None;
+            selectSequenceComboBox.DrawMode = DrawMode.OwnerDrawFixed;
+            selectSequenceComboBox.DropDownHoveredBackColor = Color.LightSeaGreen;
+            selectSequenceComboBox.DropDownHoveredForeColor = Color.Black;
+            selectSequenceComboBox.FlatStyle = FlatStyle.System;
+            selectSequenceComboBox.FormattingEnabled = true;
+            selectSequenceComboBox.Location = new Point(197, 3);
+            selectSequenceComboBox.Margin = new Padding(0);
+            selectSequenceComboBox.Name = "selectSequenceComboBox";
+            selectSequenceComboBox.Size = new Size(117, 24);
+            selectSequenceComboBox.TabIndex = 0;
+            selectSequenceComboBox.TabStop = false;
             // 
             // searchLabel
             // 
             searchLabel.Anchor = AnchorStyles.None;
             searchLabel.AutoSize = true;
-            searchLabel.Location = new Point(377, 9);
-            searchLabel.Margin = new Padding(0, 0, 9, 0);
+            searchLabel.Location = new Point(314, 8);
+            searchLabel.Margin = new Padding(0, 0, 8, 0);
             searchLabel.Name = "searchLabel";
-            searchLabel.Size = new Size(87, 20);
+            searchLabel.Size = new Size(69, 15);
             searchLabel.TabIndex = 1;
             searchLabel.Text = "Cerca valori";
             // 
             // searchTextBox
             // 
             searchTextBox.Anchor = AnchorStyles.None;
-            searchTextBox.Location = new Point(473, 5);
+            searchTextBox.Location = new Point(391, 4);
             searchTextBox.Margin = new Padding(0);
             searchTextBox.Name = "searchTextBox";
-            searchTextBox.Size = new Size(219, 27);
+            searchTextBox.Size = new Size(192, 23);
             searchTextBox.TabIndex = 2;
             // 
             // sequenceButtonsPanel
@@ -155,9 +155,10 @@ namespace TiaUtilities.SettingsStep
             sequenceButtonsPanel.AutoSize = true;
             sequenceButtonsPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             sequenceButtonsPanel.Dock = DockStyle.Fill;
-            sequenceButtonsPanel.Location = new Point(7, 45);
+            sequenceButtonsPanel.Location = new Point(7, 36);
+            sequenceButtonsPanel.Margin = new Padding(3, 2, 3, 2);
             sequenceButtonsPanel.Name = "sequenceButtonsPanel";
-            sequenceButtonsPanel.Size = new Size(886, 1);
+            sequenceButtonsPanel.Size = new Size(774, 1);
             sequenceButtonsPanel.TabIndex = 4;
             // 
             // bottomPanel
@@ -169,10 +170,10 @@ namespace TiaUtilities.SettingsStep
             bottomPanel.Controls.Add(controlsPanel);
             bottomPanel.Controls.Add(searchPanelControl);
             bottomPanel.Dock = DockStyle.Fill;
-            bottomPanel.Location = new Point(9, 53);
-            bottomPanel.Margin = new Padding(5);
+            bottomPanel.Location = new Point(8, 42);
+            bottomPanel.Margin = new Padding(4, 4, 4, 4);
             bottomPanel.Name = "bottomPanel";
-            bottomPanel.Size = new Size(882, 706);
+            bottomPanel.Size = new Size(772, 527);
             bottomPanel.TabIndex = 3;
             // 
             // controlsPanel
@@ -185,12 +186,12 @@ namespace TiaUtilities.SettingsStep
             controlsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             controlsPanel.Dock = DockStyle.Top;
             controlsPanel.Location = new Point(0, 0);
-            controlsPanel.Margin = new Padding(10);
+            controlsPanel.Margin = new Padding(9, 8, 9, 8);
             controlsPanel.Name = "controlsPanel";
             controlsPanel.RowCount = 1;
             controlsPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
             controlsPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            controlsPanel.Size = new Size(882, 0);
+            controlsPanel.Size = new Size(772, 0);
             controlsPanel.TabIndex = 0;
             // 
             // searchPanelControl
@@ -203,22 +204,23 @@ namespace TiaUtilities.SettingsStep
             searchPanelControl.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             searchPanelControl.Dock = DockStyle.Top;
             searchPanelControl.Location = new Point(0, 0);
-            searchPanelControl.Margin = new Padding(10);
+            searchPanelControl.Margin = new Padding(9, 8, 9, 8);
             searchPanelControl.Name = "searchPanelControl";
             searchPanelControl.RowCount = 1;
             searchPanelControl.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
             searchPanelControl.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            searchPanelControl.Size = new Size(882, 0);
+            searchPanelControl.Size = new Size(772, 0);
             searchPanelControl.TabIndex = 1;
             // 
             // SettingsControl
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             AutoSizeMode = AutoSizeMode.GrowAndShrink;
             Controls.Add(mainTable);
+            Margin = new Padding(3, 2, 3, 2);
             Name = "SettingsControl";
-            Size = new Size(900, 768);
+            Size = new Size(788, 576);
             mainTable.ResumeLayout(false);
             mainTable.PerformLayout();
             selectConfigurationPanel.ResumeLayout(false);
@@ -234,7 +236,7 @@ namespace TiaUtilities.SettingsStep
         private TableLayoutPanelColorizable mainTable;
         private FlowLayoutPanel selectConfigurationPanel;
         private Label selectConfigurationLabel;
-        private ComboBoxFilterable selectConfigurationComboBox;
+        private ComboBoxFilterable selectSequenceComboBox;
         private Panel bottomPanel;
         private TableLayoutPanelColorizable controlsPanel;
         private Label searchLabel;

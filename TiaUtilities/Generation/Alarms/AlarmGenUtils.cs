@@ -7,9 +7,17 @@ namespace TiaUtilities.Generation.Alarms
 {
     public static class AlarmGenUtils
     {
+        private static readonly List<SettingsSequencePanelDescriptor> GLOBAL_DESCRIPTORS = [];
+        private static readonly List<SettingsSequencePanelDescriptor> TAB_DESCRIPTORS = [];
+        private static readonly List<SettingsSequencePanelDescriptor> TEMPLATE_DESCRIPTORS = [];
 
-        public static List<SettingsSequencePanelDescriptor> CreateGlobalSettingsStepDescriptors()
+        public static List<SettingsSequencePanelDescriptor> CreateGlobalSettingsDescriptors()
         {
+            if(GLOBAL_DESCRIPTORS.Count > 0)
+            {
+                return GLOBAL_DESCRIPTORS;
+            }
+
             var blocksStepDescriptor = new SettingsSequencePanelDescriptor("Blocks", "Settings for generated blocks")
                 .CreateBinder<AlarmMainConfiguration>()
                 .StartGroup(Locale.ALARM_SETTINGS_FC)
@@ -54,11 +62,18 @@ namespace TiaUtilities.Generation.Alarms
                     .Add(x => x.DatabaseQuery, "", options: new() { StringSpecifiedEditor = StringCustomEditor.TSQL, MinWidth = 1600 })
                 .End();
 
-            return [enablingsStepDescriptor, blocksStepDescriptor, segmentNamesStepDescriptor, alarmStepDescriptor, sqlQueryDescriptor];
+            GLOBAL_DESCRIPTORS.Clear();
+            GLOBAL_DESCRIPTORS.AddRange([enablingsStepDescriptor, blocksStepDescriptor, segmentNamesStepDescriptor, alarmStepDescriptor, sqlQueryDescriptor]);
+            return GLOBAL_DESCRIPTORS;
         }
         
         public static List<SettingsSequencePanelDescriptor> CreateTabSettingsStepDescriptors()
         {
+            if(TAB_DESCRIPTORS.Count > 0)
+            {
+                return TAB_DESCRIPTORS;
+            }
+
             var blocksStepDescriptor = new SettingsSequencePanelDescriptor("Blocks")
                 .CreateBinder<AlarmTabConfiguration>()
                 .StartGroup(Locale.ALARM_SETTINGS_FC)
@@ -119,17 +134,26 @@ namespace TiaUtilities.Generation.Alarms
 
                 .End();
 
-            return [blocksStepDescriptor, variablesStepDescriptor, alarmsStepDescriptor, hmiStepDescriptor, placeholdersStepDescriptor];
+            TAB_DESCRIPTORS.Clear();
+            TAB_DESCRIPTORS.AddRange([blocksStepDescriptor, variablesStepDescriptor, alarmsStepDescriptor, hmiStepDescriptor, placeholdersStepDescriptor]);
+            return TAB_DESCRIPTORS;
         }
         
         public static List<SettingsSequencePanelDescriptor> CreateTemplateSettingsStepDescriptor()
         {
+            if(TEMPLATE_DESCRIPTORS.Count > 0)
+            {
+                return TEMPLATE_DESCRIPTORS;
+            }
+
             var descriptor = new SettingsSequencePanelDescriptor("Alarms")
                 .CreateBinder<AlarmTemplateConfiguration>()
                 .Add(x => x.StandaloneAlarms, Locale.ALARM_SETTINGS_TEMPLATE_STANDALONE_ALARMS, Locale.ALARM_SETTINGS_TEMPLATE_STANDALONE_ALARMS_DESC)
                 .End();
 
-            return [descriptor];
+            TEMPLATE_DESCRIPTORS.Clear();
+            TEMPLATE_DESCRIPTORS.AddRange([descriptor]);
+            return TEMPLATE_DESCRIPTORS;
         }
 
     }

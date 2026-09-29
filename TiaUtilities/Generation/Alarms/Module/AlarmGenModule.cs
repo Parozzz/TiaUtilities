@@ -8,7 +8,6 @@ using TiaUtilities.CustomControls.EditableTab;
 using TiaUtilities.Generation.Alarms.Configurations;
 using TiaUtilities.Generation.Alarms.Data;
 using TiaUtilities.Generation.Alarms.Module.Tab;
-using TiaUtilities.Generation.Alarms.Module.Template;
 using TiaUtilities.Generation.Alarms.Template;
 using TiaUtilities.Generation.Alarms.Xml;
 using TiaUtilities.Generation.GridHandler;
@@ -407,7 +406,7 @@ namespace TiaUtilities.Generation.Alarms.Module
 
             List<SettingsSequence> sequenceList = [];
 
-            var globalStepDescriptors = AlarmGenUtils.CreateGlobalSettingsStepDescriptors();
+            var globalStepDescriptors = AlarmGenUtils.CreateGlobalSettingsDescriptors();
             var tablStepDescriptors = AlarmGenUtils.CreateTabSettingsStepDescriptors();
             var templateStepDescriptors = AlarmGenUtils.CreateTemplateSettingsStepDescriptor();
 

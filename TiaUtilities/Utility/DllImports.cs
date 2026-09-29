@@ -41,6 +41,7 @@ namespace TiaUtilities.Utility
         public const int WM_ACTIVATE = 0x0006;
         public const int WM_SETFOCUS = 0x0007;
         public const int WM_KILLFOCUS = 0x0008;
+        private const int WM_SETREDRAW = 0x000B;
         public const int WM_PAINT = 0x000F;
         public const int WM_ERASEBKGND = 0x0014;
         public const int WM_SETCURSOR = 0x0020;
@@ -73,6 +74,17 @@ namespace TiaUtilities.Utility
         public static void RaiseLeftMouse(Point position)
         {
             DllImports.mouse_event(DllImports.MOUSEEVENTF_LEFTUP, position.X, position.Y, 0, 0);
+        }
+
+        public static void SuspendDrawing(Control control)
+        {//wParam = 0->Content can't be redrawn after a change.
+            SendMessage(control.Handle, WM_SETREDRAW, (IntPtr)0, IntPtr.Zero);
+        }
+
+        public static void ResumeDrawing(Control control)
+        {//wParam = 1->Content can be redrawn after a change.
+            SendMessage(control.Handle, WM_SETREDRAW, (IntPtr)1, IntPtr.Zero);
+            control.Refresh();
         }
 
     }

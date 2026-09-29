@@ -68,11 +68,8 @@ namespace TiaUtilities.CustomControls.EditableTab
 
         protected override void OnPaintBackground(PaintEventArgs e)
         {
-            //e.Graphics.SmoothingMode = SmoothingMode.AntiAlias; //No smoothing, it causes a border on the Control.
-
             Rectangle clientRect = this.ClientRectangle;
 
-            //Painting Background
             using Brush backBrush = new SolidBrush(SystemColors.Control);
             e.Graphics.FillRectangle(backBrush, clientRect);
 

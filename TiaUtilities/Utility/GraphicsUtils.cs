@@ -25,8 +25,10 @@ namespace TiaUtilities.Utility
             Validate.NotNull(graphics);
             Validate.NotNull(pen);
 
-            using var path = CreateRoundedRectanglePath(bounds, cornerRadius);
             graphics.SmoothingMode = SmoothingMode.AntiAlias; // Rende i bordi lisci
+            graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+            using var path = CreateRoundedRectanglePath(bounds, cornerRadius, borderWidth: pen.Width);
             graphics.DrawPath(pen, path);
         }
 
@@ -35,66 +37,91 @@ namespace TiaUtilities.Utility
             Validate.NotNull(graphics);
             Validate.NotNull(brush);
 
+            graphics.SmoothingMode = SmoothingMode.AntiAlias; // Rende i bordi lisci
+            graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
             using var path = CreateRoundedRectanglePath(bounds, cornerRadius);
-            graphics.SmoothingMode = SmoothingMode.AntiAlias;
             graphics.FillPath(brush, path);
         }
 
-        public static GraphicsPath CreateRoundedRectanglePath(Rectangle bounds, BorderRadius radii)
+        public static GraphicsPath CreateRoundedRectanglePath(RectangleF bounds, BorderRadius radii, float borderWidth = 1f)
         {
             GraphicsPath path = new();
 
-            if (radii.TopLeft == 0 && radii.TopRight == 0 && radii.BottomLeft == 0 && radii.BottomRight == 0)
+            // Rientro per allineare la penna perfettamente all'interno del controllo
+            float halfPen = borderWidth / 2f;
+
+            float x = bounds.X + halfPen;
+            float y = bounds.Y + halfPen;
+            float width = bounds.Width - borderWidth;
+            float height = bounds.Height - borderWidth;
+
+            if (width <= 0 || height <= 0)
             {
-                path.AddRectangle(bounds);
                 return path;
             }
 
-            if (radii.TopLeft > 0)
+            float right = x + width;
+            float bottom = y + height;
+
+            // Limite di sicurezza per evitare sovrapposizione degli archi
+            float maxRadius = Math.Min(width, height) / 2f;
+            float rTL = Math.Min(radii.TopLeft, maxRadius);
+            float rTR = Math.Min(radii.TopRight, maxRadius);
+            float rBR = Math.Min(radii.BottomRight, maxRadius);
+            float rBL = Math.Min(radii.BottomLeft, maxRadius);
+
+            // 1. TOP-LEFT (Arco o Angolo retto)
+            if (rTL > 0)
             {
-                int diameter = radii.TopLeft * 2;
-                Rectangle arc = new(bounds.Left, bounds.Top, diameter, diameter);
-                path.AddArc(arc, 180, 90);
+                path.AddArc(x, y, rTL * 2f, rTL * 2f, 180, 90);
             }
             else
             {
-                path.AddLine(bounds.Left, bounds.Top, bounds.Left, bounds.Top);
+                path.AddLine(x, y, x + rTR, y); // Inizia la linea superiore
             }
 
-            if (radii.TopRight > 0)
+            // Linea Superiore (tra TL e TR)
+            if (rTL > 0 || rTR > 0)
             {
-                int diameter = radii.TopRight * 2;
-                Rectangle arc = new(bounds.Right - diameter, bounds.Top, diameter, diameter);
-                path.AddArc(arc, 270, 90);
-            }
-            else
-            {
-                path.AddLine(bounds.Right, bounds.Top, bounds.Right, bounds.Top);
+                path.AddLine(x + rTL, y, right - rTR, y);
             }
 
-            if (radii.BottomRight > 0)
+            // 2. TOP-RIGHT (Arco o Angolo retto)
+            if (rTR > 0)
             {
-                int diameter = radii.BottomRight * 2;
-                Rectangle arc = new(bounds.Right - diameter, bounds.Bottom - diameter, diameter, diameter);
-                path.AddArc(arc, 0, 90);
-            }
-            else
-            {
-                path.AddLine(bounds.Right, bounds.Bottom, bounds.Right, bounds.Bottom);
+                path.AddArc(right - (rTR * 2f), y, rTR * 2f, rTR * 2f, 270, 90);
             }
 
-            if (radii.BottomLeft > 0)
+            // Linea Destra (tra TR e BR)
+            if (rTR > 0 || rBR > 0)
             {
-                int diameter = radii.BottomLeft * 2;
-                Rectangle arc = new(bounds.Left, bounds.Bottom - diameter, diameter, diameter);
-                path.AddArc(arc, 90, 90);
-            }
-            else
-            {
-                path.AddLine(bounds.Left, bounds.Bottom, bounds.Left, bounds.Bottom);
+                path.AddLine(right, y + rTR, right, bottom - rBR);
             }
 
-            path.CloseFigure();
+            // 3. BOTTOM-RIGHT (Arco o Angolo retto)
+            if (rBR > 0)
+            {
+                path.AddArc(right - (rBR * 2f), bottom - (rBR * 2f), rBR * 2f, rBR * 2f, 0, 90);
+            }
+
+            // Linea Inferiore (tra BR e BL)
+            if (rBR > 0 || rBL > 0)
+            {
+                path.AddLine(right - rBR, bottom, x + rBL, bottom);
+            }
+
+            // 4. BOTTOM-LEFT (Arco o Angolo retto)
+            if (rBL > 0)
+            {
+                path.AddArc(x, bottom - (rBL * 2f), rBL * 2f, rBL * 2f, 90, 90);
+            }
+
+            // Linea Sinistra (tra BL e TL) -> Chiude la figura connettendosi al punto di partenza
+            path.AddLine(x, bottom - rBL, x, y + rTL);
+
+            // NOTA: NESSUNA chiamata a path.CloseFigure() !
+
             return path;
         }
     }

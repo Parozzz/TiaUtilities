@@ -71,6 +71,14 @@ namespace TiaUtilities.SettingsStep.CustomControls
             this.SelectActiveColors(this._backColor, this._foreColor);
         }
 
+        public override Size GetPreferredSize(Size proposedSize)
+        {
+            var preferredSize = base.GetPreferredSize(proposedSize);
+            preferredSize.Width += this.BorderWidth;
+            preferredSize.Height += this.BorderWidth;
+            return preferredSize;
+        }
+
         private void SelectActiveColors(Color backColor, Color foreColor)
         {
             if (this._activeBackColor != backColor)
@@ -113,12 +121,12 @@ namespace TiaUtilities.SettingsStep.CustomControls
             {
                 e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
-                Rectangle borderRect = new(
-                    this._borderWidth,
-                    this._borderWidth,
-                    this.ClientRectangle.Width - this._borderWidth - 1,
-                    this.ClientRectangle.Height - this._borderWidth - 1
-                );
+                Rectangle borderRect = Rectangle.Round(new(
+                    0,
+                    0,
+                    this.ClientSize.Width - 1,
+                    this.ClientSize.Height  - 1
+                ));
 
                 if(borderRect.Width > 0 && borderRect.Height > 0)
                 {

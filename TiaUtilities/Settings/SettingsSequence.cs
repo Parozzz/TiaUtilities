@@ -7,7 +7,7 @@ namespace TiaUtilities.SettingsStep
 {
     public class SettingsSequence
     {
-        public class PanelControlsContainer(List<SettingsSequencePanel> panelControlsList) : IEnumerable<SettingsSequencePanel>
+        public class PanelContainer(List<SettingsSequencePanel> panelControlsList) : IEnumerable<SettingsSequencePanel>
         {
             public int Count { get => panelControlsList.Count; }
 
@@ -43,7 +43,7 @@ namespace TiaUtilities.SettingsStep
         public string GroupName { get; init; }
         public string Name { get; init; }
 
-        public PanelControlsContainer PanelControls { get; init; }
+        public PanelContainer Panels { get; init; }
 
         public Func<string, string>? PlaceholdersCallBack { get; set; } = null;
 
@@ -59,7 +59,7 @@ namespace TiaUtilities.SettingsStep
             this.descriptors = [];
             this.panelControlsList = [];
 
-            this.PanelControls = new(this.panelControlsList);
+            this.Panels = new(this.panelControlsList);
         }
 
         public void Add(SettingsSequencePanelDescriptor context) => descriptors.Add(context);
@@ -76,13 +76,11 @@ namespace TiaUtilities.SettingsStep
             }
         }
 
-        public void DisposeControls()
+        public void DisposeAll()
         {
             this.panelControlsList.ForEach(p =>
             {
                 p.UnregisterListeners();
-
-                p.Label.Dispose();
                 p.Lines.ForEach(l => l.DisposeAll());
             });
         }

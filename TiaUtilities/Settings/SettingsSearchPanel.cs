@@ -3,43 +3,26 @@ using System.Runtime.InteropServices;
 using TiaUtilities.CustomControls.tableColorizable;
 using TiaUtilities.SettingsStep.CustomControls;
 using TiaUtilities.Styles;
+using TiaUtilities.Utility;
 using TiaUtilities.Utility.Extensions;
 
 namespace TiaUtilities.SettingsStep
 {
     public class SettingsSearchPanel
     {
-        private const int WM_SETREDRAW = 0x000B;
-
-        [DllImport("user32.dll")]
-        private static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
-
-        public static void SuspendDrawing(Control control)
-        {
-            SendMessage(control.Handle, WM_SETREDRAW, (IntPtr)0, IntPtr.Zero);
-        }
-
-        public static void ResumeDrawing(Control control)
-        {
-            SendMessage(control.Handle, WM_SETREDRAW, (IntPtr)1, IntPtr.Zero);
-            control.Refresh();
-        }
-
         private const int CONTEXT_LABEL_COLUMN = 1;
         private const int CONTROL_COLUMN = 2;
 
-        private static readonly char[] WordSeparators = [' ', ',', '.', ';', ':', '-', '_', '!', '?'];
+        private const string CONTEXT_DIVIDER_SYMBOL = "↦";
 
         private readonly TableLayoutPanelColorizable panel;
-        private readonly List<SettingsSequence> sequences;
         private readonly List<SettingsSequencePanelLine> searchLines;
 
         private string actualSearchText = "";
 
-        public SettingsSearchPanel(TableLayoutPanelColorizable panel, List<SettingsSequence> sequences)
+        public SettingsSearchPanel(TableLayoutPanelColorizable panel)
         {
             this.panel = panel;
-            this.sequences = sequences;
             this.searchLines = [];
         }
 
@@ -49,9 +32,11 @@ namespace TiaUtilities.SettingsStep
 
             this.panel.SuspendLayout();
 
-            this.Clear();
+            this.panel.RowStyles.Clear();
+            this.panel.ColumnStyles.Clear();
+            this.panel.Controls.Clear();
 
-            this.panel.ColumnCount = 5;
+            this.panel.ColumnCount = 4;
             this.panel.ColumnStyles.Add(new(SizeType.Percent, 100f));
             this.panel.ColumnStyles.Add(new(SizeType.AutoSize)); //Main Label
             this.panel.ColumnStyles.Add(new(SizeType.AutoSize)); //Control
@@ -66,20 +51,16 @@ namespace TiaUtilities.SettingsStep
 
             this.panel.SuspendLayout();
 
+            this.panel.RowStyles.Clear();
+            this.panel.ClearCellStyles();
             this.panel.Controls.Clear();
 
-            this.panel.RowCount = 0;
-            this.panel.RowStyles.Clear();
-
-            this.panel.ColumnCount = 0;
-            this.panel.ColumnStyles.Clear();
-
-            this.panel.ClearCellStyles();
+            this.searchLines.Clear();
 
             this.panel.ResumeLayout();
         }
 
-        public void UpdateSearchText(string searchText)
+        public void UpdateSearchText(List<SettingsSequence> sequences, string searchText)
         {
             if (searchText == actualSearchText)
             {
@@ -91,38 +72,31 @@ namespace TiaUtilities.SettingsStep
             Cursor.Current = Cursors.WaitCursor;
 
             this.panel.SuspendLayout();
-            SuspendDrawing(this.panel);
+            DllImports.SuspendDrawing(this.panel);
 
+            this.panel.Controls.Clear();
+            this.panel.RowStyles.Clear();
             this.panel.ClearCellStyles();
-            this.searchLines.Clear();
 
-            var lines = SettingsSearchPanel.GetLines(this.sequences.SelectMany(s => s.PanelControls).SelectMany(p => p.Lines), searchText).ToList();
+            this.searchLines.Clear(); //Since i don't add anything particular to the ContextLabel, i do not need to dispose of it. It should be done automagically.
+
+            var sequencesLines = SettingsSearchPanel.GetLines(sequences.SelectMany(s => s.Panels).SelectMany(p => p.Lines), searchText).ToList();
 
             int rowCounter = 0;
-            foreach (var line in lines)
+            foreach (var sequenceLine in sequencesLines)
             {
-                if (line.Name == "GroupLabel" || line.Name == "Divider")
+                if (sequenceLine.Name == "GroupLabel" || sequenceLine.Name == "Divider")
                 {
                     continue;
                 }
 
-                var context = String.Join(" ↦ ", line.ContextPhrases.Where(str => !string.IsNullOrWhiteSpace(str)));
-                context = LabelHtmlStyle.Wrap(context,
-                    borderColor: Color.FromArgb(100, Color.Black),
-                    backColor: Color.Transparent,
-                    textColor: Color.DimGray,
-                    borderWidth: 1,
-                    borderRadius: 3,
-                    padding: new(5, 2, 5, 3)
-                );
+                var context = String.Join($" {CONTEXT_DIVIDER_SYMBOL} ", sequenceLine.ContextPhrases.Where(str => !string.IsNullOrWhiteSpace(str)));
 
-                var lineLabelText = String.Join(" ", line.Label?.Control.Text ?? "");
-
-                var contextLabel = CreateContextLabel($"{context} {lineLabelText}");
+                var contextLabel = SettingsSearchPanel.CreateContextLabel(context, sequenceLine.Name);
                 SettingsSequencePanelLine searchLine = new()
                 {
-                    Name = line.Name,
-                    MainControl = new(line.MainControl.Control) { Column = CONTROL_COLUMN, Row = rowCounter },
+                    Name = sequenceLine.Name,
+                    Main = new(sequenceLine.Main.Control) { Column = CONTROL_COLUMN, Row = rowCounter },
                     Label = new(contextLabel) { Column = CONTEXT_LABEL_COLUMN, Row = rowCounter }
                 };
 
@@ -142,29 +116,26 @@ namespace TiaUtilities.SettingsStep
                 Padding = Padding.Empty,
                 RowChangedCallback = args =>
                 {
-                    if (lines.TryGet(args.oldRow, out var oldLine))
+                    if (sequencesLines.TryGet(args.oldRow, out var oldLine))
                     {
-                        oldLine.MainControl.Control.BackColor = Form.DefaultBackColor;
+                        oldLine.Main.Control.BackColor = Form.DefaultBackColor;
                     }
 
-                    if (lines.TryGet(args.newRow, out var newLine))
+                    if (sequencesLines.TryGet(args.newRow, out var newLine))
                     {
-                        newLine.MainControl.Control.BackColor = Color.AntiqueWhite;
+                        newLine.Main.Control.BackColor = Color.AntiqueWhite;
                     }
                 }
             });
 
-            this.panel.RowStyles.Clear();
             Enumerable.Range(0, rowCounter)
                 .Select(i => new RowStyle(SizeType.AutoSize))
                 .ForEach(rs => this.panel.RowStyles.Add(rs));
 
-            this.panel.Controls.Clear();
-            this.searchLines.ForEach(l => l.AddAllControls(this.panel));
-            this.searchLines.ForEach(l => l.SetAllPositionsToPanel(this.panel));
+            this.searchLines.ForEach(l => l.AddToPanel(this.panel));
 
             this.panel.ResumeLayout();
-            ResumeDrawing(this.panel);
+            DllImports.ResumeDrawing(this.panel);
 
             Cursor.Current = Cursors.Default;
         }
@@ -214,21 +185,34 @@ namespace TiaUtilities.SettingsStep
             }).OrderBy(i => i.Name, StringComparer.OrdinalIgnoreCase);
         }
 
-        private static Label CreateContextLabel(string text)
+        private static Label CreateContextLabel(string context, string text)
         {
+            context = LabelHtmlStyle.Wrap(context,
+                    borderColor: Color.FromArgb(100, Color.Black),
+                    backColor: Color.Transparent,
+                    textColor: Color.DimGray,
+                    borderWidth: 1,
+                    borderRadius: 3,
+                    padding: new(5, 2, 5, 3)
+            );
+
             return new LabelHtmlStyle()
             {
-                BackColor = Color.Transparent,
-
-                Anchor = AnchorStyles.Right,
+                Dock = DockStyle.Fill,
                 AutoSize = true,
+
                 Font = StyleManager.Fonts.NORMAL,
+
                 FlatStyle = FlatStyle.Flat,
+
+                BackColor = Color.Transparent,
                 BorderStyle = BorderStyle.None,
-                Text = text,
-                TextAlign = ContentAlignment.MiddleRight,
+
+                Text = $"{context} {text}",
+                TextAlign = ContentAlignment.MiddleCenter,
+
                 Padding = Padding.Empty,
-                Margin = Padding.Empty,
+                Margin = new(1),
             };
         }
     }

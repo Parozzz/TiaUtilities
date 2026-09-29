@@ -1,15 +1,16 @@
-﻿using System.Data;
+﻿using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using System.Data;
 using TiaUtilities.Configuration;
 using TiaUtilities.Generation;
 using TiaUtilities.Resources;
 using TiaUtilities.SettingsStep.CustomControls;
 using TiaUtilities.Styles;
 using TiaUtilities.Utility;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using TiaUtilities.Utility.Extensions;
 
 namespace TiaUtilities.SettingsStep
 {
-    public partial class SettingsControl : UserControl
+    public partial class SettingsControl : UserControl, IMessageFilter
     {
         private class ComboBoxSourceItem
         {
@@ -19,6 +20,20 @@ namespace TiaUtilities.SettingsStep
             public override string ToString()
             {
                 return this.Text;
+            }
+        }
+
+        private class SequencePanelMetadata
+        {
+            public required SettingsSequencePanel Panel { get; init; }
+
+            public required LabelColorizable SelectControl { get; init; }
+            public required EventHandler SelectClick { get; init; }
+
+            public void DisposeSingleUse()
+            {
+                this.SelectControl.Click -= this.SelectClick;
+                this.SelectControl.Dispose();
             }
         }
 
@@ -51,16 +66,17 @@ namespace TiaUtilities.SettingsStep
             }
         }
 
-        internal Dictionary<Type, List<SettingsSequence>> ConfigurationTypeModelDict { get; init; }
+        internal Dictionary<Type, List<SettingsSequence>> ConfigurationTypeSequenceDict { get; init; }
 
         private readonly ObservableObject<SettingsSequence?> selectedSequence;
-        private readonly ObservableObject<SettingsSequencePanel?> selectedPanelControls;
+        private readonly ObservableObject<SettingsSequencePanel?> selectedPanel;
         private readonly ObservableObject<bool> searchMode;
 
-        //private readonly TableLayoutPanelNoScrollbarsColorizable controlsPanel;
         private readonly List<SettingsSequence> sequences;
 
         private readonly SettingsSearchPanel searchPanel;
+        private readonly List<SequencePanelMetadata> sequencePanelMetadataList;
+
         private bool _initialized = false;
 
         public SettingsControl()
@@ -73,13 +89,16 @@ namespace TiaUtilities.SettingsStep
             ControlUtils.SetDoubleBuffered(this.sequenceButtonsPanel);
 
             this.sequences = [];
-            this.ConfigurationTypeModelDict = [];
+            this.ConfigurationTypeSequenceDict = [];
 
-            this.selectedPanelControls = new(null);
+            this.selectedPanel = new(null);
             this.selectedSequence = new(null);
             this.searchMode = new(false);
 
-            this.searchPanel = new(this.searchPanelControl, this.sequences);
+            this.searchPanel = new(this.searchPanelControl);
+            this.searchPanel.InitPanel();
+
+            this.sequencePanelMetadataList = [];
         }
 
 
@@ -135,7 +154,7 @@ namespace TiaUtilities.SettingsStep
             };
             #endregion
 
-            #region CONTROLS_PANEL
+            #region CONTROLS_PANEL_COLUMNS
             this.controlsPanel.RowStyles.Clear();
             this.controlsPanel.ColumnStyles.Clear();
 
@@ -148,35 +167,41 @@ namespace TiaUtilities.SettingsStep
             this.controlsPanel.ColumnStyles.Add(new(SizeType.Percent, 50f)); //For centering the table in the panel
             #endregion
 
-            #region SELECTED_CONFIGURATION
+            #region SELECTED_SEQUENCE
             this.selectedSequence.Changed += (sender, args) =>
             {
                 var oldSequence = args.OldValue;
                 var newSequence = args.NewValue;
 
-                var oldPanelControls = this.selectedPanelControls.Value;
-
                 this.sequenceButtonsPanel.SuspendLayout();
                 this.sequenceButtonsPanel.Controls.Clear();
 
-                this.selectedPanelControls.Value = null;
+                var oldPanel = this.selectedPanel.Value;
+                var oldPanelName = oldPanel?.Descriptor.Name;
+                this.selectedPanel.Value = null;
 
-                if (oldSequence != null)
-                {
-                    foreach (var panelControls in oldSequence.PanelControls)
-                    {
-                        panelControls.LabelClick = null;
-                        panelControls.Label.BorderWidth = 0;
-                    }
-                }
+                this.sequencePanelMetadataList.ForEach(m => m.DisposeSingleUse()); //Avoid Memory leak
+                this.sequencePanelMetadataList.Clear();
 
                 if (newSequence != null)
                 {
-                    List<Control> sectionsControls = [];
-                    foreach (var panelControls in newSequence.PanelControls)
+                    List<Control> selectControls = [];
+                    foreach (var panel in newSequence.Panels)
                     {
-                        panelControls.LabelClick = () => this.selectedPanelControls.Value = panelControls;
-                        sectionsControls.Add(panelControls.Label);
+                        void click(object? sender, EventArgs args) => this.selectedPanel.Value = panel;
+
+                        var selectControl = panel.CreateSelectControl();
+                        selectControl.Click += click;
+
+                        SequencePanelMetadata metadata = new() 
+                        { 
+                            Panel = panel,
+                            SelectControl = selectControl,
+                            SelectClick = click
+                        };
+                        this.sequencePanelMetadataList.Add(metadata);
+
+                        selectControls.Add(selectControl);
                     }
 
                     var sequenceNameLabel = new LabelWithSymbols()
@@ -213,33 +238,29 @@ namespace TiaUtilities.SettingsStep
                             }
                         }
                     };
-                    var symbolLabel = SettingsSequencePanel.CreateSectionLabel(CHEVRON_DOUBLE_RIGHT, symbol: true);
+                    var nameSpacerSymbolLabel = SettingsSequencePanel.CreateSelectLabelColorizable(CHEVRON_DOUBLE_RIGHT, symbol: true);
 
-                    this.sequenceButtonsPanel.Controls.AddRange([sequenceNameLabel/*, selectAsDefaultControl*/, symbolLabel]);
+                    IEnumerable<Control> l = selectControls.SelectMany((x, index) =>
+                        index < selectControls.Count - 1 ?
+                        new[] { x, SettingsSequencePanel.CreateSelectLabelColorizable(MIDDLE_DOT, symbol: true) } :
+                        [ x ]
+                    );
+                    this.sequenceButtonsPanel.Controls.AddRange([sequenceNameLabel, nameSpacerSymbolLabel, ..l]);
 
-                    var l = sectionsControls.SelectMany((x, index) =>
-                        index < sectionsControls.Count - 1 ?
-                        new[] { x, SettingsSequencePanel.CreateSectionLabel(MIDDLE_DOT, symbol: true) } :
-                        new[] { x }
-                    ).ToArray();
-                    this.sequenceButtonsPanel.Controls.AddRange(l);
-
-                    if (oldPanelControls != null)
+                    SettingsSequencePanel? activePanel = null;
+                    if (!string.IsNullOrEmpty(oldPanelName))
                     {
-                        var activePanelControls = newSequence.PanelControls.FirstOrDefault(p => p.Label.Text.Contains(oldPanelControls.Label.Text, StringComparison.OrdinalIgnoreCase));
-                        if (activePanelControls != null)
-                        {
-                            this.selectedPanelControls.Value = activePanelControls;
-                        }
+                        activePanel = newSequence.Panels.FirstOrDefault(p => p.Descriptor.Name.Contains(oldPanelName, StringComparison.OrdinalIgnoreCase));
                     }
+                    this.selectedPanel.Value = activePanel ?? newSequence.Panels.FirstOrDefault();
                 }
 
-                this.sequenceButtonsPanel.ResumeLayout(performLayout: true);
+                this.sequenceButtonsPanel.ResumeLayout();
             };
             #endregion
 
-            #region SELECTED_PANEL_CONTROLS
-            this.selectedPanelControls.Changed += (sender, args) =>
+            #region SELECTED_PANEL
+            this.selectedPanel.Changed += (sender, args) =>
             {
                 var oldPanel = args.OldValue;
                 var newPanel = args.NewValue;
@@ -250,91 +271,95 @@ namespace TiaUtilities.SettingsStep
                 this.controlsPanel.Controls.Clear();
                 this.controlsPanel.ClearCellStyles();
 
-                if (oldPanel != null)
+                foreach(var metadata in this.sequencePanelMetadataList)
                 {
-                    oldPanel.Label.BorderWidth = 0;
+                    if(metadata.Panel == oldPanel)
+                    {
+                        metadata.SelectControl.BorderWidth = 0;
+                    }
+                    else if(metadata.Panel == newPanel)
+                    {
+                        metadata.SelectControl.BorderWidth = 1;
+                        newPanel.ApplyControls(this.controlsPanel);
+                    }
                 }
 
-                if (newPanel != null)
-                {
-                    Utility.Validate.IsTrue(newPanel.Sequence == this.selectedSequence.Value);
-
-                    newPanel.Label.BorderWidth = 1;
-                    newPanel.ApplyControls(this.controlsPanel);
-                }
-
-                this.controlsPanel.ResumeLayout(performLayout: true);
+                this.controlsPanel.ResumeLayout();
             };
             #endregion
 
             #region SELECT_CONFIGURATION_COMBOBOX
-            this.selectConfigurationComboBox.BackColor = Form.DefaultBackColor;
-            this.selectConfigurationComboBox.Font = StyleManager.Fonts.NORMAL_SEMIBOLD;
-            this.selectConfigurationComboBox.DropDownClosed += (sender, args) =>
+            this.selectSequenceComboBox.BackColor = Form.DefaultBackColor;
+            this.selectSequenceComboBox.Font = StyleManager.Fonts.NORMAL_SEMIBOLD;
+            this.selectSequenceComboBox.DropDownClosed += (sender, args) =>
             {//Remove focus on ComboBox after closing drop down to avoid having it selected (Annoying).
                 this.BeginInvoke(() => this.ActiveControl = null);
             };
-            this.selectConfigurationComboBox.DisplayMember = nameof(ComboBoxSourceItem.Text);
-            this.selectConfigurationComboBox.ValueMember = nameof(ComboBoxSourceItem.Sequence);
-            this.selectConfigurationComboBox.FilterPredicate = (item, text) =>
+            this.selectSequenceComboBox.DisplayMember = nameof(ComboBoxSourceItem.Text);
+            this.selectSequenceComboBox.ValueMember = nameof(ComboBoxSourceItem.Sequence);
+            this.selectSequenceComboBox.FilterPredicate = (obj, text) =>
             {
-                var i = (ComboBoxSourceItem)item;
-                return CalculateMatchCustom(i.Text, text);
+                return obj is ComboBoxSourceItem item && SettingsControl.CalculateMatchCustom(item.Text, text);
             };
-            this.selectConfigurationComboBox.SelectionChangeCommitted += (sender, args) =>
-            {
-                if (this.selectConfigurationComboBox.SelectedItem is ComboBoxSourceItem item)
-                {
-                    this.selectedSequence.Value = item.Sequence;
-                }
-            };
+            this.selectSequenceComboBox.SelectionChangeCommitted += (sender, args) => UpdateSelectedSequenceFromComboBox();
+
+            ControlUtils.CreateToolTip(quick: true).SetToolTip(this.selectSequenceComboBox, "CTRL|PAG-UP/DOWN");
             #endregion
 
-            #region SEARCH_CONTROLS
+            #region SEARCH_TEXT_BOX
             this.searchTextBox.BackColor = Form.DefaultBackColor;
             this.searchTextBox.LostFocus += (sender, args) =>
             {
-                this.searchPanel.UpdateSearchText(this.searchTextBox.Text);
+                this.searchPanel.UpdateSearchText(this.sequences, this.searchTextBox.Text);
             };
 
             this.searchTextBox.KeyDown += (sender, args) =>
             {
                 if (args.KeyData == Keys.Enter || args.KeyData == Keys.Tab)
                 {
-                    this.searchPanel.UpdateSearchText(this.searchTextBox.Text);
+                    this.searchPanel.UpdateSearchText(this.sequences, this.searchTextBox.Text);
                 }
             };
             #endregion
 
             #region SEARCH_MODE
-
             void UpdateVisibilityForSearchMode(bool searchModeActive)
             {
+                this.SuspendLayout();
+
                 if (searchModeActive)
                 {
-                    this.selectConfigurationComboBox.Visible = false;
+                    this.selectSequenceComboBox.Visible = false;
                     this.selectConfigurationLabel.Visible = false;
                     this.sequenceButtonsPanel.Visible = false;
                     this.controlsPanel.Visible = false;
-                    this.controlsPanel.Controls.Clear();
+
+                    this.selectedSequence.Value = null;
+                    this.selectedPanel.Value = null;
 
                     this.searchLabel.Visible = true;
                     this.searchTextBox.Visible = true;
                     this.searchPanelControl.Visible = true;
-                    this.searchPanel.InitPanel();
                 }
                 else
                 {
-                    this.selectConfigurationComboBox.Visible = true;
+                    this.selectSequenceComboBox.Visible = true;
                     this.selectConfigurationLabel.Visible = true;
                     this.sequenceButtonsPanel.Visible = true;
                     this.controlsPanel.Visible = true;
+
+                    if(this.selectSequenceComboBox.SelectedItem is ComboBoxSourceItem item)
+                    {
+                        this.selectedSequence.Value = item.Sequence;
+                    }
 
                     this.searchLabel.Visible = false;
                     this.searchTextBox.Visible = false;
                     this.searchPanelControl.Visible = false;
                     this.searchPanel.Clear();
                 }
+
+                this.ResumeLayout();
             }
 
             UpdateVisibilityForSearchMode(this.searchMode.Value);
@@ -342,17 +367,25 @@ namespace TiaUtilities.SettingsStep
             #endregion
         }
 
+        private void UpdateSelectedSequenceFromComboBox()
+        {
+            if (this.selectSequenceComboBox.SelectedItem is ComboBoxSourceItem item)
+            {
+                this.selectedSequence.Value = item.Sequence;
+            }
+        }
+
         public void SetSequences(IEnumerable<SettingsSequence> sequences)
         {
             this.searchMode.Value = false;
 
-            this.sequences.ForEach(s => s.DisposeControls());
+            this.sequences.ForEach(s => s.DisposeAll());
             this.sequences.Clear();
 
             this.searchPanel.DisposeControls();
             this.searchPanel.Clear();
 
-            this.ConfigurationTypeModelDict.Clear();
+            this.ConfigurationTypeSequenceDict.Clear();
 
             if (!sequences.Any())
             {
@@ -366,11 +399,11 @@ namespace TiaUtilities.SettingsStep
 
                 var cfgType = sequence.Configuration.GetType();
 
-                var tryGetOK = this.ConfigurationTypeModelDict.TryGetValue(cfgType, out var configurationSequences);
+                var tryGetOK = this.ConfigurationTypeSequenceDict.TryGetValue(cfgType, out var configurationSequences);
                 if (!tryGetOK)
                 {
                     configurationSequences = [];
-                    this.ConfigurationTypeModelDict.Add(cfgType, configurationSequences);
+                    this.ConfigurationTypeSequenceDict.Add(cfgType, configurationSequences);
                 }
 
                 configurationSequences?.Add(sequence);
@@ -378,12 +411,12 @@ namespace TiaUtilities.SettingsStep
 
             var items = sequences.Select(s => new ComboBoxSourceItem() { Text = s.FullName, Sequence = s });
 
-            var maxWidth = items.Max(i => TextRenderer.MeasureText(i.Text, this.selectConfigurationComboBox.Font, Size.Empty, TextFormatFlags.TextBoxControl).Width);
-            this.selectConfigurationComboBox.Width = maxWidth + (int)(maxWidth * 0.15);
-            this.selectConfigurationComboBox.SetFilterableSource(items);
+            var maxWidth = items.Max(i => TextRenderer.MeasureText(i.Text, this.selectSequenceComboBox.Font, Size.Empty, TextFormatFlags.TextBoxControl).Width);
+            this.selectSequenceComboBox.Width = maxWidth + (int)(maxWidth * 0.15);
+            this.selectSequenceComboBox.SetFilterableSource(items);
 
             this.sequences.AddRange(sequences);
-            this.selectedSequence.Value = sequences.First();
+            this.selectedSequence.Value = sequences.FirstOrDefault();
         }
 
         private static bool CalculateMatchCustom(string text, string searchText)
@@ -425,15 +458,15 @@ namespace TiaUtilities.SettingsStep
         private void SelectNextPrevious(bool next)
         {
             var sequence = this.selectedSequence.Value;
-            var panelControls = this.selectedPanelControls.Value;
+            var panelControls = this.selectedPanel.Value;
             if (sequence == null || panelControls == null)
             {
                 return;
             }
 
-            var count = sequence.PanelControls.Count;
+            var count = sequence.Panels.Count;
 
-            var indexOf = sequence.PanelControls.IndexOf(panelControls);
+            var indexOf = sequence.Panels.IndexOf(panelControls);
 
             int newIndex = 0;
             if (next)
@@ -444,93 +477,64 @@ namespace TiaUtilities.SettingsStep
             {
                 newIndex = indexOf <= 0 ? count - 1 : indexOf - 1;
             }
-            this.selectedPanelControls.Value = sequence.PanelControls[newIndex];
+            this.selectedPanel.Value = sequence.Panels[newIndex];
 
         }
 
-        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        protected override void OnHandleCreated(EventArgs e)
         {
+            base.OnHandleCreated(e);
+            if(!this.DesignMode)
+            {
+                Application.AddMessageFilter(this);
+            }
+        }
+
+        protected override void OnHandleDestroyed(EventArgs e)
+        {
+            base.OnHandleDestroyed(e);
+            if(!this.DesignMode)
+            {
+                Application.RemoveMessageFilter(this);
+            }
+        }
+
+        public bool PreFilterMessage(ref Message m)
+        {
+            if(m.Msg != DllImports.WM_KEYDOWN || !this.Visible)
+            {
+                return false;
+            }
+
+            Keys keyData = (Keys)(int)m.WParam | Control.ModifierKeys;
             if (keyData == Keys.PageUp || keyData == (Keys.Right | Keys.Control))
             {
                 SelectNextPrevious(true);
+                return true;
             }
             else if (keyData == Keys.PageDown || keyData == (Keys.Left | Keys.Control))
             {
                 SelectNextPrevious(false);
+                return true;
+            }
+            else if(keyData == (Keys.PageUp | Keys.Control))
+            {
+                var comboBox = this.selectSequenceComboBox;
+                comboBox.SelectedIndex = Math.Min(comboBox.Items.Count - 1, comboBox.SelectedIndex + 1);
+                this.UpdateSelectedSequenceFromComboBox();
+
+                return true;
+            }
+            else if(keyData == (Keys.PageDown | Keys.Control))
+            {
+                var comboBox = this.selectSequenceComboBox;
+                comboBox.SelectedIndex = Math.Max(0, comboBox.SelectedIndex - 1);
+                this.UpdateSelectedSequenceFromComboBox();
+
+                return true;
             }
 
-            return base.ProcessCmdKey(ref msg, keyData);
+            return false;
         }
     }
 }
-
-
-/*
-private Control CreateSelectAsDefaultControl()
-{
-
-    ImageList imageList = new()
-    {
-        Images = { ImageResources.EFFECT },
-        ImageSize = new(16, 16),
-    };
-
-    Button selectedAsDefaultButton = new()
-    {
-        Dock = DockStyle.Fill,
-        AutoSize = true,
-        AutoSizeMode = AutoSizeMode.GrowAndShrink,
-
-        //ImageList = imageList,
-        //ImageIndex = 0,
-        //ImageAlign = ContentAlignment.MiddleCenter,
-        //TextImageRelation = TextImageRelation.Overlay,
-        //MinimumSize = new(24, 24),
-        //MaximumSize = new(24, 24),
-        Text = "★",
-        FlatStyle = FlatStyle.Flat,
-        FlatAppearance = {
-            BorderSize = 0,
-            MouseOverBackColor = Color.FromArgb(127, Color.LightSkyBlue),
-            MouseDownBackColor = Color.FromArgb(127, Color.LightGreen)
-        },
-        Padding = Padding.Empty,
-        Margin = new(0, 0, 4, 0),
-    };
-
-    LabelColorizable control = new()
-    {
-        Dock = DockStyle.Fill,
-        AutoSize = true,
-
-        Text = STAR_FILLED,
-        TextAlign = ContentAlignment.MiddleCenter,
-        Font = StyleManager.Fonts.NORMAL_SEMIBOLD,
-
-        BorderWidth = 0,
-
-        BackColor = Color.Transparent,
-        MouseDownBackColor = Color.Transparent,
-        MouseHoverBackColor = Color.Transparent,
-
-        MouseHoverForeColor = Color.FromArgb(127, Color.DarkGreen),
-        MouseDownForeColor = Color.FromArgb(127, Color.DarkBlue),
-
-
-        Margin = new(0, 0, 4, 0),
-    };
-
-    var tooltip = ControlUtils.CreateToolTip(quick: true);
-    control.MouseHover += (sender, args) =>
-    {
-        var selectedSequence = this.selectedSequence.Value;
-        if (selectedSequence != null)
-        {
-            var text = $"Save as default configuration ({selectedSequence.Name} => {selectedSequence.Configuration.GetType().Name})";
-            tooltip.Show(text, control);
-        }
-    };
-
-    control.Click += (sender, args) => SaveSelectedSequenceConfigurationAsDefault();
-    return control;
-}*/

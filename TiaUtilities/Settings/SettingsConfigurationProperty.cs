@@ -26,7 +26,7 @@ namespace TiaUtilities.SettingsStep
 
         public object? GetFrom(ObservableConfiguration configuration)
         {
-            if (!this.VerifyOwner(configuration))
+            if (!this.IsAssignableToOwner(configuration))
             {
                 return null;
             }
@@ -49,7 +49,7 @@ namespace TiaUtilities.SettingsStep
 
         public void SetTo(ObservableConfiguration configuration, object setValue)
         {
-            if (!this.VerifyOwner(configuration))
+            if (!this.IsAssignableToOwner(configuration))
             {
                 return;
             }
@@ -96,7 +96,7 @@ namespace TiaUtilities.SettingsStep
             }
         }
 
-        private bool VerifyOwner(object owner)
+        private bool IsAssignableToOwner(object owner)
         {
             if (owner == null)
             {

@@ -23,9 +23,9 @@ namespace TiaUtilities.CustomControls.EditableTab
             public int BorderWidth { get; set; } = 1;
             public int BorderRadius { get; set; } = 3;
 
-            public Padding Margin { get; set; } = new(3, 2, 3, 8);
+            public Padding Margin { get; set; } = new(3, 1, 3, 5);
 
-            public string Symbol { get; set; } = "♥";
+            public string Symbol { get; set; } = "➕";
         }
 
         public ButtonStyle Style { get; init; } = new();

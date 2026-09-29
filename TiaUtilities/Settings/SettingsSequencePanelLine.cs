@@ -40,29 +40,29 @@
 
         public required string Name { get; init; }
 
-        public required PanelControl<Control> MainControl { get; init; }
+        public required PanelControl<Control> Main { get; init; }
         public PanelControl<Label>? Label { get; init; }
         public List<string> ContextPhrases { get; init; } = [];
 
         public void DisposeAll()
         {
-            this.MainControl.Dispose();
+            this.Main.Dispose();
             this.Label?.Dispose();
         }
 
-        public void AddAllControls(TableLayoutPanel panel)
+        public void AddToPanel(TableLayoutPanel panel, bool setPositionOnly = false)
         {
-            if (this.Label != null)
+            if (!setPositionOnly)
             {
-                panel.Controls.Add(this.Label.Control);
+                panel.Controls.Add(this.Main.Control);
+                if (this.Label != null)
+                {
+                    panel.Controls.Add(this.Label.Control);
+                }
             }
-            panel.Controls.Add(this.MainControl.Control);
-        }
 
-        public void SetAllPositionsToPanel(TableLayoutPanel panel)
-        {
-            this.MainControl.SetPositionToPanel(panel);
+            this.Main.SetPositionToPanel(panel);
             this.Label?.SetPositionToPanel(panel);
-        } 
+        }
     }
 }

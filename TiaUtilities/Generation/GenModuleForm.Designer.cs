@@ -41,20 +41,25 @@
             toolsTextsEditorMenuItem = new ToolStripMenuItem();
             importExportMenuItem = new ToolStripMenuItem();
             exportXMLMenuItem = new ToolStripMenuItem();
-            formTableLayout = new TableLayoutPanel();
+            viewMenuItem = new ToolStripMenuItem();
+            viewSingleMenuItem = new ToolStripMenuItem();
+            viewSplitMenuItem = new ToolStripMenuItem();
+            mainPanel = new TableLayoutPanel();
             selectControlButtonPanel = new FlowLayoutPanel();
+            bottomSplitContainer = new SplitContainer();
             topMenuStrip.SuspendLayout();
-            formTableLayout.SuspendLayout();
+            mainPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)bottomSplitContainer).BeginInit();
+            bottomSplitContainer.SuspendLayout();
             SuspendLayout();
             // 
             // topMenuStrip
             // 
             topMenuStrip.ImageScalingSize = new Size(20, 20);
-            topMenuStrip.Items.AddRange(new ToolStripItem[] { fileMenuItem, programMenuItem, toolsMenuItem, importExportMenuItem });
+            topMenuStrip.Items.AddRange(new ToolStripItem[] { fileMenuItem, programMenuItem, toolsMenuItem, importExportMenuItem, viewMenuItem });
             topMenuStrip.Location = new Point(0, 0);
             topMenuStrip.Name = "topMenuStrip";
-            topMenuStrip.Padding = new Padding(7, 3, 0, 3);
-            topMenuStrip.Size = new Size(914, 30);
+            topMenuStrip.Size = new Size(800, 24);
             topMenuStrip.TabIndex = 0;
             topMenuStrip.Text = "menuStrip1";
             // 
@@ -62,25 +67,25 @@
             // 
             fileMenuItem.DropDownItems.AddRange(new ToolStripItem[] { loadMenuItem, saveMenuItem, saveAsMenuItem });
             fileMenuItem.Name = "fileMenuItem";
-            fileMenuItem.Size = new Size(46, 24);
+            fileMenuItem.Size = new Size(37, 20);
             fileMenuItem.Text = "File";
             // 
             // loadMenuItem
             // 
             loadMenuItem.Name = "loadMenuItem";
-            loadMenuItem.Size = new Size(139, 26);
+            loadMenuItem.Size = new Size(111, 22);
             loadMenuItem.Text = "Load";
             // 
             // saveMenuItem
             // 
             saveMenuItem.Name = "saveMenuItem";
-            saveMenuItem.Size = new Size(139, 26);
+            saveMenuItem.Size = new Size(111, 22);
             saveMenuItem.Text = "Save";
             // 
             // saveAsMenuItem
             // 
             saveAsMenuItem.Name = "saveAsMenuItem";
-            saveAsMenuItem.Size = new Size(139, 26);
+            saveAsMenuItem.Size = new Size(111, 22);
             saveAsMenuItem.Text = "SaveAs";
             // 
             // programMenuItem
@@ -88,94 +93,126 @@
             programMenuItem.DropDownItems.AddRange(new ToolStripItem[] { programSettingsMenuItem, programModuleSetupMenuItem });
             programMenuItem.Font = new Font("Segoe UI", 9F);
             programMenuItem.Name = "programMenuItem";
-            programMenuItem.Size = new Size(80, 24);
+            programMenuItem.Size = new Size(65, 20);
             programMenuItem.Text = "Program";
             // 
             // programSettingsMenuItem
             // 
             programSettingsMenuItem.Name = "programSettingsMenuItem";
-            programSettingsMenuItem.Size = new Size(181, 26);
+            programSettingsMenuItem.Size = new Size(145, 22);
             programSettingsMenuItem.Text = "Settings";
             // 
             // programModuleSetupMenuItem
             // 
             programModuleSetupMenuItem.Name = "programModuleSetupMenuItem";
-            programModuleSetupMenuItem.Size = new Size(181, 26);
+            programModuleSetupMenuItem.Size = new Size(145, 22);
             programModuleSetupMenuItem.Text = "ModuleSetup";
             // 
             // toolsMenuItem
             // 
             toolsMenuItem.DropDownItems.AddRange(new ToolStripItem[] { toolsPlaceholderViewerMenuItem, toolsTextsEditorMenuItem });
             toolsMenuItem.Name = "toolsMenuItem";
-            toolsMenuItem.Size = new Size(58, 24);
+            toolsMenuItem.Size = new Size(47, 20);
             toolsMenuItem.Text = "Tools";
             // 
             // toolsPlaceholderViewerMenuItem
             // 
             toolsPlaceholderViewerMenuItem.Name = "toolsPlaceholderViewerMenuItem";
-            toolsPlaceholderViewerMenuItem.Size = new Size(217, 26);
+            toolsPlaceholderViewerMenuItem.Size = new Size(173, 22);
             toolsPlaceholderViewerMenuItem.Text = "Placeholder viewer";
             // 
             // toolsTextsEditorMenuItem
             // 
             toolsTextsEditorMenuItem.Name = "toolsTextsEditorMenuItem";
-            toolsTextsEditorMenuItem.Size = new Size(217, 26);
+            toolsTextsEditorMenuItem.Size = new Size(173, 22);
             toolsTextsEditorMenuItem.Text = "Texts Editor";
             // 
             // importExportMenuItem
             // 
             importExportMenuItem.DropDownItems.AddRange(new ToolStripItem[] { exportXMLMenuItem });
             importExportMenuItem.Name = "importExportMenuItem";
-            importExportMenuItem.Size = new Size(117, 24);
+            importExportMenuItem.Size = new Size(93, 20);
             importExportMenuItem.Text = "Import/Export";
             // 
             // exportXMLMenuItem
             // 
             exportXMLMenuItem.Name = "exportXMLMenuItem";
-            exportXMLMenuItem.Size = new Size(168, 26);
+            exportXMLMenuItem.Size = new Size(134, 22);
             exportXMLMenuItem.Text = "Export XML";
             // 
-            // formTableLayout
+            // viewMenuItem
             // 
-            formTableLayout.ColumnCount = 1;
-            formTableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            formTableLayout.Controls.Add(topMenuStrip, 0, 0);
-            formTableLayout.Controls.Add(selectControlButtonPanel, 0, 1);
-            formTableLayout.Dock = DockStyle.Fill;
-            formTableLayout.Location = new Point(0, 0);
-            formTableLayout.Margin = new Padding(3, 4, 3, 4);
-            formTableLayout.Name = "formTableLayout";
-            formTableLayout.RowCount = 3;
-            formTableLayout.RowStyles.Add(new RowStyle());
-            formTableLayout.RowStyles.Add(new RowStyle());
-            formTableLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            formTableLayout.Size = new Size(914, 600);
-            formTableLayout.TabIndex = 0;
+            viewMenuItem.DropDownItems.AddRange(new ToolStripItem[] { viewSingleMenuItem, viewSplitMenuItem });
+            viewMenuItem.Name = "viewMenuItem";
+            viewMenuItem.Size = new Size(44, 20);
+            viewMenuItem.Text = "View";
+            // 
+            // viewSingleMenuItem
+            // 
+            viewSingleMenuItem.Name = "viewSingleMenuItem";
+            viewSingleMenuItem.Size = new Size(180, 22);
+            viewSingleMenuItem.Text = "Single";
+            // 
+            // viewSplitMenuItem
+            // 
+            viewSplitMenuItem.Name = "viewSplitMenuItem";
+            viewSplitMenuItem.Size = new Size(180, 22);
+            viewSplitMenuItem.Text = "Split Vertical";
+            // 
+            // mainPanel
+            // 
+            mainPanel.ColumnCount = 1;
+            mainPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            mainPanel.Controls.Add(topMenuStrip, 0, 0);
+            mainPanel.Controls.Add(selectControlButtonPanel, 0, 1);
+            mainPanel.Controls.Add(bottomSplitContainer, 0, 2);
+            mainPanel.Dock = DockStyle.Fill;
+            mainPanel.Location = new Point(0, 0);
+            mainPanel.Name = "mainPanel";
+            mainPanel.RowCount = 3;
+            mainPanel.RowStyles.Add(new RowStyle());
+            mainPanel.RowStyles.Add(new RowStyle());
+            mainPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            mainPanel.Size = new Size(800, 450);
+            mainPanel.TabIndex = 0;
             // 
             // selectControlButtonPanel
             // 
             selectControlButtonPanel.AutoSize = true;
             selectControlButtonPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             selectControlButtonPanel.Dock = DockStyle.Fill;
-            selectControlButtonPanel.Location = new Point(3, 33);
+            selectControlButtonPanel.Location = new Point(3, 26);
+            selectControlButtonPanel.Margin = new Padding(3, 2, 3, 2);
             selectControlButtonPanel.Name = "selectControlButtonPanel";
-            selectControlButtonPanel.Size = new Size(908, 1);
+            selectControlButtonPanel.Size = new Size(794, 1);
             selectControlButtonPanel.TabIndex = 1;
+            // 
+            // bottomSplitContainer
+            // 
+            bottomSplitContainer.Dock = DockStyle.Fill;
+            bottomSplitContainer.FixedPanel = FixedPanel.Panel1;
+            bottomSplitContainer.Location = new Point(3, 31);
+            bottomSplitContainer.Name = "bottomSplitContainer";
+            bottomSplitContainer.Size = new Size(794, 416);
+            bottomSplitContainer.SplitterDistance = 264;
+            bottomSplitContainer.SplitterWidth = 12;
+            bottomSplitContainer.TabIndex = 2;
             // 
             // GenModuleForm
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(914, 600);
-            Controls.Add(formTableLayout);
+            ClientSize = new Size(800, 450);
+            Controls.Add(mainPanel);
             DoubleBuffered = true;
-            Margin = new Padding(3, 4, 3, 4);
             Name = "GenModuleForm";
             Text = "GenerationProjectForm";
             topMenuStrip.ResumeLayout(false);
             topMenuStrip.PerformLayout();
-            formTableLayout.ResumeLayout(false);
-            formTableLayout.PerformLayout();
+            mainPanel.ResumeLayout(false);
+            mainPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)bottomSplitContainer).EndInit();
+            bottomSplitContainer.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -187,7 +224,7 @@
         private ToolStripMenuItem saveAsMenuItem;
         private ToolStripMenuItem loadMenuItem;
         private ToolStripMenuItem exportXMLMenuItem;
-        private TableLayoutPanel formTableLayout;
+        private TableLayoutPanel mainPanel;
         public ToolStripMenuItem importExportMenuItem;
         private ToolStripMenuItem programMenuItem;
         private ToolStripMenuItem programSettingsMenuItem;
@@ -196,5 +233,9 @@
         public ToolStripMenuItem programModuleSetupMenuItem;
         private ToolStripMenuItem toolsTextsEditorMenuItem;
         private FlowLayoutPanel selectControlButtonPanel;
+        private ToolStripMenuItem viewMenuItem;
+        private ToolStripMenuItem viewSingleMenuItem;
+        private ToolStripMenuItem viewSplitMenuItem;
+        private SplitContainer bottomSplitContainer;
     }
 }
