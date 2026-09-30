@@ -288,13 +288,13 @@ namespace TiaUtilities.SettingsStep
             };
             #endregion
 
-            #region SELECT_CONFIGURATION_COMBOBOX
+            #region SELECT_SEQUENCE_COMBOBOX
             this.selectSequenceComboBox.BackColor = Form.DefaultBackColor;
             this.selectSequenceComboBox.Font = StyleManager.Fonts.NORMAL_SEMIBOLD;
-            this.selectSequenceComboBox.DropDownClosed += (sender, args) =>
-            {//Remove focus on ComboBox after closing drop down to avoid having it selected (Annoying).
-                this.BeginInvoke(() => this.ActiveControl = null);
-            };
+
+            this.selectSequenceComboBox.AutoWidthFromItems = true;
+            this.selectSequenceComboBox.AutoWidthRightPadding = 20;
+
             this.selectSequenceComboBox.DisplayMember = nameof(ComboBoxSourceItem.Text);
             this.selectSequenceComboBox.ValueMember = nameof(ComboBoxSourceItem.Sequence);
             this.selectSequenceComboBox.FilterPredicate = (obj, text) =>
@@ -302,6 +302,11 @@ namespace TiaUtilities.SettingsStep
                 return obj is ComboBoxSourceItem item && SettingsControl.CalculateMatchCustom(item.Text, text);
             };
             this.selectSequenceComboBox.SelectionChangeCommitted += (sender, args) => UpdateSelectedSequenceFromComboBox();
+
+            this.selectSequenceComboBox.DropDownClosed += (sender, args) =>
+            {//Remove focus on ComboBox after closing drop down to avoid having it selected (Annoying).
+                this.BeginInvoke(() => this.ActiveControl = null);
+            };
 
             ControlUtils.CreateToolTip(quick: true).SetToolTip(this.selectSequenceComboBox, "CTRL|PAG-UP/DOWN");
             #endregion
@@ -430,9 +435,9 @@ namespace TiaUtilities.SettingsStep
 
             var items = sequences.Select(s => new ComboBoxSourceItem() { Text = s.FullName, Sequence = s });
 
-            var maxWidth = items.Max(i => TextRenderer.MeasureText(i.Text, this.selectSequenceComboBox.Font, Size.Empty, TextFormatFlags.TextBoxControl).Width);
-            this.selectSequenceComboBox.Width = maxWidth + (int)(maxWidth * 0.15);
-            this.selectSequenceComboBox.SetFilterableSource(items);
+            //var maxWidth = items.Max(i => TextRenderer.MeasureText(i.Text, this.selectSequenceComboBox.Font, Size.Empty, TextFormatFlags.TextBoxControl).Width);
+            //this.selectSequenceComboBox.Width = maxWidth + (int)(maxWidth * 0.15);
+            this.selectSequenceComboBox.DataSource = items;
 
             this.sequences.AddRange(sequences);
             this.selectedSequence.Value = sequences.FirstOrDefault();

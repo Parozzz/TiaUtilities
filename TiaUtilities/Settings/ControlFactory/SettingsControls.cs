@@ -43,12 +43,9 @@ namespace TiaUtilities.SettingsStep.ControlFactory
             return textBox;
         }
 
-        public static ComboBox GetComboBox(IEnumerable<string> items, SettingsFactoryGeneralOptions generalOptions, SettingsFactoryCreateOptions createOptions)
+        private static ComboBox GetGenericComboBox(SettingsFactoryGeneralOptions generalOptions, SettingsFactoryCreateOptions createOptions)
         {
             var font = StyleManager.Fonts.NORMAL;
-
-            var maxWidth = items.Max(i => TextRenderer.MeasureText(i, font, Size.Empty, TextFormatFlags.TextBoxControl).Width);
-            maxWidth += 20;
 
             ComboBoxFilterable comboBox = new()
             {
@@ -58,16 +55,15 @@ namespace TiaUtilities.SettingsStep.ControlFactory
                 Anchor = AnchorStyles.Left,
                 FlatStyle = FlatStyle.System,
 
-                MinimumSize = new(maxWidth, 0),
-                Size = new(maxWidth, 0),
+                AutoWidthFromItems = true,
+                AutoWidthRightPadding = 20,
 
                 BackColor = Form.DefaultBackColor,
                 ForeColor = Form.DefaultForeColor,
 
                 Margin = new(8, 0, 8, 0),
-            };
-            comboBox.Items.AddRange([.. items]);
-
+            }; 
+            
             comboBox.DropDownClosed += (sender, args) =>
             {//Remove focus on ComboBox after closing drop down to avoid having it selected (Annoying).
                 var form = comboBox.FindForm();
@@ -80,6 +76,20 @@ namespace TiaUtilities.SettingsStep.ControlFactory
                 comboBox.MinimumSize = new(generalOptions.MinWidth, minSize.Height);
             }
 
+            return comboBox;
+        }
+
+        public static ComboBox GetComboBox(IEnumerable<object> items, SettingsFactoryGeneralOptions generalOptions, SettingsFactoryCreateOptions createOptions)
+        {
+            ComboBox comboBox = SettingsControls.GetGenericComboBox(generalOptions, createOptions);
+            ControlUtils.CreateComboBoxObjectDataSource(comboBox, [.. items]);
+            return comboBox;
+        }
+
+        public static ComboBox GetEnumComboBox(Type enumType, SettingsFactoryGeneralOptions generalOptions, SettingsFactoryCreateOptions createOptions)
+        {
+            ComboBox comboBox = SettingsControls.GetGenericComboBox(generalOptions, createOptions);
+            ControlUtils.CreateComboBoxEnumDataSource(comboBox, enumType);
             return comboBox;
         }
 

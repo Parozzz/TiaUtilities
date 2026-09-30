@@ -78,6 +78,12 @@ namespace TiaUtilities.Utility
             };
         }
 
+        public class ComboBoxDataSourceItem() 
+        { 
+            public required string Text { get; init; }
+            public required object Value { get; init; }
+        }
+
         public static void CreateComboBoxEnumDataSource(ComboBox comboBox, Type enumType, bool editable = false)
         {
             if (!editable)
@@ -85,13 +91,14 @@ namespace TiaUtilities.Utility
                 comboBox.DropDownStyle = ComboBoxStyle.DropDownList; //Disable text Editing 
             }
 
-            comboBox.DisplayMember = "Text";
-            comboBox.ValueMember = "Value";
+            comboBox.DisplayMember = nameof(ComboBoxDataSourceItem.Text);
+            comboBox.ValueMember = nameof(ComboBoxDataSourceItem.Value);
 
             var dataSourceList = new List<object>();
             foreach (Enum enumItem in Enum.GetValues(enumType))
             {
-                dataSourceList.Add(new { Text = enumItem.GetTranslation(), Value = enumItem });
+                ComboBoxDataSourceItem item = new() { Text = enumItem.GetTranslation(), Value = enumItem };
+                dataSourceList.Add(item);
             }
             comboBox.DataSource = dataSourceList;
         }
@@ -103,8 +110,8 @@ namespace TiaUtilities.Utility
                 comboBox.DropDownStyle = ComboBoxStyle.DropDownList; //Disable text Editing 
             }
 
-            comboBox.DisplayMember = "Text";
-            comboBox.ValueMember = "Value";
+            comboBox.DisplayMember = nameof(ComboBoxDataSourceItem.Text);
+            comboBox.ValueMember = nameof(ComboBoxDataSourceItem.Value);
 
             var dataSourceList = new List<object>();
             foreach (var obj in objectList)
@@ -114,10 +121,12 @@ namespace TiaUtilities.Utility
                     continue;
                 }
 
-                dataSourceList.Add(new { Text = "" + obj, Value = obj });
+                ComboBoxDataSourceItem item = new() { Text = $"{obj}", Value = obj };
+                dataSourceList.Add(item);
             }
             comboBox.DataSource = dataSourceList;
         }
+
         public static void CreateRJComboBoxEnumDataSource(RJComboBox comboBox, Type enumType, bool editable = false)
         {
             if (!editable)

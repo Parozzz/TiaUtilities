@@ -151,10 +151,10 @@ namespace TiaUtilities.Generation.IO
                 .CreateBinder<IOExcelImportConfiguration>()
                 .StartGroup(Locale.GENERICS_ADDRESS)
                     .Add(x => x.AddressCellConfig, Locale.GENERICS_ADDRESS, description: Locale.IO_SETTINGS_EXCELIMPORT_ADDRESS_DESC)
-                    .Add(x => x.IONameCellConfig, Locale.IO_SETTINGS_EXCELIMPORT_IO_NAME, description: Locale.IO_SETTINGS_EXCELIMPORT_IO_NAME_DESC, options: new() { StringSpecifiedEditor = StringCustomEditor.JS })
+                    .Add(x => x.IONameCellConfig, Locale.IO_SETTINGS_EXCELIMPORT_IO_NAME, description: Locale.IO_SETTINGS_EXCELIMPORT_IO_NAME_DESC, options: new() { StringEditor = StringCustomEditor.JS })
                     .Add(x => x.CommentCellConfig, Locale.GENERICS_COMMENT, description: Locale.IO_SETTINGS_EXCELIMPORT_COMMENT_DESC)
                     .Add(x => x.StartingRow, Locale.IO_SETTINGS_EXCELIMPORT_STARTING_ROW, description: Locale.IO_SETTINGS_EXCELIMPORT_STARTING_ROW_DESC)
-                    .Add(x => x.IgnoreRowExpressionConfig, Locale.IO_SETTINGS_EXCELIMPORT_EXPRESSION, description: Locale.IO_SETTINGS_EXCELIMPORT_EXPRESSION_DESC, options: new() { StringSpecifiedEditor = StringCustomEditor.JS })
+                    .Add(x => x.IgnoreRowExpressionConfig, Locale.IO_SETTINGS_EXCELIMPORT_EXPRESSION, description: Locale.IO_SETTINGS_EXCELIMPORT_EXPRESSION_DESC, options: new() { StringEditor = StringCustomEditor.JS })
                 .End();
 
             return [descriptor];

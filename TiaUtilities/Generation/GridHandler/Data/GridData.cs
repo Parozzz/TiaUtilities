@@ -21,32 +21,33 @@ namespace TiaUtilities.Generation.GridHandler.Data
 
         public void Set(object? newValue, [CallerMemberName] string propertyName = "")
         {
-            var getDone = objectDict.TryGetValue(propertyName, out var storedData);
-            if (getDone)
+            try
             {
-                if (storedData != null && Utils.AreDifferentObject(storedData.Value, newValue))
+                if (objectDict.TryGetValue(propertyName, out var storedData))
                 {
-                    var oldValue = storedData.Value;
-                    storedData.Value = newValue;
+                    if (Utils.AreDifferentObject(storedData.Value, newValue))
+                    {
+                        var oldValue = storedData.Value;
+                        storedData.Value = newValue;
 
-                    //Maybe the data changes is better to be called AFTER data is changed?
-                    this.CallDataChangedEvent(propertyName, storedData.Column,  oldValue, newValue);
+                        //Maybe the data changes is better to be called AFTER data is changed?
+                        this.CallDataChangedEvent(propertyName, storedData.Column, oldValue, newValue);
+                    }
                 }
-            }
-            else
-            {
-                try
+                else
                 {
+
                     var column = this.GetColumnFromPropertyName(propertyName);
                     objectDict.Add(propertyName, new() { Column = column, Value = newValue });
 
                     //Maybe the data changes is better to be called AFTER data is changed?
                     this.CallDataChangedEvent(propertyName, column, oldValue: null, newValue);
                 }
-                catch (Exception ex)
-                {
-                    Utils.ShowExceptionMessage(ex);
-                }
+
+            }
+            catch (Exception ex)
+            {
+                Utils.ShowExceptionMessage(ex);
             }
         }
 
@@ -111,7 +112,7 @@ namespace TiaUtilities.Generation.GridHandler.Data
                 var columns = ValidateColumns(c);
 
                 var propertyInfo = columns[c].PropertyInfo;
-                if(value != null && !propertyInfo.PropertyType.IsAssignableFrom(value.GetType()))
+                if (value != null && !propertyInfo.PropertyType.IsAssignableFrom(value.GetType()))
                 {
                     throw new InvalidOperationException($"Invalid value type for SET GridData[{c}]. Found: {value?.GetType().FullName}, Expected: {propertyInfo.PropertyType.FullName}");
                 }

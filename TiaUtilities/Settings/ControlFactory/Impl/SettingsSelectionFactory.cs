@@ -5,7 +5,7 @@ using TiaUtilities.Utility;
 
 namespace TiaUtilities.SettingsStep.ControlFactory.Impl
 {
-    public class SettingsStringSelectionFactory(SettingsConfigurationProperty? configurationProperty, string name, string description, SettingsFactoryGeneralOptions options) 
+    public class SettingsSelectionFactory(SettingsConfigurationProperty? configurationProperty, string name, string description, SettingsFactoryGeneralOptions options) 
         : SettingsControlFactory(configurationProperty, name, description, options)
     {
         public override (Label, Control, Predicate<PropertyChangedEventArgs>) Create(ObservableConfiguration configuration, SettingsFactoryCreateOptions createOptions)
@@ -14,20 +14,20 @@ namespace TiaUtilities.SettingsStep.ControlFactory.Impl
 
             var nameLabel = SettingsControls.GetNameLabel(this.Name, this.Description, this.GeneralOptions, createOptions, () => $"{this.ConfigurationProperty?.GetFrom(configuration)}");
             
-            var comboBox = SettingsControls.GetComboBox(this.GeneralOptions.StringSelections, this.GeneralOptions, createOptions);
+            var comboBox = SettingsControls.GetComboBox(this.GeneralOptions.Selections, this.GeneralOptions, createOptions);
 
             var startValue = this.ConfigurationProperty.GetFrom(configuration);
             comboBox.Text = $"{startValue}";
 
             var setInProgress = false;
-            comboBox.SelectedValueChanged += (sender, args) =>
+            comboBox.SelectionChangeCommitted += (sender, args) =>
             {
-                setInProgress = true;
-
-                var value = comboBox.Text;
-                this.ConfigurationProperty.SetTo(configuration, value);
-
-                setInProgress = false;
+                if(comboBox.SelectedItem is ControlUtils.ComboBoxDataSourceItem item)
+                {
+                    setInProgress = true;
+                    this.ConfigurationProperty.SetTo(configuration, item.Value);
+                    setInProgress = false;
+                }
             };
 
             bool propertyChangedPredicate(PropertyChangedEventArgs args)

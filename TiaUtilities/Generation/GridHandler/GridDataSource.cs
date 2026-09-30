@@ -2,17 +2,24 @@
 using System.Reflection;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.UndoRedo;
+using TiaUtilities.Utility.Collections;
 
 namespace TiaUtilities.Generation.GridHandler
 {
     public class GridDataSource<T> : IGridDataSource, ISaveable<Dictionary<int, T>> where T : IGridData
     {
+        public event AddingNewEventHandler AddingNew { add => this.bindingList.AddingNew += value; remove => this.bindingList.AddingNew -= value; }
+
+        public event ListChangedEventHandler ListChanged { add => this.bindingList.ListChanged += value; remove => this.bindingList.ListChanged -= value; }
+
         public IReadOnlyList<GridDataColumn> DataColumns { get; init; }
-        public int Count { get => dataList.Count; }
+        public int Count { get => this.bindingList.Count; }
 
         private readonly ExcelLikeDataGridView dataGridView;
         private readonly GridDataChangedHandler dataChangedHandler;
-        private readonly List<T> dataList;
+
+        private readonly List<T> baseDataList;
+        private readonly BindingList<T> bindingList;
 
         private readonly GridDataPropertyChangedEvent dataPropertyChanged;
 
@@ -22,14 +29,20 @@ namespace TiaUtilities.Generation.GridHandler
 
             this.dataGridView = dataGridView;
             this.dataChangedHandler = dataChangedHandler;
-            this.dataList = [];
+
+            this.baseDataList = [];
+            this.bindingList = new(this.baseDataList)
+            {
+                RaiseListChangedEvents = true,
+
+            };
 
             this.dataPropertyChanged = (sender, args) =>
             {
                 var data = args.Data;
                 if (data is T t)
                 {
-                    var row = this.dataList.IndexOf(t);
+                    var row = this.bindingList.IndexOf(t);
                     this.dataChangedHandler.HandleCellChangeEvent(args, row);
                 }
             };
@@ -57,6 +70,8 @@ namespace TiaUtilities.Generation.GridHandler
             var type = typeof(T);
             return (T)type.Assembly.CreateInstance(type.FullName);
         }
+
+        public ReadOnlyBindingListWrapper<T> CreateDataListWrapper() => new(this.bindingList);
 
         public Dictionary<int, T> CreateSave()
         {
@@ -86,43 +101,40 @@ namespace TiaUtilities.Generation.GridHandler
             }
         }
 
-        private int ValidateRowIndex(int index) => index >= 0 && index < this.Count ? index : throw new IndexOutOfRangeException($"Index {index} out of range for {this.dataList.GetType().FullName}.");
+        private int ValidateRowIndex(int index) => index >= 0 && index < this.Count ? index : throw new IndexOutOfRangeException($"Index {index} out of range for {this.GetType().FullName}.");
 
         public T this[int i]
         {
-            get => dataList[this.ValidateRowIndex(i)];
-            set => dataList[this.ValidateRowIndex(i)] = value;
+            get => this.bindingList[this.ValidateRowIndex(i)];
+            set => this.bindingList[this.ValidateRowIndex(i)] = value;
         }
 
         public void Clear()
         {
-            foreach (var data in this.dataList)
+            foreach (var data in this.bindingList)
             {
                 data.Clear();
             }
         }
- 
+
         public void InitializeData(uint dataAmount)
         {
-            foreach (var data in this.dataList)
+            foreach (var data in this.bindingList)
             {
                 data.Dispose();
             }
 
-            this.dataList.Clear();
+            this.bindingList.Clear();
             for (int row = 0; row < dataAmount; row++)
             {
                 var data = this.CreateInstance();
                 data.DataPropertyChanged += this.dataPropertyChanged;
 
-                this.dataList.Add(data);
+                this.bindingList.Add(data);
             }
 
-            //BindingList<T> bindingList = new(this.dataList);
-            //BindingSource bindingSource = new() { DataSource = bindingList };
-
-            this.dataGridView.RowCount = this.dataList.Count;
-            //dataGridView.DataSource = bindingSource;
+            //this.bindingList.ResetBindings(); //Reset bindings at the end to avoid calling an obscene amount of events
+            this.dataGridView.RowCount = this.bindingList.Count;
         }
 
         public List<int> GetFirstEmptyRowIndexes(int num)
@@ -134,7 +146,7 @@ namespace TiaUtilities.Generation.GridHandler
             }
 
             var emptyDataCounter = 0;
-            for (int i = 0; i < this.dataList.Count; i++)
+            for (int i = 0; i < this.bindingList.Count; i++)
             {
                 var data = this[i];
                 if (data.IsEmpty())
@@ -154,29 +166,31 @@ namespace TiaUtilities.Generation.GridHandler
         {
             if (sortOrder != SortOrder.None)
             {
-                dataList.Sort(comparer);
+                this.baseDataList.Sort(comparer);
                 if (sortOrder == SortOrder.Descending)
                 {
-                    dataList.Reverse();
+                    this.baseDataList.Reverse();
                 }
 
-                dataGridView.Refresh();
+                this.bindingList.ResetBindings();
+                this.dataGridView.Refresh();
             }
         }
 
         public Dictionary<T, int> CreateIndexListSnapshot()
         {
             var dict = new Dictionary<T, int>();
-            for (int x = 0; x < dataList.Count; x++)
+            for (int x = 0; x < this.bindingList.Count; x++)
             {
-                dict.Add(dataList[x], x);
+                var value = this.bindingList[x];
+                dict.Add(value, x);
             }
             return dict;
         }
 
         public void RestoreIndexListSnapshot(Dictionary<T, int> dict)
         {
-            dataList.Sort((x, y) =>
+            this.baseDataList.Sort((x, y) =>
             {
                 if (!dict.TryGetValue(x, out int xValue) || !dict.TryGetValue(y, out int yValue))
                 {
@@ -185,6 +199,7 @@ namespace TiaUtilities.Generation.GridHandler
 
                 return xValue.CompareTo(yValue);
             });
+            this.bindingList.ResetBindings();
 
             dataGridView.Refresh();
         }
@@ -196,9 +211,9 @@ namespace TiaUtilities.Generation.GridHandler
                 return -1;
             }
 
-            for (var x = indexStart; x < dataList.Count; x++)
+            for (var x = indexStart; x < this.bindingList.Count; x++)
             {
-                var data = dataList[x];
+                var data = this.bindingList[x];
                 if (!data.IsEmpty())
                 {
                     return x;
@@ -211,14 +226,14 @@ namespace TiaUtilities.Generation.GridHandler
         public Dictionary<T, int> GetNotEmptyDataDict(int startRow = 0)
         {
             Dictionary<T, int> dict = [];
-            if (startRow >= dataList.Count)
+            if (startRow >= this.bindingList.Count)
             {
                 return dict;
             }
 
-            for (var x = startRow; x < dataList.Count; x++)
+            for (var x = startRow; x < this.bindingList.Count; x++)
             {
-                var data = dataList[x];
+                var data = this.bindingList[x];
                 if (!data.IsEmpty())
                 {
                     dict.Add(data, x);
@@ -235,9 +250,9 @@ namespace TiaUtilities.Generation.GridHandler
         {
             var notEmptyDict = new Dictionary<T, int>();
 
-            for (var x = 0; x < dataList.Count; x++)
+            for (var x = 0; x < this.bindingList.Count; x++)
             {
-                var data = dataList[x];
+                var data = this.bindingList[x];
                 if (!data.IsEmpty())
                 {
                     var dataClone = this.CreateInstance();
@@ -257,15 +272,15 @@ namespace TiaUtilities.Generation.GridHandler
 
         Dictionary<IGridData, int> IGridDataSource.GetGenericNotEmptyDataDict(int startRow)
         {
-            if (startRow >= dataList.Count)
+            if (startRow >= this.bindingList.Count)
             {
                 return [];
             }
 
             Dictionary<IGridData, int> dict = [];
-            for (var x = startRow; x < dataList.Count; x++)
+            for (var x = startRow; x < this.bindingList.Count; x++)
             {
-                var data = dataList[x];
+                var data = this.bindingList[x];
                 if (!data.IsEmpty())
                 {
                     dict.Add(data, x);
@@ -280,9 +295,9 @@ namespace TiaUtilities.Generation.GridHandler
         {
             var notEmptyDict = new Dictionary<IGridData, int>();
 
-            for (var x = 0; x < dataList.Count; x++)
+            for (var x = 0; x < this.bindingList.Count; x++)
             {
-                var data = dataList[x];
+                var data = this.bindingList[x];
                 if (!data.IsEmpty())
                 {
                     var dataClone = this.CreateInstance();

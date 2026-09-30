@@ -6,6 +6,7 @@ using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.JSScript;
+using TiaUtilities.Utility.Extensions;
 
 namespace TiaUtilities.Generation.Alarms.Template
 {
@@ -77,7 +78,29 @@ namespace TiaUtilities.Generation.Alarms.Template
             #endregion
 
             this.gridHandler.Init();
+            /*
+            this.gridHandler.DataSource.ListChanged += (sender, args) =>
+            {
+                if(sender is IList<TemplateData> templates)
+                {
+                    templates.TryGet(args.NewIndex, out var template);
 
+                    switch (args.ListChangedType)
+                    {
+                        case System.ComponentModel.ListChangedType.ItemAdded:
+                        case System.ComponentModel.ListChangedType.ItemChanged:
+                        case System.ComponentModel.ListChangedType.ItemDeleted:
+                        case System.ComponentModel.ListChangedType.ItemMoved:
+                        case System.ComponentModel.ListChangedType.PropertyDescriptorAdded:
+                        case System.ComponentModel.ListChangedType.PropertyDescriptorChanged:
+                        case System.ComponentModel.ListChangedType.PropertyDescriptorDeleted:
+                        case System.ComponentModel.ListChangedType.Reset:
+                            break;
+                    }
+                }
+
+            };
+            */
             #region HIDE_CUSTOM_VARIABLE/TIMER_COLUMNS
             ShowCustomVar(mainConfig.EnableCustomVariable);
             mainConfig.Subscribe(() => mainConfig.EnableCustomVariable, ShowCustomVar);

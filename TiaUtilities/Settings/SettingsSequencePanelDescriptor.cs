@@ -96,23 +96,23 @@ namespace TiaUtilities.SettingsStep
                     SettingsControlFactory? factory = null;
 
                     var type = propInfo.PropertyType;
-                    if (type == typeof(string))
+                    if (options.Selections.Any())
                     {
-                        if(options.StringSpecifiedEditor == SettingsFactoryGeneralOptions.StringCustomEditor.JS)
+                        factory = new SettingsSelectionFactory(configurationProperty, name, description, options);
+                    }
+                    else if (type == typeof(string))
+                    {
+                        if(options.StringEditor == SettingsFactoryGeneralOptions.StringCustomEditor.JS)
                         {
                             factory = new SettingsJavascriptFactory(configurationProperty, name, description, options);
                         }
-                        else if(options.StringSpecifiedEditor == SettingsFactoryGeneralOptions.StringCustomEditor.JSON)
+                        else if(options.StringEditor == SettingsFactoryGeneralOptions.StringCustomEditor.JSON)
                         {
                             factory = new SettingsJSONFactory(configurationProperty, name, description, options);
                         }
-                        else if(options.StringSpecifiedEditor == SettingsFactoryGeneralOptions.StringCustomEditor.TSQL)
+                        else if(options.StringEditor == SettingsFactoryGeneralOptions.StringCustomEditor.TSQL)
                         {
                             factory = new SettingsTSQLFactory(configurationProperty, name, description, options);
-                        }
-                        else if(options.StringSelections.Any())
-                        {
-                            factory = new SettingsStringSelectionFactory(configurationProperty, name, description, options);
                         }
                         else
                         {

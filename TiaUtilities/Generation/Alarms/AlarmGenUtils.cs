@@ -59,7 +59,7 @@ namespace TiaUtilities.Generation.Alarms
             var sqlQueryDescriptor = new SettingsSequencePanelDescriptor("SQl", "SQL query for database")
                 .CreateBinder<AlarmMainConfiguration>()
                 .StartGroup("Query")
-                    .Add(x => x.DatabaseQuery, "", options: new() { StringSpecifiedEditor = StringCustomEditor.TSQL, MinWidth = 1600 })
+                    .Add(x => x.DatabaseQuery, "", options: new() { StringEditor = StringCustomEditor.TSQL, MinWidth = 1600 })
                 .End();
 
             GLOBAL_DESCRIPTORS.Clear();
@@ -98,7 +98,7 @@ namespace TiaUtilities.Generation.Alarms
 
                 .StartGroup(Locale.ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_TIMER)
                     .Add(x => x.DefaultTimerAddress, Locale.GENERICS_ADDRESS, Locale.GENERICS_DESCR_SET_SLASH_TO_DISABLE, options: new() { SupportPlaceholders = true })
-                    .Add(x => x.DefaultTimerType, Locale.GENERICS_TYPE, options: new() { StringSelections = ["TON", "TOF"] })
+                    .Add(x => x.DefaultTimerType, Locale.GENERICS_TYPE, options: new() { Selections = ["TON", "TOF"] })
                     .Add(x => x.DefaultTimerValue, Locale.GENERICS_VALUE, "It must be formatted the same as in TiaPortal (eg. T#0s, T#100ms)")
 
                 .StartGroup(Locale.ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_CUSTOM_VAR)
@@ -130,7 +130,7 @@ namespace TiaUtilities.Generation.Alarms
             var placeholdersStepDescriptor = new SettingsSequencePanelDescriptor("Placeholders")
                 .CreateBinder<AlarmTabConfiguration>()
                 .StartGroup(Locale.ALARM_SETTINGS_TAB_PLACEHOLDERS)
-                    .Add(x => x.CustomPlaceholdersJSON, "Placeholders", description: Locale.ALARM_SETTINGS_TAB_PLACEHOLDERS_DESC, options: new() { StringSpecifiedEditor = StringCustomEditor.JSON })
+                    .Add(x => x.CustomPlaceholdersJSON, "Placeholders", description: Locale.ALARM_SETTINGS_TAB_PLACEHOLDERS_DESC, options: new() { StringEditor = StringCustomEditor.JSON })
 
                 .End();
 

@@ -78,11 +78,11 @@ namespace TiaUtilities.Generation.Alarms.Template
             this.cloneButton.Click += (sender, args) => this.templateHandler.CloneSelectedTemplate();
 
             this.selectComboBox.AutoWidthFromItems = true;
-            this.selectComboBox.SetFilterableSource(this.templateHandler.BindingList, "Name", "Name");
+            this.selectComboBox.ValueMember = this.selectComboBox.DisplayMember = nameof(AlarmGenTemplate.Name);
+            this.selectComboBox.DataSource = this.templateHandler.BindingList;
             this.selectComboBox.SelectionChangeCommitted += (sender, args) =>
             {
-                var selectedItem = this.selectComboBox.SelectedItem;
-                if (selectedItem is AlarmGenTemplate template)
+                if (this.selectComboBox.SelectedItem is AlarmGenTemplate template)
                 {
                     this.templateHandler.SelectedTemplate = template;
                 }
@@ -99,10 +99,9 @@ namespace TiaUtilities.Generation.Alarms.Template
 
             if(!this.Visible)
             {
-                HandleTemplateChanged(this.SelectedTemplate);
+                this.HandleTemplateChanged(this.SelectedTemplate);
             }
         }
-
 
         private void HandleTemplateChanged(AlarmGenTemplate? oldTemplate = null)
         {

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using DocumentFormat.OpenXml.Bibliography;
+using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics;
 using TiaUtilities.Utility;
@@ -15,9 +16,32 @@ namespace TiaUtilities.SettingsStep.CustomControls
         public int AutoWidthRightPadding { get; set; } = 20;
 
 
+        public new IEnumerable<object>? DataSource
+        {
+            get => _fullDataSource;
+            set
+            {
+                if (value is IBindingList bindingList)
+                {//BindingSource implements IBindingList
+                    bindingList.ListChanged += (sender, args) =>
+                    {
+                        this._fullDataSource = [.. bindingList.Cast<object>()];
+                        base.DataSource = this._fullDataSource;
+
+                        this.CalculateWidthFromItems();
+                    };
+                }
+
+                this._fullDataSource = [.. value.Cast<object>()];
+                base.DataSource = this._fullDataSource;
+
+                this.CalculateWidthFromItems();
+            }
+        }
+
         public Func<object, string, bool>? FilterPredicate { get; set; }
 
-        private List<object>? _unfilteredItems;
+        private List<object>? _fullDataSource;
         private string? _lastFilterString;
         private bool _isFiltering;
 
@@ -30,43 +54,14 @@ namespace TiaUtilities.SettingsStep.CustomControls
             this.DrawMode = DrawMode.OwnerDrawFixed;
         }
 
-        public void SetFilterableSource<T>(IEnumerable<T> source, string displayMember = "", string valueMember = "")
-        {
-            if (!string.IsNullOrEmpty(displayMember))
-            {
-                this.DisplayMember = displayMember;
-            }
-
-            if (!string.IsNullOrEmpty(valueMember))
-            {
-                this.ValueMember = valueMember;
-            }
-
-            if(source is IBindingList bindingList)
-            {//BindingSource implements IBindingList
-                bindingList.ListChanged += (sender, args) =>
-                {
-                    this._unfilteredItems = [.. bindingList.Cast<object>()];
-                    this.DataSource = this._unfilteredItems;
-
-                    this.CalculateWidthFromItems();
-                };
-            }
-
-            this._unfilteredItems = [.. source.Cast<object>()];
-            this.DataSource = this._unfilteredItems;
-
-            this.CalculateWidthFromItems();
-        }
-
         private void CalculateWidthFromItems()
         {
-            if(!this.AutoWidthFromItems || this._unfilteredItems == null || this._unfilteredItems.Count <= 0)
+            if(!this.AutoWidthFromItems || this._fullDataSource == null || this._fullDataSource.Count <= 0)
             {
                 return;
             }
 
-            var maxWidth = this._unfilteredItems.Select(this.GetDisplayMember).Max(n => TextRenderer.MeasureText(n, base.Font, Size.Empty, TextFormatFlags.TextBoxControl).Width);
+            var maxWidth = this._fullDataSource.Select(this.GetDisplayMember).Max(n => TextRenderer.MeasureText(n, base.Font, Size.Empty, TextFormatFlags.TextBoxControl).Width);
             this.Width = maxWidth + this.AutoWidthRightPadding;
         }
 
@@ -104,7 +99,7 @@ namespace TiaUtilities.SettingsStep.CustomControls
         {
             base.OnTextUpdate(e);
 
-            if (_unfilteredItems == null || this.Sorted || this.AutoCompleteMode != AutoCompleteMode.None) //Cannot change DataSource to a Sorted Combobox
+            if (_fullDataSource == null || this.Sorted || this.AutoCompleteMode != AutoCompleteMode.None) //Cannot change DataSource to a Sorted Combobox
             {
                 return;
             }
@@ -117,7 +112,7 @@ namespace TiaUtilities.SettingsStep.CustomControls
 
             if (string.IsNullOrWhiteSpace(searchText))
             {
-                this.DataSource = _unfilteredItems;
+                base.DataSource = _fullDataSource;
                 this.DroppedDown = true;
 
                 this.BeginInvoke(() =>
@@ -128,19 +123,19 @@ namespace TiaUtilities.SettingsStep.CustomControls
             }
             else
             {
-                var filteredList = _unfilteredItems.Cast<object>()
+                var filteredList = _fullDataSource.Cast<object>()
                     .Where(item => this.FilterPredicate == null ? this.DefaultFilter(item, searchText) : this.FilterPredicate(item, searchText))
                     .ToList();
 
                 var listsEquality = false;
-                if(this.DataSource is IList dataSourceList)
+                if(base.DataSource is IList dataSourceList)
                 {
                     listsEquality = dataSourceList.Cast<object>().SequenceEqual(filteredList);
                 }
 
                 if(!listsEquality || !this.DroppedDown)
                 {
-                    this.DataSource = filteredList;
+                    base.DataSource = filteredList;
                     this.DroppedDown = true;
                     this.BeginInvoke(() =>
                     {
@@ -171,8 +166,8 @@ namespace TiaUtilities.SettingsStep.CustomControls
 
                 // Paracadute finale per intercettare l'eccezione nativa di WinForms 
                 // nel caso in cui get_SelectedItem() venga chiamato internamente.
-                this.DataSource = _unfilteredItems;
-                this.SelectedIndex = _unfilteredItems == null || _unfilteredItems.Count == 0 ? -1 : 0;
+                base.DataSource = _fullDataSource;
+                this.SelectedIndex = _fullDataSource == null || _fullDataSource.Count == 0 ? -1 : 0;
                 this.Text = _lastFilterString;
 
                 _isFiltering = false;
@@ -202,19 +197,19 @@ namespace TiaUtilities.SettingsStep.CustomControls
 
         protected override void OnDropDown(EventArgs e)
         {
-            if (_unfilteredItems == null || this.Sorted || this.AutoCompleteMode != AutoCompleteMode.None) //Cannot change DataSource to a Sorted Combobox
+            if (_fullDataSource == null || this.Sorted || this.AutoCompleteMode != AutoCompleteMode.None) //Cannot change DataSource to a Sorted Combobox
             {
                 base.OnDropDown(e);
                 return;
             }
 
             // Quando si apre la tendina via click o freccia, ripristina la lista completa
-            if (!_isFiltering && this.DataSource != _unfilteredItems)
+            if (!_isFiltering && base.DataSource != _fullDataSource)
             {
                 string currentText = this.Text;
                 int selectionStart = this.SelectionStart;
 
-                this.DataSource = _unfilteredItems;
+                base.DataSource = _fullDataSource;
 
                 this.Text = currentText;
                 this.SelectionStart = selectionStart;

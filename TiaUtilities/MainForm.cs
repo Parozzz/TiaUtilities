@@ -181,8 +181,8 @@ namespace TiaUtilities
                 .CreateBinder<ProgramSettingsV1>()
                 .StartGroup(Locale.GENERICS_SETTINGS)
                     .Add(x => x.AutoSaveTime, Locale.PROGRAM_SETTINGS_AUTO_SAVE)
-                    .Add(x => x.IetfLanguage, Locale.PROGRAM_SETTINGS_LANGUAGE, options: new() { StringSelections = ["it-IT", "en-US"] })
-                    .Add(x => x.TIAVersion, Locale.PROGRAM_SETTINGS_TIA_VERSION)//, options: new() { StringSelections = [16, 17, 18, 19] })
+                    .Add(x => x.IetfLanguage, Locale.PROGRAM_SETTINGS_LANGUAGE, options: new() { Selections = ["it-IT", "en-US"] })
+                    .Add(x => x.TIAVersion, Locale.PROGRAM_SETTINGS_TIA_VERSION, options: new() { Selections = [16, 17, 18, 19] })
                 .End();
             
             var gridDescriptor = new SettingsSequencePanelDescriptor(Locale.GRID_SETTINGS)
