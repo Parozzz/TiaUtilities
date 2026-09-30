@@ -15,7 +15,7 @@ namespace TiaUtilities.Generation
 {
     public partial class GenModuleForm : Form
     {
-        private enum SplitMode { NO_SPLIT, VERTICAL }
+        private enum SplitMode { NO_SPLIT, VERTICAL, HORIZONTAL }
 
         private const int CONTROL_ROW = 2;
 
@@ -131,7 +131,8 @@ namespace TiaUtilities.Generation
 
             #region TOP_MENU_VIEW
             this.viewSingleMenuItem.Click += (sender, args) => this.splitMode.Value = SplitMode.NO_SPLIT;
-            this.viewSplitMenuItem.Click += (sender, args) => this.splitMode.Value = SplitMode.VERTICAL;
+            this.viewSplitVerticalMenuItem.Click += (sender, args) => this.splitMode.Value = SplitMode.VERTICAL;
+            this.viewSplitHorizontalMenuItem.Click += (sender, args) => this.splitMode.Value = SplitMode.HORIZONTAL;
             #endregion
 
             #region AUTO_SAVE
@@ -150,10 +151,9 @@ namespace TiaUtilities.Generation
 
             this.splitMode.Changed += (sender, args) =>
             {
-                var oldSplitMode = args.OldValue;
                 var newSplitMode = args.NewValue;
 
-                if(newSplitMode == SplitMode.VERTICAL)
+                if(newSplitMode == SplitMode.VERTICAL || newSplitMode == SplitMode.HORIZONTAL)
                 {
                     this.bottomSplitContainer.Panel2Collapsed = false;
                 }
@@ -162,6 +162,8 @@ namespace TiaUtilities.Generation
                     this.bottomSplitContainer.Panel2Collapsed = true;
                     this.panel2ModuleControl.Value = null;
                 }
+
+                this.bottomSplitContainer.Orientation = newSplitMode == SplitMode.VERTICAL ? Orientation.Vertical : Orientation.Horizontal;
 
                 this.UpdateControlsLabels();
             };
@@ -215,6 +217,8 @@ namespace TiaUtilities.Generation
                 }
 
                 this.bottomSplitContainer.SuspendLayout();
+                DllImports.SuspendDrawing(this.bottomSplitContainer);
+
                 this.bottomSplitContainer.Panel1.Controls.Clear();
 
                 if (newModuleControl != null)
@@ -224,6 +228,8 @@ namespace TiaUtilities.Generation
                 }
 
                 this.UpdateControlsLabels();
+
+                DllImports.ResumeDrawing(this.bottomSplitContainer);
                 this.bottomSplitContainer.ResumeLayout();
             }; 
             
@@ -238,6 +244,8 @@ namespace TiaUtilities.Generation
                 }
 
                 this.bottomSplitContainer.SuspendLayout();
+                DllImports.SuspendDrawing(this.bottomSplitContainer);
+
                 this.bottomSplitContainer.Panel2.Controls.Clear();
 
                 if (newModuleControl != null)
@@ -247,6 +255,8 @@ namespace TiaUtilities.Generation
                 }
 
                 this.UpdateControlsLabels();
+
+                DllImports.ResumeDrawing(this.bottomSplitContainer);
                 this.bottomSplitContainer.ResumeLayout();
             };
 

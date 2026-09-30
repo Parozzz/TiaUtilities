@@ -26,6 +26,9 @@ namespace TiaUtilities.Resources
         public static Image EFFECT { get => GetImage("effect_4433833.png"); }
         public static Image SEARCH { get => GetImage("search_8180752.png"); }
         public static Image DROPDOWN { get => GetImage("dropdown_6972189.png"); }
+        public static Image DELETE { get => GetImage("delete_8439989.png"); }
+        public static Image DUPLICATE { get => GetImage("duplicate_7573756.png"); }
+        public static Image RENAME { get => GetImage("rename_6778502.png"); }
 
         public static Image DOUBLE_ARROW_DOWN_3134107 { get => GetImage("double-arrow-down-3134107.png"); }
         public static Image DOUBLE_ARROW_UP_3134107 { get => GetImage("double-arrow-up-3134107.png"); }

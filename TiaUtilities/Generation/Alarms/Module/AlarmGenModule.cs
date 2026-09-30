@@ -76,12 +76,7 @@ namespace TiaUtilities.Generation.Alarms.Module
                 new() { Name = Locale.DEVICE_DATA_TEMPLATE, RequestControlCallback = this.CreateTemplateControl },
                 new() {
                     Name = Locale.GENERICS_SETTINGS,
-                    RequestControlCallback = () => {
-                        var sequences = this.GetSettingsSequences();
-                        this.settingsControl.SetSequences(sequences);
-
-                        return this.settingsControl;
-                    }
+                    RequestControlCallback = () => UpdateSettingsControl()
                 },
             ];
         }
@@ -157,13 +152,18 @@ namespace TiaUtilities.Generation.Alarms.Module
 
             #region TEMPLATE_HANDLER
             this.templateHandler.Init([]);
-            this.templateHandler.TemplateRenamed += (sender, args) =>
+            this.templateHandler.Renamed += (sender, args) =>
             {
                 foreach (var tab in this.alarmTabList)
                 {
                     tab.ParseTemplateRenamed(args.OldName, args.NewName);
                 }
+
+                this.UpdateSettingsControl(ifVisible: true);
             };
+
+            this.templateHandler.Added += (sender, args) =>  this.UpdateSettingsControl(ifVisible: true);
+
             #endregion
 
             #region TAB_CONTROL
@@ -175,6 +175,7 @@ namespace TiaUtilities.Generation.Alarms.Module
                 }
 
                 this.TabCreation(args.TabPage);
+                this.UpdateSettingsControl(ifVisible: true);
             };
             this.tabControl.TabRemoved += (sender, args) =>
             {
@@ -187,6 +188,8 @@ namespace TiaUtilities.Generation.Alarms.Module
                 {
                     this.alarmTabList.Remove(tab);
                 }
+
+                this.UpdateSettingsControl(ifVisible: true);
             };
 
             this.tabControl.TabRenamed += (sender, args) =>
@@ -209,6 +212,8 @@ namespace TiaUtilities.Generation.Alarms.Module
                         args.NewName = fixedNewName;
                     }
                 }
+
+                this.UpdateSettingsControl(ifVisible: true);
             };
             this.tabControl.Selected += (sender, args) =>
             {
@@ -394,6 +399,18 @@ namespace TiaUtilities.Generation.Alarms.Module
             }
 
             return placeholdersHandler;
+        }
+
+        private SettingsControl UpdateSettingsControl(bool ifVisible = true)
+        {
+            if(!this.settingsControl.Visible)
+            {
+                return this.settingsControl;
+            }
+
+            var sequences = this.GetSettingsSequences();
+            this.settingsControl.SetSequences(sequences);
+            return this.settingsControl;
         }
 
         private List<SettingsSequence> GetSettingsSequences()

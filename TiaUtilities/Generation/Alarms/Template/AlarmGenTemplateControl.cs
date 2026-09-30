@@ -11,6 +11,7 @@ using TiaUtilities.Generation.Alarms.Configurations;
 using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Languages;
+using TiaUtilities.Resources;
 
 namespace TiaUtilities.Generation.Alarms.Template
 {
@@ -44,17 +45,41 @@ namespace TiaUtilities.Generation.Alarms.Template
 
             this.mainPanel.Controls.Add(this.templateDataGridWrapper.GetGridControl());
 
-            this.templateHandler.SelectedTemplateChanged += (sender, args) => this.HandleTemplateChanged(args.OldTemplate);
+            this.templateHandler.SelectedChanged += (sender, args) => this.HandleTemplateChanged(oldTemplate: args.OldTemplate);
 
+            ImageList buttonsImages = new()
+            {
+                Images = { ImageResources.ADD_501366_007435, ImageResources.DELETE, ImageResources.RENAME, ImageResources.DUPLICATE },
+                ImageSize = new(18, 18),
+            };
+
+            this.addButton.ImageList = buttonsImages;
+            this.addButton.ImageIndex = 0;
+            this.addButton.ImageAlign = ContentAlignment.MiddleLeft;
+            this.addButton.TextImageRelation = TextImageRelation.ImageBeforeText;
             this.addButton.Click += (sender, args) => this.templateHandler.Add();
+
+            this.removeButton.ImageList = buttonsImages;
+            this.removeButton.ImageIndex = 1;
+            this.removeButton.ImageAlign = ContentAlignment.MiddleLeft;
+            this.removeButton.TextImageRelation = TextImageRelation.ImageBeforeText;
             this.removeButton.Click += (sender, args) => this.templateHandler.RemoveSelectedTemplate();
+
+            this.renameButton.ImageList = buttonsImages;
+            this.renameButton.ImageIndex = 2;
+            this.renameButton.ImageAlign = ContentAlignment.MiddleLeft;
+            this.renameButton.TextImageRelation = TextImageRelation.ImageBeforeText;
             this.renameButton.Click += (sender, args) => this.templateHandler.RenameSelectedTemplate(this);
+
+            this.cloneButton.ImageList = buttonsImages;
+            this.cloneButton.ImageIndex = 3;
+            this.cloneButton.ImageAlign = ContentAlignment.MiddleLeft;
+            this.cloneButton.TextImageRelation = TextImageRelation.ImageBeforeText;
             this.cloneButton.Click += (sender, args) => this.templateHandler.CloneSelectedTemplate();
 
-            this.selectComboBox.DataSource = new BindingSource() { DataSource = this.templateHandler.BindingList };
-            this.selectComboBox.DisplayMember = "Name";
-            this.selectComboBox.ValueMember = "Name";
-            this.selectComboBox.SelectedIndexChanged += (sender, args) =>
+            this.selectComboBox.AutoWidthFromItems = true;
+            this.selectComboBox.SetFilterableSource(this.templateHandler.BindingList, "Name", "Name");
+            this.selectComboBox.SelectionChangeCommitted += (sender, args) =>
             {
                 var selectedItem = this.selectComboBox.SelectedItem;
                 if (selectedItem is AlarmGenTemplate template)
@@ -64,7 +89,7 @@ namespace TiaUtilities.Generation.Alarms.Template
             };
 
             //Load Current after init and save current when form is closed.
-            this.HandleTemplateChanged(null);
+            this.HandleTemplateChanged();
             this.Translate();
         }
 
@@ -78,7 +103,8 @@ namespace TiaUtilities.Generation.Alarms.Template
             }
         }
 
-        private void HandleTemplateChanged(AlarmGenTemplate? oldTemplate)
+
+        private void HandleTemplateChanged(AlarmGenTemplate? oldTemplate = null)
         {
             if (oldTemplate != null)
             {
@@ -100,6 +126,11 @@ namespace TiaUtilities.Generation.Alarms.Template
         {
             this.Text = Locale.ALARM_TEMPLATE_FORM;
             this.selectLabel.Text = Locale.ALARM_TEMPLATE_SELECT_TEMPLATE;
+
+            this.addButton.Text = "Add";
+            this.removeButton.Text = "Remove";
+            this.renameButton.Text = "Rename";
+            this.cloneButton.Text = "Clone";
         }
     }
 }

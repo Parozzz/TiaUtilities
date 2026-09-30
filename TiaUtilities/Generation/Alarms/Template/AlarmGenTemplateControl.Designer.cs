@@ -33,16 +33,16 @@ namespace TiaUtilities.Generation.Alarms.Template
         {
             mainPanel = new TableLayoutPanel();
             topPanel = new FlowLayoutPanel();
-            selectPanel = new TableLayoutPanel();
             selectLabel = new Label();
-            selectComboBox = new TiaUtilities.CustomControls.FlatComboBox();
+            selectComboBox = new TiaUtilities.SettingsStep.CustomControls.ComboBoxFilterable();
             addButton = new Button();
             removeButton = new Button();
             renameButton = new Button();
             cloneButton = new Button();
+            comboBoxFilterable1 = new TiaUtilities.SettingsStep.CustomControls.ComboBoxFilterable();
+            comboBoxFilterable2 = new TiaUtilities.SettingsStep.CustomControls.ComboBoxFilterable();
             mainPanel.SuspendLayout();
             topPanel.SuspendLayout();
-            selectPanel.SuspendLayout();
             SuspendLayout();
             // 
             // mainPanel
@@ -54,65 +54,57 @@ namespace TiaUtilities.Generation.Alarms.Template
             mainPanel.Controls.Add(topPanel, 0, 0);
             mainPanel.Dock = DockStyle.Fill;
             mainPanel.Location = new Point(0, 0);
+            mainPanel.Margin = new Padding(3, 2, 3, 2);
             mainPanel.Name = "mainPanel";
             mainPanel.RowCount = 2;
             mainPanel.RowStyles.Add(new RowStyle());
             mainPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            mainPanel.Size = new Size(1584, 761);
+            mainPanel.Size = new Size(612, 188);
             mainPanel.TabIndex = 0;
             // 
             // topPanel
             // 
             topPanel.AutoSize = true;
             topPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            topPanel.Controls.Add(selectPanel);
+            topPanel.Controls.Add(selectLabel);
+            topPanel.Controls.Add(selectComboBox);
             topPanel.Controls.Add(addButton);
             topPanel.Controls.Add(removeButton);
             topPanel.Controls.Add(renameButton);
             topPanel.Controls.Add(cloneButton);
             topPanel.Dock = DockStyle.Fill;
-            topPanel.Location = new Point(3, 3);
+            topPanel.Location = new Point(3, 2);
+            topPanel.Margin = new Padding(3, 2, 3, 2);
             topPanel.Name = "topPanel";
-            topPanel.Size = new Size(1578, 37);
+            topPanel.Size = new Size(606, 32);
             topPanel.TabIndex = 0;
-            // 
-            // selectPanel
-            // 
-            selectPanel.AutoSize = true;
-            selectPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            selectPanel.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
-            selectPanel.ColumnCount = 2;
-            selectPanel.ColumnStyles.Add(new ColumnStyle());
-            selectPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            selectPanel.Controls.Add(selectLabel, 0, 0);
-            selectPanel.Controls.Add(selectComboBox, 1, 0);
-            selectPanel.Location = new Point(3, 3);
-            selectPanel.Name = "selectPanel";
-            selectPanel.RowCount = 1;
-            selectPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            selectPanel.Size = new Size(265, 31);
-            selectPanel.TabIndex = 0;
             // 
             // selectLabel
             // 
             selectLabel.AutoSize = true;
             selectLabel.Dock = DockStyle.Fill;
-            selectLabel.Location = new Point(4, 1);
+            selectLabel.Location = new Point(3, 0);
             selectLabel.Name = "selectLabel";
-            selectLabel.Size = new Size(90, 29);
+            selectLabel.Size = new Size(90, 32);
             selectLabel.TabIndex = 0;
             selectLabel.Text = "Select Template";
             selectLabel.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // selectComboBox
             // 
-            selectComboBox.BackColor = SystemColors.Control;
-            selectComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            selectComboBox.Anchor = AnchorStyles.None;
+            selectComboBox.AutoWidthFromItems = true;
+            selectComboBox.AutoWidthRightPadding = 20;
+            selectComboBox.DrawMode = DrawMode.OwnerDrawFixed;
+            selectComboBox.DropDownHoveredBackColor = Color.LightSeaGreen;
+            selectComboBox.DropDownHoveredForeColor = Color.Black;
+            selectComboBox.FilterPredicate = null;
+            selectComboBox.FlatStyle = FlatStyle.Flat;
             selectComboBox.FormattingEnabled = true;
-            selectComboBox.Location = new Point(101, 4);
+            selectComboBox.Location = new Point(99, 4);
             selectComboBox.Name = "selectComboBox";
-            selectComboBox.Size = new Size(160, 28);
-            selectComboBox.TabIndex = 1;
+            selectComboBox.Size = new Size(121, 24);
+            selectComboBox.TabIndex = 5;
             // 
             // addButton
             // 
@@ -121,10 +113,10 @@ namespace TiaUtilities.Generation.Alarms.Template
             addButton.FlatAppearance.BorderColor = SystemColors.Control;
             addButton.FlatStyle = FlatStyle.Flat;
             addButton.Font = new Font("Segoe UI", 11F);
-            addButton.Location = new Point(279, 0);
-            addButton.Margin = new Padding(8, 0, 0, 0);
+            addButton.Location = new Point(230, 0);
+            addButton.Margin = new Padding(7, 0, 0, 0);
             addButton.Name = "addButton";
-            addButton.Size = new Size(37, 37);
+            addButton.Size = new Size(53, 32);
             addButton.TabIndex = 1;
             addButton.Text = "ADD";
             addButton.UseVisualStyleBackColor = true;
@@ -136,10 +128,10 @@ namespace TiaUtilities.Generation.Alarms.Template
             removeButton.FlatAppearance.BorderColor = SystemColors.Control;
             removeButton.FlatStyle = FlatStyle.Flat;
             removeButton.Font = new Font("Segoe UI", 11F);
-            removeButton.Location = new Point(324, 0);
-            removeButton.Margin = new Padding(8, 0, 0, 0);
+            removeButton.Location = new Point(290, 0);
+            removeButton.Margin = new Padding(7, 0, 0, 0);
             removeButton.Name = "removeButton";
-            removeButton.Size = new Size(37, 37);
+            removeButton.Size = new Size(79, 32);
             removeButton.TabIndex = 2;
             removeButton.Text = "REMOVE";
             removeButton.UseVisualStyleBackColor = true;
@@ -151,10 +143,10 @@ namespace TiaUtilities.Generation.Alarms.Template
             renameButton.FlatAppearance.BorderColor = SystemColors.Control;
             renameButton.FlatStyle = FlatStyle.Flat;
             renameButton.Font = new Font("Segoe UI", 11F);
-            renameButton.Location = new Point(369, 0);
-            renameButton.Margin = new Padding(8, 0, 0, 0);
+            renameButton.Location = new Point(376, 0);
+            renameButton.Margin = new Padding(7, 0, 0, 0);
             renameButton.Name = "renameButton";
-            renameButton.Size = new Size(40, 37);
+            renameButton.Size = new Size(80, 32);
             renameButton.TabIndex = 3;
             renameButton.Text = "RENAME";
             renameButton.UseVisualStyleBackColor = true;
@@ -166,28 +158,53 @@ namespace TiaUtilities.Generation.Alarms.Template
             cloneButton.FlatAppearance.BorderColor = SystemColors.Control;
             cloneButton.FlatStyle = FlatStyle.Flat;
             cloneButton.Font = new Font("Segoe UI", 11F);
-            cloneButton.Location = new Point(417, 0);
-            cloneButton.Margin = new Padding(8, 0, 0, 0);
+            cloneButton.Location = new Point(463, 0);
+            cloneButton.Margin = new Padding(7, 0, 0, 0);
             cloneButton.Name = "cloneButton";
-            cloneButton.Size = new Size(40, 37);
+            cloneButton.Size = new Size(66, 32);
             cloneButton.TabIndex = 4;
             cloneButton.Text = "CLONE";
             cloneButton.UseVisualStyleBackColor = true;
             // 
+            // comboBoxFilterable1
+            // 
+            comboBoxFilterable1.AutoWidthFromItems = true;
+            comboBoxFilterable1.AutoWidthRightPadding = 20;
+            comboBoxFilterable1.DrawMode = DrawMode.OwnerDrawFixed;
+            comboBoxFilterable1.DropDownHoveredBackColor = Color.LightSeaGreen;
+            comboBoxFilterable1.DropDownHoveredForeColor = Color.Black;
+            comboBoxFilterable1.FilterPredicate = null;
+            comboBoxFilterable1.Location = new Point(0, 0);
+            comboBoxFilterable1.Name = "comboBoxFilterable1";
+            comboBoxFilterable1.Size = new Size(121, 23);
+            comboBoxFilterable1.TabIndex = 0;
+            // 
+            // comboBoxFilterable2
+            // 
+            comboBoxFilterable2.AutoWidthFromItems = true;
+            comboBoxFilterable2.AutoWidthRightPadding = 20;
+            comboBoxFilterable2.DrawMode = DrawMode.OwnerDrawFixed;
+            comboBoxFilterable2.DropDownHoveredBackColor = Color.LightSeaGreen;
+            comboBoxFilterable2.DropDownHoveredForeColor = Color.Black;
+            comboBoxFilterable2.FilterPredicate = null;
+            comboBoxFilterable2.Location = new Point(0, 0);
+            comboBoxFilterable2.Name = "comboBoxFilterable2";
+            comboBoxFilterable2.Size = new Size(121, 23);
+            comboBoxFilterable2.TabIndex = 0;
+            // 
             // AlarmGenTemplateControl
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             AutoSizeMode = AutoSizeMode.GrowAndShrink;
             Controls.Add(mainPanel);
+            Margin = new Padding(3, 2, 3, 2);
             Name = "AlarmGenTemplateControl";
-            Size = new Size(700, 250);
+            Size = new Size(612, 188);
             mainPanel.ResumeLayout(false);
             mainPanel.PerformLayout();
             topPanel.ResumeLayout(false);
             topPanel.PerformLayout();
-            selectPanel.ResumeLayout(false);
-            selectPanel.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -196,12 +213,13 @@ namespace TiaUtilities.Generation.Alarms.Template
 
         private TableLayoutPanel mainPanel;
         private FlowLayoutPanel topPanel;
-        private TableLayoutPanel selectPanel;
         private Label selectLabel;
-        private TiaUtilities.CustomControls.FlatComboBox selectComboBox;
         private Button addButton;
         private Button removeButton;
         private Button renameButton;
         private Button cloneButton;
+        private SettingsStep.CustomControls.ComboBoxFilterable comboBoxFilterable1;
+        private SettingsStep.CustomControls.ComboBoxFilterable comboBoxFilterable2;
+        private SettingsStep.CustomControls.ComboBoxFilterable selectComboBox;
     }
 }

@@ -27,7 +27,7 @@ namespace TiaUtilities.Generation.Alarms.Template
 
         public void Init(AlarmMainConfiguration mainConfig, AlarmTabConfiguration tabConfig, Func<AlarmTemplateConfiguration> getTemplateConfig)
         {
-            #region DRAG
+            #region EXCEL_DRAG
             this.gridHandler.ExcelDragPreview += (sender, args) => GridUtils.DragPreview(args, gridHandler);
             this.gridHandler.ExcelDragDone += (sender, args) => GridUtils.DragDone(args, gridHandler);
             #endregion
@@ -190,60 +190,52 @@ namespace TiaUtilities.Generation.Alarms.Template
             return obj != null && obj is string str && !string.IsNullOrWhiteSpace(str);
         }
 
-        public void Refresh()
-        {
-            this.gridHandler.ViewManipulator.Refresh();
-        }
+        public void Refresh() => this.gridHandler.ViewManipulator.Refresh();
 
         public Control GetGridControl() => this.gridHandler.GetControl();
 
-        public void AddScriptVariable(JSScriptVariable scriptVariable)
-        {
-            gridHandler.ScriptVariableList.Add(scriptVariable);
-        }
+        public void AddScriptVariable(JSScriptVariable scriptVariable) => this.gridHandler.ScriptVariableList.Add(scriptVariable);
 
-        public GridSave<TemplateData> CreateSave() => gridHandler.CreateSave();
-        public void LoadSave(GridSave<TemplateData> gridSave) => gridHandler.LoadSave(gridSave);
+        public GridSave<TemplateData> CreateSave() => this.gridHandler.CreateSave();
+
+        public void LoadSave(GridSave<TemplateData> gridSave) => this.gridHandler.LoadSave(gridSave);
 
         public void ShowCustomVar(bool show)
         {
             if (!show)
             {
-                gridHandler.Columns.Hide(TemplateData.CUSTOM_VARIABLE_ADDRESS);
-                gridHandler.Columns.Hide(TemplateData.CUSTOM_VARIABLE_VALUE);
+                this.gridHandler.Columns.Hide(TemplateData.CUSTOM_VARIABLE_ADDRESS);
+                this.gridHandler.Columns.Hide(TemplateData.CUSTOM_VARIABLE_VALUE);
             }
             else
             {
-                gridHandler.Columns.Show(TemplateData.CUSTOM_VARIABLE_ADDRESS);
-                gridHandler.Columns.Show(TemplateData.CUSTOM_VARIABLE_VALUE);
+                this.gridHandler.Columns.Show(TemplateData.CUSTOM_VARIABLE_ADDRESS);
+                this.gridHandler.Columns.Show(TemplateData.CUSTOM_VARIABLE_VALUE);
             }
 
-            gridHandler.Columns.InitializeColumns();
+            this.gridHandler.Columns.InitializeColumns();
         }
 
         public void ShowTimer(bool show)
         {
             if (!show)
             {
-                gridHandler.Columns.Hide(TemplateData.TIMER_ADDRESS);
-                gridHandler.Columns.Hide(TemplateData.TIMER_TYPE);
-                gridHandler.Columns.Hide(TemplateData.TIMER_VALUE);
+                this.gridHandler.Columns.Hide(TemplateData.TIMER_ADDRESS);
+                this.gridHandler.Columns.Hide(TemplateData.TIMER_TYPE);
+                this.gridHandler.Columns.Hide(TemplateData.TIMER_VALUE);
             }
             else
             {
-                gridHandler.Columns.Show(TemplateData.TIMER_ADDRESS);
-                gridHandler.Columns.Show(TemplateData.TIMER_TYPE);
-                gridHandler.Columns.Show(TemplateData.TIMER_VALUE);
+                this.gridHandler.Columns.Show(TemplateData.TIMER_ADDRESS);
+                this.gridHandler.Columns.Show(TemplateData.TIMER_TYPE);
+                this.gridHandler.Columns.Show(TemplateData.TIMER_VALUE);
             }
 
-            gridHandler.Columns.InitializeColumns();
+            this.gridHandler.Columns.InitializeColumns();
         }
 
-        public bool IsDirty() => gridHandler.IsDirty();
+        public bool IsDirty() => this.gridHandler.IsDirty();
 
-        public void Wash()
-        {
-            gridHandler.Wash();
-        }
+        public void Wash() => this.gridHandler.Wash();
     }
 }

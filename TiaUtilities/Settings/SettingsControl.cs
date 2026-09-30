@@ -367,6 +367,25 @@ namespace TiaUtilities.SettingsStep
             #endregion
         }
 
+        public void SelectSequenceFromName(string name)
+        {
+            ComboBoxSourceItem? found = null;
+            foreach(ComboBoxSourceItem item in this.selectSequenceComboBox.Items)
+            {
+                if(item.Text.Contains(name, StringComparison.OrdinalIgnoreCase))
+                {
+                    found = item;
+                    break;
+                }
+            }
+
+            if(found != null)
+            {
+                this.selectSequenceComboBox.SelectedItem = found;
+                this.UpdateSelectedSequenceFromComboBox();
+            }
+        }
+
         private void UpdateSelectedSequenceFromComboBox()
         {
             if (this.selectSequenceComboBox.SelectedItem is ComboBoxSourceItem item)
@@ -502,6 +521,13 @@ namespace TiaUtilities.SettingsStep
         public bool PreFilterMessage(ref Message m)
         {
             if(m.Msg != DllImports.WM_KEYDOWN || !this.Visible)
+            {
+                return false;
+            }
+
+            var point = this.PointToClient(Cursor.Position);
+            var enable = this.DisplayRectangle.Contains(point) || this.ContainsFocus;
+            if(!enable)
             {
                 return false;
             }

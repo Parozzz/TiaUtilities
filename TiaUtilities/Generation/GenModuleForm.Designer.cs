@@ -43,7 +43,8 @@
             exportXMLMenuItem = new ToolStripMenuItem();
             viewMenuItem = new ToolStripMenuItem();
             viewSingleMenuItem = new ToolStripMenuItem();
-            viewSplitMenuItem = new ToolStripMenuItem();
+            viewSplitVerticalMenuItem = new ToolStripMenuItem();
+            viewSplitHorizontalMenuItem = new ToolStripMenuItem();
             mainPanel = new TableLayoutPanel();
             selectControlButtonPanel = new FlowLayoutPanel();
             bottomSplitContainer = new SplitContainer();
@@ -142,7 +143,7 @@
             // 
             // viewMenuItem
             // 
-            viewMenuItem.DropDownItems.AddRange(new ToolStripItem[] { viewSingleMenuItem, viewSplitMenuItem });
+            viewMenuItem.DropDownItems.AddRange(new ToolStripItem[] { viewSingleMenuItem, viewSplitVerticalMenuItem, viewSplitHorizontalMenuItem });
             viewMenuItem.Name = "viewMenuItem";
             viewMenuItem.Size = new Size(44, 20);
             viewMenuItem.Text = "View";
@@ -153,11 +154,17 @@
             viewSingleMenuItem.Size = new Size(180, 22);
             viewSingleMenuItem.Text = "Single";
             // 
-            // viewSplitMenuItem
+            // viewSplitVerticalMenuItem
             // 
-            viewSplitMenuItem.Name = "viewSplitMenuItem";
-            viewSplitMenuItem.Size = new Size(180, 22);
-            viewSplitMenuItem.Text = "Split Vertical";
+            viewSplitVerticalMenuItem.Name = "viewSplitVerticalMenuItem";
+            viewSplitVerticalMenuItem.Size = new Size(180, 22);
+            viewSplitVerticalMenuItem.Text = "Split Vertical";
+            // 
+            // viewSplitHorizontalMenuItem
+            // 
+            viewSplitHorizontalMenuItem.Name = "viewSplitHorizontalMenuItem";
+            viewSplitHorizontalMenuItem.Size = new Size(180, 22);
+            viewSplitHorizontalMenuItem.Text = "Split Horizontal";
             // 
             // mainPanel
             // 
@@ -235,7 +242,8 @@
         private FlowLayoutPanel selectControlButtonPanel;
         private ToolStripMenuItem viewMenuItem;
         private ToolStripMenuItem viewSingleMenuItem;
-        private ToolStripMenuItem viewSplitMenuItem;
+        private ToolStripMenuItem viewSplitVerticalMenuItem;
         private SplitContainer bottomSplitContainer;
+        private ToolStripMenuItem viewSplitHorizontalMenuItem;
     }
 }

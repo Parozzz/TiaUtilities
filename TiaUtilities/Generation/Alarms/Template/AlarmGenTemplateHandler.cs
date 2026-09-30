@@ -19,6 +19,12 @@ namespace TiaUtilities.Generation.Alarms.Template
         public string NewName { get; init; } = newName;
     }
 
+    public delegate void AlarmTemplateAddedEvent(object? sender, AlarmTemplateAddedEventArgs args);
+    public class AlarmTemplateAddedEventArgs(AlarmGenTemplate added) : EventArgs
+    {
+        public AlarmGenTemplate Added { get; init; } = added;
+    }
+
     public class AlarmGenTemplateHandler : ICleanable
     {
         private readonly List<AlarmGenTemplate> templateList;
@@ -35,13 +41,14 @@ namespace TiaUtilities.Generation.Alarms.Template
 
                 if (Utils.AreDifferentObject(oldTemplate, _selectedTemplate))
                 {
-                    this.SelectedTemplateChanged(this, new() { OldTemplate = oldTemplate });
+                    this.SelectedChanged(this, new() { OldTemplate = oldTemplate });
                 }
             }
         }
 
-        public event AlarmTemplateSelectedChanged SelectedTemplateChanged = delegate { };
-        public event AlarmTemplateRenamedEvent TemplateRenamed = delegate { };
+        public event AlarmTemplateSelectedChanged SelectedChanged = delegate { };
+        public event AlarmTemplateRenamedEvent Renamed = delegate { };
+        public event AlarmTemplateAddedEvent Added = delegate { };
 
         private bool dirty = false;
 
@@ -91,9 +98,13 @@ namespace TiaUtilities.Generation.Alarms.Template
 
         public AlarmGenTemplate Add(string name = "")
         {
-            var templateName = string.IsNullOrEmpty(name) ? $"New template [{templateList.Count}]" : name;
+            var templateName = string.IsNullOrEmpty(name) ? $"TEMPLATE [{templateList.Count}]" : name;
 
             AlarmGenTemplate newTemplate = new(templateName);
+
+            AlarmTemplateAddedEventArgs args = new(newTemplate);
+            this.Added.Invoke(this, args);
+
             this.templateList.Add(newTemplate);
             this.BindingList.ResetBindings();
 
@@ -118,10 +129,13 @@ namespace TiaUtilities.Generation.Alarms.Template
                 {
                     this.BindingList.ResetBindings();
 
-                    var index = this.templateList.IndexOf(template);
                     if (this.templateList.Count > 0)
                     {//Select the template above the one just deleted.
-                        this.SelectedTemplate = this.templateList[index - 1];
+                        var index = this.templateList.IndexOf(template);
+                        if(index >= 0)
+                        {
+                            this.SelectedTemplate = this.templateList[index - 1];
+                        }
                     }
                 }
 
@@ -161,7 +175,7 @@ namespace TiaUtilities.Generation.Alarms.Template
                 var oldName = this.SelectedTemplate.Name;
                 var newName = floatingTextBox.InputText;
 
-                TemplateRenamed(this, new(oldName, newName));
+                Renamed(this, new(oldName, newName));
 
                 this.SelectedTemplate.Name = newName;
                 this.BindingList.ResetBindings();

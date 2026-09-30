@@ -11,19 +11,22 @@ namespace TiaUtilities.SettingsStep.CustomControls
         public Color DropDownHoveredBackColor { get; set; } = Color.LightSeaGreen; // Colore di sfondo della selezione
         public Color DropDownHoveredForeColor { get; set; } = Color.Black;      // Colore del testo della selezione
 
-        public Func<object, string, bool> FilterPredicate { get; set; }
+        public bool AutoWidthFromItems { get; set; } = true;
+        public int AutoWidthRightPadding { get; set; } = 20;
 
-        private IList? _fullList;
+
+        public Func<object, string, bool>? FilterPredicate { get; set; }
+
+        private List<object>? _unfilteredItems;
         private string? _lastFilterString;
         private bool _isFiltering;
 
         public ComboBoxFilterable()
         {
             this.DoubleBuffered = true;
+            this.SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
 
             this.AutoCompleteMode = AutoCompleteMode.None;
-            this.FilterPredicate = DefaultFilter;
-
             this.DrawMode = DrawMode.OwnerDrawFixed;
         }
 
@@ -39,8 +42,32 @@ namespace TiaUtilities.SettingsStep.CustomControls
                 this.ValueMember = valueMember;
             }
 
-            _fullList = source.ToList();
-            this.DataSource = _fullList;
+            if(source is IBindingList bindingList)
+            {//BindingSource implements IBindingList
+                bindingList.ListChanged += (sender, args) =>
+                {
+                    this._unfilteredItems = [.. bindingList.Cast<object>()];
+                    this.DataSource = this._unfilteredItems;
+
+                    this.CalculateWidthFromItems();
+                };
+            }
+
+            this._unfilteredItems = [.. source.Cast<object>()];
+            this.DataSource = this._unfilteredItems;
+
+            this.CalculateWidthFromItems();
+        }
+
+        private void CalculateWidthFromItems()
+        {
+            if(!this.AutoWidthFromItems || this._unfilteredItems == null || this._unfilteredItems.Count <= 0)
+            {
+                return;
+            }
+
+            var maxWidth = this._unfilteredItems.Select(this.GetDisplayMember).Max(n => TextRenderer.MeasureText(n, base.Font, Size.Empty, TextFormatFlags.TextBoxControl).Width);
+            this.Width = maxWidth + this.AutoWidthRightPadding;
         }
 
         protected override void OnDrawItem(DrawItemEventArgs e)
@@ -77,7 +104,7 @@ namespace TiaUtilities.SettingsStep.CustomControls
         {
             base.OnTextUpdate(e);
 
-            if (_fullList == null || this.Sorted || this.AutoCompleteMode != AutoCompleteMode.None) //Cannot change DataSource to a Sorted Combobox
+            if (_unfilteredItems == null || this.Sorted || this.AutoCompleteMode != AutoCompleteMode.None) //Cannot change DataSource to a Sorted Combobox
             {
                 return;
             }
@@ -90,7 +117,7 @@ namespace TiaUtilities.SettingsStep.CustomControls
 
             if (string.IsNullOrWhiteSpace(searchText))
             {
-                this.DataSource = _fullList;
+                this.DataSource = _unfilteredItems;
                 this.DroppedDown = true;
 
                 this.BeginInvoke(() =>
@@ -101,8 +128,8 @@ namespace TiaUtilities.SettingsStep.CustomControls
             }
             else
             {
-                var filteredList = _fullList.Cast<object>()
-                    .Where(item => FilterPredicate(item, searchText))
+                var filteredList = _unfilteredItems.Cast<object>()
+                    .Where(item => this.FilterPredicate == null ? this.DefaultFilter(item, searchText) : this.FilterPredicate(item, searchText))
                     .ToList();
 
                 var listsEquality = false;
@@ -111,7 +138,7 @@ namespace TiaUtilities.SettingsStep.CustomControls
                     listsEquality = dataSourceList.Cast<object>().SequenceEqual(filteredList);
                 }
 
-                if(!listsEquality)
+                if(!listsEquality || !this.DroppedDown)
                 {
                     this.DataSource = filteredList;
                     this.DroppedDown = true;
@@ -140,11 +167,15 @@ namespace TiaUtilities.SettingsStep.CustomControls
             }
             catch (ArgumentOutOfRangeException)
             {
+                _isFiltering = true;
+
                 // Paracadute finale per intercettare l'eccezione nativa di WinForms 
                 // nel caso in cui get_SelectedItem() venga chiamato internamente.
-                this.DataSource = _fullList;
-                this.SelectedIndex = _fullList == null || _fullList.Count == 0 ? -1 : 0;
+                this.DataSource = _unfilteredItems;
+                this.SelectedIndex = _unfilteredItems == null || _unfilteredItems.Count == 0 ? -1 : 0;
                 this.Text = _lastFilterString;
+
+                _isFiltering = false;
 
                 this.BeginInvoke(() =>
                 {
@@ -171,19 +202,19 @@ namespace TiaUtilities.SettingsStep.CustomControls
 
         protected override void OnDropDown(EventArgs e)
         {
-            if (_fullList == null || this.Sorted || this.AutoCompleteMode != AutoCompleteMode.None) //Cannot change DataSource to a Sorted Combobox
+            if (_unfilteredItems == null || this.Sorted || this.AutoCompleteMode != AutoCompleteMode.None) //Cannot change DataSource to a Sorted Combobox
             {
                 base.OnDropDown(e);
                 return;
             }
 
             // Quando si apre la tendina via click o freccia, ripristina la lista completa
-            if (!_isFiltering && this.DataSource != _fullList)
+            if (!_isFiltering && this.DataSource != _unfilteredItems)
             {
                 string currentText = this.Text;
                 int selectionStart = this.SelectionStart;
 
-                this.DataSource = _fullList;
+                this.DataSource = _unfilteredItems;
 
                 this.Text = currentText;
                 this.SelectionStart = selectionStart;
