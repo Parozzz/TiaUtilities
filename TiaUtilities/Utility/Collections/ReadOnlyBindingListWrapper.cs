@@ -28,14 +28,14 @@ namespace TiaUtilities.Utility.Collections
         public ListSortDirection SortDirection => ((IBindingList)this._source).SortDirection;
         public PropertyDescriptor? SortProperty => ((IBindingList)this._source).SortProperty;
 
-        public bool IsFixedSize => true;
+        public bool IsFixedSize => _source.IsFixedSize;
         public bool IsSynchronized => ((ICollection)this._source).IsSynchronized;
         public object SyncRoot => ((ICollection)this._source).SyncRoot;
 
-        private readonly BindingList<T> _source;
+        private readonly BindingListSmart<T> _source;
         private readonly ListChangedEventHandler _listChangedEvent;
 
-        public ReadOnlyBindingListWrapper(BindingList<T> source)
+        public ReadOnlyBindingListWrapper(BindingListSmart<T> source)
         {
             Validate.NotNull(source);
 

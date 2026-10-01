@@ -1,8 +1,10 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using System.Collections;
 using System.ComponentModel;
 using TiaUtilities.CustomControls;
 using TiaUtilities.Languages;
 using TiaUtilities.Utility;
+using TiaUtilities.Utility.Collections;
 
 namespace TiaUtilities.Generation.Alarms.Template
 {
@@ -25,58 +27,55 @@ namespace TiaUtilities.Generation.Alarms.Template
         public AlarmGenTemplate Added { get; init; } = added;
     }
 
-    public class AlarmGenTemplateHandler : ICleanable
+    public class AlarmGenTemplateContainer : IEnumerable<AlarmGenTemplate>, IReadOnlyList<AlarmGenTemplate>, ICleanable
     {
-        private readonly List<AlarmGenTemplate> templateList;
-        public BindingList<AlarmGenTemplate> BindingList { get; init; }
-
-        private AlarmGenTemplate? _selectedTemplate;
         public AlarmGenTemplate? SelectedTemplate
         {
-            get => _selectedTemplate;
+            get => selectedTemplate;
             set
             {
-                var oldTemplate = _selectedTemplate;
-                _selectedTemplate = value;
+                var oldTemplate = selectedTemplate;
+                selectedTemplate = value;
 
-                if (Utils.AreDifferentObject(oldTemplate, _selectedTemplate))
+                if (Utils.AreDifferentObject(oldTemplate, selectedTemplate))
                 {
                     this.SelectedChanged(this, new() { OldTemplate = oldTemplate });
                 }
             }
         }
 
+        public int Count => this.templateList.Count;
+
+        public ReadOnlyBindingListWrapper<AlarmGenTemplate> ReadOnlyBindingList => new(this.templateList);
+
         public event AlarmTemplateSelectedChanged SelectedChanged = delegate { };
         public event AlarmTemplateRenamedEvent Renamed = delegate { };
         public event AlarmTemplateAddedEvent Added = delegate { };
 
+        private readonly BindingListSmart<AlarmGenTemplate> templateList;
+        private AlarmGenTemplate? selectedTemplate;
+
         private bool dirty = false;
 
-        public AlarmGenTemplateHandler()
+        public AlarmGenTemplateContainer()
         {
             this.templateList = [];
-            this.BindingList = new(templateList);
         }
 
         public void Init(ICollection<AlarmGenTemplate> templateCollection)
         {
             this.templateList.Clear();
-            foreach (var template in templateCollection)
-            {
-                this.templateList.Add(template);
-            }
+            this.templateList.AddRange(templateCollection);
 
             if (templateCollection.Count == 0)
             {
                 this.Add();
             }
+
             this.SelectedTemplate = this.templateList[0];
         }
 
-        public IEnumerable<string> GetAllNames()
-        {
-            return this.templateList.Select(template => template.Name);
-        }
+        public AlarmGenTemplate this[int index] => this.templateList[index];
 
         public AlarmGenTemplate? Find(string? name)
         {
@@ -103,10 +102,8 @@ namespace TiaUtilities.Generation.Alarms.Template
             AlarmGenTemplate newTemplate = new(templateName);
 
             AlarmTemplateAddedEventArgs args = new(newTemplate);
-            this.Added.Invoke(this, args);
-
+            this.Added(this, args);
             this.templateList.Add(newTemplate);
-            this.BindingList.ResetBindings();
 
             this.SelectedTemplate = newTemplate;
 
@@ -127,8 +124,6 @@ namespace TiaUtilities.Generation.Alarms.Template
             {
                 if (template == this.SelectedTemplate)
                 {
-                    this.BindingList.ResetBindings();
-
                     if (this.templateList.Count > 0)
                     {//Select the template above the one just deleted.
                         var index = this.templateList.IndexOf(template);
@@ -178,7 +173,6 @@ namespace TiaUtilities.Generation.Alarms.Template
                 Renamed(this, new(oldName, newName));
 
                 this.SelectedTemplate.Name = newName;
-                this.BindingList.ResetBindings();
 
                 this.dirty = true;
             }
@@ -194,7 +188,6 @@ namespace TiaUtilities.Generation.Alarms.Template
             AlarmGenTemplate newClone = this.SelectedTemplate.Clone();
             newClone.Name += $" [{this.templateList.Count}]";
             this.templateList.Add(newClone);
-            this.BindingList.ResetBindings();
 
             this.SelectedTemplate = newClone;
 
@@ -228,7 +221,11 @@ namespace TiaUtilities.Generation.Alarms.Template
             List<AlarmGenTemplate> templateList = [];
             foreach (var save in saveList)
             {
-                AlarmGenTemplate template = new(save.Name) { AlarmGridSave = save.AlarmGrid, TemplateConfig = save.TemplateConfig };
+                AlarmGenTemplate template = new(save.Name) 
+                { 
+                    AlarmGridSave = save.AlarmGrid, 
+                    TemplateConfig = save.TemplateConfig 
+                };
                 templateList.Add(template);
             }
 
@@ -238,6 +235,10 @@ namespace TiaUtilities.Generation.Alarms.Template
         public bool IsDirty() => this.dirty;
 
         public void Wash() => this.dirty = false;
+
+        public IEnumerator<AlarmGenTemplate> GetEnumerator() => this.templateList.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
     }
 
 }

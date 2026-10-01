@@ -18,11 +18,11 @@ namespace TiaUtilities.CustomControls.EditableTab
             public required EventHandler TextChanged { get; init; }
             public required string OldName { get; set; }
 
-            public bool renamingInProgress { get; set; } = false;
+            public bool RenamingInProgress { get; set; } = false;
         }
 
-        private const int SELECTED_TAB_RECT_SIDE_PADDING = 4;
-        private const int SELECTED_TAB_RECT_HEIGHT = 2;
+        private const int SELECTED_TAB_RECT_SIDE_PADDING = 10;
+        private const int SELECTED_TAB_RECT_HEIGHT = 3;
 
         public event TabRemovedEventHandler TabRemoved = delegate { };
         public event TabAddedEventHandler TabAdded = delegate { };
@@ -32,8 +32,10 @@ namespace TiaUtilities.CustomControls.EditableTab
 
         public EditableTabAddButton AddButton { get; init; }
 
-        private Dictionary<TabPage, TabMetadata> metadataDict;
+        private readonly Dictionary<TabPage, TabMetadata> metadataDict;
         private Point? dragMouseDownPoint;
+
+        private bool dragDropActive = false;
 
         public EditableTabControl() : base()
         {
@@ -83,50 +85,71 @@ namespace TiaUtilities.CustomControls.EditableTab
 
         private void DrawTabCustom(Graphics g, int index)
         {
-            var tabPage = this.TabPages[index];
-            var isSelected = this.SelectedTab == tabPage;
-
-            var foreColor = isSelected ? StyleManager.EditableTabControl.SELECTED_TAB_FORE_COLOR : StyleManager.EditableTabControl.TAB_FORE_COLOR;
-            var backColor = isSelected ? StyleManager.EditableTabControl.SELECTED_TAB_BACK_COLOR : StyleManager.EditableTabControl.TAB_BACK_COLOR;
-
             var tabRect = this.GetTabRect(index);
-
-            //Draw background
-            using Brush backBrush = new SolidBrush(backColor);
-            g.FillRectangle(backBrush, tabRect);
-
-            using Pen displayRectPen = new(backColor, 3f);
-
-            var borderRect = this.DisplayRectangle;
-            borderRect.Offset(-1, 0);
-            borderRect.Inflate(3, 2);
-            g.DrawRectangle(displayRectPen, borderRect);
-
-            int textHeightOffset = -2;
-
-            //Draw selected tab bottom line
-            if (isSelected)
+            if (tabRect == Rectangle.Empty)
             {
-                var selectedRect = tabRect;
-                selectedRect.Offset(SELECTED_TAB_RECT_SIDE_PADDING, selectedRect.Height - (SELECTED_TAB_RECT_HEIGHT + 1));
-                selectedRect.Width -= SELECTED_TAB_RECT_SIDE_PADDING * 2;
-                selectedRect.Height = SELECTED_TAB_RECT_HEIGHT;
-
-                using Brush bottomRectBrush = new SolidBrush(StyleManager.EditableTabControl.SELECTED_TAB_BOTTOM_LINE_COLOR);
-                g.FillRectangle(bottomRectBrush, selectedRect);
-
-                textHeightOffset += SELECTED_TAB_RECT_HEIGHT;
+                return;
             }
 
-            var textRect = tabRect;
-            textRect.Offset(0, 3);
-            TextRenderer.DrawText(g,
-                tabPage.Text,
-                tabPage.Font,
-                textRect,
-                foreColor,
-                Color.Transparent,
-                TextFormatFlags.TextBoxControl | TextFormatFlags.WordEllipsis | TextFormatFlags.HorizontalCenter);
+            var tabPage = this.TabPages[index];
+
+            var isSelected = this.SelectedTab == tabPage;
+
+            var selectedAndFocused = isSelected && this.Focused;
+            var selectedOnly = isSelected && !this.Focused;
+
+            var backColor = selectedAndFocused || selectedOnly ?
+                StyleManager.EditableTabControl.FOCUSED_TAB_BACK :
+                StyleManager.EditableTabControl.TAB_BACK;
+
+            if (!backColor.IsEmpty && backColor.A > 0)
+            {
+                if (selectedOnly)
+                {
+                    using Pen backBorderPen = new(backColor, 2f)
+                    {
+                        Alignment = System.Drawing.Drawing2D.PenAlignment.Inset
+                    };
+
+                    GraphicsUtils.DrawRoundedRectangle(g, backBorderPen, tabRect, new(3, 0));
+                }
+                else
+                {
+                    using Brush backBrush = new SolidBrush(backColor);
+                    GraphicsUtils.FillRoundedRectangle(g, backBrush, tabRect, new(3, 0));
+                }
+            }
+
+            var foreColor = selectedAndFocused ?
+                StyleManager.EditableTabControl.FOCUSED_TAB_FORE :
+                StyleManager.EditableTabControl.TAB_FORE;
+
+            if (!foreColor.IsEmpty && foreColor.A > 0)
+            {
+                var textRect = tabRect;
+                textRect.Offset(0, -2);
+
+                TextRenderer.DrawText(g,
+                    tabPage.Text,
+                    tabPage.Font,
+                    textRect,
+                    foreColor,
+                    Color.Transparent,
+                    TextFormatFlags.TextBoxControl | TextFormatFlags.WordEllipsis | TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
+            }
+
+
+            var panelColor = StyleManager.EditableTabControl.PANEL_BORDER_COLOR;
+            if(!panelColor.IsEmpty && panelColor.A > 0)
+            {//Whole panel border. Not tab related
+                var borderRect = this.DisplayRectangle;
+                borderRect.Inflate(3, 2);
+
+                using Pen panelBorderPen = new(StyleManager.EditableTabControl.PANEL_BORDER_COLOR, 3f);
+                g.DrawRectangle(panelBorderPen, borderRect);
+            }
+
+
         }
 
         protected override void OnDrawItem(DrawItemEventArgs e) { }
@@ -159,6 +182,14 @@ namespace TiaUtilities.CustomControls.EditableTab
             if (e.KeyData == (Keys.Enter | Keys.Control))
             {
                 this.HandleContextMenuOnKeyboard();
+            }
+            else if (e.KeyData == Keys.Delete)
+            {
+                var tab = this.SelectedTab;
+                if (tab != null)
+                {
+                    this.CloseTabs([tab]);
+                }
             }
         }
 
@@ -255,31 +286,44 @@ namespace TiaUtilities.CustomControls.EditableTab
                 return;
             }
 
-            var droppedTabPage = this.TabPages[tabRectIndex];
-
-            var dataObj = args.Data?.GetData(typeof(EditableTabControl.DragAndDropData));
-            if (dataObj is EditableTabControl.DragAndDropData dragAndDrop && dragAndDrop.TabPage != droppedTabPage)
+            try
             {
-                this.SuspendLayout();
+                this.dragDropActive = true;
 
-                int dragStartIndex = this.TabPages.IndexOf(dragAndDrop.TabPage);
-                int dragEndIndex = this.TabPages.IndexOf(droppedTabPage);
+                var droppedTabPage = this.TabPages[tabRectIndex];
 
-                if (dragStartIndex >= 0 && dragStartIndex < this.TabCount &&
-                    dragEndIndex >= 0 && dragEndIndex < this.TabCount &&
-                    dragStartIndex != dragEndIndex)
+                var dataObj = args.Data?.GetData(typeof(EditableTabControl.DragAndDropData));
+                if (dataObj is EditableTabControl.DragAndDropData dragAndDrop && dragAndDrop.TabPage != droppedTabPage)
                 {
-                    var oldSelectedTab = this.SelectedTab;
+                    this.SuspendLayout();
 
-                    var item = this.TabPages[dragStartIndex];
-                    this.TabPages.RemoveAt(dragStartIndex);
-                    this.TabPages.Insert(dragEndIndex, item);
+                    int dragStartIndex = this.TabPages.IndexOf(dragAndDrop.TabPage);
+                    int dragEndIndex = this.TabPages.IndexOf(droppedTabPage);
 
-                    this.SelectedTab = oldSelectedTab;
+                    if (dragStartIndex >= 0 && dragStartIndex < this.TabCount &&
+                        dragEndIndex >= 0 && dragEndIndex < this.TabCount &&
+                        dragStartIndex != dragEndIndex)
+                    {
+                        var oldSelectedTab = this.SelectedTab;
+
+                        var item = this.TabPages[dragStartIndex];
+                        this.TabPages.RemoveAt(dragStartIndex);
+                        this.TabPages.Insert(dragEndIndex, item);
+
+                        this.SelectedTab = oldSelectedTab;
+                    }
+
+                    this.ResumeLayout(true);
                 }
 
-                this.ResumeLayout(true);
             }
+            catch (Exception) { }
+            finally
+            {
+                this.dragDropActive = false;
+            }
+
+
         }
 
         private int GetMousePointTabRectIndex(int x, int y)
@@ -319,6 +363,11 @@ namespace TiaUtilities.CustomControls.EditableTab
 
         protected override void OnControlAdded(ControlEventArgs e)
         {
+            if (this.dragDropActive)
+            {
+                return;
+            }
+
             if (e.Control is TabPage tabPage)
             {
                 if (this.removedTabFromEvent == tabPage)
@@ -343,6 +392,11 @@ namespace TiaUtilities.CustomControls.EditableTab
 
         protected override void OnControlRemoved(ControlEventArgs e)
         {
+            if (this.dragDropActive)
+            {
+                return;
+            }
+
             if (e.Control is TabPage tabPage)
             {
                 var indexOf = this.TabPages.IndexOf(tabPage);
@@ -479,12 +533,12 @@ namespace TiaUtilities.CustomControls.EditableTab
             }
 
             var metadata = this.GetMetadata(tabPage);
-            if (metadata.renamingInProgress)
+            if (metadata.RenamingInProgress)
             {
                 return;
             }
 
-            metadata.renamingInProgress = true;
+            metadata.RenamingInProgress = true;
 
             try
             {
@@ -499,7 +553,7 @@ namespace TiaUtilities.CustomControls.EditableTab
             }
             catch (Exception) { }
 
-            metadata.renamingInProgress = false;
+            metadata.RenamingInProgress = false;
         }
 
     }

@@ -35,7 +35,7 @@ namespace TiaUtilities.Generation.Alarms.Module
         private readonly SettingsControl settingsControl;
 
         private readonly AlarmMainConfiguration mainConfig;
-        private readonly AlarmGenTemplateHandler templateHandler;
+        private readonly AlarmGenTemplateContainer templateContainer;
 
         private readonly List<AlarmGenTab> alarmTabList;
         public IEnumerable<AlarmTabConfiguration> TabConfigurations { get => this.alarmTabList.Select(tab => tab.TabConfig); }
@@ -66,7 +66,7 @@ namespace TiaUtilities.Generation.Alarms.Module
             this.settingsControl.InitControls();
 
             this.mainConfig = new();
-            this.templateHandler = new();
+            this.templateContainer = new();
             GenUtils.CopyJsonFieldsAndProperties(MainForm.Settings.PresetAlarmMainConfiguration, this.mainConfig);
 
             this.alarmTabList = [];
@@ -115,9 +115,9 @@ namespace TiaUtilities.Generation.Alarms.Module
                         if (xmlNodeConfiguration is BlockFB blockFB)
                         {
                             var templateName = blockFB.AttributeList.BlockName;
-                            templateHandler.Remove(templateName);
+                            templateContainer.Remove(templateName);
 
-                            var template = templateHandler.Add(templateName);
+                            var template = templateContainer.Add(templateName);
                             foreach (var member in blockFB.AttributeList.STATIC.GetItems())
                             {
                                 if (member.MemberName.StartsWith("allarmi", StringComparison.CurrentCultureIgnoreCase))
@@ -151,8 +151,8 @@ namespace TiaUtilities.Generation.Alarms.Module
             #endregion
 
             #region TEMPLATE_HANDLER
-            this.templateHandler.Init([]);
-            this.templateHandler.Renamed += (sender, args) =>
+            this.templateContainer.Init([]);
+            this.templateContainer.Renamed += (sender, args) =>
             {
                 foreach (var tab in this.alarmTabList)
                 {
@@ -162,7 +162,7 @@ namespace TiaUtilities.Generation.Alarms.Module
                 this.UpdateSettingsControl(ifVisible: true);
             };
 
-            this.templateHandler.Added += (sender, args) =>  this.UpdateSettingsControl(ifVisible: true);
+            this.templateContainer.Added += (sender, args) =>  this.UpdateSettingsControl(ifVisible: true);
 
             #endregion
 
@@ -246,7 +246,7 @@ namespace TiaUtilities.Generation.Alarms.Module
 
         private void TabCreation(TabPage tabPage, AlarmGenTabSave? save = null)
         {
-            AlarmGenTab alarmTab = new(this.multiGrid, this, this.mainConfig, this.templateHandler, tabPage);
+            AlarmGenTab alarmTab = new(this.multiGrid, this, this.mainConfig, this.templateContainer, tabPage);
             alarmTab.Init();
 
             if (save == null)
@@ -271,7 +271,7 @@ namespace TiaUtilities.Generation.Alarms.Module
             this.tabControl.TabPages.Clear();
         }
 
-        public bool IsDirty() => this.mainConfig.IsDirty() || this.alarmTabList.Any(x => x.IsDirty()) || this.JsScriptHandler.IsDirty() || this.templateHandler.IsDirty();
+        public bool IsDirty() => this.mainConfig.IsDirty() || this.alarmTabList.Any(x => x.IsDirty()) || this.JsScriptHandler.IsDirty() || this.templateContainer.IsDirty();
         public void Wash()
         {
             this.mainConfig.Wash();
@@ -280,7 +280,7 @@ namespace TiaUtilities.Generation.Alarms.Module
                 tab.Wash();
             }
             this.JsScriptHandler.Wash();
-            this.templateHandler.IsDirty();
+            this.templateContainer.IsDirty();
         }
 
         public object CreateSave()
@@ -288,7 +288,7 @@ namespace TiaUtilities.Generation.Alarms.Module
             var projectSave = new AlarmGenSaveV1()
             {
                 ScriptSave = this.JsScriptHandler.CreateSave(),
-                TemplateSaves = this.templateHandler.CreateSave()
+                TemplateSaves = this.templateContainer.CreateSave()
             };
 
             GenUtils.CopyJsonFieldsAndProperties(mainConfig, projectSave.AlarmMainConfig);
@@ -315,9 +315,10 @@ namespace TiaUtilities.Generation.Alarms.Module
             {
                 this.Clear();
 
-                this.JsScriptHandler.LoadSave(loadedSave.ScriptSave);
-                this.templateHandler.LoadSave(loadedSave.TemplateSaves);
                 GenUtils.CopyJsonFieldsAndProperties(loadedSave.AlarmMainConfig, mainConfig);
+
+                this.JsScriptHandler.LoadSave(loadedSave.ScriptSave);
+                this.templateContainer.LoadSave(loadedSave.TemplateSaves);
 
                 foreach (var tabSave in loadedSave.TabSaves)
                 {
@@ -345,7 +346,7 @@ namespace TiaUtilities.Generation.Alarms.Module
             AlarmXmlGenerator ioXmlGenerator = new(mainConfig);
             foreach (var tab in alarmTabList)
             {
-                ioXmlGenerator.GenerateAlarms(tab.TabPage.Text, tab.TabConfig, this.templateHandler, tab.DeviceDataList);
+                ioXmlGenerator.GenerateAlarms(tab.TabPage.Text, tab.TabConfig, this.templateContainer, tab.DeviceDataList);
             }
             ioXmlGenerator.ExportXML(folderPath);
         }
@@ -382,9 +383,9 @@ namespace TiaUtilities.Generation.Alarms.Module
                     placeholdersHandler.DeviceData = firstDeviceData;
                 }
 
-                if (this.templateHandler.BindingList.Count > 0)
+                if (this.templateContainer.Count > 0)
                 {
-                    var firstTemplate = this.templateHandler.BindingList[0];
+                    var firstTemplate = this.templateContainer[0];
                     if (firstTemplate.AlarmGridSave.RowData.Count > 0)
                     {
                         var firstTemplateData = firstTemplate.AlarmGridSave.RowData[0];
@@ -438,7 +439,7 @@ namespace TiaUtilities.Generation.Alarms.Module
                 sequenceList.Add(tabSequence);
             }
 
-            foreach (var template in this.templateHandler.BindingList)
+            foreach (var template in this.templateContainer)
             {
                 SettingsSequence templateSequence = new(template.TemplateConfig, "Template", template.Name) { PlaceholdersCallBack = ParsePlaceholders };
                 templateSequence.AddRange(templateStepDescriptors);
@@ -454,7 +455,7 @@ namespace TiaUtilities.Generation.Alarms.Module
 
             Validate.NotNull(currentTabConfig);
 
-            AlarmGenTemplateControl control = new(this.mainConfig, currentTabConfig, this.multiGrid, this.templateHandler)
+            AlarmGenTemplateControl control = new(this.mainConfig, currentTabConfig, this.multiGrid, this.templateContainer)
             {
                 Dock = DockStyle.Fill,
                 AutoSize = true,
@@ -497,19 +498,19 @@ namespace TiaUtilities.Generation.Alarms.Module
 
         private string GetActiveTemplateName()
         {
-            var selectedTemplate = this.templateHandler.SelectedTemplate;
+            var selectedTemplate = this.templateContainer.SelectedTemplate;
             return selectedTemplate == null ? "" : selectedTemplate.Name;
         }
 
         private AlarmTemplateConfiguration? GetActiveTemplateConfiguration()
         {
-            return this.templateHandler.SelectedTemplate?.TemplateConfig;
+            return this.templateContainer.SelectedTemplate?.TemplateConfig;
         }
 
         private Dictionary<string, ObservableConfiguration> GetTemplateConfigurationDict()
         {
             Dictionary<string, ObservableConfiguration> dict = [];
-            foreach (var template in this.templateHandler.BindingList)
+            foreach (var template in this.templateContainer)
             {
                 if (!dict.TryAdd(template.Name, template.TemplateConfig))
                 {
@@ -530,7 +531,7 @@ namespace TiaUtilities.Generation.Alarms.Module
                 AddDataFieldTextReferences(textReferencesList, tab.DeviceDataList, moduleId, d => d.Name ?? "INVALID", nameof(DeviceData.Description));
             }
 
-            foreach (var template in this.templateHandler.BindingList)
+            foreach (var template in this.templateContainer)
             {
                 var moduleId = $"TEMPLATE{splitter}{template.Name}";
 
@@ -552,7 +553,7 @@ namespace TiaUtilities.Generation.Alarms.Module
                 this.SetTextReferencesToDataField(tabTextReferences, tab.DeviceDataList, d => d.Name);
             }
 
-            foreach (var template in this.templateHandler.BindingList)
+            foreach (var template in this.templateContainer)
             {
                 var templateTextReferenced = textReferences.Where(r => this.CheckTextReferenceID1(r, "TEMPLATE", template.Name));
                 this.SetTextReferencesToDataField(templateTextReferenced, template.AlarmGridSave.RowData.Values, d => d.AlarmVariable);

@@ -8,18 +8,17 @@ namespace TiaUtilities.Generation.GridHandler
 {
     public class GridDataSource<T> : IGridDataSource, ISaveable<Dictionary<int, T>> where T : IGridData
     {
-        public event AddingNewEventHandler AddingNew { add => this.bindingList.AddingNew += value; remove => this.bindingList.AddingNew -= value; }
-
         public event ListChangedEventHandler ListChanged { add => this.bindingList.ListChanged += value; remove => this.bindingList.ListChanged -= value; }
 
         public IReadOnlyList<GridDataColumn> DataColumns { get; init; }
+
         public int Count { get => this.bindingList.Count; }
 
         private readonly ExcelLikeDataGridView dataGridView;
         private readonly GridDataChangedHandler dataChangedHandler;
 
         private readonly List<T> baseDataList;
-        private readonly BindingList<T> bindingList;
+        private readonly BindingListSmart<T> bindingList;
 
         private readonly GridDataPropertyChangedEvent dataPropertyChanged;
 
@@ -125,15 +124,15 @@ namespace TiaUtilities.Generation.GridHandler
             }
 
             this.bindingList.Clear();
-            for (int row = 0; row < dataAmount; row++)
-            {
-                var data = this.CreateInstance();
-                data.DataPropertyChanged += this.dataPropertyChanged;
+            this.bindingList.AddRange(
+                Enumerable.Range(0, (int)dataAmount).Select(r =>
+                {
+                    var data = this.CreateInstance();
+                    data.DataPropertyChanged += this.dataPropertyChanged;
+                    return data;
+                })
+            );
 
-                this.bindingList.Add(data);
-            }
-
-            //this.bindingList.ResetBindings(); //Reset bindings at the end to avoid calling an obscene amount of events
             this.dataGridView.RowCount = this.bindingList.Count;
         }
 
@@ -199,9 +198,9 @@ namespace TiaUtilities.Generation.GridHandler
 
                 return xValue.CompareTo(yValue);
             });
-            this.bindingList.ResetBindings();
 
-            dataGridView.Refresh();
+            this.bindingList.ResetBindings();
+            this.dataGridView.Refresh();
         }
 
         public int GetFirstNotEmptyIndexStartingFrom(int indexStart)

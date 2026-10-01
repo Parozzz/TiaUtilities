@@ -21,6 +21,11 @@ namespace TiaUtilities.Generation.Alarms.Template
             return newClone;
         }
 
+        public override string ToString()
+        {
+            return this.Name;
+        }
+
     }
 
 }

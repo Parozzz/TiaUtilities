@@ -14,7 +14,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
         private readonly MultiGridOperationHandler multiGrid;
         private readonly AlarmGenModule module;
         private readonly AlarmMainConfiguration mainConfig;
-        private readonly AlarmGenTemplateHandler templateHandler;
+        private readonly AlarmGenTemplateContainer templateContainer;
 
         public string Name { get => this.TabPage.Text; set => this.TabPage.Text = value; }
         public TabPage TabPage { get; init; }
@@ -27,12 +27,12 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
 
         private bool dirty = false;
 
-        public AlarmGenTab(MultiGridOperationHandler multiGrid, AlarmGenModule module, AlarmMainConfiguration mainConfig, AlarmGenTemplateHandler templateHandler, TabPage tabPage)
+        public AlarmGenTab(MultiGridOperationHandler multiGrid, AlarmGenModule module, AlarmMainConfiguration mainConfig, AlarmGenTemplateContainer templateHandler, TabPage tabPage)
         {
             this.module = module;
             this.multiGrid = multiGrid;
             this.mainConfig = mainConfig;
-            this.templateHandler = templateHandler;
+            this.templateContainer = templateHandler;
             this.TabPage = tabPage;
 
             this.TabConfig = new();
@@ -49,8 +49,7 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             this.deviceGridHandler.ExcelDragPreview += (sender, args) => GridUtils.DragPreview(args, deviceGridHandler);
             this.deviceGridHandler.ExcelDragDone += (sender, args) => GridUtils.DragDone(args, deviceGridHandler);
 
-            //Columns before GridHandler.Init()
-            SuggestionTextBoxColumn templateSuggestionColumn = new() { ItemsCallback = templateHandler.GetAllNames };
+            SuggestionTextBoxColumn templateSuggestionColumn = new() { ItemsCallback = () => templateContainer.Select(t => t.Name) };
 
             //COLUMNS
             this.deviceGridHandler.Columns.AddTextBox(DeviceData.NAME, 125);

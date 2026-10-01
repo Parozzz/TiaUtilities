@@ -78,7 +78,6 @@ namespace TiaUtilities.Generation.Alarms.Template
             #endregion
 
             this.gridHandler.Init();
-            /*
             this.gridHandler.DataSource.ListChanged += (sender, args) =>
             {
                 if(sender is IList<TemplateData> templates)
@@ -87,20 +86,22 @@ namespace TiaUtilities.Generation.Alarms.Template
 
                     switch (args.ListChangedType)
                     {
-                        case System.ComponentModel.ListChangedType.ItemAdded:
                         case System.ComponentModel.ListChangedType.ItemChanged:
+                            break;
+                        case System.ComponentModel.ListChangedType.ItemAdded:
                         case System.ComponentModel.ListChangedType.ItemDeleted:
                         case System.ComponentModel.ListChangedType.ItemMoved:
+                            break;
                         case System.ComponentModel.ListChangedType.PropertyDescriptorAdded:
                         case System.ComponentModel.ListChangedType.PropertyDescriptorChanged:
                         case System.ComponentModel.ListChangedType.PropertyDescriptorDeleted:
+                            break;
                         case System.ComponentModel.ListChangedType.Reset:
                             break;
                     }
                 }
 
             };
-            */
             #region HIDE_CUSTOM_VARIABLE/TIMER_COLUMNS
             ShowCustomVar(mainConfig.EnableCustomVariable);
             mainConfig.Subscribe(() => mainConfig.EnableCustomVariable, ShowCustomVar);

@@ -67,7 +67,7 @@ namespace TiaUtilities.Generation.Alarms.Data
         [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_TIMER_VALUE))] public string? TimerValue { get => this.GetAs<string>(); set => this.Set(value); }
         [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_HMI_CLASS))] public string? HmiAlarmClass { get => this.GetAs<string>(); set => this.Set(value); }
         [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_HMI_PARAMETERS), append: $" > {GenPlaceholders.Alarms.HMI_PARAMETER}")] public string? HmiParametersJsonString { get => this.GetAs<string>(); set => this.Set(value); }
-        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_HMI_TEXT), append: $" > {GenPlaceholders.Alarms.ALARM_HMI_TEXT}")] public string ? HmiAlarmText { get => this.GetAs<string>(); set => this.Set(value); }
+        [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_HMI_TEXT), append: $" > {GenPlaceholders.Alarms.ALARM_HMI_TEXT}")] public string? HmiAlarmText { get => this.GetAs<string>(); set => this.Set(value); }
         [JsonProperty][Locale(nameof(Locale.ALARM_TEMPLATE_DATA_DESCRIPTION), append: $" > {GenPlaceholders.Alarms.ALARM_DESCRIPTION}")] public string? Description { get => this.GetAs<string>(); set => this.Set(value); }
 
         public override IReadOnlyList<GridDataColumn> GetColumns()
@@ -88,8 +88,8 @@ namespace TiaUtilities.Generation.Alarms.Data
         public override void Clear()
         {
             this.Enable = this.AlarmNegated = false;
-            this.AlarmVariable = this.CustomVariableAddress = this.CustomVariableValue = this.Coil1Address 
-                = this.Coil1Type = this.Coil2Address = this.Coil2Type = this.TimerAddress = this.TimerType = this.TimerValue 
+            this.AlarmVariable = this.CustomVariableAddress = this.CustomVariableValue = this.Coil1Address
+                = this.Coil1Type = this.Coil2Address = this.Coil2Type = this.TimerAddress = this.TimerType = this.TimerValue
                 = this.HmiParametersJsonString = this.HmiAlarmText = this.Description = null;
         }
 
@@ -139,6 +139,30 @@ namespace TiaUtilities.Generation.Alarms.Data
         public override int GetHashCode()
         {
             return base.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            var parts = new List<string>(16);
+
+            if (Enable) parts.Add("En: 1");
+            if (!string.IsNullOrWhiteSpace(AlarmVariable)) parts.Add($"AV: {AlarmVariable}");
+            if (AlarmNegated) parts.Add("AN: 1");
+            if (!string.IsNullOrWhiteSpace(CustomVariableAddress)) parts.Add($"CVA: {CustomVariableAddress}");
+            if (!string.IsNullOrWhiteSpace(CustomVariableValue)) parts.Add($"CVV: {CustomVariableValue}");
+            if (!string.IsNullOrWhiteSpace(Coil1Address)) parts.Add($"C1A: {Coil1Address}");
+            if (!string.IsNullOrWhiteSpace(Coil1Type)) parts.Add($"C1T: {Coil1Type}");
+            if (!string.IsNullOrWhiteSpace(Coil2Address)) parts.Add($"C2A: {Coil2Address}");
+            if (!string.IsNullOrWhiteSpace(Coil2Type)) parts.Add($"C2T: {Coil2Type}");
+            if (!string.IsNullOrWhiteSpace(TimerAddress)) parts.Add($"TA: {TimerAddress}");
+            if (!string.IsNullOrWhiteSpace(TimerType)) parts.Add($"TT: {TimerType}");
+            if (!string.IsNullOrWhiteSpace(TimerValue)) parts.Add($"TV: {TimerValue}");
+            if (!string.IsNullOrWhiteSpace(HmiAlarmClass)) parts.Add($"HC: {HmiAlarmClass}");
+            if (!string.IsNullOrWhiteSpace(HmiParametersJsonString)) parts.Add($"HP: {HmiParametersJsonString}");
+            if (!string.IsNullOrWhiteSpace(HmiAlarmText)) parts.Add($"HT: {HmiAlarmText}");
+            if (!string.IsNullOrWhiteSpace(Description)) parts.Add($"Desc: {Description}");
+
+            return parts.Count > 0 ? string.Join(", ", parts) : "[Empty]";
         }
     }
 }

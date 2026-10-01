@@ -59,7 +59,6 @@ namespace TiaUtilities.Generation.GridHandler
         private readonly GridHandlerEventCaller eventCaller;
         private readonly GenPlaceholderHandler placeholderHandler;
 
-
         private readonly UndoRedoHandler undoRedoHandler;
         private readonly GridDoDragDropHandler doDragDropHandler;
         private readonly GridDragDownHandler dragDownHandler;
@@ -75,7 +74,6 @@ namespace TiaUtilities.Generation.GridHandler
             GenPlaceholderHandler placeholderHandler,
             IGridRowComparer<T>? comparer = null)
         {
-
             this.GridSettings = settings;
             this.multiGrid = multiGrid;
             this.DataPreviewer = previewer;
@@ -603,12 +601,12 @@ namespace TiaUtilities.Generation.GridHandler
             var req = this.DataChangedHandler.Suspend();
 
             this.DataGridView.SuspendLayout();
-            this.DataGridView.Enabled = false;
+            DllImports.SuspendDrawing(this.DataGridView);
 
             this.undoRedoHandler.Clear();
             this.DataSource.LoadSave(gridSave.RowData);
 
-            this.DataGridView.Enabled = true;
+            DllImports.ResumeDrawing(this.DataGridView);
             this.DataGridView.Refresh();
             this.DataGridView.ResumeLayout();
 

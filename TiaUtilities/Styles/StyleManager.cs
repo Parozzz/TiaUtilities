@@ -10,15 +10,15 @@ namespace TiaUtilities.Styles
     {
         public static class EditableTabControl
         {
-            public readonly static Color SELECTED_TAB_FORE_COLOR = Color.White;
-            public readonly static Color SELECTED_TAB_BACK_COLOR = Color.LightSlateGray;
+            public readonly static Color TAB_FORE = Color.Black;
+            public readonly static Color FOCUSED_TAB_FORE = Color.White;
 
-            public readonly static Color SELECTED_TAB_BOTTOM_LINE_COLOR = Color.BlanchedAlmond;
+            public readonly static Color TAB_BACK = Color.Transparent;
+            public readonly static Color FOCUSED_TAB_BACK = Color.LightSlateGray;
 
-            public readonly static Color ADD_TAB_FORE_COLOR = Color.DarkGreen;
+            public static readonly Color PANEL_BORDER_COLOR = Color.LightSlateGray;
 
-            public readonly static Color TAB_BACK_COLOR = Color.Transparent;
-            public readonly static Color TAB_FORE_COLOR = Color.Black;
+            public readonly static Color ADD_TAB_FORE_COLOR = Color.DarkOliveGreen;
         }
 
         public static class  Fonts

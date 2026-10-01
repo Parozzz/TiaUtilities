@@ -36,7 +36,7 @@ namespace TiaUtilities.Generation.Alarms.Xml
         private readonly AlarmMainConfiguration mainConfig = mainConfig;
         private readonly Dictionary<string, AlarmGroupXmlItem> alarmGroupDict = [];
 
-        public void GenerateAlarms(string tabName, AlarmTabConfiguration tabConfig, AlarmGenTemplateHandler templateHandler, List<DeviceData> deviceDataList)
+        public void GenerateAlarms(string tabName, AlarmTabConfiguration tabConfig, AlarmGenTemplateContainer templateHandler, List<DeviceData> deviceDataList)
         {
             AlarmGenPlaceholdersHandler placeholdersHandler = new(this.mainConfig, tabConfig)
             {
