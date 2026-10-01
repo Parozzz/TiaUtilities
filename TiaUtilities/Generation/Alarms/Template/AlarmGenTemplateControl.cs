@@ -7,6 +7,7 @@ using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Languages;
 using TiaUtilities.Resources;
+using TiaUtilities.Utility;
 using TiaUtilities.Utility.Extensions;
 
 namespace TiaUtilities.Generation.Alarms.Template
@@ -16,13 +17,8 @@ namespace TiaUtilities.Generation.Alarms.Template
         private static readonly string[] TIMERS_TYPES_ITEMS = ["TON", "TOF"];
         private static readonly string[] ALARM_COIL_TYPE_ITEMS = Enum.GetNames(typeof(AlarmCoilType));
 
-
-        public List<TemplateData> TemplateDataList { get => [.. gridHandler.DataSource.GetNotEmptyClonedDataDict().Keys]; } //Return CLONED data, otherwise operations on the xml generation will affect the table!
-
-
         private readonly AlarmMainConfiguration mainConfig;
         private readonly AlarmTabConfiguration tabConfig;
-        //private readonly TemplateAlarmGridWrapper templateDataGridWrapper;
 
         private readonly AlarmGenTemplateContainer templateContainer;
         private AlarmGenTemplate? SelectedTemplate { get => this.templateContainer.SelectedTemplate; set => this.templateContainer.SelectedTemplate = value; }
@@ -31,7 +27,7 @@ namespace TiaUtilities.Generation.Alarms.Template
         private readonly GridHandler<TemplateData> gridHandler;
 
         public AlarmGenTemplateControl(AlarmMainConfiguration mainConfig, AlarmTabConfiguration tabConfig,
-            MultiGridOperationHandler multiGrid, AlarmGenTemplateContainer templateHandler)
+            MultiGridOperationHandler multiGrid, AlarmGenTemplateContainer templateContainer)
         {
             InitializeComponent();
 
@@ -41,7 +37,7 @@ namespace TiaUtilities.Generation.Alarms.Template
             AlarmGenPlaceholdersHandler placeholdersHandler = new(mainConfig, tabConfig);
             //this.templateDataGridWrapper = new(placeholdersHandler, multiGrid);
 
-            this.templateContainer = templateHandler;
+            this.templateContainer = templateContainer;
 
             this.previewer = new();
             this.gridHandler = new(MainForm.Settings.GridSettings, multiGrid, previewer, placeholdersHandler)
@@ -216,7 +212,7 @@ namespace TiaUtilities.Generation.Alarms.Template
             #endregion
 
             #region ENABLE_CHECKBOX_IF_FILLED     
-            
+
             bool IsObjectStringEmpty(object? obj) => obj == null || (obj is string str && string.IsNullOrWhiteSpace(str));
             bool IsObjectStringFull(object? obj) => obj != null && obj is string str && !string.IsNullOrWhiteSpace(str);
 
@@ -254,12 +250,17 @@ namespace TiaUtilities.Generation.Alarms.Template
                     switch (args.ListChangedType)
                     {
                         case System.ComponentModel.ListChangedType.ItemChanged:
-                            if(this.SelectedTemplate != null)
+                            if (this.SelectedTemplate == null || args.PropertyDescriptor == null)
+                            {
+                                return;
+                            }
+
+                            try
                             {
                                 templates.TryGet(args.NewIndex, out var changedTemplateData);
 
                                 TemplateData data;
-                                if(this.SelectedTemplate.AlarmGridSave.RowData.TryGetValue(args.NewIndex, out var existingTemplateData))
+                                if (this.SelectedTemplate.AlarmGridSave.RowData.TryGetValue(args.NewIndex, out var existingTemplateData))
                                 {
                                     data = existingTemplateData;
                                 }
@@ -272,6 +273,11 @@ namespace TiaUtilities.Generation.Alarms.Template
                                 var value = args.PropertyDescriptor.GetValue(changedTemplateData);
                                 args.PropertyDescriptor.SetValue(data, value);
                             }
+                            catch (Exception ex)
+                            {
+                                Utils.ShowExceptionMessage(ex);
+                            }
+
                             break;
                         case System.ComponentModel.ListChangedType.ItemAdded:
                         case System.ComponentModel.ListChangedType.ItemDeleted:
@@ -288,7 +294,6 @@ namespace TiaUtilities.Generation.Alarms.Template
             };
 
             this.mainPanel.Controls.Add(this.gridHandler.GetControl());
-
 
             #region ADD_REMOVE_RENAME_CLOSE_BUTTONS
             ImageList buttonsImages = new()
@@ -325,7 +330,7 @@ namespace TiaUtilities.Generation.Alarms.Template
             #region SELECT_COMBO_BOX
             this.selectComboBox.BackColor = Form.DefaultBackColor;
             this.selectComboBox.AutoWidthFromItems = true;
-            this.selectComboBox.ValueMember = this.selectComboBox.DisplayMember = nameof(AlarmGenTemplate.Name);
+            this.selectComboBox.DisplayMember = this.selectComboBox.ValueMember = nameof(AlarmGenTemplate.Name);
             this.selectComboBox.DataSource = this.templateContainer.ReadOnlyBindingList;
             this.selectComboBox.SelectionChangeCommitted += (sender, args) =>
             {
@@ -337,7 +342,7 @@ namespace TiaUtilities.Generation.Alarms.Template
             #endregion
 
             //Load Current after init and save current when form is closed.
-            this.templateContainer.SelectedChanged += (sender, args) => this.SelectedTemplateChanged(args.OldTemplate);
+            this.templateContainer.SelectedChanged += (sender, args) => this.SelectedTemplateChanged();
             this.SelectedTemplateChanged();
 
             this.Translate();
@@ -346,21 +351,11 @@ namespace TiaUtilities.Generation.Alarms.Template
         protected override void OnVisibleChanged(EventArgs e)
         {
             base.OnVisibleChanged(e);
-
-            if (!this.Visible)
-            {
-                this.SelectedTemplateChanged(this.SelectedTemplate);
-            }
         }
 
-        private void SelectedTemplateChanged(AlarmGenTemplate? oldTemplate = null)
+        private void SelectedTemplateChanged()
         {
-            if (oldTemplate != null)
-            {
-                oldTemplate.AlarmGridSave = this.gridHandler.CreateSave();
-            }
-
-            if (this.SelectedTemplate == null || oldTemplate == this.SelectedTemplate)
+            if (this.SelectedTemplate == null)
             {
                 return;
             }

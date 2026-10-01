@@ -151,12 +151,11 @@ namespace TiaUtilities.Generation.Alarms.Module
             #endregion
 
             #region TEMPLATE_HANDLER
-            this.templateContainer.Init([]);
             this.templateContainer.Renamed += (sender, args) =>
             {
                 foreach (var tab in this.alarmTabList)
                 {
-                    tab.ParseTemplateRenamed(args.OldName, args.NewName);
+                    tab.ParseTemplateRenamed(args.OldName, args.Template.Name);
                 }
 
                 this.UpdateSettingsControl(ifVisible: true);

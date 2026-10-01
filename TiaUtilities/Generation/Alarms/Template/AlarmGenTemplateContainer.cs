@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Wordprocessing;
 using System.Collections;
 using System.ComponentModel;
 using TiaUtilities.CustomControls;
@@ -15,10 +16,10 @@ namespace TiaUtilities.Generation.Alarms.Template
     }
 
     public delegate void AlarmTemplateRenamedEvent(object? sender, AlarmTemplateRenamedEventArgs args);
-    public class AlarmTemplateRenamedEventArgs(string oldName, string newName) : EventArgs
+    public class AlarmTemplateRenamedEventArgs(AlarmGenTemplate template, string oldName) : EventArgs
     {
+        public AlarmGenTemplate Template { get; init; } = template;
         public string OldName { get; init; } = oldName;
-        public string NewName { get; init; } = newName;
     }
 
     public delegate void AlarmTemplateAddedEvent(object? sender, AlarmTemplateAddedEventArgs args);
@@ -60,19 +61,9 @@ namespace TiaUtilities.Generation.Alarms.Template
         public AlarmGenTemplateContainer()
         {
             this.templateList = [];
-        }
+            this.templateList.ListChanged += (sender, args) => this.dirty = true;
 
-        public void Init(ICollection<AlarmGenTemplate> templateCollection)
-        {
-            this.templateList.Clear();
-            this.templateList.AddRange(templateCollection);
-
-            if (templateCollection.Count == 0)
-            {
-                this.Add();
-            }
-
-            this.SelectedTemplate = this.templateList[0];
+            this.Add(silent: true);
         }
 
         public AlarmGenTemplate this[int index] => this.templateList[index];
@@ -95,22 +86,24 @@ namespace TiaUtilities.Generation.Alarms.Template
             return null;
         }
 
-        public AlarmGenTemplate Add(string name = "")
+        public AlarmGenTemplate Add(string name = "") => this.Add(name, silent: false);
+        private AlarmGenTemplate Add(string name = "", bool silent = false)
         {
-            var templateName = string.IsNullOrEmpty(name) ? $"TEMPLATE [{templateList.Count}]" : name;
+            var templateName = string.IsNullOrEmpty(name) ? this.GetDefaultTemplateName() : name;
 
-            AlarmGenTemplate newTemplate = new(templateName);
+            AlarmGenTemplate newTemplate = new(this, templateName);
 
-            AlarmTemplateAddedEventArgs args = new(newTemplate);
-            this.Added(this, args);
+            if(!silent)
+            {
+                this.Added(this, new(newTemplate));
+            }
+
             this.templateList.Add(newTemplate);
-
             this.SelectedTemplate = newTemplate;
-
-            this.dirty = true;
-
             return newTemplate;
         }
+
+        private string GetDefaultTemplateName() => $"TEMPLATE [{templateList.Count}]";
 
         public void Remove(string name)
         {
@@ -127,7 +120,7 @@ namespace TiaUtilities.Generation.Alarms.Template
                     if (this.templateList.Count > 0)
                     {//Select the template above the one just deleted.
                         var index = this.templateList.IndexOf(template);
-                        if(index >= 0)
+                        if (index >= 0)
                         {
                             this.SelectedTemplate = this.templateList[index - 1];
                         }
@@ -135,7 +128,6 @@ namespace TiaUtilities.Generation.Alarms.Template
                 }
 
                 this.templateList.Remove(template);
-                this.dirty = true;
             }
         }
 
@@ -167,14 +159,8 @@ namespace TiaUtilities.Generation.Alarms.Template
             var floatingTextBox = new FloatingTextBox(SelectedTemplate.Name) { Width = 400 };
             if (floatingTextBox.ShowDialogAtCursor(window) == DialogResult.OK)
             {
-                var oldName = this.SelectedTemplate.Name;
                 var newName = floatingTextBox.InputText;
-
-                Renamed(this, new(oldName, newName));
-
                 this.SelectedTemplate.Name = newName;
-
-                this.dirty = true;
             }
         }
 
@@ -185,13 +171,12 @@ namespace TiaUtilities.Generation.Alarms.Template
                 return;
             }
 
-            AlarmGenTemplate newClone = this.SelectedTemplate.Clone();
-            newClone.Name += $" [{this.templateList.Count}]";
+            var newName = $"{this.SelectedTemplate.Name} ({this.templateList.Count})";
+
+            AlarmGenTemplate newClone = this.SelectedTemplate.Clone(this, newName);
             this.templateList.Add(newClone);
 
             this.SelectedTemplate = newClone;
-
-            this.dirty = true;
         }
 
         public List<AlarmGenTemplateSave> CreateSave()
@@ -218,18 +203,24 @@ namespace TiaUtilities.Generation.Alarms.Template
 
         public void LoadSave(List<AlarmGenTemplateSave> saveList)
         {
-            List<AlarmGenTemplate> templateList = [];
-            foreach (var save in saveList)
-            {
-                AlarmGenTemplate template = new(save.Name) 
-                { 
-                    AlarmGridSave = save.AlarmGrid, 
-                    TemplateConfig = save.TemplateConfig 
-                };
-                templateList.Add(template);
-            }
+            this.templateList.Clear();
+            this.templateList.AddRange(
+                saveList.Select(save =>
+                    new AlarmGenTemplate(this, save.Name)
+                    {
+                        AlarmGridSave = save.AlarmGrid,
+                        TemplateConfig = save.TemplateConfig
+                    }
+                )
+            );
 
-            this.Init(templateList);
+            this.Wash();
+        }
+
+        internal void TemplateRenamed(AlarmGenTemplate template, string oldName)
+        {
+            this.dirty = true;
+            this.Renamed(this, new(template, oldName));
         }
 
         public bool IsDirty() => this.dirty;

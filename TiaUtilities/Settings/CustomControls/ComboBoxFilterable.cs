@@ -19,29 +19,15 @@ namespace TiaUtilities.SettingsStep.CustomControls
         public new IEnumerable<object>? DataSource
         {
             get => _fullDataSource;
-            set
-            {
-                if (value is IBindingList bindingList)
-                {//BindingSource implements IBindingList
-                    bindingList.ListChanged += (sender, args) =>
-                    {
-                        this._fullDataSource = [.. bindingList.Cast<object>()];
-                        base.DataSource = this._fullDataSource;
-
-                        this.CalculateWidthFromItems();
-                    };
-                }
-
-                this._fullDataSource = [.. value.Cast<object>()];
-                base.DataSource = this._fullDataSource;
-
-                this.CalculateWidthFromItems();
-            }
+            set => this.UpdateFullDataSource(value);
         }
 
         public Func<object, string, bool>? FilterPredicate { get; set; }
 
-        private List<object>? _fullDataSource;
+
+        private readonly ListChangedEventHandler listChangedEvent;
+
+        private IEnumerable<object>? _fullDataSource;
         private string? _lastFilterString;
         private bool _isFiltering;
 
@@ -52,17 +38,53 @@ namespace TiaUtilities.SettingsStep.CustomControls
 
             this.AutoCompleteMode = AutoCompleteMode.None;
             this.DrawMode = DrawMode.OwnerDrawFixed;
+
+            this.listChangedEvent = (sender, args) =>
+            {
+                if(sender is IEnumerable<object> enumerable)
+                {
+                    base.DataSource = enumerable.Cast<object>().ToList();
+                    this.CalculateWidthFromItems();
+                }
+            };
+        }
+
+        private void UpdateFullDataSource(object? source)
+        {
+            if (this._fullDataSource is IBindingList oldBindingList)
+            {
+                oldBindingList.ListChanged -= this.listChangedEvent;
+            }
+
+            if (source is not IEnumerable<object> enumerable)
+            {
+                _fullDataSource = [];
+                base.DataSource = null;
+                return;
+            }
+
+            if (enumerable is IBindingList newBindingList)
+            {//BindingSource implements IBindingList
+                newBindingList.ListChanged += this.listChangedEvent;
+            }
+
+            this._fullDataSource = enumerable;
+            base.DataSource = this._fullDataSource.Cast<object>().ToList();
+
+            this.CalculateWidthFromItems();
         }
 
         private void CalculateWidthFromItems()
         {
-            if(!this.AutoWidthFromItems || this._fullDataSource == null || this._fullDataSource.Count <= 0)
+            if(!this.AutoWidthFromItems || this._fullDataSource == null || !this._fullDataSource.Any())
             {
                 return;
             }
+            
 
-            var maxWidth = this._fullDataSource.Select(this.GetDisplayMember).Max(n => TextRenderer.MeasureText(n, base.Font, Size.Empty, TextFormatFlags.TextBoxControl).Width);
+            var maxWidth = this._fullDataSource.Select(this.GetItemText).Max(n => TextRenderer.MeasureText(n, base.Font, Size.Empty, TextFormatFlags.TextBoxControl).Width);
             this.Width = maxWidth + this.AutoWidthRightPadding;
+            this.MinimumSize = new(this.Width, this.MinimumSize.Height);
         }
 
         protected override void OnDrawItem(DrawItemEventArgs e)
@@ -167,14 +189,14 @@ namespace TiaUtilities.SettingsStep.CustomControls
                 // Paracadute finale per intercettare l'eccezione nativa di WinForms 
                 // nel caso in cui get_SelectedItem() venga chiamato internamente.
                 base.DataSource = _fullDataSource;
-                this.SelectedIndex = _fullDataSource == null || _fullDataSource.Count == 0 ? -1 : 0;
+                this.SelectedIndex = _fullDataSource == null || !_fullDataSource.Any() ? -1 : 0;
                 this.Text = _lastFilterString;
 
                 _isFiltering = false;
 
                 this.BeginInvoke(() =>
                 {
-                    var text = this.GetDisplayMember(this.SelectedItem);
+                    var text = this.GetItemText(this.SelectedItem);
                     this.Text = text;
                 });
             }
@@ -221,39 +243,16 @@ namespace TiaUtilities.SettingsStep.CustomControls
         /// <summary>
         /// Algoritmo di filtro di default: cerca tutte le parole digitate all'interno dell'oggetto.
         /// </summary>
-        private bool DefaultFilter(object item, string searchText)
+        private bool DefaultFilter(object? item, string searchText)
         {
-            if (item == null)
+            var itemText = this.GetItemText(item);
+            if(itemText == null)
             {
                 return false;
             }
 
-            string itemText = this.GetDisplayMember(item);
-
             string[] searchWords = searchText.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             return searchWords.All(word => itemText.Contains(word, StringComparison.OrdinalIgnoreCase));
-        }
-
-        private string GetDisplayMember(object? item)
-        {
-            if(item == null)
-            {
-                return "NULL";
-            }
-
-            if(string.IsNullOrEmpty(this.DisplayMember))
-            {
-                return $"{item}";
-            }
-
-            var itemProperty = item.GetType().GetProperty(this.DisplayMember);
-            if(itemProperty == null)
-            {
-                return $"{item}";
-            }
-
-            var itemValue = itemProperty.GetValue(item, null);
-            return itemValue == null ? $"{item}" : $"{itemValue}";
         }
     }
 }

@@ -108,10 +108,10 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
 
         public void ParseTemplateRenamed(string oldName, string newName)
         {
-            var indexes = deviceGridHandler.DataSource.GetNotEmptyIndexes();
+            var indexes = this.deviceGridHandler.DataSource.GetNotEmptyIndexes();
             foreach (var index in indexes)
             {
-                var data = deviceGridHandler.DataSource[index];
+                var data = this.deviceGridHandler.DataSource[index];
                 if(oldName.Equals(data.Template))
                 {
                     data.Template = newName;
