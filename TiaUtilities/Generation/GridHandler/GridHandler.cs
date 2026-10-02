@@ -1,6 +1,7 @@
 ﻿using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Reflection;
 using TiaUtilities.Generation.GridHandler.CustomColumns;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.GridHandler.GridImprovements;
@@ -512,6 +513,7 @@ namespace TiaUtilities.Generation.GridHandler
             #endregion
 
             #region EVENTS(CellContentClick) - Fix for edit mode for DataGridViewCheckBoxCell
+            /*
             this.DataGridView.CellContentClick += (sender, args) =>
             {
                 var rowIndex = args.RowIndex;
@@ -527,6 +529,7 @@ namespace TiaUtilities.Generation.GridHandler
                     this.DataGridView.EndEdit(); //If a checkbox is clicked, it goes in edit mode. I do not want that, is confusing. This fixes it.
                 }
             };
+            */
             #endregion
 
             #region EVENTS(CellMouseClick) Javascripts - Add context menu to top left cell
@@ -561,22 +564,67 @@ namespace TiaUtilities.Generation.GridHandler
             this.GridSettings.PropertyChanged += (sender, args) => this.DataGridView.Refresh();
             this.DataGridView.VisibleChanged += (sender, args) => this.DataGridView.AutoResizeColumnHeadersHeight();
 
+            #region VIRTUAL_MODE
 
+            #region EVENTS(CellValueNeeded / CellValuePushed)
             this.DataGridView.VirtualMode = true;
             this.DataGridView.CellValueNeeded += (sender, args) =>
             {
-                var value = this.DataSource[args.RowIndex][args.ColumnIndex];
-                args.Value = value;
-
-                //Debug.WriteLine($"CellValueNeeded R.{args.RowIndex}, C.{args.ColumnIndex}, V.{args.Value}");
+                var rowData = this.DataSource[args.RowIndex];
+                if (rowData != null)
+                {
+                    args.Value = rowData[args.ColumnIndex];
+                }
             };
 
             this.DataGridView.CellValuePushed += (sender, args) =>
             {
-                this.DataSource[args.RowIndex][args.ColumnIndex] = args.Value;
-                //Debug.WriteLine($"CellValuePushed R.{args.RowIndex}, C.{args.ColumnIndex}, V.{args.Value}");
-            };
+                var rowData = this.DataSource[args.RowIndex];
+                if (rowData == null)
+                {
+                    return;
+                }
 
+                var column = rowData.GetColumn(args.ColumnIndex);
+                if (!column.PropertyInfo.CanWrite)
+                {
+                    return;
+                }
+
+                var columnType = column.PropertyInfo.PropertyType;
+
+                var value = args.Value;
+                if (value == null)
+                {
+                    if(columnType == typeof(bool))
+                    {
+                        rowData[args.ColumnIndex] = false;
+                        this.DataGridView.EndEdit(); //Fixes checkbox not updating after settings value.
+                    }
+                    else if (ReflectionUtils.IsNullable(column.PropertyInfo))
+                    {
+                        rowData[args.ColumnIndex] = null;
+                    }
+                }
+                else
+                {
+                    var valueType = value.GetType();
+                    if (value is string boolStringValue && columnType == typeof(bool))
+                    {
+                        if (bool.TryParse(boolStringValue, out var boolValue))
+                        {
+                            rowData[args.ColumnIndex] = boolValue;
+                        }
+                    }
+                    else if (columnType == valueType)
+                    {
+                        rowData[args.ColumnIndex] = value;
+                    }
+                }
+            };
+            #endregion
+
+            #endregion
             this.DataGridView.ResumeLayout(true);
 
             init = true;
@@ -786,7 +834,7 @@ namespace TiaUtilities.Generation.GridHandler
 
         public bool PreFilterMessage(ref Message m)
         {
-            if(m.Msg == DllImports.WM_KEYDOWN || m.Msg == DllImports.WM_SYSKEYDOWN)
+            if (m.Msg == DllImports.WM_KEYDOWN || m.Msg == DllImports.WM_SYSKEYDOWN)
             {
                 Keys keyCode = (Keys)m.WParam;
                 return processCmdKeyCallback(m, keyCode);

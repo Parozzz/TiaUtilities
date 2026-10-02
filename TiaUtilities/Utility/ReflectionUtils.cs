@@ -4,6 +4,14 @@ namespace TiaUtilities.Utility
 {
     public static class ReflectionUtils
     {
+        private readonly static NullabilityInfoContext NULLABILITY_STATE_CONTEXT = new();
+
+        public static bool IsNullable(PropertyInfo propertyInfo)
+        {
+            var nullabilityInfo = ReflectionUtils.NULLABILITY_STATE_CONTEXT.Create(propertyInfo);
+            return nullabilityInfo.ReadState == NullabilityState.Nullable;
+        }
+
         public static bool IsUnsignedNumber(Type type) => type == typeof(byte) || type == typeof(ushort) || type == typeof(uint) || type == typeof(ulong);
 
         public static bool IsSignedNumber(Type type) => type == typeof(sbyte) || type == typeof(short) || type == typeof(int) || type == typeof(long);
