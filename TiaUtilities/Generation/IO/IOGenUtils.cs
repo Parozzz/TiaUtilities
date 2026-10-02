@@ -14,6 +14,11 @@ namespace TiaUtilities.Generation.IO
 {
     public static class IOGenUtils
     {
+
+        private static readonly List<SettingsSequencePanelDescriptor> GLOBAL_DESCRIPTORS = [];
+        private static readonly List<SettingsSequencePanelDescriptor> TAB_DESCRIPTORS = [];
+        private static readonly List<SettingsSequencePanelDescriptor> EXCEL_DESCRIPTORS = [];
+
         public static void DragPreview<T>(GridExcelDragEventArgs eventArgs, GridHandler<T> gridHandler) where T : GridData
         {
             var startingCellValue = gridHandler.DataSource[eventArgs.StartingRow][eventArgs.DraggedColumn];
@@ -88,6 +93,10 @@ namespace TiaUtilities.Generation.IO
 
         public static List<SettingsSequencePanelDescriptor> CreateGlobalSettingsDescriptors()
         {
+            if(GLOBAL_DESCRIPTORS.Count > 0)
+            {
+                return GLOBAL_DESCRIPTORS;
+            }
             var genericStepDescriptor = new SettingsSequencePanelDescriptor(Locale.GENERICS_CONFIGURATION)
             .CreateBinder<IOMainConfiguration>()
             .StartGroup(Locale.GENERICS_CONFIGURATION)
@@ -123,11 +132,16 @@ namespace TiaUtilities.Generation.IO
                     .Add(x => x.DefaultMerkerOutputVariable, Locale.IO_SETTINGS_ALIAS_TABLE_OUTPUT_DEFAULT_NAME, "", options: new() { SupportPlaceholders = true })
                 .End();
 
-            return [genericStepDescriptor, ioTableStepDescriptor, aliasDbStepDescriptor, aliasTableStepDescriptor];
+            GLOBAL_DESCRIPTORS.AddRange([genericStepDescriptor, ioTableStepDescriptor, aliasDbStepDescriptor, aliasTableStepDescriptor]);
+            return GLOBAL_DESCRIPTORS;
         }
 
         public static List<SettingsSequencePanelDescriptor> CreateTabSettingsDescriptors()
         {
+            if(TAB_DESCRIPTORS.Count > 0)
+            {
+                return TAB_DESCRIPTORS;
+            }
             var fcStepDescriptor = new SettingsSequencePanelDescriptor(Locale.IO_GEN_CONFIG_FC)
             .CreateBinder<IOTabConfiguration>()
             .StartGroup(Locale.IO_GEN_CONFIG_FC)
@@ -142,11 +156,16 @@ namespace TiaUtilities.Generation.IO
                     .Add(x => x.SegmentNameByteGrouping, Locale.IO_SETTINGS_SEGMENT_BYTE_GROUPING, "", options: new() { SupportPlaceholders = true })
                 .End();
 
-            return [fcStepDescriptor, segmentStepDescriptor];
+            TAB_DESCRIPTORS.AddRange([fcStepDescriptor, segmentStepDescriptor]);
+            return TAB_DESCRIPTORS;
         }
 
         public static List<SettingsSequencePanelDescriptor> CreateExcelSettingsDescriptors()
         {
+            if(EXCEL_DESCRIPTORS.Count > 0)
+            {
+                return EXCEL_DESCRIPTORS;
+            }
             var descriptor = new SettingsSequencePanelDescriptor(Locale.GENERICS_ADDRESS)
                 .CreateBinder<IOExcelImportConfiguration>()
                 .StartGroup(Locale.GENERICS_ADDRESS)
@@ -157,7 +176,8 @@ namespace TiaUtilities.Generation.IO
                     .Add(x => x.IgnoreRowExpressionConfig, Locale.IO_SETTINGS_EXCELIMPORT_EXPRESSION, description: Locale.IO_SETTINGS_EXCELIMPORT_EXPRESSION_DESC, options: new() { StringEditor = StringCustomEditor.JS })
                 .End();
 
-            return [descriptor];
+            EXCEL_DESCRIPTORS.AddRange([descriptor]);
+            return EXCEL_DESCRIPTORS;
         }
     }
 }

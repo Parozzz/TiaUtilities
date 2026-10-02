@@ -4,6 +4,8 @@ using SimaticML.API;
 using SimaticML.Blocks;
 using SimaticML.TagTable;
 using TiaUtilities.Configuration;
+using TiaUtilities.CustomControls.EditableTab;
+using TiaUtilities.Generation.Alarms;
 using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.IO.Configurations;
@@ -56,6 +58,9 @@ namespace TiaUtilities.Generation.IO.Module
     {
         private record GenTabRowRecord(IOGenTab GenTab, IOData IOData, int Row);
 
+        private readonly EditableTabControl tabControl;
+        private readonly SettingsControl settingsControl;
+
         private readonly MultiGridOperationHandler multiGrid;
 
         private readonly IOMainConfiguration mainConfig;
@@ -64,7 +69,7 @@ namespace TiaUtilities.Generation.IO.Module
         private readonly GridDataPreviewer<IOSuggestionData> suggestionPreviewer;
         private readonly GridHandler<IOSuggestionData> suggestionGridHandler;
 
-        private readonly IOGenControl control;
+        //private readonly IOGenControl control;
 
         private readonly List<IOGenTab> ioTabList;
 
@@ -72,6 +77,22 @@ namespace TiaUtilities.Generation.IO.Module
 
         public IOGenModule()
         {
+            this.tabControl = new()
+            {
+                Dock = DockStyle.Fill,
+                Padding = new Point(12, 5),
+                RequireConfirmationBeforeClosing = true,
+                SelectedIndex = 0,
+            };
+
+            this.settingsControl = new()
+            {
+                Dock = DockStyle.Fill,
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
+            };
+            this.settingsControl.InitControls();
+
             this.multiGrid = new();
 
             this.mainConfig = new();
@@ -83,17 +104,23 @@ namespace TiaUtilities.Generation.IO.Module
             this.suggestionPreviewer = new();
             this.suggestionGridHandler = new(MainForm.Settings.GridSettings, this.multiGrid, suggestionPreviewer, new(), new IOSuggesttionRowComparare()) { InitializeRowCount = 9999 };
 
-            this.control = new(suggestionGridHandler.GetControl());
+            //this.control = new(suggestionGridHandler.GetControl());
 
             this.ioTabList = [];
+
+            this.ModuleControls = [
+                new() { Name = "Grids", RequestControlCallback = () => this.tabControl },
+                new() { Name = "Suggestions", RequestControlCallback = () => this.suggestionGridHandler.GetControl() },
+                new() {
+                    Name = Locale.GENERICS_SETTINGS,
+                    RequestControlCallback = () => UpdateSettingsControl()
+                },
+
+            ];
         }
 
         public void Init(GenModuleForm form)
         {
-            #region TOP_BUTTONS_STRIP
-            this.control.setupButton.Click += (sender, args) => this.ShowSettings();
-            #endregion
-
             #region IMPORT_EXPORT_MENU_ITEMS
             ToolStripMenuItem importExcelMenuItem = new(Locale.IO_GEN_FORM_IMPEXP_IMPORT_EXCEL);
             importExcelMenuItem.Click += (sender, args) =>
@@ -114,7 +141,7 @@ namespace TiaUtilities.Generation.IO.Module
                         });
                     }
 
-                    var selectedTab = this.control.tabControl.SelectedTab;
+                    var selectedTab = this.tabControl.SelectedTab;
                     if (selectedTab != null && selectedTab.Tag is IOGenTab genTab)
                     {
                         var gridHandler = genTab.GridHandler;
@@ -195,7 +222,7 @@ namespace TiaUtilities.Generation.IO.Module
             ToolStripMenuItem importAddressMenuItem = new(Locale.IO_GEN_FORM_IMPEXP_IMPORT_IO);
             importAddressMenuItem.Click += (sender, args) =>
             {
-                if (this.control.tabControl.SelectedTab?.Tag is not IOGenTab ioTab)
+                if (this.tabControl.SelectedTab?.Tag is not IOGenTab ioTab)
                 {
                     return;
                 }
@@ -320,8 +347,8 @@ namespace TiaUtilities.Generation.IO.Module
             #endregion
 
             #region TAB CONTROL
-            this.control.tabControl.TabAdded += (sender, args) => TabCreation(args.TabPage);
-            this.control.tabControl.TabRemoved += (sender, args) =>
+            this.tabControl.TabAdded += (sender, args) => TabCreation(args.TabPage);
+            this.tabControl.TabRemoved += (sender, args) =>
             {
                 if (args.TabPage.Tag is IOGenTab ioGenTab)
                 {
@@ -329,7 +356,7 @@ namespace TiaUtilities.Generation.IO.Module
                 }
             };
 
-            this.control.tabControl.TabRenamed += (sender, args) =>
+            this.tabControl.TabRenamed += (sender, args) =>
             {
                 var newName = args.NewName;
                 foreach (var loopTab in this.ioTabList)
@@ -346,7 +373,7 @@ namespace TiaUtilities.Generation.IO.Module
                 }
             };
 
-            this.control.tabControl.Selected += (sender, args) =>
+            this.tabControl.Selected += (sender, args) =>
             {
                 if (args.TabPage?.Tag is IOGenTab tab)
                 {
@@ -358,16 +385,16 @@ namespace TiaUtilities.Generation.IO.Module
             form.Shown += (sender, args) =>
             {
                 this.suggestionGridHandler.ViewManipulator.AutoResizeColumnHeadersHeight();
-                if (this.control.tabControl.TabCount == 0)
+                if (this.tabControl.TabCount == 0)
                 { //Check required because Load could be called before form is shown!
-                    this.control.tabControl.AddTabs();
+                    this.tabControl.AddTabs();
                 }
             };
         }
 
         public void ShowSettings()
         {
-            var sequences = this.GetSettingsStepSequences();
+            var sequences = this.GetSettingsSequences();
 
             SettingsForm form = new();
             form.SetSequences(sequences);
@@ -400,7 +427,7 @@ namespace TiaUtilities.Generation.IO.Module
         public void Clear()
         {
             this.ioTabList.Clear();
-            this.control.tabControl.TabPages.Clear();
+            this.tabControl.TabPages.Clear();
         }
 
         public bool IsDirty() => mainConfig.IsDirty() || suggestionGridHandler.IsDirty() || ioTabList.Any(x => x.IsDirty()) || this.multiGrid.IsDirty();
@@ -415,14 +442,9 @@ namespace TiaUtilities.Generation.IO.Module
             this.multiGrid.Wash();
         }
 
-        public Control? GetControl()
-        {
-            return this.control;
-        }
-
         public void OpenPlaceholderViewer(IWin32Window? window = null)
         {
-            var form = window ?? this.control.FindForm();
+            var form = window ?? this.tabControl.FindForm();
             if (form == null)
             {
                 return;
@@ -430,6 +452,73 @@ namespace TiaUtilities.Generation.IO.Module
 
             var placeholderForm = new PlaceholderViewerForm(GenPlaceholders.IO.PLACEHOLDER_LIST);
             placeholderForm.Show(form);
+        }
+
+        private GenPlaceholderHandler? CreateGenericPlaceholderHandler()
+        {
+            var currentTabName = this.GetCurrentTabName();
+            var currentTab = this.GetCurrentTab();
+
+            IOGenPlaceholderHandler? placeholdersHandler = null;
+            if (currentTabName != null && currentTab != null)
+            {
+                placeholdersHandler = new(currentTab.Previewer, this.mainConfig, currentTab.TabConfig)
+                {
+                    TabName = currentTabName
+                };
+
+                var notEmptyData = currentTab.GridHandler.DataSource.GetNotEmptyData().FirstOrDefault();
+                if (notEmptyData != null)
+                {
+                    placeholdersHandler.IOData = notEmptyData;
+                }
+            }
+
+            return placeholdersHandler;
+        }
+
+        private SettingsControl UpdateSettingsControl(bool ifVisible = true)
+        {
+            if (!this.settingsControl.Visible && ifVisible)
+            {
+                return this.settingsControl;
+            }
+
+            var sequences = this.GetSettingsSequences();
+            this.settingsControl.SetSequences(sequences);
+            return this.settingsControl;
+        }
+
+        private List<SettingsSequence> GetSettingsSequences()
+        {
+            string ParsePlaceholders(string str)
+            {
+                var placeholderHandler = this.CreateGenericPlaceholderHandler();
+                return placeholderHandler == null ? str : placeholderHandler.ParseNotNull(str);
+            }
+
+            List<SettingsSequence> sequenceList = [];
+
+            var globalDescriptors = IOGenUtils.CreateGlobalSettingsDescriptors();
+            var tabDescriptors = IOGenUtils.CreateTabSettingsDescriptors();
+            var excelDescriptors = IOGenUtils.CreateExcelSettingsDescriptors();
+
+            SettingsSequence globalSequence = new(this.mainConfig, "Global", "Settings") { PlaceholdersCallBack = ParsePlaceholders };
+            globalSequence.AddRange(globalDescriptors);
+            sequenceList.Add(globalSequence);
+
+            SettingsSequence excelSequence = new(this.excelImportConfig, "Global", "Excel") { PlaceholdersCallBack = ParsePlaceholders };
+            excelSequence.AddRange(excelDescriptors);
+            sequenceList.Add(excelSequence);
+
+            foreach (var tab in this.ioTabList)
+            {
+                SettingsSequence tabSequence = new(tab.TabConfig, "Tab", tab.Name) { PlaceholdersCallBack = ParsePlaceholders };
+                tabSequence.AddRange(tabDescriptors);
+                sequenceList.Add(tabSequence);
+            }
+
+            return sequenceList;
         }
 
         public void ExportXML(string folderPath)
@@ -485,13 +574,13 @@ namespace TiaUtilities.Generation.IO.Module
             {
                 TabPage tabPage = new();
                 TabCreation(tabPage, tabSave);
-                this.control.tabControl.TabPages.Add(tabPage);
+                this.tabControl.TabPages.Add(tabPage);
             }
 
             this.UpdateSuggestionColors();
 
             //Seems that the Selected event is not called in this case. Doing it manually.
-            if (this.control.tabControl.SelectedTab?.Tag is IOGenTab tab)
+            if (this.tabControl.SelectedTab?.Tag is IOGenTab tab)
             {
                 tab.Selected();
             }
@@ -562,70 +651,15 @@ namespace TiaUtilities.Generation.IO.Module
             this.suggestionGridHandler.ViewManipulator.ResumeLayout(refresh: true);
         }
 
-        private GenPlaceholderHandler? CreateGenericPlaceholderHandler()
-        {
-            var currentTabName = this.GetCurrentTabName();
-            var currentTab = this.GetCurrentTab();
-
-            IOGenPlaceholderHandler? placeholdersHandler = null;
-            if (currentTabName != null && currentTab != null)
-            {
-                placeholdersHandler = new(currentTab.Previewer, this.mainConfig, currentTab.TabConfig)
-                {
-                    TabName = currentTabName
-                };
-
-                var firstIOData = currentTab.GridHandler.DataSource.GetNotEmptyData().FirstOrDefault();
-                if (firstIOData != null)
-                {
-                    placeholdersHandler.IOData = firstIOData;
-                }
-            }
-
-            return placeholdersHandler;
-        }
-
-        private List<SettingsSequence> GetSettingsStepSequences()
-        {
-            string ParsePlaceholders(string str)
-            {
-                var placeholderHandler = this.CreateGenericPlaceholderHandler();
-                return placeholderHandler == null ? str : placeholderHandler.ParseNotNull(str);
-            }
-
-            List<SettingsSequence> sequenceList = [];
-
-            var globalDescriptors = IOGenUtils.CreateGlobalSettingsDescriptors();
-            var excelDescriptors = IOGenUtils.CreateExcelSettingsDescriptors();
-            var tabDescriptors = IOGenUtils.CreateTabSettingsDescriptors();
-
-            SettingsSequence globalSequence = new(this.mainConfig, "Global", "Settings") { PlaceholdersCallBack = ParsePlaceholders };
-            globalSequence.AddRange(globalDescriptors);
-            sequenceList.Add(globalSequence);
-
-            SettingsSequence excelSequence = new(this.excelImportConfig, "Global", "Excel") { PlaceholdersCallBack = ParsePlaceholders };
-            excelSequence.AddRange(excelDescriptors);
-            sequenceList.Add(excelSequence);
-
-            foreach (var tab in this.ioTabList)
-            {
-                SettingsSequence tabSequence = new(tab.TabConfig, "Tab", tab.Name) { PlaceholdersCallBack = ParsePlaceholders };
-                tabSequence.AddRange(tabDescriptors);
-                sequenceList.Add(tabSequence);
-            }
-
-            return sequenceList;
-        }
-
         private string GetCurrentTabName()
         {
-            var tabPage = this.control.tabControl.SelectedTab;
+            var tabPage = this.tabControl.SelectedTab;
             return tabPage == null ? "" : tabPage.Text;
         }
 
         private bool IsAnyTabSelected()
         {
-            return this.control.tabControl.SelectedTab != null;
+            return this.tabControl.SelectedTab != null;
         }
 
         private IOTabConfiguration? GetCurrentTabConfiguration()
@@ -633,7 +667,7 @@ namespace TiaUtilities.Generation.IO.Module
             return this.GetCurrentTab()?.TabConfig;
         }
 
-        private IOGenTab? GetCurrentTab() => this.control.tabControl.SelectedTab?.Tag is IOGenTab genTab ? genTab : null;
+        private IOGenTab? GetCurrentTab() => this.tabControl.SelectedTab?.Tag is IOGenTab genTab ? genTab : null;
 
         private Dictionary<string, ObservableConfiguration> GetTabConfigurationDict()
         {

@@ -31,7 +31,6 @@ namespace TiaUtilities.Generation.Alarms.Module
         private JSScriptHandler JsScriptHandler { get => this.multiGrid.JsScriptHandler; }
 
         private readonly EditableTabControl tabControl;
-        //private readonly AlarmGenTemplateControl templateControl;
         private readonly SettingsControl settingsControl;
 
         private readonly AlarmMainConfiguration mainConfig;
@@ -403,7 +402,7 @@ namespace TiaUtilities.Generation.Alarms.Module
 
         private SettingsControl UpdateSettingsControl(bool ifVisible = true)
         {
-            if(!this.settingsControl.Visible)
+            if(!this.settingsControl.Visible && ifVisible)
             {
                 return this.settingsControl;
             }
