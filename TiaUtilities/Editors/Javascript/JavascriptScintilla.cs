@@ -13,29 +13,38 @@ namespace TiaUtilities.Editors.Javascript
         private const string keywords0 = "async await break case catch class const continue debugger default delete do else export extends false finally for function if import in instanceof let new null return super switch this throw true try typeof var void while yield";
         private const string keywords1 = "Array Date JSON Math Number number Object object String string console parseInt parseFloat undefined NaN";
 
-        private static void SetScintillaLightStyle(Scintilla scintilla, Color? backColor = null, Color? foreColor = null)
+        private static void SetScintillaLightStyle(Scintilla scintilla,
+            Color? backColor = null,
+            Color? foreColor = null,
+            bool showLineNumbers = false,
+            bool showSymbolMargin = false)
         {
-            var defaultBackColor = backColor ?? Color.FromArgb(250, 250, 250); // Sfondo quasi bianco
-            var defaultForeColor = foreColor ?? Color.FromArgb(40, 40, 40); // Testo principale scuro
+            var defaultBackColor = backColor ?? Color.FromArgb(250, 250, 250);
+            var defaultForeColor = foreColor ?? Color.FromArgb(40, 40, 40);
 
-            // 1. Resetta lo stile base
             scintilla.StyleResetDefault();
 
-            // Imposta font e colore dello sfondo principale (Bianco Puro)
             scintilla.Styles[Style.Default].Font = "Consolas";
             scintilla.Styles[Style.Default].Size = 11;
-            scintilla.Styles[Style.Default].BackColor = defaultBackColor; // Sfondo Bianco
-            scintilla.Styles[Style.Default].ForeColor = defaultForeColor;   // Testo base (Nero/Grigio scuro)
+            scintilla.Styles[Style.Default].BackColor = defaultBackColor;
+            scintilla.Styles[Style.Default].ForeColor = defaultForeColor;
 
-            scintilla.StyleClearAll(); // Applica il font/sfondo a tutti gli stili di default
+            scintilla.StyleClearAll();
 
             scintilla.SetKeywords(0, keywords0); //Style.Cpp.Word
             scintilla.SetKeywords(1, keywords1); //Style.Cpp.Word2
 
-            scintilla.Margins[0].Type = MarginType.RightText;
-            scintilla.Margins[0].Width = 40;
-            scintilla.Margins[1].Type = MarginType.Symbol;
-            scintilla.Margins[1].Width = 15;
+            if (showLineNumbers)
+            {
+                scintilla.Margins[0].Type = MarginType.RightText;
+                scintilla.Margins[0].Width = 40;
+            }
+
+            if (showSymbolMargin)
+            {
+                scintilla.Margins[1].Type = MarginType.Symbol;
+                scintilla.Margins[1].Width = 15;
+            }
 
             scintilla.CaretLineBackColor = Color.FromArgb(243, 243, 243);
             scintilla.SelectionBackColor = Color.FromArgb(173, 214, 255);
@@ -132,7 +141,7 @@ namespace TiaUtilities.Editors.Javascript
             this.brackets = new(this.Scintilla);
         }
 
-        public void InitControl(ScintillaNET.BorderStyle? borderStyle = null, Color? backColor = null, Color? foreColor = null)
+        public void InitControl(EditorOptions options)
         {
             this.Scintilla.LexerName = this.Scintilla.GetLexerIDFromLexer(Lexer.SCLEX_JAVASCRIPT);
 
@@ -147,13 +156,19 @@ namespace TiaUtilities.Editors.Javascript
             this.Scintilla.AdditionalCaretsVisible = true;
             this.Scintilla.AdditionalCaretsBlink = true;
 
-            JavascriptScintilla.SetScintillaLightStyle(this.Scintilla, backColor, foreColor);
+            JavascriptScintilla.SetScintillaLightStyle(
+                this.Scintilla,
+                options.BackColor,
+                options.ForeColor,
+                showLineNumbers: options.ShowLineNumbers,
+                showSymbolMargin: options.ShowErrorIndicator
+            );
 
             this.Scintilla.TabWidth = 4;
             this.Scintilla.UseTabs = false;
             this.Scintilla.MouseDwellTime = 800;
 
-            this.Scintilla.BorderStyle = borderStyle ?? ScintillaNET.BorderStyle.None;
+            this.Scintilla.BorderStyle = options.BorderStyle ?? ScintillaNET.BorderStyle.None;
 
             this.Scintilla.DwellStart += (sender, e) =>
             {
@@ -166,22 +181,25 @@ namespace TiaUtilities.Editors.Javascript
 
             this.Scintilla.DwellEnd += (sender, args) => this.tooltip.EventDwellStop();
 
-            UpdateLineNumbers(0);
-            this.Scintilla.Insert += (sender, args) =>
+            if (options.ShowLineNumbers)
             {
-                if (args.LinesAdded != 0)
+                UpdateLineNumbers(0);
+                this.Scintilla.Insert += (sender, args) =>
                 {
-                    UpdateLineNumbers(Scintilla.LineFromPosition(args.Position));
-                }
-            };
+                    if (args.LinesAdded != 0)
+                    {
+                        UpdateLineNumbers(Scintilla.LineFromPosition(args.Position));
+                    }
+                };
 
-            this.Scintilla.Delete += (sender, args) =>
-            {
-                if (args.LinesAdded != 0)
+                this.Scintilla.Delete += (sender, args) =>
                 {
-                    UpdateLineNumbers(Scintilla.LineFromPosition(args.Position));
-                }
-            };
+                    if (args.LinesAdded != 0)
+                    {
+                        UpdateLineNumbers(Scintilla.LineFromPosition(args.Position));
+                    }
+                };
+            }
 
             this.Scintilla.BeforeDelete += (sender, args) =>
             {
@@ -191,7 +209,7 @@ namespace TiaUtilities.Editors.Javascript
             this.Scintilla.CharAdded += (sender, args) =>
             {
                 var wrapSelectionDone = this.brackets.EventCharAdded_WrapSelection(args.Char, ScintillaUtils.IsJSBrace);
-                if(wrapSelectionDone)
+                if (wrapSelectionDone)
                 {
                     return;
                 }
@@ -200,7 +218,7 @@ namespace TiaUtilities.Editors.Javascript
                 this.tooltip.EventCharAdded_ShowOnBracket(args.Char);
 
                 var ignoredClosingifExistsDone = this.brackets.EventCharAdded_IgnoreClosingIfExists(args.Char, ScintillaUtils.IsJSBrace);
-                if(!ignoredClosingifExistsDone)
+                if (!ignoredClosingifExistsDone)
                 {
                     this.brackets.EventCharAdded_InsertMatchedBracket(args.Char);
                 }
@@ -220,7 +238,7 @@ namespace TiaUtilities.Editors.Javascript
             for (int i = startingAtLine; i < Scintilla.Lines.Count; i++)
             {
                 Scintilla.Lines[i].MarginStyle = Style.LineNumber;
-                Scintilla.Lines[i].MarginText = i.ToString().PadLeft(4, '0');
+                Scintilla.Lines[i].MarginText = i.ToString().PadLeft(4, ' ');
             }
         }
     }

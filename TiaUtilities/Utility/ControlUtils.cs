@@ -82,6 +82,8 @@ namespace TiaUtilities.Utility
         { 
             public required string Text { get; init; }
             public required object Value { get; init; }
+
+            public override string ToString() => this.Text;
         }
 
         public static void CreateComboBoxEnumDataSource(ComboBox comboBox, Type enumType, bool editable = false)

@@ -3,10 +3,10 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Reflection;
 using TiaUtilities.Configuration;
 using TiaUtilities.Constants;
+using TiaUtilities.CustomControls;
 using TiaUtilities.Generation.TextsEditor;
 using TiaUtilities.Languages;
 using TiaUtilities.Resources;
-using TiaUtilities.SettingsStep.CustomControls;
 using TiaUtilities.Styles;
 using TiaUtilities.Utility;
 using TiaUtilities.Utility.Extensions;
@@ -16,8 +16,6 @@ namespace TiaUtilities.Generation
     public partial class GenModuleForm : Form
     {
         private enum SplitMode { NO_SPLIT, VERTICAL, HORIZONTAL }
-
-        private const int CONTROL_ROW = 2;
 
         private readonly IGenModule module;
         private readonly TimedSaveHandler autoSaveHandler;
@@ -91,7 +89,6 @@ namespace TiaUtilities.Generation
 
             #region TOP_MENU_PROGRAM
             this.programSettingsMenuItem.Click += (sender, args) => MainForm.ShowSettingsForm();
-            this.programModuleSetupMenuItem.Click += (sender, args) => this.module.ShowSettings();
             #endregion
 
             #region TOP_MENU_IMPORT_EXPORT
@@ -99,7 +96,7 @@ namespace TiaUtilities.Generation
             {
                 try
                 {
-                    var filePath = MainForm.Settings.GetSavedFileDialogPath(FileDialogResources.GENERATION_EXPORT_XML);
+                    var filePath = MainForm.Settings.GetFilePath(FileDialogResources.GENERATION_EXPORT_XML);
 
                     var folderDialog = new CommonOpenFileDialog
                     {
@@ -270,10 +267,7 @@ namespace TiaUtilities.Generation
 
         private void UpdateControlsLabels()
         {
-            this.moduleControlLabelDict.Values.ForEach(l =>
-            {
-                l.BorderWidth = 0;
-            });
+            this.moduleControlLabelDict.Values.ForEach(l => l.BorderWidth = 0);
 
             var pos1Control = this.panel1ModuleControl.Value;
             if(pos1Control != null)
@@ -307,7 +301,6 @@ namespace TiaUtilities.Generation
 
             this.programMenuItem.Text = Locale.GENERICS_PROGRAM;
             this.programSettingsMenuItem.Text = Locale.GENERICS_SETTINGS + " (CTRL+P)";
-            this.programModuleSetupMenuItem.Text = Locale.GENERICS_SETUP + " (CTRL+W)";
 
             this.toolsMenuItem.Text = Locale.GEN_FORM_TOOLS;
             this.toolsPlaceholderViewerMenuItem.Text = Locale.GEN_FORM_TOOLS_PLACEHOLDER_VIEWER + " (CTRL+Q)";
@@ -325,18 +318,12 @@ namespace TiaUtilities.Generation
                     case Keys.P | Keys.Control:
                         this.programSettingsMenuItem.PerformClick();
                         return true;
-                    case Keys.W | Keys.Control:
-                        this.programModuleSetupMenuItem.PerformClick();
-                        return true;
                     case Keys.S | Keys.Control:
                         this.ModuleSave(force: true);
                         return true; //Return required otherwise will write the letter.
                     case Keys.L | Keys.Control:
                         this.ModuleLoad();
                         return true; //Return required otherwise will write the letter.
-                    case Keys.I | Keys.Control:
-                        this.module.ShowSettings();
-                        return true;
                     case Keys.Q | Keys.Control:
                         this.module.OpenPlaceholderViewer(this);
                         return true;
@@ -372,12 +359,10 @@ namespace TiaUtilities.Generation
 
             var version = GetProjectSaveVersion(projectSave);
 
-
-
             var filePath = this.openProjectFilePath;
             if (string.IsNullOrEmpty(filePath))
             {
-                filePath = MainForm.Settings.GetSavedFileDialogPath(FileDialogResources.GENERATION_SAVE);
+                filePath = MainForm.Settings.GetFilePath(FileDialogResources.GENERATION_SAVE);
             }
 
             var requireFileDialog = string.IsNullOrEmpty(this.openProjectFilePath) || saveAs || !File.Exists(filePath);
@@ -401,7 +386,7 @@ namespace TiaUtilities.Generation
             var filePath = this.openProjectFilePath;
             if (string.IsNullOrEmpty(filePath))
             {
-                filePath = MainForm.Settings.GetSavedFileDialogPath(FileDialogResources.GENERATION_LOAD);
+                filePath = MainForm.Settings.GetFilePath(FileDialogResources.GENERATION_LOAD);
             }
 
             saveObject ??= SavesLoader.LoadWithDialog(ref filePath, ProgramConstants.SAVE_FILE_EXTENSION);
@@ -422,7 +407,7 @@ namespace TiaUtilities.Generation
 
         private void SetLocalizedFormText(string filePath)
         {
-            this.Text = this.module.GetFormLocalizatedName().Replace("{file_path}", filePath);
+            this.Text = this.module.LocalizedName.Replace("{file_path}", filePath);
         }
 
         public void SetOpenProjectFilePath(string? filePath)

@@ -83,16 +83,6 @@ namespace TiaUtilities.Properties {
         /// <summary>
         ///   Cerca una risorsa localizzata di tipo System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap play_6444203_007435 {
-            get {
-                object obj = ResourceManager.GetObject("play-6444203-007435", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una risorsa localizzata di tipo System.Drawing.Bitmap.
-        /// </summary>
         public static System.Drawing.Bitmap previous_8463010 {
             get {
                 object obj = ResourceManager.GetObject("previous-8463010", resourceCulture);

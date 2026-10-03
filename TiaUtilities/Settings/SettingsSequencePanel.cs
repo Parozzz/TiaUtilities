@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel;
 using TiaUtilities.Configuration;
+using TiaUtilities.CustomControls;
 using TiaUtilities.CustomControls.tableColorizable;
 using TiaUtilities.Languages;
 using TiaUtilities.Resources;
 using TiaUtilities.SettingsStep.ControlFactory;
-using TiaUtilities.SettingsStep.CustomControls;
 using TiaUtilities.Styles;
 using TiaUtilities.Utility;
 using TiaUtilities.Utility.Extensions;

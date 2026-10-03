@@ -114,6 +114,7 @@ namespace TiaUtilities.Generation.GridHandler
             {
                 data.Clear();
             }
+            this.dataGridView.Refresh();
         }
 
         public void InitializeData(uint dataAmount)

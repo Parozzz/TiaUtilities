@@ -3,7 +3,7 @@ using System.Drawing.Text;
 using TiaUtilities.Utility;
 using TiaUtilities.Utility.Extensions;
 
-namespace TiaUtilities.SettingsStep.CustomControls
+namespace TiaUtilities.CustomControls
 {
     public class LabelWithSymbols : Label
     {

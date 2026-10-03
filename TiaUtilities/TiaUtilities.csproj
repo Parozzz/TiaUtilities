@@ -38,7 +38,7 @@
     <PackageReference Include="ClosedXML" Version="0.105.1" />
     <PackageReference Include="Cyotek.Windows.Forms.ColorPicker" Version="1.7.2" />
     <PackageReference Include="InformationBox" Version="1.5.0.242" />
-    <PackageReference Include="Jint" Version="4.16.0" />
+    <PackageReference Include="Jint" Version="4.16.4" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="Scintilla5.NET" Version="7.0.0" />
     <PackageReference Include="Svg" Version="3.4.8" />
@@ -60,12 +60,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Update="zzzTests\DBDuplicationForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="Generation\Configuration\ConfigForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="Generation\IO\IOGenExcelImportForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="Languages\Locale.Designer.cs">
@@ -130,6 +124,9 @@
     <None Update="Resources\Images\delete_8439989.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\Images\delete_8439989_FF001C.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\Images\double-arrow-down-3134107.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -179,6 +176,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Images\noun-transfer-7710063.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Images\play-6444203-007435.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Images\questionmark_8412440_007435.png">

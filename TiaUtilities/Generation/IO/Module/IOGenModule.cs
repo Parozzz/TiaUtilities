@@ -5,12 +5,10 @@ using SimaticML.Blocks;
 using SimaticML.TagTable;
 using TiaUtilities.Configuration;
 using TiaUtilities.CustomControls.EditableTab;
-using TiaUtilities.Generation.Alarms;
 using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.IO.Configurations;
 using TiaUtilities.Generation.IO.Data;
-using TiaUtilities.Generation.IO.Module.ExcelImporter;
 using TiaUtilities.Generation.IO.Module.Tab;
 using TiaUtilities.Generation.IO.Xml;
 using TiaUtilities.Generation.Placeholders;
@@ -58,25 +56,34 @@ namespace TiaUtilities.Generation.IO.Module
     {
         private record GenTabRowRecord(IOGenTab GenTab, IOData IOData, int Row);
 
-        private readonly EditableTabControl tabControl;
-        private readonly SettingsControl settingsControl;
-
         private readonly MultiGridOperationHandler multiGrid;
 
         private readonly IOMainConfiguration mainConfig;
         private readonly IOExcelImportConfiguration excelImportConfig;
 
+
+        private readonly EditableTabControl tabControl;
+        private readonly SettingsControl settingsControl;
+        private readonly IOGenExcelImportControl excelImportControl;
+
+
         private readonly GridDataPreviewer<IOSuggestionData> suggestionPreviewer;
         private readonly GridHandler<IOSuggestionData> suggestionGridHandler;
 
-        //private readonly IOGenControl control;
-
         private readonly List<IOGenTab> ioTabList;
 
+        public string LocalizedName => Locale.IO_GEN_FORM_NAME;
         public List<IGenModule.ModuleControl> ModuleControls { get; init; } = [];
+
+        private bool loadingSave = false;
 
         public IOGenModule()
         {
+            this.multiGrid = new();
+
+            this.mainConfig = new();
+            this.excelImportConfig = new();
+
             this.tabControl = new()
             {
                 Dock = DockStyle.Fill,
@@ -93,45 +100,15 @@ namespace TiaUtilities.Generation.IO.Module
             };
             this.settingsControl.InitControls();
 
-            this.multiGrid = new();
-
-            this.mainConfig = new();
-            GenUtils.CopyJsonFieldsAndProperties(MainForm.Settings.PresetIOMainConfiguration, this.mainConfig);
-
-            this.excelImportConfig = new();
-            GenUtils.CopyJsonFieldsAndProperties(MainForm.Settings.PresetIOExcelImportConfiguration, this.excelImportConfig);
-
-            this.suggestionPreviewer = new();
-            this.suggestionGridHandler = new(MainForm.Settings.GridSettings, this.multiGrid, suggestionPreviewer, new(), new IOSuggesttionRowComparare()) { InitializeRowCount = 9999 };
-
-            //this.control = new(suggestionGridHandler.GetControl());
-
-            this.ioTabList = [];
-
-            this.ModuleControls = [
-                new() { Name = "Grids", RequestControlCallback = () => this.tabControl },
-                new() { Name = "Suggestions", RequestControlCallback = () => this.suggestionGridHandler.GetControl() },
-                new() {
-                    Name = Locale.GENERICS_SETTINGS,
-                    RequestControlCallback = () => UpdateSettingsControl()
-                },
-
-            ];
-        }
-
-        public void Init(GenModuleForm form)
-        {
-            #region IMPORT_EXPORT_MENU_ITEMS
-            ToolStripMenuItem importExcelMenuItem = new(Locale.IO_GEN_FORM_IMPEXP_IMPORT_EXCEL);
-            importExcelMenuItem.Click += (sender, args) =>
+            this.excelImportControl = new(MainForm.Settings.GridSettings, this.multiGrid, this.excelImportConfig)
             {
-                IOGenerationExcelImportForm excelImportForm = new(MainForm.Settings.GridSettings, this.multiGrid, this.excelImportConfig);
-
-                var dialogResult = excelImportForm.ShowDialog();
-                if (dialogResult == DialogResult.OK)
+                Dock = DockStyle.Fill,
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                AcceptCallback = importDataEnumerable =>
                 {
                     var ioDataList = new List<IOData>();
-                    foreach (var importData in excelImportForm.ImportDataEnumerable)
+                    foreach (var importData in importDataEnumerable)
                     {
                         ioDataList.Add(new IOData()
                         {
@@ -160,12 +137,36 @@ namespace TiaUtilities.Generation.IO.Module
                     }
                 }
             };
-            form.importExportMenuItem.DropDownItems.Add(importExcelMenuItem);
 
+
+            GenUtils.CopyJsonFieldsAndProperties(MainForm.Settings.PresetIOMainConfiguration, this.mainConfig);
+            GenUtils.CopyJsonFieldsAndProperties(MainForm.Settings.PresetIOExcelImportConfiguration, this.excelImportConfig);
+
+            this.suggestionPreviewer = new();
+            this.suggestionGridHandler = new(MainForm.Settings.GridSettings, this.multiGrid, suggestionPreviewer, new(), new IOSuggesttionRowComparare()) { InitializeRowCount = 9999 };
+
+            //this.control = new(suggestionGridHandler.GetControl());
+
+            this.ioTabList = [];
+
+            this.ModuleControls = [
+                new() { Name = "Grids", RequestControlCallback = () => this.tabControl },
+                new() { Name = "Suggestions", RequestControlCallback = () => this.suggestionGridHandler.GetControl() },
+                new() {
+                    Name = Locale.GENERICS_SETTINGS,
+                    RequestControlCallback = () => UpdateSettingsControl(ignoreIfInvisible: false)
+                },
+                new() { Name = "Excel Import", RequestControlCallback = () => this.excelImportControl }
+            ];
+        }
+
+        public void Init(GenModuleForm form)
+        {
+            #region IMPORT_EXPORT_MENU_ITEMS
             ToolStripMenuItem importSuggestionsMenuItem = new(Locale.IO_GEN_FORM_IMPEXP_IMPORT_SUGGESTION);
             importSuggestionsMenuItem.Click += (sender, args) =>
             {
-                var savedFilePath = MainForm.Settings.GetSavedFileDialogPath(FileDialogResources.GENERATION_IO_IMPORT_SUGGESTIONS);
+                var savedFilePath = MainForm.Settings.GetFilePath(FileDialogResources.GENERATION_IO_IMPORT_SUGGESTIONS);
 
                 var fileDialog = new CommonOpenFileDialog
                 {
@@ -227,7 +228,7 @@ namespace TiaUtilities.Generation.IO.Module
                     return;
                 }
 
-                var savedFilePath = MainForm.Settings.GetSavedFileDialogPath(FileDialogResources.GENERATION_IO_IMPORT_FROM_TABLE);
+                var savedFilePath = MainForm.Settings.GetFilePath(FileDialogResources.GENERATION_IO_IMPORT_FROM_TABLE);
 
                 var fileDialog = new CommonOpenFileDialog
                 {
@@ -307,7 +308,9 @@ namespace TiaUtilities.Generation.IO.Module
             this.multiGrid.Init(form);
             this.suggestionGridHandler.Init();
 
-            #region SUGGESTIONS GRID - EVENTS - TOOL TIP / CELL CHANGE
+            #region SUGGESTIONS_GRID
+
+            #region EVENTS(CellToolTipTextNeeded / DataChanged)
             this.suggestionGridHandler.CellToolTipTextNeeded += (sender, args) =>
             {
                 if (args.RowIndex < 0 || args.RowIndex > suggestionGridHandler.InitializeRowCount)
@@ -339,15 +342,25 @@ namespace TiaUtilities.Generation.IO.Module
                 }
             };
 
-            suggestionGridHandler.DataChanged += (sender, args) => UpdateSuggestionColors();
+            this.suggestionGridHandler.DataChanged += (sender, args) => UpdateSuggestionColors();
             #endregion
 
             #region PREVIEW
             this.suggestionPreviewer.Function = (column, ioData) => null;
             #endregion
 
+            #endregion
+
             #region TAB CONTROL
-            this.tabControl.TabAdded += (sender, args) => TabCreation(args.TabPage);
+            this.tabControl.TabAdded += (sender, args) =>
+            {
+                if(loadingSave)
+                {
+                    return;
+                }
+
+                TabCreation(args.TabPage);
+            };
             this.tabControl.TabRemoved += (sender, args) =>
             {
                 if (args.TabPage.Tag is IOGenTab ioGenTab)
@@ -358,6 +371,11 @@ namespace TiaUtilities.Generation.IO.Module
 
             this.tabControl.TabRenamed += (sender, args) =>
             {
+                if (loadingSave)
+                {
+                    return;
+                }
+
                 var newName = args.NewName;
                 foreach (var loopTab in this.ioTabList)
                 {
@@ -431,6 +449,7 @@ namespace TiaUtilities.Generation.IO.Module
         }
 
         public bool IsDirty() => mainConfig.IsDirty() || suggestionGridHandler.IsDirty() || ioTabList.Any(x => x.IsDirty()) || this.multiGrid.IsDirty();
+
         public void Wash()
         {
             this.mainConfig.Wash();
@@ -477,9 +496,9 @@ namespace TiaUtilities.Generation.IO.Module
             return placeholdersHandler;
         }
 
-        private SettingsControl UpdateSettingsControl(bool ifVisible = true)
+        private SettingsControl UpdateSettingsControl(bool ignoreIfInvisible = true)
         {
-            if (!this.settingsControl.Visible && ifVisible)
+            if (!this.settingsControl.Visible && ignoreIfInvisible)
             {
                 return this.settingsControl;
             }
@@ -562,6 +581,8 @@ namespace TiaUtilities.Generation.IO.Module
                 return;
             }
 
+            this.loadingSave = true;
+
             this.Clear();
 
             this.multiGrid.JsScriptHandler.LoadSave(loadedSave.ScriptSave);
@@ -572,9 +593,8 @@ namespace TiaUtilities.Generation.IO.Module
 
             foreach (var tabSave in loadedSave.TabSaves)
             {
-                TabPage tabPage = new();
+                TabPage tabPage = this.tabControl.AddTab();
                 TabCreation(tabPage, tabSave);
-                this.tabControl.TabPages.Add(tabPage);
             }
 
             this.UpdateSuggestionColors();
@@ -584,11 +604,8 @@ namespace TiaUtilities.Generation.IO.Module
             {
                 tab.Selected();
             }
-        }
 
-        public string GetFormLocalizatedName()
-        {
-            return Locale.IO_GEN_FORM_NAME;
+            this.loadingSave = false;
         }
 
         public IEnumerable<string> GetSuggestions(bool filterAlreadyUsed = false)
@@ -598,9 +615,8 @@ namespace TiaUtilities.Generation.IO.Module
             {
                 foreach (var ioTab in this.ioTabList)
                 {
-                    var tabVariables = ioTab.GridHandler.DataSource.GetNotEmptyData().Select(i => i.Variable?.ToLowerInvariant())
-                                                                                     .Where(i => i != null);
-                    suggestions = suggestions.Where(v => !tabVariables.Contains(v.ToLowerInvariant()));
+                    var tabVariables = ioTab.GridHandler.DataSource.GetNotEmptyData().Select(i => i.Variable).WhereNotNull();
+                    suggestions = suggestions.Where(v => !tabVariables.Contains(v, StringComparer.OrdinalIgnoreCase));
                 }
             }
             return suggestions;
@@ -657,30 +673,7 @@ namespace TiaUtilities.Generation.IO.Module
             return tabPage == null ? "" : tabPage.Text;
         }
 
-        private bool IsAnyTabSelected()
-        {
-            return this.tabControl.SelectedTab != null;
-        }
-
-        private IOTabConfiguration? GetCurrentTabConfiguration()
-        {
-            return this.GetCurrentTab()?.TabConfig;
-        }
-
         private IOGenTab? GetCurrentTab() => this.tabControl.SelectedTab?.Tag is IOGenTab genTab ? genTab : null;
-
-        private Dictionary<string, ObservableConfiguration> GetTabConfigurationDict()
-        {
-            Dictionary<string, ObservableConfiguration> dict = [];
-            foreach (var tab in this.ioTabList)
-            {
-                if (!dict.TryAdd(tab.Name, tab.TabConfig))
-                {
-                    dict.Add(tab.Name + "*", tab.TabConfig);
-                }
-            }
-            return dict;
-        }
 
         public List<GenModuleEditableTextReference> GetTextsReferences()
         {

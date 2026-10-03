@@ -3,6 +3,7 @@ using TiaUtilities.Editors.Javascript;
 using TiaUtilities.Editors.Json;
 using TiaUtilities.Editors.myScintilla;
 using TiaUtilities.Languages;
+using TiaUtilities.Resources;
 using TiaUtilities.Utility;
 using TiaUtilities.Utility.Extensions;
 using static TiaUtilities.JSScript.IJsScriptExecutionData;
@@ -14,10 +15,11 @@ namespace TiaUtilities.JSScript
         public record TabPageScriptRecord(ScriptInfo Script, JavascriptEditor Editor);
 
         private readonly JSScriptHandler scriptHandler;
-        
-        public IJsScriptExecutionData.DataDescriptor? DataDescriptor {
+
+        public IJsScriptExecutionData.DataDescriptor? DataDescriptor
+        {
             get => _dataDescriptor;
-            set 
+            set
             {
                 _dataDescriptor = value;
                 this.UpdateVariables();
@@ -27,6 +29,8 @@ namespace TiaUtilities.JSScript
 
         private readonly JsonEditor contextEditor;
         private readonly LoggerScintilla logger;
+
+        private bool initializing = false;
 
         public JSScriptForm(JSScriptHandler scriptHandler)
         {
@@ -39,7 +43,9 @@ namespace TiaUtilities.JSScript
 
         public void Init()
         {
-            this.contextEditor.InitControl(borderStyle: ScintillaNET.BorderStyle.FixedSingle, backColor: SystemColors.Control);
+            this.initializing = true;
+
+            this.contextEditor.InitControl(new() { ShowLineNumbers = false, ShowErrorIndicator = false });
             this.contextEditor.Text = "{}"; //Avoid throwing errors at startup.
 
             var contextEditorControl = this.contextEditor.GetControl();
@@ -51,11 +57,12 @@ namespace TiaUtilities.JSScript
             loggerControl.ReadOnly = true;
 
             var contextMenu = loggerControl.ContextMenuStrip;
-            if(contextMenu == null)
+            if (contextMenu == null)
             {
                 contextMenu = new();
                 loggerControl.ContextMenuStrip = contextMenu;
-            } else
+            }
+            else
             {
                 contextMenu.Items.Add(new ToolStripSeparator());
             }
@@ -64,25 +71,13 @@ namespace TiaUtilities.JSScript
 
             contextMenu.Items.Add(clearLogMenuItem);
 
-            /*
-            this.variablesTreeView.NodeMouseDoubleClick += (sender, args) =>
+            this.scriptTabControl.TabAdded += (sender, args) =>
             {
-                var currentRecord = this.GetCurrentTabPageRecord();
-                if(currentRecord == null)
+                if (this.initializing)
                 {
                     return;
                 }
 
-                if(args.Node.Tag is JSScriptVariable variable)
-                {
-                    var editor = currentRecord.Editor;
-                    editor.InsertText(variable.Name);
-                    editor.FocusControl();
-                }
-            };
-            */
-            this.scriptTabControl.TabAdded += (sender, args) =>
-            {
                 var tabPage = args.TabPage;
 
                 ScriptInfo script = new();
@@ -99,6 +94,11 @@ namespace TiaUtilities.JSScript
 
             this.scriptTabControl.TabRemoved += (sender, args) =>
             {
+                if (this.initializing)
+                {
+                    return;
+                }
+
                 var tabPage = args.TabPage;
                 if (tabPage.Tag is TabPageScriptRecord record)
                 {
@@ -110,6 +110,11 @@ namespace TiaUtilities.JSScript
 
             this.scriptTabControl.TabRenamed += (sender, args) =>
             {
+                if (this.initializing)
+                {
+                    return;
+                }
+
                 var tabPage = args.TabPage;
                 if (tabPage.Tag is not TabPageScriptRecord record)
                 {
@@ -123,10 +128,15 @@ namespace TiaUtilities.JSScript
                 record.Script.Name = fixedNewName;
             };
 
-            this.runButton.Click += (sender, args) => this.scriptHandler.ParseJS(this.GetCurrentTabPageRecord());
+            ImageList imageList = new()
+            {
+                Images = { ImageResources.PLAY_GREEN },
+                ImageSize = new(15, 15),
+            };
 
-            //this.executeAllButton.Click += (sender, args) => this.scriptHandler.ParseJS(this.GetCurrentTabPageRecord());
-            //this.executeLineButton.Click += (sender, args) => this.scriptHandler.ParseJS(this.GetCurrentTabPageRecord(), singleExecution: true);
+            this.runButton.ImageList = imageList;
+            this.runButton.ImageIndex = 0;
+            this.runButton.Click += (sender, args) => this.scriptHandler.ParseJS(this.GetCurrentTabPageRecord());
 
             foreach (var script in this.scriptHandler.Scripts)
             {
@@ -136,6 +146,8 @@ namespace TiaUtilities.JSScript
             }
 
             this.Translate();
+
+            this.initializing = false;
         }
 
         private List<string> GetTabNames(TabPage toIgnore)
@@ -161,7 +173,7 @@ namespace TiaUtilities.JSScript
 
         private void UpdateVariables()
         {
-            if(_dataDescriptor == null || (_dataDescriptor.SimpleProperties.Count == 0 && _dataDescriptor.ComplexProperties.Count == 0))
+            if (_dataDescriptor == null || (_dataDescriptor.SimpleProperties.Count == 0 && _dataDescriptor.ComplexProperties.Count == 0))
             {
                 return;
             }
@@ -227,7 +239,7 @@ namespace TiaUtilities.JSScript
         private void AddJavascriptControl(TabPage tabPage, ScriptInfo scriptInfo)
         {
             JavascriptEditor jsEditor = new();
-            jsEditor.InitControl();
+            jsEditor.InitControl(new());
             jsEditor.Text = scriptInfo.Text;
             jsEditor.TextChanged += (sender, args) => scriptInfo.Text = jsEditor.Text;
             this.UpdateEditorSuggestion(jsEditor);

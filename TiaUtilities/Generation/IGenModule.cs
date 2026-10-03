@@ -11,6 +11,8 @@ namespace TiaUtilities.Generation
             public required Func<Control> RequestControlCallback { get; init; }
         }
 
+        public string LocalizedName { get; }
+
         public List<ModuleControl> ModuleControls { get; init; }
 
         public void Init(GenModuleForm form);
@@ -19,11 +21,6 @@ namespace TiaUtilities.Generation
 
         public void ExportXML(string folderPath);
 
-        public string GetFormLocalizatedName();
-
         public void OpenPlaceholderViewer(IWin32Window? window = null);
-
-        public void ShowSettings();
-
     }
 }

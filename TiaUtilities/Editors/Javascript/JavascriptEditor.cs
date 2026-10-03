@@ -41,9 +41,9 @@ namespace TiaUtilities.Editors.Javascript
             //this.visualErrorHandler = new(this.textBox, this.jsErrorReporter);
         }
 
-        public void InitControl(ScintillaNET.BorderStyle? borderStyle = null, Color? backColor = null, Color? foreColor = null)
+        public void InitControl(EditorOptions options)
         {
-            this.jsScintilla.InitControl(borderStyle, backColor, foreColor);
+            this.jsScintilla.InitControl(options);
 
             ErrorReportThread.ISTANCE.AddReporter(this.jsErrorReporter);
             this.jsScintilla.Scintilla.Disposed += (sender, args) =>

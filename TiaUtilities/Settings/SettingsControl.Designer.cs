@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
+using TiaUtilities.CustomControls;
 using TiaUtilities.CustomControls.tableColorizable;
-using TiaUtilities.SettingsStep.CustomControls;
 
 
 namespace TiaUtilities.SettingsStep

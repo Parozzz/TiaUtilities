@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
+using TiaUtilities.CustomControls;
 using TiaUtilities.CustomControls.tableColorizable;
-using TiaUtilities.SettingsStep.CustomControls;
 using TiaUtilities.Styles;
 using TiaUtilities.Utility;
 using TiaUtilities.Utility.Extensions;

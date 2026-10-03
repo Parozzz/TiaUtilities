@@ -39,6 +39,8 @@ namespace TiaUtilities.Generation.Alarms.Module
         private readonly List<AlarmGenTab> alarmTabList;
         public IEnumerable<AlarmTabConfiguration> TabConfigurations { get => this.alarmTabList.Select(tab => tab.TabConfig); }
 
+
+        public string LocalizedName => Locale.ALARM_GEN_FORM;
         public List<IGenModule.ModuleControl> ModuleControls { get; init; }
 
         private bool loadingSave = false;
@@ -75,7 +77,7 @@ namespace TiaUtilities.Generation.Alarms.Module
                 new() { Name = Locale.DEVICE_DATA_TEMPLATE, RequestControlCallback = this.CreateTemplateControl },
                 new() {
                     Name = Locale.GENERICS_SETTINGS,
-                    RequestControlCallback = () => UpdateSettingsControl()
+                    RequestControlCallback = () => UpdateSettingsControl(ignoreifInvisible: false)
                 },
             ];
         }
@@ -88,7 +90,7 @@ namespace TiaUtilities.Generation.Alarms.Module
             ToolStripMenuItem importTemplatesFromFb = new("Import templates from FB");
             importTemplatesFromFb.Click += (sender, args) =>
             {
-                var savedFilePath = MainForm.Settings.GetSavedFileDialogPath(FileDialogResources.GENERATION_ALARM_IMPORT_TEMPLATES_FROM_FB);
+                var savedFilePath = MainForm.Settings.GetFilePath(FileDialogResources.GENERATION_ALARM_IMPORT_TEMPLATES_FROM_FB);
 
                 var fileDialog = new CommonOpenFileDialog
                 {
@@ -157,10 +159,10 @@ namespace TiaUtilities.Generation.Alarms.Module
                     tab.ParseTemplateRenamed(args.OldName, args.Template.Name);
                 }
 
-                this.UpdateSettingsControl(ifVisible: true);
+                this.UpdateSettingsControl(ignoreifInvisible: true);
             };
 
-            this.templateContainer.Added += (sender, args) =>  this.UpdateSettingsControl(ifVisible: true);
+            this.templateContainer.Added += (sender, args) =>  this.UpdateSettingsControl(ignoreifInvisible: true);
 
             #endregion
 
@@ -173,7 +175,7 @@ namespace TiaUtilities.Generation.Alarms.Module
                 }
 
                 this.TabCreation(args.TabPage);
-                this.UpdateSettingsControl(ifVisible: true);
+                this.UpdateSettingsControl(ignoreifInvisible: true);
             };
             this.tabControl.TabRemoved += (sender, args) =>
             {
@@ -187,7 +189,7 @@ namespace TiaUtilities.Generation.Alarms.Module
                     this.alarmTabList.Remove(tab);
                 }
 
-                this.UpdateSettingsControl(ifVisible: true);
+                this.UpdateSettingsControl(ignoreifInvisible: true);
             };
 
             this.tabControl.TabRenamed += (sender, args) =>
@@ -211,7 +213,7 @@ namespace TiaUtilities.Generation.Alarms.Module
                     }
                 }
 
-                this.UpdateSettingsControl(ifVisible: true);
+                this.UpdateSettingsControl(ignoreifInvisible: true);
             };
             this.tabControl.Selected += (sender, args) =>
             {
@@ -238,8 +240,6 @@ namespace TiaUtilities.Generation.Alarms.Module
             SettingsForm form = new();
             form.SetSequences(sequences);
             form.ShowDialog();
-
-            //this.settingsFormCache.ToggleVisibility();
         }
 
         private void TabCreation(TabPage tabPage, AlarmGenTabSave? save = null)
@@ -357,11 +357,6 @@ namespace TiaUtilities.Generation.Alarms.Module
             placeholderForm.Show(form);
         }
 
-        public string GetFormLocalizatedName()
-        {
-            return Locale.ALARM_GEN_FORM;
-        }
-
         private GenPlaceholderHandler? CreateGenericPlaceholderHandler()
         {
             var currentTabName = this.GetCurrentTabName();
@@ -400,9 +395,9 @@ namespace TiaUtilities.Generation.Alarms.Module
             return placeholdersHandler;
         }
 
-        private SettingsControl UpdateSettingsControl(bool ifVisible = true)
+        private SettingsControl UpdateSettingsControl(bool ignoreifInvisible = true)
         {
-            if(!this.settingsControl.Visible && ifVisible)
+            if(!this.settingsControl.Visible && ignoreifInvisible)
             {
                 return this.settingsControl;
             }

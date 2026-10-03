@@ -1,7 +1,7 @@
 ﻿using System.Drawing.Drawing2D;
 using TiaUtilities.Utility;
 
-namespace TiaUtilities.SettingsStep.CustomControls
+namespace TiaUtilities.CustomControls
 {
     public class LabelColorizable : Label
     {

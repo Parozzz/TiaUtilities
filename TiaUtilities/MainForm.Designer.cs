@@ -123,13 +123,6 @@
             importXMLToolStripMenuItem.Text = "Import XML";
             importXMLToolStripMenuItem.Click += ImportXMLToolStripMenuItem_Click;
             // 
-            // jSToolStripMenuItem
-            // 
-            jSToolStripMenuItem.Name = "jSToolStripMenuItem";
-            jSToolStripMenuItem.Size = new Size(268, 32);
-            jSToolStripMenuItem.Text = "JS";
-            jSToolStripMenuItem.Click += JSToolStripMenuItem_Click;
-            // 
             // sampleXMLMenuItem
             // 
             sampleXMLMenuItem.Name = "sampleXMLMenuItem";

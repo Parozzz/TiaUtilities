@@ -26,9 +26,9 @@ namespace TiaUtilities.Editors.Json
             this.jsonErrorReporter = new(() => this.Text, () => !this.jsonScintilla.Scintilla.CanFocus);
         }
 
-        public void InitControl(ScintillaNET.BorderStyle? borderStyle = null, Color? backColor = null, Color? foreColor = null)
+        public void InitControl(EditorOptions options)
         {
-            this.jsonScintilla.InitControl(borderStyle, backColor, foreColor);
+            this.jsonScintilla.InitControl(options);
 
             ErrorReportThread.ISTANCE.AddReporter(this.jsonErrorReporter);
             this.jsonScintilla.Scintilla.Disposed += (sender, args) =>

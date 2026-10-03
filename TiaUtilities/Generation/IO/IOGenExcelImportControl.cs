@@ -25,25 +25,21 @@ namespace TiaUtilities.Generation.IO
     {
         public const string ROW_SPECIAL_CHAR = "$";
 
-        public IEnumerable<IOGenExcelImportData> ImportDataEnumerable { get => gridHandler.DataSource.GetNotEmptyDataDict().Keys; }
+        public required Action<IEnumerable<IOGenExcelImportData>> AcceptCallback { get; init; }
 
         private readonly IOExcelImportConfiguration excelImportConfig;
         private readonly GridHandler<IOGenExcelImportData> gridHandler;
-        private readonly Action acceptCallback;
 
         public IOGenExcelImportControl(
-            GridSettings gridSettings, 
-            MultiGridOperationHandler multiGrid, 
-            IOExcelImportConfiguration configuration,
-            Action acceptCallback
+            GridSettings gridSettings,
+            MultiGridOperationHandler multiGrid,
+            IOExcelImportConfiguration configuration
         )
         {
             InitializeComponent();
 
             this.excelImportConfig = configuration;
             this.gridHandler = new(gridSettings, multiGrid, new(), new()) { InitializeRowCount = 1999 };
-
-            this.acceptCallback = acceptCallback;
 
             Init();
         }
@@ -62,35 +58,36 @@ namespace TiaUtilities.Generation.IO
 
         private void Init()
         {
-            this.MainTableLayoutPanel.Controls.Add(this.gridHandler.GetControl());
-
-            #region FORM
+            #region ACCEPT_CANCEL_BUTTONS
             this.acceptButton.Click += (sender, args) =>
             {
-                acceptCallback.Invoke();
+                var dataEnumerable = this.gridHandler.DataSource.GetNotEmptyData();
+                AcceptCallback.Invoke(dataEnumerable);
+
                 this.gridHandler.DataSource.Clear();
             };
             this.cancelButton.Click += (sender, args) => this.gridHandler.DataSource.Clear();
             #endregion
 
-            #region DRAG
+            #region GRID_EXCEL_DRAG
             this.gridHandler.ExcelDragPreview += (sender, args) => IOGenUtils.DragPreview(args, this.gridHandler);
             this.gridHandler.ExcelDragDone += (sender, args) => IOGenUtils.DragDone(args, this.gridHandler);
             #endregion
 
-            #region COLUMNS
+            #region GRID_COLUMNS
             this.gridHandler.Columns.AddTextBox(IOGenExcelImportData.ADDRESS, 80);
             this.gridHandler.Columns.AddTextBox(IOGenExcelImportData.IO_NAME, 110);
             this.gridHandler.Columns.AddTextBox(IOGenExcelImportData.COMMENT, 0);
             #endregion
 
             gridHandler.Init();
+            this.mainPanel.Controls.Add(this.gridHandler.GetControl(), 0, 0);
 
             //this.setupButton.Click += (sender, args) => new SettingsForm(this.settingsBindings).ShowDialog(this);
 
             this.importExcelButton.Click += (sender, args) =>
             {
-                var savedFilePath = MainForm.Settings.GetSavedFileDialogPath(FileDialogResources.GENERATION_IO_IMPORT_EXCEL);
+                var savedFilePath = MainForm.Settings.GetFilePath(FileDialogResources.GENERATION_IO_IMPORT_EXCEL);
 
                 var fileDialog = new CommonOpenFileDialog
                 {
@@ -118,7 +115,6 @@ namespace TiaUtilities.Generation.IO
         private void Translate()
         {
             this.importExcelButton.Text = Locale.IO_GEN_FORM_IMPEXP_IMPORT_EXCEL;
-            this.setupButton.Text = Locale.GENERICS_SETUP;
             this.acceptButton.Text = Locale.GENERICS_ACCEPT;
             this.cancelButton.Text = Locale.GENERICS_CANCEL;
         }

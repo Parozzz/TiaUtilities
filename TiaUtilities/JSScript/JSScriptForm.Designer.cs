@@ -108,7 +108,7 @@ namespace TiaUtilities.JSScript
             toolsLabel.Dock = DockStyle.Fill;
             toolsLabel.Location = new Point(3, 0);
             toolsLabel.Name = "toolsLabel";
-            toolsLabel.Size = new Size(44, 41);
+            toolsLabel.Size = new Size(44, 36);
             toolsLabel.TabIndex = 1;
             toolsLabel.Text = "Tools";
             toolsLabel.TextAlign = ContentAlignment.MiddleCenter;
@@ -119,23 +119,28 @@ namespace TiaUtilities.JSScript
             toolsSplitter.Cursor = Cursors.Hand;
             toolsSplitter.Location = new Point(53, 3);
             toolsSplitter.Name = "toolsSplitter";
-            toolsSplitter.Size = new Size(4, 35);
+            toolsSplitter.Size = new Size(4, 30);
             toolsSplitter.TabIndex = 2;
             toolsSplitter.TabStop = false;
             // 
             // runButton
             // 
-            runButton.BackgroundImage = Properties.Resources.play_6444203_007435;
+            runButton.Anchor = AnchorStyles.None;
+            runButton.AutoSize = true;
+            runButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             runButton.BackgroundImageLayout = ImageLayout.Zoom;
             runButton.FlatAppearance.BorderSize = 0;
             runButton.FlatAppearance.MouseDownBackColor = Color.DarkGray;
             runButton.FlatAppearance.MouseOverBackColor = Color.Gainsboro;
             runButton.FlatStyle = FlatStyle.Flat;
-            runButton.ImageAlign = ContentAlignment.MiddleLeft;
+            runButton.ImageAlign = ContentAlignment.TopLeft;
             runButton.Location = new Point(63, 3);
             runButton.Name = "runButton";
-            runButton.Size = new Size(35, 35);
+            runButton.Size = new Size(44, 30);
             runButton.TabIndex = 0;
+            runButton.Text = "Run";
+            runButton.TextAlign = ContentAlignment.MiddleRight;
+            runButton.TextImageRelation = TextImageRelation.ImageBeforeText;
             runButton.UseVisualStyleBackColor = true;
             // 
             // bottom

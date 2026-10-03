@@ -25,7 +25,7 @@ namespace TiaUtilities.SettingsStep.ControlFactory.Impl
             {
                 this.numberType = NumberType.SIGNED;
             }
-            else if (ReflectionUtils.IsFloatingNumber(this.ConfigurationProperty.PropertyType))
+            else if (ReflectionUtils.IsFloating(this.ConfigurationProperty.PropertyType))
             {
                 this.numberType = NumberType.FLOAT;
             }
@@ -101,7 +101,7 @@ namespace TiaUtilities.SettingsStep.ControlFactory.Impl
 
             bool propertyChangedPredicate(PropertyChangedEventArgs args)
             {
-                if (!this.ConfigurationProperty.IsPropertyChanged(args))
+                if (!this.ConfigurationProperty.IsThisPropertyChanged(args))
                 {
                     return false;
                 }

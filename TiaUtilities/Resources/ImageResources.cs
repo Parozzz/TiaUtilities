@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace TiaUtilities.Resources
 {
     public static class ImageResources
@@ -22,13 +17,15 @@ namespace TiaUtilities.Resources
         public static Image CLOSE_193002 { get => GetImage("close-193002.png"); }
         public static Image CLOSE_193002_FF001C { get => GetImage("close-193002-FF001C.png"); }
         public static Image EDIT_562275 { get => GetImage("edit-562275.png"); }
+        public static Image PLAY_GREEN => GetImage("play-6444203-007435.png");
         public static Image TRANSFER { get => GetImage("noun-transfer-7710063.png"); }
         public static Image EFFECT { get => GetImage("effect_4433833.png"); }
         public static Image SEARCH { get => GetImage("search_8180752.png"); }
         public static Image DROPDOWN { get => GetImage("dropdown_6972189.png"); }
-        public static Image DELETE { get => GetImage("delete_8439989.png"); }
-        public static Image DUPLICATE { get => GetImage("duplicate_7573756.png"); }
-        public static Image RENAME { get => GetImage("rename_6778502.png"); }
+        public static Image DELETE => GetImage("delete_8439989.png");
+        public static Image DELETE_RED => GetImage("delete_8439989_FF001C.png");
+        public static Image DUPLICATE => GetImage("duplicate_7573756.png");
+        public static Image RENAME => GetImage("rename_6778502.png");
 
         public static Image DOUBLE_ARROW_DOWN_3134107 { get => GetImage("double-arrow-down-3134107.png"); }
         public static Image DOUBLE_ARROW_UP_3134107 { get => GetImage("double-arrow-up-3134107.png"); }

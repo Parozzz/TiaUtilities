@@ -10,7 +10,7 @@ namespace TiaUtilities.SettingsStep
     {
 
         public Type PropertyType { get => targetProperty.PropertyType; }
-        public bool IsPropertyChanged(PropertyChangedEventArgs args) => args.PropertyName == targetProperty.Name;
+        public bool IsThisPropertyChanged(PropertyChangedEventArgs args) => args.PropertyName == targetProperty.Name;
 
         private readonly IReadOnlyList<PropertyInfo> propertiesChain;
         private readonly PropertyInfo targetProperty;
@@ -73,22 +73,17 @@ namespace TiaUtilities.SettingsStep
             try
             {
                 var propertyType = this.PropertyType;
+                var setValueType = setValue.GetType();
+
                 if (propertyType == setValue.GetType())
                 {
                     this.targetProperty.SetValue(targetOwner, setValue);
                 }
-                else if (ReflectionUtils.IsSignedNumber(propertyType) && setValue is long signedSetValue) //When parsed, always use maximun size!
+                else
                 {
-                    ReflectionUtils.SetPropertyCastedAsSigned(this.targetProperty, targetOwner, signedSetValue);
+                    var result = ReflectionUtils.SetPropertyIfNumber(this.targetProperty, targetOwner, setValue);
                 }
-                else if (ReflectionUtils.IsUnsignedNumber(propertyType) && setValue is ulong unsignedSetValue) //When parsed, always use maximun size!
-                {
-                    ReflectionUtils.SetPropertyCastedAsUnsigned(this.targetProperty, targetOwner, unsignedSetValue);
-                }
-                else if (ReflectionUtils.IsFloatingNumber(propertyType) && setValue is double float64Value)
-                {
-                    ReflectionUtils.SetPropertyCastedAsFloating(this.targetProperty, targetOwner, float64Value);
-                }
+
             }
             catch (Exception ex)
             {
@@ -179,7 +174,7 @@ namespace TiaUtilities.SettingsStep
             value = 0.0;
 
             var propertyType = this.PropertyType;
-            if (ReflectionUtils.IsFloatingNumber(propertyType))
+            if (ReflectionUtils.IsFloating(propertyType))
             {
                 if (propertyType == typeof(float) && float.TryParse(text, out float floatValue))
                 {

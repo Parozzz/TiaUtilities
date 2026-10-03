@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using TiaUtilities.Utility;
 
-namespace TiaUtilities.SettingsStep.CustomControls
+namespace TiaUtilities.CustomControls
 {
     public class LabelHtmlStyle : Label
     {

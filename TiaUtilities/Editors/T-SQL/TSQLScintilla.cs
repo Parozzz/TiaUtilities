@@ -36,7 +36,13 @@ namespace TiaUtilities.Editors.T_SQL
             "cast convert try_cast try_convert coalesce nullif len charindex substring replace lower upper ltrim rtrim " +
             "getdate sysdatetime getutcdate ISNULL ISNUMERIC SCOPE_IDENTITY ROW_NUMBER RANK DENSE_RANK OVER";
 
-        private static void SetScintillaLightStyle(Scintilla scintilla, Color? backColor = null, Color? foreColor = null)
+        private static void SetScintillaLightStyle(
+            Scintilla scintilla, 
+            Color? backColor = null,
+            Color? foreColor = null,
+            bool showLineNumbers = false,
+            bool showSymbolMargin = false
+        )
         {
             var defaultBackColor = backColor ?? Color.FromArgb(250, 250, 250);
             var defaultForeColor = foreColor ?? Color.FromArgb(40, 40, 40);
@@ -55,10 +61,18 @@ namespace TiaUtilities.Editors.T_SQL
             scintilla.SetKeywords(0, keywords0.ToLower());
             scintilla.SetKeywords(1, keywords1.ToLower());
 
-            scintilla.Margins[0].Type = MarginType.RightText;
-            scintilla.Margins[0].Width = 40;
-            scintilla.Margins[1].Type = MarginType.Symbol;
-            scintilla.Margins[1].Width = 15;
+            if(showLineNumbers)
+            {
+                scintilla.Margins[0].Type = MarginType.RightText;
+                scintilla.Margins[0].Width = 40;
+            }
+
+            if(showSymbolMargin)
+            {
+                scintilla.Margins[1].Type = MarginType.Symbol;
+                scintilla.Margins[1].Width = 15;
+            }
+
 
             scintilla.CaretLineBackColor = Color.FromArgb(243, 243, 243);
             scintilla.SelectionBackColor = Color.FromArgb(173, 214, 255);
@@ -168,7 +182,7 @@ namespace TiaUtilities.Editors.T_SQL
             this.brackets = new(this.Scintilla);
         }
 
-        public void InitControl(ScintillaNET.BorderStyle? borderStyle = null, Color? backColor = null, Color? foreColor = null)
+        public void InitControl(EditorOptions options)
         {
             this.Scintilla.LexerName = this.Scintilla.GetLexerIDFromLexer(Lexer.SCLEX_SQL);
 
@@ -190,13 +204,13 @@ namespace TiaUtilities.Editors.T_SQL
             this.Scintilla.AdditionalCaretsVisible = true;
             this.Scintilla.AdditionalCaretsBlink = true;
 
-            TSQLScintilla.SetScintillaLightStyle(this.Scintilla, backColor, foreColor);
+            TSQLScintilla.SetScintillaLightStyle(this.Scintilla, options.BackColor, options.ForeColor);
 
             this.Scintilla.TabWidth = 4;
             this.Scintilla.UseTabs = false;
             this.Scintilla.MouseDwellTime = 800;
 
-            this.Scintilla.BorderStyle = borderStyle ?? ScintillaNET.BorderStyle.None;
+            this.Scintilla.BorderStyle = options.BorderStyle ?? ScintillaNET.BorderStyle.None;
 
             this.Scintilla.DwellStart += (sender, e) =>
             {

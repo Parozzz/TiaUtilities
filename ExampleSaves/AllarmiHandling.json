@@ -6,6 +6,26 @@
       "Scripts": [
         {
           "Name": "JS_SCRIPT",
+          "Text": "for(var row of table.rows) \r\n{\r\n    row.name += \"_COOL\";\r\n}"
+        },
+        {
+          "Name": "JS_SCRIPT(1)",
+          "Text": ""
+        },
+        {
+          "Name": "JS_SCRIPT(2)",
+          "Text": ""
+        },
+        {
+          "Name": "JS_SCRIPT(3)",
+          "Text": ""
+        },
+        {
+          "Name": "JS_SCRIPT(4)",
+          "Text": ""
+        },
+        {
+          "Name": "JS_SCRIPT(5)",
           "Text": ""
         }
       ]

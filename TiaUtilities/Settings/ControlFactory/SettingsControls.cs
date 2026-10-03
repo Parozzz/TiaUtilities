@@ -1,7 +1,7 @@
-﻿using TiaUtilities.Editors.Javascript;
+﻿using TiaUtilities.CustomControls;
+using TiaUtilities.Editors.Javascript;
 using TiaUtilities.Editors.Json;
 using TiaUtilities.Editors.T_SQL;
-using TiaUtilities.SettingsStep.CustomControls;
 using TiaUtilities.Styles;
 using TiaUtilities.Utility;
 
@@ -96,7 +96,7 @@ namespace TiaUtilities.SettingsStep.ControlFactory
         public static JavascriptEditor GetJavascriptEditor(SettingsFactoryGeneralOptions generalOptions, SettingsFactoryCreateOptions createOptions)
         {
             JavascriptEditor editor = new();
-            editor.InitControl();
+            editor.InitControl(new());
 
             var control = editor.GetControl();
             control.MinimumSize = new(550, 480);
@@ -113,7 +113,7 @@ namespace TiaUtilities.SettingsStep.ControlFactory
         public static JsonEditor GetJSONEditor(SettingsFactoryGeneralOptions generalOptions, SettingsFactoryCreateOptions createOptions)
         {
             JsonEditor editor = new();
-            editor.InitControl();
+            editor.InitControl(new() { ShowLineNumbers = false });
 
             var control = editor.GetControl();
             control.MinimumSize = new(550, 480);
@@ -130,7 +130,7 @@ namespace TiaUtilities.SettingsStep.ControlFactory
         public static TSQLEditor GetTSQLEditor(SettingsFactoryGeneralOptions generalOptions, SettingsFactoryCreateOptions createOptions)
         {
             TSQLEditor editor = new();
-            editor.InitControl();
+            editor.InitControl(new());
 
             var control = editor.GetControl();
             control.MinimumSize = new(550, 480);

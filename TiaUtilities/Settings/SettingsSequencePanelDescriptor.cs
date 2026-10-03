@@ -127,14 +127,15 @@ namespace TiaUtilities.SettingsStep
                     {
                         factory = new SettingsBoolFactory(configurationProperty, name, description, options);
                     }
-                    else if (ReflectionUtils.IsUnsignedNumber(type) || ReflectionUtils.IsSignedNumber(type) || ReflectionUtils.IsFloatingNumber(type))
+                    else if (typeof(Enum).IsAssignableFrom(type))
+                    {//MUST BE BEFORE NUMBER! Enums are identified as numbers, so we need to check for enums first
+                        factory = new SettingsEnumFactory(configurationProperty, name, description, options) { EnumType = type };
+                    }
+                    else if (ReflectionUtils.IsUnsignedNumber(type) || ReflectionUtils.IsSignedNumber(type) || ReflectionUtils.IsFloating(type))
                     {
                         factory = new SettingsNumberFactory(configurationProperty, name, description, options);
                     }
-                    else if (typeof(Enum).IsAssignableFrom(type))
-                    {
-                        factory = new SettingsEnumFactory(configurationProperty, name, description, options) { EnumType = type };
-                    }
+
 
 
                     if (factory != null)

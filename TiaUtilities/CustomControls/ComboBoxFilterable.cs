@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using TiaUtilities.Utility;
 
-namespace TiaUtilities.SettingsStep.CustomControls
+namespace TiaUtilities.CustomControls
 {
     public class ComboBoxFilterable : ComboBox
     {
@@ -41,7 +41,7 @@ namespace TiaUtilities.SettingsStep.CustomControls
 
             this.listChangedEvent = (sender, args) =>
             {
-                if(sender is IEnumerable<object> enumerable)
+                if (sender is IEnumerable<object> enumerable)
                 {
                     base.DataSource = enumerable.Cast<object>().ToList();
                     this.CalculateWidthFromItems();
@@ -76,15 +76,18 @@ namespace TiaUtilities.SettingsStep.CustomControls
 
         private void CalculateWidthFromItems()
         {
-            if(!this.AutoWidthFromItems || this._fullDataSource == null || !this._fullDataSource.Any())
+            if (!this.AutoWidthFromItems || this._fullDataSource == null || !this._fullDataSource.Any())
             {
                 return;
             }
-            
 
-            var maxWidth = this._fullDataSource.Select(this.GetItemText).Max(n => TextRenderer.MeasureText(n, base.Font, Size.Empty, TextFormatFlags.TextBoxControl).Width);
-            this.Width = maxWidth + this.AutoWidthRightPadding;
-            this.MinimumSize = new(this.Width, this.MinimumSize.Height);
+
+            var maxWidth = this._fullDataSource
+                .Select(this.GetItemText)
+                .Max(n => TextRenderer.MeasureText(n, base.Font, Size.Empty, TextFormatFlags.TextBoxControl).Width);
+
+            this.MinimumSize = new(maxWidth + this.AutoWidthRightPadding, this.MinimumSize.Height);
+            this.Width = this.MinimumSize.Width;
         }
 
         protected override void OnDrawItem(DrawItemEventArgs e)
@@ -121,7 +124,7 @@ namespace TiaUtilities.SettingsStep.CustomControls
         {
             base.OnTextUpdate(e);
 
-            if (_fullDataSource == null || this.Sorted || this.AutoCompleteMode != AutoCompleteMode.None) //Cannot change DataSource to a Sorted Combobox
+            if (_fullDataSource == null || this.Sorted || this.AutoCompleteMode != AutoCompleteMode.None || !this.IsHandleCreated) //Cannot change DataSource to a Sorted Combobox
             {
                 return;
             }
@@ -134,7 +137,7 @@ namespace TiaUtilities.SettingsStep.CustomControls
 
             if (string.IsNullOrWhiteSpace(searchText))
             {
-                base.DataSource = _fullDataSource;
+                base.DataSource = _fullDataSource.ToList();
                 this.DroppedDown = true;
 
                 this.BeginInvoke(() =>
@@ -150,12 +153,12 @@ namespace TiaUtilities.SettingsStep.CustomControls
                     .ToList();
 
                 var listsEquality = false;
-                if(base.DataSource is IList dataSourceList)
+                if (base.DataSource is IList dataSourceList)
                 {
                     listsEquality = dataSourceList.Cast<object>().SequenceEqual(filteredList);
                 }
 
-                if(!listsEquality || !this.DroppedDown)
+                if (!listsEquality || !this.DroppedDown)
                 {
                     base.DataSource = filteredList;
                     this.DroppedDown = true;
@@ -173,7 +176,7 @@ namespace TiaUtilities.SettingsStep.CustomControls
 
         protected override void WndProc(ref Message m)
         {
-            if(m.Msg == DllImports.WM_MOUSEWHEEL && !this.DroppedDown)
+            if (m.Msg == DllImports.WM_MOUSEWHEEL && !this.DroppedDown)
             {//Avoid having the scroll wheel to change values. Annoying since scrolling can casually change value.
                 return;
             }
@@ -188,7 +191,7 @@ namespace TiaUtilities.SettingsStep.CustomControls
 
                 // Paracadute finale per intercettare l'eccezione nativa di WinForms 
                 // nel caso in cui get_SelectedItem() venga chiamato internamente.
-                base.DataSource = _fullDataSource;
+                base.DataSource = _fullDataSource?.ToList();
                 this.SelectedIndex = _fullDataSource == null || !_fullDataSource.Any() ? -1 : 0;
                 this.Text = _lastFilterString;
 
@@ -231,7 +234,7 @@ namespace TiaUtilities.SettingsStep.CustomControls
                 string currentText = this.Text;
                 int selectionStart = this.SelectionStart;
 
-                base.DataSource = _fullDataSource;
+                base.DataSource = _fullDataSource.ToList();
 
                 this.Text = currentText;
                 this.SelectionStart = selectionStart;
@@ -246,7 +249,7 @@ namespace TiaUtilities.SettingsStep.CustomControls
         private bool DefaultFilter(object? item, string searchText)
         {
             var itemText = this.GetItemText(item);
-            if(itemText == null)
+            if (itemText == null)
             {
                 return false;
             }

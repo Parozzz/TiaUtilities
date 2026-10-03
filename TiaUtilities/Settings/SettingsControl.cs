@@ -1,12 +1,10 @@
-﻿using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
-using System.Data;
+﻿using System.Data;
 using TiaUtilities.Configuration;
+using TiaUtilities.CustomControls;
 using TiaUtilities.Generation;
 using TiaUtilities.Resources;
-using TiaUtilities.SettingsStep.CustomControls;
 using TiaUtilities.Styles;
 using TiaUtilities.Utility;
-using TiaUtilities.Utility.Extensions;
 
 namespace TiaUtilities.SettingsStep
 {

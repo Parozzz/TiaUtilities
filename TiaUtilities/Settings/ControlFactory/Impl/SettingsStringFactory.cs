@@ -33,7 +33,7 @@ namespace TiaUtilities.SettingsStep.ControlFactory.Impl
 
             bool propertyChangedPredicate(PropertyChangedEventArgs args)
             {
-                if (!this.ConfigurationProperty.IsPropertyChanged(args))
+                if (!this.ConfigurationProperty.IsThisPropertyChanged(args))
                 {
                     return false;
                 }

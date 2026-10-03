@@ -1,4 +1,5 @@
-﻿using TiaUtilities.Properties;
+﻿using TiaUtilities.CustomControls;
+using TiaUtilities.Properties;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace TiaUtilities.Generation.Alarms.Template
@@ -34,13 +35,13 @@ namespace TiaUtilities.Generation.Alarms.Template
             mainPanel = new TableLayoutPanel();
             topPanel = new FlowLayoutPanel();
             selectLabel = new Label();
-            selectComboBox = new TiaUtilities.SettingsStep.CustomControls.ComboBoxFilterable();
+            selectComboBox = new ComboBoxFilterable();
             addButton = new Button();
             removeButton = new Button();
             renameButton = new Button();
             cloneButton = new Button();
-            comboBoxFilterable1 = new TiaUtilities.SettingsStep.CustomControls.ComboBoxFilterable();
-            comboBoxFilterable2 = new TiaUtilities.SettingsStep.CustomControls.ComboBoxFilterable();
+            comboBoxFilterable1 = new ComboBoxFilterable();
+            comboBoxFilterable2 = new ComboBoxFilterable();
             mainPanel.SuspendLayout();
             topPanel.SuspendLayout();
             SuspendLayout();
@@ -218,8 +219,8 @@ namespace TiaUtilities.Generation.Alarms.Template
         private Button removeButton;
         private Button renameButton;
         private Button cloneButton;
-        private SettingsStep.CustomControls.ComboBoxFilterable comboBoxFilterable1;
-        private SettingsStep.CustomControls.ComboBoxFilterable comboBoxFilterable2;
-        private SettingsStep.CustomControls.ComboBoxFilterable selectComboBox;
+        private ComboBoxFilterable comboBoxFilterable1;
+        private ComboBoxFilterable comboBoxFilterable2;
+        private ComboBoxFilterable selectComboBox;
     }
 }

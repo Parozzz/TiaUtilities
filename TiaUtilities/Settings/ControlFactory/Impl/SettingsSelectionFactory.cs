@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml;
+using System.Collections;
 using System.ComponentModel;
 using TiaUtilities.Configuration;
 using TiaUtilities.Utility;
@@ -16,8 +17,21 @@ namespace TiaUtilities.SettingsStep.ControlFactory.Impl
             
             var comboBox = SettingsControls.GetComboBox(this.GeneralOptions.Selections, this.GeneralOptions, createOptions);
 
-            var startValue = this.ConfigurationProperty.GetFrom(configuration);
-            comboBox.Text = $"{startValue}";
+            void startValueSetter(object? sender, EventArgs args)
+            {
+                comboBox.BindingContextChanged -= startValueSetter; //Unsubscribe first to avoid never clearing it if an exception is thrown.
+
+                var startValue = this.ConfigurationProperty.GetFrom(configuration);
+                if (comboBox.DataSource is IEnumerable enumerableSource)
+                {                    
+                    var selectedItem = enumerableSource
+                        .OfType<ControlUtils.ComboBoxDataSourceItem>()
+                        .FirstOrDefault(i => i.Text.Equals($"{startValue}", StringComparison.OrdinalIgnoreCase)); //Compare with string because is easier. For numbers would be a lot of work to check for each type.
+
+                    comboBox.SelectedItem = selectedItem;
+                }
+            }
+            comboBox.BindingContextChanged += startValueSetter;
 
             var setInProgress = false;
             comboBox.SelectionChangeCommitted += (sender, args) =>
@@ -32,7 +46,7 @@ namespace TiaUtilities.SettingsStep.ControlFactory.Impl
 
             bool propertyChangedPredicate(PropertyChangedEventArgs args)
             {
-                if (!this.ConfigurationProperty.IsPropertyChanged(args))
+                if (!this.ConfigurationProperty.IsThisPropertyChanged(args))
                 {
                     return false;
                 }

@@ -6,12 +6,15 @@ namespace TiaUtilities.Editors.Json
     public class JsonScintilla
     {
 
-        private static void SetScintillaLightStyle(Scintilla scintilla, Color? backColor = null, Color? foreColor = null)
+        private static void SetScintillaLightStyle(Scintilla scintilla,
+            Color? backColor = null,
+            Color? foreColor = null,
+            bool showLineNumbers = false,
+            bool showSymbolMargin = false)
         {
-            var defaultBackColor = backColor ?? Color.FromArgb(250, 250, 250); // Sfondo quasi bianco
-            var defaultForeColor = foreColor ?? Color.FromArgb(40, 40, 40); // Testo principale scuro
+            var defaultBackColor = backColor ?? Color.FromArgb(250, 250, 250);
+            var defaultForeColor = foreColor ?? Color.FromArgb(40, 40, 40);
 
-            // 2. Stile di default (Sfondo chiaro e testo base grigio scuro)
             scintilla.StyleResetDefault();
 
             scintilla.Styles[Style.Default].Font = "Consolas";
@@ -19,12 +22,19 @@ namespace TiaUtilities.Editors.Json
             scintilla.Styles[Style.Default].BackColor = defaultBackColor;
             scintilla.Styles[Style.Default].ForeColor = defaultForeColor;
 
-            scintilla.StyleClearAll(); // Applica le basi a tutti gli stili
+            scintilla.StyleClearAll();
 
-            scintilla.Margins[0].Type = MarginType.RightText;
-            scintilla.Margins[0].Width = 40;
-            scintilla.Margins[1].Type = MarginType.Symbol;
-            scintilla.Margins[1].Width = 15;
+            if (showLineNumbers)
+            {
+                scintilla.Margins[0].Type = MarginType.RightText;
+                scintilla.Margins[0].Width = 40;
+            }
+
+            if (showSymbolMargin)
+            {
+                scintilla.Margins[1].Type = MarginType.Symbol;
+                scintilla.Margins[1].Width = 15;
+            }
 
             scintilla.CaretForeColor = Color.Black;
             scintilla.SelectionBackColor = Color.FromArgb(173, 214, 255); // Evidenziazione azzurra per il testo selezionato
@@ -69,7 +79,7 @@ namespace TiaUtilities.Editors.Json
 
             // Errore di Sintassi (Sfondo rosa tenue per evidenziare stringhe o elementi non validi)
             scintilla.Styles[Style.Json.Error].ForeColor = Color.DarkRed;
-            
+
             scintilla.Indicators[ScintillaTooltip.ERROR_INDICATOR].Style = IndicatorStyle.Squiggle;
             scintilla.Indicators[ScintillaTooltip.ERROR_INDICATOR].ForeColor = Color.Red;
 
@@ -116,7 +126,7 @@ namespace TiaUtilities.Editors.Json
             this.brackets = new(this.Scintilla);
         }
 
-        public void InitControl(ScintillaNET.BorderStyle? borderStyle = null, Color? backColor = null, Color? foreColor = null)
+        public void InitControl(EditorOptions options)
         {
             this.Scintilla.LexerName = this.Scintilla.GetLexerIDFromLexer(Lexer.SCLEX_JSON);
 
@@ -131,33 +141,43 @@ namespace TiaUtilities.Editors.Json
             this.Scintilla.AdditionalCaretsVisible = true;
             this.Scintilla.AdditionalCaretsBlink = true;
 
-            JsonScintilla.SetScintillaLightStyle(this.Scintilla, backColor, foreColor);
+            JsonScintilla.SetScintillaLightStyle(
+                this.Scintilla,
+                options.BackColor, 
+                options.ForeColor, 
+                showLineNumbers: options.ShowLineNumbers,
+                showSymbolMargin: options.ShowErrorIndicator
+            );
 
             this.Scintilla.TabWidth = 4;
             this.Scintilla.UseTabs = false;
             this.Scintilla.MouseDwellTime = 800;
 
-            this.Scintilla.BorderStyle = borderStyle ?? ScintillaNET.BorderStyle.None;
+            this.Scintilla.BorderStyle = options.BorderStyle ?? ScintillaNET.BorderStyle.None;
 
             this.Scintilla.DwellStart += (sender, e) => this.tooltip.EventDwellStart_Error(e.Position);
             this.Scintilla.DwellEnd += (sender, args) => this.tooltip.EventDwellStop();
 
-            UpdateLineNumbers(0);
-            this.Scintilla.Insert += (sender, args) =>
+            if (options.ShowLineNumbers)
             {
-                if (args.LinesAdded != 0)
+                UpdateLineNumbers(0);
+                this.Scintilla.Insert += (sender, args) =>
                 {
-                    UpdateLineNumbers(Scintilla.LineFromPosition(args.Position));
-                }
-            };
+                    if (args.LinesAdded != 0)
+                    {
+                        UpdateLineNumbers(Scintilla.LineFromPosition(args.Position));
+                    }
+                };
 
-            this.Scintilla.Delete += (sender, args) =>
-            {
-                if (args.LinesAdded != 0)
+                this.Scintilla.Delete += (sender, args) =>
                 {
-                    UpdateLineNumbers(Scintilla.LineFromPosition(args.Position));
-                }
-            };
+                    if (args.LinesAdded != 0)
+                    {
+                        UpdateLineNumbers(Scintilla.LineFromPosition(args.Position));
+                    }
+                };
+            }
+
 
             /*
             this.Scintilla.BeforeDelete += (sender, args) =>
@@ -172,9 +192,9 @@ namespace TiaUtilities.Editors.Json
                 {
                     return;
                 }
-                
+
                 //this.tooltip.EventCharAdded_ShowOnBracket(args.Char);
-                
+
                 var ignoredClosingifExistsDone = this.brackets.EventCharAdded_IgnoreClosingIfExists(args.Char, ScintillaUtils.IsJSBrace);
                 if (!ignoredClosingifExistsDone)
                 {
@@ -196,7 +216,7 @@ namespace TiaUtilities.Editors.Json
             for (int i = startingAtLine; i < Scintilla.Lines.Count; i++)
             {
                 Scintilla.Lines[i].MarginStyle = Style.LineNumber;
-                Scintilla.Lines[i].MarginText = i.ToString().PadLeft(4, '0');
+                Scintilla.Lines[i].MarginText = i.ToString().PadLeft(4, ' ');
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -23,10 +24,22 @@ namespace TiaUtilities.SettingsStep.ControlFactory.Impl
             var nameLabel = SettingsControls.GetNameLabel(this.Name, this.Description, this.GeneralOptions, createOptions, () => $"{this.ConfigurationProperty?.GetFrom(configuration)}");
 
             var comboBox = SettingsControls.GetEnumComboBox(this.EnumType, this.GeneralOptions, createOptions);
-            //ControlUtils.CreateComboBoxEnumDataSource(comboBox, this.EnumType);
 
-            var startValue = this.ConfigurationProperty.GetFrom(configuration);
-            comboBox.SelectedValue = startValue;
+            void startValueSetter(object? sender, EventArgs args)
+            {
+                comboBox.BindingContextChanged -= startValueSetter; //Unsubscribe first to avoid never clearing it if an exception is thrown.
+
+                var startValue = this.ConfigurationProperty.GetFrom(configuration);
+                if (comboBox.DataSource is IEnumerable enumerableSource)
+                {
+                    var selectedItem = enumerableSource
+                        .OfType<ControlUtils.ComboBoxDataSourceItem>()
+                        .FirstOrDefault(i => Enum.Equals(i.Value, startValue));
+                    
+                    comboBox.SelectedItem = selectedItem;
+                }
+            }
+            comboBox.BindingContextChanged += startValueSetter;
 
             var setInProgress = false;
             comboBox.SelectionChangeCommitted += (sender, args) =>
@@ -42,7 +55,7 @@ namespace TiaUtilities.SettingsStep.ControlFactory.Impl
 
             bool propertyChangedPredicate(PropertyChangedEventArgs args)
             {
-                if (!this.ConfigurationProperty.IsPropertyChanged(args))
+                if (!this.ConfigurationProperty.IsThisPropertyChanged(args))
                 {
                     return false;
                 }

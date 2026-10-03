@@ -298,7 +298,12 @@ namespace TiaUtilities.Generation.Alarms.Template
             #region ADD_REMOVE_RENAME_CLOSE_BUTTONS
             ImageList buttonsImages = new()
             {
-                Images = { ImageResources.ADD_501366_007435, ImageResources.DELETE, ImageResources.RENAME, ImageResources.DUPLICATE },
+                Images = { 
+                    ImageResources.ADD_501366_007435, 
+                    ImageResources.DELETE, 
+                    ImageResources.RENAME, 
+                    ImageResources.DUPLICATE 
+                },
                 ImageSize = new(18, 18),
             };
 

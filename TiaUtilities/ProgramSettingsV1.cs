@@ -86,9 +86,14 @@ namespace TiaUtilities
 
         public ObservableConfiguration? GetPresetConfiguration(Type type) => this.presetConfigurationsDict.TryGetValue(type, out var cfg) ? cfg : null;
 
-        public string? GetSavedFileDialogPath(Guid guid)
+        public string? GetFilePath(Guid guid, string? path = null)
         {
-            return this.SaveFileDialogPath.TryGetValue(guid, out var path) ? path : null;
+            if(!string.IsNullOrWhiteSpace(path))
+            {
+                return path;
+            }
+
+            return this.SaveFileDialogPath.TryGetValue(guid, out var savedPath) ? savedPath : path;
         }
 
         public void SetSavedFileDialogPath(Guid guid, string? filePath)

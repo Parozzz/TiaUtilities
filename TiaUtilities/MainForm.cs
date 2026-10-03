@@ -14,8 +14,6 @@ using TiaUtilities.DbVisualization;
 using TiaUtilities.Generation;
 using TiaUtilities.Generation.Alarms;
 using TiaUtilities.Generation.Alarms.Module;
-using TiaUtilities.Generation.Configuration;
-using TiaUtilities.Generation.Configuration.Utility;
 using TiaUtilities.Generation.IO;
 using TiaUtilities.Generation.IO.Module;
 using TiaUtilities.Languages;
@@ -211,8 +209,7 @@ namespace TiaUtilities
 
         private void LoadToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var filePath = "";
-
+            var filePath = MainForm.Settings.GetFilePath(FileDialogResources.MAIN_FORM_LOAD_SAVE);
             var saveObject = SavesLoader.LoadWithDialog(ref filePath, ProgramConstants.SAVE_FILE_EXTENSION);
 
             GenModuleForm genForm;
@@ -260,12 +257,14 @@ namespace TiaUtilities
 
         private void ImportXMLToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            var savedFilePath = MainForm.Settings.GetFilePath(FileDialogResources.MAIN_FORM_LOAD_XML);
             var fileDialog = new CommonOpenFileDialog
             {
                 IsFolderPicker = false,
                 EnsurePathExists = true,
                 EnsureFileExists = true,
                 DefaultExtension = ".xml",
+                DefaultDirectory = Path.GetDirectoryName(savedFilePath),
                 Filters = { new CommonFileDialogFilter("XML Files (*.xml)", "*.xml") }
             };
 
@@ -310,50 +309,6 @@ namespace TiaUtilities
                 }
                 var _debug = "" + "";
             }
-        }
-
-        private string? JS;
-        private void JSToolStripMenuItem_Click(object sender, EventArgs args)
-        {
-            var configForm = new ConfigForm("TEST JS")
-            {
-                ControlWidth = 500
-            };
-
-            var mainGroup = configForm.Init();
-            mainGroup.AddJavascript().Label("Espressione").Height(300)
-                  .ControlText(JS)
-                  .TextChanged(str => JS = str);
-
-            configForm.FormClosed += (s, e) =>
-            {
-                try
-                {
-                    if (JS == null)
-                    {
-                        return;
-                    }
-
-                    using (var engine = new Engine())
-                    {
-                        engine.SetValue("nome", "cacca");
-
-                        var eval = engine.Evaluate(JS);
-
-                        var nome = engine.GetValue("nome");
-                        var _ = "";
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Utils.ShowExceptionMessage(ex);
-                }
-            };
-
-            configForm.StartShowingAtCursor();
-            configForm.Init();
-            configForm.Show(this);
-
         }
 
         private void SvgToolStripMenuItem_Click(object sender, EventArgs e)

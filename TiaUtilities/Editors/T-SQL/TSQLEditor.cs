@@ -25,9 +25,9 @@ namespace TiaUtilities.Editors.T_SQL
             this.sqlScintilla = new(scintilla);
         }
 
-        public void InitControl(ScintillaNET.BorderStyle? borderStyle = null, Color? backColor = null, Color? foreColor = null)
+        public void InitControl(EditorOptions options)
         {
-            this.sqlScintilla.InitControl(borderStyle, backColor, foreColor);
+            this.sqlScintilla.InitControl(options);
         }
 
         public void ClearUndo() => this.sqlScintilla.Scintilla.EmptyUndoBuffer();
