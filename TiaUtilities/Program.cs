@@ -14,7 +14,7 @@ namespace TiaUtilities
         //Fixed a bug where comment for alarms where generated from the hmi placeholders instead of UDT placeholders
         //Change device custom placeholder to {device_x}
         //Added ChatGPT generated icon
-        public const string VERSION = "0.5.0_GridImprov02";
+        public const string VERSION = "0.5.0_GridImprov_Beta01";
 
         /// <summary>
         /// Punto di ingresso principale dell'applicazione.
