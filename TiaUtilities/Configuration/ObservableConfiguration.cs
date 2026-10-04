@@ -52,7 +52,7 @@ namespace TiaUtilities.Configuration
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        public event PropertyChangedEventHandler? PropertyChanged = delegate { };
 
         private readonly Dictionary<string, ConfigurationObject> objectDict = [];
         private readonly Dictionary<string, List<Action>> objectChangedDict = [];
@@ -105,7 +105,7 @@ namespace TiaUtilities.Configuration
         private void ConfigurationObjectChanged(string propertyName)
         {
             this.dirty = true;
-            PropertyChanged(this, new(propertyName));
+            this.PropertyChanged?.Invoke(this, new(propertyName));
             if (objectChangedDict.TryGetValue(propertyName, out var actionList))
             {
                 foreach (var action in actionList)

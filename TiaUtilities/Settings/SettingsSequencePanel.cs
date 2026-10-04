@@ -4,13 +4,12 @@ using TiaUtilities.CustomControls;
 using TiaUtilities.CustomControls.tableColorizable;
 using TiaUtilities.Languages;
 using TiaUtilities.Resources;
-using TiaUtilities.SettingsStep.ControlFactory;
+using TiaUtilities.Settings.ControlFactory;
 using TiaUtilities.Styles;
 using TiaUtilities.Utility;
 using TiaUtilities.Utility.Extensions;
-using static TiaUtilities.SettingsStep.SettingsSequencePanel;
 
-namespace TiaUtilities.SettingsStep
+namespace TiaUtilities.Settings
 {
     public class SettingsSequencePanel
     {
@@ -75,7 +74,7 @@ namespace TiaUtilities.SettingsStep
 
                 panel.Controls.Add(this.control, column, row);
 
-                var caption = $"{Locale.SETTINGS_FORM_CONTEXT_MENU_SET_TO_OTHERS} ({count})";
+                var caption = Locale.SETTINGS_CONTROL_TRASFER_TO_OTHERS.Replace("{count}", $"{count}");
                 this.ToolTip.SetToolTip(this.control, caption);
 
                 this.click = (sender, args) =>
@@ -117,6 +116,7 @@ namespace TiaUtilities.SettingsStep
         public SettingsSequencePanelDescriptor Descriptor { get; init; }
 
         public List<SettingsSequencePanelLine> Lines { get; init; }
+        public ObservableObject<bool> Enabled { get; init; } = new(true);
 
         public bool ListenersRegistered { get; private set; } = false;
 
@@ -214,7 +214,7 @@ namespace TiaUtilities.SettingsStep
                 {
                     var (nameLabel, control, predicate) = factory.Create(configuration, new()
                     {
-                        PlaceholdersCallback = str => this.Sequence.PlaceholdersCallBack?.Invoke(str) ?? str
+                        PlaceholdersCallback = str => this.Sequence.PlaceholdersCallback?.Invoke(str) ?? str
                     });
 
                     if (control == null || predicate == null) //If no predicate is provided, means is not a binded control and will not have a label
@@ -383,8 +383,10 @@ namespace TiaUtilities.SettingsStep
                 FlatStyle = FlatStyle.Flat,
                 BorderStyle = BorderStyle.None,
 
-                Padding = symbol ? Padding.Empty : new(4),
-                Margin = Padding.Empty,
+                Padding = symbol ? Padding.Empty : new(3),
+                Margin = new(0, 3, 0, 3),
+
+                Tag = symbol ? "Symbol" : "Selectable",
             };
         }
 

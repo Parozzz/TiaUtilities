@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using TiaUtilities.Configuration;
 using TiaUtilities.Utility.Extensions;
 
-namespace TiaUtilities.SettingsStep
+namespace TiaUtilities.Settings
 {
     public class SettingsSequence
     {
@@ -45,7 +45,9 @@ namespace TiaUtilities.SettingsStep
 
         public PanelContainer Panels { get; init; }
 
-        public Func<string, string>? PlaceholdersCallBack { get; set; } = null;
+        public Func<string, string>? PlaceholdersCallback { get; set; } = null;
+        public Action<SettingsSequencePanel>? PanelCreationCallback { get; set; } = null;
+        public Action<SettingsSequencePanel>? PanelDisposeCallback { get; set; } = null;
 
         private readonly ObservableCollection<SettingsSequencePanelDescriptor> descriptors = [];
         private readonly List<SettingsSequencePanel> panelControlsList = [];
@@ -70,7 +72,12 @@ namespace TiaUtilities.SettingsStep
             if (this.panelControlsList.Count == 0)
             {
                 this.panelControlsList.AddRange(
-                    descriptors.Select(d => new SettingsSequencePanel(settingsControl, this, d, this.Configuration))
+                    descriptors.Select(d => 
+                    {
+                        var panel = new SettingsSequencePanel(settingsControl, this, d, this.Configuration);
+                        this.PanelCreationCallback?.Invoke(panel);
+                        return panel;
+                    })
                 );
                 this.panelControlsList.ForEach(p => p.RegisterListeners());
             }
@@ -80,8 +87,13 @@ namespace TiaUtilities.SettingsStep
         {
             this.panelControlsList.ForEach(p =>
             {
+                this.PanelDisposeCallback?.Invoke(p);
+
                 p.UnregisterListeners();
                 p.Lines.ForEach(l => l.DisposeAll());
+
+                this.PanelCreationCallback = null;
+                this.PanelDisposeCallback = null;
             });
         }
     }

@@ -2,11 +2,14 @@
 using TiaUtilities.Configuration;
 using TiaUtilities.CustomControls;
 using TiaUtilities.Generation;
+using TiaUtilities.Languages;
 using TiaUtilities.Resources;
+using TiaUtilities.Settings;
 using TiaUtilities.Styles;
 using TiaUtilities.Utility;
+using TiaUtilities.Utility.Extensions;
 
-namespace TiaUtilities.SettingsStep
+namespace TiaUtilities.Settings
 {
     public partial class SettingsControl : UserControl, IMessageFilter
     {
@@ -24,14 +27,19 @@ namespace TiaUtilities.SettingsStep
         private class SequencePanelMetadata
         {
             public required SettingsSequencePanel Panel { get; init; }
+            public required ObservableObjectChangedEventHandler<bool> PanelEnabledChanged { get; init; }
 
             public required LabelColorizable SelectControl { get; init; }
             public required EventHandler SelectClick { get; init; }
 
+
             public void DisposeSingleUse()
             {
+                this.Panel.Enabled.Changed -= PanelEnabledChanged;
+
                 this.SelectControl.Click -= this.SelectClick;
                 this.SelectControl.Dispose();
+
             }
         }
 
@@ -165,21 +173,23 @@ namespace TiaUtilities.SettingsStep
             this.controlsPanel.ColumnStyles.Add(new(SizeType.Percent, 50f)); //For centering the table in the panel
             #endregion
 
-            #region SELECTED_SEQUENCE
+            #region SELECTED_SEQUENCE_CHANGED
             this.selectedSequence.Changed += (sender, args) =>
             {
                 var oldSequence = args.OldValue;
                 var newSequence = args.NewValue;
 
                 this.sequenceButtonsPanel.SuspendLayout();
+
+                this.sequenceButtonsPanel.Controls.Cast<Control>().Where(c => String.Equals(c.Tag, "Symbol")).ForEach(c => c.Dispose());
+                this.sequencePanelMetadataList.ForEach(m => m.DisposeSingleUse()); //Avoid Memory leak
+
                 this.sequenceButtonsPanel.Controls.Clear();
+                this.sequencePanelMetadataList.Clear();
 
                 var oldPanel = this.selectedPanel.Value;
                 var oldPanelName = oldPanel?.Descriptor.Name;
                 this.selectedPanel.Value = null;
-
-                this.sequencePanelMetadataList.ForEach(m => m.DisposeSingleUse()); //Avoid Memory leak
-                this.sequencePanelMetadataList.Clear();
 
                 if (newSequence != null)
                 {
@@ -189,13 +199,19 @@ namespace TiaUtilities.SettingsStep
                         void click(object? sender, EventArgs args) => this.selectedPanel.Value = panel;
 
                         var selectControl = panel.CreateSelectControl();
+                        selectControl.Enabled = panel.Enabled.Value;
                         selectControl.Click += click;
 
-                        SequencePanelMetadata metadata = new() 
-                        { 
+                        void enabledChanged(object? sender, ObservableObjectChangedEventArgs<bool> args) => selectControl.Enabled = args.NewValue;
+                        panel.Enabled.Changed += enabledChanged;
+
+                        SequencePanelMetadata metadata = new()
+                        {
                             Panel = panel,
+                            PanelEnabledChanged = enabledChanged,
+
                             SelectControl = selectControl,
-                            SelectClick = click
+                            SelectClick = click,
                         };
                         this.sequencePanelMetadataList.Add(metadata);
 
@@ -203,7 +219,7 @@ namespace TiaUtilities.SettingsStep
                     }
 
                     var sequenceNameLabel = new LabelWithSymbols()
-                    {
+                    {//Selected sequence name label with a star icon to save as default configuration
                         BackColor = Color.Transparent,
 
                         Text = newSequence.FullName,
@@ -214,7 +230,7 @@ namespace TiaUtilities.SettingsStep
                         FlatStyle = FlatStyle.Flat,
                         BorderStyle = BorderStyle.None,
 
-                        Padding = new(4, 4, 0, 4),
+                        Padding = new(4, 4, 0, 4), //Fo
                         Margin = Padding.Empty,
 
                         SymbolSizePercent = 0.82f,
@@ -226,7 +242,9 @@ namespace TiaUtilities.SettingsStep
                                 TooltipTextCallback = () =>
                                 {
                                     var selectedSequence = this.selectedSequence.Value;
-                                    return $"Save as default configuration ({selectedSequence?.Name} => {selectedSequence?.Configuration.GetType().Name})";
+                                    return Locale.SETTINGS_CONTROL_SAVE_AS_DEFAULT
+                                                .Replace("{name}", selectedSequence?.Name)
+                                                .Replace("{type}", selectedSequence?.Configuration.GetType().Name);;
                                 },
                                 Color = Color.Gray,
                                 HoverColor = Color.Green,
@@ -241,9 +259,9 @@ namespace TiaUtilities.SettingsStep
                     IEnumerable<Control> l = selectControls.SelectMany((x, index) =>
                         index < selectControls.Count - 1 ?
                         new[] { x, SettingsSequencePanel.CreateSelectLabelColorizable(MIDDLE_DOT, symbol: true) } :
-                        [ x ]
+                        [x]
                     );
-                    this.sequenceButtonsPanel.Controls.AddRange([sequenceNameLabel, nameSpacerSymbolLabel, ..l]);
+                    this.sequenceButtonsPanel.Controls.AddRange([sequenceNameLabel, nameSpacerSymbolLabel, .. l]);
 
                     SettingsSequencePanel? activePanel = null;
                     if (!string.IsNullOrEmpty(oldPanelName))
@@ -257,7 +275,7 @@ namespace TiaUtilities.SettingsStep
             };
             #endregion
 
-            #region SELECTED_PANEL
+            #region SELECTED_PANEL_CHANGED
             this.selectedPanel.Changed += (sender, args) =>
             {
                 var oldPanel = args.OldValue;
@@ -269,13 +287,13 @@ namespace TiaUtilities.SettingsStep
                 this.controlsPanel.Controls.Clear();
                 this.controlsPanel.ClearCellStyles();
 
-                foreach(var metadata in this.sequencePanelMetadataList)
+                foreach (var metadata in this.sequencePanelMetadataList)
                 {
-                    if(metadata.Panel == oldPanel)
+                    if (metadata.Panel == oldPanel)
                     {
                         metadata.SelectControl.BorderWidth = 0;
                     }
-                    else if(metadata.Panel == newPanel)
+                    else if (metadata.Panel == newPanel)
                     {
                         metadata.SelectControl.BorderWidth = 1;
                         newPanel.ApplyControls(this.controlsPanel);
@@ -351,7 +369,7 @@ namespace TiaUtilities.SettingsStep
                     this.sequenceButtonsPanel.Visible = true;
                     this.controlsPanel.Visible = true;
 
-                    if(this.selectSequenceComboBox.SelectedItem is ComboBoxSourceItem item)
+                    if (this.selectSequenceComboBox.SelectedItem is ComboBoxSourceItem item)
                     {
                         this.selectedSequence.Value = item.Sequence;
                     }
@@ -368,21 +386,29 @@ namespace TiaUtilities.SettingsStep
             UpdateVisibilityForSearchMode(this.searchMode.Value);
             this.searchMode.Changed += (sender, args) => UpdateVisibilityForSearchMode(args.NewValue);
             #endregion
+
+            this.Translate();
+        }
+
+        private void Translate() 
+        {
+            this.selectConfigurationLabel.Text = Locale.SETTINGS_CONTROL_LABEL_SELECT_CONFIGURATION;
+            this.searchLabel.Text = Locale.SETTINGS_CONTROL_LABEL_SEARCH;
         }
 
         public void SelectSequenceFromName(string name)
         {
             ComboBoxSourceItem? found = null;
-            foreach(ComboBoxSourceItem item in this.selectSequenceComboBox.Items)
+            foreach (ComboBoxSourceItem item in this.selectSequenceComboBox.Items)
             {
-                if(item.Text.Contains(name, StringComparison.OrdinalIgnoreCase))
+                if (item.Text.Contains(name, StringComparison.OrdinalIgnoreCase))
                 {
                     found = item;
                     break;
                 }
             }
 
-            if(found != null)
+            if (found != null)
             {
                 this.selectSequenceComboBox.SelectedItem = found;
                 this.UpdateSelectedSequenceFromComboBox();
@@ -432,9 +458,6 @@ namespace TiaUtilities.SettingsStep
             }
 
             var items = sequences.Select(s => new ComboBoxSourceItem() { Text = s.FullName, Sequence = s });
-
-            //var maxWidth = items.Max(i => TextRenderer.MeasureText(i.Text, this.selectSequenceComboBox.Font, Size.Empty, TextFormatFlags.TextBoxControl).Width);
-            //this.selectSequenceComboBox.Width = maxWidth + (int)(maxWidth * 0.15);
             this.selectSequenceComboBox.DataSource = items;
 
             this.sequences.AddRange(sequences);
@@ -506,7 +529,7 @@ namespace TiaUtilities.SettingsStep
         protected override void OnHandleCreated(EventArgs e)
         {
             base.OnHandleCreated(e);
-            if(!this.DesignMode)
+            if (!this.DesignMode)
             {
                 Application.AddMessageFilter(this);
             }
@@ -515,7 +538,7 @@ namespace TiaUtilities.SettingsStep
         protected override void OnHandleDestroyed(EventArgs e)
         {
             base.OnHandleDestroyed(e);
-            if(!this.DesignMode)
+            if (!this.DesignMode)
             {
                 Application.RemoveMessageFilter(this);
             }
@@ -523,14 +546,14 @@ namespace TiaUtilities.SettingsStep
 
         public bool PreFilterMessage(ref Message m)
         {
-            if(m.Msg != DllImports.WM_KEYDOWN || !this.Visible)
+            if (m.Msg != DllImports.WM_KEYDOWN || !this.Visible)
             {
                 return false;
             }
 
             var point = this.PointToClient(Cursor.Position);
             var enable = this.DisplayRectangle.Contains(point) || this.ContainsFocus;
-            if(!enable)
+            if (!enable)
             {
                 return false;
             }
@@ -546,7 +569,7 @@ namespace TiaUtilities.SettingsStep
                 SelectNextPrevious(false);
                 return true;
             }
-            else if(keyData == (Keys.PageUp | Keys.Control))
+            else if (keyData == (Keys.PageUp | Keys.Control))
             {
                 var comboBox = this.selectSequenceComboBox;
                 comboBox.SelectedIndex = Math.Min(comboBox.Items.Count - 1, comboBox.SelectedIndex + 1);
@@ -554,7 +577,7 @@ namespace TiaUtilities.SettingsStep
 
                 return true;
             }
-            else if(keyData == (Keys.PageDown | Keys.Control))
+            else if (keyData == (Keys.PageDown | Keys.Control))
             {
                 var comboBox = this.selectSequenceComboBox;
                 comboBox.SelectedIndex = Math.Max(0, comboBox.SelectedIndex - 1);

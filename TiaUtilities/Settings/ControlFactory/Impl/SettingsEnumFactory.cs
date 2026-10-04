@@ -7,9 +7,11 @@ using System.Text;
 using System.Threading.Tasks;
 using TiaUtilities.Configuration;
 using TiaUtilities.Languages;
+using TiaUtilities.Settings;
+using TiaUtilities.Settings.ControlFactory;
 using TiaUtilities.Utility;
 
-namespace TiaUtilities.SettingsStep.ControlFactory.Impl
+namespace TiaUtilities.Settings.ControlFactory.Impl
 {
     public class SettingsEnumFactory(SettingsConfigurationProperty? configurationProperty, string name, string description, SettingsFactoryGeneralOptions options) 
         : SettingsControlFactory(configurationProperty, name, description, options)

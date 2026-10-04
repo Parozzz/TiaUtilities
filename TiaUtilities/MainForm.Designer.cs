@@ -302,7 +302,6 @@
         private ToolStripSeparator toolStripSeparator2;
         private ToolStripMenuItem programMenuItem;
         private ToolStripMenuItem programSettingsMenuItem;
-        private FlowLayoutPanel ioGenPanel;
         private Button ioGenButton;
         private FlowLayoutPanel bottomPanel;
         private Button alarmGenButton;

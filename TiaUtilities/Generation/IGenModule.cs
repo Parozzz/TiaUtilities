@@ -9,9 +9,14 @@ namespace TiaUtilities.Generation
         {
             public required string Name { get; init; }
             public required Func<Control> RequestControlCallback { get; init; }
+
+            /** 1: Left, 2: Right, <=0: Not specified */
+            public int DefaultPosition { get; init; } = -1;
         }
 
         public string LocalizedName { get; }
+
+        public GenModuleForm.SplitMode DefaultSplitMode { get; }
 
         public List<ModuleControl> ModuleControls { get; init; }
 

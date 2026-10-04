@@ -1,4 +1,4 @@
-﻿namespace TiaUtilities.SettingsStep.ControlFactory
+﻿namespace TiaUtilities.Settings.ControlFactory
 {
     public class SettingsFactoryCreateOptions
     {

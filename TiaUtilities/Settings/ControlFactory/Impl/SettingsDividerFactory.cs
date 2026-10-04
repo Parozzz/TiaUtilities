@@ -1,7 +1,8 @@
 ﻿using System.ComponentModel;
 using TiaUtilities.Configuration;
+using TiaUtilities.Settings.ControlFactory;
 
-namespace TiaUtilities.SettingsStep.ControlFactory.Impl
+namespace TiaUtilities.Settings.ControlFactory.Impl
 {
     public class SettingsDividerFactory(SettingsFactoryGeneralOptions options)
         : SettingsControlFactory(null, "", "", options)

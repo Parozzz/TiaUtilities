@@ -17,7 +17,7 @@ using TiaUtilities.Generation.TextsEditor;
 using TiaUtilities.JSScript;
 using TiaUtilities.Languages;
 using TiaUtilities.Resources;
-using TiaUtilities.SettingsStep;
+using TiaUtilities.Settings;
 using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.Alarms.Module
@@ -41,7 +41,9 @@ namespace TiaUtilities.Generation.Alarms.Module
 
 
         public string LocalizedName => Locale.ALARM_GEN_FORM;
+        public GenModuleForm.SplitMode DefaultSplitMode => GenModuleForm.SplitMode.NO_SPLIT;
         public List<IGenModule.ModuleControl> ModuleControls { get; init; }
+
 
         private bool loadingSave = false;
 
@@ -73,8 +75,8 @@ namespace TiaUtilities.Generation.Alarms.Module
             this.alarmTabList = [];
 
             this.ModuleControls = [
-                new() { Name = "Grids", RequestControlCallback = () => this.tabControl },
-                new() { Name = Locale.DEVICE_DATA_TEMPLATE, RequestControlCallback = this.CreateTemplateControl },
+                new() { Name = Locale.ALARM_GEN_MODULE_GRIDS, RequestControlCallback = () => this.tabControl, DefaultPosition = 1 },
+                new() { Name = Locale.ALARM_GEN_MODULE_TEMPLATE, RequestControlCallback = this.CreateTemplateControl },
                 new() {
                     Name = Locale.GENERICS_SETTINGS,
                     RequestControlCallback = () => UpdateSettingsControl(ignoreifInvisible: false)
@@ -417,25 +419,25 @@ namespace TiaUtilities.Generation.Alarms.Module
 
             List<SettingsSequence> sequenceList = [];
 
-            var globalStepDescriptors = AlarmGenUtils.CreateGlobalSettingsDescriptors();
-            var tablStepDescriptors = AlarmGenUtils.CreateTabSettingsStepDescriptors();
-            var templateStepDescriptors = AlarmGenUtils.CreateTemplateSettingsStepDescriptor();
+            var globalDescriptors = AlarmGenUtils.CreateGlobalSettingsDescriptors();
+            var tabDescriptors = AlarmGenUtils.CreateTabSettingsStepDescriptors();
+            var templateDescriptors = AlarmGenUtils.CreateTemplateSettingsStepDescriptor();
 
-            SettingsSequence globalSequence = new(this.mainConfig, "Global", "Settings") { PlaceholdersCallBack = ParsePlaceholders };
-            globalSequence.AddRange(globalStepDescriptors);
+            SettingsSequence globalSequence = new(this.mainConfig, Locale.GEN_MODULE_SETTINGS_GROUP_GLOBAL, Locale.GENERICS_SETTINGS) { PlaceholdersCallback = ParsePlaceholders };
+            globalSequence.AddRange(globalDescriptors);
             sequenceList.Add(globalSequence);
 
             foreach (var tab in this.alarmTabList)
             {
-                SettingsSequence tabSequence = new(tab.TabConfig, "Tab", tab.Name) { PlaceholdersCallBack = ParsePlaceholders };
-                tabSequence.AddRange(tablStepDescriptors);
+                SettingsSequence tabSequence = new(tab.TabConfig, Locale.GEN_MODULE_SETTINGS_GROUP_TAB, tab.Name) { PlaceholdersCallback = ParsePlaceholders };
+                tabSequence.AddRange(tabDescriptors);
                 sequenceList.Add(tabSequence);
             }
 
             foreach (var template in this.templateContainer)
             {
-                SettingsSequence templateSequence = new(template.TemplateConfig, "Template", template.Name) { PlaceholdersCallBack = ParsePlaceholders };
-                templateSequence.AddRange(templateStepDescriptors);
+                SettingsSequence templateSequence = new(template.TemplateConfig, Locale.GEN_MODULE_SETTINGS_GROUP_TEMPLATE, template.Name) { PlaceholdersCallback = ParsePlaceholders };
+                templateSequence.AddRange(templateDescriptors);
                 sequenceList.Add(templateSequence);
             }
 

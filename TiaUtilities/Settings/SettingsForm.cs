@@ -7,8 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TiaUtilities.Settings;
 
-namespace TiaUtilities.SettingsStep
+namespace TiaUtilities.Settings
 {
     public partial class SettingsForm : Form
     {

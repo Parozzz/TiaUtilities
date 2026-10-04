@@ -5,7 +5,7 @@ using TiaUtilities.Editors.T_SQL;
 using TiaUtilities.Styles;
 using TiaUtilities.Utility;
 
-namespace TiaUtilities.SettingsStep.ControlFactory
+namespace TiaUtilities.Settings.ControlFactory
 {
     internal static class SettingsControls
     {

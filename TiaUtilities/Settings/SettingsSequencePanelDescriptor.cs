@@ -1,12 +1,11 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
 using TiaUtilities.Configuration;
+using TiaUtilities.Settings.ControlFactory;
 using TiaUtilities.Settings.ControlFactory.Impl;
-using TiaUtilities.SettingsStep.ControlFactory;
-using TiaUtilities.SettingsStep.ControlFactory.Impl;
 using TiaUtilities.Utility;
 
-namespace TiaUtilities.SettingsStep
+namespace TiaUtilities.Settings
 {
     public class SettingsSequencePanelDescriptor(string name, string description = "")
     {

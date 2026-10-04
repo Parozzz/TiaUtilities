@@ -70,29 +70,29 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Grids.
+        /// </summary>
+        internal static string ALARM_GEN_MODULE_GRIDS {
+            get {
+                return ResourceManager.GetString("ALARM_GEN_MODULE_GRIDS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Templates.
+        /// </summary>
+        internal static string ALARM_GEN_MODULE_TEMPLATE {
+            get {
+                return ResourceManager.GetString("ALARM_GEN_MODULE_TEMPLATE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Group Size.
         /// </summary>
         internal static string ALARM_SETTINGS__GENERATION_ANTI_SLIP_AMOUNT {
             get {
                 return ResourceManager.GetString("ALARM_SETTINGS__GENERATION_ANTI_SLIP_AMOUNT", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Alarm number format.
-        /// </summary>
-        internal static string ALARM_SETTINGS_ALARM_NUM_PLACEHOLDER_FORMAT {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_ALARM_NUM_PLACEHOLDER_FORMAT", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a String format for all alarm number placeholders. Please follow String.Format C# guide..
-        /// </summary>
-        internal static string ALARM_SETTINGS_ALARM_NUM_PLACEHOLDER_FORMAT_DESCR {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_ALARM_NUM_PLACEHOLDER_FORMAT_DESCR", resourceCulture);
             }
         }
         
@@ -151,56 +151,362 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Enablings.
+        ///   Cerca una stringa localizzata simile a Alarm.
         /// </summary>
-        internal static string ALARM_SETTINGS_ENABLE {
+        internal static string ALARM_SETTINGS_GLOBAL_ALARM {
             get {
-                return ResourceManager.GetString("ALARM_SETTINGS_ENABLE", resourceCulture);
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_ALARM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Alarm number format.
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_ALARM_FORMAT {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_ALARM_FORMAT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a String format for all alarm number placeholders. Please follow String.Format C# guide..
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_ALARM_FORMAT_TOOLTIP {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_ALARM_FORMAT_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Settings for hmi / plc generated alarm.
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_ALARM_TOOLTIP {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_ALARM_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Grids.
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_GRIDS {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_GRIDS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Template.
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_GRIDS_TEMPLATE {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_GRIDS_TEMPLATE", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Cerca una stringa localizzata simile a Custom variable.
         /// </summary>
-        internal static string ALARM_SETTINGS_ENABLE_CUSTOM_VAR {
+        internal static string ALARM_SETTINGS_GLOBAL_GRIDS_TEMPLATE_CUSTOM_VAR {
             get {
-                return ResourceManager.GetString("ALARM_SETTINGS_ENABLE_CUSTOM_VAR", resourceCulture);
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_GRIDS_TEMPLATE_CUSTOM_VAR", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Cerca una stringa localizzata simile a Enable custom variable inside templates..
         /// </summary>
-        internal static string ALARM_SETTINGS_ENABLE_CUSTOM_VAR_DESCR {
+        internal static string ALARM_SETTINGS_GLOBAL_GRIDS_TEMPLATE_CUSTOM_VAR_TOOLTIP {
             get {
-                return ResourceManager.GetString("ALARM_SETTINGS_ENABLE_CUSTOM_VAR_DESCR", resourceCulture);
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_GRIDS_TEMPLATE_CUSTOM_VAR_TOOLTIP", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Cerca una stringa localizzata simile a Timer.
         /// </summary>
-        internal static string ALARM_SETTINGS_ENABLE_TIMER {
+        internal static string ALARM_SETTINGS_GLOBAL_GRIDS_TEMPLATE_TIMER {
             get {
-                return ResourceManager.GetString("ALARM_SETTINGS_ENABLE_TIMER", resourceCulture);
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_GRIDS_TEMPLATE_TIMER", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Cerca una stringa localizzata simile a Enable timer inside templates..
         /// </summary>
-        internal static string ALARM_SETTINGS_ENABLE_TIMER_DESCR {
+        internal static string ALARM_SETTINGS_GLOBAL_GRIDS_TEMPLATE_TIMER_TOOLTIP {
             get {
-                return ResourceManager.GetString("ALARM_SETTINGS_ENABLE_TIMER_DESCR", resourceCulture);
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_GRIDS_TEMPLATE_TIMER_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Settings for input grids.
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_GRIDS_TOOLTIP {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_GRIDS_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Alarm name.
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_HMI_ITEM_NAME {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_HMI_ITEM_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Value to be used inside siemens WinCC &quot;Name&quot; column..
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_HMI_ITEM_NAME_TOOLTIP {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_HMI_ITEM_NAME_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Alarm text.
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_HMI_ITEM_TEXT {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_HMI_ITEM_TEXT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Value to be used inside siemens WinCC &quot;Alarm Text&quot; column..
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_HMI_ITEM_TEXT_TOOLTIP {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_HMI_ITEM_TEXT_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Name.
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_HMI_NAME {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_HMI_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Trigger tag.
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_HMI_TRIGGER_TAG {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_HMI_TRIGGER_TAG", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Value to be used inside siemens WinCC &quot;Trigger Tag&quot; column..
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_HMI_TRIGGER_TAG_TOOLTIP {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_HMI_TRIGGER_TAG_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Word array as trigger (Unified).
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_HMI_USE_WORD_ARRAY {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_HMI_USE_WORD_ARRAY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Define if the &quot;Trigger Tag&quot; should use single element of the Array[*] of word inside WinCC (e.g. HmiAlm[0], increasing &quot;Trigger Bit&quot; up to 15) instead of the full tag (Increasing &quot;Trigger Bit&quot; indefinately). Used for WinCC Unified panels..
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_HMI_USE_WORD_ARRAY_TOOLTIP {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_HMI_USE_WORD_ARRAY_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a UDT Alarm variable.
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_PLC_ALARM_VARIABLE {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_PLC_ALARM_VARIABLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Alarm comment.
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_PLC_ALARM_VARIABLE_COMMENT {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_PLC_ALARM_VARIABLE_COMMENT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Alarm name.
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_PLC_ALARM_VARIABLE_NAME {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_PLC_ALARM_VARIABLE_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a SPARE alarm comment.
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_PLC_ALARM_VARIABLE_SPARE_COMMENT {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_PLC_ALARM_VARIABLE_SPARE_COMMENT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Settings for alarm variables inside PLC.
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_PLC_TOOLTIP {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_PLC_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Program Blocks.
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_PRG_BLOCKS {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_PRG_BLOCKS", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Cerca una stringa localizzata simile a FC.
         /// </summary>
-        internal static string ALARM_SETTINGS_FC {
+        internal static string ALARM_SETTINGS_GLOBAL_PRG_BLOCKS_FC {
             get {
-                return ResourceManager.GetString("ALARM_SETTINGS_FC", resourceCulture);
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_PRG_BLOCKS_FC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a FC - Segment Names.
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_PRG_BLOCKS_FC_SEGMENT_NAMES {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_PRG_BLOCKS_FC_SEGMENT_NAMES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Groupped.
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_PRG_BLOCKS_FC_SEGMENT_NAMES_GROUP_EACH {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_PRG_BLOCKS_FC_SEGMENT_NAMES_GROUP_EACH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Groupped (Spare).
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_PRG_BLOCKS_FC_SEGMENT_NAMES_GROUP_EACH_SPARE {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_PRG_BLOCKS_FC_SEGMENT_NAMES_GROUP_EACH_SPARE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Segment name inside the FC block for the GroupingType groupped..
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_PRG_BLOCKS_FC_SEGMENT_NAMES_GROUP_EACH_TOOLTIP {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_PRG_BLOCKS_FC_SEGMENT_NAMES_GROUP_EACH_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a One each.
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_PRG_BLOCKS_FC_SEGMENT_NAMES_ONE_EACH {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_PRG_BLOCKS_FC_SEGMENT_NAMES_ONE_EACH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a One each (Spare).
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_PRG_BLOCKS_FC_SEGMENT_NAMES_ONE_EACH_SPARE {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_PRG_BLOCKS_FC_SEGMENT_NAMES_ONE_EACH_SPARE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Segment name inside the FC block for the GroupingType single..
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_PRG_BLOCKS_FC_SEGMENT_NAMES_ONE_EACH_TOOLTIP {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_PRG_BLOCKS_FC_SEGMENT_NAMES_ONE_EACH_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Settings for generated plc program blocks.
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_PRG_BLOCKS_TOOLTIP {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_PRG_BLOCKS_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a UDT.
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_PRG_BLOCKS_UDT {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_PRG_BLOCKS_UDT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Generated UDT given name.
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_PRG_BLOCKS_UDT_TOOLTIP {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_PRG_BLOCKS_UDT_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a TSQL.
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_TSQL {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_TSQL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Query.
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_TSQL_QUERY {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_TSQL_QUERY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Microsoft TSQL query generated in .sql file for each alarm.
+        /// </summary>
+        internal static string ALARM_SETTINGS_GLOBAL_TSQL_TOOLTIP {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_GLOBAL_TSQL_TOOLTIP", resourceCulture);
             }
         }
         
@@ -228,87 +534,6 @@ namespace TiaUtilities.Languages {
         internal static string ALARM_SETTINGS_GROUPING_TYPE_ONE {
             get {
                 return ResourceManager.GetString("ALARM_SETTINGS_GROUPING_TYPE_ONE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Alarm name.
-        /// </summary>
-        internal static string ALARM_SETTINGS_HMI_ITEM_NAME {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_HMI_ITEM_NAME", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Value to be used inside siemens WinCC &quot;Name&quot; column..
-        /// </summary>
-        internal static string ALARM_SETTINGS_HMI_ITEM_NAME_DESCR {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_HMI_ITEM_NAME_DESCR", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Alarm text.
-        /// </summary>
-        internal static string ALARM_SETTINGS_HMI_ITEM_TEXT {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_HMI_ITEM_TEXT", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Value to be used inside siemens WinCC &quot;Alarm Text&quot; column..
-        /// </summary>
-        internal static string ALARM_SETTINGS_HMI_ITEM_TEXT_DESCR {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_HMI_ITEM_TEXT_DESCR", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Name.
-        /// </summary>
-        internal static string ALARM_SETTINGS_HMI_NAME {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_HMI_NAME", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Trigger tag.
-        /// </summary>
-        internal static string ALARM_SETTINGS_HMI_TRIGGER_TAG {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_HMI_TRIGGER_TAG", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Value to be used inside siemens WinCC &quot;Trigger Tag&quot; column..
-        /// </summary>
-        internal static string ALARM_SETTINGS_HMI_TRIGGER_TAG_DESCR {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_HMI_TRIGGER_TAG_DESCR", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Word array as trigger (Unified).
-        /// </summary>
-        internal static string ALARM_SETTINGS_HMI_USE_WORD_ARRAY {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_HMI_USE_WORD_ARRAY", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Define if the &quot;Trigger Tag&quot; should use single element of the Array[*] of word inside WinCC (e.g. HmiAlm[0], increasing &quot;Trigger Bit&quot; up to 15) instead of the full tag (Increasing &quot;Trigger Bit&quot; indefinately). Used for WinCC Unified panels..
-        /// </summary>
-        internal static string ALARM_SETTINGS_HMI_USE_WORD_ARRAY_DESCR {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_HMI_USE_WORD_ARRAY_DESCR", resourceCulture);
             }
         }
         
@@ -385,47 +610,11 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Variables prefixes.
+        ///   Cerca una stringa localizzata simile a Alarms.
         /// </summary>
-        internal static string ALARM_SETTINGS_PREFIXES {
+        internal static string ALARM_SETTINGS_TAB_ALARM {
             get {
-                return ResourceManager.GetString("ALARM_SETTINGS_PREFIXES", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Alarm.
-        /// </summary>
-        internal static string ALARM_SETTINGS_PREFIXES_ALARM {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_PREFIXES_ALARM", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Coil 1.
-        /// </summary>
-        internal static string ALARM_SETTINGS_PREFIXES_COIL1 {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_PREFIXES_COIL1", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Coil 2.
-        /// </summary>
-        internal static string ALARM_SETTINGS_PREFIXES_COIL2 {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_PREFIXES_COIL2", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Timer.
-        /// </summary>
-        internal static string ALARM_SETTINGS_PREFIXES_TIMER {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_PREFIXES_TIMER", resourceCulture);
+                return ResourceManager.GetString("ALARM_SETTINGS_TAB_ALARM", resourceCulture);
             }
         }
         
@@ -475,20 +664,83 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Grouping type.
+        ///   Cerca una stringa localizzata simile a Spare alarms.
         /// </summary>
-        internal static string ALARM_SETTINGS_TAB_GROUPING_TYPE {
+        internal static string ALARM_SETTINGS_TAB_ALARM_SPARE {
             get {
-                return ResourceManager.GetString("ALARM_SETTINGS_TAB_GROUPING_TYPE", resourceCulture);
+                return ResourceManager.GetString("ALARM_SETTINGS_TAB_ALARM_SPARE", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Define if every fc segment contains a complete template or an individual alarm.
+        ///   Cerca una stringa localizzata simile a Alarm Address.
         /// </summary>
-        internal static string ALARM_SETTINGS_TAB_GROUPING_TYPE_DESCR {
+        internal static string ALARM_SETTINGS_TAB_ALARM_SPARE_ADDRESS {
             get {
-                return ResourceManager.GetString("ALARM_SETTINGS_TAB_GROUPING_TYPE_DESCR", resourceCulture);
+                return ResourceManager.GetString("ALARM_SETTINGS_TAB_ALARM_SPARE_ADDRESS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Anti-Slip.
+        /// </summary>
+        internal static string ALARM_SETTINGS_TAB_ALARM_SPARE_ANTI_SLIP {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_TAB_ALARM_SPARE_ANTI_SLIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Defines the quantity of alarms for each template to avoid slipping. If the alarm quantity inside a template is lower than this, it will skip alarms (Or generate spare if enabled). Set 0 to disable..
+        /// </summary>
+        internal static string ALARM_SETTINGS_TAB_ALARM_SPARE_ANTI_SLIP_DESCR {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_TAB_ALARM_SPARE_ANTI_SLIP_DESCR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Generate Empty for Anti-Slip.
+        /// </summary>
+        internal static string ALARM_SETTINGS_TAB_ALARM_SPARE_ANTI_SLIP_GEN_EMPTY {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_TAB_ALARM_SPARE_ANTI_SLIP_GEN_EMPTY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Num. at end.
+        /// </summary>
+        internal static string ALARM_SETTINGS_TAB_ALARM_SPARE_EMPTY_NUM_AT_END {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_TAB_ALARM_SPARE_EMPTY_NUM_AT_END", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Quantity of spare alarm to generate at the end of FC block..
+        /// </summary>
+        internal static string ALARM_SETTINGS_TAB_ALARM_SPARE_EMPTY_NUM_AT_END_TOOLTIP {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_TAB_ALARM_SPARE_EMPTY_NUM_AT_END_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Quantity after each group.
+        /// </summary>
+        internal static string ALARM_SETTINGS_TAB_ALARM_SPARE_GROUP_SKIP {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_TAB_ALARM_SPARE_GROUP_SKIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Quantity of spare alarm to generate at the end of each template..
+        /// </summary>
+        internal static string ALARM_SETTINGS_TAB_ALARM_SPARE_GROUP_SKIP_TOOLTIP {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_TAB_ALARM_SPARE_GROUP_SKIP_TOOLTIP", resourceCulture);
             }
         }
         
@@ -547,209 +799,164 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Segment Names.
-        /// </summary>
-        internal static string ALARM_SETTINGS_TAB_SEGMENT_NAME {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_TAB_SEGMENT_NAME", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Groupped.
-        /// </summary>
-        internal static string ALARM_SETTINGS_TAB_SEGMENT_NAME_GROUP_EACH {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_TAB_SEGMENT_NAME_GROUP_EACH", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Segment name inside the FC block for the GroupingType groupped..
-        /// </summary>
-        internal static string ALARM_SETTINGS_TAB_SEGMENT_NAME_GROUP_EACH_DESCR {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_TAB_SEGMENT_NAME_GROUP_EACH_DESCR", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Groupped (Spare).
-        /// </summary>
-        internal static string ALARM_SETTINGS_TAB_SEGMENT_NAME_GROUP_EACH_SPARE {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_TAB_SEGMENT_NAME_GROUP_EACH_SPARE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a One each.
-        /// </summary>
-        internal static string ALARM_SETTINGS_TAB_SEGMENT_NAME_ONE_EACH {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_TAB_SEGMENT_NAME_ONE_EACH", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Segment name inside the FC block for the GroupingType single..
-        /// </summary>
-        internal static string ALARM_SETTINGS_TAB_SEGMENT_NAME_ONE_EACH_DESCR {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_TAB_SEGMENT_NAME_ONE_EACH_DESCR", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a One each (Spare).
-        /// </summary>
-        internal static string ALARM_SETTINGS_TAB_SEGMENT_NAME_ONE_EACH_SPARE {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_TAB_SEGMENT_NAME_ONE_EACH_SPARE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Spare alarms.
-        /// </summary>
-        internal static string ALARM_SETTINGS_TAB_SPARE {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_TAB_SPARE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Alarm Address.
-        /// </summary>
-        internal static string ALARM_SETTINGS_TAB_SPARE_ADDRESS {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_TAB_SPARE_ADDRESS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Anti-Slip.
-        /// </summary>
-        internal static string ALARM_SETTINGS_TAB_SPARE_ANTI_SLIP {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_TAB_SPARE_ANTI_SLIP", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Defines the quantity of alarms for each template to avoid slipping. If the alarm quantity inside a template is lower than this, it will skip alarms (Or generate spare if enabled). Set 0 to disable..
-        /// </summary>
-        internal static string ALARM_SETTINGS_TAB_SPARE_ANTI_SLIP_DESCR {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_TAB_SPARE_ANTI_SLIP_DESCR", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Generate Empty for Anti-Slip.
-        /// </summary>
-        internal static string ALARM_SETTINGS_TAB_SPARE_ANTI_SLIP_GEN_EMPTY {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_TAB_SPARE_ANTI_SLIP_GEN_EMPTY", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Num. at end.
-        /// </summary>
-        internal static string ALARM_SETTINGS_TAB_SPARE_EMPTY_NUM_AT_END {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_TAB_SPARE_EMPTY_NUM_AT_END", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Quantity of spare alarm to generate at the end of FC block..
-        /// </summary>
-        internal static string ALARM_SETTINGS_TAB_SPARE_EMPTY_NUM_AT_END_DESCR {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_TAB_SPARE_EMPTY_NUM_AT_END_DESCR", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Quantity after each group.
-        /// </summary>
-        internal static string ALARM_SETTINGS_TAB_SPARE_GROUP_SKIP {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_TAB_SPARE_GROUP_SKIP", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Quantity of spare alarm to generate at the end of each template..
-        /// </summary>
-        internal static string ALARM_SETTINGS_TAB_SPARE_GROUP_SKIP_DESCR {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_TAB_SPARE_GROUP_SKIP_DESCR", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Templates default.
-        /// </summary>
-        internal static string ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Cerca una stringa localizzata simile a Coil 1 Defaults.
         /// </summary>
-        internal static string ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_COIL1 {
+        internal static string ALARM_SETTINGS_TAB_PLC_DEFAULTS_COIL1 {
             get {
-                return ResourceManager.GetString("ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_COIL1", resourceCulture);
+                return ResourceManager.GetString("ALARM_SETTINGS_TAB_PLC_DEFAULTS_COIL1", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Cerca una stringa localizzata simile a Coil 2 Defaults.
         /// </summary>
-        internal static string ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_COIL2 {
+        internal static string ALARM_SETTINGS_TAB_PLC_DEFAULTS_COIL2 {
             get {
-                return ResourceManager.GetString("ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_COIL2", resourceCulture);
+                return ResourceManager.GetString("ALARM_SETTINGS_TAB_PLC_DEFAULTS_COIL2", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Cerca una stringa localizzata simile a Custom variable Defaults.
         /// </summary>
-        internal static string ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_CUSTOM_VAR {
+        internal static string ALARM_SETTINGS_TAB_PLC_DEFAULTS_CUSTOM_VAR {
             get {
-                return ResourceManager.GetString("ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_CUSTOM_VAR", resourceCulture);
+                return ResourceManager.GetString("ALARM_SETTINGS_TAB_PLC_DEFAULTS_CUSTOM_VAR", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Cerca una stringa localizzata simile a Timer Defaults.
         /// </summary>
-        internal static string ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_TIMER {
+        internal static string ALARM_SETTINGS_TAB_PLC_DEFAULTS_TIMER {
             get {
-                return ResourceManager.GetString("ALARM_SETTINGS_TAB_TEMPLATE_DEFAULTS_TIMER", resourceCulture);
+                return ResourceManager.GetString("ALARM_SETTINGS_TAB_PLC_DEFAULTS_TIMER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a It must be formatted the same as stardard Time type in TiaPortal (eg. T#0s, T#100ms).
+        /// </summary>
+        internal static string ALARM_SETTINGS_TAB_PLC_DEFAULTS_TIMER_VALUE_TOOLTIP {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_TAB_PLC_DEFAULTS_TIMER_VALUE_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a FC.
+        /// </summary>
+        internal static string ALARM_SETTINGS_TAB_PLC_FC {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_TAB_PLC_FC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Grouping type.
+        /// </summary>
+        internal static string ALARM_SETTINGS_TAB_PLC_GROUPING_TYPE {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_TAB_PLC_GROUPING_TYPE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Define if every fc segment contains a complete template or an individual alarm.
+        /// </summary>
+        internal static string ALARM_SETTINGS_TAB_PLC_GROUPING_TYPE_DESCR {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_TAB_PLC_GROUPING_TYPE_DESCR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Variables prefixes.
+        /// </summary>
+        internal static string ALARM_SETTINGS_TAB_PLC_PREFIXES {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_TAB_PLC_PREFIXES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Alarm.
+        /// </summary>
+        internal static string ALARM_SETTINGS_TAB_PLC_PREFIXES_ALARM {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_TAB_PLC_PREFIXES_ALARM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Coil 1.
+        /// </summary>
+        internal static string ALARM_SETTINGS_TAB_PLC_PREFIXES_COIL1 {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_TAB_PLC_PREFIXES_COIL1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Coil 2.
+        /// </summary>
+        internal static string ALARM_SETTINGS_TAB_PLC_PREFIXES_COIL2 {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_TAB_PLC_PREFIXES_COIL2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Timer.
+        /// </summary>
+        internal static string ALARM_SETTINGS_TAB_PLC_PREFIXES_TIMER {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_TAB_PLC_PREFIXES_TIMER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Prefix used for generating variable associated with alarm chain (Can be previewed inside templates)..
+        /// </summary>
+        internal static string ALARM_SETTINGS_TAB_PLC_PREFIXES_TOOLTIP {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_TAB_PLC_PREFIXES_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Templates default.
+        /// </summary>
+        internal static string ALARM_SETTINGS_TAB_PLC_TEMPLATE_DEFAULTS {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_TAB_PLC_TEMPLATE_DEFAULTS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Alarms.
+        /// </summary>
+        internal static string ALARM_SETTINGS_TEMPLATE_ALARMS {
+            get {
+                return ResourceManager.GetString("ALARM_SETTINGS_TEMPLATE_ALARMS", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Cerca una stringa localizzata simile a Standalone Alarms.
         /// </summary>
-        internal static string ALARM_SETTINGS_TEMPLATE_STANDALONE_ALARMS {
+        internal static string ALARM_SETTINGS_TEMPLATE_ALARMS_STANDALONE {
             get {
-                return ResourceManager.GetString("ALARM_SETTINGS_TEMPLATE_STANDALONE_ALARMS", resourceCulture);
+                return ResourceManager.GetString("ALARM_SETTINGS_TEMPLATE_ALARMS_STANDALONE", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Cerca una stringa localizzata simile a Allows to ignore all the default values from the alarm setup. Useful for generating standalone alarms that are not linked to a device..
         /// </summary>
-        internal static string ALARM_SETTINGS_TEMPLATE_STANDALONE_ALARMS_DESC {
+        internal static string ALARM_SETTINGS_TEMPLATE_ALARMS_STANDALONE_TOOLTIP {
             get {
-                return ResourceManager.GetString("ALARM_SETTINGS_TEMPLATE_STANDALONE_ALARMS_DESC", resourceCulture);
+                return ResourceManager.GetString("ALARM_SETTINGS_TEMPLATE_ALARMS_STANDALONE_TOOLTIP", resourceCulture);
             }
         }
         
@@ -777,60 +984,6 @@ namespace TiaUtilities.Languages {
         internal static string ALARM_SETTINGS_TEXT_LIST_FULL {
             get {
                 return ResourceManager.GetString("ALARM_SETTINGS_TEXT_LIST_FULL", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a UDT.
-        /// </summary>
-        internal static string ALARM_SETTINGS_UDT {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_UDT", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a UDT Alarm variable.
-        /// </summary>
-        internal static string ALARM_SETTINGS_UDT_ALARM_VARIABLE {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_UDT_ALARM_VARIABLE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Alarm comment.
-        /// </summary>
-        internal static string ALARM_SETTINGS_UDT_ALARM_VARIABLE_COMMENT {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_UDT_ALARM_VARIABLE_COMMENT", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Alarm name.
-        /// </summary>
-        internal static string ALARM_SETTINGS_UDT_ALARM_VARIABLE_NAME {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_UDT_ALARM_VARIABLE_NAME", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a SPARE alarm comment.
-        /// </summary>
-        internal static string ALARM_SETTINGS_UDT_ALARM_VARIABLE_SPARE_COMMENT {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_UDT_ALARM_VARIABLE_SPARE_COMMENT", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Generated UDT given name.
-        /// </summary>
-        internal static string ALARM_SETTINGS_UDT_DESCR {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_UDT_DESCR", resourceCulture);
             }
         }
         
@@ -1249,6 +1402,16 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Left click: Show in panel 1
+        ///Right click: Show in panel 2.
+        /// </summary>
+        internal static string GEN_FORM_MODULE_LABEL_TOOLTIP {
+            get {
+                return ResourceManager.GetString("GEN_FORM_MODULE_LABEL_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Tools.
         /// </summary>
         internal static string GEN_FORM_TOOLS {
@@ -1263,6 +1426,69 @@ namespace TiaUtilities.Languages {
         internal static string GEN_FORM_TOOLS_PLACEHOLDER_VIEWER {
             get {
                 return ResourceManager.GetString("GEN_FORM_TOOLS_PLACEHOLDER_VIEWER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a View.
+        /// </summary>
+        internal static string GEN_FORM_VIEW {
+            get {
+                return ResourceManager.GetString("GEN_FORM_VIEW", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Single.
+        /// </summary>
+        internal static string GEN_FORM_VIEW_SINGLE {
+            get {
+                return ResourceManager.GetString("GEN_FORM_VIEW_SINGLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Split horizontal.
+        /// </summary>
+        internal static string GEN_FORM_VIEW_SPLIT_HORIZONTAL {
+            get {
+                return ResourceManager.GetString("GEN_FORM_VIEW_SPLIT_HORIZONTAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Split vertical.
+        /// </summary>
+        internal static string GEN_FORM_VIEW_SPLIT_VERTICAL {
+            get {
+                return ResourceManager.GetString("GEN_FORM_VIEW_SPLIT_VERTICAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Global.
+        /// </summary>
+        internal static string GEN_MODULE_SETTINGS_GROUP_GLOBAL {
+            get {
+                return ResourceManager.GetString("GEN_MODULE_SETTINGS_GROUP_GLOBAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Tab.
+        /// </summary>
+        internal static string GEN_MODULE_SETTINGS_GROUP_TAB {
+            get {
+                return ResourceManager.GetString("GEN_MODULE_SETTINGS_GROUP_TAB", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Template.
+        /// </summary>
+        internal static string GEN_MODULE_SETTINGS_GROUP_TEMPLATE {
+            get {
+                return ResourceManager.GetString("GEN_MODULE_SETTINGS_GROUP_TEMPLATE", resourceCulture);
             }
         }
         
@@ -1398,6 +1624,15 @@ namespace TiaUtilities.Languages {
         internal static string GENERICS_NUMBER {
             get {
                 return ResourceManager.GetString("GENERICS_NUMBER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a PLC.
+        /// </summary>
+        internal static string GENERICS_PLC {
+            get {
+                return ResourceManager.GetString("GENERICS_PLC", resourceCulture);
             }
         }
         
@@ -1861,6 +2096,33 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Excel Import.
+        /// </summary>
+        internal static string IO_GEN_MODULE_EXCEL_IMPORT {
+            get {
+                return ResourceManager.GetString("IO_GEN_MODULE_EXCEL_IMPORT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Grids.
+        /// </summary>
+        internal static string IO_GEN_MODULE_GRIDS {
+            get {
+                return ResourceManager.GetString("IO_GEN_MODULE_GRIDS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Suggestions.
+        /// </summary>
+        internal static string IO_GEN_MODULE_SUGGESTIONS {
+            get {
+                return ResourceManager.GetString("IO_GEN_MODULE_SUGGESTIONS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Bit.
         /// </summary>
         internal static string IO_GROUPING_TYPE_BIT {
@@ -2265,27 +2527,63 @@ namespace TiaUtilities.Languages {
         /// <summary>
         ///   Cerca una stringa localizzata simile a Open other configuration fast edit.
         /// </summary>
-        internal static string SETTINGS_FORM_CONTEXT_MENU_OPEN_OTHER_CONF_FAST_EDIT {
+        internal static string SETTINGS_CONTROL_CONTEXT_MENU_OPEN_OTHER_CONF_FAST_EDIT {
             get {
-                return ResourceManager.GetString("SETTINGS_FORM_CONTEXT_MENU_OPEN_OTHER_CONF_FAST_EDIT", resourceCulture);
+                return ResourceManager.GetString("SETTINGS_CONTROL_CONTEXT_MENU_OPEN_OTHER_CONF_FAST_EDIT", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Transfer values to all others configurations.
+        ///   Cerca una stringa localizzata simile a Search configurations values by name.
         /// </summary>
-        internal static string SETTINGS_FORM_CONTEXT_MENU_SET_TO_OTHERS {
+        internal static string SETTINGS_CONTROL_LABEL_SEARCH {
             get {
-                return ResourceManager.GetString("SETTINGS_FORM_CONTEXT_MENU_SET_TO_OTHERS", resourceCulture);
+                return ResourceManager.GetString("SETTINGS_CONTROL_LABEL_SEARCH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Select configuration.
+        /// </summary>
+        internal static string SETTINGS_CONTROL_LABEL_SELECT_CONFIGURATION {
+            get {
+                return ResourceManager.GetString("SETTINGS_CONTROL_LABEL_SELECT_CONFIGURATION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Save as default configuration ({name} =&gt; {type}).
+        /// </summary>
+        internal static string SETTINGS_CONTROL_SAVE_AS_DEFAULT {
+            get {
+                return ResourceManager.GetString("SETTINGS_CONTROL_SAVE_AS_DEFAULT", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Cerca una stringa localizzata simile a Support placeholders..
         /// </summary>
-        internal static string SETTINGS_FORM_SECTION_HAS_PLACEHOLDER_TOOLTIP {
+        internal static string SETTINGS_CONTROL_SECTION_HAS_PLACEHOLDER_TOOLTIP {
             get {
-                return ResourceManager.GetString("SETTINGS_FORM_SECTION_HAS_PLACEHOLDER_TOOLTIP", resourceCulture);
+                return ResourceManager.GetString("SETTINGS_CONTROL_SECTION_HAS_PLACEHOLDER_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Transfer values to all others configurations ({count}).
+        /// </summary>
+        internal static string SETTINGS_CONTROL_TRASFER_TO_OTHERS {
+            get {
+                return ResourceManager.GetString("SETTINGS_CONTROL_TRASFER_TO_OTHERS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Template.
+        /// </summary>
+        internal static string Te {
+            get {
+                return ResourceManager.GetString("Te", resourceCulture);
             }
         }
     }

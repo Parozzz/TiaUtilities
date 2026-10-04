@@ -6,9 +6,9 @@ using TiaUtilities.Generation.IO.Configurations;
 using TiaUtilities.Generation.IO.Data;
 using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Languages;
-using TiaUtilities.SettingsStep;
+using TiaUtilities.Settings;
 using TiaUtilities.Utility;
-using static TiaUtilities.SettingsStep.ControlFactory.SettingsFactoryGeneralOptions;
+using static TiaUtilities.Settings.ControlFactory.SettingsFactoryGeneralOptions;
 
 namespace TiaUtilities.Generation.IO
 {
@@ -18,6 +18,9 @@ namespace TiaUtilities.Generation.IO
         private static readonly List<SettingsSequencePanelDescriptor> GLOBAL_DESCRIPTORS = [];
         private static readonly List<SettingsSequencePanelDescriptor> TAB_DESCRIPTORS = [];
         private static readonly List<SettingsSequencePanelDescriptor> EXCEL_DESCRIPTORS = [];
+
+        public static SettingsSequencePanelDescriptor? GLOBAL_ALIAS_DB_DESCRIPTOR { get; private set; } = null;
+        public static SettingsSequencePanelDescriptor? GLOBAL_ALIAS_TAG_TABLE_DESCRIPTOR { get; private set; } = null;
 
         public static void DragPreview<T>(GridExcelDragEventArgs eventArgs, GridHandler<T> gridHandler) where T : GridData
         {
@@ -97,14 +100,14 @@ namespace TiaUtilities.Generation.IO
             {
                 return GLOBAL_DESCRIPTORS;
             }
-            var genericStepDescriptor = new SettingsSequencePanelDescriptor(Locale.GENERICS_CONFIGURATION)
+            var genericDescriptor = new SettingsSequencePanelDescriptor(Locale.GENERICS_CONFIGURATION)
             .CreateBinder<IOMainConfiguration>()
             .StartGroup(Locale.GENERICS_CONFIGURATION)
                 .Add(x => x.GroupingType, Locale.IO_SETTINGS_GROUPING_TYPE, Locale.IO_SETTINGS_GROUPING_TYPE_DESC)
                 .Add(x => x.MemoryType, Locale.IO_SETTINGS_MEMORY_TYPE, Locale.IO_SETTINGS_MEMORY_TYPE_DESC)
             .End();
 
-            var ioTableStepDescriptor = new SettingsSequencePanelDescriptor(Locale.IO_GEN_CONFIG_IO_TABLE)
+            var ioTableDescriptor = new SettingsSequencePanelDescriptor(Locale.IO_GEN_CONFIG_IO_TABLE)
                 .CreateBinder<IOMainConfiguration>()
                 .StartGroup(Locale.IO_GEN_CONFIG_IO_TABLE)
                     .Add(x => x.IOTableName, Locale.GENERICS_NAME, Locale.IO_SETTINGS_IO_TABLE_NAME_DESC, options: new() { SupportPlaceholders = true })
@@ -112,7 +115,7 @@ namespace TiaUtilities.Generation.IO
                     .Add(x => x.DefaultIoName, Locale.IO_SETTINGS_IO_TABLE_DEFAULT_NAME, Locale.IO_SETTINGS_IO_TABLE_DEFAULT_NAME_DESC, options: new() { SupportPlaceholders = true })
                 .End();
 
-            var aliasDbStepDescriptor = new SettingsSequencePanelDescriptor(Locale.IO_GEN_CONFIG_ALIAS_DB/*, enabledFunc: () => mainConfig.MemoryType == IOMemoryTypeEnum.DB*/)
+            GLOBAL_ALIAS_DB_DESCRIPTOR = new SettingsSequencePanelDescriptor(Locale.IO_GEN_CONFIG_ALIAS_DB)
                 .CreateBinder<IOMainConfiguration>()
                 .StartGroup(Locale.IO_GEN_CONFIG_ALIAS_DB)
                     .Add(x => x.DBName, Locale.GENERICS_NAME, Locale.IO_SETTINGS_ALIAS_DB_NAME_DESC.Replace("<placeholder>", GenPlaceholders.IO.CONFIG_DB_NAME), options: new() { SupportPlaceholders = true })
@@ -121,7 +124,7 @@ namespace TiaUtilities.Generation.IO
                     .Add(x => x.DefaultDBOutputVariable, Locale.IO_SETTINGS_ALIAS_DB_OUTPUT_DEFAULT, "", options: new() { SupportPlaceholders = true })
                 .End();
 
-            var aliasTableStepDescriptor = new SettingsSequencePanelDescriptor(Locale.IO_GEN_CONFIG_ALIAS_TABLE/*, enabledFunc: () => mainConfig.MemoryType == IOMemoryTypeEnum.MERKER*/)
+           GLOBAL_ALIAS_TAG_TABLE_DESCRIPTOR = new SettingsSequencePanelDescriptor(Locale.IO_GEN_CONFIG_ALIAS_TABLE)
                 .CreateBinder<IOMainConfiguration>()
                 .StartGroup(Locale.IO_GEN_CONFIG_ALIAS_TABLE)
                     .Add(x => x.VariableTableName, Locale.GENERICS_NAME, Locale.IO_SETTINGS_ALIAS_TABLE_NAME_DESC, options: new() { SupportPlaceholders = true })
@@ -132,7 +135,7 @@ namespace TiaUtilities.Generation.IO
                     .Add(x => x.DefaultMerkerOutputVariable, Locale.IO_SETTINGS_ALIAS_TABLE_OUTPUT_DEFAULT_NAME, "", options: new() { SupportPlaceholders = true })
                 .End();
 
-            GLOBAL_DESCRIPTORS.AddRange([genericStepDescriptor, ioTableStepDescriptor, aliasDbStepDescriptor, aliasTableStepDescriptor]);
+            GLOBAL_DESCRIPTORS.AddRange([genericDescriptor, ioTableDescriptor, GLOBAL_ALIAS_DB_DESCRIPTOR, GLOBAL_ALIAS_TAG_TABLE_DESCRIPTOR]);
             return GLOBAL_DESCRIPTORS;
         }
 

@@ -9,7 +9,7 @@ namespace TiaUtilities.Generation.GridHandler
         public DataGridViewColumn Column { get; init; } = column;
         public GridDataColumn DataColumn { get; init; } = dataColumn;
         public int Width { get; init; } = width;
-        public bool Visible { get; set; } = true;
+        public bool Visible { get => this.Column.Visible; set => this.Column.Visible = value; }
     }
 
     public class GridColumnHandler(ExcelLikeDataGridView dataGridView)
@@ -58,32 +58,20 @@ namespace TiaUtilities.Generation.GridHandler
             return column;
         }
 
-        public void Show(GridDataColumn dataColumn)
-        {
-            this.ChangeVisibility(dataColumn, visible: true);
-        }
+        public void Show(GridDataColumn dataColumn) => this.ChangeVisibility(dataColumn, visible: true);
 
-        public void Hide(GridDataColumn dataColumn)
-        {
-            this.ChangeVisibility(dataColumn, visible: false);
-        }
+        public void Hide(GridDataColumn dataColumn) => this.ChangeVisibility(dataColumn, visible: false);
 
-        public void ChangeVisibility(GridDataColumn dataColumn, bool visible, bool init = false)
+        public void ChangeVisibility(GridDataColumn dataColumn, bool visible)
         {
             var columnInfo = columnInfoList.FirstOrDefault(i => i.DataColumn == dataColumn);
-            if (columnInfo == null)
+            if (columnInfo != null)
             {
-                return;
-            }
-
-            columnInfo.Visible = visible;
-            if (init)
-            {
-                this.InitializeColumns();
+                columnInfo.Visible = visible;
             }
         }
 
-        public void InitializeColumns()
+        internal void InitializeColumns()
         {
             dataGridView.Columns.Clear();
 
@@ -99,8 +87,6 @@ namespace TiaUtilities.Generation.GridHandler
                 column.Width = columnInfo.Width;
                 column.MinimumWidth = 15;
                 column.SortMode = DataGridViewColumnSortMode.Programmatic;
-
-                column.Visible = columnInfo.Visible;
 
                 dataGridView.Columns.Add(column);
             }

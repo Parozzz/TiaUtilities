@@ -5,8 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TiaUtilities.Configuration;
+using TiaUtilities.Settings.ControlFactory;
 
-namespace TiaUtilities.SettingsStep.ControlFactory.Impl
+namespace TiaUtilities.Settings.ControlFactory.Impl
 {
     public class SettingsTextFactory(string name, string description, SettingsFactoryGeneralOptions options) 
         : SettingsControlFactory(null, name, description, options)

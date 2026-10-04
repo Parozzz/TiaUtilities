@@ -1,4 +1,4 @@
-﻿namespace TiaUtilities.SettingsStep
+﻿namespace TiaUtilities.Settings
 {
     public class SettingsSequencePanelLine
     {

@@ -6,7 +6,7 @@ using TiaUtilities.Styles;
 using TiaUtilities.Utility;
 using TiaUtilities.Utility.Extensions;
 
-namespace TiaUtilities.SettingsStep
+namespace TiaUtilities.Settings
 {
     public class SettingsSearchPanel
     {

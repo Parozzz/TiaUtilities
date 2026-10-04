@@ -1,4 +1,6 @@
-﻿namespace TiaUtilities.Utility.Extensions
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace TiaUtilities.Utility.Extensions
 {
     public static class DictionaryExtensions
     {

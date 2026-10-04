@@ -18,7 +18,7 @@ using TiaUtilities.Generation.IO;
 using TiaUtilities.Generation.IO.Module;
 using TiaUtilities.Languages;
 using TiaUtilities.Resources;
-using TiaUtilities.SettingsStep;
+using TiaUtilities.Settings;
 using TiaUtilities.Utility;
 using Timer = System.Windows.Forms.Timer;
 

@@ -3,7 +3,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using SimaticML.API;
 using SimaticML.Blocks;
 using SimaticML.TagTable;
-using TiaUtilities.Configuration;
+using System.ComponentModel;
 using TiaUtilities.CustomControls.EditableTab;
 using TiaUtilities.Generation.GridHandler;
 using TiaUtilities.Generation.GridHandler.Data;
@@ -15,7 +15,7 @@ using TiaUtilities.Generation.Placeholders;
 using TiaUtilities.Generation.TextsEditor;
 using TiaUtilities.Languages;
 using TiaUtilities.Resources;
-using TiaUtilities.SettingsStep;
+using TiaUtilities.Settings;
 using TiaUtilities.Utility;
 using TiaUtilities.Utility.Extensions;
 
@@ -73,9 +73,11 @@ namespace TiaUtilities.Generation.IO.Module
         private readonly List<IOGenTab> ioTabList;
 
         public string LocalizedName => Locale.IO_GEN_FORM_NAME;
+        public GenModuleForm.SplitMode DefaultSplitMode => GenModuleForm.SplitMode.VERTICAL;
         public List<IGenModule.ModuleControl> ModuleControls { get; init; } = [];
 
         private bool loadingSave = false;
+        private PropertyChangedEventHandler? settingsMainConfigPropertyChangedEvent = null;
 
         public IOGenModule()
         {
@@ -150,13 +152,13 @@ namespace TiaUtilities.Generation.IO.Module
             this.ioTabList = [];
 
             this.ModuleControls = [
-                new() { Name = "Grids", RequestControlCallback = () => this.tabControl },
-                new() { Name = "Suggestions", RequestControlCallback = () => this.suggestionGridHandler.GetControl() },
+                new() { Name = Locale.IO_GEN_MODULE_GRIDS, RequestControlCallback = () => this.tabControl, DefaultPosition = 2 },
+                new() { Name = Locale.IO_GEN_MODULE_SUGGESTIONS, RequestControlCallback = () => this.suggestionGridHandler.GetControl(), DefaultPosition = 1 },
                 new() {
                     Name = Locale.GENERICS_SETTINGS,
                     RequestControlCallback = () => UpdateSettingsControl(ignoreIfInvisible: false)
                 },
-                new() { Name = "Excel Import", RequestControlCallback = () => this.excelImportControl }
+                new() { Name = Locale.IO_GEN_MODULE_EXCEL_IMPORT, RequestControlCallback = () => this.excelImportControl }
             ];
         }
 
@@ -354,7 +356,7 @@ namespace TiaUtilities.Generation.IO.Module
             #region TAB CONTROL
             this.tabControl.TabAdded += (sender, args) =>
             {
-                if(loadingSave)
+                if (loadingSave)
                 {
                     return;
                 }
@@ -522,17 +524,46 @@ namespace TiaUtilities.Generation.IO.Module
             var tabDescriptors = IOGenUtils.CreateTabSettingsDescriptors();
             var excelDescriptors = IOGenUtils.CreateExcelSettingsDescriptors();
 
-            SettingsSequence globalSequence = new(this.mainConfig, "Global", "Settings") { PlaceholdersCallBack = ParsePlaceholders };
+            SettingsSequence globalSequence = new(this.mainConfig, Locale.GEN_MODULE_SETTINGS_GROUP_GLOBAL, Locale.GENERICS_SETTINGS) { PlaceholdersCallback = ParsePlaceholders };
             globalSequence.AddRange(globalDescriptors);
             sequenceList.Add(globalSequence);
 
-            SettingsSequence excelSequence = new(this.excelImportConfig, "Global", "Excel") { PlaceholdersCallBack = ParsePlaceholders };
+            if (this.settingsMainConfigPropertyChangedEvent != null)
+            {
+                this.mainConfig.PropertyChanged -= settingsMainConfigPropertyChangedEvent;
+            }
+
+            void updatePanelEnabledState(SettingsSequencePanel panel)
+            {
+                var memoryType = this.mainConfig.MemoryType;
+                if (panel.Descriptor == IOGenUtils.GLOBAL_ALIAS_DB_DESCRIPTOR)
+                {
+                    panel.Enabled.Value = (memoryType == IOMemoryTypeEnum.DB);
+                }
+                else if (panel.Descriptor == IOGenUtils.GLOBAL_ALIAS_TAG_TABLE_DESCRIPTOR)
+                {
+                    panel.Enabled.Value = (memoryType == IOMemoryTypeEnum.MERKER);
+                }
+            }
+
+            globalSequence.PanelCreationCallback = panel => updatePanelEnabledState(panel);
+            this.settingsMainConfigPropertyChangedEvent = (sender, args) =>
+            {
+                if (args.PropertyName == nameof(IOMainConfiguration.MemoryType))
+                {
+                    globalSequence.Panels.ForEach(p => updatePanelEnabledState(p));
+                }
+            };
+
+            this.mainConfig.PropertyChanged += this.settingsMainConfigPropertyChangedEvent;
+
+            SettingsSequence excelSequence = new(this.excelImportConfig, Locale.GEN_MODULE_SETTINGS_GROUP_GLOBAL, Locale.IO_GEN_MODULE_EXCEL_IMPORT) { PlaceholdersCallback = ParsePlaceholders };
             excelSequence.AddRange(excelDescriptors);
             sequenceList.Add(excelSequence);
 
             foreach (var tab in this.ioTabList)
             {
-                SettingsSequence tabSequence = new(tab.TabConfig, "Tab", tab.Name) { PlaceholdersCallBack = ParsePlaceholders };
+                SettingsSequence tabSequence = new(tab.TabConfig, Locale.GEN_MODULE_SETTINGS_GROUP_TAB, tab.Name) { PlaceholdersCallback = ParsePlaceholders };
                 tabSequence.AddRange(tabDescriptors);
                 sequenceList.Add(tabSequence);
             }

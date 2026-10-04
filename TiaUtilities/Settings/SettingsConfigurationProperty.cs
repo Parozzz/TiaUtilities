@@ -4,7 +4,7 @@ using System.Reflection;
 using TiaUtilities.Configuration;
 using TiaUtilities.Utility;
 
-namespace TiaUtilities.SettingsStep
+namespace TiaUtilities.Settings
 {
     public class SettingsConfigurationProperty
     {

@@ -1,7 +1,8 @@
 ﻿using System.ComponentModel;
 using TiaUtilities.Configuration;
+using TiaUtilities.Settings;
 
-namespace TiaUtilities.SettingsStep.ControlFactory
+namespace TiaUtilities.Settings.ControlFactory
 {
     public abstract class SettingsControlFactory(SettingsConfigurationProperty? configurationProperty, string name, string description, SettingsFactoryGeneralOptions generalOptions)
     {

@@ -115,8 +115,6 @@ namespace TiaUtilities.Generation.Alarms.Template
                     this.gridHandler.Columns.Show(TemplateData.CUSTOM_VARIABLE_ADDRESS);
                     this.gridHandler.Columns.Show(TemplateData.CUSTOM_VARIABLE_VALUE);
                 }
-
-                this.gridHandler.Columns.InitializeColumns();
             }
 
             ShowCustomVar(mainConfig.EnableCustomVariable);
@@ -136,8 +134,6 @@ namespace TiaUtilities.Generation.Alarms.Template
                     this.gridHandler.Columns.Show(TemplateData.TIMER_TYPE);
                     this.gridHandler.Columns.Show(TemplateData.TIMER_VALUE);
                 }
-
-                this.gridHandler.Columns.InitializeColumns();
             }
 
             ShowTimer(mainConfig.EnableTimer);

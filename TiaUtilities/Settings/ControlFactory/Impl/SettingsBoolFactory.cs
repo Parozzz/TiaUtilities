@@ -1,8 +1,10 @@
 ﻿using System.ComponentModel;
 using TiaUtilities.Configuration;
+using TiaUtilities.Settings;
+using TiaUtilities.Settings.ControlFactory;
 using TiaUtilities.Utility;
 
-namespace TiaUtilities.SettingsStep.ControlFactory.Impl
+namespace TiaUtilities.Settings.ControlFactory.Impl
 {
     public class SettingsBoolFactory : SettingsControlFactory
     {

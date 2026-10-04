@@ -176,7 +176,7 @@ namespace TiaUtilities.Generation.IO.Module.Tab
 
         private void UpdateMerkerColumn(IOMemoryTypeEnum memoryType)
         {
-            this.GridHandler.Columns.ChangeVisibility(IOData.MERKER_ADDRESS, visible: memoryType == IOMemoryTypeEnum.MERKER, init: true);
+            this.GridHandler.Columns.ChangeVisibility(IOData.MERKER_ADDRESS, visible: memoryType == IOMemoryTypeEnum.MERKER);
         }
 
         public IOGenTabSave CreateSave()

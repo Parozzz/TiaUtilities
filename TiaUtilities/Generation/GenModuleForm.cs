@@ -15,18 +15,18 @@ namespace TiaUtilities.Generation
 {
     public partial class GenModuleForm : Form
     {
-        private enum SplitMode { NO_SPLIT, VERTICAL, HORIZONTAL }
+        public enum SplitMode { NO_SPLIT, VERTICAL, HORIZONTAL }
 
         private readonly IGenModule module;
         private readonly TimedSaveHandler autoSaveHandler;
-
-        private bool projectLoading = false;
-        protected string? openProjectFilePath;
 
         private readonly ObservableObject<SplitMode> splitMode;
         private readonly ObservableObject<IGenModule.ModuleControl?> panel1ModuleControl;
         private readonly ObservableObject<IGenModule.ModuleControl?> panel2ModuleControl;
         private readonly Dictionary<IGenModule.ModuleControl, LabelColorizable> moduleControlLabelDict;
+
+        private bool projectLoading = false;
+        protected string? openProjectFilePath;
 
         public GenModuleForm(IGenModule generationProject, TimedSaveHandler autoSaveHandler)
         {
@@ -146,6 +146,7 @@ namespace TiaUtilities.Generation
 
             this.module.Init(this);
 
+            #region SPLIT_MODE
             this.splitMode.Changed += (sender, args) =>
             {
                 var newSplitMode = args.NewValue;
@@ -164,6 +165,10 @@ namespace TiaUtilities.Generation
 
                 this.UpdateControlsLabels();
             };
+            #endregion
+
+            #region INITIALIZE_MODULE_CONTROLS
+            ToolTip moduleControlLabelTooltip = ControlUtils.CreateToolTip(quick: true, fading: true);
 
             var labels = module.ModuleControls.Select(m =>
             {
@@ -186,6 +191,7 @@ namespace TiaUtilities.Generation
 
                     Font = StyleManager.Fonts.NORMAL_BOLD,
                 };
+
                 label.MouseClick += (sender, args) =>
                 {
                     if (args.Button == MouseButtons.Left || splitMode.Value == SplitMode.NO_SPLIT)
@@ -197,72 +203,63 @@ namespace TiaUtilities.Generation
                         this.panel2ModuleControl.Value = m;
                     }
                 };
+                label.MouseHover += (sender, args) => moduleControlLabelTooltip.Show(Locale.GEN_FORM_MODULE_LABEL_TOOLTIP, label);
 
                 this.moduleControlLabelDict.Add(m, label);
                 return label;
             });
             this.selectControlButtonPanel.Controls.AddRange([.. labels]);
 
-            this.panel1ModuleControl.Changed += (sender, args) =>
-            {
-                var oldModuleControl = args.OldValue;
-                var newModuleControl = args.NewValue;
-
-                if(newModuleControl == panel2ModuleControl.Value)
-                {
-                    panel2ModuleControl.Value = null;
-                }
-
-                this.bottomSplitContainer.SuspendLayout();
-                DllImports.SuspendDrawing(this.bottomSplitContainer);
-
-                this.bottomSplitContainer.Panel1.Controls.Clear();
-
-                if (newModuleControl != null)
-                {
-                    var control = newModuleControl.RequestControlCallback();
-                    this.bottomSplitContainer.Panel1.Controls.Add(control);
-                }
-
-                this.UpdateControlsLabels();
-
-                DllImports.ResumeDrawing(this.bottomSplitContainer);
-                this.bottomSplitContainer.ResumeLayout();
-            }; 
-            
-            this.panel2ModuleControl.Changed += (sender, args) =>
-            {
-                var oldModuleControl = args.OldValue;
-                var newModuleControl = args.NewValue;
-
-                if (newModuleControl == panel1ModuleControl.Value)
-                {
-                    panel1ModuleControl.Value = null;
-                }
-
-                this.bottomSplitContainer.SuspendLayout();
-                DllImports.SuspendDrawing(this.bottomSplitContainer);
-
-                this.bottomSplitContainer.Panel2.Controls.Clear();
-
-                if (newModuleControl != null)
-                {
-                    var control = newModuleControl.RequestControlCallback();
-                    this.bottomSplitContainer.Panel2.Controls.Add(control);
-                }
-
-                this.UpdateControlsLabels();
-
-                DllImports.ResumeDrawing(this.bottomSplitContainer);
-                this.bottomSplitContainer.ResumeLayout();
-            };
+            this.panel1ModuleControl.Changed += (sender, args) => this.UpdateControlPanel(args.NewValue, this.bottomSplitContainer.Panel1, this.panel2ModuleControl);
+            this.panel2ModuleControl.Changed += (sender, args) => this.UpdateControlPanel(args.NewValue, this.bottomSplitContainer.Panel2, this.panel1ModuleControl);
 
             this.bottomSplitContainer.Panel1Collapsed = false;
             this.bottomSplitContainer.Panel2Collapsed = true;
 
             this.panel1ModuleControl.Value = this.module.ModuleControls.FirstOrDefault();
+            #endregion
+
+            #region DEFAULT_PANELS_FROM_MODULE
+            this.splitMode.Value = this.module.DefaultSplitMode;
+
+            var defaultPanel1Control = this.module.ModuleControls.FirstOrDefault(m => m.DefaultPosition == 1);
+            if(defaultPanel1Control != null)
+            {
+                this.panel1ModuleControl.Value = defaultPanel1Control;
+            }
+
+            var defaultPanel2Control = this.module.ModuleControls.FirstOrDefault(m => m.DefaultPosition == 2);
+            if (defaultPanel2Control != null)
+            {
+                this.panel2ModuleControl.Value = defaultPanel2Control;
+            }
+            #endregion
 
             Translate();
+        }
+
+        private void UpdateControlPanel(IGenModule.ModuleControl? moduleControl, SplitterPanel thisPanel, ObservableObject<IGenModule.ModuleControl?> otherModuleControl)
+        {
+            if (moduleControl == otherModuleControl.Value)
+            {
+                otherModuleControl.Value = null;
+            }
+
+            this.bottomSplitContainer.SuspendLayout();
+            DllImports.SuspendDrawing(this.bottomSplitContainer);
+
+            thisPanel.Controls.Clear();
+
+            if (moduleControl != null)
+            {
+                var control = moduleControl.RequestControlCallback();
+                thisPanel.Controls.Add(control);
+            }
+
+            this.UpdateControlsLabels();
+
+            DllImports.ResumeDrawing(this.bottomSplitContainer);
+            this.bottomSplitContainer.ResumeLayout();
         }
 
         private void UpdateControlsLabels()
@@ -307,6 +304,11 @@ namespace TiaUtilities.Generation
 
             this.importExportMenuItem.Text = Locale.GEN_FORM_IMPORT_EXPORT;
             this.exportXMLMenuItem.Text = Locale.GEN_FORM_IMPORT_EXPORT_EXPORT_XML;
+
+            this.viewMenuItem.Text = Locale.GEN_FORM_VIEW;
+            this.viewSingleMenuItem.Text = Locale.GEN_FORM_VIEW_SINGLE + " (CTRL+ALT+S)";
+            this.viewSplitVerticalMenuItem.Text = Locale.GEN_FORM_VIEW_SPLIT_VERTICAL + " (CTRL+ALT+V)";
+            this.viewSplitHorizontalMenuItem.Text = Locale.GEN_FORM_VIEW_SPLIT_HORIZONTAL + " (CTRL+ALT+H)";
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -327,6 +329,16 @@ namespace TiaUtilities.Generation
                     case Keys.Q | Keys.Control:
                         this.module.OpenPlaceholderViewer(this);
                         return true;
+                    case Keys.V | Keys.Alt | Keys.Control:
+                        this.splitMode.Value = SplitMode.VERTICAL;
+                        return true;
+                    case Keys.H | Keys.Alt | Keys.Control:
+                        this.splitMode.Value = SplitMode.HORIZONTAL;
+                        return true;
+                    case Keys.S | Keys.Alt | Keys.Control:
+                        this.splitMode.Value = SplitMode.NO_SPLIT;
+                        return true;
+
                 }
             }
             catch (Exception ex)

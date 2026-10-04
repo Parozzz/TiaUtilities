@@ -1,4 +1,4 @@
-﻿namespace TiaUtilities.SettingsStep
+﻿namespace TiaUtilities.Settings
 {
     partial class SettingsForm
     {
