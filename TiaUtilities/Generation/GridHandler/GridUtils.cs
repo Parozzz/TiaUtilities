@@ -9,7 +9,7 @@ namespace TiaUtilities.Generation.GridHandler
 {
     public static class GridUtils
     {
-        public static void CopyGridDataValues(IGridData copyFrom, IGridData moveTo)
+        public static void CopyGridDataValues(IGridRowData copyFrom, IGridRowData moveTo)
         {
             if (copyFrom.GetType() == moveTo.GetType())
             {
@@ -25,7 +25,7 @@ namespace TiaUtilities.Generation.GridHandler
         }
 
         #region DRAG_DOWN
-        public static void DragPreview<T>(GridExcelDragEventArgs eventArgs, GridHandler<T> gridHandler) where T : GridData
+        public static void DragPreview<T>(GridExcelDragEventArgs eventArgs, GridHandler<T> gridHandler) where T : GridRowData
         {
             var gridColumn = gridHandler.DataSource[eventArgs.StartingRow].GetColumn(eventArgs.DraggedColumn);
             if (gridColumn.PropertyInfo.PropertyType != typeof(string))
@@ -55,7 +55,7 @@ namespace TiaUtilities.Generation.GridHandler
             }
         }
 
-        public static void DragDone<T>(GridExcelDragEventArgs eventArgs, GridHandler<T> gridHandler) where T : GridData
+        public static void DragDone<T>(GridExcelDragEventArgs eventArgs, GridHandler<T> gridHandler) where T : GridRowData
         {
             var gridColumn = gridHandler.DataSource[eventArgs.StartingRow].GetColumn(eventArgs.DraggedColumn);
             if (gridColumn.PropertyInfo.PropertyType != typeof(string))
@@ -289,13 +289,13 @@ namespace TiaUtilities.Generation.GridHandler
         #endregion
 
         #region CELL VALUES PREVIEW PAINT
-        public class GridCellValuePreviewData<T> where T : GridData
+        public class GridCellValuePreviewData<T> where T : GridRowData
         {
             public required GridDataPreview Preview { get; init; }
             public required T GridData { get; init; }
         }
 
-        public static GridCellValuePreviewData<T>? CellValuePreviewRequestData<T>(GridHandler<T> gridHandler, int columnIndex, int rowIndex) where T : GridData
+        public static GridCellValuePreviewData<T>? CellValuePreviewRequestData<T>(GridHandler<T> gridHandler, int columnIndex, int rowIndex) where T : GridRowData
         {
             try
             {
@@ -322,7 +322,7 @@ namespace TiaUtilities.Generation.GridHandler
             return null;
         }
 
-        public static void CellValuePreviewContentPaint<T>(GridHandler<T> gridHandler, GridCellValuePreviewData<T> paintData, GenPlaceholderHandler placeholderHandler, DataGridViewCellPaintingEventArgs args) where T : GridData
+        public static void CellValuePreviewContentPaint<T>(GridHandler<T> gridHandler, GridCellValuePreviewData<T> paintData, GenPlaceholderHandler placeholderHandler, DataGridViewCellPaintingEventArgs args) where T : GridRowData
         {
             var bounds = args.CellBounds;
             var graphics = args.Graphics;

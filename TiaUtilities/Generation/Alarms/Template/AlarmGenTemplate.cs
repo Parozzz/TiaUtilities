@@ -7,6 +7,15 @@ namespace TiaUtilities.Generation.Alarms.Template
 {
     public class AlarmGenTemplate(AlarmGenTemplateContainer container, string name) : INotifyPropertyChanged
     {
+        public static AlarmGenTemplate CreateFromSave(AlarmGenTemplateContainer container, AlarmGenTemplateSave save)
+        {
+            return new AlarmGenTemplate(container, save.Name)
+            {
+                GridSave = save.AlarmGrid,
+                Config = save.TemplateConfig
+            };
+        }
+
         public event PropertyChangedEventHandler? PropertyChanged = delegate { };
 
         public string Name
@@ -21,17 +30,28 @@ namespace TiaUtilities.Generation.Alarms.Template
                 PropertyChanged?.Invoke(this, new(nameof(Name)));
             }
         }
-        public AlarmTemplateConfiguration TemplateConfig { get; init; } = new();
-        public GridSave<TemplateData> AlarmGridSave { get; set; } = new(); //This should be TemplateGridSave. But for compatibility, won't be renamed yet
+
+        public AlarmTemplateConfiguration Config { get; init; } = new();
+        public GridSave<TemplateRowData> GridSave { get; set; } = new(); 
 
         private string _name = name;
+
+        public AlarmGenTemplateSave CreateSave()
+        {
+            return new()
+            {
+                Name = this.Name,
+                AlarmGrid = this.GridSave,
+                TemplateConfig = this.Config,
+            };
+        }
 
         public AlarmGenTemplate Clone(AlarmGenTemplateContainer container, string? name = null)
         {
             AlarmGenTemplate newClone = new(container, name ?? this.Name);
-            foreach (var item in this.AlarmGridSave.RowData)
+            foreach (var item in this.GridSave.RowData)
             {
-                newClone.AlarmGridSave.RowData.Add(item.Key, item.Value.Clone());
+                newClone.GridSave.RowData.Add(item.Key, item.Value.Clone());
             }
             return newClone;
         }

@@ -181,37 +181,15 @@ namespace TiaUtilities.Generation.Alarms.Template
 
         public List<AlarmGenTemplateSave> CreateSave()
         {
-            List<AlarmGenTemplateSave> list = [];
-
-            foreach (var template in this.templateList)
-            {
-                if (template.AlarmGridSave == null)
-                {
-                    continue;
-                }
-
-                list.Add(new()
-                {
-                    Name = template.Name,
-                    AlarmGrid = template.AlarmGridSave,
-                    TemplateConfig = template.TemplateConfig,
-                });
-            }
-
-            return list;
+            var templateSaveList = this.templateList.Select(t => t.CreateSave()).ToList();
+            return templateSaveList;
         }
 
         public void LoadSave(List<AlarmGenTemplateSave> saveList)
         {
             this.templateList.Clear();
             this.templateList.AddRange(
-                saveList.Select(save =>
-                    new AlarmGenTemplate(this, save.Name)
-                    {
-                        AlarmGridSave = save.AlarmGrid,
-                        TemplateConfig = save.TemplateConfig
-                    }
-                )
+                saveList.Select(save => AlarmGenTemplate.CreateFromSave(this, save))
             );
 
             this.Wash();

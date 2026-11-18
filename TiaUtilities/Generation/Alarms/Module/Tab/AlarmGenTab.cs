@@ -20,10 +20,10 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
         public TabPage TabPage { get; init; }
         public AlarmTabConfiguration TabConfig { get; init; }
 
-        private readonly GridDataPreviewer<DeviceData> deviceDataPreview;
-        private readonly GridHandler<DeviceData> deviceGridHandler;
+        private readonly GridDataPreviewer<DeviceRowData> deviceDataPreview;
+        private readonly GridHandler<DeviceRowData> deviceGridHandler;
 
-        public List<DeviceData> DeviceDataList { get => [.. deviceGridHandler.DataSource.GetNotEmptyClonedDataDict().Keys]; } //Return CLONED data, otherwise operations on the xml generation will affect the table!
+        public List<DeviceRowData> DeviceDataList { get => [.. deviceGridHandler.DataSource.GetNotEmptyClonedDataDict().Keys]; } //Return CLONED data, otherwise operations on the xml generation will affect the table!
 
         private bool dirty = false;
 
@@ -52,10 +52,10 @@ namespace TiaUtilities.Generation.Alarms.Module.Tab
             SuggestionTextBoxColumn templateSuggestionColumn = new() { ItemsCallback = () => templateContainer.Select(t => t.Name) };
 
             //COLUMNS
-            this.deviceGridHandler.Columns.AddTextBox(DeviceData.NAME, 125);
-            this.deviceGridHandler.Columns.Add(templateSuggestionColumn, DeviceData.TEMPLATE, 200);
-            this.deviceGridHandler.Columns.AddTextBox(DeviceData.PLACEHOLDERS, 300);
-            this.deviceGridHandler.Columns.AddTextBox(DeviceData.DESCRIPTION, 0);
+            this.deviceGridHandler.Columns.AddTextBox(DeviceRowData.NAME, 125);
+            this.deviceGridHandler.Columns.Add(templateSuggestionColumn, DeviceRowData.TEMPLATE, 200);
+            this.deviceGridHandler.Columns.AddTextBox(DeviceRowData.PLACEHOLDERS, 300);
+            this.deviceGridHandler.Columns.AddTextBox(DeviceRowData.DESCRIPTION, 0);
 
             this.deviceGridHandler.Init();
             this.deviceDataPreview.Function = (column, deviceData) => null;

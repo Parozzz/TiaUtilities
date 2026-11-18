@@ -6,7 +6,7 @@ namespace TiaUtilities.Generation.Placeholders
 {
     public class AlarmGenPlaceholdersHandler(AlarmMainConfiguration mainConfig, AlarmTabConfiguration tabConfig) : GenPlaceholderHandler
     {
-        public DeviceData DeviceData
+        public DeviceRowData DeviceData
         {
             set
             {
@@ -15,7 +15,7 @@ namespace TiaUtilities.Generation.Placeholders
             }
         }
 
-        public TemplateData TemplateData
+        public TemplateRowData TemplateData
         {
             set
             {

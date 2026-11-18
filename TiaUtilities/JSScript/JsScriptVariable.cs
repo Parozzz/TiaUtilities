@@ -6,7 +6,7 @@ namespace TiaUtilities.JSScript
 {
     public class JSScriptVariable(string programmingName, string valueType)
     {
-        public static JSScriptVariable CreateFromGrid<H>(GridDataColumn column, GridHandler<H> gridHandler) where H : GridData
+        public static JSScriptVariable CreateFromGrid<H>(GridDataColumn column, GridHandler<H> gridHandler) where H : GridRowData
         {
             JSScriptVariable scriptVariable = new(column.ProgrammingFriendlyName, column.PropertyInfo.PropertyType.Name)
             {

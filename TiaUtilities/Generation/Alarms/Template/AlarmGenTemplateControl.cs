@@ -1,4 +1,5 @@
-﻿using TiaUtilities.Generation.Alarms.Configurations;
+﻿using System.ComponentModel;
+using TiaUtilities.Generation.Alarms.Configurations;
 using TiaUtilities.Generation.Alarms.Data;
 using TiaUtilities.Generation.Alarms.Module;
 using TiaUtilities.Generation.Alarms.Module.Template;
@@ -23,8 +24,8 @@ namespace TiaUtilities.Generation.Alarms.Template
         private readonly AlarmGenTemplateContainer templateContainer;
         private AlarmGenTemplate? SelectedTemplate { get => this.templateContainer.SelectedTemplate; set => this.templateContainer.SelectedTemplate = value; }
 
-        private readonly GridDataPreviewer<TemplateData> previewer;
-        private readonly GridHandler<TemplateData> gridHandler;
+        private readonly GridDataPreviewer<TemplateRowData> previewer;
+        private readonly GridHandler<TemplateRowData> gridHandler;
 
         public AlarmGenTemplateControl(AlarmMainConfiguration mainConfig, AlarmTabConfiguration tabConfig,
             MultiGridOperationHandler multiGrid, AlarmGenTemplateContainer templateContainer)
@@ -35,7 +36,6 @@ namespace TiaUtilities.Generation.Alarms.Template
             this.tabConfig = tabConfig;
 
             AlarmGenPlaceholdersHandler placeholdersHandler = new(mainConfig, tabConfig);
-            //this.templateDataGridWrapper = new(placeholdersHandler, multiGrid);
 
             this.templateContainer = templateContainer;
 
@@ -56,21 +56,21 @@ namespace TiaUtilities.Generation.Alarms.Template
             #endregion
 
             #region GRID_COLUMNS
-            this.gridHandler.Columns.AddCheckBox(TemplateData.ENABLE, 40);
-            this.gridHandler.Columns.AddTextBox(TemplateData.ALARM_VARIABLE, 200);
-            this.gridHandler.Columns.AddCheckBox(TemplateData.ALARM_NEGATED, 55);
-            this.gridHandler.Columns.AddTextBox(TemplateData.CUSTOM_VARIABLE_ADDRESS, 145);
-            this.gridHandler.Columns.AddTextBox(TemplateData.CUSTOM_VARIABLE_VALUE, 50);
-            this.gridHandler.Columns.AddTextBox(TemplateData.COIL1_ADDRESS, 145);
-            this.gridHandler.Columns.AddComboBox(TemplateData.COIL1_TYPE, 65, ALARM_COIL_TYPE_ITEMS);
-            this.gridHandler.Columns.AddTextBox(TemplateData.COIL2_ADDRESS, 145);
-            this.gridHandler.Columns.AddComboBox(TemplateData.COIL2_TYPE, 65, ALARM_COIL_TYPE_ITEMS);
-            this.gridHandler.Columns.AddTextBox(TemplateData.TIMER_ADDRESS, 95);
-            this.gridHandler.Columns.AddComboBox(TemplateData.TIMER_TYPE, 55, TIMERS_TYPES_ITEMS);
-            this.gridHandler.Columns.AddTextBox(TemplateData.TIMER_VALUE, 50);
-            this.gridHandler.Columns.AddTextBox(TemplateData.HMI_ALARM_CLASS, 150);
+            this.gridHandler.Columns.AddCheckBox(TemplateRowData.ENABLE, 40);
+            this.gridHandler.Columns.AddTextBox(TemplateRowData.ALARM_VARIABLE, 200);
+            this.gridHandler.Columns.AddCheckBox(TemplateRowData.ALARM_NEGATED, 55);
+            this.gridHandler.Columns.AddTextBox(TemplateRowData.CUSTOM_VARIABLE_ADDRESS, 145);
+            this.gridHandler.Columns.AddTextBox(TemplateRowData.CUSTOM_VARIABLE_VALUE, 50);
+            this.gridHandler.Columns.AddTextBox(TemplateRowData.COIL1_ADDRESS, 145);
+            this.gridHandler.Columns.AddComboBox(TemplateRowData.COIL1_TYPE, 65, ALARM_COIL_TYPE_ITEMS);
+            this.gridHandler.Columns.AddTextBox(TemplateRowData.COIL2_ADDRESS, 145);
+            this.gridHandler.Columns.AddComboBox(TemplateRowData.COIL2_TYPE, 65, ALARM_COIL_TYPE_ITEMS);
+            this.gridHandler.Columns.AddTextBox(TemplateRowData.TIMER_ADDRESS, 95);
+            this.gridHandler.Columns.AddComboBox(TemplateRowData.TIMER_TYPE, 55, TIMERS_TYPES_ITEMS);
+            this.gridHandler.Columns.AddTextBox(TemplateRowData.TIMER_VALUE, 50);
+            this.gridHandler.Columns.AddTextBox(TemplateRowData.HMI_ALARM_CLASS, 150);
 
-            var hmiParametersColumn = this.gridHandler.Columns.AddButton(TemplateData.HMI_PARAMETERS, 150);
+            var hmiParametersColumn = this.gridHandler.Columns.AddButton(TemplateRowData.HMI_PARAMETERS, 150);
             hmiParametersColumn.ButtonPressed += (sender, args) =>
             {
                 var cell = args.Cell;
@@ -95,8 +95,8 @@ namespace TiaUtilities.Generation.Alarms.Template
                 }
             };
 
-            this.gridHandler.Columns.AddTextBox(TemplateData.HMI_ALARM_TEXT, 250);
-            this.gridHandler.Columns.AddTextBox(TemplateData.DESCRIPTION, 0);
+            this.gridHandler.Columns.AddTextBox(TemplateRowData.HMI_ALARM_TEXT, 250);
+            this.gridHandler.Columns.AddTextBox(TemplateRowData.DESCRIPTION, 0);
             #endregion
 
             this.gridHandler.Init();
@@ -107,13 +107,13 @@ namespace TiaUtilities.Generation.Alarms.Template
             {
                 if (!show)
                 {
-                    this.gridHandler.Columns.Hide(TemplateData.CUSTOM_VARIABLE_ADDRESS);
-                    this.gridHandler.Columns.Hide(TemplateData.CUSTOM_VARIABLE_VALUE);
+                    this.gridHandler.Columns.Hide(TemplateRowData.CUSTOM_VARIABLE_ADDRESS);
+                    this.gridHandler.Columns.Hide(TemplateRowData.CUSTOM_VARIABLE_VALUE);
                 }
                 else
                 {
-                    this.gridHandler.Columns.Show(TemplateData.CUSTOM_VARIABLE_ADDRESS);
-                    this.gridHandler.Columns.Show(TemplateData.CUSTOM_VARIABLE_VALUE);
+                    this.gridHandler.Columns.Show(TemplateRowData.CUSTOM_VARIABLE_ADDRESS);
+                    this.gridHandler.Columns.Show(TemplateRowData.CUSTOM_VARIABLE_VALUE);
                 }
             }
 
@@ -124,15 +124,15 @@ namespace TiaUtilities.Generation.Alarms.Template
             {
                 if (!show)
                 {
-                    this.gridHandler.Columns.Hide(TemplateData.TIMER_ADDRESS);
-                    this.gridHandler.Columns.Hide(TemplateData.TIMER_TYPE);
-                    this.gridHandler.Columns.Hide(TemplateData.TIMER_VALUE);
+                    this.gridHandler.Columns.Hide(TemplateRowData.TIMER_ADDRESS);
+                    this.gridHandler.Columns.Hide(TemplateRowData.TIMER_TYPE);
+                    this.gridHandler.Columns.Hide(TemplateRowData.TIMER_VALUE);
                 }
                 else
                 {
-                    this.gridHandler.Columns.Show(TemplateData.TIMER_ADDRESS);
-                    this.gridHandler.Columns.Show(TemplateData.TIMER_TYPE);
-                    this.gridHandler.Columns.Show(TemplateData.TIMER_VALUE);
+                    this.gridHandler.Columns.Show(TemplateRowData.TIMER_ADDRESS);
+                    this.gridHandler.Columns.Show(TemplateRowData.TIMER_TYPE);
+                    this.gridHandler.Columns.Show(TemplateRowData.TIMER_VALUE);
                 }
             }
 
@@ -148,57 +148,57 @@ namespace TiaUtilities.Generation.Alarms.Template
                     return null;
                 }
 
-                var templateConfig = this.SelectedTemplate?.TemplateConfig ?? new();
+                var templateConfig = this.SelectedTemplate?.Config ?? new();
 
-                if (column == TemplateData.ALARM_VARIABLE)
+                if (column == TemplateRowData.ALARM_VARIABLE)
                 {
                     var prefix = templateConfig.StandaloneAlarms ? "" : tabConfig.AlarmAddressPrefix;
                     return new() { Prefix = prefix, Value = templateData.AlarmVariable };
                 }
-                else if (column == TemplateData.CUSTOM_VARIABLE_ADDRESS)
+                else if (column == TemplateRowData.CUSTOM_VARIABLE_ADDRESS)
                 {
                     return new() { DefaultValue = tabConfig.DefaultCustomVarAddress, Value = templateData.CustomVariableAddress };
                 }
-                else if (column == TemplateData.CUSTOM_VARIABLE_VALUE)
+                else if (column == TemplateRowData.CUSTOM_VARIABLE_VALUE)
                 {
                     return new() { DefaultValue = tabConfig.DefaultCustomVarValue, Value = templateData.CustomVariableValue };
                 }
-                else if (column == TemplateData.COIL1_ADDRESS)
+                else if (column == TemplateRowData.COIL1_ADDRESS)
                 {
                     return new() { Prefix = tabConfig.Coil1AddressPrefix, DefaultValue = tabConfig.DefaultCoil1Address, Value = templateData.Coil1Address };
                 }
-                else if (column == TemplateData.COIL1_TYPE && TemplateData.IsAddressValid(templateData.Coil1Address))
+                else if (column == TemplateRowData.COIL1_TYPE && TemplateRowData.IsAddressValid(templateData.Coil1Address))
                 {
                     return new() { DefaultValue = tabConfig.DefaultCoil1Type.ToString(), Value = templateData.Coil1Type };
                 }
-                else if (column == TemplateData.COIL2_ADDRESS)
+                else if (column == TemplateRowData.COIL2_ADDRESS)
                 {
                     return new() { Prefix = tabConfig.Coil2AddressPrefix, DefaultValue = tabConfig.DefaultCoil2Address, Value = templateData.Coil2Address };
                 }
-                else if (column == TemplateData.COIL2_TYPE && TemplateData.IsAddressValid(templateData.Coil2Address))
+                else if (column == TemplateRowData.COIL2_TYPE && TemplateRowData.IsAddressValid(templateData.Coil2Address))
                 {
                     return new() { DefaultValue = tabConfig.DefaultCoil2Type.ToString(), Value = templateData.Coil2Type };
                 }
-                else if (column == TemplateData.TIMER_ADDRESS)
+                else if (column == TemplateRowData.TIMER_ADDRESS)
                 {
                     return new() { Prefix = tabConfig.TimerAddressPrefix, DefaultValue = tabConfig.DefaultTimerAddress, Value = templateData.TimerAddress };
                 }
-                else if (string.IsNullOrEmpty(templateData.TimerAddress) ? TemplateData.IsAddressValid(tabConfig.DefaultTimerAddress) : TemplateData.IsAddressValid(templateData.TimerAddress))
+                else if (string.IsNullOrEmpty(templateData.TimerAddress) ? TemplateRowData.IsAddressValid(tabConfig.DefaultTimerAddress) : TemplateRowData.IsAddressValid(templateData.TimerAddress))
                 {
-                    if (column == TemplateData.TIMER_TYPE)
+                    if (column == TemplateRowData.TIMER_TYPE)
                     {
                         return new() { DefaultValue = tabConfig.DefaultTimerType, Value = templateData.TimerType };
                     }
-                    else if (column == TemplateData.TIMER_VALUE)
+                    else if (column == TemplateRowData.TIMER_VALUE)
                     {
                         return new() { DefaultValue = tabConfig.DefaultTimerValue, Value = templateData.TimerValue };
                     }
                 }
-                else if (column == TemplateData.HMI_ALARM_CLASS)
+                else if (column == TemplateRowData.HMI_ALARM_CLASS)
                 {
                     return new() { DefaultValue = tabConfig.DefaultHmiAlarmClass, Value = templateData.HmiAlarmClass };
                 }
-                else if (column == TemplateData.HMI_ALARM_TEXT)
+                else if (column == TemplateRowData.HMI_ALARM_TEXT)
                 {
                     return new() { DefaultValue = templateData.Description, Value = templateData.HmiAlarmText };
                 }
@@ -216,7 +216,7 @@ namespace TiaUtilities.Generation.Alarms.Template
             {
                 foreach (var changedCellData in args.ChangedCellDataList)
                 {
-                    if (changedCellData.Column == TemplateData.ALARM_VARIABLE)
+                    if (changedCellData.Column == TemplateRowData.ALARM_VARIABLE)
                     {//If an alarm variable is filled (Before empty and now full) i will automatically set the enable to be true. The opposite removes the enable. QOL
                         if (IsObjectStringEmpty(changedCellData.OldValue) && IsObjectStringFull(changedCellData.NewValue))
                         {
@@ -229,7 +229,7 @@ namespace TiaUtilities.Generation.Alarms.Template
 
                         this.gridHandler.ViewManipulator.RefreshRow(changedCellData.RowIndex);
                     }
-                    else if (changedCellData.Column == TemplateData.DESCRIPTION)
+                    else if (changedCellData.Column == TemplateRowData.DESCRIPTION)
                     {
                         this.gridHandler.ViewManipulator.RefreshRow(changedCellData.RowIndex);
                     }
@@ -241,7 +241,7 @@ namespace TiaUtilities.Generation.Alarms.Template
 
             this.gridHandler.DataSource.ListChanged += (sender, args) =>
             {
-                if (sender is IList<TemplateData> templates)
+                if (sender is IList<TemplateRowData> templates)
                 {
                     switch (args.ListChangedType)
                     {
@@ -255,15 +255,15 @@ namespace TiaUtilities.Generation.Alarms.Template
                             {
                                 templates.TryGet(args.NewIndex, out var changedTemplateData);
 
-                                TemplateData data;
-                                if (this.SelectedTemplate.AlarmGridSave.RowData.TryGetValue(args.NewIndex, out var existingTemplateData))
+                                TemplateRowData data;
+                                if (this.SelectedTemplate.GridSave.RowData.TryGetValue(args.NewIndex, out var existingTemplateData))
                                 {
                                     data = existingTemplateData;
                                 }
                                 else
                                 {
                                     data = new();
-                                    this.SelectedTemplate.AlarmGridSave.RowData.Add(args.NewIndex, data);
+                                    this.SelectedTemplate.GridSave.RowData.Add(args.NewIndex, data);
                                 }
 
                                 var value = args.PropertyDescriptor.GetValue(changedTemplateData);
@@ -294,11 +294,11 @@ namespace TiaUtilities.Generation.Alarms.Template
             #region ADD_REMOVE_RENAME_CLOSE_BUTTONS
             ImageList buttonsImages = new()
             {
-                Images = { 
-                    ImageResources.ADD_501366_007435, 
-                    ImageResources.DELETE, 
-                    ImageResources.RENAME, 
-                    ImageResources.DUPLICATE 
+                Images = {
+                    ImageResources.ADD_501366_007435,
+                    ImageResources.DELETE,
+                    ImageResources.RENAME,
+                    ImageResources.DUPLICATE
                 },
                 ImageSize = new(18, 18),
             };
@@ -342,6 +342,62 @@ namespace TiaUtilities.Generation.Alarms.Template
             };
             #endregion
 
+            #region STANDALONE_CHECK_BOX
+            bool updateFromCheckbox = false;
+            void templateConfigPropertyChanged(object? sender, PropertyChangedEventArgs args)
+            {
+                if (args.PropertyName == nameof(AlarmTemplateConfiguration.StandaloneAlarms))
+                {
+                    if (updateFromCheckbox)
+                    {
+                        return;
+                    }
+
+                    var selectedTemplate = this.templateContainer.SelectedTemplate;
+                    if (selectedTemplate != null)
+                    {
+                        this.standaloneCheckBox.Checked = selectedTemplate.Config.StandaloneAlarms;
+                    }
+                }
+            }
+
+            this.templateContainer.SelectedChanged += (sender, args) =>
+            {
+                var oldTemplate = args.OldTemplate;
+                if (oldTemplate != null)
+                {
+                    oldTemplate.Config.PropertyChanged -= templateConfigPropertyChanged;
+                }
+
+                var newTemplate = this.templateContainer.SelectedTemplate;
+                if (newTemplate == null)
+                {
+                    this.standaloneCheckBox.Checked = false;
+                }
+                else
+                {
+                    newTemplate.Config.PropertyChanged += templateConfigPropertyChanged;
+                    this.standaloneCheckBox.Checked = newTemplate.Config.StandaloneAlarms;
+                }
+            };
+
+            this.standaloneCheckBox.CheckedChanged += (sender, args) =>
+            {
+                var selectedTemplate = this.templateContainer.SelectedTemplate;
+                if (selectedTemplate == null)
+                {
+                    return;
+                }
+
+                updateFromCheckbox = true;
+
+                selectedTemplate.Config.StandaloneAlarms = this.standaloneCheckBox.Checked;
+                this.gridHandler.ViewManipulator.Refresh(); //Update all the previews :)
+
+                updateFromCheckbox = false;
+            };
+            #endregion
+
             //Load Current after init and save current when form is closed.
             this.templateContainer.SelectedChanged += (sender, args) => this.SelectedTemplateChanged();
             this.SelectedTemplateChanged();
@@ -361,7 +417,7 @@ namespace TiaUtilities.Generation.Alarms.Template
                 return;
             }
 
-            this.gridHandler.LoadSave(this.SelectedTemplate.AlarmGridSave);
+            this.gridHandler.LoadSave(this.SelectedTemplate.GridSave);
             this.gridHandler.Wash();
 
             this.selectComboBox.SelectedItem = this.SelectedTemplate;
@@ -376,6 +432,9 @@ namespace TiaUtilities.Generation.Alarms.Template
             this.removeButton.Text = "Remove";
             this.renameButton.Text = "Rename";
             this.cloneButton.Text = "Clone";
+
+            this.standaloneCheckBox.Text = Locale.ALARM_TEMPLATE_CONTROL_ALARMS_STANDALONE;
+            ControlUtils.CreateToolTip().SetToolTip(this.standaloneCheckBox, Locale.ALARM_TEMPLATE_CONTROL_ALARMS_STANDALONE_TOOLTIP);
         }
     }
 }

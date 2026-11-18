@@ -2,7 +2,7 @@
 
 namespace TiaUtilities.Generation.GridHandler
 {
-    public interface IGridRowComparer<T> : IComparer<T> where T : GridData
+    public interface IGridRowComparer<T> : IComparer<T> where T : GridRowData
     {
         void SetSortOrder(SortOrder sortOrder);
 

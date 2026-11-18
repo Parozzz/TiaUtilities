@@ -7,7 +7,7 @@ using TiaUtilities.Languages;
 
 namespace TiaUtilities.Generation.Alarms.Data
 {
-    public class DeviceData : GridData
+    public class DeviceRowData : GridRowData
     {
         private readonly static int COLUMN_COUNT = 0;
         //THESE IS THE ORDER IN WHICH THEY APPEAR!
@@ -17,13 +17,13 @@ namespace TiaUtilities.Generation.Alarms.Data
         public static readonly GridDataColumn PLACEHOLDERS;
         public static readonly IReadOnlyList<GridDataColumn> COLUMN_LIST;
 
-        static DeviceData()
+        static DeviceRowData()
         {
-            var type = typeof(DeviceData);
-            NAME = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(DeviceData.Name));
-            TEMPLATE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(DeviceData.Template));
-            PLACEHOLDERS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(DeviceData.Placeholders));
-            DESCRIPTION = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(DeviceData.Description));
+            var type = typeof(DeviceRowData);
+            NAME = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(DeviceRowData.Name));
+            TEMPLATE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(DeviceRowData.Template));
+            PLACEHOLDERS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(DeviceRowData.Placeholders));
+            DESCRIPTION = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(DeviceRowData.Description));
 
             var columnList = GridDataColumn.GetStaticColumnList(type);
             columnList.Sort((x, y) => x.ColumnIndex.CompareTo(y.ColumnIndex));

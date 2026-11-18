@@ -16,15 +16,15 @@ namespace TiaUtilities.Generation.GridHandler
 
         public ICollection<int> GetNotEmptyIndexes(int startRow = 0);
 
-        public IGridData GetGeneric(int index);
+        public IGridRowData GetGeneric(int index);
 
-        public Dictionary<IGridData, int> GetGenericNotEmptyDataDict(int startRow = 0);
+        public Dictionary<IGridRowData, int> GetGenericNotEmptyDataDict(int startRow = 0);
 
-        public IEnumerable<IGridData> GetGenericNotEmptyData(int startRow = 0);
+        public IEnumerable<IGridRowData> GetGenericNotEmptyData(int startRow = 0);
 
-        public Dictionary<IGridData, int> GetGenericNotEmptyClonedDataDict();
+        public Dictionary<IGridRowData, int> GetGenericNotEmptyClonedDataDict();
 
-        public IEnumerable<IGridData> GetGenericNotEmptyClonedData();
+        public IEnumerable<IGridRowData> GetGenericNotEmptyClonedData();
 
     }
 }

@@ -8,7 +8,7 @@ using TiaUtilities.Languages;
 
 namespace TiaUtilities.Generation.IO.Data
 {
-    public class IOData : GridData
+    public class IOData : GridRowData
     {
         private readonly static int COLUMN_COUNT = 0;
         //THESE IS THE ORDER IN WHICH THEY APPEAR!

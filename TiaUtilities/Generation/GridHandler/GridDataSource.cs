@@ -6,7 +6,7 @@ using TiaUtilities.Utility.Collections;
 
 namespace TiaUtilities.Generation.GridHandler
 {
-    public class GridDataSource<T> : IGridDataSource, ISaveable<Dictionary<int, T>> where T : IGridData
+    public class GridDataSource<T> : IGridDataSource, ISaveable<Dictionary<int, T>> where T : IGridRowData
     {
         public event ListChangedEventHandler ListChanged { add => this.bindingList.ListChanged += value; remove => this.bindingList.ListChanged -= value; }
 
@@ -268,16 +268,16 @@ namespace TiaUtilities.Generation.GridHandler
             return GetNotEmptyClonedDataDict().Keys;
         }
 
-        public IGridData GetGeneric(int index) => this[index];
+        public IGridRowData GetGeneric(int index) => this[index];
 
-        Dictionary<IGridData, int> IGridDataSource.GetGenericNotEmptyDataDict(int startRow)
+        Dictionary<IGridRowData, int> IGridDataSource.GetGenericNotEmptyDataDict(int startRow)
         {
             if (startRow >= this.bindingList.Count)
             {
                 return [];
             }
 
-            Dictionary<IGridData, int> dict = [];
+            Dictionary<IGridRowData, int> dict = [];
             for (var x = startRow; x < this.bindingList.Count; x++)
             {
                 var data = this.bindingList[x];
@@ -289,11 +289,11 @@ namespace TiaUtilities.Generation.GridHandler
             return dict;
         }
 
-        IEnumerable<IGridData> IGridDataSource.GetGenericNotEmptyData(int startRow) => ((IGridDataSource)this).GetGenericNotEmptyDataDict(startRow).Keys;
+        IEnumerable<IGridRowData> IGridDataSource.GetGenericNotEmptyData(int startRow) => ((IGridDataSource)this).GetGenericNotEmptyDataDict(startRow).Keys;
 
-        Dictionary<IGridData, int> IGridDataSource.GetGenericNotEmptyClonedDataDict()
+        Dictionary<IGridRowData, int> IGridDataSource.GetGenericNotEmptyClonedDataDict()
         {
-            var notEmptyDict = new Dictionary<IGridData, int>();
+            var notEmptyDict = new Dictionary<IGridRowData, int>();
 
             for (var x = 0; x < this.bindingList.Count; x++)
             {
@@ -308,7 +308,7 @@ namespace TiaUtilities.Generation.GridHandler
             return notEmptyDict;
         }
 
-        IEnumerable<IGridData> IGridDataSource.GetGenericNotEmptyClonedData() => ((IGridDataSource)this).GetGenericNotEmptyClonedDataDict().Keys;
+        IEnumerable<IGridRowData> IGridDataSource.GetGenericNotEmptyClonedData() => ((IGridDataSource)this).GetGenericNotEmptyClonedDataDict().Keys;
 
     }
 }

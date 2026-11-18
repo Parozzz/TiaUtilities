@@ -3,7 +3,7 @@ using TiaUtilities.Generation.GridHandler.Data;
 
 namespace TiaUtilities.Generation.GridHandler
 {
-    public class GridSave<T> where T : GridData
+    public class GridSave<T> where T : GridRowData
     {
         [JsonProperty] public Dictionary<int, T> RowData { get; set; } = [];
     }

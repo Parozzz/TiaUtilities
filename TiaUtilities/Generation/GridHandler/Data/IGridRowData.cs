@@ -4,7 +4,7 @@ using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.GridHandler.Data
 {
-    public interface IGridData : INotifyPropertyChanged
+    public interface IGridRowData : INotifyPropertyChanged
     {
         public event GridDataPropertyChangedEvent DataPropertyChanged;
 

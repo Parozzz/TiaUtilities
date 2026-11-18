@@ -8,7 +8,9 @@ namespace TiaUtilities.Generation.Alarms.Template
     public class AlarmGenTemplateSave
     {
         [JsonProperty] public string Name { get; set; } = "GenericTemplate";
-        [JsonProperty] public GridSave<TemplateData> AlarmGrid { get; set; } = new();
+
+        //This should be TemplateGridSave. But for compatibility, won't be renamed yet
+        [JsonProperty] public GridSave<TemplateRowData> AlarmGrid { get; set; } = new();
         [JsonProperty] public AlarmTemplateConfiguration TemplateConfig { get; set; } = new();
     }
 }

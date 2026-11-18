@@ -36,7 +36,7 @@ namespace TiaUtilities.Generation.Alarms.Xml
         private readonly AlarmMainConfiguration mainConfig = mainConfig;
         private readonly Dictionary<string, AlarmGroupXmlItem> alarmGroupDict = [];
 
-        public void GenerateAlarms(string tabName, AlarmTabConfiguration tabConfig, AlarmGenTemplateContainer templateHandler, List<DeviceData> deviceDataList)
+        public void GenerateAlarms(string tabName, AlarmTabConfiguration tabConfig, AlarmGenTemplateContainer templateHandler, List<DeviceRowData> deviceDataList)
         {
             AlarmGenPlaceholdersHandler placeholdersHandler = new(this.mainConfig, tabConfig)
             {
@@ -65,7 +65,7 @@ namespace TiaUtilities.Generation.Alarms.Xml
                     continue;
                 }
 
-                var templateDataList = template.AlarmGridSave?.RowData.Values;
+                var templateDataList = template.GridSave?.RowData.Values;
                 if (templateDataList == null || templateDataList.Count == 0)
                 {
                     continue;
@@ -110,7 +110,7 @@ namespace TiaUtilities.Generation.Alarms.Xml
                     var alarmNum = nextAlarmNum;
                     nextAlarmNum++;
 
-                    var parsedTemplateData = ReplaceTemplateDataWithDefaultAndPrefix(tabConfig, template.TemplateConfig, templateData);
+                    var parsedTemplateData = ReplaceTemplateDataWithDefaultAndPrefix(tabConfig, template.Config, templateData);
                     placeholdersHandler.TemplateData = parsedTemplateData;
                     placeholdersHandler.SetAlarmNum(alarmNum, mainConfig.AlarmNumFormat);
 
@@ -224,7 +224,7 @@ namespace TiaUtilities.Generation.Alarms.Xml
             this.alarmGroupDict.Add(tabName, item);
         }
 
-        private AlarmXmlItem CreateItem(ref uint ID, string tabName, CommentTemplateTypeEnum commentTemplateType, AlarmGenPlaceholdersHandler placeholdersHandler, TemplateData? templateData, uint alarmNum, AlarmTabConfiguration tabConfig, bool hmiEmpty = false)
+        private AlarmXmlItem CreateItem(ref uint ID, string tabName, CommentTemplateTypeEnum commentTemplateType, AlarmGenPlaceholdersHandler placeholdersHandler, TemplateRowData? templateData, uint alarmNum, AlarmTabConfiguration tabConfig, bool hmiEmpty = false)
         {
             var commentTemplate = commentTemplateType switch
             {
@@ -314,7 +314,7 @@ namespace TiaUtilities.Generation.Alarms.Xml
 
         private void GenerateEmptyAlarms(AlarmGenPlaceholdersHandler placeholdersHandler, AlarmTabConfiguration tabConfig, uint startAlarmNum, uint alarmCount, SimaticLADSegment? externalGroupSegment = null)
         {
-            var emptyTemplateData = new TemplateData()
+            var emptyTemplateData = new TemplateRowData()
             {
                 AlarmVariable = tabConfig.EmptyAlarmContactAddress,
                 AlarmNegated = false,
@@ -359,7 +359,7 @@ namespace TiaUtilities.Generation.Alarms.Xml
             }
         }
 
-        private static TemplateData ReplaceTemplateDataWithDefaultAndPrefix(AlarmTabConfiguration tabConfig, AlarmTemplateConfiguration templateConfig, TemplateData templateData)
+        private static TemplateRowData ReplaceTemplateDataWithDefaultAndPrefix(AlarmTabConfiguration tabConfig, AlarmTemplateConfiguration templateConfig, TemplateRowData templateData)
         {
             AlarmCoilType coil1Type = tabConfig.DefaultCoil1Type;
             if (Enum.TryParse(templateData.Coil1Type, out AlarmCoilType res1))
@@ -373,7 +373,7 @@ namespace TiaUtilities.Generation.Alarms.Xml
                 coil2Type = res2;
             }
 
-            return new TemplateData()
+            return new TemplateRowData()
             {
                 AlarmVariable = (templateConfig.StandaloneAlarms ? "" : tabConfig.AlarmAddressPrefix) + templateData.AlarmVariable,
                 AlarmNegated = templateData.AlarmNegated,
@@ -393,7 +393,7 @@ namespace TiaUtilities.Generation.Alarms.Xml
 
         }
 
-        private void FillAlarmSegment(AlarmTabConfiguration tabConfig, SimaticLADSegment segment, GenPlaceholderHandler placeholders, TemplateData templateData)
+        private void FillAlarmSegment(AlarmTabConfiguration tabConfig, SimaticLADSegment segment, GenPlaceholderHandler placeholders, TemplateRowData templateData)
         {
             if (string.IsNullOrEmpty(templateData.AlarmVariable))
             {
@@ -417,8 +417,8 @@ namespace TiaUtilities.Generation.Alarms.Xml
             var parsedCustomVarAddress = placeholders.Parse(templateData.CustomVariableAddress);
             var parsedCustomVarValue = placeholders.Parse(templateData.CustomVariableValue);
             if (mainConfig.EnableCustomVariable &&
-                !string.IsNullOrEmpty(parsedCustomVarAddress) && TemplateData.IsAddressValid(parsedCustomVarAddress) &&
-                !string.IsNullOrEmpty(parsedCustomVarValue) && TemplateData.IsAddressValid(parsedCustomVarValue))
+                !string.IsNullOrEmpty(parsedCustomVarAddress) && TemplateRowData.IsAddressValid(parsedCustomVarAddress) &&
+                !string.IsNullOrEmpty(parsedCustomVarValue) && TemplateRowData.IsAddressValid(parsedCustomVarValue))
             {
 
                 SimaticVariable inVar;
@@ -447,7 +447,7 @@ namespace TiaUtilities.Generation.Alarms.Xml
                 !string.IsNullOrEmpty(templateData.TimerAddress) &&
                 !string.IsNullOrEmpty(templateData.TimerType) &&
                 !string.IsNullOrEmpty(templateData.TimerValue) &&
-                TemplateData.IsAddressValid(templateData.TimerAddress))
+                TemplateRowData.IsAddressValid(templateData.TimerAddress))
             {
                 var partType = templateData.TimerType.ToLower() switch
                 {
@@ -465,7 +465,7 @@ namespace TiaUtilities.Generation.Alarms.Xml
             }
 
             SimaticPart? coil1 = null;
-            if (!string.IsNullOrEmpty(templateData.Coil1Address) && TemplateData.IsAddressValid(templateData.Coil1Address))
+            if (!string.IsNullOrEmpty(templateData.Coil1Address) && TemplateRowData.IsAddressValid(templateData.Coil1Address))
             {
                 var coilVariable = new SimaticGlobalVariable(placeholders.Parse(templateData.Coil1Address));
 
@@ -479,7 +479,7 @@ namespace TiaUtilities.Generation.Alarms.Xml
             }
 
             SimaticPart? coil2 = null;
-            if (!string.IsNullOrEmpty(templateData.Coil2Address) && TemplateData.IsAddressValid(templateData.Coil2Address))
+            if (!string.IsNullOrEmpty(templateData.Coil2Address) && TemplateRowData.IsAddressValid(templateData.Coil2Address))
             {
                 var coilVariable = new SimaticGlobalVariable(placeholders.Parse(templateData.Coil2Address));
 

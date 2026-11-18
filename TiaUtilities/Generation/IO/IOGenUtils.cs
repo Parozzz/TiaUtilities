@@ -22,7 +22,7 @@ namespace TiaUtilities.Generation.IO
         public static SettingsSequencePanelDescriptor? GLOBAL_ALIAS_DB_DESCRIPTOR { get; private set; } = null;
         public static SettingsSequencePanelDescriptor? GLOBAL_ALIAS_TAG_TABLE_DESCRIPTOR { get; private set; } = null;
 
-        public static void DragPreview<T>(GridExcelDragEventArgs eventArgs, GridHandler<T> gridHandler) where T : GridData
+        public static void DragPreview<T>(GridExcelDragEventArgs eventArgs, GridHandler<T> gridHandler) where T : GridRowData
         {
             var startingCellValue = gridHandler.DataSource[eventArgs.StartingRow][eventArgs.DraggedColumn];
             if (eventArgs.DraggedColumn == IOData.ADDRESS)
@@ -41,7 +41,7 @@ namespace TiaUtilities.Generation.IO
             }
         }
 
-        public static void DragDone<T>(GridExcelDragEventArgs eventArgs, GridHandler<T> gridHandler) where T : GridData
+        public static void DragDone<T>(GridExcelDragEventArgs eventArgs, GridHandler<T> gridHandler) where T : GridRowData
         {
             if (eventArgs.SelectedRowCount <= 0 || eventArgs.TopSelectedRow < 0)
             {

@@ -125,12 +125,12 @@ namespace TiaUtilities.Generation.Alarms.Module
                             {
                                 if (member.MemberName.StartsWith("allarmi", StringComparison.CurrentCultureIgnoreCase))
                                 {
-                                    var templateRowData = template.AlarmGridSave.RowData;
+                                    var templateRowData = template.GridSave.RowData;
 
                                     var nextGridIndex = templateRowData.Count == 0 ? 0 : (templateRowData.Keys.Max() + 1);
                                     foreach (var subMember in member.Members)
                                     {
-                                        TemplateData newTemplateData = new()
+                                        TemplateRowData newTemplateData = new()
                                         {
                                             Enable = true,
                                             AlarmVariable = subMember.MemberName,
@@ -381,9 +381,9 @@ namespace TiaUtilities.Generation.Alarms.Module
                 if (this.templateContainer.Count > 0)
                 {
                     var firstTemplate = this.templateContainer[0];
-                    if (firstTemplate.AlarmGridSave.RowData.Count > 0)
+                    if (firstTemplate.GridSave.RowData.Count > 0)
                     {
-                        var firstTemplateData = firstTemplate.AlarmGridSave.RowData[0];
+                        var firstTemplateData = firstTemplate.GridSave.RowData[0];
                         placeholdersHandler.TemplateData = firstTemplateData;
                     }
                 }
@@ -421,7 +421,6 @@ namespace TiaUtilities.Generation.Alarms.Module
 
             var globalDescriptors = AlarmGenUtils.CreateGlobalSettingsDescriptors();
             var tabDescriptors = AlarmGenUtils.CreateTabSettingsStepDescriptors();
-            var templateDescriptors = AlarmGenUtils.CreateTemplateSettingsStepDescriptor();
 
             SettingsSequence globalSequence = new(this.mainConfig, Locale.GEN_MODULE_SETTINGS_GROUP_GLOBAL, Locale.GENERICS_SETTINGS) { PlaceholdersCallback = ParsePlaceholders };
             globalSequence.AddRange(globalDescriptors);
@@ -432,13 +431,6 @@ namespace TiaUtilities.Generation.Alarms.Module
                 SettingsSequence tabSequence = new(tab.TabConfig, Locale.GEN_MODULE_SETTINGS_GROUP_TAB, tab.Name) { PlaceholdersCallback = ParsePlaceholders };
                 tabSequence.AddRange(tabDescriptors);
                 sequenceList.Add(tabSequence);
-            }
-
-            foreach (var template in this.templateContainer)
-            {
-                SettingsSequence templateSequence = new(template.TemplateConfig, Locale.GEN_MODULE_SETTINGS_GROUP_TEMPLATE, template.Name) { PlaceholdersCallback = ParsePlaceholders };
-                templateSequence.AddRange(templateDescriptors);
-                sequenceList.Add(templateSequence);
             }
 
             return sequenceList;
@@ -478,43 +470,6 @@ namespace TiaUtilities.Generation.Alarms.Module
 
         private AlarmGenTab? GetCurrentTab() => this.tabControl.SelectedTab?.Tag is AlarmGenTab genTab ? genTab : null;
 
-        private Dictionary<string, ObservableConfiguration> GetTabConfigurationDict()
-        {
-            Dictionary<string, ObservableConfiguration> dict = [];
-            foreach (var tab in this.alarmTabList)
-            {
-                if (!dict.TryAdd(tab.Name, tab.TabConfig))
-                {
-                    dict.Add(tab.Name + "*", tab.TabConfig);
-                }
-            }
-            return dict;
-        }
-
-        private string GetActiveTemplateName()
-        {
-            var selectedTemplate = this.templateContainer.SelectedTemplate;
-            return selectedTemplate == null ? "" : selectedTemplate.Name;
-        }
-
-        private AlarmTemplateConfiguration? GetActiveTemplateConfiguration()
-        {
-            return this.templateContainer.SelectedTemplate?.TemplateConfig;
-        }
-
-        private Dictionary<string, ObservableConfiguration> GetTemplateConfigurationDict()
-        {
-            Dictionary<string, ObservableConfiguration> dict = [];
-            foreach (var template in this.templateContainer)
-            {
-                if (!dict.TryAdd(template.Name, template.TemplateConfig))
-                {
-                    dict.Add(template.Name + "*", template.TemplateConfig);
-                }
-            }
-            return dict;
-        }
-
         public List<GenModuleEditableTextReference> GetTextsReferences()
         {
             var splitter = GenModuleTextsEditorForm.REFERENCE_EDITOR_SPLITTER;
@@ -523,16 +478,16 @@ namespace TiaUtilities.Generation.Alarms.Module
             foreach (var tab in this.alarmTabList)
             {
                 var moduleId = $"TAB{splitter}{tab.Name}";
-                AddDataFieldTextReferences(textReferencesList, tab.DeviceDataList, moduleId, d => d.Name ?? "INVALID", nameof(DeviceData.Description));
+                AddDataFieldTextReferences(textReferencesList, tab.DeviceDataList, moduleId, d => d.Name ?? "INVALID", nameof(DeviceRowData.Description));
             }
 
             foreach (var template in this.templateContainer)
             {
                 var moduleId = $"TEMPLATE{splitter}{template.Name}";
 
-                var templateDataEnumerable = template.AlarmGridSave.RowData.Values;
-                AddDataFieldTextReferences(textReferencesList, templateDataEnumerable, moduleId, t => t.AlarmVariable ?? "INVALID", nameof(TemplateData.HmiAlarmText));
-                AddDataFieldTextReferences(textReferencesList, templateDataEnumerable, moduleId, t => t.AlarmVariable ?? "INVALID", nameof(TemplateData.Description));
+                var templateDataEnumerable = template.GridSave.RowData.Values;
+                AddDataFieldTextReferences(textReferencesList, templateDataEnumerable, moduleId, t => t.AlarmVariable ?? "INVALID", nameof(TemplateRowData.HmiAlarmText));
+                AddDataFieldTextReferences(textReferencesList, templateDataEnumerable, moduleId, t => t.AlarmVariable ?? "INVALID", nameof(TemplateRowData.Description));
             }
 
             return textReferencesList;
@@ -551,7 +506,7 @@ namespace TiaUtilities.Generation.Alarms.Module
             foreach (var template in this.templateContainer)
             {
                 var templateTextReferenced = textReferences.Where(r => this.CheckTextReferenceID1(r, "TEMPLATE", template.Name));
-                this.SetTextReferencesToDataField(templateTextReferenced, template.AlarmGridSave.RowData.Values, d => d.AlarmVariable);
+                this.SetTextReferencesToDataField(templateTextReferenced, template.GridSave.RowData.Values, d => d.AlarmVariable);
             }
             /*
             foreach (var textReference in textReferences)
@@ -619,14 +574,14 @@ namespace TiaUtilities.Generation.Alarms.Module
 
         private void AddDataFieldTextReferences<T>(List<GenModuleEditableTextReference> textReferenceList,
             IEnumerable<T> dataEnumerable,
-            string moduleId, string id2, string propertyName) where T : GridData
+            string moduleId, string id2, string propertyName) where T : GridRowData
         {
             AddDataFieldTextReferences<T>(textReferenceList, dataEnumerable, moduleId, t => id2, propertyName);
         }
 
         private void AddDataFieldTextReferences<T>(List<GenModuleEditableTextReference> textReferenceList,
             IEnumerable<T> dataEnumerable,
-            string moduleId, Func<T, string?> id2Getter, string propertyName) where T : GridData
+            string moduleId, Func<T, string?> id2Getter, string propertyName) where T : GridRowData
         {
             foreach (var data in dataEnumerable)
             {
@@ -652,7 +607,7 @@ namespace TiaUtilities.Generation.Alarms.Module
 
         private void SetTextReferencesToDataField<T>(IEnumerable<GenModuleEditableTextReference> textReferenceList,
             IEnumerable<T> dataEnumerable,
-            Func<T, string?> id2Getter) where T : GridData
+            Func<T, string?> id2Getter) where T : GridRowData
         {
             foreach (var textReference in textReferenceList)
             {

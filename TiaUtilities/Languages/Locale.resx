@@ -664,10 +664,10 @@ for row validation</value>
   <data name="GENERICS_SETUP" xml:space="preserve">
     <value>Setup</value>
   </data>
-  <data name="ALARM_SETTINGS_TEMPLATE_ALARMS_STANDALONE" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_CONTROL_ALARMS_STANDALONE" xml:space="preserve">
     <value>Standalone Alarms</value>
   </data>
-  <data name="ALARM_SETTINGS_TEMPLATE_ALARMS_STANDALONE_TOOLTIP" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_CONTROL_ALARMS_STANDALONE_TOOLTIP" xml:space="preserve">
     <value>Allows to ignore all the default values from the alarm setup. Useful for generating standalone alarms that are not linked to a device.</value>
   </data>
   <data name="SETTINGS_CONTROL_CONTEXT_MENU_OPEN_OTHER_CONF_FAST_EDIT" xml:space="preserve">
@@ -959,9 +959,6 @@ Right click: Show in panel 2</value>
     <value>Tab</value>
   </data>
   <data name="Te" xml:space="preserve">
-    <value>Template</value>
-  </data>
-  <data name="GEN_MODULE_SETTINGS_GROUP_TEMPLATE" xml:space="preserve">
     <value>Template</value>
   </data>
 </root>

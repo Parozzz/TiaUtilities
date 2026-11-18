@@ -8,7 +8,7 @@ namespace TiaUtilities.Generation.GridHandler.GridImprovements
         GridDataSource<T> dataSource, 
         GridHandlerEventCaller gridHandlerEventCaller,
         UndoRedoHandler undoRedoHandler, 
-        IGridRowComparer<T>? comparer) where T : GridData
+        IGridRowComparer<T>? comparer) where T : GridRowData
     {
         private SortOrder sortOrder = SortOrder.None;
         private Dictionary<T, int>? noSortIndexSnapshot;

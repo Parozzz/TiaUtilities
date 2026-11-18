@@ -56,7 +56,7 @@ namespace TiaUtilities.Generation.GridHandler
             }
         }
 
-        public void ShowGridScript<T>(GridHandler<T> handler) where T : GridData
+        public void ShowGridScript<T>(GridHandler<T> handler) where T : GridRowData
         {
             this.SetActiveGrid(handler); 
             if (this.GridHandler != null)

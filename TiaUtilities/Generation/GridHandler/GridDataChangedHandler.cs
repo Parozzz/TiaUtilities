@@ -11,7 +11,7 @@ namespace TiaUtilities.Generation.GridHandler
         public GridDataPropertyChangedEventArgs Args { get; init; } = args;
         public int Row { get; init; } = row;
 
-        public GridData GridData { get => this.Args.Data; }
+        public GridRowData GridData { get => this.Args.Data; }
         public string PropertyName { get => this.Args.PropertyName; }
         public GridDataColumn Column { get => this.Args.Column; }
         public int ColumnIndex { get => this.Column.ColumnIndex; }

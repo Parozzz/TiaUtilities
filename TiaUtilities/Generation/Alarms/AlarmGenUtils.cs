@@ -9,7 +9,6 @@ namespace TiaUtilities.Generation.Alarms
     {
         private static readonly List<SettingsSequencePanelDescriptor> GLOBAL_DESCRIPTORS = [];
         private static readonly List<SettingsSequencePanelDescriptor> TAB_DESCRIPTORS = [];
-        private static readonly List<SettingsSequencePanelDescriptor> TEMPLATE_DESCRIPTORS = [];
 
         public static List<SettingsSequencePanelDescriptor> CreateGlobalSettingsDescriptors()
         {
@@ -129,23 +128,6 @@ namespace TiaUtilities.Generation.Alarms
             TAB_DESCRIPTORS.AddRange([alarmsDescriptor, plcDescriptor, hmiDescriptor, placeholdersDescriptor]);
             return TAB_DESCRIPTORS;
         }
-        
-        public static List<SettingsSequencePanelDescriptor> CreateTemplateSettingsStepDescriptor()
-        {
-            if(TEMPLATE_DESCRIPTORS.Count > 0)
-            {
-                return TEMPLATE_DESCRIPTORS;
-            }
-
-            var descriptor = new SettingsSequencePanelDescriptor(Locale.ALARM_SETTINGS_TEMPLATE_ALARMS)
-                .CreateBinder<AlarmTemplateConfiguration>()
-                .Add(x => x.StandaloneAlarms, Locale.ALARM_SETTINGS_TEMPLATE_ALARMS_STANDALONE, Locale.ALARM_SETTINGS_TEMPLATE_ALARMS_STANDALONE_TOOLTIP)
-                .End();
-
-            TEMPLATE_DESCRIPTORS.Clear();
-            TEMPLATE_DESCRIPTORS.AddRange([descriptor]);
-            return TEMPLATE_DESCRIPTORS;
-        }
-
+       
     }
 }

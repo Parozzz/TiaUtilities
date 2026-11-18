@@ -3,7 +3,7 @@ using TiaUtilities.Languages;
 
 namespace TiaUtilities.Generation.IO.Data
 {
-    public class IOGenExcelImportData : GridData
+    public class IOGenExcelImportData : GridRowData
     {
         private readonly static int COLUMN_COUNT = 0;
         //THESE IS THE ORDER IN WHICH THEY APPEAR!

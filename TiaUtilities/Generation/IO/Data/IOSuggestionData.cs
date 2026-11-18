@@ -4,7 +4,7 @@ using TiaUtilities.Generation.GridHandler.Data;
 
 namespace TiaUtilities.Generation.IO.Module
 {
-    public class IOSuggestionData : GridData
+    public class IOSuggestionData : GridRowData
     {
         private readonly static int COLUMN_COUNT = 0;
         //THESE IS THE ORDER IN WHICH THEY APPEAR!

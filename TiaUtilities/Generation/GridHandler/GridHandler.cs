@@ -15,7 +15,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace TiaUtilities.Generation.GridHandler
 {
-    public class GridHandler<T> : IGridHandler, IGridHandlerEventCalls, ICleanable, ISaveable<GridSave<T>> where T : GridData
+    public class GridHandler<T> : IGridHandler, IGridHandlerEventCalls, ICleanable, ISaveable<GridSave<T>> where T : GridRowData
     {
         public required uint InitializeRowCount { get; set; } = 9;
 

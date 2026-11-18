@@ -664,10 +664,10 @@ validità riga</value>
   <data name="GENERICS_SETUP" xml:space="preserve">
     <value>Setup</value>
   </data>
-  <data name="ALARM_SETTINGS_TEMPLATE_ALARMS_STANDALONE" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_CONTROL_ALARMS_STANDALONE" xml:space="preserve">
     <value>Allarmi Indipendenti</value>
   </data>
-  <data name="ALARM_SETTINGS_TEMPLATE_ALARMS_STANDALONE_TOOLTIP" xml:space="preserve">
+  <data name="ALARM_TEMPLATE_CONTROL_ALARMS_STANDALONE_TOOLTIP" xml:space="preserve">
     <value>Permette di generare allarmi ignorando i valori di default. Utile per generare allarmi indipendenti non legati ad un dispositivo.</value>
   </data>
   <data name="SETTINGS_CONTROL_CONTEXT_MENU_OPEN_OTHER_CONF_FAST_EDIT" xml:space="preserve">
@@ -957,8 +957,5 @@ Tasto destro: Mostra in pannello 2</value>
   </data>
   <data name="GEN_MODULE_SETTINGS_GROUP_TAB" xml:space="preserve">
     <value>Tab</value>
-  </data>
-  <data name="GEN_MODULE_SETTINGS_GROUP_TEMPLATE" xml:space="preserve">
-    <value>Template</value>
   </data>
 </root>

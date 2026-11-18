@@ -10,9 +10,9 @@ namespace TiaUtilities.Generation.GridHandler
     #region DATA_CHANGED
     public delegate void GridDataChangedEventHandler(object? sender, GridDataChangedEventArgs args);
 
-    public class GridChangedData(GridData gridData, string propertyName, GridDataColumn column, int row, object? oldValue, object? newValue)
+    public class GridChangedData(GridRowData gridData, string propertyName, GridDataColumn column, int row, object? oldValue, object? newValue)
     {
-        public GridData GridData { get; init; } = gridData;
+        public GridRowData GridData { get; init; } = gridData;
         public string PropertyName { get; init; } = propertyName;
         public GridDataColumn Column { get; init; } = column;
         public int ColumnIndex { get => this.Column.ColumnIndex; }

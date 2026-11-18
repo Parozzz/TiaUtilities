@@ -6,7 +6,7 @@ using System.Text.Json.Nodes;
 
 namespace TiaUtilities.Generation.Alarms.Data
 {
-    public class TemplateData : GridData
+    public class TemplateRowData : GridRowData
     {
         private readonly static int COLUMN_COUNT = 0;
         //THESE IS THE ORDER IN WHICH THEY APPEAR!
@@ -28,25 +28,25 @@ namespace TiaUtilities.Generation.Alarms.Data
         public static readonly GridDataColumn DESCRIPTION;
         public static readonly IReadOnlyList<GridDataColumn> COLUMN_LIST;
 
-        static TemplateData()
+        static TemplateRowData()
         {
-            var type = typeof(TemplateData);
-            ENABLE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateData.Enable));
-            ALARM_VARIABLE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateData.AlarmVariable));
-            ALARM_NEGATED = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateData.AlarmNegated), "negated");
-            CUSTOM_VARIABLE_ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateData.CustomVariableAddress), "customVarAddress");
-            CUSTOM_VARIABLE_VALUE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateData.CustomVariableValue), "customVarValue");
-            COIL1_ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateData.Coil1Address), "coil1Address");
-            COIL1_TYPE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateData.Coil1Type), "coil1Type");
-            COIL2_ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateData.Coil2Address), "coil2Address");
-            COIL2_TYPE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateData.Coil2Type), "coil2Type");
-            TIMER_ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateData.TimerAddress), "timerAddress");
-            TIMER_TYPE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateData.TimerType), "timerType");
-            TIMER_VALUE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateData.TimerValue), "timerValue");
-            HMI_ALARM_CLASS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateData.HmiAlarmClass), "hmiClass");
-            HMI_PARAMETERS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateData.HmiParametersJsonString));
-            HMI_ALARM_TEXT = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateData.HmiAlarmText), "hmiAlarmText");
-            DESCRIPTION = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateData.Description));
+            var type = typeof(TemplateRowData);
+            ENABLE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateRowData.Enable));
+            ALARM_VARIABLE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateRowData.AlarmVariable));
+            ALARM_NEGATED = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateRowData.AlarmNegated), "negated");
+            CUSTOM_VARIABLE_ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateRowData.CustomVariableAddress), "customVarAddress");
+            CUSTOM_VARIABLE_VALUE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateRowData.CustomVariableValue), "customVarValue");
+            COIL1_ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateRowData.Coil1Address), "coil1Address");
+            COIL1_TYPE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateRowData.Coil1Type), "coil1Type");
+            COIL2_ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateRowData.Coil2Address), "coil2Address");
+            COIL2_TYPE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateRowData.Coil2Type), "coil2Type");
+            TIMER_ADDRESS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateRowData.TimerAddress), "timerAddress");
+            TIMER_TYPE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateRowData.TimerType), "timerType");
+            TIMER_VALUE = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateRowData.TimerValue), "timerValue");
+            HMI_ALARM_CLASS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateRowData.HmiAlarmClass), "hmiClass");
+            HMI_PARAMETERS = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateRowData.HmiParametersJsonString));
+            HMI_ALARM_TEXT = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateRowData.HmiAlarmText), "hmiAlarmText");
+            DESCRIPTION = GridDataColumn.GetFromReflection(type, COLUMN_COUNT++, nameof(TemplateRowData.Description));
 
             var columnList = GridDataColumn.GetStaticColumnList(type);
             columnList.Sort((x, y) => x.ColumnIndex.CompareTo(y.ColumnIndex));
@@ -103,7 +103,7 @@ namespace TiaUtilities.Generation.Alarms.Data
                 string.IsNullOrEmpty(this.HmiParametersJsonString) && string.IsNullOrEmpty(this.HmiAlarmText) && string.IsNullOrEmpty(this.Description);
         }
 
-        public TemplateData Clone()
+        public TemplateRowData Clone()
         {
             return new()
             {

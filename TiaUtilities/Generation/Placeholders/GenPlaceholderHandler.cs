@@ -19,7 +19,7 @@ namespace TiaUtilities.Generation.Placeholders
 
         public string TabName { set => AddOrReplace(GenPlaceholders.Generation.TAB_NAME, new StringGenPlaceholderData() { Value = value }); }
 
-        public GridData GridData
+        public GridRowData GridData
         {
             set
             {
@@ -32,11 +32,11 @@ namespace TiaUtilities.Generation.Placeholders
                 }
                 else if (this is AlarmGenPlaceholdersHandler alarmPlaceholderHandler)
                 {
-                    if (value is DeviceData deviceData)
+                    if (value is DeviceRowData deviceData)
                     {
                         alarmPlaceholderHandler.DeviceData = deviceData;
                     }
-                    else if (value is TemplateData templateData)
+                    else if (value is TemplateRowData templateData)
                     {
                         alarmPlaceholderHandler.TemplateData = templateData;
                     }

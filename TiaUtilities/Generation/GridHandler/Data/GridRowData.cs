@@ -5,7 +5,7 @@ using TiaUtilities.Utility;
 
 namespace TiaUtilities.Generation.GridHandler.Data
 {
-    public abstract class GridData : IGridData
+    public abstract class GridRowData : IGridRowData
     { //CLASS THAT IMPLEMENT THIS MUST HAVE AN EMPTY CONSTRUCTOR!
 
         private class StoredData
@@ -138,6 +138,6 @@ namespace TiaUtilities.Generation.GridHandler.Data
     }
 
     public delegate void GridDataPropertyChangedEvent(object? Sender, GridDataPropertyChangedEventArgs args);
-    public record GridDataPropertyChangedEventArgs(GridData Data, string PropertyName, GridDataColumn Column, object? OldValue, object? NewValue);
+    public record GridDataPropertyChangedEventArgs(GridRowData Data, string PropertyName, GridDataColumn Column, object? OldValue, object? NewValue);
 
 }

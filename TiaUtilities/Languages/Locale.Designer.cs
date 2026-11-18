@@ -943,24 +943,6 @@ namespace TiaUtilities.Languages {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Standalone Alarms.
-        /// </summary>
-        internal static string ALARM_SETTINGS_TEMPLATE_ALARMS_STANDALONE {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_TEMPLATE_ALARMS_STANDALONE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Allows to ignore all the default values from the alarm setup. Useful for generating standalone alarms that are not linked to a device..
-        /// </summary>
-        internal static string ALARM_SETTINGS_TEMPLATE_ALARMS_STANDALONE_TOOLTIP {
-            get {
-                return ResourceManager.GetString("ALARM_SETTINGS_TEMPLATE_ALARMS_STANDALONE_TOOLTIP", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Cerca una stringa localizzata simile a Alarm Text List.
         /// </summary>
         internal static string ALARM_SETTINGS_TEXT_LIST {
@@ -984,6 +966,24 @@ namespace TiaUtilities.Languages {
         internal static string ALARM_SETTINGS_TEXT_LIST_FULL {
             get {
                 return ResourceManager.GetString("ALARM_SETTINGS_TEXT_LIST_FULL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Standalone Alarms.
+        /// </summary>
+        internal static string ALARM_TEMPLATE_CONTROL_ALARMS_STANDALONE {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_CONTROL_ALARMS_STANDALONE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Allows to ignore all the default values from the alarm setup. Useful for generating standalone alarms that are not linked to a device..
+        /// </summary>
+        internal static string ALARM_TEMPLATE_CONTROL_ALARMS_STANDALONE_TOOLTIP {
+            get {
+                return ResourceManager.GetString("ALARM_TEMPLATE_CONTROL_ALARMS_STANDALONE_TOOLTIP", resourceCulture);
             }
         }
         
@@ -1480,15 +1480,6 @@ namespace TiaUtilities.Languages {
         internal static string GEN_MODULE_SETTINGS_GROUP_TAB {
             get {
                 return ResourceManager.GetString("GEN_MODULE_SETTINGS_GROUP_TAB", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Template.
-        /// </summary>
-        internal static string GEN_MODULE_SETTINGS_GROUP_TEMPLATE {
-            get {
-                return ResourceManager.GetString("GEN_MODULE_SETTINGS_GROUP_TEMPLATE", resourceCulture);
             }
         }
         

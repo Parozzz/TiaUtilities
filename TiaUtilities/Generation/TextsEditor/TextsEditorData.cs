@@ -4,7 +4,7 @@ using TiaUtilities.Languages;
 
 namespace TiaUtilities.Generation.TextsEditor
 {
-    public class TextsEditorData : GridData
+    public class TextsEditorData : GridRowData
     {
         private readonly static int COLUMN_COUNT = 0;
         //THESE IS THE ORDER IN WHICH THEY APPEAR!
