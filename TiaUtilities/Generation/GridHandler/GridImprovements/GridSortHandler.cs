@@ -49,6 +49,11 @@ namespace TiaUtilities.Generation.GridHandler.GridImprovements
 
         private void ColumnSort(SortOrder oldSortOrder, int columnIndex)
         {
+            if(comparer == null)
+            {
+                return;
+            }
+
             var preSortEventArgs = new GridPreSortEventArgs(oldSortOrder, this.sortOrder, columnIndex);
             gridHandlerEventCaller.CallPreSortEvent(preSortEventArgs);
 
@@ -105,7 +110,7 @@ namespace TiaUtilities.Generation.GridHandler.GridImprovements
             }
         }
 
-        public bool IsTopRow(int columnIndex, int rowIndex)
+        public bool IsValid(int columnIndex, int rowIndex)
         {
             //Check column index to avoid 0xffffffff (Top left square corner!)
             return comparer != null && GridUtils.IsColumnValid(dataGridView, columnIndex) && rowIndex == -1;

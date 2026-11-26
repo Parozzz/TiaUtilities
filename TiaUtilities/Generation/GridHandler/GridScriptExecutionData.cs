@@ -47,7 +47,7 @@ namespace TiaUtilities.Generation.GridHandler
 
                 foreach (var column in data.GetColumns())
                 {
-                    var dataValue = column.GetValueFrom(data);
+                    var dataValue = column.GetValue(data);
                     ((IDictionary<string, object?>)gridDataRow).Add(column.ProgrammingFriendlyName, dataValue);
                 }
 

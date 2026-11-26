@@ -162,7 +162,7 @@ namespace TiaUtilities.Generation.GridHandler
                 {
                     var gridData = gridHandler.DataSource.GetGeneric(rowIndex);
 
-                    var strValue = column.GetValueFrom<string>(gridData);
+                    var strValue = column.GetValue<string>(gridData);
                     if (strValue == null)
                     {
                         continue;

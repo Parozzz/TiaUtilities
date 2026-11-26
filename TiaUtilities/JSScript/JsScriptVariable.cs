@@ -10,11 +10,11 @@ namespace TiaUtilities.JSScript
         {
             JSScriptVariable scriptVariable = new(column.ProgrammingFriendlyName, column.PropertyInfo.PropertyType.Name)
             {
-                Get = row => column.GetValueFrom(gridHandler.DataSource[row]),
+                Get = row => column.GetValue(gridHandler.DataSource[row]),
                 CreateCachedCellChange = (row, v) =>
                 {
                     var data = gridHandler.DataSource[row];
-                    column.SetValueTo(data, v);
+                    column.SetValue(data, v);
                 }
             };
             return scriptVariable;

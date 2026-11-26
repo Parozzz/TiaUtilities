@@ -1,7 +1,4 @@
-﻿using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
-using System.Collections.Immutable;
-using System.Diagnostics;
-using System.Reflection;
+﻿using System.Collections.Immutable;
 using TiaUtilities.Generation.GridHandler.CustomColumns;
 using TiaUtilities.Generation.GridHandler.Data;
 using TiaUtilities.Generation.GridHandler.GridImprovements;
@@ -11,7 +8,6 @@ using TiaUtilities.JSScript;
 using TiaUtilities.Languages;
 using TiaUtilities.UndoRedo;
 using TiaUtilities.Utility;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace TiaUtilities.Generation.GridHandler
 {
@@ -65,6 +61,7 @@ namespace TiaUtilities.Generation.GridHandler
         private readonly GridDragDownHandler dragDownHandler;
         private readonly GridSortHandler<T> sortHandler;
         private readonly GridQOL qol;
+        private DataGridViewHeaderFilter _filter = null!;
 
         private bool init;
         private bool dirty;
@@ -193,13 +190,21 @@ namespace TiaUtilities.Generation.GridHandler
 
             this.Columns.InitializeColumns();
             this.DataSource.InitializeData(this.InitializeRowCount);
+            this.InitGridFilter();
 
             #region EVENTS(CellMouseDown / CellClick / CellMouseDoubleClick / MouseWheel / RowPostPaint) QOL
             this.DataGridView.CellMouseDown += (sender, args) => this.qol.EventCellMouseDown_FullRowSelection(args.RowIndex, args.ColumnIndex);
             this.DataGridView.CellClick += (sender, args) => this.qol.EventCellClick_ImproveComboBox(args.RowIndex, args.ColumnIndex);
             this.DataGridView.CellMouseDoubleClick += (sender, args) => this.qol.EventCellDoubleClick(args.RowIndex, args.ColumnIndex, args.Button);
             this.DataGridView.MouseWheel += (sender, args) => this.qol.EventMouseWheel_UseWheelDuringSelection(args.Delta);
-            this.DataGridView.RowPostPaint += (sender, args) => this.qol.EventRowPostPaint_AddNumbers(args.RowBounds, args.InheritedRowStyle, args.Graphics, args.RowIndex);
+            this.DataGridView.RowPostPaint += (sender, args) =>
+            {
+                int srcRowIndex = _filter.ToSourceRow(args.RowIndex);
+                if (srcRowIndex >= 0)
+                {
+                    this.qol.EventRowPostPaint_AddNumbers(args.RowBounds, args.InheritedRowStyle, args.Graphics, srcRowIndex);
+                }
+            };
             #endregion
 
             #region EVENTS(SelectionChanged / CellPainting / Paint) - Paint stuff on cells / Draw borders on cells
@@ -213,11 +218,12 @@ namespace TiaUtilities.Generation.GridHandler
             {
                 args.Handled = true;
 
-                if (sortHandler.IsTopRow(args.ColumnIndex, args.RowIndex))
+                if (sortHandler.IsValid(args.ColumnIndex, args.RowIndex))
                 {
                     args.PaintBackground(args.ClipBounds, true);
 
                     sortHandler.EventCellPainting_DrawText(args.CellBounds, args.Graphics, args.CellStyle, args.RowIndex, args.ColumnIndex, args.FormattedValue); //This paints the top columns cell
+                    _filter.PaintGlyph(args);   // <-- alla fine
                     return;
                 }
 
@@ -280,6 +286,14 @@ namespace TiaUtilities.Generation.GridHandler
                 else
                 {
                     args.PaintContent(args.ClipBounds);
+                }
+
+                if (args.RowIndex == -1 && args.ColumnIndex >= 0)
+                {
+                    // ... il tuo painting attuale dell'header ...
+                    // Per il testo usa e.CellStyle.Padding (la classe aggiunge già spazio a destra per l'imbuto)
+
+                    _filter.PaintGlyph(args);   // <-- alla fine
                 }
             };
 
@@ -558,19 +572,31 @@ namespace TiaUtilities.Generation.GridHandler
             #endregion
 
             #region EVENTS(ColumnHeaderMouseClick) - SortHandler
-            this.DataGridView.ColumnHeaderMouseClick += (sender, args) => this.sortHandler.EventColumnHeaderMouseClick(args.Button, args.ColumnIndex);
+            this.DataGridView.ColumnHeaderMouseClick += (sender, args) =>
+            {
+                if (_filter.IsOnFilterGlyph(args))
+                {
+                    return;
+                }      // click sull'imbuto: non ordinare
+
+                this.sortHandler.EventColumnHeaderMouseClick(args.Button, args.ColumnIndex);
+            };
             #endregion
 
             this.GridSettings.PropertyChanged += (sender, args) => this.DataGridView.Refresh();
             this.DataGridView.VisibleChanged += (sender, args) => this.DataGridView.AutoResizeColumnHeadersHeight();
 
             #region VIRTUAL_MODE
-
-            #region EVENTS(CellValueNeeded / CellValuePushed)
             this.DataGridView.VirtualMode = true;
             this.DataGridView.CellValueNeeded += (sender, args) =>
             {
-                var rowData = this.DataSource[args.RowIndex];
+                int srcRowIndex = _filter.ToSourceRow(args.RowIndex);
+                if (srcRowIndex < 0) 
+                {
+                    return; 
+                }
+
+                var rowData = this.DataSource[srcRowIndex];
                 if (rowData != null)
                 {
                     args.Value = rowData[args.ColumnIndex];
@@ -579,7 +605,13 @@ namespace TiaUtilities.Generation.GridHandler
 
             this.DataGridView.CellValuePushed += (sender, args) =>
             {
-                var rowData = this.DataSource[args.RowIndex];
+                int srcRowIndex = _filter.ToSourceRow(args.RowIndex);
+                if (srcRowIndex < 0)
+                {
+                    return;
+                }
+
+                var rowData = this.DataSource[srcRowIndex];
                 if (rowData == null)
                 {
                     return;
@@ -596,7 +628,7 @@ namespace TiaUtilities.Generation.GridHandler
                 var value = args.Value;
                 if (value == null)
                 {
-                    if(columnType == typeof(bool))
+                    if (columnType == typeof(bool))
                     {
                         rowData[args.ColumnIndex] = false;
                         this.DataGridView.EndEdit(); //Fixes checkbox not updating after settings value.
@@ -624,10 +656,27 @@ namespace TiaUtilities.Generation.GridHandler
             };
             #endregion
 
-            #endregion
             this.DataGridView.ResumeLayout(true);
 
             init = true;
+        }
+
+        private void InitGridFilter()   // chiamalo dopo aver creato le colonne
+        {
+            _filter = new DataGridViewHeaderFilter(
+                this.DataGridView,
+                getSourceRowCount: () => this.DataSource.Count,
+                getSourceValue: (row, col) => this.DataSource[row][col]);
+
+            // opzionale: niente imbuto su alcune colonne
+            // _filter.EnableFilter(dataGridView1.Columns["colNote"], false);
+/*
+            _filter.FilterChanged += (_, _) =>
+                lblStato.Text = _filter.IsAnyFilterActive
+                    ? $"{_filter.VisibleRowCount} di {this.DataSource.Count} righe"
+                    : $"{this.DataSource.Count} righe";
+*/
+            _filter.Refresh();          // sostituisce: dataGridView1.RowCount = _ds.Count;
         }
 
         public void MarkDirty() => this.dirty = true;

@@ -1,5 +1,4 @@
-﻿using Microsoft.WindowsAPICodePack.Dialogs;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using TiaUtilities.Generation.Alarms;
@@ -37,15 +36,18 @@ namespace TiaUtilities
             SavesLoader.RegisterType(typeof(IOGenSaveV1), "IOGeneration");
         }
 
-        public static CommonOpenFileDialog CreateFileDialog(bool ensureFileExists, string? filePath, string extension)
+        public static OpenFileDialog CreateFileDialog(bool ensureFileExists, string? filePath, string extension)
         {
-            return new CommonOpenFileDialog
+            return new OpenFileDialog
             {
-                EnsurePathExists = true,
-                EnsureFileExists = ensureFileExists,
-                DefaultExtension = "." + extension,
-                Filters = { new CommonFileDialogFilter(extension + " Files", "*." + extension) },
-                InitialDirectory = !string.IsNullOrEmpty(filePath) && File.Exists(filePath) ? Path.GetDirectoryName(filePath) : null,// : Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
+                CheckPathExists = true,
+                CheckFileExists = ensureFileExists,
+                DefaultExt = extension, 
+                AddExtension = true,
+                Filter = $"{extension} Files (*.{extension})|*.{extension}",
+                InitialDirectory = !string.IsNullOrEmpty(filePath) && File.Exists(filePath)
+                    ? Path.GetDirectoryName(filePath)
+                    : null,
             };
         }
 
@@ -97,7 +99,7 @@ namespace TiaUtilities
                     }
 
                     var fileDialog = CreateFileDialog(false, filePath, extension);
-                    if (fileDialog.ShowDialog() != CommonFileDialogResult.Ok)
+                    if (fileDialog.ShowDialog() != DialogResult.OK)
                     {
                         return false;
                     }
@@ -155,7 +157,7 @@ namespace TiaUtilities
             if (showFileDialog)
             {
                 var fileDialog = CreateFileDialog(true, filePath, extension);
-                if (fileDialog.ShowDialog() != CommonFileDialogResult.Ok)
+                if (fileDialog.ShowDialog() != DialogResult.OK)
                 {
                     return false;
                 }

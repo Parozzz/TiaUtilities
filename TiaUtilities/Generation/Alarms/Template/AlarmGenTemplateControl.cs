@@ -239,54 +239,36 @@ namespace TiaUtilities.Generation.Alarms.Template
 
             #endregion
 
-            this.gridHandler.DataSource.ListChanged += (sender, args) =>
+            this.gridHandler.DataSource.ValueChanged += (sender, args) =>
             {
-                if (sender is IList<TemplateRowData> templates)
+                if (this.SelectedTemplate == null)
                 {
-                    switch (args.ListChangedType)
-                    {
-                        case System.ComponentModel.ListChangedType.ItemChanged:
-                            if (this.SelectedTemplate == null || args.PropertyDescriptor == null)
-                            {
-                                return;
-                            }
-
-                            try
-                            {
-                                templates.TryGet(args.NewIndex, out var changedTemplateData);
-
-                                TemplateRowData data;
-                                if (this.SelectedTemplate.GridSave.RowData.TryGetValue(args.NewIndex, out var existingTemplateData))
-                                {
-                                    data = existingTemplateData;
-                                }
-                                else
-                                {
-                                    data = new();
-                                    this.SelectedTemplate.GridSave.RowData.Add(args.NewIndex, data);
-                                }
-
-                                var value = args.PropertyDescriptor.GetValue(changedTemplateData);
-                                args.PropertyDescriptor.SetValue(data, value);
-                            }
-                            catch (Exception ex)
-                            {
-                                Utils.ShowExceptionMessage(ex);
-                            }
-
-                            break;
-                        case System.ComponentModel.ListChangedType.ItemAdded:
-                        case System.ComponentModel.ListChangedType.ItemDeleted:
-                        case System.ComponentModel.ListChangedType.ItemMoved:
-                            break;
-                        case System.ComponentModel.ListChangedType.PropertyDescriptorAdded:
-                        case System.ComponentModel.ListChangedType.PropertyDescriptorChanged:
-                        case System.ComponentModel.ListChangedType.PropertyDescriptorDeleted:
-                            break;
-                        case System.ComponentModel.ListChangedType.Reset:
-                            break;
-                    }
+                    return;
                 }
+
+                try
+                {
+                    var changedTemplateData = args.RowData;
+
+                    TemplateRowData data;
+                    if (this.SelectedTemplate.GridSave.RowData.TryGetValue(args.RowIndex, out var existingTemplateData))
+                    {
+                        data = existingTemplateData;
+                    }
+                    else
+                    {
+                        data = new();
+                        this.SelectedTemplate.GridSave.RowData.Add(args.RowIndex, data);
+                    }
+
+                    var value = args.Column.GetValue(changedTemplateData);
+                    args.Column.SetValue(data, value);
+                }
+                catch (Exception ex)
+                {
+                    Utils.ShowExceptionMessage(ex);
+                }
+
             };
 
             this.mainPanel.Controls.Add(this.gridHandler.GetControl());

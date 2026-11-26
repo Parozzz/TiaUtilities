@@ -17,8 +17,8 @@ namespace TiaUtilities.Generation.GridHandler
 
                 foreach (var dataColumn in columns)
                 {
-                    var copeFromValue = dataColumn.GetValueFrom<object>(copyFrom);
-                    dataColumn.SetValueTo(moveTo, copeFromValue);
+                    var copeFromValue = dataColumn.GetValue<object>(copyFrom);
+                    dataColumn.SetValue(moveTo, copeFromValue);
                 }
             }
 
